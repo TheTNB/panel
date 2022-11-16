@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\StreamFactory;
+use Laminas\Diactoros\UploadedFileFactory;
+use Laravel\Octane\ApplicationFactory;
+use Laravel\Octane\RequestContext;
+use Laravel\Octane\RoadRunner\RoadRunnerClient;
+use Laravel\Octane\Stream;
+use Laravel\Octane\Worker;
+use Psr\Http\Message\ServerRequestInterface;
+use Spiral\Goridge\Relay;
+use Spiral\RoadRunner\Http\PSR7Worker;
+use Spiral\RoadRunner\Worker as RoadRunnerWorker;
+
+$basePath = require __DIR__.'/bootstrap.php';
+
+/*
+|--------------------------------------------------------------------------
+| Start The Octane Worker
+|--------------------------------------------------------------------------
+|
+| Next we will start the Octane worker, which is a long running process to
+| handle incoming requests to the application. Octane can intercept the
+| incoming requests and proxy them to the Laravel application for us.
+|
+*/
+
+$roadRunnerClient = new RoadRunnerClient($psr7Client = new PSR7Worker(
+    new RoadRunnerWorker(Relay::create($_ENV['LARAVEL_OCTANE_ROADRUNNER_RELAY'] ?? 'pipes')),
+    new ServerRequestFactory,
+    new StreamFactory,
+    new UploadedFileFactory,
+));
+
+$worker = null;
+
+while ($psr7Request = $psr7Client->waitRequest()) {
+    try {
+        $worker = $worker ?: tap((new Worker(
+            new ApplicationFactory($basePath), $roadRunnerClient
+        )))->boot();
+    } catch (Throwable $e) {
+        Stream::shutdown($e);
+
+        exit(1);
+    }
+
+    if (! $psr7Request instanceof ServerRequestInterface) {
+        break;
+    }
+
+    [$request, $context] = $roadRunnerClient->marshalRequest(new RequestContext([
+        'psr7Request' => $psr7Request
+    ]));
+
+    $worker->handle($request, $context);
+}
+
+if (! is_null($worker)) {
+    $worker->terminate();
+}

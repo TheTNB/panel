@@ -1,0 +1,15 @@
+version: 2
+updates:
+- package-ecosystem: composer
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "21:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: laravel-lang/lang
+    versions:
+    - 8.0.0
+    - 8.1.0
+    - 9.0.0
+    - 9.1.0

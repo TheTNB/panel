@@ -1,0 +1,21 @@
+{
+    "name": "panel/openresty",
+    "description": "openresty plugin for haozi linux panel",
+    "type": "project",
+    "license": "GPLv3",
+    "autoload": {
+        "psr-4": {
+            "Plugins\\Openresty\\": "./"
+        }
+    },
+    "authors": [
+        {
+            "name": "耗子",
+            "email": "i@haozi.net"
+        }
+    ],
+    "require": {},
+    "config": {
+        "optimize-autoloader": true
+    }
+}

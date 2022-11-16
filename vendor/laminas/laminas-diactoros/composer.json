@@ -1,0 +1,99 @@
+{
+    "name": "laminas/laminas-diactoros",
+    "description": "PSR HTTP Message implementations",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "http",
+        "psr",
+        "psr-7",
+        "psr-17"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-diactoros/",
+        "issues": "https://github.com/laminas/laminas-diactoros/issues",
+        "source": "https://github.com/laminas/laminas-diactoros",
+        "rss": "https://github.com/laminas/laminas-diactoros/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true,
+        "platform": {
+            "php": "8.0.99"
+        }
+    },
+    "extra": {
+        "laminas": {
+            "config-provider": "Laminas\\Diactoros\\ConfigProvider",
+            "module": "Laminas\\Diactoros"
+        }
+    },
+    "require": {
+        "php": "~8.0.0 || ~8.1.0 || ~8.2.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0"
+    },
+    "require-dev": {
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-gd": "*",
+        "ext-libxml": "*",
+        "http-interop/http-factory-tests": "^0.9.0",
+        "laminas/laminas-coding-standard": "^2.4.0",
+        "php-http/psr7-integration-tests": "^1.1.1",
+        "phpunit/phpunit": "^9.5.25",
+        "psalm/plugin-phpunit": "^0.17.0",
+        "vimeo/psalm": "^4.28"
+    },
+    "provide": {
+        "psr/http-factory-implementation": "1.0",
+        "psr/http-message-implementation": "1.0"
+    },
+    "conflict": {
+        "zendframework/zend-diactoros": "*"
+    },
+    "autoload": {
+        "files": [
+            "src/functions/create_uploaded_file.php",
+            "src/functions/marshal_headers_from_sapi.php",
+            "src/functions/marshal_method_from_sapi.php",
+            "src/functions/marshal_protocol_version_from_sapi.php",
+            "src/functions/marshal_uri_from_sapi.php",
+            "src/functions/normalize_server.php",
+            "src/functions/normalize_uploaded_files.php",
+            "src/functions/parse_cookie_header.php",
+            "src/functions/create_uploaded_file.legacy.php",
+            "src/functions/marshal_headers_from_sapi.legacy.php",
+            "src/functions/marshal_method_from_sapi.legacy.php",
+            "src/functions/marshal_protocol_version_from_sapi.legacy.php",
+            "src/functions/marshal_uri_from_sapi.legacy.php",
+            "src/functions/normalize_server.legacy.php",
+            "src/functions/normalize_uploaded_files.legacy.php",
+            "src/functions/parse_cookie_header.legacy.php"
+        ],
+        "psr-4": {
+            "Laminas\\Diactoros\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\Diactoros\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
+        "static-analysis": "psalm --shepherd --stats"
+    }
+}
