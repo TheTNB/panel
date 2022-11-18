@@ -29,7 +29,7 @@ Date: 2022-11-02
                                 </div>
                             </div>
                             <div class="layui-tab-item">
-                                <blockquote class="layui-elem-quote">此处修改的是OpenResty主配置文件，如果你不了解各参数的含义，请不要随意修改！</br>
+                                <blockquote class="layui-elem-quote">此处修改的是OpenResty主配置文件，如果你不了解各参数的含义，请不要随意修改！<br>
                                     提示：Ctrl+F 搜索关键字，Ctrl+S 保存，Ctrl+H 查找替换！
                                 </blockquote>
                                 <div id="openresty-config-editor"
@@ -162,7 +162,7 @@ Date: 2022-11-02
                 ,
                 skin: 'layui-anim layui-anim-upbit'
                 ,
-                content: '面板的正常访问依赖OpenResty，因此不支持在面板启动OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">/etc/init.d/nginx start</span>以启动OpenResty！'
+                content: '面板的正常访问依赖OpenResty，因此不支持在面板启动OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">systemctl start nginx</span>以启动OpenResty！'
             });
         });
         $('#openresty-stop').click(function () {
@@ -179,7 +179,7 @@ Date: 2022-11-02
                 ,
                 skin: 'layui-anim layui-anim-upbit'
                 ,
-                content: '面板的正常访问依赖OpenResty，因此不支持在面板停止OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">/etc/init.d/nginx stop</span>以停止OpenResty！'
+                content: '面板的正常访问依赖OpenResty，因此不支持在面板停止OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">systemctl stop nginx</span>以停止OpenResty！'
             });
         });
         $('#openresty-restart').click(function () {

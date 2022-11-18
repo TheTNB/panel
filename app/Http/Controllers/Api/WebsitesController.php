@@ -17,12 +17,11 @@ class WebsitesController extends Controller
 {
     /**
      * 获取面板网站
-     * @param  Website  $website
      * @return JsonResponse
      */
-    public function getList(Website $website): JsonResponse
+    public function getList(): JsonResponse
     {
-        $website_lists = $website->query()->get();
+        $website_lists = Website::query()->get();
         // 判空
         if ($website_lists->isEmpty()) {
             return response()->json([
@@ -75,7 +74,7 @@ class WebsitesController extends Controller
         $credentials['status'] = 1;
         $domain = trim($credentials['domain']);
         // 入库
-        Website::create($credentials);
+        Website::query()->create($credentials);
         // 创建网站目录
         shell_exec("mkdir -p " . $credentials['path']);
         // 创建index.html
@@ -83,7 +82,7 @@ class WebsitesController extends Controller
         // 写入到index.html
         $index_html = <<<EOF
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <title>耗子Linux面板</title>
@@ -181,7 +180,7 @@ EOF;
         shell_exec('echo "" > /www/server/vhost/rewrite/' . $credentials['name'] . '.conf');
         shell_exec('echo "" > /www/server/vhost/ssl/' . $credentials['name'] . '.pem');
         shell_exec('echo "" > /www/server/vhost/ssl/' . $credentials['name'] . '.key');
-        shell_exec("/etc/init.d/nginx reload");
+        shell_exec("systemctl reload nginx");
 
         // 创建数据库
         if ($credentials['db']) {
@@ -189,7 +188,8 @@ EOF;
                 $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
                 shell_exec("/www/server/mysql/bin/mysql -u root -p" . $password . " -e \"CREATE DATABASE IF NOT EXISTS " . $credentials['db_name'] . " DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;\" 2>&1");
                 shell_exec("/www/server/mysql/bin/mysql -u root -p" . $password . " -e \"CREATE USER '" . $credentials['db_username'] . "'@'localhost' IDENTIFIED BY '" . $credentials['db_password'] . "';\"");
-                shell_exec("/www/server/mysql/bin/mysql -u root -p" . $password . " -e \"GRANT ALL PRIVILEGES ON " . $credentials['db_name'] . ".* TO '" . $credentials['db_username'] . "'@'localhost' IDENTIFIED BY '" . $credentials['db_password'] . "';\"");
+                shell_exec("/www/server/mysql/bin/mysql -u root -p" . $password . " -e \"GRANT ALL PRIVILEGES ON " . $credentials['db_name'] . ".* TO '" . $credentials['db_username'] . "'@'localhost';\"");
+                shell_exec("/www/server/mysql/bin/mysql -u root -p" . $password . " -e \"flush privileges;\"");
             }
         }
         $res['code'] = 0;
@@ -200,13 +200,14 @@ EOF;
 
     /**
      * 删除面板网站
-     * @return
+     * @param  Request  $request
+     * @return JsonResponse
      */
-    public function delete_website()
+    public function delete(Request $request): JsonResponse
     {
-        $name = Request::param('name');
+        $name = $request->input('name');
         // 从数据库删除
-        Db::table('website')->where('name', $name)->delete();
+        Website::query()->where('name', $name)->delete();
         // 删除站点目录
         shell_exec("rm -rf /www/wwwroot/$name");
         // 删除nginx配置
@@ -219,7 +220,7 @@ EOF;
 
         $res['code'] = 0;
         $res['msg'] = 'success';
-        return json($res);
+        return response()->json($res);
     }
 
     /**
@@ -242,12 +243,13 @@ EOF;
 
     /**
      * 获取面板网站设置
-     * @return
+     * @param  Request  $request
+     * @return JsonResponse
      */
-    public function get_website_settings()
+    public function getSiteSettings(Request $request): JsonResponse
     {
-        $name = Request::param('name');
-        $website = Db::table('website')->where('name', $name)->find();
+        $name = $request->input('name');
+        $website = Website::query()->where('name', $name)->first();
         // 通过name读取相应的nginx配置
         $nginx_config = file_get_contents('/www/server/vhost/' . $name . '.conf');
         // 从nginx配置中port标记位提取全部端口
@@ -302,17 +304,18 @@ EOF;
         $res['code'] = 0;
         $res['msg'] = 'success';
         $res['data'] = $website;
-        return json($res);
+        return response()->json($res);
     }
 
     /**
      * 保存网站设置
-     * @return
+     * @param  Request  $request
+     * @return JsonResponse
      */
-    public function save_website_settings()
+    public function saveSiteSettings(Request $request): JsonResponse
     {
         // 获取前端传递过来的数据
-        $config = Request::param('config');
+        $config = $request->input('config');
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -321,7 +324,7 @@ EOF;
         $config_raw = shell_exec('cat /www/server/vhost/' . $config['name'] . '.conf');
         if (trim($config_raw) != trim($config['config_raw'])) {
             file_put_contents('/www/server/vhost/' . $config['name'] . '.conf', $config['config_raw']);
-            return json($res);
+            return response()->json($res);
         }
 
         // 域名
@@ -404,7 +407,7 @@ EOF;
         }
 
         // 如果PHP版本不一致，则更新PHP版本
-        $php_old = DB::table('website')->where('name', $config['name'])->value('php');
+        $php_old = Website::query()->where('name', $config['name'])->value('php');
         if ($config['php'] != $php_old) {
             $php_config_old = $this->cut('# php标记位开始', '# php标记位结束', $config_raw);
             $php_config_new = PHP_EOL;
@@ -419,30 +422,31 @@ EOL;
         }
 
         // 将数据入库
-        DB::table('website')->where('name', $config['name'])->update(['php' => $config['php']]);
-        DB::table('website')->where('name', $config['name'])->update(['ssl' => $config['ssl']]);
+        Website::query()->where('name', $config['name'])->update(['php' => $config['php']]);
+        Website::query()->where('name', $config['name'])->update(['ssl' => $config['ssl']]);
         file_put_contents('/www/server/vhost/' . $config['name'] . '.conf', $config_raw);
         file_put_contents('/www/server/vhost/rewrite/' . $config['name'] . '.conf', $config['rewrite_raw']);
-        shell_exec('/etc/init.d/nginx reload');
-        return json($res);
+        shell_exec('systemctl reload nginx');
+        return response()->json($res);
     }
 
     /**
      * 清理网站日志
-     * @return
+     * @param  Request  $request
+     * @return JsonResponse
      */
-    public function clean_website_log()
+    public function cleanSiteLog(Request $request): JsonResponse
     {
-        $name = Request::param('name');
+        $name = $request->input('name');
         shell_exec('echo "" > /www/wwwlogs/' . $name . '.log');
         $res['code'] = 0;
         $res['msg'] = 'success';
-        return json($res);
+        return response()->json($res);
     }
 
 
     // 裁剪字符串
-    private function cut($begin, $end, $str)
+    private function cut($begin, $end, $str): string
     {
         $b = mb_strpos($str, $begin) + mb_strlen($begin);
         $e = mb_strpos($str, $end) - $b;
