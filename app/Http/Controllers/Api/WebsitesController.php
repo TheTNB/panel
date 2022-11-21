@@ -189,10 +189,10 @@ EOF;
         if ($credentials['db']) {
             if ($credentials['db_type'] == 'mysql') {
                 $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
-                shell_exec("/www/server/mysql/bin/mysql -u root -p".$password." -e \"CREATE DATABASE IF NOT EXISTS ".$credentials['db_name']." DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;\" 2>&1");
-                shell_exec("/www/server/mysql/bin/mysql -u root -p".$password." -e \"CREATE USER '".$credentials['db_username']."'@'localhost' IDENTIFIED BY '".$credentials['db_password']."';\"");
-                shell_exec("/www/server/mysql/bin/mysql -u root -p".$password." -e \"GRANT ALL PRIVILEGES ON ".$credentials['db_name'].".* TO '".$credentials['db_username']."'@'localhost';\"");
-                shell_exec("/www/server/mysql/bin/mysql -u root -p".$password." -e \"flush privileges;\"");
+                shell_exec("mysql -u root -p".$password." -e \"CREATE DATABASE IF NOT EXISTS ".$credentials['db_name']." DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;\" 2>&1");
+                shell_exec("mysql -u root -p".$password." -e \"CREATE USER '".$credentials['db_username']."'@'localhost' IDENTIFIED BY '".$credentials['db_password']."';\"");
+                shell_exec("mysql -u root -p".$password." -e \"GRANT ALL PRIVILEGES ON ".$credentials['db_name'].".* TO '".$credentials['db_username']."'@'localhost';\"");
+                shell_exec("mysql -u root -p".$password." -e \"flush privileges;\"");
             }
         }
         $res['code'] = 0;
