@@ -45,6 +45,8 @@ class Plugin
     }
 
     /**
+     * 读取所有插件
+     *
      * @return Collection|null
      * @throws FileNotFoundException
      * @throws Exception
@@ -88,15 +90,18 @@ class Plugin
                 // 初始化插件信息
                 $plugin = [];
                 $plugin['name'] = (Arr::get($package, 'name'));
+                $plugin['slug'] = (Arr::get($package, 'slug'));
+                $plugin['version'] = (Arr::get($package, 'version'));
                 $plugin['path'] = $this->getPluginsDir().DIRECTORY_SEPARATOR.$dirname;
 
-                if ($plugins->has($plugin['name'])) {
+                if ($plugins->has($plugin['slug'])) {
                     continue;
                 }
 
-                $plugins->put($plugin['name'], $plugin);
+                $plugins->put($plugin['slug'], $plugin);
             }
 
+            define('PLUGINS', $plugins->toArray());
             $this->plugins = $plugins;
         }
 

@@ -78,7 +78,7 @@ Date: 2022-10-09
                 });
             }
             , error: function (xhr, status, error) {
-                console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                console.log('耗子Linux面板：ajax请求出错，错误' + error);
             }
         })
     }
@@ -136,11 +136,11 @@ Date: 2022-10-09
         table.on('tool(panel-task-finished)', function (obj) {
             let data = obj.data;
             if (obj.event === 'remove') {
-                layer.confirm('确定卸载该插件安装记录吗？', function (index) {
+                layer.confirm('确定移除该记录吗？', function (index) {
                     layer.close(index);
                     admin.req({
                         url: '/api/panel/task/deleteTask',
-                        type: 'GET',
+                        type: 'post',
                         data: {
                             name: data.name
                         }
@@ -155,7 +155,7 @@ Date: 2022-10-09
                             }
                         }
                         , error: function (xhr, status, error) {
-                            console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
                         }
                     });
                 });

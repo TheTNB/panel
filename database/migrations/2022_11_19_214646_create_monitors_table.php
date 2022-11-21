@@ -13,13 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('monitors', function (Blueprint $table) {
             $table->id();
-            $table->integer('job_id')->nullable()->comment('任务ID');
-            $table->string('name')->comment('任务名');
-            $table->string('status')->default('waiting')->comment('任务状态');
-            $table->string('shell')->nullable()->comment('任务脚本');
-            $table->string('log')->nullable()->comment('任务日志目录');
+            $table->json('info')->comment('监控记录');
             $table->timestamps();
         });
     }
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('monitors');
     }
 };

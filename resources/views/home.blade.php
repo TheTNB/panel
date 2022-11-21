@@ -6,19 +6,24 @@ Date: 2022-10-14
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
         <div id="address1" class="layui-col-md12">
-            <div style="background: #fff;" class="layui-collapse" lay-filter="home_ad">
-                <div class="layui-colla-content layui-show">
+            <div class="layui-collapse">
+                <div style="background: #fff;" class="layui-colla-content layui-show">
                     <div class="text" style="overflow: hidden;height: 22px;">
-                        <ul style="margin-top: -2px;">
-                            <li>
-                                <a href="https://hzbk.net"
+                        <div class="layui-carousel" id="home_ad" lay-filter="home_ad">
+                            <div carousel-item="">
+                                <a style="background: #fff;" href="https://hzbk.net"
                                    title="耗子博客" target="_blank"><i class="layui-icon layui-icon-release"></i> 耗子博客</a>
-                            </li>
-
-                        </ul>
+                                <a style="background: #fff;" href="https://weavatar.com"
+                                   title="WeAvatar" target="_blank"><i class="layui-icon layui-icon-release"></i> WeAvatar - 互联网公共头像服务</a>
+                                <a style="background: #fff;" href="https://wepublish.cn"
+                                   title="WePublish" target="_blank"><i class="layui-icon layui-icon-release"></i> WePublish - WordPress的本土化版本</a>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
         <div id="monitor1" class="layui-col-md6">
 
@@ -190,7 +195,7 @@ Date: 2022-10-14
                     element.render('progress');
                 }
                 , error: function (xhr, status, error) {
-                    console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
                 }
             });
         });
@@ -202,10 +207,19 @@ Date: 2022-10-14
     clearInterval(home_timer);
     home_timer = setInterval(refresh_home_info, 3000);
     // 获取系统信息，这部分信息无需更新。
-    layui.use(['index', 'jquery', 'admin'], function () {
+    layui.use(['index', 'jquery', 'admin', 'carousel'], function () {
         let $ = layui.jquery
             , admin = layui.admin
-            , element = layui.element;
+            , element = layui.element
+            , carousel = layui.carousel;
+        carousel.render({
+            elem: '#home_ad'
+            , width: '100%'
+            , height: '200px'
+            , anim: 'fade'
+            , arrow: 'none'
+            , indicator: 'none'
+        });
         admin.req({
             url: "/api/panel/info/getSystemInfo"
             , method: 'get'
@@ -217,10 +231,10 @@ Date: 2022-10-14
                 }
                 $('#home_os_name').text(result.data.os_name);
                 $('#home_panel_version').text(result.data.panel_version);
-                $('#home_uptime').text('已不间断运行' + result.data.uptime + '天');
+                $('#home_uptime').text('已不间断运行 ' + result.data.uptime + ' 天');
             }
             , error: function (xhr, status, error) {
-                console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                console.log('耗子Linux面板：ajax请求出错，错误' + error);
             }
         });
     });
@@ -254,7 +268,7 @@ Date: 2022-10-14
                 ,
                 skin: 'layui-anim layui-anim-upbit'
                 ,
-                content: '请在SSH执行<span class="layui-badge-rim">cd /www/panel && php-panel artisan panel update</span>以更新面板！'
+                content: '请在SSH执行<span class="layui-badge-rim">panel update</span>以更新面板！'
             });
         });
     });

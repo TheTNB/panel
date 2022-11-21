@@ -241,7 +241,7 @@ class InfosController extends Controller
      */
     public function getHomePlugins(): JsonResponse
     {
-        $plugins = Plugin::where('show', 1)->get();
+        $plugins = Plugin::query()->where('show', 1)->get();
         // 判空
         if ($plugins->isEmpty()) {
             $res['code'] = 0;
@@ -310,17 +310,29 @@ class InfosController extends Controller
     /**
      * 获取已安装的数据库和PHP版本
      */
-    public function getInstalledDbAndPhp()
+    public function getInstalledDbAndPhp(): JsonResponse
     {
-        // 判断mysql插件目录是否存在
-        if (is_dir('/www/panel/plugins/mysql')) {
-            $mysql_version = 80;
+        $dbVersions = [];
+        // 判断mysql插件是否安装
+        if (isset(PLUGINS['mysql'])) {
+            $dbVersions['mysql'] = PLUGINS['mysql']['version'];
         } else {
-            $mysql_version = false;
+            $dbVersions['mysql'] = false;
         }
-        /**
-         * TODO: PostgreSQL版本
-         */
+        // 判断postgresql插件是否安装
+        if (isset(PLUGINS['postgresql15'])) {
+            $dbVersions['postgresql15'] = PLUGINS['postgresql15']['version'];
+        } else {
+            $dbVersions['postgresql15'] = false;
+        }
+        // 循环获取已安装的PHP版本
+        $php_versions = Plugin::query()->where('slug', 'like', 'php%')->get();
+        $php_versions = $php_versions->toArray();
+        $php_versions = array_column($php_versions, 'slug');
+        $php_versions = array_map(function ($item) {
+            return str_replace('php', '', $item);
+        }, $php_versions);
+
         $php_version = shell_exec('ls /www/server/php');
         $php_version = trim($php_version);
 
@@ -333,10 +345,7 @@ class InfosController extends Controller
         $res['code'] = 0;
         $res['msg'] = 'success';
         $res['data'] = array(
-            'db_version' => [
-                'mysql' => $mysql_version,
-                'postgresql' => false
-            ],
+            'db_version' => $dbVersions,
             'php_version' => $php_versions
         );
         return response()->json($res);

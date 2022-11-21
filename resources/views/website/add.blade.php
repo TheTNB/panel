@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 添加
 Author: 耗子
-Date: 2022-10-14
+Date: 2022-11-21
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <form class="layui-form" action="" lay-filter="add-website-form">
@@ -39,7 +39,7 @@ Date: 2022-10-14
                 <label class="layui-form-label">数据库</label>
                 <div class="layui-input-block">
                     <select name="db_type" lay-filter="add-website-db">
-                        <option value="" selected=""></option>
+                        <option value="" selected="">不使用</option>
                         @{{# layui.each(d.params.db_version, function(index, item){ }}
                         @{{# if(item){ }}
                         <option value="@{{ index }}">@{{ index }}</option>
@@ -53,19 +53,19 @@ Date: 2022-10-14
             <div class="layui-inline">
                 <label class="layui-form-label">数据库名</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_name" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_name" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库用户</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_username" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_username" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库密码</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_password" lay-verify="required" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_password" autocomplete="off" class="layui-input">
                 </div>
             </div>
         </div>
@@ -117,7 +117,12 @@ Date: 2022-10-14
                 if (data.value === 'mysql') {
                     $("#add-website-db-info").show();
                     $('input[name="db_name"]').val($('input[name="name"]').val() + '_mysql');
-                    $('input[name="db_user"]').val($('input[name="name"]').val() + '_mysql');
+                    $('input[name="db_username"]').val($('input[name="name"]').val() + '_mysql');
+                    $('input[name="db_password"]').val($('input[name="name"]').val() + '_password');
+                }else if(data.value === 'postgresql15') {
+                    $("#add-website-db-info").show();
+                    $('input[name="db_name"]').val($('input[name="name"]').val() + '_postgresql');
+                    $('input[name="db_username"]').val($('input[name="name"]').val() + '_postgresql');
                     $('input[name="db_password"]').val($('input[name="name"]').val() + '_password');
                 }
             });
@@ -129,7 +134,6 @@ Date: 2022-10-14
                 }else{
                     data.field.db = 1;
                 }
-                console.log(data.field);
                 admin.req({
                     url: "/api/panel/website/add"
                     , method: 'post'
@@ -151,7 +155,7 @@ Date: 2022-10-14
                         });
                     }
                     , error: function (xhr, status, error) {
-                        console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                        console.log('耗子Linux面板：ajax请求出错，错误' + error);
                     }
                 });
                 return false;

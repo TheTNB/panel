@@ -15,30 +15,16 @@ Date: 2022-10-14
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板名称</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="name" value="获取中ing..." class="layui-input">
+                                <input type="text" name="name" value="获取中ing..." class="layui-input" disabled/>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的显示名称</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label" style="font-size: 13px;">MySQL密码</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="mysql_root_password" value="获取中ing..." class="layui-input">
+                                <input type="text" name="mysql_root_password" value="获取中ing..." class="layui-input" disabled/>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改MySQL的root密码</div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">面板账号</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="username" value="获取中ing..." class="layui-input">
-                            </div>
-                            <div class="layui-form-mid layui-word-aux">修改面板账号</div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">面板密码</label>
-                            <div class="layui-input-inline">
-                                <input type="password" name="password" value="获取中ing..." class="layui-input">
-                            </div>
-                            <div class="layui-form-mid layui-word-aux">修改面板密码</div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-block">
@@ -69,7 +55,7 @@ Date: 2022-10-14
 
         // ajax获取设置项并赋值
         admin.req({
-            url: "/api/panel/get_settings"
+            url: "/api/panel/setting/get"
             , method: 'get'
             , success: function (result) {
                 if (result.code !== 0) {
@@ -80,9 +66,10 @@ Date: 2022-10-14
                 form.val("panel_setting",
                     result.data
                 );
+                $('input').attr('disabled', false);
             }
             , error: function (xhr, status, error) {
-                console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                console.log('耗子Linux面板：ajax请求出错，错误' + error);
             }
         });
 
@@ -116,7 +103,7 @@ Date: 2022-10-14
         form.on('submit(panel_setting_submit)', function (obj) {
             // 提交修改
             admin.req({
-                url: "/api/panel/save_settings"
+                url: "/api/panel/setting/save"
                 , method: 'post'
                 , data: obj.field
                 , success: function (result) {
@@ -126,15 +113,9 @@ Date: 2022-10-14
                         return false;
                     }
                     layer.msg('面板设置保存成功！');
-                    if (result.msg == 'change') {
-                        layer.msg('您已修改用户名/密码，请重新登录！');
-                        setTimeout(function () {
-                            location.hash = '/logout';
-                        }, 2000);
-                    }
                 }
                 , error: function (xhr, status, error) {
-                    console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
                 }
             });
             return false;

@@ -1,4 +1,4 @@
-<title>应用</title>
+<title>插件</title>
 
 <div class="layui-fluid">
     <div class="layui-card">
@@ -23,16 +23,16 @@
             <!-- 操作按钮模板 -->
             <script type="text/html" id="store-control-tpl">
                 @{{#  if(d.control.installed == true && d.control.allow_uninstall == true){ }}
-                    @{{#  if(d.control.update == true){ }}
-                    <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
-                    @{{#  } }}
+                @{{#  if(d.control.update == true){ }}
+                <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
+                @{{#  } }}
                 <a class="layui-btn layui-btn-xs" lay-event="open">管理</a>
                 <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="uninstall">卸载</a>
                 @{{#  } else{ }}
                 @{{#  if(d.control.installed == true && d.control.allow_uninstall == false){ }}
-                    @{{#  if(d.control.update == true){ }}
-                    <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
-                    @{{#  } }}
+                @{{#  if(d.control.update == true){ }}
+                <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
+                @{{#  } }}
                 <a class="layui-btn layui-btn-xs" lay-event="open">管理</a>
                 @{{#  } else{ }}
                 <a class="layui-btn layui-btn-xs" lay-event="install">安装</a>
@@ -44,8 +44,8 @@
                 <input type="checkbox" name="plugin-show-home" lay-skin="switch" lay-text="ON|OFF"
                        lay-filter="plugin-show-home"
                        value="@{{ d.show }}" data-plugin-slug="@{{ d.slug }}"
-                        @{{ d.run==
-                        1 ? 'checked' : '' }} />
+                       @{{ d.show==
+                       1 ? 'checked' : '' }} />
             </script>
         </div>
     </div>
@@ -86,14 +86,17 @@
                 layer.confirm('确定安装该插件吗？', function (index) {
                     layer.close(index);
                     admin.req({
-                        url: '/api/panel/install',
+                        url: '/api/panel/plugin/install',
                         type: 'POST',
                         data: {
                             slug: data.slug
                         }
                         , success: function (res) {
-                            if (res.code == 0) {
-                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {icon: 1, time: 1000}, function () {
+                            if (res.code === 0) {
+                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
+                                }, function () {
                                     location.reload();
                                 });
                             } else {
@@ -101,7 +104,7 @@
                             }
                         }
                         , error: function (xhr, status, error) {
-                            console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
                         }
                     });
                 });
@@ -109,13 +112,13 @@
                 layer.confirm('确定卸载该插件吗？', function (index) {
                     layer.close(index);
                     admin.req({
-                        url: '/api/panel/uninstall',
+                        url: '/api/panel/plugin/uninstall',
                         type: 'POST',
                         data: {
                             slug: data.slug
                         }
                         , success: function (res) {
-                            if (res.code == 0) {
+                            if (res.code === 0) {
                                 layer.msg('卸载：' + data.name + ' 成功！', {icon: 1, time: 1000}, function () {
                                     location.reload();
                                 });
@@ -124,7 +127,7 @@
                             }
                         }
                         , error: function (xhr, status, error) {
-                            console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
                         }
                     });
                 });
@@ -132,14 +135,17 @@
                 layer.confirm('确定升级该插件吗？', function (index) {
                     layer.close(index);
                     admin.req({
-                        url: '/api/panel/update',
+                        url: '/api/panel/plugin/update',
                         type: 'POST',
                         data: {
                             slug: data.slug
                         }
                         , success: function (res) {
-                            if (res.code == 0) {
-                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {icon: 1, time: 1000}, function () {
+                            if (res.code === 0) {
+                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
+                                }, function () {
                                     location.reload();
                                 });
                             } else {
@@ -147,7 +153,7 @@
                             }
                         }
                         , error: function (xhr, status, error) {
-                            console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
                         }
                     });
                 });
@@ -160,6 +166,7 @@
             let show = obj.elem.checked ? 1 : 0;
 
             console.log(plugin_slug); //当前行数据
+            
         });
         /*form.render(null, 'store-form');
 

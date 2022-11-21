@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.1.9",
-        "alexusmai/laravel-file-manager": "^3.0",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
         "laravel/octane": "^1.3",

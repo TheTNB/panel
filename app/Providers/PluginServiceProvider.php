@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use App\Services\Plugin;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
 class PluginServiceProvider extends ServiceProvider
@@ -28,10 +29,10 @@ class PluginServiceProvider extends ServiceProvider
         foreach ($plugins->getPlugins() as $plugin) {
 
             // 加载视图路径
-            $finder->addNamespace($plugin['name'], $plugin['path']."/views");
+            $finder->addNamespace($plugin['slug'], $plugin['path']."/views");
 
             // 加载语言包
-            $loader->addNamespace($plugin['name'], $plugin['path']."/lang");
+            $loader->addNamespace($plugin['slug'], $plugin['path']."/lang");
         }
 
         // 加载插件Composer装载文件
@@ -61,5 +62,8 @@ class PluginServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton('plugins', Plugin::class);
+        // 设置面板名称
+        $name = DB::table('settings')->where('name', 'name')->value('value');
+        $this->app['config']['panel.name'] = !empty($name) ? $name : config('panel.name');
     }
 }

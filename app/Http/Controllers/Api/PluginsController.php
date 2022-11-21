@@ -30,20 +30,20 @@ class PluginsController extends Controller
         $data['msg'] = 'success';
         $data['data'] = $this->pluginList(false);
         foreach ($data['data'] as $k => $v) {
-            // 获取已装版本
-            $installVersion = Plugin::query()->where('slug', $v['slug'])->first();
-            // 判空
-            if ($installVersion) {
-                $data['data'][$k]['install_version'] = $installVersion->version;
-            } else {
-                $data['data'][$k]['install_version'] = '';
-            }
+            // 获取首页显示状态
+            $shows = Plugin::query()->pluck('show', 'slug');
+            // 如果本地已安装，则显示本地名称
+            $data['data'][$k]['name'] = PLUGINS[$v['slug']]['name'] ?? $data['data'][$k]['name'];
+            // 已装版本
+            $data['data'][$k]['install_version'] = PLUGINS[$v['slug']]['version'] ?? '';
+            // 首页显示
+            $data['data'][$k]['show'] = $shows[$v['slug']] ?? 0;
             // 去除不需要的字段
             unset($data['data'][$k]['url']);
             unset($data['data'][$k]['install']);
             unset($data['data'][$k]['uninstall']);
             unset($data['data'][$k]['update']);
-            if (!empty(Plugin::query()->where('slug', $v['slug'])->first())) {
+            if (isset(PLUGINS[$v['slug']])) {
                 $data['data'][$k]['control']['installed'] = true;
                 $data['data'][$k]['control']['allow_uninstall'] = true;
                 // 判断是否有更新
@@ -109,7 +109,7 @@ class PluginsController extends Controller
         // 入库等待安装
         $task = new Task();
         $task->name = '安装' . $plugin_data['name'];
-        $task->shell = $plugin_data['install_shell'];
+        $task->shell = $plugin_data['install'];
         $task->status = 'waiting';
         $task->log = '/tmp/' . $plugin_data['slug'] . '.log';
         $task->save();
@@ -124,7 +124,8 @@ class PluginsController extends Controller
 
     /**
      * 卸载插件
-     * @return
+     * @param  Request  $request
+     * @return JsonResponse
      */
     public function uninstall(Request $request): JsonResponse
     {
@@ -162,12 +163,12 @@ class PluginsController extends Controller
             return response()->json($data);
         }
         // 判断插件是否未安装
-        $installed = Task::query()->where('slug', $slug)->first();
+        /*$installed = Task::query()->where('slug', $slug)->first();
         if (!$installed) {
             $data['code'] = 1;
-            $data['msg'] = '请不要重复卸载！';
+            $data['msg'] = '插件未安装，无需卸载！';
             return response()->json($data);
-        }
+        }*/
 
         // 判断是否是操作openresty
         if ($slug == 'openresty') {
@@ -179,7 +180,7 @@ class PluginsController extends Controller
         // 入库等待卸载
         $task = new Task();
         $task->name = '卸载' . $plugin_data['name'];
-        $task->shell = $plugin_data['uninstall_shell'];
+        $task->shell = $plugin_data['uninstall'];
         $task->status = 'waiting';
         $task->log = '/tmp/' . $plugin_data['slug'] . '.log';
         $task->save();

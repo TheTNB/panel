@@ -1,4 +1,5 @@
 {
-  "name": "openresty",
-  "version": "20221102"
+  "name": "OpenResty-1.21.4",
+  "slug": "openresty",
+  "version": "1.21.4.1"
 }

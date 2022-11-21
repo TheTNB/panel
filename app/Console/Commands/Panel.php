@@ -34,6 +34,9 @@ class Panel extends Command
     {
         $action = $this->argument('action');
         switch ($action) {
+            case 'init':
+                $this->init();
+                break;
             case 'update':
                 $this->update();
                 break;
@@ -46,14 +49,24 @@ class Panel extends Command
             case 'writePluginUnInstall':
                 $this->writePluginUnInstall();
                 break;
-            case 'writePluginUpdate':
-                $this->writePluginUpdate();
-                break;
             default:
                 $this->error('错误的操作');
                 break;
         }
         return Command::SUCCESS;
+    }
+
+    /**
+     * 初始化
+     * @return void
+     */
+    private function init(): void
+    {
+        Setting::query()->updateOrCreate(['name' => 'name'], ['value' => '耗子Linux面板']);
+        Setting::query()->updateOrCreate(['name' => 'monitor'], ['value' => '1']);
+        Setting::query()->updateOrCreate(['name' => 'monitor_days'], ['value' => '30']);
+        Setting::query()->updateOrCreate(['name' => 'mysql_root_password'], ['value' => '']);
+        Setting::query()->updateOrCreate(['name' => 'postgresql_root_password'], ['value' => '']);
     }
 
     /**
@@ -83,10 +96,10 @@ class Panel extends Command
         $this->info(shell_exec('rm -rf /tmp/panel.zip'));
         $this->info(shell_exec('rm -rf /tmp/database.sqlite'));
         $this->info(shell_exec('rm -rf /tmp/plugins'));
-        $this->info('正在更新数据库...');
+        $this->info('正在更新面板数据库...');
         $this->info(shell_exec('cd /www/panel && php-panel artisan migrate'));
         $this->info('正在重启面板服务...');
-        $this->info(shell_exec('systemctl reload panel.service'));
+        $this->info(shell_exec('systemctl restart panel.service'));
         $this->info('更新完成');
     }
 
@@ -97,21 +110,26 @@ class Panel extends Command
     private function getInfo(): void
     {
         $user = User::query()->where('id', 1);
-        // 判空
-        if (empty($user)) {
-            $this->error('获取失败');
-            return;
-        }
         // 生成唯一信息
         $username = Str::random(6);
         $password = Str::random(12);
-        // 入库
-        $user->update([
-            'username' => $username,
-            'password' => Hash::make($password),
-        ]);
-        $this->info('面板用户名：' . $username);
-        $this->info('面板密码：' . $password);
+        // 判空
+        if (empty($user)) {
+            User::query()->create([
+                'id' => 1,
+                'username' => $username,
+                'password' => Hash::make($password),
+            ]);
+        } else {
+            // 入库
+            $user->update([
+                'username' => $username,
+                'password' => Hash::make($password),
+            ]);
+        }
+
+        $this->info('面板用户名：'.$username);
+        $this->info('面板密码：'.$password);
         $this->info('访问地址：http://IP:8888');
     }
 
@@ -122,19 +140,15 @@ class Panel extends Command
     private function writePluginInstall(): void
     {
         $pluginSlug = $this->argument('a1');
-        $pluginName = $this->argument('a2');
-        $pluginVersion = $this->argument('a3');
 
         // 判空
-        if (empty($pluginSlug) || empty($pluginName) || empty($pluginVersion)) {
+        if (empty($pluginSlug)) {
             $this->error('参数错误');
             return;
         }
         // 入库
         Plugin::query()->create([
             'slug' => $pluginSlug,
-            'name' => $pluginName,
-            'version' => $pluginVersion,
             'show' => 0,
         ]);
         $this->info('成功');
@@ -159,27 +173,6 @@ class Panel extends Command
         }
         // 入库
         Plugin::query()->where('slug', $pluginSlug)->delete();
-        $this->info('成功');
-    }
-
-    /**
-     * 写入插件更新状态
-     * @return void
-     */
-    private function writePluginUpdate(): void
-    {
-        $pluginSlug = $this->argument('a1');
-        $pluginVersion = $this->argument('a2');
-
-        // 判空
-        if (empty($pluginSlug) || empty($pluginVersion)) {
-            $this->error('参数错误');
-            return;
-        }
-        // 入库
-        Plugin::query()->where('slug', $pluginSlug)->update([
-            'version' => $pluginVersion,
-        ]);
         $this->info('成功');
     }
 }

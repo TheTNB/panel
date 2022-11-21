@@ -1,7 +1,7 @@
 <!--
 Name: Openresty管理器
 Author: 耗子
-Date: 2022-11-02
+Date: 2022-11-21
 -->
 <title>OpenResty</title>
 <div class="layui-fluid" id="component-tabs">

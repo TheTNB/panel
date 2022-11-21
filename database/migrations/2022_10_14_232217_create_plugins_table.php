@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('slug')->unique()->comment('插件标识');
             $table->string('name')->comment('插件名称');
-            $table->string('version')->comment('插件版本');
             $table->boolean('show')->comment('是否首页显示')->nullable();
             $table->timestamps();
         });

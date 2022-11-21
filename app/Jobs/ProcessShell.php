@@ -53,13 +53,13 @@ class ProcessShell implements ShouldQueue, ShouldBeUnique
     public function handle(): void
     {
         // 查询任务
-        $task = Task::query()->where('id', $this->task_id)->get();
+        $task = Task::query()->where('id', $this->task_id)->first();
         echo $task->name . "开始执行".PHP_EOL;
         // 更新任务状态为running
         $task->job_id = $this->job->getJobId();
         $task->status = 'running';
         $task->save();
-        //shell_exec($task->shell.' > '.$task->log.' 2>&1 &');
+        shell_exec($task->shell);
         // 更新任务状态
         $task->status = 'finished';
         $task->save();

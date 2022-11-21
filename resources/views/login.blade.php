@@ -50,6 +50,14 @@
             , router = layui.router()
             , search = router.search;
 
+        // 判断并清除定时器
+        if (typeof home_timer !== 'undefined') {
+            clearInterval(home_timer);
+        }
+        if (typeof install_plugin_timer !== 'undefined') {
+            clearInterval(install_plugin_timer);
+        }
+
         form.render();
 
         //提交

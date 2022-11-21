@@ -20,7 +20,7 @@
 //                          `=---='                               //
 //     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^          //
 //         佛祖保佑          永无Bug          永不宕机               //
-//    Name：耗子Linux面板   Author：耗子   Date：2022-10-14          //
+//    Name：耗子Linux面板   Author：耗子   Date：2022-11-21          //
 ////////////////////////////////////////////////////////////////////
 -->
 
@@ -45,17 +45,14 @@
         base: 'panel/'
         , version: {{config('panel.version')}}
     }).use('index', function () {
-        var layer = layui.layer, admin = layui.admin, $ = layui.jquery;
+        let layer = layui.layer, admin = layui.admin, $ = layui.jquery;
         layer.ready(function () {
-            /**
-             * TODO: 因为开发临时注释了测试版tips，需要取消注释
-             */
-            /*admin.popup({
-                content: '当前面板为测试版本，如遇到问题请联系耗子反馈！</br>QQ: 823374000'
+            admin.popup({
+                content: '当前面板为公测版本，如遇到问题请联系耗子反馈！</br>QQ: 823374000'
                 , area: '380px'
                 , shade: false
                 , offset: 't'
-            });*/
+            });
         });
     });
 </script>

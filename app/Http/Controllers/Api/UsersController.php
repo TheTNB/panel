@@ -19,16 +19,6 @@ class UsersController extends Controller
      */
     public function login(Request $request)
     {
-        /*$user = User::create([
-            'id' => '',
-            'username' => 'haozi',
-            'password' => Hash::make('haozi'),
-        ]);
-        return response()->json([
-            'code' => 200,
-            'message' => '注册成功',
-            'data' => $user,
-        ]);*/
         // 消毒数据
         try {
             $credentials = $this->validate($request, [
@@ -38,7 +28,8 @@ class UsersController extends Controller
             ]);
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => '参数错误',
+                'code' => 1,
+                'msg' => '参数错误',
                 'errors' => $e->errors()
             ], 422);
         }
@@ -56,7 +47,7 @@ class UsersController extends Controller
         $user = $request->user();
         $res['code'] = 0;
         $res['msg'] = 'success';
-        $res['data']['username'] = 'haozi';
+        $res['data']['username'] = $user->username;
         return response()->json($res);
     }
 }

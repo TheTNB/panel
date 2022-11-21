@@ -1,7 +1,7 @@
 <!--
-Name: 网站
+Name: 网站 - 列表
 Author: 耗子
-Date: 2022-10-14
+Date: 2022-11-21
 -->
 <title>网站</title>
 <div class="layui-fluid">
@@ -28,9 +28,8 @@ Date: 2022-10-14
                     <script type="text/html" id="website-run">
                         <input type="checkbox" name="run" lay-skin="switch" lay-text="ON|OFF"
                                lay-filter="website-run-checkbox"
-                               value="@{{ d.run }}" data-website-name="@{{ d.name }}"
-                               @{{ d.run==
-                                1 ? 'checked' : '' }} />
+                               value="@{{ d.status }}" data-website-name="@{{ d.name }}"
+                               @{{ d.status== 1 ? 'checked' : '' }} />
                     </script>
                 </div>
             </div>
@@ -65,7 +64,7 @@ Date: 2022-10-14
                     , icon: 2
                     , content: '已安装的PHP和DB版本获取失败，接口返回' + xhr.status + ' ' + xhr.statusText
                 });
-                console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                console.log('耗子Linux面板：ajax请求出错，错误' + error);
             }
         });
         table.render({
@@ -75,8 +74,8 @@ Date: 2022-10-14
             , title: '网站列表'
             , cols: [[
                 {field: 'name', title: '网站名', width: 200, fixed: 'left', unresize: true, sort: true, edit: 'text'}
-                , {field: 'run', title: '运行', width: 90, templet: '#website-run', unresize: true}
-                , {field: 'directory', title: '目录', width: 250}
+                , {field: 'run', title: '运行', width: 100, templet: '#website-run', unresize: true}
+                , {field: 'path', title: '目录', width: 250}
                 , {field: 'php', title: 'PHP', width: 60}
                 , {field: 'ssl', title: 'SSL', width: 110}
                 , {field: 'note', title: '备注', edit: 'textarea'}
@@ -140,7 +139,7 @@ Date: 2022-10-14
                             layer.alert('网站' + data.name + '删除成功！');
                         }
                         , error: function (xhr, status, error) {
-                            console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
                         }
                     });
                     layer.close(index);
@@ -149,7 +148,7 @@ Date: 2022-10-14
                 let config;
 
                 admin.req({
-                    url: "/api/panel/get_website_settings?name=" + data.name
+                    url: "/api/panel/website/getSiteSettings?name=" + data.name
                     , method: 'get'
                     , beforeSend: function (request) {
                         layer.load();
@@ -186,13 +185,28 @@ Date: 2022-10-14
             }
         });
 
-        // 单元格编辑
-        table.on('edit(website-run)', function (obj) {
-            var value = obj.value //得到修改后的值
-                , data = obj.data //得到所在行所有键值
-                , field = obj.field; //得到字段
-            layer.msg('[ID: ' + data.id + '] ' + field + ' 字段更改为：' + value, {
-                offset: '15px'
+        // 网站备注编辑
+        table.on('edit(website-list)', function (obj) {
+            var value = obj.value // 得到修改后的值
+                , data = obj.data; // 得到行数据
+            admin.req({
+                url: "/api/panel/website/updateSiteNote"
+                , method: 'post'
+                , data: {
+                    name: data.name,
+                    note: value
+                }
+                , success: function (result) {
+                    if (result.code !== 0) {
+                        console.log('耗子Linux面板：网站备注更新失败，接口返回' + result);
+                        layer.msg('网站备注更新失败，请刷新重试！')
+                        return false;
+                    }
+                    layer.alert('网站 ' + data.name + ' 备注更新成功！');
+                }
+                , error: function (xhr, status, error) {
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                }
             });
         });
 
