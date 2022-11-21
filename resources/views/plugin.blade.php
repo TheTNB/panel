@@ -165,8 +165,24 @@
             let plugin_slug = $(this).data('plugin-slug');
             let show = obj.elem.checked ? 1 : 0;
 
-            console.log(plugin_slug); //当前行数据
-            
+            admin.req({
+                url: '/api/panel/plugin/setShowHome',
+                type: 'POST',
+                data: {
+                    slug: plugin_slug,
+                    show: show
+                }
+                , success: function (res) {
+                    if (res.code === 0) {
+                        layer.msg('设置成功', {icon: 1, time: 1000});
+                    } else {
+                        layer.msg(res.msg, {icon: 2, time: 1000});
+                    }
+                }
+                , error: function (xhr, status, error) {
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                }
+            });
         });
         /*form.render(null, 'store-form');
 

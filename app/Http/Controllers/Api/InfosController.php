@@ -249,6 +249,10 @@ class InfosController extends Controller
             $res['data'] = [];
         } else {
             $plugins = $plugins->toArray();
+            $plugins = array_map(function ($item) {
+                $item['name'] = PLUGINS[$item['slug']]['name'];
+                return $item;
+            }, $plugins);
             $res['code'] = 0;
             $res['msg'] = 'success';
             $res['data'] = $plugins;

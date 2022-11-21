@@ -63,7 +63,7 @@ class PluginServiceProvider extends ServiceProvider
     {
         $this->app->singleton('plugins', Plugin::class);
         // 设置面板名称
-        $name = DB::table('settings')->where('name', 'name')->value('value');
+        $name = @DB::table('settings')->where('name', 'name')->value('value');
         $this->app['config']['panel.name'] = !empty($name) ? $name : config('panel.name');
     }
 }

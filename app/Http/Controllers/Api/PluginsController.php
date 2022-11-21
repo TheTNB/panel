@@ -47,7 +47,8 @@ class PluginsController extends Controller
                 $data['data'][$k]['control']['installed'] = true;
                 $data['data'][$k]['control']['allow_uninstall'] = true;
                 // 判断是否有更新
-                $data['data'][$k]['control']['update'] = version_compare($v['version'], $data['data'][$k]['install_version'], '>');
+                $data['data'][$k]['control']['update'] = version_compare($v['version'],
+                    $data['data'][$k]['install_version'], '>');
                 if ($v['slug'] == 'openresty') {
                     $data['data'][$k]['control']['allow_uninstall'] = false;
                 }
@@ -92,7 +93,7 @@ class PluginsController extends Controller
         }
 
         // 判断有无任务记录
-        $task_check = Task::query()->where('name', '安装' . $plugin_data['name'])->first();
+        $task_check = Task::query()->where('name', '安装'.$plugin_data['name'])->first();
         if ($task_check) {
             $data['code'] = 1;
             $data['msg'] = '此插件已存在安装记录，请先删除！';
@@ -108,10 +109,10 @@ class PluginsController extends Controller
 
         // 入库等待安装
         $task = new Task();
-        $task->name = '安装' . $plugin_data['name'];
+        $task->name = '安装'.$plugin_data['name'];
         $task->shell = $plugin_data['install'];
         $task->status = 'waiting';
-        $task->log = '/tmp/' . $plugin_data['slug'] . '.log';
+        $task->log = '/tmp/'.$plugin_data['slug'].'.log';
         $task->save();
         // 塞入队列
         ProcessShell::dispatch($task->id)->delay(1);
@@ -156,19 +157,12 @@ class PluginsController extends Controller
         }
 
         // 判断有无任务记录
-        $task_check = Task::query()->where('name', '卸载' . $plugin_data['name'])->first();
+        $task_check = Task::query()->where('name', '卸载'.$plugin_data['name'])->first();
         if ($task_check) {
             $data['code'] = 1;
             $data['msg'] = '此插件已存在卸载记录，请先删除！';
             return response()->json($data);
         }
-        // 判断插件是否未安装
-        /*$installed = Task::query()->where('slug', $slug)->first();
-        if (!$installed) {
-            $data['code'] = 1;
-            $data['msg'] = '插件未安装，无需卸载！';
-            return response()->json($data);
-        }*/
 
         // 判断是否是操作openresty
         if ($slug == 'openresty') {
@@ -179,10 +173,10 @@ class PluginsController extends Controller
 
         // 入库等待卸载
         $task = new Task();
-        $task->name = '卸载' . $plugin_data['name'];
+        $task->name = '卸载'.$plugin_data['name'];
         $task->shell = $plugin_data['uninstall'];
         $task->status = 'waiting';
-        $task->log = '/tmp/' . $plugin_data['slug'] . '.log';
+        $task->log = '/tmp/'.$plugin_data['slug'].'.log';
         $task->save();
         // 塞入队列
         ProcessShell::dispatch($task->id)->delay(1);
@@ -196,12 +190,13 @@ class PluginsController extends Controller
     /**
      * 读取插件列表
      */
-    public function pluginList($cache = true) {
+    public function pluginList($cache = true)
+    {
         // 判断刷新缓存
         if (!$cache) {
             Cache::forget('pluginList');
         }
-        if ( ! Cache::has('pluginList')) {
+        if (!Cache::has('pluginList')) {
             return Cache::remember('pluginList', 3600, function () {
                 $response = Http::get('https://api.panel.haozi.xyz/api/plugin/list');
                 // 判断请求是否成功，如果不成功则抛出异常
@@ -209,7 +204,7 @@ class PluginsController extends Controller
                     throw new Exception('获取插件列表失败，请求错误');
                 }
                 // 判断返回的JSON数据中code是否为0，如果不为0则抛出异常
-                if ( ! $response->json('code') == 0) {
+                if (!$response->json('code') == 0) {
                     throw new Exception('获取插件列表失败，服务器未返回正确的状态码');
                 }
 
@@ -219,5 +214,29 @@ class PluginsController extends Controller
             // 从缓存中获取access_token
             return Cache::get('pluginList');
         }
+    }
+
+    /**
+     * 设置插件首页显示
+     */
+    public function setShowHome(Request $request): JsonResponse
+    {
+        // 消毒
+        try {
+            $credentials = $this->validate($request, [
+                'slug' => 'required|max:255',
+                'show' => 'required|boolean',
+            ]);
+            $slug = $credentials['slug'];
+            $show = $credentials['show'];
+        } catch (Exception $e) {
+            return response()->json(['code' => 1, 'msg' => $e->getMessage()]);
+        }
+
+        Plugin::query()->where('slug', $slug)->update(['show' => $show]);
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        $res['data'] = '设置成功';
+        return response()->json($res);
     }
 }

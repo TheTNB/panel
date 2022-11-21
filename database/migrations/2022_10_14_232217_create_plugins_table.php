@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('plugins', function (Blueprint $table) {
             $table->id();
             $table->string('slug')->unique()->comment('插件标识');
-            $table->string('name')->comment('插件名称');
             $table->boolean('show')->comment('是否首页显示')->nullable();
             $table->timestamps();
         });

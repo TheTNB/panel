@@ -8,7 +8,6 @@
         "php": "^8.1.9",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.19",
-        "laravel/octane": "^1.3",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "overtrue/laravel-lang": "^6.0"

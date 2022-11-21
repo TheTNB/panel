@@ -123,6 +123,7 @@ Route::prefix('panel')->group(function () {
         Route::get('getList', [PluginsController::class, 'getList']);
         Route::post('install', [PluginsController::class, 'install']);
         Route::post('uninstall', [PluginsController::class, 'uninstall']);
+        Route::post('setShowHome', [PluginsController::class, 'setShowHome']);
     });
     // 设置
     Route::middleware('auth:sanctum')->prefix('setting')->group(function () {

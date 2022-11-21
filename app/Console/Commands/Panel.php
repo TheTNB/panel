@@ -49,6 +49,9 @@ class Panel extends Command
             case 'writePluginUnInstall':
                 $this->writePluginUnInstall();
                 break;
+            case 'writeMysqlPassword':
+                $this->writeMysqlPassword();
+                break;
             default:
                 $this->error('错误的操作');
                 break;
@@ -67,6 +70,12 @@ class Panel extends Command
         Setting::query()->updateOrCreate(['name' => 'monitor_days'], ['value' => '30']);
         Setting::query()->updateOrCreate(['name' => 'mysql_root_password'], ['value' => '']);
         Setting::query()->updateOrCreate(['name' => 'postgresql_root_password'], ['value' => '']);
+        User::query()->create([
+            'id' => 1,
+            'username' => 'admin',
+            'email' => 'panel@haozi.net',
+            'password' => Hash::make(Str::random()),
+        ]);
     }
 
     /**
@@ -113,20 +122,11 @@ class Panel extends Command
         // 生成唯一信息
         $username = Str::random(6);
         $password = Str::random(12);
-        // 判空
-        if (empty($user)) {
-            User::query()->create([
-                'id' => 1,
-                'username' => $username,
-                'password' => Hash::make($password),
-            ]);
-        } else {
-            // 入库
-            $user->update([
-                'username' => $username,
-                'password' => Hash::make($password),
-            ]);
-        }
+        // 入库
+        $user->update([
+            'username' => $username,
+            'password' => Hash::make($password),
+        ]);
 
         $this->info('面板用户名：'.$username);
         $this->info('面板密码：'.$password);
@@ -173,6 +173,23 @@ class Panel extends Command
         }
         // 入库
         Plugin::query()->where('slug', $pluginSlug)->delete();
+        $this->info('成功');
+    }
+
+    /**
+     * 写入MySQL密码
+     */
+    private function writeMysqlPassword(): void
+    {
+        $password = $this->argument('a1');
+
+        // 判空
+        if (empty($password)) {
+            $this->error('参数错误');
+            return;
+        }
+        // 入库
+        Setting::query()->where('name', 'mysql_root_password')->update(['value' => $password]);
         $this->info('成功');
     }
 }
