@@ -52,7 +52,7 @@ class WebsitesController extends Controller
                 'name' => 'required|max:255',
                 'domain' => 'required',
                 'path' => 'string|nullable|max:255',
-                'php' => 'required|integer',
+                'php' => 'required',
                 'note' => 'string|nullable|max:255',
                 'db' => 'required|boolean',
                 'db_type' => 'required_if:db,true|max:10',
