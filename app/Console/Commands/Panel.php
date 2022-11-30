@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Plugin;
 use App\Models\Setting;
+use App\Models\Task;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -51,6 +52,9 @@ class Panel extends Command
                 break;
             case 'writeMysqlPassword':
                 $this->writeMysqlPassword();
+                break;
+            case 'cleanRunningTask':
+                $this->cleanRunningTask();
                 break;
             default:
                 $this->error('错误的操作');
@@ -190,6 +194,15 @@ class Panel extends Command
         }
         // 入库
         Setting::query()->where('name', 'mysql_root_password')->update(['value' => $password]);
+        $this->info('成功');
+    }
+
+    /**
+     * 清理所有运行中的任务
+     */
+    private function cleanRunningTask(): void
+    {
+        Task::query()->where('status', 'running')->update(['status' => 'finished']);
         $this->info('成功');
     }
 }
