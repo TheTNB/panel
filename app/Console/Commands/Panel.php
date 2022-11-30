@@ -198,11 +198,11 @@ class Panel extends Command
     }
 
     /**
-     * 清理所有运行中的任务
+     * 清理所有运行中和等待中的任务
      */
     private function cleanRunningTask(): void
     {
-        Task::query()->where('status', 'running')->update(['status' => 'finished']);
+        Task::query()->update(['status' => 'finished']);
         $this->info('成功');
     }
 }
