@@ -20,6 +20,20 @@ Date: 2022-10-14
                             <div class="layui-form-mid layui-word-aux">修改面板的显示名称</div>
                         </div>
                         <div class="layui-form-item">
+                            <label class="layui-form-label">面板用户名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="username" value="获取中ing..." class="layui-input" disabled/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">修改面板的登录用户名</div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">面板密码</label>
+                            <div class="layui-input-inline">
+                                <input type="password" name="password" value="" class="layui-input" disabled/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">修改面板的登录密码（留空不修改）</div>
+                        </div>
+                        <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button class="layui-btn" lay-submit lay-filter="panel_setting_submit">确认修改</button>
                             </div>
