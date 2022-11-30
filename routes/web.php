@@ -30,7 +30,7 @@ Route::prefix('panel/views')->group(function () {
     // 网站
     Route::prefix('website')->group(function () {
         //全局设置
-        Route::view('default_setting', 'website.default_settings');
+        Route::view('default_settings', 'website.default_settings');
         // 列表
         Route::view('list', 'website.list');
         // 添加

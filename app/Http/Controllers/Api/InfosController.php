@@ -32,23 +32,6 @@ class InfosController extends Controller
                     "jump" => "website/list"
                 ),
                 array(
-                    "name" => "database",
-                    "title" => "数据库",
-                    "icon" => "layui-icon-template-1",
-                    "list" => array(
-                        array(
-                            "name" => "mysql",
-                            "title" => "MySQL",
-                            "jump" => "database/mysql"
-                        ),
-                        array(
-                            "name" => "postgresql",
-                            "title" => "PostgreSQL",
-                            "jump" => "database/postgresql"
-                        )
-                    )
-                ),
-                array(
                     "name" => "monitor",
                     "title" => "监控",
                     "icon" => "layui-icon-chart-screen",

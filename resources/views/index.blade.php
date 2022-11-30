@@ -20,7 +20,7 @@
 //                          `=---='                               //
 //     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^          //
 //         佛祖保佑          永无Bug          永不宕机               //
-//    Name：耗子Linux面板   Author：耗子   Date：2022-11-21          //
+//    Name：耗子Linux面板   Author：耗子   Date：2022-11-30          //
 ////////////////////////////////////////////////////////////////////
 -->
 
@@ -47,12 +47,12 @@
     }).use('index', function () {
         let layer = layui.layer, admin = layui.admin, $ = layui.jquery;
         layer.ready(function () {
-            admin.popup({
+            /*admin.popup({
                 content: '当前面板为公测版本，如遇到问题请联系耗子反馈！</br>QQ: 823374000'
                 , area: '380px'
                 , shade: false
                 , offset: 't'
-            });
+            });*/
         });
     });
 </script>

@@ -71,6 +71,8 @@ Route::prefix('panel')->group(function () {
     // 网站
     Route::middleware('auth:sanctum')->prefix('website')->group(function () {
         // 获取网站列表
+        Route::get('getDefaultSettings', [WebsitesController::class, 'getDefaultSettings']);
+        Route::post('saveDefaultSettings', [WebsitesController::class, 'saveDefaultSettings']);
         Route::get('getList', [WebsitesController::class, 'getList']);
         Route::post('add', [WebsitesController::class, 'add']);
         Route::post('delete', [WebsitesController::class, 'delete']);
@@ -123,6 +125,7 @@ Route::prefix('panel')->group(function () {
         Route::get('getList', [PluginsController::class, 'getList']);
         Route::post('install', [PluginsController::class, 'install']);
         Route::post('uninstall', [PluginsController::class, 'uninstall']);
+        Route::post('update', [PluginsController::class, 'update']);
         Route::post('setShowHome', [PluginsController::class, 'setShowHome']);
     });
     // 设置

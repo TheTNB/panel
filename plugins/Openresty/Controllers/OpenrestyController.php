@@ -2,7 +2,7 @@
 /**
  * Name: OpenResty插件控制器
  * Author:耗子
- * Date: 2022-11-21
+ * Date: 2022-11-30
  */
 
 namespace Plugins\Openresty\Controllers;
@@ -11,15 +11,16 @@ namespace Plugins\Openresty\Controllers;
 use App\Http\Controllers\Controller;
 
 // HTTP
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Request;
 // Filesystem
 use Illuminate\Filesystem\Filesystem;
 
 class OpenrestyController extends Controller
 {
 
-    public function status()
+    public function status(): JsonResponse
     {
         $command = 'systemctl status nginx';
         $result = shell_exec($command);
@@ -35,7 +36,7 @@ class OpenrestyController extends Controller
         return response()->json($res);
     }
 
-    public function restart()
+    public function restart(): JsonResponse
     {
         $command = 'nginx -t 2>&1';
         $result = shell_exec($command);
@@ -50,15 +51,12 @@ class OpenrestyController extends Controller
         }
 
         $command2 = 'systemctl restart nginx';
-        $result2 = shell_exec($command2);
-        if (str_contains($result2, 'done')) {
-            $res['data'] = 'OpenResty已重启';
-            return response()->json($res);
-        }
+        shell_exec($command2);
+        $res['data'] = 'OpenResty已重启';
         return response()->json($res);
     }
 
-    public function reload()
+    public function reload(): JsonResponse
     {
         $command = 'nginx -t 2>&1';
         $result = shell_exec($command);
@@ -72,17 +70,12 @@ class OpenrestyController extends Controller
         }
 
         $command2 = 'systemctl reload nginx';
-        $result2 = shell_exec($command2);
-        if (str_contains($result2, 'done')) {
-            $res['data'] = 'OpenResty已重载';
-        } else {
-            $res['msg'] = 'error';
-            $res['data'] = 'OpenResty重载失败';
-        }
+        shell_exec($command2);
+        $res['data'] = 'OpenResty已重载';
         return response()->json($res);
     }
 
-    public function getConfig()
+    public function getConfig(): JsonResponse
     {
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -90,12 +83,12 @@ class OpenrestyController extends Controller
         return response()->json($res);
     }
 
-    public function saveConfig()
+    public function saveConfig(Request $request): JsonResponse
     {
         $res['code'] = 0;
         $res['msg'] = 'success';
         // 获取配置内容
-        $config = Request::post('config');
+        $config = $request->input('config');
         // 备份一份旧配置
         $old_config = file_get_contents('/www/server/nginx/conf/nginx.conf');
         // 写入配置
@@ -118,7 +111,7 @@ class OpenrestyController extends Controller
         }
     }
 
-    public function load()
+    public function load(): JsonResponse
     {
         $raw_status = HTTP::get('http://127.0.0.1/nginx_status')->body();
 
@@ -158,7 +151,7 @@ class OpenrestyController extends Controller
         return response()->json($res);
     }
 
-    public function errorLog()
+    public function errorLog(): JsonResponse
     {
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -170,7 +163,7 @@ class OpenrestyController extends Controller
         return response()->json($res);
     }
 
-    public function cleanErrorLog()
+    public function cleanErrorLog(): JsonResponse
     {
         $res['code'] = 0;
         $res['msg'] = 'success';

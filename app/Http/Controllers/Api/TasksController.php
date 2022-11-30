@@ -23,7 +23,7 @@ class TasksController extends Controller
         $task = Task::query()->where('status', 'running')->orWhere('status', 'waiting')->first();
         $res['code'] = 0;
         $res['msg'] = 'success';
-        if ($task) {
+        if (empty($task)) {
             $res['data'] = false;
         } else {
             $res['data'] = true;

@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 编辑
 Author: 耗子
-Date: 2022-11-21
+Date: 2022-11-28
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <div class="layui-tab">
@@ -182,7 +182,7 @@ Date: 2022-11-21
             <div class="layui-tab-item">
                 <!-- 访问日志 -->
                 <button id="clean-site-log" class="layui-btn">清空日志</button>
-                <pre class="layui-code" lay-options="{about: '@{{ d.params.config.name }}.log'}">@{{ d.params.config.log }}</pre>
+                <pre id="website-log" class="layui-code" lay-options="{about: '@{{ d.params.config.name }}.log'}">@{{ d.params.config.log }}</pre>
             </div>
         </div>
     </div>
@@ -200,7 +200,7 @@ Date: 2022-11-21
                 , element = layui.element
                 , layer = layui.layer
                 , laydate = layui.laydate
-                , table = layui.table
+                , code = layui.code
                 , form = layui.form;
             console.log(params);
             form.render();
@@ -212,8 +212,9 @@ Date: 2022-11-21
                 mode: "ace/mode/nginx",
                 selectionStyle: "text"
             });
-            layui.code({
-                encode: true
+            code({
+                elem: '#website-log'
+                , encode: true
                 , about: false
 
             });
@@ -301,6 +302,11 @@ Date: 2022-11-21
                     }
                 });
             });
+
+            // 重载配置
+            $('#site-config-restore').click(function (){
+                layer.msg('待开发功能！', {icon: 2});
+            })
         });
     };
 </script>

@@ -1,7 +1,7 @@
 <!--
 Name: 主页模板
 Author: 耗子
-Date: 2022-10-14
+Date: 2022-11-30
 -->
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
@@ -84,7 +84,7 @@ Date: 2022-10-14
                             <ul class="layui-row layui-col-space10 layui-this">
                                 <script type="text/html" template lay-url="/api/panel/info/getHomePlugins">
                                     @{{#  layui.each(d.data, function(index, item){ }}
-                                    <li class="layui-col-xs2">
+                                    <li class="layui-col-xs4 layui-col-md2 layui-col-sm4">
                                         <a lay-href="/plugin/@{{ item.slug }}">
                                             <i class="layui-icon layui-icon-engine"></i>
                                             <cite>@{{ item.name }}</cite>
@@ -146,7 +146,7 @@ Date: 2022-10-14
                 </div>
                 <div class="layui-card-body layui-text layadmin-text">
                     <blockquote class="layui-elem-quote">
-                        <p>暂时没想好写什么，啦啦啦。</p>
+                        <p>这是一个全新的项目，欢迎您的使用。如果遇到问题/Bug，请前往交流反馈QQ群：<a href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">12370907</a> 反馈给我，我们共同让她变得更完美。</p>
                     </blockquote>
                 </div>
             </div>

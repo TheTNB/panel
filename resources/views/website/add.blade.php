@@ -144,13 +144,14 @@ Date: 2022-11-21
                             layer.msg('新网站添加失败，请刷新重试！')
                             return false;
                         }
+                        table.reload('website-list');
                         layer.alert('新网站添加成功！', {
                             icon: 1
                             , title: '提示'
                             , btn: ['确定']
                             , yes: function (index) {
-                                layer.close(index);
-                                location.reload();
+                                layer.closeAll();
+                                //location.reload();
                             }
                         });
                     }

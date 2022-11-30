@@ -29,7 +29,7 @@ class UsersController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'code' => 1,
-                'msg' => '参数错误',
+                'msg' => '参数错误：'.$e->getMessage(),
                 'errors' => $e->errors()
             ], 422);
         }

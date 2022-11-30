@@ -9,10 +9,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Website;
 use App\Models\Setting;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class WebsitesController extends Controller
@@ -23,9 +21,9 @@ class WebsitesController extends Controller
      */
     public function getList(): JsonResponse
     {
-        $website_lists = Website::query()->get();
+        $websiteList = Website::query()->get();
         // 判空
-        if ($website_lists->isEmpty()) {
+        if ($websiteList->isEmpty()) {
             return response()->json([
                 'code' => 0,
                 'msg' => '无数据',
@@ -35,7 +33,7 @@ class WebsitesController extends Controller
         return response()->json([
             'code' => 0,
             'msg' => '获取成功',
-            'data' => $website_lists
+            'data' => $websiteList
         ]);
     }
 
@@ -58,14 +56,30 @@ class WebsitesController extends Controller
                 'db_type' => 'required_if:db,true|max:10',
                 'db_name' => 'required_if:db,true|max:255',
                 'db_username' => 'required_if:db,true|max:255',
-                'db_password' => 'required_if:db,true|max:255',
+                'db_password' => ['required_if:db,true', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/', 'min:8'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'code' => 1,
-                'msg' => '参数错误',
+                'msg' => '参数错误：'.$e->getMessage(),
                 'errors' => $e->errors()
             ], 200);
+        }
+
+        // 禁止添加重复网站
+        $website = Website::query()->where('name', $credentials['name'])->first();
+        if ($website) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站已存在'
+            ]);
+        }
+        // 禁止phpmyadmin作为名称
+        if ($credentials['name'] == 'phpmyadmin') {
+            return response()->json([
+                'code' => 1,
+                'msg' => '该名称为保留名称，请更换'
+            ]);
         }
         // path为空时，设置默认值
         if (empty($credentials['path'])) {
@@ -228,20 +242,34 @@ EOF;
 
     /**
      * 获取网站全局设置
-     * @return
+     * @return JsonResponse
      */
-    public function get_website_default_settings()
+    public function getDefaultSettings(): JsonResponse
     {
-        return '待开发功能';
+        $index = @file_get_contents('/www/server/nginx/html/index.html') ? file_get_contents('/www/server/nginx/html/index.html') : '';
+        $stop = @file_get_contents('/www/server/nginx/html/stop.html') ? file_get_contents('/www/server/nginx/html/stop.html') : '';
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        $res['data'] = [
+            'index' => $index,
+            'stop' => $stop,
+        ];
+        return response()->json($res);
     }
 
     /**
      * 保存网站全局设置
-     * @return
+     * @return JsonResponse
      */
-    public function save_website_default_settings()
+    public function saveDefaultSettings(): JsonResponse
     {
-        return '待开发功能';
+        $index = request()->input('index');
+        $stop = request()->input('stop');
+        file_put_contents('/www/server/nginx/html/index.html', $index);
+        file_put_contents('/www/server/nginx/html/stop.html', $stop);
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
     }
 
     /**

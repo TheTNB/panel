@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 
 class PluginsController extends Controller
@@ -28,7 +29,7 @@ class PluginsController extends Controller
     {
         $data['code'] = 0;
         $data['msg'] = 'success';
-        $data['data'] = $this->pluginList(false);
+        $data['data'] = $this->pluginList();
         foreach ($data['data'] as $k => $v) {
             // 获取首页显示状态
             $shows = Plugin::query()->pluck('show', 'slug');
@@ -73,34 +74,28 @@ class PluginsController extends Controller
                 'slug' => 'required|max:255',
             ]);
             $slug = $credentials['slug'];
-        } catch (Exception $e) {
+        } catch (ValidationException $e) {
             return response()->json(['code' => 1, 'msg' => $e->getMessage()]);
         }
         // 通过slug获取插件信息
         $pluginList = $this->pluginList();
         // 循环插件列表查找对应的插件信息
-        $plugin_check = false;
-        $plugin_data = [];
+        $pluginCheck = false;
+        $pluginData = [];
         foreach ($pluginList as $v) {
             if ($v['slug'] == $slug) {
-                $plugin_data = $v;
-                $plugin_check = true;
+                $pluginData = $v;
+                $pluginCheck = true;
             }
         }
+
         // 判断插件是否存在
-        if (!$plugin_check) {
+        if (!$pluginCheck) {
             return response()->json(['code' => 1, 'msg' => '插件不存在']);
         }
 
-        // 判断有无任务记录
-        $task_check = Task::query()->where('name', '安装'.$plugin_data['name'])->first();
-        if ($task_check) {
-            $data['code'] = 1;
-            $data['msg'] = '此插件已存在安装记录，请先删除！';
-            return response()->json($data);
-        }
         // 判断插件是否已经安装
-        $installed = Task::query()->where('slug', $slug)->first();
+        $installed = isset(PLUGINS[$slug]);
         if ($installed) {
             $data['code'] = 1;
             $data['msg'] = '请不要重复安装！';
@@ -109,10 +104,10 @@ class PluginsController extends Controller
 
         // 入库等待安装
         $task = new Task();
-        $task->name = '安装'.$plugin_data['name'];
-        $task->shell = $plugin_data['install'];
+        $task->name = '安装 '.$pluginData['name'];
+        $task->shell = $pluginData['install'];
         $task->status = 'waiting';
-        $task->log = '/tmp/'.$plugin_data['slug'].'.log';
+        $task->log = '/tmp/'.$pluginData['slug'].'.log';
         $task->save();
         // 塞入队列
         ProcessShell::dispatch($task->id)->delay(1);
@@ -136,32 +131,25 @@ class PluginsController extends Controller
                 'slug' => 'required|max:255',
             ]);
             $slug = $credentials['slug'];
-        } catch (Exception $e) {
+        } catch (ValidationException $e) {
             return response()->json(['code' => 1, 'msg' => $e->getMessage()]);
         }
         // 通过slug获取插件信息
         $pluginList = $this->pluginList();
 
         // 循环插件列表查找对应的插件信息
-        $plugin_check = false;
-        $plugin_data = [];
+        $pluginCheck = false;
+        $pluginData = [];
         foreach ($pluginList as $v) {
             if ($v['slug'] == $slug) {
-                $plugin_data = $v;
-                $plugin_check = true;
+                $pluginData = $v;
+                $pluginCheck = true;
             }
         }
-        // 判断插件是否存在
-        if (!$plugin_check) {
-            return response()->json(['code' => 1, 'msg' => '插件不存在']);
-        }
 
-        // 判断有无任务记录
-        $task_check = Task::query()->where('name', '卸载'.$plugin_data['name'])->first();
-        if ($task_check) {
-            $data['code'] = 1;
-            $data['msg'] = '此插件已存在卸载记录，请先删除！';
-            return response()->json($data);
+        // 判断插件是否存在
+        if (!$pluginCheck) {
+            return response()->json(['code' => 1, 'msg' => '插件不存在']);
         }
 
         // 判断是否是操作openresty
@@ -173,10 +161,67 @@ class PluginsController extends Controller
 
         // 入库等待卸载
         $task = new Task();
-        $task->name = '卸载'.$plugin_data['name'];
-        $task->shell = $plugin_data['uninstall'];
+        $task->name = '卸载 '.$pluginData['name'];
+        $task->shell = $pluginData['uninstall'];
         $task->status = 'waiting';
-        $task->log = '/tmp/'.$plugin_data['slug'].'.log';
+        $task->log = '/tmp/'.$pluginData['slug'].'.log';
+        $task->save();
+        // 塞入队列
+        ProcessShell::dispatch($task->id)->delay(1);
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        $res['data'] = '任务添加成功';
+
+        return response()->json($res);
+    }
+
+    /**
+     * 更新插件
+     */
+    public function update(Request $request): JsonResponse
+    {
+        // 消毒
+        try {
+            $credentials = $this->validate($request, [
+                'slug' => 'required|max:255',
+            ]);
+            $slug = $credentials['slug'];
+        } catch (ValidationException $e) {
+            return response()->json(['code' => 1, 'msg' => $e->getMessage()]);
+        }
+        // 通过slug获取插件信息
+        $pluginList = $this->pluginList();
+
+        // 循环插件列表查找对应的插件信息
+        $pluginCheck = false;
+        $pluginData = [];
+        foreach ($pluginList as $v) {
+            if ($v['slug'] == $slug) {
+                $pluginData = $v;
+                $pluginCheck = true;
+                break;
+            }
+        }
+
+        // 判断插件是否存在
+        if (!$pluginCheck) {
+            return response()->json(['code' => 1, 'msg' => '插件不存在']);
+        }
+
+        // 判断插件是否已经安装
+        $installed = isset(PLUGINS[$slug]);
+        if (!$installed) {
+            $data['code'] = 1;
+            $data['msg'] = '插件未安装！';
+            return response()->json($data);
+        }
+
+        // 入库等待更新
+        $task = new Task();
+        $task->name = '更新 '.$pluginData['name'];
+        $task->shell = $pluginData['update'];
+        $task->status = 'waiting';
+        $task->log = '/tmp/'.$pluginData['slug'].'.log';
         $task->save();
         // 塞入队列
         ProcessShell::dispatch($task->id)->delay(1);
@@ -229,8 +274,16 @@ class PluginsController extends Controller
             ]);
             $slug = $credentials['slug'];
             $show = $credentials['show'];
-        } catch (Exception $e) {
+        } catch (ValidationException $e) {
             return response()->json(['code' => 1, 'msg' => $e->getMessage()]);
+        }
+
+        // 判断插件是否已经安装
+        $installed = isset(PLUGINS[$slug]);
+        if (!$installed) {
+            $data['code'] = 1;
+            $data['msg'] = '插件未安装！';
+            return response()->json($data);
         }
 
         Plugin::query()->where('slug', $slug)->update(['show' => $show]);

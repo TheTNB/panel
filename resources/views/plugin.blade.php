@@ -2,26 +2,26 @@
 
 <div class="layui-fluid">
     <div class="layui-card">
-        <!--<div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="store-form">
+        <!--<div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="plugin-form">
             <div class="layui-form-item">
                 <div class="layui-inline">
                     <label class="layui-form-label">搜索</label>
                     <div class="layui-input-block">
-                        <input type="text" name="store_search" placeholder="请输入关键词（如php）" autocomplete="off"
+                        <input type="text" name="plugin_search" placeholder="请输入关键词（如php）" autocomplete="off"
                                class="layui-input">
                     </div>
                 </div>
                 <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-order" lay-submit lay-filter="store-search-submit">
+                    <button class="layui-btn layuiadmin-btn-order" lay-submit lay-filter="plugin-search-submit">
                         <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
                     </button>
                 </div>
             </div>
         </div>-->
         <div class="layui-card-body">
-            <table id="panel-store" lay-filter="panel-store"></table>
+            <table id="panel-plugin" lay-filter="panel-plugin"></table>
             <!-- 操作按钮模板 -->
-            <script type="text/html" id="store-control-tpl">
+            <script type="text/html" id="panel-plugin-control">
                 @{{#  if(d.control.installed == true && d.control.allow_uninstall == true){ }}
                 @{{#  if(d.control.update == true){ }}
                 <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
@@ -59,16 +59,16 @@
             , admin = layui.admin;
 
         table.render({
-            elem: '#panel-store'
+            elem: '#panel-plugin'
             , url: '/api/panel/plugin/getList'
             , cols: [[
                 {field: 'slug', hide: true, title: 'Slug', sort: true}
-                , {field: 'name', width: '10%', title: '插件名'}
-                , {field: 'describe', width: '48%', title: '描述'}
+                , {field: 'name', width: '13%', title: '插件名'}
+                , {field: 'describe', width: '42%', title: '描述'}
                 , {field: 'install_version', width: '12%', title: '已装版本'}
                 , {field: 'version', width: '12%', title: '最新版本'}
                 , {field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true}
-                , {field: 'control', title: '操作', templet: '#store-control-tpl', fixed: 'right', align: 'center'}
+                , {field: 'control', title: '操作', templet: '#panel-plugin-control', fixed: 'right', align: 'left'}
             ]]
             , page: false
             , text: '耗子Linux面板：数据加载出现异常！'
@@ -77,8 +77,8 @@
             }
         });
 
-        //工具条
-        table.on('tool(panel-store)', function (obj) {
+        // 工具条
+        table.on('tool(panel-plugin)', function (obj) {
             let data = obj.data;
             if (obj.event === 'open') {
                 location.hash = '/plugin/' + data.slug;
@@ -93,11 +93,10 @@
                         }
                         , success: function (res) {
                             if (res.code === 0) {
+                                table.reload('panel-plugin');
                                 layer.msg('安装：' + data.name + ' 成功加入任务队列', {
                                     icon: 1,
                                     time: 1000
-                                }, function () {
-                                    location.reload();
                                 });
                             } else {
                                 layer.msg(res.msg, {icon: 2, time: 1000});
@@ -119,8 +118,10 @@
                         }
                         , success: function (res) {
                             if (res.code === 0) {
-                                layer.msg('卸载：' + data.name + ' 成功！', {icon: 1, time: 1000}, function () {
-                                    location.reload();
+                                table.reload('panel-plugin');
+                                layer.msg('卸载：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
                                 });
                             } else {
                                 layer.msg(res.msg, {icon: 2, time: 1000});
@@ -142,11 +143,10 @@
                         }
                         , success: function (res) {
                             if (res.code === 0) {
-                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {
+                                table.reload('panel-plugin');
+                                layer.msg('升级：' + data.name + ' 成功加入任务队列', {
                                     icon: 1,
                                     time: 1000
-                                }, function () {
-                                    location.reload();
                                 });
                             } else {
                                 layer.msg(res.msg, {icon: 2, time: 1000});
@@ -184,14 +184,14 @@
                 }
             });
         });
-        /*form.render(null, 'store-form');
+        /*form.render(null, 'plugin-form');
 
         //搜索
-        form.on('submit(store-search-submit)', function (data) {
+        form.on('submit(plugin-search-submit)', function (data) {
             var field = data.field;
 
             //执行重载
-            table.reload('store-search-submit', {
+            table.reload('plugin-search-submit', {
                 where: field
             });
         });*/

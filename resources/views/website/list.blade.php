@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 列表
 Author: 耗子
-Date: 2022-11-21
+Date: 2022-11-28
 -->
 <title>网站</title>
 <div class="layui-fluid">
@@ -15,8 +15,8 @@ Date: 2022-11-21
                     <!-- 顶部工具栏 -->
                     <script type="text/html" id="website-list-bar">
                         <div class="layui-btn-container">
-                            <button class="layui-btn layui-btn-sm" lay-event="add_website">添加网站</button>
-                            <!--<button class="layui-btn layui-btn-sm" lay-event="edit_default_settings">全局设置</button>-->
+                            <button class="layui-btn layui-btn-sm" lay-event="website_add">添加网站</button>
+                            <button class="layui-btn layui-btn-sm" lay-event="website_default_settings">全局设置</button>
                         </div>
                     </script>
                     <!-- 右侧网站设置和删除网站 -->
@@ -30,6 +30,10 @@ Date: 2022-11-21
                                lay-filter="website-run-checkbox"
                                value="@{{ d.status }}" data-website-name="@{{ d.name }}"
                                @{{ d.status== 1 ? 'checked' : '' }} />
+                    </script>
+                    <!-- 网站SSL状态 -->
+                    <script type="text/html" id="website-ssl">
+                        @{{ d.ssl == 1 ? '已开启' : '未开启' }}
                     </script>
                 </div>
             </div>
@@ -77,7 +81,7 @@ Date: 2022-11-21
                 , {field: 'run', title: '运行', width: 100, templet: '#website-run', unresize: true}
                 , {field: 'path', title: '目录', width: 250}
                 , {field: 'php', title: 'PHP', width: 60}
-                , {field: 'ssl', title: 'SSL', width: 110}
+                , {field: 'ssl', title: 'SSL', width: 110, templet: '#website-ssl'}
                 , {field: 'note', title: '备注', edit: 'textarea'}
                 , {fixed: 'right', title: '操作', toolbar: '#website-setting', width: 150}
             ]]
@@ -90,7 +94,7 @@ Date: 2022-11-21
         // 头工具栏事件
         table.on('toolbar(website-list)', function (obj) {
             console.log(obj);
-            if (obj.event === 'add_website') {
+            if (obj.event === 'website_add') {
                 admin.popup({
                     title: '添加网站'
                     , area: ['70%', '60%']
@@ -104,22 +108,22 @@ Date: 2022-11-21
                         });
                     }
                 });
-            } else if (obj.event === 'edit_default_settings') {
-                layer.open({
-                    type: 2
-                    , title: '全局设置'
-                    , content: 'website/edit_default_settings'
-                    , area: ['500px', '500px']
-                    , btn: ['确定', '取消']
-                    , yes: function (index, layero) {
-                        var iframeWin = window[layero.find('iframe')[0]['name']];
-                        iframeWin.submitForm();
+            } else if (obj.event === 'website_default_settings') {
+                admin.popup({
+                    title: '全局设置'
+                    , area: ['70%', '60%']
+                    , id: 'LAY-popup-website-add'
+                    , success: function (layer, index) {
+                        view(this.id).render('website/default_settings', {
+                        }).done(function () {
+                            form.render(null, 'LAY-popup-website-default-settings');
+                        });
                     }
                 });
             }
         });
 
-        //行工具事件
+        // 行工具事件
         table.on('tool(website-list)', function (obj) {
             console.log(obj);
             let data = obj.data;
@@ -156,7 +160,7 @@ Date: 2022-11-21
                     , success: function (result) {
                         if (result.code !== 0) {
                             console.log('耗子Linux面板：网站设置获取失败，接口返回' + result);
-                            layui.alert('网站设置获取失败！');
+                            layer.alert('网站设置获取失败！');
                             return false;
                         }
                         config = result.data;
@@ -217,6 +221,7 @@ Date: 2022-11-21
             let run = obj.elem.checked ? 1 : 0;
 
             console.log(website_name); //当前行数据
+            layer.msg('待开发功能！', {icon: 2});
         });
 
     });

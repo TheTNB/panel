@@ -22,7 +22,7 @@ Date: 2022-10-09
                                 <script type="text/html" template lay-url="/api/panel/task/getListRunning"
                                         lay-done="layui.data.done(d);">
                                     @{{# if(d.data != ""){ }}
-                                    <blockquote class="layui-elem-quote">安装 @{{ d.data.name }}</blockquote>
+                                    <blockquote class="layui-elem-quote">@{{ d.data.name }}</blockquote>
                                     <pre id="plugin-install-log" class="layui-code">
                                         日志获取中...
                                     </pre>
@@ -50,10 +50,11 @@ Date: 2022-10-09
 
 <script>
     var install_plugin_timer;
+
     function render_plugin_install_log(d) {
         let admin = layui.admin
-            ,$ = layui.$
-            ,code = layui.code;
+            , $ = layui.$
+            , code = layui.code;
         admin.req({
             url: "/api/panel/task/getTaskLog?name=" + d.data.name
             , method: 'get'
@@ -62,7 +63,8 @@ Date: 2022-10-09
                     console.log('耗子Linux面板：实时安装日志获取失败，接口返回' + result);
                     $('#plugin-install-log').html('实时安装日志获取失败，请刷新重试！');
                     code({
-                        title: 'install.log'
+                        elem: '#plugin-install-log'
+                        , title: 'install.log'
                         , encode: true
                         , about: false
 
@@ -71,7 +73,8 @@ Date: 2022-10-09
                 }
                 $('#plugin-install-log').html(result.data);
                 code({
-                    title: 'install.log'
+                    elem: '#plugin-install-log'
+                    , title: 'install.log'
                     , encode: true
                     , about: false
 
@@ -82,6 +85,7 @@ Date: 2022-10-09
             }
         })
     }
+
     layui.data.done = function (d) {
         // 判断是否有任务
         if (d.data.name) {
@@ -98,7 +102,6 @@ Date: 2022-10-09
 
     layui.use(['admin', 'table', 'jquery'], function () {
         var $ = layui.$
-            , form = layui.form
             , table = layui.table
             , admin = layui.admin;
 
@@ -118,12 +121,18 @@ Date: 2022-10-09
 
         table.render({
             elem: '#panel-task-finished'
-            ,id: 'panel-task-finished-table'
+            , id: 'panel-task-finished-table'
             , url: '/api/panel/task/getListFinished'
             , cols: [[
                 {field: 'slug', hide: true, title: 'Slug', sort: true}
                 , {field: 'name', width: '80%', title: '任务名'}
-                , {field: 'control', title: '操作', templet: '#panel-task-finished-control-tpl', fixed: 'right', align: 'center'}
+                , {
+                    field: 'control',
+                    title: '操作',
+                    templet: '#panel-task-finished-control-tpl',
+                    fixed: 'right',
+                    align: 'center'
+                }
             ]]
             , page: false
             , text: '耗子Linux面板：数据加载出现异常！'
@@ -132,7 +141,7 @@ Date: 2022-10-09
             }
         });
 
-        //工具条
+        // 工具条
         table.on('tool(panel-task-finished)', function (obj) {
             let data = obj.data;
             if (obj.event === 'remove') {

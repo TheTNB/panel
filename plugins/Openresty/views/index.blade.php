@@ -1,7 +1,7 @@
 <!--
 Name: Openresty管理器
 Author: 耗子
-Date: 2022-11-21
+Date: 2022-11-30
 -->
 <title>OpenResty</title>
 <div class="layui-fluid" id="component-tabs">
@@ -96,7 +96,8 @@ Date: 2022-11-21
                     console.log('耗子Linux面板：OpenResty错误日志获取失败，接口返回' + result);
                     $('#openresty-error-log').text('OpenResty错误日志获取失败，请刷新重试！');
                     code({
-                        title: 'error.log'
+                        elem: '#openresty-error-log'
+                        , title: 'error.log'
                         , encode: true
                         , about: false
 
@@ -105,7 +106,8 @@ Date: 2022-11-21
                 }
                 $('#openresty-error-log').text(result.data);
                 code({
-                    title: 'error.log'
+                    elem: '#openresty-error-log'
+                    , title: 'error.log'
                     , encode: true
                     , about: false
 
@@ -201,8 +203,8 @@ Date: 2022-11-21
                             layer.alert(result.data);
                             return false;
                         }
-                        layer.alert('OpenResty重启成功！');
                         admin.events.refresh();
+                        layer.alert('OpenResty重启成功！');
                     }
                     , error: function (xhr, status, error) {
                         console.log('耗子Linux面板：ajax请求出错，错误' + error)
