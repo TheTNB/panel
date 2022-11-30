@@ -216,7 +216,7 @@
                     layer.msg(res.msg, {icon: 2});
                     return false;
                 }
-                renderEcharts('load_monitor', '负载监控', undefined, res.data.times, [{
+                let loadChart = renderEcharts('load_monitor', '负载监控', undefined, res.data.times, [{
                     name: '负载',
                     type: 'line',
                     smooth: true,
@@ -229,7 +229,7 @@
                         data: [{type: 'average', name: '平均值'}]
                     }
                 }]);
-                renderEcharts('cpu_monitor', 'CPU监控', undefined, res.data.times, [{
+                let cpuChart = renderEcharts('cpu_monitor', 'CPU监控', undefined, res.data.times, [{
                     name: '使用率',
                     type: 'line',
                     smooth: true,
@@ -242,7 +242,7 @@
                         data: [{type: 'average', name: '平均值'}]
                     }
                 }], '{value} %', '单位 %');
-                renderEcharts('memory_monitor', '内存', {
+                let memoryChart = renderEcharts('memory_monitor', '内存', {
                     x: 'left',
                     data: ["内存", "Swap"]
                 }, res.data.times, [{
@@ -270,7 +270,7 @@
                         data: [{type: 'average', name: '平均值'}]
                     }
                 }], '{value} M', '单位 MB');
-                renderEcharts('network_monitor', '网络', {
+                let networkChart = renderEcharts('network_monitor', '网络', {
                     x: 'left',
                     data: ["出", "入"]
                 }, res.data.times, [{
@@ -298,6 +298,14 @@
                         data: [{type: 'average', name: '平均值'}]
                     }
                 }], '{value} Kb', '单位 Kb/s');
+
+                // 在窗口大小改变时，重置图表大小
+                window.addEventListener("resize", function () {
+                    loadChart.resize();
+                    cpuChart.resize();
+                    memoryChart.resize();
+                    networkChart.resize();
+                });
             }, error: function (xhr, status, error) {
                 console.log('耗子Linux面板：ajax请求出错，错误' + error);
             }
@@ -329,6 +337,6 @@
         };
 
         Chart.setOption(option);
-        window.onresize = Chart.resize;
+        return Chart;
     }
 </script>
