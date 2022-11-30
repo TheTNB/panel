@@ -228,6 +228,8 @@
                     markLine: {
                         data: [{type: 'average', name: '平均值'}]
                     }
+                }], [{
+                    type: 'value',
                 }]);
                 let cpuChart = renderEcharts('cpu_monitor', 'CPU监控', undefined, res.data.times, [{
                     name: '使用率',
@@ -241,7 +243,15 @@
                     markLine: {
                         data: [{type: 'average', name: '平均值'}]
                     }
-                }], '{value} %', '单位 %');
+                }], [{
+                    name: '单位 %',
+                    min: 0,
+                    max: 100,
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} %'
+                    }
+                }]);
                 let memoryChart = renderEcharts('memory_monitor', '内存', {
                     x: 'left',
                     data: ["内存", "Swap"]
@@ -269,7 +279,15 @@
                     markLine: {
                         data: [{type: 'average', name: '平均值'}]
                     }
-                }], '{value} M', '单位 MB');
+                }], [{
+                    name: '单位 MB',
+                    min: 0,
+                    max: res.data.mem_total,
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} M'
+                    }
+                }]);
                 let networkChart = renderEcharts('network_monitor', '网络', {
                     x: 'left',
                     data: ["出", "入"]
@@ -297,7 +315,13 @@
                     markLine: {
                         data: [{type: 'average', name: '平均值'}]
                     }
-                }], '{value} Kb', '单位 Kb/s');
+                }], [{
+                    name: '单位 Kb/s',
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value} Kb'
+                    }
+                }]);
 
                 // 在窗口大小改变时，重置图表大小
                 window.addEventListener("resize", function () {
@@ -313,20 +337,14 @@
     });
 
     // 渲染图表
-    function renderEcharts(element_id, title, legend = undefined, data_xAxis, series, formatter = '{value}', yName = '') {
+    function renderEcharts(element_id, title, legend = undefined, data_xAxis, series, yAxis = undefined) {
         var Chart = echarts.init(document.getElementById(element_id), layui.echartsTheme);
         var option = {
             title: {text: title, x: 'center', textStyle: {fontSize: 20}},
             tooltip: {trigger: 'axis'},
             legend: legend,
             xAxis: [{type: 'category', boundaryGap: false, data: data_xAxis}],
-            yAxis: [{
-                name: yName,
-                type: 'value',
-                axisLabel: {
-                    formatter: formatter
-                }
-            }],
+            yAxis: yAxis,
             dataZoom: {
                 show: true,
                 realtime: true,

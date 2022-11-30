@@ -87,7 +87,8 @@ class MonitorsController extends Controller
         }
         foreach ($data as $key => $value) {
             $info = json_decode($value['info'], true);
-            $res['data']['times'][] = Carbon::create($value['created_at'])->tz(config('app.timezone', 'PRC'))->isoFormat('MM-DD HH:mm');
+            $res['data']['times'][] = Carbon::create($value['created_at'])->tz(config('app.timezone',
+                'PRC'))->isoFormat('MM-DD HH:mm');
             $res['data']['uptime']['uptime'][] = round($info['uptime'], 2);
             $res['data']['cpu']['use'][] = round($info['cpu_use'], 2);
             $res['data']['memory']['mem_use'][] = round($info['mem_use'], 2);
@@ -97,6 +98,18 @@ class MonitorsController extends Controller
             $res['data']['network']['tx_now'][] = round($info['tx_now'] / 1024, 2);
             $res['data']['network']['rx_now'][] = round($info['rx_now'] / 1024, 2);
         }
+        // 插入总内存大小
+        $result = explode("\n", shell_exec('free -m'));
+        foreach ($result as $key => $val) {
+            if (str_contains($val, 'Mem')) {
+                $mem_list = preg_replace("/\s+/", " ", $val);
+                break;
+            }
+        }
+        $mem_arr = explode(' ', $mem_list);
+        // 内存大小MB
+        $mem_total = $mem_arr[1];
+        $res['data']['mem_total'] = round($mem_total, 2);
         return response()->json($res);
     }
 }
