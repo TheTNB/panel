@@ -15,14 +15,14 @@ Date: 2022-11-30
                 <blockquote class="layui-elem-quote layui-quote-nm">
                     设置站点未找到时的提示页面。
                 </blockquote>
-                <div id="index-editor" style="height: -webkit-fill-available;">@{{ d.data.index }}</div>
+                <div id="index-editor" style="height: 400px;">@{{ d.data.index }}</div>
             </div>
             <div class="layui-tab-item">
                 <!-- 停止页 -->
                 <blockquote class="layui-elem-quote layui-quote-nm">
                     设置站点停止时的提示页面。
                 </blockquote>
-                <div id="stop-editor" style="height: -webkit-fill-available;">@{{ d.data.stop }}</div>
+                <div id="stop-editor" style="height: 400px;">@{{ d.data.stop }}</div>
             </div>
         </div>
     </div>

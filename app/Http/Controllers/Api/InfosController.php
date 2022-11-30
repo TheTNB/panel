@@ -307,10 +307,10 @@ class InfosController extends Controller
             $dbVersions['mysql'] = false;
         }
         // 判断postgresql插件是否安装
-        if (isset(PLUGINS['postgresql15'])) {
-            $dbVersions['postgresql15'] = PLUGINS['postgresql15']['version'];
+        if (isset(PLUGINS['postgresql'])) {
+            $dbVersions['postgresql'] = PLUGINS['postgresql']['version'];
         } else {
-            $dbVersions['postgresql15'] = false;
+            $dbVersions['postgresql'] = false;
         }
         // 循环获取已安装的PHP版本
         $php_versions = Plugin::query()->where('slug', 'like', 'php%')->get();

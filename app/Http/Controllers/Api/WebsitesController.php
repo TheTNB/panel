@@ -207,6 +207,14 @@ EOF;
                 shell_exec("mysql -u root -p".$password." -e \"CREATE USER '".$credentials['db_username']."'@'localhost' IDENTIFIED BY '".$credentials['db_password']."';\"");
                 shell_exec("mysql -u root -p".$password." -e \"GRANT ALL PRIVILEGES ON ".$credentials['db_name'].".* TO '".$credentials['db_username']."'@'localhost';\"");
                 shell_exec("mysql -u root -p".$password." -e \"flush privileges;\"");
+            } elseif ($credentials['db_type'] == 'postgresql') {
+                shell_exec('echo "CREATE DATABASE '.$credentials['db_name'].';"|su - postgres -c "psql"');
+                shell_exec('echo "CREATE USER '.$credentials['db_username'].' WITH PASSWORD \''.$credentials['db_password'].'\';"|su - postgres -c "psql"');
+                shell_exec('echo "GRANT ALL PRIVILEGES ON DATABASE '.$credentials['db_name'].' TO '.$credentials['db_username'].';"|su - postgres -c "psql"');
+                // 写入用户配置
+                shell_exec('echo "host    '.$credentials['db_name'].'    '.$credentials['db_username'].'    127.0.0.1/32    scram-sha-256" >> /www/server/postgresql/15/pg_hba.conf');
+                // 重载
+                shell_exec('systemctl reload postgresql-15');
             }
         }
         $res['code'] = 0;

@@ -53,19 +53,19 @@ Date: 2022-11-21
             <div class="layui-inline">
                 <label class="layui-form-label">数据库名</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_name" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_name" autocomplete="off" class="layui-input"/>
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库用户</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_username" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_username" autocomplete="off" class="layui-input"/>
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库密码</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_password" autocomplete="off" class="layui-input">
+                    <input id="add-website-db-password" type="text" name="db_password" autocomplete="off" class="layui-input"/>
                 </div>
             </div>
         </div>
@@ -99,14 +99,21 @@ Date: 2022-11-21
         layui.use(['admin', 'form', 'laydate'], function () {
             var $ = layui.$
                 , admin = layui.admin
-                , element = layui.element
                 , layer = layui.layer
-                , laydate = layui.laydate
                 , table = layui.table
                 , form = layui.form;
 
             $("#add-website-db-info").hide();
             form.render();
+
+            $('#add-website-db-password').hover(function () {
+                layer.tips('必须8位以上大小写数字特殊符号混合', '#add-website-db-password', {
+                    tips: 1,
+                    time: 0
+                });
+            }, function () {
+                layer.closeAll('tips');
+            });
 
             form.on('select(add-website-db)', function (data) {
                 console.log(data.value); //得到被选中的值
@@ -118,12 +125,10 @@ Date: 2022-11-21
                     $("#add-website-db-info").show();
                     $('input[name="db_name"]').val($('input[name="name"]').val() + '_mysql');
                     $('input[name="db_username"]').val($('input[name="name"]').val() + '_mysql');
-                    $('input[name="db_password"]').val($('input[name="name"]').val() + '_password');
-                }else if(data.value === 'postgresql15') {
+                }else if(data.value === 'postgresql') {
                     $("#add-website-db-info").show();
                     $('input[name="db_name"]').val($('input[name="name"]').val() + '_postgresql');
                     $('input[name="db_username"]').val($('input[name="name"]').val() + '_postgresql');
-                    $('input[name="db_password"]').val($('input[name="name"]').val() + '_password');
                 }
             });
             // 提交

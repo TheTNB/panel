@@ -167,7 +167,7 @@ Date: 2022-11-28
                 <blockquote class="layui-elem-quote layui-quote-nm">
                     设置伪静态规则，填入 <code>location</code> 部分即可
                 </blockquote>
-                <div id="rewrite-editor" style="height: -webkit-fill-available;">@{{ d.params.config.rewrite }}</div>
+                <div id="rewrite-editor" style="height: 400px;">@{{ d.params.config.rewrite }}</div>
             </div>
             <div class="layui-tab-item">
                 <!-- 配置原文 -->
@@ -177,7 +177,7 @@ Date: 2022-11-28
                     <br>
                     如果你修改了原文，那么点击保存后，其余的修改将不会生效！
                 </blockquote>
-                <div id="config-editor" style="height: -webkit-fill-available;">@{{ d.params.config.config_raw }}</div>
+                <div id="config-editor" style="height: 400px;">@{{ d.params.config.config_raw }}</div>
             </div>
             <div class="layui-tab-item">
                 <!-- 访问日志 -->
