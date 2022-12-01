@@ -77,7 +77,7 @@ Date: 2022-11-28
             , toolbar: '#website-list-bar'
             , title: '网站列表'
             , cols: [[
-                {field: 'name', title: '网站名', width: 200, fixed: 'left', unresize: true, sort: true, edit: 'text'}
+                {field: 'name', title: '网站名', width: 200, fixed: 'left', unresize: true, sort: true}
                 , {field: 'run', title: '运行', width: 100, templet: '#website-run', unresize: true}
                 , {field: 'path', title: '目录', width: 250}
                 , {field: 'php', title: 'PHP', width: 60}
