@@ -19,7 +19,7 @@
 ## 安装说明
 
 ```shell
-wget -O install_panel.sh https://dl.panel.haozi.xyz/shell/install_panel.sh && bash install_panel.sh
+wget -O install_panel.sh https://dl.panel.haozi.xyz/script/install_panel.sh && bash install_panel.sh
 ```
 
 ## 更新说明
