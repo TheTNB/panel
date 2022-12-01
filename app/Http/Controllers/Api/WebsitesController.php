@@ -101,6 +101,13 @@ class WebsitesController extends Controller
         if (empty($credentials['path'])) {
             $credentials['path'] = '/www/wwwroot/'.$credentials['name'];
         }
+        // 如果path不以/开头，则返回错误
+        if (!str_starts_with($credentials['path'], '/')) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站路径必须以/开头'
+            ]);
+        }
         // ssl默认设置为0
         $credentials['ssl'] = 0;
         // 运行状态默认设置为1
