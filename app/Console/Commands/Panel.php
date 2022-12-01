@@ -103,7 +103,7 @@ class Panel extends Command
         $this->info(shell_exec('rm -rf /www/panel'));
         $this->info(shell_exec('mkdir /www/panel'));
         $this->info('正在解压新版本...');
-        $this->info(shell_exec('unzip /tmp/panel.zip -d /www/panel'));
+        $this->info(shell_exec('unzip -o /tmp/panel.zip -d /www/panel'));
         $this->info('正在恢复数据库...');
         $this->info(shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite'));
         $this->info('正在恢复插件...');
