@@ -44,6 +44,9 @@ class Panel extends Command
             case 'getInfo':
                 $this->getInfo();
                 break;
+            case 'getPort':
+                $this->getPort();
+                break;
             case 'writePluginInstall':
                 $this->writePluginInstall();
                 break;
@@ -132,9 +135,32 @@ class Panel extends Command
             'password' => Hash::make($password),
         ]);
 
+        // 从nginx配置文件中获取面板端口
+        $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
+        preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
+
+        if (!isset($matches[1])) {
+            $this->info('获取面板端口失败，请检查nginx主配置文件');
+        }
+
         $this->info('面板用户名：'.$username);
         $this->info('面板密码：'.$password);
-        $this->info('访问地址：http://IP:8888');
+        $this->info('访问地址：http://IP:'.$matches[1]);
+    }
+
+    /**
+     * 获取端口
+     * @return void
+     */
+    private function getPort(): void
+    {
+        // 从nginx配置文件中获取面板端口
+        $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
+        preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
+
+        if (!isset($matches[1])) {
+            $this->info($matches[1]);
+        }
     }
 
     /**

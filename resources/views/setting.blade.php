@@ -34,6 +34,13 @@ Date: 2022-12-01
                             <div class="layui-form-mid layui-word-aux">修改面板的登录密码（留空不修改）</div>
                         </div>
                         <div class="layui-form-item">
+                            <label class="layui-form-label">面板端口</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="port" value="" class="layui-input" disabled/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">修改面板的访问端口（<b style="color: red;">保存后需要手动修改浏览器地址栏的端口为新端口以访问面板</b>）</div>
+                        </div>
+                        <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button class="layui-btn" lay-submit lay-filter="panel_setting_submit">确认修改</button>
                             </div>

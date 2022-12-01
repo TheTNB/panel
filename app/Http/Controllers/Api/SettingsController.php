@@ -28,10 +28,20 @@ class SettingsController extends Controller
         $settings->makeHidden('updated_at');
         $settingArr = $settings->pluck('value', 'name');
 
+        // 从nginx配置文件中获取面板端口
+        $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
+        preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
+
+        if (!isset($matches[1])) {
+            $res['code'] = 1;
+            $res['msg'] = '获取面板端口失败，请检查nginx主配置文件';
+            return response()->json($res);
+        }
         $data = [
             'name' => $settingArr['name'],
             'username' => $request->user()->username,
             'password' => '',
+            'port' => $matches[1],
         ];
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -61,6 +71,24 @@ class SettingsController extends Controller
         }
         if ($request->input('password') != '') {
             $request->user()->update(['password' => Hash::make($request->input('password'))]);
+        }
+        // 处理面板端口
+        $port = $request->input('port');
+        $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
+        preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
+        if (!isset($matches[1])) {
+            $res['code'] = 1;
+            $res['msg'] = '获取面板端口失败，请检查nginx主配置文件';
+            return response()->json($res);
+        }
+        if ($port != $matches[1]) {
+            $nginxConf = preg_replace('/listen\s+(\d+)/', 'listen '.$port, $nginxConf);
+            file_put_contents('/www/server/nginx/conf/nginx.conf', $nginxConf);
+            // 重载nginx
+            shell_exec('systemctl reload nginx');
+            // 防火墙放行端口
+            shell_exec('firewall-cmd --permanent --zone=public --add-port='.$port.'/tcp >/dev/null 2>&1');
+            shell_exec('firewall-cmd --reload');
         }
         $res['code'] = 0;
         $res['msg'] = 'success';
