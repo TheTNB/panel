@@ -65,7 +65,8 @@ Date: 2022-12-01
             <div class="layui-inline">
                 <label class="layui-form-label">数据库密码</label>
                 <div class="layui-input-inline">
-                    <input id="add-website-db-password" type="text" name="db_password" autocomplete="off" class="layui-input"/>
+                    <input id="add-website-db-password" type="text" name="db_password" autocomplete="off"
+                           class="layui-input"/>
                 </div>
             </div>
         </div>
@@ -124,7 +125,7 @@ Date: 2022-12-01
                     $("#add-website-db-info").show();
                     $('input[name="db_name"]').val($('input[name="name"]').val() + '_mysql');
                     $('input[name="db_username"]').val($('input[name="name"]').val() + '_mysql');
-                }else if(data.value === 'postgresql') {
+                } else if (data.value === 'postgresql') {
                     $("#add-website-db-info").show();
                     $('input[name="db_name"]').val($('input[name="name"]').val() + '_postgresql');
                     $('input[name="db_username"]').val($('input[name="name"]').val() + '_postgresql');
@@ -135,7 +136,7 @@ Date: 2022-12-01
                 // 判断db_type是否为空
                 if (data.field.db_type === "") {
                     data.field.db = 0;
-                }else{
+                } else {
                     data.field.db = 1;
                 }
                 admin.req({
@@ -145,7 +146,7 @@ Date: 2022-12-01
                     , success: function (result) {
                         if (result.code !== 0) {
                             console.log('耗子Linux面板：新网站添加失败，接口返回' + result);
-                            layer.msg('新网站添加失败，请刷新重试！')
+                            layer.msg('新网站添加失败！')
                             return false;
                         }
                         table.reload('website-list');

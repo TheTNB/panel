@@ -56,7 +56,7 @@ class WebsitesController extends Controller
                 'db_type' => 'required_if:db,true|max:10',
                 'db_name' => 'required_if:db,true|max:255',
                 'db_username' => 'required_if:db,true|max:255',
-                'db_password' => ['required_if:db,true', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/', 'min:8'],
+                'db_password' => ['required_if:db,true', 'max:255'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -64,6 +64,22 @@ class WebsitesController extends Controller
                 'msg' => '参数错误：'.$e->getMessage(),
                 'errors' => $e->errors()
             ], 200);
+        }
+
+        // 对db_password单独验证
+        if ($credentials['db']) {
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*(_|[^\w])).+$/',
+                $credentials['db_password'])) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '数据库密码必须包含大小写字母、数字、特殊字符'
+                ], 200);
+            } elseif (strlen($credentials['db_password']) < 8) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '数据库密码长度不能小于8位'
+                ], 200);
+            }
         }
 
         // 禁止添加重复网站
