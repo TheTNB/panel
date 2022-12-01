@@ -93,7 +93,6 @@ Date: 2022-11-28
 
         // 头工具栏事件
         table.on('toolbar(website-list)', function (obj) {
-            console.log(obj);
             if (obj.event === 'website_add') {
                 admin.popup({
                     title: '添加网站'
@@ -125,7 +124,6 @@ Date: 2022-11-28
 
         // 行工具事件
         table.on('tool(website-list)', function (obj) {
-            console.log(obj);
             let data = obj.data;
             if (obj.event === 'del') {
                 layer.confirm('删除网站将一并删除站点目录（不包括数据库），是否继续？', function (index) {
@@ -220,7 +218,7 @@ Date: 2022-11-28
             let website_name = $(this).data('website-name');
             let run = obj.elem.checked ? 1 : 0;
 
-            console.log(website_name); //当前行数据
+            //console.log(website_name); //当前行数据
             layer.msg('待开发功能！', {icon: 2});
         });
 

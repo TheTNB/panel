@@ -116,7 +116,6 @@ Date: 2022-12-01
             });
 
             form.on('select(add-website-db)', function (data) {
-                console.log(data.value); //得到被选中的值
                 if (data.value === "") {
                     $("#add-website-db-info").hide();
                     return false;

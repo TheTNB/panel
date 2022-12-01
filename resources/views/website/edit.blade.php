@@ -197,12 +197,9 @@ Date: 2022-12-01
         layui.use(['admin', 'form', 'laydate', 'code'], function () {
             var $ = layui.$
                 , admin = layui.admin
-                , element = layui.element
                 , layer = layui.layer
-                , laydate = layui.laydate
                 , code = layui.code
                 , form = layui.form;
-            console.log(params);
             form.render();
             rewriteEditor = ace.edit("rewrite-editor", {
                 mode: "ace/mode/nginx",
@@ -252,14 +249,12 @@ Date: 2022-12-01
                 var reg = new RegExp(/\n443.*\n?/);
                 // 如果开启了https，就自动添加443端口
                 if ($('input[name="ssl"]').prop('checked') && !reg.test(port)) {
-                    console.log(port);
                     port = port + '\n443';
                 }
                 // 如果关闭了https，就自动删除443端口
                 if (!$('input[name="ssl"]').prop('checked') && reg.test(port)) {
                     // 正则替换
                     port = port.replace(/443.*\n?/, '');
-                    console.log(port);
                 }
                 admin.req({
                     url: '/api/panel/website/saveSiteSettings'
