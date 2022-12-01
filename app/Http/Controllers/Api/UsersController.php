@@ -6,6 +6,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -15,9 +16,9 @@ class UsersController extends Controller
      * 登录
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         // 消毒数据
         try {
@@ -42,7 +43,7 @@ class UsersController extends Controller
             return response()->json(['code' => 1, 'msg' => '登录失败，用户名或密码错误']);
         }
     }
-    public function getInfo(Request $request)
+    public function getInfo(Request $request): JsonResponse
     {
         $user = $request->user();
         $res['code'] = 0;

@@ -8,9 +8,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class SettingsController extends Controller
 {
@@ -32,6 +35,13 @@ class SettingsController extends Controller
         $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
         preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
 
+        $api = 0;
+        $apiToken = '';
+        if (isset($settingArr['api']) && $settingArr['api'] == 1) {
+            $api = 1;
+            $apiToken = $settingArr['api_token'] ?? '';
+        }
+
         if (!isset($matches[1])) {
             $res['code'] = 1;
             $res['msg'] = '获取面板端口失败，请检查nginx主配置文件';
@@ -42,6 +52,8 @@ class SettingsController extends Controller
             'username' => $request->user()->username,
             'password' => '',
             'port' => $matches[1],
+            'api' => $api,
+            'api_token' => $apiToken,
         ];
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -60,7 +72,7 @@ class SettingsController extends Controller
         $settings = $request->all();
         // 将数据入库
         foreach ($settings as $key => $value) {
-            if ($key == 'access_token' || $key == 'username' || $key == 'password') {
+            if ($key == 'access_token' || $key == 'username' || $key == 'password' || $key == 'api_token' || $key == 'api') {
                 continue;
             }
             Setting::query()->where('name', $key)->update(['value' => $value]);
@@ -89,6 +101,48 @@ class SettingsController extends Controller
             // 防火墙放行端口
             shell_exec('firewall-cmd --permanent --zone=public --add-port='.$port.'/tcp >/dev/null 2>&1');
             shell_exec('firewall-cmd --reload');
+        }
+        // 处理api
+        $api = $request->input('api', 0);
+        $apiCheck = Setting::query()->where('name', 'api')->value('value');
+        if (empty($apiCheck)) {
+            $apiCheck = 0;
+        }
+        if ($api != $apiCheck) {
+            if ($api) {
+                Setting::query()->insert([
+                    'name' => 'api',
+                    'value' => 1,
+                ]);
+                // 生成api用户
+                $username = 'api_'.Str::random();
+                $apiUser = User::query()->create([
+                    'username' => $username,
+                    'password' => Hash::make(Str::random()),
+                    'email' => 'panel_api@haozi.net',
+                ]);
+                // 生成api token
+                $apiToken = $apiUser->createToken('api')->plainTextToken;
+                Setting::query()->insert([
+                    'name' => 'api_user',
+                    'value' => $username,
+                ]);
+                Setting::query()->insert([
+                    'name' => 'api_token',
+                    'value' => $apiToken,
+                ]);
+            } else {
+                Setting::query()->where('name', 'api')->delete();
+                Setting::query()->where('name', 'api_token')->delete();
+                $username = Setting::query()->where('name', 'api_user')->value('value');
+                Setting::query()->where('name', 'api_user')->delete();
+                Setting::query()->where('name', 'api')->delete();
+                $apiUser = User::query()->where('username', $username)->first();
+                // 删除api用户的所有token
+                $apiUser->tokens()->delete();
+                // 删除api用户
+                $apiUser->delete();
+            }
         }
         $res['code'] = 0;
         $res['msg'] = 'success';
