@@ -80,118 +80,125 @@ class InfosController extends Controller
     public function getNowMonitor(): JsonResponse
     {
         // 第一次获取网络信息
-        $net_info1 = $this->getNetInfo();
+        $netInfo1 = getNetInfo();
         // 卡它一秒钟
         sleep(1);
         // 第二次获取网络信息
-        $net_info2 = $this->getNetInfo();
+        $netInfo2 = getNetInfo();
 
         // CPU统计信息及负载
-        $cpu_info = file_get_contents('/proc/cpuinfo');
-        $physical_list = array();
-        $physical_sum = 0;
-        $cores_sum = 0;
-        $siblings_sum = 0;
-        preg_match("/model name\s*:(.*)/", $cpu_info, $name);
-        preg_match("/vendor_id\s*:(.*)/", $cpu_info, $vendor);
-        preg_match("/cpu family\s*:(.*)/", $cpu_info, $family);
-        preg_match("/cpu MHz\s*:(.*)/", $cpu_info, $MHz);
-        preg_match("/cache size\s*:(.*)/", $cpu_info, $cache);
+        $cpuInfoRaw = file_get_contents('/proc/cpuinfo');
+        $physicalArr = array();
+        $physicalSum = 0;
+        $coresSum = 0;
+        $siblingsSum = 0;
+        preg_match("/model name\s*:\s(.*)/", $cpuInfoRaw, $cpuName);
+        preg_match("/vendor_id\s*:\s(.*)/", $cpuInfoRaw, $cpuVendor);
+        preg_match("/cpu family\s*:\s(.*)/", $cpuInfoRaw, $cpuFamily);
+        preg_match("/cpu MHz\s*:\s(.*)/", $cpuInfoRaw, $cpuFreq);
+        preg_match("/cache size\s*:\s(.*)/", $cpuInfoRaw, $cpuCache);
         preg_match("/(\d+\.\d+), (\d+\.\d+), (\d+\.\d+)/", exec('uptime'), $uptime);
-        $name = $name[1] ?? 'No';
-        $vendor = $vendor[1] ?? 'No';
-        $family = $family[1] ?? 'No';
-        $MHz = isset($MHz[1]) ? number_format($MHz[1] / 1000, 2) : 'No';
-        $cache = $cache[1] ?? 'No';
-        $uptime_1 = $uptime[1] ?? 'No';
-        $uptime_5 = $uptime[2] ?? 'No';
-        $uptime_15 = $uptime[3] ?? 'No';
+        $cpuName = $cpuName[1] ?? 'No';
+        $cpuVendor = $cpuVendor[1] ?? 'No';
+        $cpuFamily = $cpuFamily[1] ?? 'No';
+        $cpuFreq = isset($cpuFreq[1]) ? round($cpuFreq[1], 2) : 'No';
+        $cpuCache = $cpuCache[1] ?? 'No';
+        $uptime1 = $uptime[1] ?? 0;
+        $uptime5 = $uptime[2] ?? 0;
+        $uptime15 = $uptime[3] ?? 0;
 
-        $p_list = explode("\nprocessor", $cpu_info);
-        foreach ($p_list as $key => $val) {
-            preg_match("/physical id\s*:(.*)/", $val, $physical);
-            preg_match("/cpu cores\s*:(.*)/", $val, $cores);
-            preg_match("/siblings\s*:(.*)/", $val, $siblings);
+        $processorArr = explode("\nprocessor", $cpuInfoRaw);
+        foreach ($processorArr as $v) {
+            preg_match("/physical id\s*:\s(.*)/", $v, $physical);
+            preg_match("/cpu cores\s*:\s(.*)/", $v, $cores);
+            preg_match("/siblings\s*:\s(.*)/", $v, $siblings);
             if (isset($physical[1])) {
-                if (!in_array($physical[1], $physical_list)) {
-                    $physical_sum += 1;
+                if (!in_array($physical[1], $physicalArr)) {
+                    $physicalSum += 1;
                     if (isset($cores[1])) {
-                        $cores_sum += $cores[1];
+                        $coresSum += $cores[1];
                     }
 
                     if (isset($siblings[1])) {
-                        $siblings_sum += $siblings[1];
+                        $siblingsSum += $siblings[1];
                     }
                 }
-                $physical_list[] = $physical[1];
+                $physicalArr[] = $physical[1];
             }
         }
 
         // CPU使用率
-        $cpu_use = 0.1;
-
-        $result = explode("\n", shell_exec('ps aux'));
-        foreach ($result as $key => $val) {
-            $val = preg_replace("/\s+/", " ", $val);
-            $val = (explode(' ', $val));
-            $cpu_use += isset($val[2]) ? (float) $val[2] : 0;
+        $cpuUse = 0.1;
+        $cpuRaw = explode("\n", shell_exec('ps aux'));
+        // 弹出第一项和最后一项
+        array_pop($cpuRaw);
+        array_shift($cpuRaw);
+        // 获取当前php进程的pid
+        $pid = getmypid();
+        foreach ($cpuRaw as $v) {
+            $v = preg_replace("/\s+/", " ", $v);
+            $v = (explode(' ', $v));
+            // 排除当前进程
+            if ($v[1] == $pid) {
+                continue;
+            }
+            $cpuUse += isset($v[2]) ? (float) $v[2] : 0;
         }
-        $cpu_use = $siblings_sum > 0 ? ($cpu_use / $siblings_sum) : $cpu_use;
-        $cpu_use = round($cpu_use, 2);
-        $cpu_use = $cpu_use > 100 ? 100 .'%' : $cpu_use.'%';
-
+        $cpuUse = $siblingsSum > 0 ? ($cpuUse / $siblingsSum) : $cpuUse;
+        $cpuUse = round($cpuUse, 2);
+        $cpuUse = $cpuUse > 100 ? 100 .'%' : $cpuUse.'%';
 
         // 内存使用率
-        $result = explode("\n", shell_exec('free -m'));
-        foreach ($result as $key => $val) {
-            if (str_contains($val, 'Mem')) {
-                $mem_list = preg_replace("/\s+/", " ", $val);
+        $memRaw = explode("\n", shell_exec('free -m'));
+        foreach ($memRaw as $v) {
+            if (str_contains($v, 'Mem')) {
+                $memList = preg_replace("/\s+/", " ", $v);
             }
         }
-        $mem_arr = explode(' ', $mem_list);
+        $memArr = explode(' ', $memList);
         // 内存大小MB
-        $mem_total = $mem_arr[1];
+        $memTotal = $memArr[1];
         // 使用中MB
-        $mem_use = (str_contains($result[0], 'buff/cache')) ? $mem_arr[2] : ($mem_arr[2] - $mem_arr[5] - $mem_arr[6]);
+        $memUse = (str_contains($memRaw[0], 'buff/cache')) ? $memArr[2] : ($memArr[2] - $memArr[5] - $memArr[6]);
         // 使用中%
-        $mem_use_p = round($mem_use / $mem_total, 2) * 100 .'%';
+        $memUseP = round($memUse / $memTotal, 2) * 100 .'%';
         // 1分钟负载%
-        $uptime_1_p = $uptime_1 * 10;
-        $uptime_1_p = $uptime_1_p > 100 ? 100 .'%' : $uptime_1_p.'%';
+        $uptime1P = $uptime1 * 10;
+        $uptime1P = $uptime1P > 100 ? 100 .'%' : $uptime1P.'%';
         // 5分钟负载%
-        $uptime_5_p = $uptime_5 * 10;
-        $uptime_5_p = $uptime_5_p > 100 ? 100 .'%' : $uptime_5_p.'%';
+        $uptime5P = $uptime5 * 10;
+        $uptime5P = $uptime5P > 100 ? 100 .'%' : $uptime5P.'%';
         // 15分钟负载%
-        $uptime_15_p = $uptime_15 * 10;
-        $uptime_15_p = $uptime_15_p > 100 ? 100 .'%' : $uptime_15_p.'%';
+        $uptime15P = $uptime15 * 10;
+        $uptime15P = $uptime15P > 100 ? 100 .'%' : $uptime15P.'%';
 
         // 构建返回数组
         $res['code'] = 0;
         $res['msg'] = 'success';
         $res['data'] = [
-            'cpu_use' => $cpu_use,
-            'uptime_1' => $uptime_1,
-            'uptime_1_p' => $uptime_1_p,
-            'uptime_5' => $uptime_5,
-            'uptime_5_p' => $uptime_5_p,
-            'uptime_15' => $uptime_15,
-            'uptime_15_p' => $uptime_15_p,
-            'mem_total' => $mem_total,
-            'mem_use' => $mem_use,
-            'mem_use_p' => $mem_use_p,
-            'tx_total' => $this->formatBytes($net_info1['tx']),
-            'rx_total' => $this->formatBytes($net_info1['rx']),
-            'tx_now' => $this->formatBytes($net_info2['tx'] - $net_info1['tx']),
-            'rx_now' => $this->formatBytes($net_info2['rx'] - $net_info1['rx']),
+            'cpu_use' => $cpuUse,
+            'uptime_1' => $uptime1,
+            'uptime_1_p' => $uptime1P,
+            'uptime_5' => $uptime5,
+            'uptime_5_p' => $uptime5P,
+            'uptime_15' => $uptime15,
+            'uptime_15_p' => $uptime15P,
+            'mem_total' => $memTotal,
+            'mem_use' => $memUse,
+            'mem_use_p' => $memUseP,
+            'tx_total' => formatBytes($netInfo1['tx']),
+            'rx_total' => formatBytes($netInfo1['rx']),
+            'tx_now' => formatBytes($netInfo2['tx'] - $netInfo1['tx']),
+            'rx_now' => formatBytes($netInfo2['rx'] - $netInfo1['rx']),
             'cpu_info' => [
-                'name' => $name,
-                'cores' => $cores_sum,
-                'physical' => $physical_sum,
-                'siblings' => $siblings_sum,
-                'vendor' => $vendor,
-                'family' => $family,
-                'MHz' => $MHz,
-                'cache' => $cache,
+                'name' => $cpuName,
+                'cores' => $coresSum,
+                'physical' => $physicalSum,
+                'siblings' => $siblingsSum,
+                'vendor' => $cpuVendor,
+                'family' => $cpuFamily,
+                'freq' => $cpuFreq,
+                'cache' => $cpuCache,
             ],
         ];
         return response()->json($res);
@@ -241,57 +248,6 @@ class InfosController extends Controller
             $res['data'] = $plugins;
         }
         return response()->json($res);
-    }
-
-    /**
-     * 获取网络统计信息
-     * @return array
-     */
-    private function getNetInfo(): array
-    {
-        $net_result = file_get_contents('/proc/net/dev');
-        $net_result = explode("\n", $net_result);
-        foreach ($net_result as $key => $val) {
-            if ($key < 2) {
-                continue;
-            }
-            $val = str_replace(':', ' ', trim($val));
-            $val = preg_replace("/[ ]+/", " ", $val);
-            $arr = explode(' ', $val);
-            if (!empty($arr[0])) {
-                $arr = array($arr[0], $arr[1], $arr[9]);
-                $all_rs[$arr[0].$key] = $arr;
-            }
-        }
-        ksort($all_rs);
-        $tx = 0;
-        $rx = 0;
-        foreach ($all_rs as $key => $val) {
-            // 排除本地lo
-            if (str_contains($key, 'lo')) {
-                continue;
-            }
-            $tx += $val[2];
-            $rx += $val[1];
-        }
-        $res['tx'] = $tx;
-        $res['rx'] = $rx;
-        return $res;
-    }
-
-    /**
-     * 格式化bytes
-     * @param $size
-     * @return string
-     */
-    private function formatBytes($size): string
-    {
-        $size = is_numeric($size) ? $size : 0;
-        $units = array(' B', ' KB', ' MB', ' GB', ' TB');
-        for ($i = 0; $size >= 1024 && $i < 4; $i++) {
-            $size /= 1024;
-        }
-        return round($size, 2).$units[$i];
     }
 
     /**

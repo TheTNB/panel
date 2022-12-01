@@ -50,126 +50,93 @@ class Monitor extends Command
     private function getNowMonitor(): array
     {
         // 第一次获取网络信息
-        $net_info1 = $this->getNetInfo();
+        $netInfo1 = getNetInfo();
         // 卡它一秒钟
         sleep(1);
         // 第二次获取网络信息
-        $net_info2 = $this->getNetInfo();
+        $netInfo2 = getNetInfo();
 
         // CPU统计信息及负载
-        $cpu_info = file_get_contents('/proc/cpuinfo');
-        $physical_list = array();
-        $physical_sum = 0;
-        $siblings_sum = 0;
+        $cpuInfoRaw = file_get_contents('/proc/cpuinfo');
+        $physicalArr = array();
+        $siblingsSum = 0;
         preg_match("/(\d+\.\d+), (\d+\.\d+), (\d+\.\d+)/", exec('uptime'), $uptime);
-        $uptime_1 = $uptime[1] ?? 'No';
+        $uptime1 = $uptime[1] ?? 0;
 
-        $p_list = explode("\nprocessor", $cpu_info);
-        foreach ($p_list as $key => $val) {
-            preg_match("/physical id\s*:(.*)/", $val, $physical);
-            preg_match("/cpu cores\s*:(.*)/", $val, $cores);
-            preg_match("/siblings\s*:(.*)/", $val, $siblings);
+        $processorArr = explode("\nprocessor", $cpuInfoRaw);
+        foreach ($processorArr as $v) {
+            preg_match("/physical id\s*:\s(.*)/", $v, $physical);
+            preg_match("/siblings\s*:\s(.*)/", $v, $siblings);
             if (isset($physical[1])) {
-                if (!in_array($physical[1], $physical_list)) {
-                    $physical_sum += 1;
-
+                if (!in_array($physical[1], $physicalArr)) {
                     if (isset($siblings[1])) {
-                        $siblings_sum += $siblings[1];
+                        $siblingsSum += $siblings[1];
                     }
                 }
-                $physical_list[] = $physical[1];
+                $physicalArr[] = $physical[1];
             }
         }
 
         // CPU使用率
-        $cpu_use = 0.1;
-
-        $result = explode("\n", shell_exec('ps aux'));
-        foreach ($result as $key => $val) {
-            $val = preg_replace("/\s+/", " ", $val);
-            $val = (explode(' ', $val));
-            $cpu_use += isset($val[2]) ? (float) $val[2] : 0;
+        $cpuUse = 0.1;
+        $cpuRaw = explode("\n", shell_exec('ps aux'));
+        // 弹出第一项和最后一项
+        array_pop($cpuRaw);
+        array_shift($cpuRaw);
+        // 获取当前php进程的pid
+        $pid = getmypid();
+        foreach ($cpuRaw as $v) {
+            $v = preg_replace("/\s+/", " ", $v);
+            $v = (explode(' ', $v));
+            // 排除当前进程
+            if ($v[1] == $pid) {
+                continue;
+            }
+            $cpuUse += isset($v[2]) ? (float) $v[2] : 0;
         }
-        $cpu_use = $siblings_sum > 0 ? ($cpu_use / $siblings_sum) : $cpu_use;
-        $cpu_use = round($cpu_use, 2);
-        $cpu_use = min($cpu_use, 100);
+        $cpuUse = $siblingsSum > 0 ? ($cpuUse / $siblingsSum) : $cpuUse;
+        $cpuUse = round($cpuUse, 2);
+        $cpuUse = min($cpuUse, 100);
 
 
         // 内存使用率
-        $result = explode("\n", shell_exec('free -m'));
-        foreach ($result as $key => $val) {
-            if (str_contains($val, 'Mem')) {
-                $mem_list = preg_replace("/\s+/", " ", $val);
-            } elseif (str_contains($val, 'Swap')) {
-                $swap_list = preg_replace("/\s+/", " ", $val);
+        $memRaw = explode("\n", shell_exec('free -m'));
+        foreach ($memRaw as $v) {
+            if (str_contains($v, 'Mem')) {
+                $memList = preg_replace("/\s+/", " ", $v);
+            } elseif (str_contains($v, 'Swap')) {
+                $swapList = preg_replace("/\s+/", " ", $v);
             }
         }
-        $mem_arr = explode(' ', $mem_list);
-        $swap_arr = explode(' ', $swap_list);
+        $memArr = explode(' ', $memList);
+        $swapArr = explode(' ', $swapList);
         // 内存大小MB
-        $mem_total = $mem_arr[1];
+        $memTotal = $memArr[1];
         // Swap大小MB
-        $swap_total = $swap_arr[1];
+        $swapTotal = $swapArr[1];
         // 使用中MB
-        $mem_use = (str_contains($result[0], 'buff/cache')) ? $mem_arr[2] : ($mem_arr[2] - $mem_arr[5] - $mem_arr[6]);
+        $memUse = (str_contains($memRaw[0], 'buff/cache')) ? $memArr[2] : ($memArr[2] - $memArr[5] - $memArr[6]);
         // Swap使用中MB
-        $swap_use = $swap_arr[2];
+        $swapUse = $swapArr[2];
         // 使用中%
-        $mem_use_p = round($mem_use / $mem_total, 2) * 100;
+        $memUseP = round($memUse / $memTotal, 2) * 100;
         // Swap使用中%
-        $swap_use_p = round($swap_use / $swap_total, 2) * 100;
+        $swapUseP = round($swapUse / $swapTotal, 2) * 100;
         // 1分钟负载%
-        $uptime_1_p = $uptime_1 * 10;
-        $uptime_1_p = min($uptime_1_p, 100);
+        $uptime1P = round(min($uptime1 * 10, 100), 2);
 
         // 构建返回数组
-        $res['cpu_use'] = $cpu_use;
-        $res['uptime'] = $uptime_1;
-        $res['uptime_p'] = $uptime_1_p;
-        $res['mem_total'] = $mem_total;
-        $res['mem_use'] = $mem_use;
-        $res['mem_use_p'] = $mem_use_p;
-        $res['swap_total'] = $swap_total;
-        $res['swap_use'] = $swap_use;
-        $res['swap_use_p'] = $swap_use_p;
-        $res['tx_now'] = $net_info2['tx'] - $net_info1['tx'];
-        $res['rx_now'] = $net_info2['rx'] - $net_info1['rx'];
-        return $res;
-    }
-
-    /**
-     * 获取网络统计信息
-     * @return array
-     */
-    private function getNetInfo(): array
-    {
-        $net_result = file_get_contents('/proc/net/dev');
-        $net_result = explode("\n", $net_result);
-        foreach ($net_result as $key => $val) {
-            if ($key < 2) {
-                continue;
-            }
-            $val = str_replace(':', ' ', trim($val));
-            $val = preg_replace("/[ ]+/", " ", $val);
-            $arr = explode(' ', $val);
-            if (!empty($arr[0])) {
-                $arr = array($arr[0], $arr[1], $arr[9]);
-                $all_rs[$arr[0].$key] = $arr;
-            }
-        }
-        ksort($all_rs);
-        $tx = 0;
-        $rx = 0;
-        foreach ($all_rs as $key => $val) {
-            // 排除本地lo
-            if (str_contains($key, 'lo')) {
-                continue;
-            }
-            $tx += $val[2];
-            $rx += $val[1];
-        }
-        $res['tx'] = $tx;
-        $res['rx'] = $rx;
+        $res['cpu_use'] = $cpuUse;
+        $res['uptime'] = $uptime1;
+        $res['uptime_p'] = $uptime1P;
+        $res['mem_total'] = $memTotal;
+        $res['mem_use'] = $memUse;
+        $res['mem_use_p'] = $memUseP;
+        $res['swap_total'] = $swapTotal;
+        $res['swap_use'] = $swapUse;
+        $res['swap_use_p'] = $swapUseP;
+        $res['tx_now'] = $netInfo2['tx'] - $netInfo1['tx'];
+        $res['rx_now'] = $netInfo2['rx'] - $netInfo1['rx'];
         return $res;
     }
 }
