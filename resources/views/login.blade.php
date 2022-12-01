@@ -86,7 +86,12 @@
                         , icon: 1
                         , time: 1000
                     }, function () {
-                        location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
+                        /**
+                         * 可能是LayuiAdmin的bug，如果直接跳转到主页，会出现表格无法获取access_token的问题
+                         * 所以这里强制刷新到主页
+                         * location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
+                         */
+                        location.href = '/';
                     });
                 }
             });
