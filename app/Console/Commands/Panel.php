@@ -91,6 +91,14 @@ class Panel extends Command
      */
     private function update(): void
     {
+        /**
+         * 检查当前是否有任务正在运行
+         */
+        if (Task::query()->where('status', '!=', 'finished')->count()) {
+            $this->error('当前有任务正在运行，请稍后再试');
+            $this->info('如需强制更新，请先执行：panel cleanRunningTask');
+            return;
+        }
         $this->info('正在下载面板...');
         $this->info(shell_exec('wget -O /tmp/panel.zip https://api.panel.haozi.xyz/api/version/latest'));
         $this->info('正在备份数据库...');
@@ -228,7 +236,10 @@ class Panel extends Command
      */
     private function cleanRunningTask(): void
     {
+        // 更新任务状态
         Task::query()->update(['status' => 'finished']);
+        // 将所有队列任务清空
+        shell_exec('php-panel /www/panel/artisan queue:clear');
         $this->info('成功');
     }
 }
