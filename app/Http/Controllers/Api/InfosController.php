@@ -27,45 +27,45 @@ class InfosController extends Controller
                 ),
                 array(
                     "name" => "website",
-                    "title" => "网站",
+                    "title" => "网站管理",
                     "icon" => "layui-icon-website",
                     "jump" => "website/list"
                 ),
                 array(
                     "name" => "monitor",
-                    "title" => "监控",
+                    "title" => "资源监控",
                     "icon" => "layui-icon-chart-screen",
                     "jump" => "monitor"
                 ),
                 array(
                     "name" => "safe",
-                    "title" => "安全",
+                    "title" => "系统安全",
                     "icon" => "layui-icon-auz",
                     "jump" => "safe"
                 ),
                 array(
                     "name" => "file",
-                    "title" => "文件",
+                    "title" => "文件管理",
                     "icon" => "layui-icon-file",
                     "jump" => "file"
                 ),
                 array(
+                    "name" => "cron",
+                    "title" => "计划任务",
+                    "icon" => "layui-icon-date",
+                    "jump" => "cron"
+                ),
+                array(
                     "name" => "plugin",
-                    "title" => "插件",
+                    "title" => "插件中心",
                     "icon" => "layui-icon-app",
                     "jump" => "plugin"
                 ),
                 array(
                     "name" => "setting",
-                    "title" => "设置",
+                    "title" => "面板设置",
                     "icon" => "layui-icon-set",
                     "jump" => "setting"
-                ),
-                array(
-                    "name" => "logout",
-                    "title" => "退出",
-                    "icon" => "layui-icon-logout",
-                    "jump" => "logout"
                 )
             )
         );

@@ -26,7 +26,6 @@ Route::prefix('panel/views')->group(function () {
 
     // 主页
     Route::view('index', 'home');
-    Route::view('setting', 'setting');
     // 网站
     Route::prefix('website')->group(function () {
         //全局设置
@@ -38,12 +37,6 @@ Route::prefix('panel/views')->group(function () {
         // 编辑
         Route::view('edit', 'website.edit');
     });
-
-    // 数据库-MySQL
-    Route::prefix('database')->group(function () {
-        Route::view('mysql', 'database.mysql');
-        Route::view('postgresql', 'database.postgresql');
-    });
     // 监控
     Route::view('monitor', 'monitor');
     // 安全
@@ -52,6 +45,10 @@ Route::prefix('panel/views')->group(function () {
     Route::view('file', 'file');
     // 插件
     Route::view('plugin', 'plugin');
+    // 插件
+    Route::view('cron', 'cron');
+    // 设置
+    Route::view('setting', 'setting');
 
     // 其他独立页面
     // 登录
@@ -60,6 +57,6 @@ Route::prefix('panel/views')->group(function () {
     Route::view('logout', 'logout');
     // 主题设置
     Route::view('theme', 'theme');
-    // 任务
+    // 任务中心
     Route::view('task', 'task');
 });

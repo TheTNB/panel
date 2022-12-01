@@ -1,4 +1,4 @@
-<title>安全</title>
+<title>系统安全</title>
 
 <div class="layui-fluid">
     <div class="layui-card">

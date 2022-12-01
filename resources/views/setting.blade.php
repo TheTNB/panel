@@ -1,9 +1,9 @@
 <!--
-Name: 设置模版
+Name: 面板设置模版
 Author: 耗子
 Date: 2022-12-01
 -->
-<title>设置</title>
+<title>面板设置</title>
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
         <div class="layui-col-md12">

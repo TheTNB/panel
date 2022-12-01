@@ -1,4 +1,4 @@
-<title>监控</title>
+<title>资源监控</title>
 
 <div class="layui-fluid">
     <div class="layui-card">

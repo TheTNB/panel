@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CronsController;
 use App\Http\Controllers\Api\MonitorsController;
 use App\Http\Controllers\Api\PluginsController;
 use App\Http\Controllers\Api\SafesController;
@@ -62,12 +63,6 @@ Route::prefix('panel')->group(function () {
         Route::get('getInstalledDbAndPhp', [InfosController::class, 'getInstalledDbAndPhp']);
 
     });
-    Route::middleware('auth:sanctum')->prefix('settings')->group(function () {
-        // 获取面板设置
-        Route::get('get', [TasksController::class, 'get']);
-        // 保存面板设置
-        Route::post('save', [TasksController::class, 'save']);
-    });
     // 网站
     Route::middleware('auth:sanctum')->prefix('website')->group(function () {
         // 获取网站列表
@@ -127,6 +122,16 @@ Route::prefix('panel')->group(function () {
         Route::post('uninstall', [PluginsController::class, 'uninstall']);
         Route::post('update', [PluginsController::class, 'update']);
         Route::post('setShowHome', [PluginsController::class, 'setShowHome']);
+    });
+    // 计划任务
+    Route::middleware('auth:sanctum')->prefix('cron')->group(function () {
+        // 获取计划任务列表
+        Route::get('getList', [CronsController::class, 'getList']);
+        Route::post('add', [CronsController::class, 'add']);
+        Route::post('edit', [CronsController::class, 'edit']);
+        Route::post('delete', [CronsController::class, 'delete']);
+        Route::post('setStatus', [CronsController::class, 'setStatus']);
+        Route::get('getLog', [CronsController::class, 'getLog']);
     });
     // 设置
     Route::middleware('auth:sanctum')->prefix('setting')->group(function () {

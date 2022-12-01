@@ -24,8 +24,8 @@
                        placeholder="密码" class="layui-input">
             </div>
             <div class="layui-form-item" style="margin-bottom: 20px;">
-                <input type="checkbox" name="remember" id="remember" lay-skin="primary" title="记住我">
-                <a href="https://hzbk.net/" class="layadmin-user-jump-change layadmin-link"
+                {{--<input type="checkbox" name="remember" id="remember" lay-skin="primary" title="记住我">--}}
+                <a target="_blank" href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH" class="layadmin-user-jump-change layadmin-link"
                    style="margin-top: 7px;">忘记密码？</a>
             </div>
             <div class="layui-form-item">

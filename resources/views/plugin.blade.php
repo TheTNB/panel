@@ -1,4 +1,4 @@
-<title>插件</title>
+<title>插件中心</title>
 
 <div class="layui-fluid">
     <div class="layui-card">
