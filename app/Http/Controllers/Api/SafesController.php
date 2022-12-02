@@ -128,10 +128,10 @@ class SafesController extends Controller
      */
     public function getPingStatus(): JsonResponse
     {
-        $pingStatus = trim(shell_exec("cat /etc/sysctl.conf | grep 'net.ipv4.icmp_echo_ignore_all = 1'"));
+        $pingStatus = trim(shell_exec("firewall-cmd --query-rich-rule='rule protocol value=icmp drop' 2>&1"));
         $res['code'] = 0;
         $res['msg'] = 'success';
-        if ($pingStatus && !str_starts_with($pingStatus, '#')) {
+        if ($pingStatus == 'yes') {
             $res['data'] = 0;
         } else {
             $res['data'] = 1;
@@ -148,12 +148,12 @@ class SafesController extends Controller
     public function setPingStatus(Request $request): JsonResponse
     {
         $status = $request->input('status');
-        shell_exec("sed -i '/net.ipv4.icmp_echo_ignore_all/d' /etc/sysctl.conf");
-        if (!$status) {
-            // 禁止ping
-            shell_exec("echo 'net.ipv4.icmp_echo_ignore_all = 1' >> /etc/sysctl.conf");
+        if ($status) {
+            shell_exec("firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop' 2>&1");
+        } else {
+            shell_exec("firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop' 2>&1");
         }
-        shell_exec("sysctl -p");
+        shell_exec("firewall-cmd --reload");
         $res['code'] = 0;
         $res['msg'] = 'success';
         return response()->json($res);
