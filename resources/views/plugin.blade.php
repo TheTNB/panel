@@ -3,7 +3,7 @@
 <div class="layui-fluid">
     <div class="layui-card">
         <div class="layui-card-header">
-            按钮点击一次即可，请勿重复点击以免重复操作，任务中心在右上角！
+            按钮点击一次即可，请勿重复点击以免重复操作，任务中心在右上方！
         </div>
         <div class="layui-card-body">
             <table id="panel-plugin" lay-filter="panel-plugin"></table>

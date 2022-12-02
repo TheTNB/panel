@@ -69,21 +69,15 @@ class MonitorsController extends Controller
     {
         $start = $request->input('start') ?? now();
         $end = $request->input('end') ?? now();
-        $start = Carbon::create($start)->startOfDay();
-        $end = Carbon::create($end)->endOfDay();
+        $start = Carbon::create($start);
+        $end = Carbon::create($end);
         $data = Monitor::query()->where('created_at', '>=', $start)->where('created_at', '<=', $end)->get()->toArray();
         $res['code'] = 0;
         $res['msg'] = 'success';
         if (empty($data)) {
-            $res['data']['times'] = [];
-            $res['data']['uptime'] = [];
-            $res['data']['cpu']['use'] = [];
-            $res['data']['memory']['mem_use'] = [];
-            $res['data']['memory']['mem_use_p'] = [];
-            $res['data']['memory']['swap_use'] = [];
-            $res['data']['memory']['swap_use_p'] = [];
-            $res['data']['network']['tx_now'] = [];
-            $res['data']['network']['rx_now'] = [];
+            $res['code'] = 1;
+            $res['msg'] = '暂无数据';
+            return response()->json($res);
         }
         foreach ($data as $key => $value) {
             $info = json_decode($value['info'], true);

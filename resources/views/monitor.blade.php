@@ -2,7 +2,7 @@
 
 <div class="layui-fluid">
     <div class="layui-card">
-        <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+        <div class="layui-form layui-card-body">
             <div class="layui-inline">
                 <span style="margin-right: 10px;">开启监控</span><input type="checkbox" id="monitor-switch"
                                                                         lay-filter="monitor" lay-skin="switch"
@@ -16,7 +16,22 @@
                     </button>
                 </div>
             </div>
-            <div style="float: right;">
+            <div class="layui-inline" style="float: right;">
+                <span style="margin-right: 10px;">时间选择</span>
+                <div id="monitor-date" class="layui-input-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" autocomplete="off" id="monitor-startDate"
+                               class="layui-input"
+                               placeholder="开始时间">
+                    </div>
+                    -
+                    <div class="layui-input-inline">
+                        <input type="text" autocomplete="off" id="monitor-endDate"
+                               class="layui-input"
+                               placeholder="结束时间">
+                    </div>
+                </div>
+                <span style="margin-left: 40px;"></span>
                 <button id="clear_monitor_record" class="layui-btn layui-btn-sm layui-btn-danger">清空监控记录
                 </button>
             </div>
@@ -28,19 +43,6 @@
             <div class="layui-card">
                 <div class="layui-card-header">
                     <span>负载</span>
-                    <div style="float: right;">
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">昨天
-                        </button>--}}
-                        <button class="layui-btn layui-btn-xs">今天</button>
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">
-                            最近七天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">
-                            最近30天
-                        </button>
-                        <button id="test" class="layui-btn layui-btn-xs layui-btn-primary">自定义时间
-                        </button>--}}
-                    </div>
                 </div>
                 <div class="layui-card-body">
                     <div id="load_monitor" style="width: 100%;height: 400px;"></div>
@@ -52,18 +54,6 @@
             <div class="layui-card">
                 <div class="layui-card-header">
                     <span>CPU</span>
-                    <div style="float: right;">
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">昨天
-                        </button>--}}
-                        <button class="layui-btn layui-btn-xs">今天</button>
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">
-                            最近七天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">最近30天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">自定义时间
-                        </button>--}}
-                    </div>
                 </div>
                 <div class="layui-card-body">
                     <div id="cpu_monitor" style="width: 100%;height: 400px;"></div>
@@ -77,20 +67,6 @@
             <div class="layui-card">
                 <div class="layui-card-header">
                     <span>内存</span>
-                    <div style="float: right;">
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">昨天
-                        </button>--}}
-                        <button class="layui-btn layui-btn-xs">今天</button>
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">
-                            最近七天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">
-                            最近30天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">
-                            自定义时间
-                        </button>--}}
-                    </div>
                 </div>
                 <div class="layui-card-body">
                     <div id="memory_monitor" style="width: 100%;height: 400px;"></div>
@@ -101,17 +77,6 @@
             <div class="layui-card">
                 <div class="layui-card-header">
                     <span>网络</span>
-                    <div style="float: right;">
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">昨天
-                        </button>--}}
-                        <button class="layui-btn layui-btn-xs">今天</button>
-                        {{--<button class="layui-btn layui-btn-xs layui-btn-primary">最近七天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">最近30天
-                        </button>
-                        <button class="layui-btn layui-btn-xs layui-btn-primary">自定义时间
-                        </button>--}}
-                    </div>
                 </div>
                 <div class="layui-card-body">
                     <div id="network_monitor" style="width: 100%;height: 400px;"></div>
@@ -126,6 +91,25 @@
         var view = layui.view;
         var $ = layui.jquery;
         var form = layui.form;
+        var laydate = layui.laydate;
+
+        // 渲染时间选择器
+        // 默认开始时间为今天0点，结束时间为当前时间
+        var startDate = new Date(new Date().setHours(0, 0, 0, 0));
+        var endDate = new Date();
+        // 拼接时间字符串
+        var startStr = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate() + ' ' + startDate.getHours() + ':' + startDate.getMinutes() + ':' + startDate.getSeconds();
+        var endStr = endDate.getFullYear() + '-' + (endDate.getMonth() + 1) + '-' + endDate.getDate() + ' ' + endDate.getHours() + ':' + endDate.getMinutes() + ':' + endDate.getSeconds();
+        laydate.render({
+            elem: '#monitor-date'
+            , type: 'datetime'
+            , range: ['#monitor-startDate', '#monitor-endDate']
+            , value: startStr + ' - ' + endStr
+            , calendar: true
+            , done: function (value, date, endDate) {
+                getMonitorData(date.year + '-' + date.month + '-' + date.date + ' ' + date.hours + ':' + date.minutes + ':' + date.seconds, endDate.year + '-' + endDate.month + '-' + endDate.date + ' ' + endDate.hours + ':' + endDate.minutes + ':' + endDate.seconds);
+            }
+        });
 
         // 获取监控开关和保存天数
         admin.req({
@@ -206,135 +190,144 @@
             });
         });
 
-        // 获取监控数据
-        admin.req({
-            url: '/api/panel/monitor/getMonitorData',
-            type: 'get',
-            dataType: 'json',
-            success: function (res) {
-                if (res.code !== 0) {
-                    layer.msg(res.msg, {icon: 2});
-                    return false;
-                }
-                let loadChart = renderEcharts('load_monitor', '负载监控', undefined, res.data.times, [{
-                    name: '负载',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.uptime.uptime,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }], [{
-                    type: 'value',
-                }]);
-                let cpuChart = renderEcharts('cpu_monitor', 'CPU监控', undefined, res.data.times, [{
-                    name: '使用率',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.cpu.use,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }], [{
-                    name: '单位 %',
-                    min: 0,
-                    max: 100,
-                    type: 'value',
-                    axisLabel: {
-                        formatter: '{value} %'
-                    }
-                }]);
-                let memoryChart = renderEcharts('memory_monitor', '内存', {
-                    x: 'left',
-                    data: ["内存", "Swap"]
-                }, res.data.times, [{
-                    name: '内存',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.memory.mem_use,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }, {
-                    name: 'Swap',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.memory.swap_use,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }], [{
-                    name: '单位 MB',
-                    min: 0,
-                    max: res.data.mem_total,
-                    type: 'value',
-                    axisLabel: {
-                        formatter: '{value} M'
-                    }
-                }]);
-                let networkChart = renderEcharts('network_monitor', '网络', {
-                    x: 'left',
-                    data: ["出", "入"]
-                }, res.data.times, [{
-                    name: '出',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.network.tx_now,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }, {
-                    name: '入',
-                    type: 'line',
-                    smooth: true,
-                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                    data: res.data.network.rx_now,
-                    markPoint: {
-                        data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
-                    },
-                    markLine: {
-                        data: [{type: 'average', name: '平均值'}]
-                    }
-                }], [{
-                    name: '单位 Kb/s',
-                    type: 'value',
-                    axisLabel: {
-                        formatter: '{value} Kb'
-                    }
-                }]);
-
-                // 在窗口大小改变时，重置图表大小
-                window.addEventListener("resize", function () {
-                    loadChart.resize();
-                    cpuChart.resize();
-                    memoryChart.resize();
-                    networkChart.resize();
-                });
-            }, error: function (xhr, status, error) {
-                console.log('耗子Linux面板：ajax请求出错，错误' + error);
-            }
-        });
+        getMonitorData(startStr, endStr);
     });
+
+
+    // 获取监控数据
+    function getMonitorData(startDate, endDate) {
+        layui.use(['admin'], function () {
+            let admin = layui.admin;
+            // 获取监控数据
+            admin.req({
+                url: '/api/panel/monitor/getMonitorData?start=' + startDate + '&end=' + endDate,
+                type: 'get',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.code !== 0) {
+                        layer.msg(res.msg, {icon: 2});
+                        return false;
+                    }
+                    let loadChart = renderEcharts('load_monitor', '负载', undefined, res.data.times, [{
+                        name: '负载',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.uptime.uptime,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }], [{
+                        type: 'value',
+                    }]);
+                    let cpuChart = renderEcharts('cpu_monitor', 'CPU', undefined, res.data.times, [{
+                        name: '使用率',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.cpu.use,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }], [{
+                        name: '单位 %',
+                        min: 0,
+                        max: 100,
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} %'
+                        }
+                    }]);
+                    let memoryChart = renderEcharts('memory_monitor', '内存', {
+                        x: 'left',
+                        data: ["内存", "Swap"]
+                    }, res.data.times, [{
+                        name: '内存',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.memory.mem_use,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }, {
+                        name: 'Swap',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.memory.swap_use,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }], [{
+                        name: '单位 MB',
+                        min: 0,
+                        max: res.data.mem_total,
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} M'
+                        }
+                    }]);
+                    let networkChart = renderEcharts('network_monitor', '网络', {
+                        x: 'left',
+                        data: ["出", "入"]
+                    }, res.data.times, [{
+                        name: '出',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.network.tx_now,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }, {
+                        name: '入',
+                        type: 'line',
+                        smooth: true,
+                        itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                        data: res.data.network.rx_now,
+                        markPoint: {
+                            data: [{type: 'max', name: '最大值'}, {type: 'min', name: '最小值'}]
+                        },
+                        markLine: {
+                            data: [{type: 'average', name: '平均值'}]
+                        }
+                    }], [{
+                        name: '单位 Kb/s',
+                        type: 'value',
+                        axisLabel: {
+                            formatter: '{value} Kb'
+                        }
+                    }]);
+
+                    // 在窗口大小改变时，重置图表大小
+                    window.addEventListener("resize", function () {
+                        loadChart.resize();
+                        cpuChart.resize();
+                        memoryChart.resize();
+                        networkChart.resize();
+                    });
+                }, error: function (xhr, status, error) {
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                }
+            });
+        });
+    }
 
     // 渲染图表
     function renderEcharts(element_id, title, legend = undefined, data_xAxis, series, yAxis = undefined) {
