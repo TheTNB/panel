@@ -34,7 +34,13 @@ class SettingsController extends Controller
         // 从nginx配置文件中获取面板端口
         $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
         preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
+        if (!isset($matches[1])) {
+            $res['code'] = 1;
+            $res['msg'] = '获取面板端口失败，请检查nginx主配置文件';
+            return response()->json($res);
+        }
 
+        // API
         $api = 0;
         $apiToken = '';
         if (isset($settingArr['api']) && $settingArr['api'] == 1) {
@@ -42,11 +48,12 @@ class SettingsController extends Controller
             $apiToken = $settingArr['api_token'] ?? '';
         }
 
-        if (!isset($matches[1])) {
-            $res['code'] = 1;
-            $res['msg'] = '获取面板端口失败，请检查nginx主配置文件';
-            return response()->json($res);
+        // 多设备登录
+        $multiLogin = 0;
+        if (isset($settingArr['multi_login']) && $settingArr['multi_login'] == 1) {
+            $multiLogin = 1;
         }
+
         $data = [
             'name' => $settingArr['name'],
             'username' => $request->user()->username,
@@ -54,6 +61,7 @@ class SettingsController extends Controller
             'port' => $matches[1],
             'api' => $api,
             'api_token' => $apiToken,
+            'multi_login' => $multiLogin,
         ];
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -72,10 +80,11 @@ class SettingsController extends Controller
         $settings = $request->all();
         // 将数据入库
         foreach ($settings as $key => $value) {
-            if ($key == 'access_token' || $key == 'username' || $key == 'password' || $key == 'api_token' || $key == 'api') {
+            if ($key == 'access_token' || $key == 'username' || $key == 'password' || $key == 'api_token' || $key == 'api' || $key == 'port') {
                 continue;
             }
-            Setting::query()->where('name', $key)->update(['value' => $value]);
+            // 创建或更新
+            Setting::query()->updateOrCreate(['name' => $key], ['value' => $value]);
         }
         // 单独处理用户名和密码
         if ($request->input('username') != $request->user()->username) {

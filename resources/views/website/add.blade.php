@@ -26,7 +26,7 @@ Date: 2022-12-01
                 <div class="layui-input-block">
                     <select name="php" lay-filter="add-website-php">
                         @{{# layui.each(d.params.php_version, function(index, item){ }}
-                        @{{# if(index == "00"){ }}
+                        @{{# if(item == "00"){ }}
                         <option value="@{{ item }}" selected="">@{{ item }}</option>
                         @{{# }else{ }}
                         <option value="@{{ item }}">@{{ item }}</option>

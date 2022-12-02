@@ -13,6 +13,8 @@
 | RockyLinux    | 8   |
 | AlmaLinux     | 9   |
 | AlmaLinux     | 8   |
+| 其他RHEL发行版     | 8   |
+| 其他RHEL发行版     | 9   |
 
 广告： [`WeAvatar` —统一头像服务](https://weavatar.com)
 

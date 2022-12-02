@@ -1,9 +1,10 @@
 <!--
 Name: 网站 - 全局设置
 Author: 耗子
-Date: 2022-11-30
+Date: 2022-12-02
 -->
-<script type="text/html" template lay-url="/api/panel/website/getDefaultSettings" lay-done="layui.data.sendParams(d.params)">
+<script type="text/html" template lay-url="/api/panel/website/getDefaultSettings"
+        lay-done="layui.data.sendParams(d.params)">
     <div class="layui-tab">
         <ul class="layui-tab-title">
             <li class="layui-this">默认页</li>
@@ -20,7 +21,7 @@ Date: 2022-11-30
             <div class="layui-tab-item">
                 <!-- 停止页 -->
                 <blockquote class="layui-elem-quote layui-quote-nm">
-                    设置站点停止时的提示页面。
+                    设置站点停止时的提示页面，设置后需重新开关网站方可生效。
                 </blockquote>
                 <div id="stop-editor" style="height: 400px;">@{{ d.data.stop }}</div>
             </div>
@@ -33,7 +34,7 @@ Date: 2022-11-30
 <script>
     let indexEditor = '';
     let stopEditor = '';
-    layui.data.sendParams = function(params) {
+    layui.data.sendParams = function (params) {
         layui.use(['admin', 'form', 'laydate', 'code'], function () {
             var $ = layui.$
                 , admin = layui.admin
@@ -51,7 +52,7 @@ Date: 2022-11-30
             });
 
             $('#save-website-default-settings').click(function () {
-                layer.load(2);
+                layer.load();
                 admin.req({
                     url: '/api/panel/website/saveDefaultSettings'
                     , type: 'post'

@@ -88,14 +88,14 @@
             , url: '/api/panel/cron/getList'
             , cols: [[
                 {field: 'id', hide: true, title: 'ID', sort: true}
-                , {field: 'name', width: '15%', title: '任务名'}
-                , {field: 'type', width: '10%', title: '任务类型'}
+                , {field: 'name', width: 150, title: '任务名'}
+                , {field: 'type', width: 150, title: '任务类型'}
                 , {field: 'status', title: '启用', width: 100, templet: '#cron-table-status', unresize: true}
-                , {field: 'time', width: '25%', title: '任务周期（cron表达式）'}
+                , {field: 'time', width: 200, title: '任务周期（cron表达式）'}
                 , {field: 'updated_at', title: '上次运行时间'}
                 , {
                     field: 'edit',
-                    width: '15%',
+                    width: 160,
                     title: '操作',
                     templet: '#cron-table-edit',
                     fixed: 'right',

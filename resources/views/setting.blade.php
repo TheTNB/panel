@@ -27,6 +27,13 @@ Date: 2022-12-01
                             <div class="layui-form-mid layui-word-aux">API Token，用于携带访问面板接口</div>
                         </div>
                         <div class="layui-form-item">
+                            <label class="layui-form-label">多设备登录</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="multi_login" lay-skin="switch" lay-text="ON|OFF"/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">开启后将允许多设备同时登录面板，可能具有一定安全隐患</div>
+                        </div>
+                        <div class="layui-form-item">
                             <label class="layui-form-label">面板名称</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="name" value="获取中ing..." class="layui-input" disabled/>
@@ -105,10 +112,17 @@ Date: 2022-12-01
 
         // 面板设置
         form.on('submit(panel_setting_submit)', function (obj) {
+            // 面板API
             if (obj.field.api === "on") {
                 obj.field.api = 1;
             } else {
                 obj.field.api = 0;
+            }
+            // 多设备登录
+            if (obj.field.multi_login === "on") {
+                obj.field.multi_login = 1;
+            } else {
+                obj.field.multi_login = 0;
             }
             // 提交修改
             admin.req({
@@ -121,8 +135,8 @@ Date: 2022-12-01
                         layer.msg('面板设置保存失败，请刷新重试！')
                         return false;
                     }
-                    layer.msg('面板设置保存成功！');
                     admin.render();
+                    layer.msg('面板设置保存成功！');
                 }
                 , error: function (xhr, status, error) {
                     console.log('耗子Linux面板：ajax请求出错，错误' + error);

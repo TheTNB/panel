@@ -16,11 +16,13 @@ Date: 2022-11-28
                     <script type="text/html" id="website-list-bar">
                         <div class="layui-btn-container">
                             <button class="layui-btn layui-btn-sm" lay-event="website_add">添加网站</button>
-                            <button class="layui-btn layui-btn-sm" lay-event="website_default_settings">全局设置</button>
+                            <button class="layui-btn layui-btn-sm" lay-event="website_default_settings">全局设置
+                            </button>
                         </div>
                     </script>
                     <!-- 右侧网站设置和删除网站 -->
-                    <script type="text/html" id="website-setting">
+                    <script type="text/html" id="website-control">
+                        <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="backup">备份</a>
                         <a class="layui-btn layui-btn-xs" lay-event="edit">设置</a>
                         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
                     </script>
@@ -77,13 +79,13 @@ Date: 2022-11-28
             , toolbar: '#website-list-bar'
             , title: '网站列表'
             , cols: [[
-                {field: 'name', title: '网站名', width: 200, fixed: 'left', unresize: true, sort: true}
+                {field: 'name', title: '网站名', width: 150, unresize: true, sort: true}
                 , {field: 'run', title: '运行', width: 100, templet: '#website-run', unresize: true}
                 , {field: 'path', title: '目录', width: 250}
                 , {field: 'php', title: 'PHP', width: 60}
                 , {field: 'ssl', title: 'SSL', width: 110, templet: '#website-ssl'}
                 , {field: 'note', title: '备注', edit: 'textarea'}
-                , {fixed: 'right', title: '操作', toolbar: '#website-setting', width: 150}
+                , {fixed: 'right', title: '操作', toolbar: '#website-control', width: 160}
             ]]
             /**
              * TODO: 分页
@@ -96,7 +98,7 @@ Date: 2022-11-28
             if (obj.event === 'website_add') {
                 admin.popup({
                     title: '添加网站'
-                    , area: ['70%', '60%']
+                    , area: ['80%', '80%']
                     , id: 'LAY-popup-website-add'
                     , success: function (layer, index) {
                         view(this.id).render('website/add', {
@@ -110,11 +112,10 @@ Date: 2022-11-28
             } else if (obj.event === 'website_default_settings') {
                 admin.popup({
                     title: '全局设置'
-                    , area: ['70%', '60%']
+                    , area: ['80%', '80%']
                     , id: 'LAY-popup-website-add'
                     , success: function (layer, index) {
-                        view(this.id).render('website/default_settings', {
-                        }).done(function () {
+                        view(this.id).render('website/default_settings', {}).done(function () {
                             form.render(null, 'LAY-popup-website-default-settings');
                         });
                     }
@@ -166,7 +167,7 @@ Date: 2022-11-28
                         // 打开编辑网站页面
                         admin.popup({
                             title: '编辑网站 - ' + data.name
-                            , area: ['70%', '80%']
+                            , area: ['80%', '80%']
                             , id: 'LAY-popup-website-edit'
                             , success: function (layero, index) {
                                 view(this.id).render('website/edit', {
@@ -184,12 +185,26 @@ Date: 2022-11-28
                         console.log('耗子Linux面板：ajax请求出错，错误' + error);
                     }
                 });
+            } else if (obj.event === 'backup') {
+                // 打开备份页面
+                admin.popup({
+                    title: '备份管理 - ' + data.name
+                    , area: ['70%', '80%']
+                    , id: 'LAY-popup-website-backup'
+                    , success: function (layero, index) {
+                        view(this.id).render('website/backup', {
+                            data: data
+                        }).done(function () {
+                            form.render(null, 'LAY-popup-website-backup');
+                        });
+                    }
+                });
             }
         });
 
         // 网站备注编辑
         table.on('edit(website-list)', function (obj) {
-            var value = obj.value // 得到修改后的值
+            let value = obj.value // 得到修改后的值
                 , data = obj.data; // 得到行数据
             admin.req({
                 url: "/api/panel/website/updateSiteNote"
@@ -216,10 +231,27 @@ Date: 2022-11-28
         form.on('switch(website-run-checkbox)', function (obj) {
             let $ = layui.$;
             let website_name = $(this).data('website-name');
-            let run = obj.elem.checked ? 1 : 0;
+            let status = obj.elem.checked ? 1 : 0;
 
-            //console.log(website_name); //当前行数据
-            layer.msg('待开发功能！', {icon: 2});
+            admin.req({
+                url: "/api/panel/website/setSiteStatus"
+                , method: 'post'
+                , data: {
+                    name: website_name,
+                    status: status
+                }
+                , success: function (result) {
+                    if (result.code !== 0) {
+                        console.log('耗子Linux面板：网站运行状态设置失败，接口返回' + result);
+                        layer.msg('网站运行状态设置失败，请刷新重试！')
+                        return false;
+                    }
+                    layer.alert('网站 ' + website_name + ' 运行状态设置成功！');
+                }
+                , error: function (xhr, status, error) {
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                }
+            });
         });
 
     });

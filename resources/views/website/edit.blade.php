@@ -4,7 +4,7 @@ Author: 耗子
 Date: 2022-12-01
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
-    <div class="layui-tab">
+    <div class="layui-tab" lay-filter="website-edit-tab">
         <ul class="layui-tab-title">
             <li class="layui-this">域名端口</li>
             <li>基本设置</li>
@@ -26,6 +26,7 @@ Date: 2022-12-01
                                       class="layui-textarea">@{{ d.params.config.domain }}</textarea>
                         </div>
                     </div>
+                    <hr>
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label">端口</label>
                         <div class="layui-input-block">
@@ -47,6 +48,13 @@ Date: 2022-12-01
                         </div>
                     </div>
                     <div class="layui-form-item">
+                        <label class="layui-form-label">运行目录</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="root" autocomplete="off" placeholder="请输入网站运行目录（Laravel等程序需要）"
+                                   class="layui-input" value="@{{ d.params.config.root }}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
                         <label class="layui-form-label">默认文档</label>
                         <div class="layui-input-block">
                             <input type="text" name="index" autocomplete="off" placeholder="请输入默认文档，以空格隔开"
@@ -58,7 +66,7 @@ Date: 2022-12-01
                         <div class="layui-input-block">
                             <select name="php" lay-filter="website-php">
                                 @{{# layui.each(d.params.php_version, function(index, item){ }}
-                                @{{# if(index == "00"){ }}
+                                @{{# if(item == d.params.config.php){ }}
                                 <option value="@{{ item }}" selected="">@{{ item }}</option>
                                 @{{# }else{ }}
                                 <option value="@{{ item }}">@{{ item }}</option>
@@ -199,8 +207,18 @@ Date: 2022-12-01
                 , admin = layui.admin
                 , layer = layui.layer
                 , code = layui.code
-                , form = layui.form;
+                , form = layui.form
+                , element = layui.element;
             form.render();
+            element.render();
+            element.on('tab(website-edit-tab)', function (data) {
+                if (data.index === 6) {
+                    // 隐藏保存按钮
+                    $('.layui-footer').hide();
+                } else {
+                    $('.layui-footer').show();
+                }
+            });
             rewriteEditor = ace.edit("rewrite-editor", {
                 mode: "ace/mode/nginx",
                 selectionStyle: "text"
@@ -219,7 +237,7 @@ Date: 2022-12-01
             $("#clean-site-log").click(function () {
                 layer.confirm('确定要清空日志吗？', function (index) {
                     layer.close(index);
-                    layer.load(2);
+                    layer.load();
                     admin.req({
                         url: '/api/panel/website/clearSiteLog'
                         , type: 'post'
@@ -244,7 +262,7 @@ Date: 2022-12-01
             });
 
             $('#save-site-config').click(function () {
-                layer.load(2);
+                layer.load();
                 var port = $('textarea[name="port"]').val();
                 var reg = new RegExp(/\n443.*\n?/);
                 // 如果开启了https，就自动添加443端口
@@ -270,6 +288,7 @@ Date: 2022-12-01
                             ssl_certificate: $('textarea[name="ssl_certificate"]').val(),
                             ssl_certificate_key: $('textarea[name="ssl_certificate_key"]').val(),
                             path: $('input[name="path"]').val(),
+                            root: $('input[name="root"]').val(),
                             index: $('input[name="index"]').val(),
                             php: $('select[name="php"]').val(),
                             open_basedir: $('input[name="open_basedir"]').prop('checked') ? 1 : 0,
@@ -298,9 +317,33 @@ Date: 2022-12-01
                 });
             });
 
-            // 重载配置
-            $('#site-config-restore').click(function (){
-                layer.msg('待开发功能！', {icon: 2});
+            // 重置配置
+            $('#site-config-restore').click(function () {
+                layer.confirm('高风险操作，网站配置重置后所有配置均需重新设置，确定要重置配置吗？', function (index) {
+                    index = layer.msg('重置网站配置', {
+                        icon: 16
+                        , time: 0
+                    });
+                    admin.req({
+                        url: '/api/panel/website/resetSiteConfig'
+                        , type: 'post'
+                        , data: {name: params.config.name}
+                        , success: function (res) {
+                            layer.close(index);
+                            if (res.code === 0) {
+                                layer.alert('重置成功，你需要重新添加域名/端口绑定，设置各配置参数！', function (index) {
+                                    admin.render();
+                                    layer.close(index);
+                                });
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                        , error: function (xhr, status, error) {
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                        }
+                    });
+                });
             })
         });
     };

@@ -286,7 +286,10 @@ class PluginsController extends Controller
             return response()->json($data);
         }
 
-        Plugin::query()->where('slug', $slug)->update(['show' => $show]);
+        Plugin::query()->where('slug', $slug)->updateOrInsert(
+            ['slug' => $slug],
+            ['show' => $show]
+        );
         $res['code'] = 0;
         $res['msg'] = 'success';
         $res['data'] = '设置成功';

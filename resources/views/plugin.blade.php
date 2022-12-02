@@ -2,42 +2,29 @@
 
 <div class="layui-fluid">
     <div class="layui-card">
-        <!--<div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="plugin-form">
-            <div class="layui-form-item">
-                <div class="layui-inline">
-                    <label class="layui-form-label">搜索</label>
-                    <div class="layui-input-block">
-                        <input type="text" name="plugin_search" placeholder="请输入关键词（如php）" autocomplete="off"
-                               class="layui-input">
-                    </div>
-                </div>
-                <div class="layui-inline">
-                    <button class="layui-btn layuiadmin-btn-order" lay-submit lay-filter="plugin-search-submit">
-                        <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
-                    </button>
-                </div>
-            </div>
-        </div>-->
+        <div class="layui-card-header">
+            按钮点击一次即可，请勿重复点击以免重复操作，任务中心在右上角！
+        </div>
         <div class="layui-card-body">
             <table id="panel-plugin" lay-filter="panel-plugin"></table>
             <!-- 操作按钮模板 -->
             <script type="text/html" id="panel-plugin-control">
-                @{{#  if(d.control.installed == true && d.control.allow_uninstall == true){ }}
-                @{{#  if(d.control.update == true){ }}
+                @{{# if(d.control.installed == true && d.control.allow_uninstall == true){ }}
+                @{{# if(d.control.update == true){ }}
                 <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
-                @{{#  } }}
+                @{{# } }}
                 <a class="layui-btn layui-btn-xs" lay-event="open">管理</a>
                 <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="uninstall">卸载</a>
-                @{{#  } else{ }}
-                @{{#  if(d.control.installed == true && d.control.allow_uninstall == false){ }}
-                @{{#  if(d.control.update == true){ }}
+                @{{# }else{ }}
+                @{{# if(d.control.installed == true && d.control.allow_uninstall == false){ }}
+                @{{# if(d.control.update == true){ }}
                 <a class="layui-btn layui-btn-xs" lay-event="update">更新</a>
-                @{{#  } }}
+                @{{# } }}
                 <a class="layui-btn layui-btn-xs" lay-event="open">管理</a>
-                @{{#  } else{ }}
+                @{{# }else{ }}
                 <a class="layui-btn layui-btn-xs" lay-event="install">安装</a>
-                @{{#  } }}
-                @{{#  } }}
+                @{{# } }}
+                @{{# } }}
             </script>
             <!-- 首页显示开关 -->
             <script type="text/html" id="plugin-show">
@@ -63,12 +50,19 @@
             , url: '/api/panel/plugin/getList'
             , cols: [[
                 {field: 'slug', hide: true, title: 'Slug', sort: true}
-                , {field: 'name', width: '13%', title: '插件名'}
-                , {field: 'describe', width: '42%', title: '描述'}
-                , {field: 'install_version', width: '12%', title: '已装版本'}
-                , {field: 'version', width: '12%', title: '最新版本'}
+                , {field: 'name', width: 150, title: '插件名'}
+                , {field: 'describe', title: '描述'}
+                , {field: 'install_version', width: 140, title: '已装版本'}
+                , {field: 'version', width: 140, title: '最新版本'}
                 , {field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true}
-                , {field: 'control', title: '操作', templet: '#panel-plugin-control', fixed: 'right', align: 'left'}
+                , {
+                    field: 'control',
+                    width: 160,
+                    title: '操作',
+                    templet: '#panel-plugin-control',
+                    fixed: 'right',
+                    align: 'left'
+                }
             ]]
             , page: false
             , text: '耗子Linux面板：数据加载出现异常！'

@@ -36,6 +36,8 @@ Route::prefix('panel/views')->group(function () {
         Route::view('add', 'website.add');
         // 编辑
         Route::view('edit', 'website.edit');
+        // 备份
+        Route::view('backup', 'website.backup');
     });
     // 监控
     Route::view('monitor', 'monitor');

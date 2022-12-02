@@ -75,6 +75,15 @@ Route::prefix('panel')->group(function () {
         Route::post('saveSiteSettings', [WebsitesController::class, 'saveSiteSettings']);
         Route::post('clearSiteLog', [WebsitesController::class, 'clearSiteLog']);
         Route::post('updateSiteNote', [WebsitesController::class, 'updateSiteNote']);
+        Route::post('setSiteStatus', [WebsitesController::class, 'setSiteStatus']);
+        // 获取备份列表
+        Route::get('getBackupList', [WebsitesController::class, 'getBackupList']);
+        Route::post('createBackup', [WebsitesController::class, 'createBackup']);
+        Route::post('uploadBackup', [WebsitesController::class, 'uploadBackup']);
+        Route::post('restoreBackup', [WebsitesController::class, 'restoreBackup']);
+        Route::post('deleteBackup', [WebsitesController::class, 'deleteBackup']);
+        // 重置网站配置
+        Route::post('resetSiteConfig', [WebsitesController::class, 'resetSiteConfig']);
     });
     // 监控
     Route::middleware('auth:sanctum')->prefix('monitor')->group(function () {

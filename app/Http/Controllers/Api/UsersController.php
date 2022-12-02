@@ -3,9 +3,11 @@
  * 耗子Linux面板 - 用户控制器
  * @author 耗子
  */
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -34,15 +36,21 @@ class UsersController extends Controller
                 'errors' => $e->errors()
             ], 422);
         }
-        if (auth()->attempt(['username' => $credentials['username'], 'password' => $credentials['password']], $credentials['remember'])) {
+        if (auth()->attempt(['username' => $credentials['username'], 'password' => $credentials['password']],
+            $credentials['remember'])) {
             $user = auth()->user();
-            $user->tokens()->delete();
+            // 多设备登录
+            $multiLogin = Setting::query()->where('name', 'multi_login')->value('value');
+            if ($multiLogin != 1) {
+                $user->tokens()->delete();
+            }
             $token = $user->createToken('token')->plainTextToken;
             return response()->json(['code' => 0, 'msg' => '登录成功', 'data' => ['access_token' => $token]]);
         } else {
             return response()->json(['code' => 1, 'msg' => '登录失败，用户名或密码错误']);
         }
     }
+
     public function getInfo(Request $request): JsonResponse
     {
         $user = $request->user();

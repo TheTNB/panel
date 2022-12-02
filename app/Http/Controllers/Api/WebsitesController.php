@@ -30,6 +30,12 @@ class WebsitesController extends Controller
                 'data' => []
             ]);
         }
+        foreach ($websiteList as $website) {
+            // 如果PHP是0，将其设置为字符串的00
+            if ($website->php == '0') {
+                $website->php = '00';
+            }
+        }
         return response()->json([
             'code' => 0,
             'msg' => '获取成功',
@@ -335,10 +341,10 @@ EOF;
                 $website['domain'] .= PHP_EOL.$v;
             }
         }
-        // 从nginx配置中root标记位提取全部根目录
+        // 从nginx配置中root标记位提取运行目录
         $root_raw = $this->cut('# root标记位开始', '# root标记位结束', $nginx_config);
         preg_match_all('/root\s+(.+);/', $root_raw, $matches2);
-        $website['path'] = $matches2[1][0];
+        $website['root'] = $matches2[1][0];
         // 从nginx配置中index标记位提取全部默认文件
         $index_raw = $this->cut('# index标记位开始', '# index标记位结束', $nginx_config);
         preg_match_all('/index\s+(.+);/', $index_raw, $matches3);
@@ -396,6 +402,11 @@ EOF;
         // 读取访问日志
         $website['log'] = shell_exec('tail -n 100 /www/wwwlogs/'.$name.'.log');
 
+        // 如果PHP是0，将其设置为字符串的00
+        if ($website['php'] == '0') {
+            $website['php'] = '00';
+        }
+
         $res['code'] = 0;
         $res['msg'] = 'success';
         $res['data'] = $website;
@@ -412,6 +423,20 @@ EOF;
         // 获取前端传递过来的数据
         $name = $request->input('name');
         $config = $request->input('config');
+
+        $website = Website::query()->where('name', $name)->first();
+        if (!$website) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站不存在',
+            ], 200);
+        }
+        if ($website->status != 1) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站已停用，请先启用',
+            ], 200);
+        }
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -467,12 +492,12 @@ EOF;
             $configRaw = str_replace($port_config_old, PHP_EOL.$port.PHP_EOL.'    ', $configRaw);
         }
 
-        // 网站目录
+        // 运行目录
         $pathConfig = $this->cut('# root标记位开始', '# root标记位结束', $configRaw);
         preg_match_all('/root\s+(.+);/', $pathConfig, $matches1);
         $pathConfigOld = $matches1[1][0];
         if (!empty(trim($pathConfigOld)) && $pathConfigOld != PHP_EOL) {
-            $pathConfigNew = str_replace($pathConfigOld, $config['path'], $pathConfig);
+            $pathConfigNew = str_replace($pathConfigOld, $config['root'], $pathConfig);
             $configRaw = str_replace($pathConfig, $pathConfigNew, $configRaw);
         }
 
@@ -497,7 +522,7 @@ EOF;
             if (is_dir($config['path'])) {
                 file_put_contents($config['path'].'/.user.ini', $open_basedir);
                 // 为.user.ini文件添加i权限
-                shell_exec('chattr +i '.$config['path'].'/.user.ini');
+                // shell_exec('chattr +i '.$config['path'].'/.user.ini');
             }
         } else {
             // 移除.user.ini文件的i权限
@@ -600,8 +625,10 @@ EOL;
         }
 
         // 将数据入库
-        Website::query()->where('name', $name)->update(['php' => $config['php']]);
-        Website::query()->where('name', $name)->update(['ssl' => $config['ssl']]);
+        $website->php = $config['php'];
+        $website->ssl = $config['ssl'];
+        $website->path = $config['path'];
+        $website->save();
         file_put_contents('/www/server/vhost/'.$name.'.conf', $configRaw);
         file_put_contents('/www/server/vhost/rewrite/'.$name.'.conf', $config['rewrite']);
         shell_exec('systemctl reload nginx');
@@ -637,7 +664,376 @@ EOL;
         return response()->json($res);
     }
 
-    // 裁剪字符串
+    /**
+     * 获取备份列表
+     */
+    public function getBackupList(): JsonResponse
+    {
+        $backupPath = '/www/backup/website';
+        // 判断备份目录是否存在
+        if (!is_dir($backupPath)) {
+            mkdir($backupPath, 0644, true);
+        }
+        $backupFiles = scandir($backupPath);
+        $backupFiles = array_diff($backupFiles, ['.', '..']);
+        $backupFiles = array_values($backupFiles);
+        $backupFiles = array_map(function ($backupFile) {
+            return [
+                'backup' => $backupFile,
+                'size' => formatBytes(filesize('/www/backup/website/'.$backupFile)),
+            ];
+        }, $backupFiles);
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        $res['data'] = $backupFiles;
+        return response()->json($res);
+    }
+
+    /**
+     * 创建备份
+     */
+    public function createBackup(Request $request): JsonResponse
+    {
+        // 消毒数据
+        try {
+            $credentials = $this->validate($request, [
+                'name' => 'required|max:255',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $backupPath = '/www/backup/website';
+        // 判断备份目录是否存在
+        if (!is_dir($backupPath)) {
+            mkdir($backupPath, 0644, true);
+        }
+
+        // 从数据库中获取网站目录
+        $sitePath = Website::query()->where('name', $credentials['name'])->value('path');
+        $backupFile = $backupPath.'/'.$credentials['name'].'_'.date('YmdHis').'.zip';
+        shell_exec('zip -r '.$backupFile.' '.$sitePath.' 2>&1');
+
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
+    }
+
+    /**
+     * 上传备份
+     */
+    public function uploadBackup(Request $request): JsonResponse
+    {
+        // 消毒数据
+        try {
+            $credentials = $this->validate($request, [
+                'file' => 'required|file',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $file = $request->file('file');
+        $backupPath = '/www/backup/website';
+
+        // 判断备份目录是否存在
+        if (!is_dir($backupPath)) {
+            mkdir($backupPath, 0644, true);
+        }
+        $backupFile = $backupPath.'/'.$file->getClientOriginalName();
+        $file->move($backupPath, $file->getClientOriginalName());
+
+        // 返回文件名
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        $res['data'] = $file->getClientOriginalName();
+        return response()->json($res);
+    }
+
+    /**
+     * 恢复备份
+     */
+    public function restoreBackup(Request $request): JsonResponse
+    {
+        // 消毒数据
+        try {
+            $credentials = $this->validate($request, [
+                'name' => 'required|max:255',
+                'backup' => 'required|max:255',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $backupPath = '/www/backup/website';
+        // 判断备份目录是否存在
+        if (!is_dir($backupPath)) {
+            mkdir($backupPath, 0644, true);
+        }
+        $backupFile = $backupPath.'/'.$credentials['backup'];
+        // 判断备份文件是否存在
+        if (!is_file($backupFile)) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '备份文件不存在',
+            ], 200);
+        }
+
+        shell_exec('rm -rf /www/wwwroot/'.$credentials['name'].'/*');
+        shell_exec('unzip -o '.$backupFile.' -d /www/wwwroot/'.$credentials['name'].' 2>&1');
+        // 设置权限
+        shell_exec('chown -R www:www /www/wwwroot/'.$credentials['name']);
+        shell_exec('chmod -R 755 /www/wwwroot/'.$credentials['name']);
+
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
+    }
+
+    /**
+     * 删除备份
+     */
+    public function deleteBackup(Request $request): JsonResponse
+    {
+        // 消毒数据
+        try {
+            $credentials = $this->validate($request, [
+                'backup' => 'required|max:255',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $backupPath = '/www/backup/website';
+        // 判断备份目录是否存在
+        if (!is_dir($backupPath)) {
+            mkdir($backupPath, 0644, true);
+        }
+        $backupFile = $backupPath.'/'.$credentials['backup'];
+        // 判断备份文件是否存在
+        if (!is_file($backupFile)) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '备份文件不存在',
+            ], 200);
+        }
+
+        unlink($backupFile);
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
+    }
+
+    /**
+     * 重置网站配置文件
+     */
+    public function resetSiteConfig(Request $request): JsonResponse
+    {
+        try {
+            $credentials = $this->validate($request, [
+                'name' => 'required|max:255',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $website = Website::query()->where('name', $credentials['name'])->first();
+        if (!$website) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站不存在',
+            ], 200);
+        }
+
+        // 如果PHP是0，将其设置为字符串的00
+        if ($website['php'] == '0') {
+            $website['php'] = '00';
+        }
+
+        // 更新网站状态为运行
+        $website->status = 1;
+        // 更新网站ssl状态为关闭
+        $website->ssl = 0;
+        $website->save();
+
+        $nginxConfig = <<<EOF
+# 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
+# 有自定义配置需求的，请将自定义的配置写在各标记位下方。
+server
+{
+    # port标记位开始
+    listen 80;
+    # port标记位结束
+    # server_name标记位开始
+    server_name localhost;
+    # server_name标记位结束
+    # index标记位开始
+    index index.php index.html;
+    # index标记位结束
+    # root标记位开始
+    root $website[path];
+    # root标记位结束
+
+    # ssl标记位开始
+    # ssl标记位结束
+
+    # php标记位开始
+    include enable-php-$website[php].conf;
+    # php标记位结束
+
+    # waf标记位开始
+    waf on;
+    waf_rule_path /www/server/nginx/ngx_waf/assets/rules/;
+    waf_mode DYNAMIC;
+    waf_cc_deny rate=1000r/m duration=60m;
+    waf_cache capacity=50;
+    # waf标记位结束
+
+    # 错误页配置，可自行设置
+    #error_page 404 /404.html;
+    #error_page 502 /502.html;
+
+    # 伪静态规则引入，修改后将导致面板设置的伪静态规则失效
+    include /www/server/vhost/rewrite/$website[name].conf;
+
+    # 面板默认禁止访问部分敏感目录，可自行修改
+    location ~ ^/(\.user.ini|\.htaccess|\.git|\.svn)
+    {
+        return 404;
+    }
+    # 面板默认不记录静态资源的访问日志并开启1小时浏览器缓存，可自行修改
+    location ~ .*\.(js|css)$
+    {
+        expires 1h;
+        error_log /dev/null;
+        access_log /dev/null;
+    }
+    access_log /www/wwwlogs/$website[name].log;
+    error_log /www/wwwlogs/$website[name].log;
+}
+EOF;
+        file_put_contents('/www/server/vhost/'.$website['name'].'.conf', $nginxConfig);
+        // 重置伪静态规则
+        shell_exec('echo "" > /www/server/vhost/rewrite/'.$website['name'].'.conf');
+        // 重载nginx
+        shell_exec('systemctl reload nginx');
+
+        // 返回
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
+    }
+
+    /**
+     * 设置网站运行状态
+     */
+    public function setSiteStatus(Request $request): JsonResponse
+    {
+        try {
+            $credentials = $this->validate($request, [
+                'name' => 'required|max:255',
+                'status' => 'required|in:0,1',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $website = Website::query()->where('name', $credentials['name'])->first();
+        if (!$website) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站不存在',
+            ], 200);
+        }
+
+        $nginxConfig = file_get_contents('/www/server/vhost/'.$website['name'].'.conf');
+
+        // 运行目录
+        $pathConfig = $this->cut('# root标记位开始', '# root标记位结束', $nginxConfig);
+        preg_match_all('/root\s+(.+);/', $pathConfig, $matches1);
+        $pathConfigOld = $matches1[1][0];
+        if (!empty(trim($pathConfigOld)) && $pathConfigOld != PHP_EOL) {
+            if ($credentials['status'] == 0) {
+                $pathConfigNew = str_replace($pathConfigOld, '/www/server/nginx/html', $pathConfig);
+                // 将旧配置追加到新配置中
+                $pathConfigNew .= '# '.$pathConfigOld.PHP_EOL.'    ';
+            } else {
+                // 匹配旧配置
+                preg_match_all('/# (.+)/', $pathConfig, $matches2);
+                // 还原旧配置
+                $pathConfigNew = str_replace($pathConfigOld, $matches2[1][0], $pathConfig);
+                // 删除旧配置
+                $pathConfigNew = str_replace(PHP_EOL.'    # '.$matches2[1][0], '', $pathConfigNew);
+            }
+            $nginxConfig = str_replace($pathConfig, $pathConfigNew, $nginxConfig);
+        }
+
+        // 默认文件
+        $indexConfig = $this->cut('# index标记位开始', '# index标记位结束', $nginxConfig);
+        preg_match_all('/index\s+(.+);/', $indexConfig, $matches2);
+        $indexConfigOld = $matches2[1][0];
+        if (!empty(trim($indexConfigOld)) && $indexConfigOld != PHP_EOL) {
+            if ($credentials['status'] == 0) {
+                $indexConfigNew = str_replace($indexConfigOld, 'stop.html', $indexConfig);
+                // 将旧配置追加到新配置中
+                $indexConfigNew .= '# '.$indexConfigOld.PHP_EOL.'    ';
+            } else {
+                // 匹配旧配置
+                preg_match_all('/# (.+)/', $indexConfig, $matches2);
+                // 还原旧配置
+                $indexConfigNew = str_replace($indexConfigOld, $matches2[1][0], $indexConfig);
+                // 删除旧配置
+                $indexConfigNew = str_replace(PHP_EOL.'    # '.$matches2[1][0], '', $indexConfigNew);
+            }
+            $nginxConfig = str_replace($indexConfig, $indexConfigNew, $nginxConfig);
+        }
+
+        // 写入配置文件
+        file_put_contents('/www/server/vhost/'.$website['name'].'.conf', $nginxConfig);
+
+        $website->status = $credentials['status'];
+        $website->save();
+
+        // 重载nginx
+        shell_exec('systemctl reload nginx');
+
+        // 返回
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        return response()->json($res);
+    }
+
+    /**
+     * 裁剪字符串
+     * @param $begin
+     * @param $end
+     * @param $str
+     * @return string
+     */
     private function cut($begin, $end, $str): string
     {
         $b = mb_strpos($str, $begin) + mb_strlen($begin);

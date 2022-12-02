@@ -207,17 +207,12 @@
         table.render({
             elem: '#safe-port'
             , url: '/api/panel/safe/getFirewallRules'
-            //, toolbar: '#website-list-bar'
-            , title: '网站列表'
+            , title: '防火墙'
             , cols: [[
-                {field: 'port', title: '端口', width: 200}
+                {field: 'port', title: '端口', width: 100}
                 , {field: 'protocol', title: '协议'}
                 , {fixed: 'right', title: '操作', toolbar: '#safe-port-setting', width: 150}
             ]]
-            /**
-             * TODO: 分页
-             */
-            //, page: true
         });
         table.on('tool(safe-port)', function (obj) {
             let data = obj.data;
@@ -253,7 +248,7 @@
                 layer.msg('端口号不合法', {icon: 2});
                 return false;
             }
-            var index = layer.load(2);
+            var index = layer.load();
             admin.req({
                 url: '/api/panel/safe/setSshPort'
                 , type: 'post'
@@ -281,7 +276,7 @@
                 layer.msg('端口号不合法', {icon: 2});
                 return false;
             }
-            var index = layer.load(2);
+            var index = layer.load();
             admin.req({
                 url: '/api/panel/safe/addFirewallRule'
                 , type: 'post'
