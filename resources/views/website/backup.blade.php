@@ -24,14 +24,12 @@ Date: 2022-12-02
 </script>
 <script>
     layui.data.sendParams = function (params) {
-        console.log(params);
         layui.use(['admin', 'form', 'laydate', 'code'], function () {
             var $ = layui.$
                 , admin = layui.admin
                 , layer = layui.layer
                 , table = layui.table
                 , upload = layui.upload;
-            console.log(params);
 
             // 渲染表格
             table.render({

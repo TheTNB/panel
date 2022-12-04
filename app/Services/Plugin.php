@@ -90,6 +90,8 @@ class Plugin
                 // 初始化插件信息
                 $plugin = [];
                 $plugin['name'] = (Arr::get($package, 'name'));
+                $plugin['author'] = (Arr::get($package, 'author'));
+                $plugin['describe'] = (Arr::get($package, 'describe'));
                 $plugin['slug'] = (Arr::get($package, 'slug'));
                 $plugin['version'] = (Arr::get($package, 'version'));
                 $plugin['path'] = $this->getPluginsDir().DIRECTORY_SEPARATOR.$dirname;

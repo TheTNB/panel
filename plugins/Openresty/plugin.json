@@ -1,5 +1,7 @@
 {
   "name": "OpenResty",
+  "author": "耗子",
+  "describe": "",
   "slug": "openresty",
   "version": "1.21.4.1"
 }

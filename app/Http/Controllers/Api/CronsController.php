@@ -117,6 +117,10 @@ class CronsController extends Controller
         }
         $shellFile = $cron->shell;
         file_put_contents($shellDir.$shellFile, $credentials['script']);
+        // 将文件转为unix格式
+        exec('dos2unix '.$shellDir.$shellFile);
+        // 设置文件权限
+        exec('chmod 700 '.$shellDir.$shellFile);
         $cron->save();
 
         $data['code'] = 0;

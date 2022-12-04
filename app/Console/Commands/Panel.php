@@ -6,6 +6,7 @@ use App\Models\Plugin;
 use App\Models\Setting;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Website;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -59,8 +60,17 @@ class Panel extends Command
             case 'cleanRunningTask':
                 $this->cleanRunningTask();
                 break;
+            case 'backup':
+                $this->backup();
+                break;
             default:
-                $this->error('错误的操作');
+                $this->info('耗子Linux面板命令行工具');
+                $this->info('请使用以下命令:');
+                $this->info('panel update 更新/修复面板到最新版本');
+                $this->info('panel getInfo 重新初始化面板账号信息');
+                $this->info('panel getPort 获取面板访问端口');
+                $this->info('panel cleanRunningTask 强制清理面板正在运行的任务');
+                $this->info('panel backup {website/mysql/postgresql} {name} {path} 备份网站/MySQL数据库/PostgreSQL数据库到指定目录');
                 break;
         }
         return Command::SUCCESS;
@@ -166,8 +176,10 @@ class Panel extends Command
         $nginxConf = file_get_contents('/www/server/nginx/conf/nginx.conf');
         preg_match('/listen\s+(\d+)/', $nginxConf, $matches);
 
-        if (!isset($matches[1])) {
-            $this->info($matches[1]);
+        if (isset($matches[1])) {
+            $this->info('面板访问端口为：'.$matches[1]);
+        } else {
+            $this->error('获取面板端口失败，请检查nginx主配置文件');
         }
     }
 
@@ -241,5 +253,85 @@ class Panel extends Command
         // 将所有队列任务清空
         shell_exec('php-panel /www/panel/artisan queue:clear');
         $this->info('成功');
+    }
+
+    /**
+     * 备份网站/MySQL数据库/PostgreSQL数据库到指定目录
+     */
+    private function backup(): void
+    {
+        $type = $this->argument('a1');
+        $name = $this->argument('a2');
+        $path = $this->argument('a3');
+
+        // 判空
+        if (empty($type) || empty($name) || empty($path)) {
+            $this->error('参数错误');
+            return;
+        }
+
+        // 判断目录是否存在
+        if (!is_dir($path)) {
+            $this->error('目录不存在');
+            return;
+        }
+
+        // 判断目录是否可写
+        if (!is_writable($path)) {
+            $this->error('目录不可写');
+            return;
+        }
+
+        // 判断备份目录是否以/结尾，有则去掉
+        if (str_ends_with($path, '/')) {
+            $path = substr($path, 0, -1);
+        }
+
+        // 判断类型
+        if ($type == 'website') {
+            // 备份网站
+            // 从数据库中获取网站目录
+            $sitePath = Website::query()->where('name', $name)->value('path');
+            if (empty($sitePath)) {
+                $this->error('网站不存在');
+                return;
+            }
+            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.zip';
+            shell_exec('zip -r '.$backupFile.' '.$sitePath.' 2>&1');
+            $this->info('成功');
+        } elseif ($type == 'mysql') {
+            // 备份MySQL数据库
+            $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
+            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql';
+            // 判断数据库是否存在
+            $check = shell_exec("mysql -u root -p".$password." -e 'use ".$name."' 2>&1");
+            if (str_contains($check, 'ERROR')) {
+                $this->error('数据库不存在');
+                return;
+            }
+            shell_exec("mysqldump -u root -p".$password." ".$name." > ".$backupFile." 2>&1");
+            // zip压缩
+            shell_exec('zip -r '.$backupFile.'.zip '.$backupFile.' 2>&1');
+            // 删除sql文件
+            unlink($backupFile);
+            $this->info('成功');
+        } elseif ($type == 'postgresql') {
+            // 备份PostgreSQL数据库
+            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql';
+            // 判断数据库是否存在
+            $check = shell_exec('su - postgres -c "psql -l" 2>&1');
+            if (!str_contains($check, $name)) {
+                $this->error('数据库不存在');
+                return;
+            }
+            shell_exec('su - postgres -c "pg_dump '.$name.'" > '.$backupFile.' 2>&1');
+            // zip压缩
+            shell_exec('zip -r '.$backupFile.'.zip '.$backupFile.' 2>&1');
+            // 删除sql文件
+            unlink($backupFile);
+            $this->info('成功');
+        } else {
+            $this->error('参数错误');
+        }
     }
 }

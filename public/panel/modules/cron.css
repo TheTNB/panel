@@ -9,7 +9,7 @@ html #layuicss-cron {
 
 /* 主体结构 */
 .layui-cron {
-    width: 700px;
+    width: 550px;
     position: absolute;
     z-index: 99999999;
     margin: 5px 0;

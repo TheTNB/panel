@@ -30,11 +30,13 @@ class PluginsController extends Controller
         $data['code'] = 0;
         $data['msg'] = 'success';
         $data['data'] = $this->pluginList();
+        // 获取首页显示状态
+        $shows = Plugin::query()->pluck('show', 'slug');
         foreach ($data['data'] as $k => $v) {
-            // 获取首页显示状态
-            $shows = Plugin::query()->pluck('show', 'slug');
             // 如果本地已安装，则显示本地名称
             $data['data'][$k]['name'] = PLUGINS[$v['slug']]['name'] ?? $data['data'][$k]['name'];
+            // 作者名称
+            $data['data'][$k]['author'] = PLUGINS[$v['slug']]['author'] ?? '耗子';
             // 已装版本
             $data['data'][$k]['install_version'] = PLUGINS[$v['slug']]['version'] ?? '';
             // 首页显示
@@ -57,6 +59,29 @@ class PluginsController extends Controller
                 $data['data'][$k]['control']['installed'] = false;
                 $data['data'][$k]['control']['allow_uninstall'] = false;
             }
+        }
+        // 插入本地插件数据
+        $slugs = array_column($data['data'], 'slug');
+        foreach (PLUGINS as $v) {
+            // 如果本地已安装，则不显示
+            if (in_array($v['slug'], $slugs)) {
+                continue;
+            }
+            // 插入插件数据
+            $data['data'][] = [
+                'name' => $v['name'],
+                'author' => $v['author'],
+                'slug' => $v['slug'],
+                'version' => $v['version'],
+                'install_version' => $v['version'],
+                'describe' => $v['describe'],
+                'show' => $shows[$v['slug']] ?? 0,
+                'control' => [
+                    'installed' => true,
+                    'allow_uninstall' => false,
+                ],
+            ];
+
         }
         return response()->json($data);
     }

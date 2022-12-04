@@ -267,7 +267,7 @@ layui.define(['lay', 'element', 'form'], function (exports) { //假如该组件�
 
         //如果是静态定位，则插入到指定的容器中，否则，插入到body
         isStatic ? options.elem.append(elem) : (document.body.appendChild(elem)
-                , that.position());
+            , that.position());
 
 
         that.checkCron();
@@ -750,6 +750,16 @@ layui.define(['lay', 'element', 'form'], function (exports) { //假如该组件�
                 });
             }
 
+        });
+
+        //gird checkbox点击时，自动选中radio
+        form.on('checkbox', function (data) {
+            //触发选项的点击事件
+            var $parent = data.othis.parent().parent();
+            //循环父级，找到子级的子级找到value="custom"的radio
+            var $radio = $parent.children().find('input[value="custom"]');
+            //触发radio的点击事件
+            $radio.next().click();
         });
 
         //点击底部按钮

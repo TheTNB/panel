@@ -49,9 +49,10 @@
             elem: '#panel-plugin'
             , url: '/api/panel/plugin/getList'
             , cols: [[
-                {field: 'slug', hide: true, title: 'Slug', sort: true}
-                , {field: 'name', width: 150, title: '插件名'}
+                {field: 'slug', hide: true, title: 'Slug'}
+                , {field: 'name', width: 150, title: '插件名', sort: true}
                 , {field: 'describe', title: '描述'}
+                , {field: 'author', width: 100, title: '作者'}
                 , {field: 'install_version', width: 140, title: '已装版本'}
                 , {field: 'version', width: 140, title: '最新版本'}
                 , {field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true}

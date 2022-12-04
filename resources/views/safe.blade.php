@@ -209,8 +209,8 @@
             , url: '/api/panel/safe/getFirewallRules'
             , title: '防火墙'
             , cols: [[
-                {field: 'port', title: '端口', width: 100}
-                , {field: 'protocol', title: '协议'}
+                {field: 'port', title: '端口', width: 100, sort: true}
+                , {field: 'protocol', title: '协议', sort: true}
                 , {fixed: 'right', title: '操作', toolbar: '#safe-port-setting', width: 150}
             ]]
         });
