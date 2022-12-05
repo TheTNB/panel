@@ -63,6 +63,12 @@ class Panel extends Command
             case 'backup':
                 $this->backup();
                 break;
+            case 'writeSite':
+                $this->writeSite();
+                break;
+            case 'deleteSite':
+                $this->deleteSite();
+                break;
             default:
                 $this->info('耗子Linux面板命令行工具');
                 $this->info('请使用以下命令:');
@@ -71,6 +77,13 @@ class Panel extends Command
                 $this->info('panel getPort 获取面板访问端口');
                 $this->info('panel cleanRunningTask 强制清理面板正在运行的任务');
                 $this->info('panel backup {website/mysql/postgresql} {name} {path} 备份网站/MySQL数据库/PostgreSQL数据库到指定目录');
+                $this->warn('以下命令请在开发者指导下使用：');
+                $this->info('panel init 初始化面板');
+                $this->info('panel writePluginInstall {slug} 写入插件安装状态');
+                $this->info('panel writePluginUnInstall {slug} 移除插件安装状态');
+                $this->info('panel writeMysqlPassword {password} 写入MySQL root密码');
+                $this->info('panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板');
+                $this->info('panel deleteSite {name} 删除面板网站数据');
                 break;
         }
         return Command::SUCCESS;
@@ -113,28 +126,53 @@ class Panel extends Command
         $this->info(shell_exec('wget -O /tmp/panel.zip https://api.panel.haozi.xyz/api/version/latest'));
         $this->info('正在备份数据库...');
         $this->info(shell_exec('\cp /www/panel/database/database.sqlite /tmp/database.sqlite'));
+        // 检查下载是否成功
+        if (!file_exists('/tmp/panel.zip') || filesize('/tmp/panel.zip') < 4096) {
+            $this->error('检测到面板新版本下载失败，已终止更新，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在备份插件...');
         $this->info(shell_exec('rm -rf /tmp/plugins'));
         $this->info(shell_exec('mkdir /tmp/plugins'));
         $this->info(shell_exec('\cp -r /www/panel/plugins/* /tmp/plugins'));
+        // 检查备份是否成功
+        if (!file_exists('/tmp/database.sqlite') || !is_dir('/tmp/plugins/Openresty')) {
+            $this->error('检测到面板旧配置备份失败，已终止更新，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在删除旧版本...');
         $this->info(shell_exec('rm -rf /www/panel'));
         $this->info(shell_exec('mkdir /www/panel'));
         $this->info('正在解压新版本...');
         $this->info(shell_exec('unzip -o /tmp/panel.zip -d /www/panel'));
+        // 检查解压是否成功
+        if (!file_exists('/www/panel/artisan')) {
+            $this->error('检测到面板新版本解压失败，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在恢复数据库...');
         $this->info(shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite'));
+        // 检查恢复是否成功
+        if (!file_exists('/www/panel/database/database.sqlite')) {
+            $this->error('检测到面板数据库恢复失败，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在恢复插件...');
         $this->info(shell_exec('\cp -r /tmp/plugins/* /www/panel/plugins'));
-        $this->info('正在清理临时文件...');
-        $this->info(shell_exec('rm -rf /tmp/panel.zip'));
-        $this->info(shell_exec('rm -rf /tmp/database.sqlite'));
-        $this->info(shell_exec('rm -rf /tmp/plugins'));
         $this->info('正在更新面板数据库...');
         $this->info(shell_exec('cd /www/panel && php-panel artisan migrate'));
         $this->info('正在重启面板服务...');
         $this->info(shell_exec('systemctl restart panel.service'));
-        $this->info('更新完成');
+        // 检查重启是否成功
+        if (shell_exec('systemctl status panel.service | grep Active | grep -v grep | awk \'{print $2}\'') !== 'active') {
+            $this->error('检测到面板服务重启失败，请加QQ群：12370907 反馈处理');
+        } else {
+            $this->info('正在清理临时文件...');
+            $this->info(shell_exec('rm -rf /tmp/panel.zip'));
+            $this->info(shell_exec('rm -rf /tmp/database.sqlite'));
+            $this->info(shell_exec('rm -rf /tmp/plugins'));
+            $this->info('面板更新成功');
+        }
     }
 
     /**
@@ -239,7 +277,11 @@ class Panel extends Command
             return;
         }
         // 入库
-        Setting::query()->where('name', 'mysql_root_password')->update(['value' => $password]);
+        Setting::query()->where('name', 'mysql_root_password')->updateOrCreate([
+            'name' => 'mysql_root_password',
+        ], [
+            'value' => $password,
+        ]);
         $this->info('成功');
     }
 
@@ -333,5 +375,68 @@ class Panel extends Command
         } else {
             $this->error('参数错误');
         }
+    }
+
+    /**
+     * 写入网站数据到面板
+     */
+    private function writeSite(): void
+    {
+        //{name} {status} {path} {php} {ssl}
+        $name = $this->argument('a1');
+        $status = $this->argument('a2');
+        $path = $this->argument('a3');
+        $php = $this->argument('a4');
+        $ssl = $this->argument('a5');
+
+        // 判空
+        if (empty($name) || empty($status) || empty($path) || empty($php) || empty($ssl)) {
+            $this->error('参数错误');
+            return;
+        }
+
+        // 判断网站是否存在
+        if (Website::query()->where('name', $name)->exists()) {
+            $this->error('网站已存在');
+            return;
+        }
+
+        // 判断目录是否存在
+        if (!is_dir($path)) {
+            $this->error('目录不存在');
+            return;
+        }
+
+        // 写入网站
+        Website::query()->create([
+            'name' => $name,
+            'status' => $status,
+            'path' => $path,
+            'php' => $php,
+            'ssl' => $ssl,
+        ]);
+    }
+
+    /**
+     * 删除面板网站数据
+     */
+    private function deleteSite(): void
+    {
+        $name = $this->argument('a1');
+
+        // 判空
+        if (empty($name)) {
+            $this->error('参数错误');
+            return;
+        }
+
+        // 判断网站是否存在
+        if (!Website::query()->where('name', $name)->exists()) {
+            $this->error('网站不存在');
+            return;
+        }
+
+        // 删除网站
+        Website::query()->where('name', $name)->delete();
     }
 }
