@@ -171,6 +171,9 @@
                     if (res.code === 0) {
                         layer.msg('设置成功', {icon: 1, time: 1000});
                     } else {
+                        // 还原开关状态
+                        obj.elem.checked = !obj.elem.checked;
+                        form.render('checkbox');
                         layer.msg(res.msg, {icon: 2, time: 1000});
                     }
                 }
