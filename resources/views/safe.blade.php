@@ -36,8 +36,7 @@
                     <span style="margin-right: 10px;">端口控制</span>
                     <div class="layui-input-inline">
                         <input id="safe_add_firewall_rule_port" type="text" name="safe_add_firewall_rule_port" class="layui-input"
-                               placeholder="端口号（如：3306）"
-                               min=1 max=65535/>
+                               placeholder="例如：3306、1000-2000"/>
                     </div>
                     <div class="layui-input-inline">
                         <select id="safe_add_firewall_rule_protocol" lay-filter="safe_add_firewall_rule_protocol"
@@ -271,11 +270,6 @@
         $('#safe_add_firewall_rule').click(function () {
             var port = Number($('#safe_add_firewall_rule_port').val());
             var protocol = $('#safe_add_firewall_rule_protocol').val();
-            // 判断端口是否合法
-            if (isNaN(port) || port < 1 || port > 65535) {
-                layer.msg('端口号不合法', {icon: 2});
-                return false;
-            }
             var index = layer.load();
             admin.req({
                 url: '/api/panel/safe/addFirewallRule'

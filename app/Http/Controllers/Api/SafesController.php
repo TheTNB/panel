@@ -176,7 +176,6 @@ class SafesController extends Controller
         // 正则匹配出ports
         preg_match('/ports: (.*)/', $firewallRules, $matches);
         $rawPorts = $matches[1];
-        // 22/tcp 80/tcp 443/tcp 8888/tcp 5432/tcp
         $ports = explode(' ', $rawPorts);
         // 对ports进行分割为port=>protocol形式
         $rules = [];
