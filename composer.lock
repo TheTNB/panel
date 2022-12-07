@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efb63260d6e5ee652c84bfee6f458ada",
+    "content-hash": "199471d49176a915109df8e3774d6e7e",
     "packages": [
         {
             "name": "brick/math",
@@ -2979,6 +2979,50 @@
                 }
             ],
             "time": "2022-09-16T03:22:46+00:00"
+        },
+        {
+            "name": "skoerfgen/acmecert",
+            "version": "3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/skoerfgen/ACMECert.git",
+                "reference": "5cf724cebf4bcab13ec609308d6a0cbd136ccdfd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/skoerfgen/ACMECert/zipball/5cf724cebf4bcab13ec609308d6a0cbd136ccdfd",
+                "reference": "5cf724cebf4bcab13ec609308d6a0cbd136ccdfd",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "php": ">=5.6.0"
+            },
+            "suggest": {
+                "ext-curl": "Optional for better http performance"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "skoerfgen\\ACMECert\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Stefan Körfgen",
+                    "homepage": "https://github.com/skoerfgen"
+                }
+            ],
+            "description": "PHP client library for Let's Encrypt and other ACME v2 - RFC 8555 compatible Certificate Authorities",
+            "support": {
+                "issues": "https://github.com/skoerfgen/ACMECert/issues",
+                "source": "https://github.com/skoerfgen/ACMECert"
+            },
+            "time": "2022-08-03T21:36:49+00:00"
         },
         {
             "name": "symfony/console",

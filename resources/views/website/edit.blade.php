@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 编辑
 Author: 耗子
-Date: 2022-12-01
+Date: 2022-12-08
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <div class="layui-tab" lay-filter="website-edit-tab">
@@ -151,10 +151,19 @@ Date: 2022-12-01
                                        @{{ d.params.config.hsts== 1 ? 'checked' : '' }} />
                             </div>
                         </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <button id="issue-ssl" class="layui-btn layui-btn-sm">签发免费SSL证书</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="layui-form-item layui-form-text">
+                        @{{# if(d.params.config.ssl == 1){ }}
+                        <label class="layui-form-label">证书 <span style="color: red; float: right;">剩余有效期：@{{ d.params.config.ssl_date }}天</span></label>
+                        @{{# }else{ }}
                         <label class="layui-form-label">证书</label>
+                        @{{# } }}
                         <div class="layui-input-block">
                             <textarea name="ssl_certificate" placeholder="请输入pem证书文件的内容"
                                       class="layui-textarea">@{{ d.params.config.ssl_certificate }}</textarea>
@@ -344,7 +353,40 @@ Date: 2022-12-01
                         }
                     });
                 });
-            })
+            });
+
+            // 监听签发证书按钮
+            $('#issue-ssl').click(function () {
+                layer.confirm('确定要申请签发免费SSL证书吗？', function (index) {
+                    index = layer.msg('正在签发证书，可能需要较长时间，请勿操作...', {
+                        icon: 16
+                        , time: 0
+                    });
+                    admin.req({
+                        url: '/api/panel/website/issueSsl'
+                        , type: 'post'
+                        , data: {
+                            name: params.config.name
+                            , type: 'lets'
+                        }
+                        , success: function (res) {
+                            layer.close(index);
+                            if (res.code === 0) {
+                                layer.msg('签发成功', {icon: 1});
+                                setTimeout(function () {
+                                    admin.render();
+                                }, 1000);
+                            } else {
+                                layer.alert(res.msg, {icon: 2});
+                            }
+                        }
+                        , error: function (xhr, status, error) {
+                            layer.closeAll('loading');
+                            console.log('耗子Linux面板：ajax请求出错，错误' + error);
+                        }
+                    });
+                });
+            });
         });
     };
 </script>

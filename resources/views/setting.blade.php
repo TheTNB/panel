@@ -1,7 +1,7 @@
 <!--
 Name: 面板设置模版
 Author: 耗子
-Date: 2022-12-01
+Date: 2022-12-08
 -->
 <title>面板设置</title>
 <div class="layui-fluid">
@@ -31,7 +31,9 @@ Date: 2022-12-01
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="multi_login" lay-skin="switch" lay-text="ON|OFF"/>
                             </div>
-                            <div class="layui-form-mid layui-word-aux">开启后将允许多设备同时登录面板，可能具有一定安全隐患</div>
+                            <div class="layui-form-mid layui-word-aux">
+                                开启后将允许多设备同时登录面板，可能具有一定安全隐患
+                            </div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板名称</label>
@@ -53,6 +55,13 @@ Date: 2022-12-01
                                 <input type="password" name="password" value="" class="layui-input" disabled/>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的登录密码（留空不修改）</div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">面板邮箱</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="email" value="获取中ing..." class="layui-input" disabled/>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">修改面板账号的邮箱，目前用于签发免费SSL证书</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板端口</label>

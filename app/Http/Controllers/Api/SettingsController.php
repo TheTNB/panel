@@ -57,6 +57,7 @@ class SettingsController extends Controller
         $data = [
             'name' => $settingArr['name'],
             'username' => $request->user()->username,
+            'email' => $request->user()->email,
             'password' => '',
             'port' => $matches[1],
             'api' => $api,
@@ -80,18 +81,21 @@ class SettingsController extends Controller
         $settings = $request->all();
         // 将数据入库
         foreach ($settings as $key => $value) {
-            if ($key == 'access_token' || $key == 'username' || $key == 'password' || $key == 'api_token' || $key == 'api' || $key == 'port') {
+            if ($key == 'access_token' || $key == 'username' || $key == 'email' || $key == 'password' || $key == 'api_token' || $key == 'api' || $key == 'port') {
                 continue;
             }
             // 创建或更新
             Setting::query()->updateOrCreate(['name' => $key], ['value' => $value]);
         }
-        // 单独处理用户名和密码
+        // 单独处理用户名、密码、邮箱
         if ($request->input('username') != $request->user()->username) {
             $request->user()->update(['username' => $request->input('username')]);
         }
         if ($request->input('password') != '') {
             $request->user()->update(['password' => Hash::make($request->input('password'))]);
+        }
+        if ($request->input('email') != $request->user()->email) {
+            $request->user()->update(['email' => $request->input('email')]);
         }
         // 处理面板端口
         $port = $request->input('port');

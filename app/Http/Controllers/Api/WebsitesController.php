@@ -9,9 +9,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Website;
 use App\Models\Setting;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use skoerfgen\ACMECert\ACME_Exception;
+use skoerfgen\ACMECert\ACMECert;
 
 class WebsitesController extends Controller
 {
@@ -372,6 +375,13 @@ EOF;
             $website['ssl_certificate_key'] = file_get_contents($matches5[1][0]);
             $website['http_redirect'] = str_contains($nginx_config, '# http重定向标记位');
             $website['hsts'] = str_contains($nginx_config, '# hsts标记位');
+            try {
+                $sslDate = (new ACMECert())->getRemainingDays($website['ssl_certificate']);
+                $sslDate = round($sslDate, 2);
+            } catch (Exception $e) {
+                $sslDate = '未知';
+            }
+            $website['ssl_date'] = $sslDate;
         } else {
             $website['ssl_certificate'] = @file_get_contents('/www/server/vhost/ssl/'.$name.'.pem');
             $website['ssl_certificate_key'] = @file_get_contents('/www/server/vhost/ssl/'.$name.'.key');
@@ -1026,6 +1036,152 @@ EOF;
         $res['msg'] = 'success';
         return response()->json($res);
     }
+
+    /**
+     * 签发SSL证书
+     * @param  Request  $request
+     * @return JsonResponse
+     * @throws ACME_Exception|Exception
+     */
+    public function issueSsl(Request $request): JsonResponse
+    {
+        try {
+            $input = $this->validate($request, [
+                'type' => 'required|in:lets,buypass,google,sslcom,zerossl',
+                'name' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
+
+        $user = $request->user();
+
+        // 检查网站是否存在
+        $website = Website::query()->where('name', $input['name'])->first();
+        if (!$website) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '网站不存在',
+            ], 200);
+        }
+        // 从配置文件中获取网站域名
+        $nginxConfig = file_get_contents('/www/server/vhost/'.$website['name'].'.conf');
+        $domainConfig = $this->cut('# server_name标记位开始', '# server_name标记位结束', $nginxConfig);
+        preg_match_all('/server_name\s+(.+);/', $domainConfig, $matches1);
+        $domains = explode(" ", $matches1[1][0]);
+        // 从配置文件中获取网站目录
+        $pathConfig = $this->cut('# root标记位开始', '# root标记位结束', $nginxConfig);
+        preg_match_all('/root\s+(.+);/', $pathConfig, $matches2);
+        $path = $matches2[1][0];
+
+        /**
+         * 对域名需要进行一下处理，如果域名是泛域名，返回暂不支持泛域名
+         */
+        foreach ($domains as $domain) {
+            if (str_contains($domain, '*')) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '暂不支持泛域名',
+                ], 200);
+            }
+        }
+
+        switch ($input['type']) {
+            case 'lets':
+                $ac = new ACMECert('https://acme-v02.api.letsencrypt.org/directory');
+                break;
+            case 'buypass':
+                $ac = new ACMECert('https://api.buypass.com/acme/directory');
+                break;
+            case 'google':
+                $ac = new ACMECert('https://dv.acme-v02.api.pki.goog/directory');
+                break;
+            case 'sslcom':
+                $ac = new ACMECert('https://acme.ssl.com/sslcom-dv-rsa');
+                break;
+            case 'zerossl':
+                $ac = new ACMECert('https://acme.zerossl.com/v2/DV90');
+                break;
+            default:
+                $res = [
+                    'code' => 1,
+                    'msg' => '参数错误：type',
+                ];
+                return response()->json($res);
+                break;
+        }
+
+        try {
+            $accountKey = $ac->generateECKey('P-384');
+            $certKey = $ac->generateECKey('P-384');
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '生成密钥失败：'.$e->getMessage(),
+            ], 200);
+        }
+        try {
+            $ac->loadAccountKey($accountKey);
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '加载密钥失败：'.$e->getMessage(),
+            ], 200);
+        }
+        try {
+            $ac->register(true, $user->email);
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '注册CA账户失败：'.$e->getMessage(),
+            ], 200);
+        }
+
+        // 初始化域名数组
+        $domainConfig = [];
+        foreach ($domains as $domain) {
+            $domainConfig[$domain] = [
+                'challenge' => 'http-01',
+                'docroot' => $path
+            ];
+        }
+
+        $handler = function ($opts) {
+            $fn = $opts['config']['docroot'].$opts['key'];
+            @mkdir(dirname($fn), 0777, true);
+            file_put_contents($fn, $opts['value']);
+            return function ($opts) {
+                unlink($opts['config']['docroot'].$opts['key']);
+            };
+        };
+
+        // 申请证书
+        try {
+            $fullchain = $ac->getCertificateChain($certKey, $domainConfig, $handler);
+        } catch (ACME_Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '申请证书失败：'.$e->getMessage(),
+            ], 200);
+        }
+
+        // 写入证书
+        $sslDir = '/www/server/vhost/ssl/';
+        file_put_contents($sslDir.$website['name'].'.key', $certKey);
+        file_put_contents($sslDir.$website['name'].'.pem', $fullchain);
+
+        // 返回
+        $res = [
+            'code' => 0,
+            'msg' => 'success',
+        ];
+        return response()->json($res);
+    }
+
 
     /**
      * 裁剪字符串

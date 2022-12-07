@@ -84,6 +84,8 @@ Route::prefix('panel')->group(function () {
         Route::post('deleteBackup', [WebsitesController::class, 'deleteBackup']);
         // 重置网站配置
         Route::post('resetSiteConfig', [WebsitesController::class, 'resetSiteConfig']);
+        // 签发SSL证书
+        Route::post('issueSsl', [WebsitesController::class, 'issueSsl']);
     });
     // 监控
     Route::middleware('auth:sanctum')->prefix('monitor')->group(function () {
