@@ -203,7 +203,7 @@ class CronsController extends Controller
 
         $data['code'] = 0;
         $data['msg'] = 'success';
-        $data['data'] = $log;
+        $data['data'] = htmlspecialchars($log);
         return response()->json($data);
     }
 }

@@ -54,3 +54,17 @@ function formatBytes($size): string
     }
     return round($size, 2).$units[$i];
 }
+
+/**
+ * 裁剪字符串
+ * @param $begin
+ * @param $end
+ * @param $str
+ * @return string
+ */
+function cut($begin, $end, $str): string
+{
+    $b = mb_strpos($str, $begin) + mb_strlen($begin);
+    $e = mb_strpos($str, $end) - $b;
+    return mb_substr($str, $b, $e);
+}

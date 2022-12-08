@@ -18,6 +18,8 @@
 
 广告： [`WeAvatar` —统一头像服务](https://weavatar.com)
 
+服务器赞助：
+[![](https://img-cdn.haozi.xyz/2022/12/09/54a1b368700423a992789eca4af8b7e2.jpg)](http://www.ddunyun.com/aff/PNYAXMKI)
 ## 安装说明
 
 ```shell
