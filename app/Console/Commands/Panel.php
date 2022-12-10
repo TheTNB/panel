@@ -34,6 +34,11 @@ class Panel extends Command
      */
     public function handle()
     {
+        // 检测是否以root用户运行
+        if (shell_exec('whoami') != 'root') {
+            $this->error('耗子Linux面板：请以root用户运行');
+            return 1;
+        }
         $action = $this->argument('action');
         switch ($action) {
             case 'init':
@@ -69,6 +74,12 @@ class Panel extends Command
             case 'deleteSite':
                 $this->deleteSite();
                 break;
+            case 'writeSetting':
+                $this->writeSetting();
+                break;
+            case 'deleteSetting':
+                $this->deleteSetting();
+                break;
             default:
                 $this->info('耗子Linux面板命令行工具');
                 $this->info('请使用以下命令:');
@@ -84,6 +95,8 @@ class Panel extends Command
                 $this->info('panel writeMysqlPassword {password} 写入MySQL root密码');
                 $this->info('panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板');
                 $this->info('panel deleteSite {name} 删除面板网站数据');
+                $this->info('panel writeSetting {name} {value} 写入/更新面板设置数据');
+                $this->info('panel deleteSetting {name} 删除面板设置数据');
                 break;
         }
         return Command::SUCCESS;
@@ -161,6 +174,14 @@ class Panel extends Command
         $this->info(shell_exec('\cp -r /tmp/plugins/* /www/panel/plugins'));
         $this->info('正在更新面板数据库...');
         $this->info(shell_exec('cd /www/panel && php-panel artisan migrate'));
+        $this->info('正在设置面板权限...');
+        $this->info(shell_exec('chown -R root:root /www/panel'));
+        $this->info(shell_exec('chmod -R 755 /www/panel'));
+        $this->info(shell_exec('chown -R root:root /www/server/cron'));
+        $this->info(shell_exec('chmod -R 700 /www/server/cron'));
+        $this->info(shell_exec('chmod -R 600 /www/server/cron/logs'));
+        $this->info(shell_exec('chown -R root:root /www/server/vhost'));
+        $this->info(shell_exec('chmod -R 644 /www/server/vhost'));
         $this->info('正在重启面板服务...');
         $this->info(shell_exec('systemctl restart panel.service'));
         // 检查重启是否成功
@@ -266,6 +287,7 @@ class Panel extends Command
 
     /**
      * 写入MySQL密码
+     * @return void
      */
     private function writeMysqlPassword(): void
     {
@@ -287,6 +309,7 @@ class Panel extends Command
 
     /**
      * 清理所有运行中和等待中的任务
+     * @return void
      */
     private function cleanRunningTask(): void
     {
@@ -299,6 +322,7 @@ class Panel extends Command
 
     /**
      * 备份网站/MySQL数据库/PostgreSQL数据库到指定目录
+     * @return void
      */
     private function backup(): void
     {
@@ -339,13 +363,14 @@ class Panel extends Command
                 return;
             }
             $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.zip';
-            shell_exec('zip -r '.$backupFile.' '.$sitePath.' 2>&1');
+            shell_exec('zip -r '.$backupFile.' '.escapeshellarg($sitePath).' 2>&1');
             $this->info('成功');
         } elseif ($type == 'mysql') {
             // 备份MySQL数据库
             $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
             $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql';
             // 判断数据库是否存在
+            $name = escapeshellarg($name);
             $check = shell_exec("mysql -u root -p".$password." -e 'use ".$name."' 2>&1");
             if (str_contains($check, 'ERROR')) {
                 $this->error('数据库不存在');
@@ -353,7 +378,7 @@ class Panel extends Command
             }
             shell_exec("mysqldump -u root -p".$password." ".$name." > ".$backupFile." 2>&1");
             // zip压缩
-            shell_exec('zip -r '.$backupFile.'.zip '.$backupFile.' 2>&1');
+            shell_exec('zip -r '.$backupFile.'.zip '.escapeshellarg($backupFile).' 2>&1');
             // 删除sql文件
             unlink($backupFile);
             $this->info('成功');
@@ -366,9 +391,10 @@ class Panel extends Command
                 $this->error('数据库不存在');
                 return;
             }
+            $name = escapeshellarg($name);
             shell_exec('su - postgres -c "pg_dump '.$name.'" > '.$backupFile.' 2>&1');
             // zip压缩
-            shell_exec('zip -r '.$backupFile.'.zip '.$backupFile.' 2>&1');
+            shell_exec('zip -r '.$backupFile.'.zip '.escapeshellarg($backupFile).' 2>&1');
             // 删除sql文件
             unlink($backupFile);
             $this->info('成功');
@@ -379,10 +405,10 @@ class Panel extends Command
 
     /**
      * 写入网站数据到面板
+     * @return void
      */
     private function writeSite(): void
     {
-        //{name} {status} {path} {php} {ssl}
         $name = $this->argument('a1');
         $status = $this->argument('a2');
         $path = $this->argument('a3');
@@ -419,6 +445,7 @@ class Panel extends Command
 
     /**
      * 删除面板网站数据
+     * @return void
      */
     private function deleteSite(): void
     {
@@ -438,5 +465,46 @@ class Panel extends Command
 
         // 删除网站
         Website::query()->where('name', $name)->delete();
+    }
+
+    /**
+     * 写入/更新面板设置数据
+     * @return void
+     */
+    private function writeSetting(): void
+    {
+        $name = $this->argument('a1');
+        $value = $this->argument('a2');
+
+        // 判空
+        if (empty($name) || empty($value)) {
+            $this->error('参数错误');
+            return;
+        }
+        Setting::query()->updateOrCreate(['name' => $name], ['value' => $value]);
+    }
+
+    /**
+     * 删除面板设置数据
+     * @return void
+     */
+    private function deleteSetting(): void
+    {
+        $name = $this->argument('a1');
+
+        // 判空
+        if (empty($name)) {
+            $this->error('参数错误');
+            return;
+        }
+
+        // 判断设置是否存在
+        if (!Setting::query()->where('name', $name)->exists()) {
+            $this->error('设置不存在');
+            return;
+        }
+
+        // 删除设置
+        Setting::query()->where('name', $name)->delete();
     }
 }

@@ -21,12 +21,12 @@ app('router')->group([
     'middleware' => ['auth:sanctum'],
 ], function () {
     Route::get('status', [OpenrestyController::class, 'status']);
+    Route::post('restart', [OpenrestyController::class, 'restart']);
+    Route::post('reload', [OpenrestyController::class, 'reload']);
     Route::get('load', [OpenrestyController::class, 'load']);
     Route::get('errorLog', [OpenrestyController::class, 'errorLog']);
     Route::get('config', [OpenrestyController::class, 'getConfig']);
     Route::post('config', [OpenrestyController::class, 'saveConfig']);
-    Route::get('cleanErrorLog', [OpenrestyController::class, 'cleanErrorLog']);
-    Route::get('restart', [OpenrestyController::class, 'restart']);
-    Route::get('reload', [OpenrestyController::class, 'reload']);
+    Route::post('cleanErrorLog', [OpenrestyController::class, 'cleanErrorLog']);
 });
 

@@ -107,11 +107,12 @@ class SettingsController extends Controller
             return response()->json($res);
         }
         if ($port != $matches[1]) {
-            $nginxConf = preg_replace('/listen\s+(\d+)/', 'listen '.$port, $nginxConf);
+            $nginxConf = preg_replace('/listen\s+'.$matches[1].'/', 'listen '.$port, $nginxConf, 1);
             file_put_contents('/www/server/nginx/conf/nginx.conf', $nginxConf);
             // 重载nginx
             shell_exec('systemctl reload nginx');
             // 防火墙放行端口
+            $port = escapeshellarg($port);
             shell_exec('firewall-cmd --permanent --zone=public --add-port='.$port.'/tcp >/dev/null 2>&1');
             shell_exec('firewall-cmd --reload');
         }

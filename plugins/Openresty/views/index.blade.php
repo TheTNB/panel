@@ -1,7 +1,7 @@
 <!--
 Name: Openresty管理器
 Author: 耗子
-Date: 2022-11-30
+Date: 2022-12-10
 -->
 <title>OpenResty</title>
 <div class="layui-fluid" id="component-tabs">
@@ -20,7 +20,7 @@ Date: 2022-11-30
                         <div class="layui-tab-content">
                             <div class="layui-tab-item layui-show">
                                 <blockquote id="openresty-status" class="layui-elem-quote layui-quote-nm">当前状态：<span
-                                        class="layui-badge layui-bg-black">获取中</span></blockquote>
+                                            class="layui-badge layui-bg-black">获取中</span></blockquote>
                                 <div class="layui-btn-container" style="padding-top: 30px;">
                                     <button id="openresty-start" class="layui-btn">启动</button>
                                     <button id="openresty-stop" class="layui-btn layui-btn-danger">停止</button>
@@ -75,7 +75,7 @@ Date: 2022-11-30
                     console.log('耗子Linux面板：OpenResty运行状态获取失败，接口返回' + result);
                     return false;
                 }
-                if (result.data === "running") {
+                if (result.data) {
                     $('#openresty-status').html('当前状态：<span class="layui-badge layui-bg-green">运行中</span>');
                 } else {
                     $('#openresty-status').html('当前状态：<span class="layui-badge layui-bg-red">已停止</span>');
@@ -188,19 +188,17 @@ Date: 2022-11-30
             layer.confirm('重启OpenResty有可能导致面板短时间无法访问，是否继续重启？', {
                 btn: ['重启', '取消']
             }, function () {
+                index = layer.msg('正在重启OpenResty...', {icon: 16, time: 0});
                 admin.req({
                     url: "/api/plugin/openresty/restart"
-                    , method: 'get'
+                    , method: 'post'
                     , beforeSend: function () {
                         layer.msg('已发送重启请求，请稍后刷新确认重启状态。');
                     }
                     , success: function (result) {
+                        layer.close(index);
                         if (result.code !== 0) {
                             console.log('耗子Linux面板：OpenResty重启失败，接口返回' + result);
-                            return false;
-                        }
-                        if (result.msg === 'error') {
-                            layer.alert(result.data);
                             return false;
                         }
                         admin.events.refresh();
@@ -210,22 +208,17 @@ Date: 2022-11-30
                         console.log('耗子Linux面板：ajax请求出错，错误' + error)
                     }
                 });
-            }, function () {
-                layer.msg('取消重启');
             });
         });
         $('#openresty-reload').click(function () {
-            layer.msg('OpenResty重载中...');
+            index = layer.msg('正在重载OpenResty...', {icon: 16, time: 0});
             admin.req({
                 url: "/api/plugin/openresty/reload"
-                , method: 'get'
+                , method: 'post'
                 , success: function (result) {
+                    layer.close(index);
                     if (result.code !== 0) {
                         console.log('耗子Linux面板：OpenResty重载失败，接口返回' + result);
-                        return false;
-                    }
-                    if (result.msg === 'error') {
-                        layer.alert(result.data);
                         return false;
                     }
                     layer.alert('OpenResty重载成功！');
@@ -236,7 +229,7 @@ Date: 2022-11-30
             });
         });
         $('#openresty-config-save').click(function () {
-            layer.msg('OpenResty配置保存中...');
+            index = layer.msg('正在保存OpenResty主配置...', {icon: 16, time: 0});
             admin.req({
                 url: "/api/plugin/openresty/config"
                 , method: 'post'
@@ -244,12 +237,9 @@ Date: 2022-11-30
                     config: openresty_config_editor.getValue()
                 }
                 , success: function (result) {
+                    layer.close(index);
                     if (result.code !== 0) {
                         console.log('耗子Linux面板：OpenResty配置保存失败，接口返回' + result);
-                        return false;
-                    }
-                    if (result.msg === 'error') {
-                        layer.alert(result.data);
                         return false;
                     }
                     layer.alert('OpenResty配置保存成功！');
@@ -260,19 +250,18 @@ Date: 2022-11-30
             });
         });
         $('#openresty-clean-error-log').click(function () {
-            layer.msg('错误日志清空中...');
+            index = layer.msg('正在清空OpenResty错误日志...', {icon: 16, time: 0});
             admin.req({
                 url: "/api/plugin/openresty/cleanErrorLog"
-                , method: 'get'
+                , method: 'post'
                 , success: function (result) {
+                    layer.close(index);
                     if (result.code !== 0) {
                         console.log('耗子Linux面板：OpenResty错误日志清空失败，接口返回' + result);
                         return false;
                     }
+                    admin.events.refresh();
                     layer.msg('OpenResty错误日志已清空！');
-                    setTimeout(function () {
-                        admin.events.refresh();
-                    }, 1000);
                 }
                 , error: function (xhr, status, error) {
                     console.log('耗子Linux面板：ajax请求出错，错误' + error)

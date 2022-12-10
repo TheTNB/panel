@@ -1,7 +1,7 @@
 {
   "name": "OpenResty",
   "author": "耗子",
-  "describe": "",
+  "describe": "OpenResty® 是一款基于 NGINX 和 LuaJIT 的 Web 平台。",
   "slug": "openresty",
   "version": "1.21.4.1"
 }

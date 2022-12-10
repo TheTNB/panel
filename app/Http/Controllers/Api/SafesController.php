@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class SafesController extends Controller
 {
@@ -109,6 +110,12 @@ class SafesController extends Controller
     public function setSshPort(Request $request): JsonResponse
     {
         $port = $request->input('port');
+        // 只能是数字
+        if (!is_numeric($port)) {
+            $res['code'] = 1;
+            $res['msg'] = '端口只能是数字';
+            return response()->json($res);
+        }
         $oldPort = trim(shell_exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'"));
         shell_exec("sed -i 's/#Port ".$oldPort."/Port ".$port."/g' /etc/ssh/sshd_config");
         shell_exec("sed -i 's/Port ".$oldPort."/Port ".$port."/g' /etc/ssh/sshd_config");
@@ -200,8 +207,21 @@ class SafesController extends Controller
      */
     public function addFirewallRule(Request $request): JsonResponse
     {
-        $port = $request->input('port');
-        $protocol = $request->input('protocol');
+        // 消毒
+        try {
+            $input = $this->validate($request, [
+                'port' => ['required','regex:/^([0-9]+)(-([0-9]+))?$/'],
+                'protocol' => 'required|in:tcp,udp',
+            ]);
+            $port = $input['port'];
+            $protocol = $input['protocol'];
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
         // 判断是否开启
         $firewallStatus = trim(shell_exec("firewall-cmd --state 2>&1"));
         if ($firewallStatus != 'running') {
@@ -227,8 +247,21 @@ class SafesController extends Controller
      */
     public function deleteFirewallRule(Request $request): JsonResponse
     {
-        $port = $request->input('port');
-        $protocol = $request->input('protocol');
+        // 消毒
+        try {
+            $input = $this->validate($request, [
+                'port' => ['required','regex:/^([0-9]+)(-([0-9]+))?$/'],
+                'protocol' => 'required|in:tcp,udp',
+            ]);
+            $port = $input['port'];
+            $protocol = $input['protocol'];
+        } catch (ValidationException $e) {
+            return response()->json([
+                'code' => 1,
+                'msg' => '参数错误：'.$e->getMessage(),
+                'errors' => $e->errors()
+            ], 200);
+        }
         // 判断是否开启
         $firewallStatus = trim(shell_exec("firewall-cmd --state 2>&1"));
         if ($firewallStatus != 'running') {

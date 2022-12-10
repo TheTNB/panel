@@ -2,7 +2,7 @@
 
 <div class="layui-fluid">
     <div class="layui-card">
-        <div class="layui-form layui-card-body">
+        <div class="layui-form layui-card-body" style="overflow: hidden;">
             <div class="layui-inline">
                 <span style="margin-right: 10px;">开启监控</span><input type="checkbox" id="monitor-switch"
                                                                         lay-filter="monitor" lay-skin="switch"

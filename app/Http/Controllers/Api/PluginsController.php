@@ -34,9 +34,9 @@ class PluginsController extends Controller
         $shows = Plugin::query()->pluck('show', 'slug');
         foreach ($data['data'] as $k => $v) {
             // 如果本地已安装，则显示本地名称
-            $data['data'][$k]['name'] = PLUGINS[$v['slug']]['name'] ?? $data['data'][$k]['name'];
+            $data['data'][$k]['name'] = PLUGINS[$v['slug']]['name'] ?? $data['data'][$k]['name'] ?? '无名';
             // 作者名称
-            $data['data'][$k]['author'] = PLUGINS[$v['slug']]['author'] ?? '耗子';
+            $data['data'][$k]['author'] = PLUGINS[$v['slug']]['author'] ?? $data['data'][$k]['author'] ?? '耗子';
             // 已装版本
             $data['data'][$k]['install_version'] = PLUGINS[$v['slug']]['version'] ?? '';
             // 首页显示

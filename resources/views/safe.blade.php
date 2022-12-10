@@ -268,7 +268,7 @@
 
         // 监听添加端口保存
         $('#safe_add_firewall_rule').click(function () {
-            var port = Number($('#safe_add_firewall_rule_port').val());
+            var port = $('#safe_add_firewall_rule_port').val();
             var protocol = $('#safe_add_firewall_rule_protocol').val();
             var index = layer.load();
             admin.req({

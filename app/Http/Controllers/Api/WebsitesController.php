@@ -91,6 +91,35 @@ class WebsitesController extends Controller
             }
         }
 
+        // 对db_name单独验证
+        if ($credentials['db']) {
+            if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]+$/',
+                $credentials['db_name'])) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '数据库名必须以字母开头，只能包含字母、数字、下划线'
+                ], 200);
+            }
+        }
+
+        // 对数据库用户名和库名单独验证
+        if ($credentials['db']) {
+            if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]+$/',
+                $credentials['db_username'])) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '数据库用户名必须以字母开头，只能包含字母、数字、下划线'
+                ], 200);
+            }
+            if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]+$/',
+                $credentials['db_name'])) {
+                return response()->json([
+                    'code' => 1,
+                    'msg' => '数据库名必须以字母开头，只能包含字母、数字、下划线'
+                ], 200);
+            }
+        }
+
         // 禁止添加重复网站
         $website = Website::query()->where('name', $credentials['name'])->first();
         if ($website) {
@@ -99,8 +128,8 @@ class WebsitesController extends Controller
                 'msg' => '网站已存在'
             ]);
         }
-        // 禁止phpmyadmin作为名称
-        if ($credentials['name'] == 'phpmyadmin') {
+        // 禁止部分保留名称
+        if ($credentials['name'] == 'phpmyadmin' || $credentials['name'] == 'mysql' || $credentials['name'] == 'ssh' || $credentials['name'] == 'pure-ftpd' || $credentials['name'] == 'panel') {
             return response()->json([
                 'code' => 1,
                 'msg' => '该名称为保留名称，请更换'
@@ -125,9 +154,9 @@ class WebsitesController extends Controller
         // 入库
         Website::query()->create($credentials);
         // 创建网站目录
-        shell_exec("mkdir -p ".$credentials['path']);
+        shell_exec("mkdir -p ".escapeshellarg($credentials['path']));
         // 创建index.html
-        shell_exec("touch ".$credentials['path']."/index.html");
+        shell_exec("touch ".escapeshellarg($credentials['path']."/index.html"));
         // 写入到index.html
         $index_html = <<<EOF
 <!DOCTYPE html>
@@ -226,9 +255,11 @@ $port_list
 EOF;
         // 写入nginx配置
         file_put_contents('/www/server/vhost/'.$credentials['name'].'.conf', $nginx_config);
-        shell_exec('echo "" > /www/server/vhost/rewrite/'.$credentials['name'].'.conf');
-        shell_exec('echo "" > /www/server/vhost/ssl/'.$credentials['name'].'.pem');
-        shell_exec('echo "" > /www/server/vhost/ssl/'.$credentials['name'].'.key');
+        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/rewrite/'.$credentials['name'].'.conf'));
+        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/ssl/'.$credentials['name'].'.pem'));
+        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/ssl/'.$credentials['name'].'.key'));
+        shell_exec('chown -R root:root /www/server/vhost');
+        shell_exec('chmod -R 644 /www/server/vhost');
         shell_exec("systemctl reload nginx");
 
         // 创建数据库
@@ -236,15 +267,15 @@ EOF;
             if ($credentials['db_type'] == 'mysql') {
                 $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
                 shell_exec("mysql -u root -p".$password." -e \"CREATE DATABASE IF NOT EXISTS ".$credentials['db_name']." DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;\" 2>&1");
-                shell_exec("mysql -u root -p".$password." -e \"CREATE USER '".$credentials['db_username']."'@'localhost' IDENTIFIED BY '".$credentials['db_password']."';\"");
-                shell_exec("mysql -u root -p".$password." -e \"GRANT ALL PRIVILEGES ON ".$credentials['db_name'].".* TO '".$credentials['db_username']."'@'localhost';\"");
+                shell_exec("mysql -u root -p".$password." -e \"CREATE USER ".escapeshellarg($credentials['db_username'])."@'localhost' IDENTIFIED BY ".escapeshellarg($credentials['db_password']).";\"");
+                shell_exec("mysql -u root -p".$password." -e \"GRANT ALL PRIVILEGES ON ".$credentials['db_name'].".* TO ".escapeshellarg($credentials['db_username'])."@'localhost';\"");
                 shell_exec("mysql -u root -p".$password." -e \"flush privileges;\"");
             } elseif ($credentials['db_type'] == 'postgresql') {
                 shell_exec('echo "CREATE DATABASE '.$credentials['db_name'].';"|su - postgres -c "psql"');
-                shell_exec('echo "CREATE USER '.$credentials['db_username'].' WITH PASSWORD \''.$credentials['db_password'].'\';"|su - postgres -c "psql"');
+                shell_exec('echo "CREATE USER '.$credentials['db_username'].' WITH PASSWORD '.escapeshellarg($credentials['db_password']).';"|su - postgres -c "psql"');
                 shell_exec('echo "GRANT ALL PRIVILEGES ON DATABASE '.$credentials['db_name'].' TO '.$credentials['db_username'].';"|su - postgres -c "psql"');
                 // 写入用户配置
-                shell_exec('echo "host    '.$credentials['db_name'].'    '.$credentials['db_username'].'    127.0.0.1/32    scram-sha-256" >> /www/server/postgresql/15/pg_hba.conf');
+                shell_exec('echo '.escapeshellarg('host    '.$credentials['db_name'].'    '.$credentials['db_username'].'    127.0.0.1/32    scram-sha-256').' >> /www/server/postgresql/15/pg_hba.conf');
                 // 重载
                 shell_exec('systemctl reload postgresql-15');
             }
@@ -266,14 +297,14 @@ EOF;
         // 从数据库删除
         Website::query()->where('name', $name)->delete();
         // 删除站点目录
-        shell_exec("rm -rf /www/wwwroot/$name");
+        shell_exec("rm -rf ".escapeshellarg("/www/wwwroot/$name"));
         // 删除nginx配置
-        shell_exec("rm -rf /www/server/vhost/$name.conf");
+        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/$name.conf"));
         // 删除rewrite配置
-        shell_exec("rm -rf /www/server/vhost/rewrite/$name.conf");
+        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/rewrite/$name.conf"));
         // 删除ssl配置
-        shell_exec("rm -rf /www/server/vhost/ssl/$name.pem");
-        shell_exec("rm -rf /www/server/vhost/ssl/$name.key");
+        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/ssl/$name.pem"));
+        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/ssl/$name.key"));
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -410,7 +441,7 @@ EOF;
         $website['config_raw'] = file_get_contents('/www/server/vhost/'.$name.'.conf');
 
         // 读取访问日志
-        $website['log'] = shell_exec('tail -n 100 /www/wwwlogs/'.$name.'.log');
+        $website['log'] = shell_exec('tail -n 100 '.escapeshellarg('/www/wwwlogs/'.$name.'.log'));
         // log需要转义实体
         $website['log'] = htmlspecialchars($website['log']);
 
@@ -454,7 +485,7 @@ EOF;
         $res['msg'] = 'success';
 
         // 如果config_raw与本地配置文件不一致，则更新配置文件，然后直接返回
-        $configRaw = shell_exec('cat /www/server/vhost/'.$name.'.conf');
+        $configRaw = shell_exec('cat '.escapeshellarg('/www/server/vhost/'.$name.'.conf'));
         if (trim($configRaw) != trim($config['config_raw'])) {
             file_put_contents('/www/server/vhost/'.$name.'.conf', $config['config_raw']);
             return response()->json($res);
@@ -533,12 +564,8 @@ EOF;
             // 写入open_basedir配置到.user.ini文件
             if (is_dir($config['path'])) {
                 file_put_contents($config['path'].'/.user.ini', $open_basedir);
-                // 为.user.ini文件添加i权限
-                // shell_exec('chattr +i '.$config['path'].'/.user.ini');
             }
         } else {
-            // 移除.user.ini文件的i权限
-            shell_exec('chattr -i '.$config['path'].'/.user.ini');
             // 删除.user.ini文件
             if (file_exists($config['path'].'/.user.ini')) {
                 unlink($config['path'].'/.user.ini');
@@ -655,7 +682,7 @@ EOL;
     public function clearSiteLog(Request $request): JsonResponse
     {
         $name = $request->input('name');
-        shell_exec('echo "" > /www/wwwlogs/'.$name.'.log');
+        unlink('/www/wwwlogs/'.$name.'.log');
         $res['code'] = 0;
         $res['msg'] = 'success';
         return response()->json($res);
@@ -728,7 +755,7 @@ EOL;
         // 从数据库中获取网站目录
         $sitePath = Website::query()->where('name', $credentials['name'])->value('path');
         $backupFile = $backupPath.'/'.$credentials['name'].'_'.date('YmdHis').'.zip';
-        shell_exec('zip -r '.$backupFile.' '.$sitePath.' 2>&1');
+        shell_exec('zip -r '.$backupFile.' '.escapeshellarg($sitePath).' 2>&1');
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -803,11 +830,11 @@ EOL;
             ], 200);
         }
 
-        shell_exec('rm -rf /www/wwwroot/'.$credentials['name'].'/*');
-        shell_exec('unzip -o '.$backupFile.' -d /www/wwwroot/'.$credentials['name'].' 2>&1');
+        shell_exec('rm -rf '.escapeshellarg('/www/wwwroot/'.$credentials['name'].'/*'));
+        shell_exec('unzip -o '.escapeshellarg($backupFile).' -d '.escapeshellarg('/www/wwwroot/'.$credentials['name']).' 2>&1');
         // 设置权限
-        shell_exec('chown -R www:www /www/wwwroot/'.$credentials['name']);
-        shell_exec('chmod -R 755 /www/wwwroot/'.$credentials['name']);
+        shell_exec('chown -R www:www '.escapeshellarg('/www/wwwroot/'.$credentials['name']));
+        shell_exec('chmod -R 755 '.escapeshellarg('/www/wwwroot/'.$credentials['name']));
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -946,7 +973,7 @@ server
 EOF;
         file_put_contents('/www/server/vhost/'.$website['name'].'.conf', $nginxConfig);
         // 重置伪静态规则
-        shell_exec('echo "" > /www/server/vhost/rewrite/'.$website['name'].'.conf');
+        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/rewrite/'.$website['name'].'.conf'));
         // 重载nginx
         shell_exec('systemctl reload nginx');
 

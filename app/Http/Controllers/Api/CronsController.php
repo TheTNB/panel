@@ -54,7 +54,10 @@ class CronsController extends Controller
         try {
             $credentials = $this->validate($request, [
                 'name' => 'required|max:255',
-                'time' => ['required', 'regex:/^((\*|\d+|\d+-\d+|\d+\/\d+|\d+-\d+\/\d+|\*\/\d+)(\,(\*|\d+|\d+-\d+|\d+\/\d+|\d+-\d+\/\d+|\*\/\d+))*\s?){5}$/'],
+                'time' => [
+                    'required',
+                    'regex:/^((\*|\d+|\d+-\d+|\d+\/\d+|\d+-\d+\/\d+|\*\/\d+)(\,(\*|\d+|\d+-\d+|\d+\/\d+|\d+-\d+\/\d+|\*\/\d+))*\s?){5}$/'
+                ],
                 'script' => 'required',
             ]);
         } catch (ValidationException $e) {
@@ -65,10 +68,10 @@ class CronsController extends Controller
         $shellDir = '/www/server/cron/';
         $shellLogDir = '/www/server/cron/logs/';
         if (!is_dir($shellDir)) {
-            mkdir($shellDir, 0755, true);
+            mkdir($shellDir, 700, true);
         }
         if (!is_dir($shellLogDir)) {
-            mkdir($shellLogDir, 0755, true);
+            mkdir($shellLogDir, 600, true);
         }
         $shellFile = uniqid().'.sh';
         file_put_contents($shellDir.$shellFile, $credentials['script']);
@@ -110,10 +113,10 @@ class CronsController extends Controller
         $shellDir = '/www/server/cron/';
         $shellLogDir = '/www/server/cron/logs/';
         if (!is_dir($shellDir)) {
-            mkdir($shellDir, 0755, true);
+            mkdir($shellDir, 700, true);
         }
         if (!is_dir($shellLogDir)) {
-            mkdir($shellLogDir, 0755, true);
+            mkdir($shellLogDir, 600, true);
         }
         $shellFile = $cron->shell;
         file_put_contents($shellDir.$shellFile, $credentials['script']);
