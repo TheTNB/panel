@@ -35,7 +35,7 @@ class Panel extends Command
     public function handle()
     {
         // 检测是否以root用户运行
-        if (shell_exec('whoami') != 'root') {
+        if (trim(shell_exec('whoami')) != 'root') {
             $this->error('耗子Linux面板：请以root用户运行');
             return 1;
         }
