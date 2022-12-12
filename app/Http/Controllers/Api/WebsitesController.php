@@ -154,11 +154,11 @@ class WebsitesController extends Controller
         // 入库
         Website::query()->create($credentials);
         // 创建网站目录
-        shell_exec("mkdir -p ".escapeshellarg($credentials['path']));
+        mkdir($credentials['path'], 0755, true);
         // 创建index.html
-        shell_exec("touch ".escapeshellarg($credentials['path']."/index.html"));
+        touch($credentials['path']."/index.html");
         // 写入到index.html
-        $index_html = <<<EOF
+        $index = <<<EOF
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -173,40 +173,46 @@ class WebsitesController extends Controller
 </html>
 
 EOF;
-        file_put_contents($credentials['path']."/index.html", $index_html);
+        file_put_contents($credentials['path']."/index.html", $index);
 
         // 创建nginx配置
-        $port_list = "";
-        $domain_list = "";
-        $domain_arr = explode(PHP_EOL, $domain);
-        foreach ($domain_arr as $key => $value) {
+        $portList = "";
+        $portArr = [];
+        $domainList = "";
+        $domainArr = explode(PHP_EOL, $domain);
+        foreach ($domainArr as $key => $value) {
             $temp = explode(":", $value);
-            $domain_list .= " ".$temp[0];
+            $domainList .= " ".$temp[0];
             if (!isset($temp[1])) {
-                if ($key == count($domain_arr) - 1) {
-                    $port_list .= "    listen 80;";
-                } else {
-                    $port_list .= "    listen 80;".PHP_EOL;
+                if (!isset($portArr[80])) {
+                    if ($key == count($domainArr) - 1) {
+                        $portList .= "    listen 80;";
+                    } else {
+                        $portList .= "    listen 80;".PHP_EOL;
+                    }
+                    $portArr[80] = 1;
                 }
             } else {
-                if ($key == count($domain_arr) - 1) {
-                    $port_list .= "    listen ".$temp[1].";";
-                } else {
-                    $port_list .= "    listen ".$temp[1].";".PHP_EOL;
+                if (!isset($portArr[$temp[1]])) {
+                    if ($key == count($domainArr) - 1) {
+                        $portList .= "    listen ".$temp[1].";";
+                    } else {
+                        $portList .= "    listen ".$temp[1].";".PHP_EOL;
+                    }
+                    $portArr[$temp[1]] = 1;
                 }
             }
-
         }
-        $nginx_config = <<<EOF
+        $nginxConfig = <<<EOF
 # 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
 # 有自定义配置需求的，请将自定义的配置写在各标记位下方。
 server
 {
     # port标记位开始
-$port_list
+$portList
     # port标记位结束
     # server_name标记位开始
-    server_name$domain_list;
+    server_name$domainList;
     # server_name标记位结束
     # index标记位开始
     index index.php index.html;
@@ -254,12 +260,18 @@ $port_list
 }
 EOF;
         // 写入nginx配置
-        file_put_contents('/www/server/vhost/'.$credentials['name'].'.conf', $nginx_config);
-        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/rewrite/'.$credentials['name'].'.conf'));
-        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/ssl/'.$credentials['name'].'.pem'));
-        shell_exec('echo "" > '.escapeshellarg('/www/server/vhost/ssl/'.$credentials['name'].'.key'));
-        shell_exec('chown -R root:root /www/server/vhost');
-        shell_exec('chmod -R 644 /www/server/vhost');
+        file_put_contents('/www/server/vhost/'.$credentials['name'].'.conf', $nginxConfig);
+        touch('/www/server/vhost/rewrite/'.$credentials['name'].'.conf');
+        touch('/www/server/vhost/ssl/'.$credentials['name'].'.pem');
+        touch('/www/server/vhost/ssl/'.$credentials['name'].'.key');
+        chmod('/www/server/vhost/'.$credentials['name'].'.conf', 0644);
+        chmod('/www/server/vhost/rewrite/'.$credentials['name'].'.conf', 0644);
+        chmod('/www/server/vhost/ssl/'.$credentials['name'].'.pem', 0644);
+        chmod('/www/server/vhost/ssl/'.$credentials['name'].'.key', 0644);
+        chown('/www/server/vhost/'.$credentials['name'].'.conf', 'root');
+        chgrp('/www/server/vhost/'.$credentials['name'].'.conf', 'root');
+        chown('/www/server/vhost/rewrite/'.$credentials['name'].'.conf', 'root');
+        chgrp('/www/server/vhost/rewrite/'.$credentials['name'].'.conf', 'root');
         shell_exec("systemctl reload nginx");
 
         // 创建数据库
@@ -297,14 +309,14 @@ EOF;
         // 从数据库删除
         Website::query()->where('name', $name)->delete();
         // 删除站点目录
-        shell_exec("rm -rf ".escapeshellarg("/www/wwwroot/$name"));
+        rmdir("/www/wwwroot/$name");
         // 删除nginx配置
-        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/$name.conf"));
+        unlink("/www/server/vhost/$name.conf");
         // 删除rewrite配置
-        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/rewrite/$name.conf"));
+        unlink("/www/server/vhost/rewrite/$name.conf");
         // 删除ssl配置
-        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/ssl/$name.pem"));
-        shell_exec("rm -rf ".escapeshellarg("/www/server/vhost/ssl/$name.key"));
+        unlink("/www/server/vhost/ssl/$name.pem");
+        unlink("/www/server/vhost/ssl/$name.key");
 
         $res['code'] = 0;
         $res['msg'] = 'success';
@@ -353,10 +365,10 @@ EOF;
         $name = $request->input('name');
         $website = Website::query()->where('name', $name)->first();
         // 通过name读取相应的nginx配置
-        $nginx_config = file_get_contents('/www/server/vhost/'.$name.'.conf');
+        $nginxConfig = file_get_contents('/www/server/vhost/'.$name.'.conf');
         // 从nginx配置中port标记位提取全部端口
-        $port_raw = cut('# port标记位开始', '# port标记位结束', $nginx_config);
-        preg_match_all('/listen\s+(.*);/', $port_raw, $matches);
+        $portRaw = cut('# port标记位开始', '# port标记位结束', $nginxConfig);
+        preg_match_all('/listen\s+(.*);/', $portRaw, $matches);
         foreach ($matches[1] as $k => $v) {
             if ($k == 0) {
                 $website['port'] = $v;
@@ -365,10 +377,10 @@ EOF;
             }
         }
         // 从nginx配置中server_name标记位提取全部域名
-        $server_name_raw = cut('# server_name标记位开始', '# server_name标记位结束', $nginx_config);
-        preg_match_all('/server_name\s+(.+);/', $server_name_raw, $matches1);
-        $domain_arr = explode(" ", $matches1[1][0]);
-        foreach ($domain_arr as $k => $v) {
+        $serverNameRaw = cut('# server_name标记位开始', '# server_name标记位结束', $nginxConfig);
+        preg_match_all('/server_name\s+(.+);/', $serverNameRaw, $matches1);
+        $domainArr = explode(" ", $matches1[1][0]);
+        foreach ($domainArr as $k => $v) {
             if ($k == 0) {
                 $website['domain'] = $v;
             } else {
@@ -376,18 +388,18 @@ EOF;
             }
         }
         // 从nginx配置中root标记位提取运行目录
-        $root_raw = cut('# root标记位开始', '# root标记位结束', $nginx_config);
-        preg_match_all('/root\s+(.+);/', $root_raw, $matches2);
+        $rootRaw = cut('# root标记位开始', '# root标记位结束', $nginxConfig);
+        preg_match_all('/root\s+(.+);/', $rootRaw, $matches2);
         $website['root'] = $matches2[1][0];
         // 从nginx配置中index标记位提取全部默认文件
-        $index_raw = cut('# index标记位开始', '# index标记位结束', $nginx_config);
-        preg_match_all('/index\s+(.+);/', $index_raw, $matches3);
+        $index = cut('# index标记位开始', '# index标记位结束', $nginxConfig);
+        preg_match_all('/index\s+(.+);/', $index, $matches3);
         $website['index'] = $matches3[1][0];
 
         // 检查网站目录下是否存在.user.ini文件且设置了open_basedir
         if (file_exists($website['path'].'/.user.ini')) {
-            $user_ini = file_get_contents($website['path'].'/.user.ini');
-            if (str_contains($user_ini, 'open_basedir')) {
+            $userIni = file_get_contents($website['path'].'/.user.ini');
+            if (str_contains($userIni, 'open_basedir')) {
                 $website['open_basedir'] = 1;
             } else {
                 $website['open_basedir'] = 0;
@@ -397,15 +409,15 @@ EOF;
         }
 
         if ($website['ssl'] == '1') {
-            $ssl_certificate_raw = cut('# ssl标记位开始', '# ssl标记位结束', $nginx_config);
+            $sslCertificateRaw = cut('# ssl标记位开始', '# ssl标记位结束', $nginxConfig);
             // 从nginx配置中ssl_certificate标记位提取全部证书路径
-            preg_match_all('/ssl_certificate\s+(.+);/', $ssl_certificate_raw, $matches4);
+            preg_match_all('/ssl_certificate\s+(.+);/', $sslCertificateRaw, $matches4);
             $website['ssl_certificate'] = file_get_contents($matches4[1][0]);
             // 从nginx配置中ssl_certificate_key标记位提取全部证书密钥路径
-            preg_match_all('/ssl_certificate_key\s+(.+);/', $ssl_certificate_raw, $matches5);
+            preg_match_all('/ssl_certificate_key\s+(.+);/', $sslCertificateRaw, $matches5);
             $website['ssl_certificate_key'] = file_get_contents($matches5[1][0]);
-            $website['http_redirect'] = str_contains($nginx_config, '# http重定向标记位');
-            $website['hsts'] = str_contains($nginx_config, '# hsts标记位');
+            $website['http_redirect'] = str_contains($nginxConfig, '# http重定向标记位');
+            $website['hsts'] = str_contains($nginxConfig, '# hsts标记位');
             try {
                 $sslDate = (new ACMECert())->getRemainingDays($website['ssl_certificate']);
                 $sslDate = round($sslDate, 2);
@@ -421,17 +433,17 @@ EOF;
         }
 
         // 从nginx配置中ssl标记位提取waf配置
-        $waf_raw = cut('# waf标记位开始', '# waf标记位结束', $nginx_config);
-        if (str_contains($waf_raw, 'waf on;')) {
+        $wafRaw = cut('# waf标记位开始', '# waf标记位结束', $nginxConfig);
+        if (str_contains($wafRaw, 'waf on;')) {
             $website['waf'] = 1;
         } else {
             $website['waf'] = 0;
         }
-        preg_match_all('/waf_mode\s+(.+);/', $waf_raw, $matches6);
+        preg_match_all('/waf_mode\s+(.+);/', $wafRaw, $matches6);
         $website['waf_mode'] = $matches6[1][0];
-        preg_match_all('/waf_cc_deny\s+(.+);/', $waf_raw, $matches7);
+        preg_match_all('/waf_cc_deny\s+(.+);/', $wafRaw, $matches7);
         $website['waf_cc_deny'] = $matches7[1][0];
-        preg_match_all('/waf_cache\s+(.+);/', $waf_raw, $matches8);
+        preg_match_all('/waf_cache\s+(.+);/', $wafRaw, $matches8);
         $website['waf_cache'] = $matches8[1][0];
 
         // 读取伪静态文件的内容
@@ -485,7 +497,7 @@ EOF;
         $res['msg'] = 'success';
 
         // 如果config_raw与本地配置文件不一致，则更新配置文件，然后直接返回
-        $configRaw = shell_exec('cat '.escapeshellarg('/www/server/vhost/'.$name.'.conf'));
+        $configRaw = file_get_contents('/www/server/vhost/'.$name.'.conf');
         if (trim($configRaw) != trim($config['config_raw'])) {
             file_put_contents('/www/server/vhost/'.$name.'.conf', $config['config_raw']);
             return response()->json($res);
@@ -500,8 +512,8 @@ EOF;
 
         // 域名
         $domain = "server_name";
-        $domain_arr = explode(PHP_EOL, $config['domain']);
-        foreach ($domain_arr as $v) {
+        $domainArr = explode(PHP_EOL, $config['domain']);
+        foreach ($domainArr as $v) {
             $domain .= " ".$v;
         }
         $domain .= ';';
@@ -530,9 +542,9 @@ EOF;
                 $port .= "    listen ".$v.';';
             }
         }
-        $port_config_old = cut('# port标记位开始', '# port标记位结束', $configRaw);
-        if (!empty(trim($port_config_old)) && $port_config_old != PHP_EOL) {
-            $configRaw = str_replace($port_config_old, PHP_EOL.$port.PHP_EOL.'    ', $configRaw);
+        $portConfigOld = cut('# port标记位开始', '# port标记位结束', $configRaw);
+        if (!empty(trim($portConfigOld)) && $portConfigOld != PHP_EOL) {
+            $configRaw = str_replace($portConfigOld, PHP_EOL.$port.PHP_EOL.'    ', $configRaw);
         }
 
         // 运行目录
@@ -600,7 +612,7 @@ EOF;
             // 写入证书
             file_put_contents("/www/server/vhost/ssl/".$name.'.pem', $config['ssl_certificate']);
             file_put_contents("/www/server/vhost/ssl/".$name.'.key', $config['ssl_certificate_key']);
-            $ssl_config = <<<EOF
+            $sslConfig = <<<EOF
 # ssl标记位开始
     ssl_certificate /www/server/vhost/ssl/$name.pem;
     ssl_certificate_key /www/server/vhost/ssl/$name.key;
@@ -613,8 +625,8 @@ EOF;
     ssl_prefer_server_ciphers off;
 EOF;
             if ($config['http_redirect'] == '1') {
-                $ssl_config .= PHP_EOL;
-                $ssl_config .= <<<EOF
+                $sslConfig .= PHP_EOL;
+                $sslConfig .= <<<EOF
     # http重定向标记位开始
     if (\$server_port !~ 443){
         return 301 https://\$host\$request_uri;
@@ -624,42 +636,42 @@ EOF;
 EOF;
             }
             if ($config['hsts'] == '1') {
-                $ssl_config .= PHP_EOL;
-                $ssl_config .= <<<EOF
+                $sslConfig .= PHP_EOL;
+                $sslConfig .= <<<EOF
     # hsts标记位开始
     add_header Strict-Transport-Security "max-age=63072000" always;
     # hsts标记位结束
 EOF;
             }
-            $ssl_config .= PHP_EOL.'    ';
-            $ssl_config_old = cut('# ssl标记位开始', '# ssl标记位结束', $configRaw);
-            if (!empty(trim($ssl_config_old)) && $ssl_config_old != PHP_EOL) {
-                $configRaw_clean = str_replace($ssl_config_old, "", $configRaw);
+            $sslConfig .= PHP_EOL.'    ';
+            $sslConfigOld = cut('# ssl标记位开始', '# ssl标记位结束', $configRaw);
+            if (!empty(trim($sslConfigOld)) && $sslConfigOld != PHP_EOL) {
+                $configRaw_clean = str_replace($sslConfigOld, "", $configRaw);
             } else {
                 $configRaw_clean = $configRaw;
             }
-            $configRaw = str_replace('# ssl标记位开始', $ssl_config, $configRaw_clean);
+            $configRaw = str_replace('# ssl标记位开始', $sslConfig, $configRaw_clean);
 
         } else {
             // 更新nginx配置文件
-            $ssl_config_old = cut('# ssl标记位开始', '# ssl标记位结束', $configRaw);
-            if (!empty(trim($ssl_config_old)) && $ssl_config_old != PHP_EOL) {
-                $configRaw = str_replace($ssl_config_old, PHP_EOL.'    ', $configRaw);
+            $sslConfigOld = cut('# ssl标记位开始', '# ssl标记位结束', $configRaw);
+            if (!empty(trim($sslConfigOld)) && $sslConfigOld != PHP_EOL) {
+                $configRaw = str_replace($sslConfigOld, PHP_EOL.'    ', $configRaw);
             }
         }
 
         // 如果PHP版本不一致，则更新PHP版本
-        $php_old = Website::query()->where('name', $name)->value('php');
-        if ($config['php'] != $php_old) {
-            $php_config_old = cut('# php标记位开始', '# php标记位结束', $configRaw);
-            $php_config_new = PHP_EOL;
-            $php_config_new .= <<<EOL
+        $phpOld = Website::query()->where('name', $name)->value('php');
+        if ($config['php'] != $phpOld) {
+            $phpConfigOld = cut('# php标记位开始', '# php标记位结束', $configRaw);
+            $phpConfigNew = PHP_EOL;
+            $phpConfigNew .= <<<EOL
     include enable-php-$config[php].conf;
 EOL;
-            $php_config_new .= PHP_EOL.'    ';
+            $phpConfigNew .= PHP_EOL.'    ';
 
-            if (!empty(trim($php_config_old)) && $php_config_old != PHP_EOL) {
-                $configRaw = str_replace($php_config_old, $php_config_new, $configRaw);
+            if (!empty(trim($phpConfigOld)) && $phpConfigOld != PHP_EOL) {
+                $configRaw = str_replace($phpConfigOld, $phpConfigNew, $configRaw);
             }
         }
 
