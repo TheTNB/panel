@@ -14,7 +14,7 @@ class AddAccessToken
         // 获取请求头中的token
         $token = $request->header('access_token') ?? $request->input('access_token');
         // 将token放入请求中
-        $request->headers->set('Authorization', 'Bearer ' . $token);
+        $request->headers->set('Authorization', 'Bearer '.$token);
 
         return $next($request);
     }

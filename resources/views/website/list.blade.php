@@ -85,12 +85,9 @@ Date: 2022-11-28
                 , {field: 'php', title: 'PHP', width: 60}
                 , {field: 'ssl', title: 'SSL', width: 110, templet: '#website-ssl'}
                 , {field: 'note', title: '备注', edit: 'textarea'}
-                , {fixed: 'right', title: '操作', unresize: true, toolbar: '#website-control', width: 160}
+                , {fixed: 'right', title: '操作', unresize: true, toolbar: '#website-control', width: 180}
             ]]
-            /**
-             * TODO: 分页
-             */
-            //, page: true
+            , page: true
         });
 
         // 头工具栏事件

@@ -95,7 +95,7 @@
                 , {field: 'updated_at', title: '上次运行时间'}
                 , {
                     field: 'edit',
-                    width: 170,
+                    width: 180,
                     title: '操作',
                     templet: '#cron-table-edit',
                     fixed: 'right',

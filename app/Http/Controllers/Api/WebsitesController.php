@@ -20,11 +20,14 @@ class WebsitesController extends Controller
 {
     /**
      * 获取面板网站
+     * @param  Request  $request
      * @return JsonResponse
      */
-    public function getList(): JsonResponse
+    public function getList(Request $request): JsonResponse
     {
-        $websiteList = Website::query()->get();
+        $limit = $request->input('limit', 10);
+
+        $websiteList = Website::query()->orderBy('id')->paginate($limit);
         // 判空
         if ($websiteList->isEmpty()) {
             return response()->json([
@@ -42,7 +45,8 @@ class WebsitesController extends Controller
         return response()->json([
             'code' => 0,
             'msg' => '获取成功',
-            'data' => $websiteList
+            'count' => $websiteList->total(),
+            'data' => $websiteList->items()
         ]);
     }
 
