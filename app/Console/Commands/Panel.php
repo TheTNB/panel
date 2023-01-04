@@ -136,62 +136,64 @@ class Panel extends Command
             return;
         }
         $this->info('正在下载面板...');
-        $this->info(shell_exec('wget -O /tmp/panel.zip https://api.panel.haozi.xyz/api/version/latest'));
+        shell_exec('wget -O /tmp/panel.zip https://api.panel.haozi.xyz/api/version/latest');
         $this->info('正在备份数据库...');
-        $this->info(shell_exec('\cp /www/panel/database/database.sqlite /tmp/database.sqlite'));
+        shell_exec('\cp /www/panel/database/database.sqlite /tmp/database.sqlite');
         // 检查下载是否成功
         if (!file_exists('/tmp/panel.zip') || filesize('/tmp/panel.zip') < 4096) {
             $this->error('检测到面板新版本下载失败，已终止更新，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在备份插件...');
-        $this->info(shell_exec('rm -rf /tmp/plugins'));
-        $this->info(shell_exec('mkdir /tmp/plugins'));
-        $this->info(shell_exec('\cp -r /www/panel/plugins/* /tmp/plugins'));
+        shell_exec('rm -rf /tmp/plugins');
+        shell_exec('mkdir /tmp/plugins');
+        shell_exec('\cp -r /www/panel/plugins/* /tmp/plugins');
         // 检查备份是否成功
         if (!file_exists('/tmp/database.sqlite') || !is_dir('/tmp/plugins/Openresty')) {
             $this->error('检测到面板旧配置备份失败，已终止更新，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在删除旧版本...');
-        $this->info(shell_exec('rm -rf /www/panel'));
-        $this->info(shell_exec('mkdir /www/panel'));
+        shell_exec('rm -rf /www/panel');
+        shell_exec('mkdir /www/panel');
         $this->info('正在解压新版本...');
-        $this->info(shell_exec('unzip -o /tmp/panel.zip -d /www/panel'));
+        shell_exec('unzip -o /tmp/panel.zip -d /www/panel');
         // 检查解压是否成功
         if (!file_exists('/www/panel/artisan')) {
             $this->error('检测到面板新版本解压失败，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在恢复数据库...');
-        $this->info(shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite'));
+        shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite');
         // 检查恢复是否成功
         if (!file_exists('/www/panel/database/database.sqlite')) {
             $this->error('检测到面板数据库恢复失败，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在恢复插件...');
-        $this->info(shell_exec('\cp -r /tmp/plugins/* /www/panel/plugins'));
+        shell_exec('\cp -r /tmp/plugins/* /www/panel/plugins');
         $this->info('正在更新面板数据库...');
-        $this->info(shell_exec('cd /www/panel && php-panel artisan migrate'));
+        shell_exec('cd /www/panel && php-panel artisan migrate');
         $this->info('正在设置面板权限...');
-        $this->info(shell_exec('chown -R root:root /www/panel'));
-        $this->info(shell_exec('chmod -R 755 /www/panel'));
-        $this->info(shell_exec('chown -R root:root /www/server/cron'));
-        $this->info(shell_exec('chmod -R 700 /www/server/cron'));
-        $this->info(shell_exec('chmod -R 600 /www/server/cron/logs'));
-        $this->info(shell_exec('chown -R root:root /www/server/vhost'));
-        $this->info(shell_exec('chmod -R 644 /www/server/vhost'));
-        $this->info('正在重启面板服务...');
-        $this->info(shell_exec('systemctl restart panel.service'));
+        shell_exec('chown -R root:root /www/panel');
+        shell_exec('chmod -R 600 /www/panel');
+        shell_exec('chmod 755 /www/panel');
+        shell_exec('chmod -R 755 /www/panel/public');
+        shell_exec('chown -R root:root /www/server/cron');
+        shell_exec('chmod -R 700 /www/server/cron');
+        shell_exec('chmod -R 600 /www/server/cron/logs');
+        shell_exec('chown -R root:root /www/server/vhost');
+        shell_exec('chmod -R 644 /www/server/vhost');
+        $this->info('正在重载面板服务...');
+        $reloadCheck = shell_exec('systemctl reload panel.service 2>&1');
         // 检查重启是否成功
-        if (shell_exec('systemctl status panel.service | grep Active | grep -v grep | awk \'{print $2}\'') !== 'active') {
-            $this->error('检测到面板服务重启失败，请加QQ群：12370907 反馈处理');
+        if (!empty($reloadCheck)) {
+            $this->error('检测到面板服务重载失败，请加QQ群：12370907 反馈处理');
         } else {
             $this->info('正在清理临时文件...');
-            $this->info(shell_exec('rm -rf /tmp/panel.zip'));
-            $this->info(shell_exec('rm -rf /tmp/database.sqlite'));
-            $this->info(shell_exec('rm -rf /tmp/plugins'));
+            shell_exec('rm -rf /tmp/panel.zip');
+            shell_exec('rm -rf /tmp/database.sqlite');
+            shell_exec('rm -rf /tmp/plugins');
             $this->info('面板更新成功');
         }
     }
