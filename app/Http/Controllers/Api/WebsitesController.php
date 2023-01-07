@@ -301,7 +301,6 @@ EOF;
         return response()->json($res);
     }
 
-
     /**
      * 删除面板网站
      * @param  Request  $request
