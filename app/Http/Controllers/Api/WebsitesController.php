@@ -318,18 +318,18 @@ EOF;
         }
         // 从数据库删除
         Website::query()->where('name', $name)->delete();
+        // 删除nginx配置
+        @unlink("/www/server/vhost/$name.conf");
+        // 删除rewrite配置
+        @unlink("/www/server/vhost/rewrite/$name.conf");
+        // 删除ssl配置
+        @unlink("/www/server/vhost/ssl/$name.pem");
+        @unlink("/www/server/vhost/ssl/$name.key");
         // 删除站点目录
         $rm = @shell_exec("rm -rf ".escapeshellarg("/www/wwwroot/$name")." 2>&1");
         if (!empty($rm)) {
             return response()->json(['code' => 1, 'msg' => '网站目录删除失败：'.$rm]);
         }
-        // 删除nginx配置
-        unlink("/www/server/vhost/$name.conf");
-        // 删除rewrite配置
-        unlink("/www/server/vhost/rewrite/$name.conf");
-        // 删除ssl配置
-        unlink("/www/server/vhost/ssl/$name.pem");
-        unlink("/www/server/vhost/ssl/$name.key");
 
         $res['code'] = 0;
         $res['msg'] = 'success';
