@@ -60,7 +60,7 @@ class WebsitesController extends Controller
         // 消毒数据
         try {
             $credentials = $this->validate($request, [
-                'name' => 'required|max:255',
+                'name' => ['required', 'regex:/^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)*$/'],
                 'domain' => 'required',
                 'path' => 'string|nullable|max:255',
                 'php' => 'required',
@@ -310,10 +310,19 @@ EOF;
     public function delete(Request $request): JsonResponse
     {
         $name = $request->input('name');
+        // 判断是否存在
+        if (Website::query()->where('name', $name)->doesntExist()) {
+            $res['code'] = 1;
+            $res['msg'] = '网站不存在';
+            return response()->json($res);
+        }
         // 从数据库删除
         Website::query()->where('name', $name)->delete();
         // 删除站点目录
-        rmdir("/www/wwwroot/$name");
+        $rm = @shell_exec("rm -rf ".escapeshellarg("/www/wwwroot/$name")." 2>&1");
+        if (!empty($rm)) {
+            return response()->json(['code' => 1, 'msg' => '网站目录删除失败：'.$rm]);
+        }
         // 删除nginx配置
         unlink("/www/server/vhost/$name.conf");
         // 删除rewrite配置
