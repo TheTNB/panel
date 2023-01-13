@@ -10,6 +10,7 @@ use App\Models\Website;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class Panel extends Command
 {
@@ -32,7 +33,7 @@ class Panel extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         // 检测是否以root用户运行
         if (trim(shell_exec('whoami')) != 'root') {
@@ -99,7 +100,7 @@ class Panel extends Command
                 $this->info('panel deleteSetting {name} 删除面板设置数据');
                 break;
         }
-        return Command::SUCCESS;
+        return CommandAlias::SUCCESS;
     }
 
     /**
@@ -146,6 +147,7 @@ class Panel extends Command
         }
         $this->info('正在备份插件...');
         shell_exec('rm -rf /tmp/plugins');
+        shell_exec('rm -rf /tmp/database.sqlite');
         shell_exec('mkdir /tmp/plugins');
         shell_exec('\cp -r /www/panel/plugins/* /tmp/plugins');
         // 检查备份是否成功
@@ -164,6 +166,7 @@ class Panel extends Command
             return;
         }
         $this->info('正在恢复数据库...');
+        shell_exec('rm -rf /www/panel/database/database.sqlite');
         shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite');
         // 检查恢复是否成功
         if (!file_exists('/www/panel/database/database.sqlite')) {
@@ -370,7 +373,8 @@ class Panel extends Command
         } elseif ($type == 'mysql') {
             // 备份MySQL数据库
             $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
-            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql';
+            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql.zip';
+            $tempFile = '/tmp/'.$name.'_'.date('YmdHis').'.sql';
             // 判断数据库是否存在
             $name = escapeshellarg($name);
             $check = shell_exec("mysql -u root -p".$password." -e 'use ".$name."' 2>&1");
@@ -378,15 +382,22 @@ class Panel extends Command
                 $this->error('数据库不存在');
                 return;
             }
-            shell_exec("mysqldump -u root -p".$password." ".$name." > ".$backupFile." 2>&1");
+            shell_exec("mysqldump -u root -p".$password." ".$name." > ".$tempFile." 2>&1");
             // zip压缩
-            shell_exec('zip -r '.$backupFile.'.zip '.escapeshellarg($backupFile).' 2>&1');
-            // 删除sql文件
-            unlink($backupFile);
+            shell_exec('zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
+            // 移动文件
+            if (file_exists($backupFile)) {
+                $this->error('检测到备份已存在，已跳过此次备份');
+                return;
+            }
+            rename($tempFile.'.zip', $backupFile);
+            // 删除临时文件
+            unlink($tempFile);
             $this->info('成功');
         } elseif ($type == 'postgresql') {
             // 备份PostgreSQL数据库
-            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql';
+            $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql.zip';
+            $tempFile = '/tmp/'.$name.'_'.date('YmdHis').'.sql';
             // 判断数据库是否存在
             $check = shell_exec('su - postgres -c "psql -l" 2>&1');
             if (!str_contains($check, $name)) {
@@ -394,11 +405,17 @@ class Panel extends Command
                 return;
             }
             $name = escapeshellarg($name);
-            shell_exec('su - postgres -c "pg_dump '.$name.'" > '.$backupFile.' 2>&1');
+            shell_exec('su - postgres -c "pg_dump '.$name.'" > '.$tempFile.' 2>&1');
             // zip压缩
-            shell_exec('zip -r '.$backupFile.'.zip '.escapeshellarg($backupFile).' 2>&1');
-            // 删除sql文件
-            unlink($backupFile);
+            shell_exec('zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
+            // 移动文件
+            if (file_exists($backupFile)) {
+                $this->error('检测到备份已存在，已跳过此次备份');
+                return;
+            }
+            rename($tempFile.'.zip', $backupFile);
+            // 删除临时文件
+            unlink($tempFile);
             $this->info('成功');
         } else {
             $this->error('参数错误');
