@@ -6,21 +6,21 @@
             <div class="layui-inline">
                 <span style="margin-right: 10px;">防火墙</span>
                 <input type="checkbox" id="safe_firewall" lay-filter="safe_firewall" lay-skin="switch"
-                       lay-text="ON|OFF"/>
+                       lay-text="ON|OFF">
                 <span style="margin: 0px 10px;">启用SSH</span>
-                <input type="checkbox" id="safe_ssh" lay-filter="safe_ssh" lay-skin="switch" lay-text="ON|OFF"/>
+                <input type="checkbox" id="safe_ssh" lay-filter="safe_ssh" lay-skin="switch" lay-text="ON|OFF">
                 <span style="margin: 0px 10px 0px 20px;">SSH端口</span>
                 <div class="layui-input-inline" style="width: 80px;">
                     <input type="number" id="safe_ssh_port" class="layui-input" style="height: 30px; margin-top: 5px;"
                            min=1
-                           max=65535 disabled/>
+                           max=65535 disabled>
                 </div>
                 <div class="layui-input-inline">
                     <button id="safe_ssh_port_save" class="layui-btn layui-btn-sm layui-btn-primary">确定
                     </button>
                 </div>
                 <span style="margin: 0px 10px 0px 20px;">允许Ping</span>
-                <input type="checkbox" id="switch_ping" lay-filter="safe_ping" lay-skin="switch" lay-text="ON|OFF"/>
+                <input type="checkbox" id="switch_ping" lay-filter="safe_ping" lay-skin="switch" lay-text="ON|OFF">
             </div>
             <div class="layui-inline" style="float: right;">
                 {{--<button class="layui-btn layui-btn-sm layui-btn-danger">清空 OpenResty 日志
@@ -36,7 +36,7 @@
                     <span style="margin-right: 10px;">端口控制</span>
                     <div class="layui-input-inline">
                         <input id="safe_add_firewall_rule_port" type="text" name="safe_add_firewall_rule_port" class="layui-input"
-                               placeholder="例如：3306、1000-2000"/>
+                               placeholder="例如：3306、1000-2000">
                     </div>
                     <div class="layui-input-inline">
                         <select id="safe_add_firewall_rule_protocol" lay-filter="safe_add_firewall_rule_protocol"

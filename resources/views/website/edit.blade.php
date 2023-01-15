@@ -79,7 +79,7 @@ Date: 2022-12-08
                         <label class="layui-form-label">防跨站攻击</label>
                         <div class="layui-input-block">
                             <input type="checkbox" name="open_basedir" lay-skin="switch" lay-text="ON|OFF"
-                                   @{{ d.params.config.open_basedir== 1 ? 'checked' : '' }} />
+                                   @{{ d.params.config.open_basedir== 1 ? 'checked' : '' }}>
                         </div>
                     </div>
                 </div>
@@ -96,7 +96,7 @@ Date: 2022-12-08
                         <label class="layui-form-label">总开关</label>
                         <div class="layui-input-inline">
                             <input type="checkbox" name="waf" lay-skin="switch" lay-text="ON|OFF"
-                                   @{{ d.params.config.waf== 1 ? 'checked' : '' }} />
+                                   @{{ d.params.config.waf== 1 ? 'checked' : '' }}>
                         </div>
                         <div class="layui-form-mid layui-word-aux">只有打开了总开关，下面的设置才会生效！</div>
                     </div>
@@ -131,7 +131,7 @@ Date: 2022-12-08
                         <label class="layui-form-label">总开关</label>
                         <div class="layui-input-inline">
                             <input type="checkbox" name="ssl" lay-skin="switch" lay-text="ON|OFF"
-                                   @{{ d.params.config.ssl== 1 ? 'checked' : '' }} />
+                                   @{{ d.params.config.ssl== 1 ? 'checked' : '' }}>
                         </div>
                         <div class="layui-form-mid layui-word-aux">只有打开了总开关，下面的设置才会生效！</div>
                     </div>
@@ -141,14 +141,14 @@ Date: 2022-12-08
                             <label class="layui-form-label">HTTP跳转</label>
                             <div class="layui-input-block">
                                 <input type="checkbox" name="http_redirect" lay-skin="switch" lay-text="ON|OFF"
-                                       @{{ d.params.config.http_redirect== 1 ? 'checked' : '' }} />
+                                       @{{ d.params.config.http_redirect== 1 ? 'checked' : '' }}>
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">HSTS</label>
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="hsts" lay-skin="switch" lay-text="ON|OFF"
-                                       @{{ d.params.config.hsts== 1 ? 'checked' : '' }} />
+                                       @{{ d.params.config.hsts== 1 ? 'checked' : '' }}>
                             </div>
                         </div>
                         <div class="layui-inline">

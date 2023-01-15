@@ -261,10 +261,10 @@ class Panel extends Command
             return;
         }
         // 入库
-        Plugin::query()->create([
-            'slug' => $pluginSlug,
-            'show' => 0,
-        ]);
+        Plugin::query()->updateOrCreate(
+            ['slug' => $pluginSlug],
+            ['show' => 0]
+        );
         $this->info('成功');
     }
 

@@ -15,21 +15,21 @@ Date: 2022-12-08
                         <div class="layui-form-item">
                             <label class="layui-form-label">API 开关</label>
                             <div class="layui-input-inline">
-                                <input type="checkbox" name="api" lay-skin="switch" lay-text="ON|OFF"/>
+                                <input type="checkbox" name="api" lay-skin="switch" lay-text="ON|OFF">
                             </div>
                             <div class="layui-form-mid layui-word-aux">开启后将提供面板API接口的访问支持</div>
                         </div>
                         <div id="setting-api-token" class="layui-form-item">
                             <label class="layui-form-label">API Token</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="api_token" value="获取中ing..." class="layui-input" disabled/>
+                                <input type="text" name="api_token" value="获取中ing..." class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">API Token，用于携带访问面板接口</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">多设备登录</label>
                             <div class="layui-input-inline">
-                                <input type="checkbox" name="multi_login" lay-skin="switch" lay-text="ON|OFF"/>
+                                <input type="checkbox" name="multi_login" lay-skin="switch" lay-text="ON|OFF">
                             </div>
                             <div class="layui-form-mid layui-word-aux">
                                 开启后将允许多设备同时登录面板，可能具有一定安全隐患
@@ -38,35 +38,35 @@ Date: 2022-12-08
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板名称</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="name" value="获取中ing..." class="layui-input" disabled/>
+                                <input type="text" name="name" value="获取中ing..." class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的显示名称</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板用户名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="username" value="获取中ing..." class="layui-input" disabled/>
+                                <input type="text" name="username" value="获取中ing..." class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的登录用户名</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板密码</label>
                             <div class="layui-input-inline">
-                                <input type="password" name="password" value="" class="layui-input" disabled/>
+                                <input type="password" name="password" value="" class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的登录密码（留空不修改）</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板邮箱</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="email" value="获取中ing..." class="layui-input" disabled/>
+                                <input type="text" name="email" value="获取中ing..." class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板账号的邮箱，目前用于签发免费SSL证书</div>
                         </div>
                         <div class="layui-form-item">
                             <label class="layui-form-label">面板端口</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="port" value="" class="layui-input" disabled/>
+                                <input type="text" name="port" value="" class="layui-input" disabled>
                             </div>
                             <div class="layui-form-mid layui-word-aux">修改面板的访问端口（<b style="color: red;">保存后需要手动修改浏览器地址栏的端口为新端口以访问面板</b>）
                             </div>

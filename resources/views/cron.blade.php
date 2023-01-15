@@ -9,7 +9,7 @@
                     <label class="layui-form-label">任务名</label>
                     <div class="layui-input-inline">
                         <input type="text" name="name" lay-verify="required" placeholder="请输入任务名称"
-                               autocomplete="off" class="layui-input"/>
+                               autocomplete="off" class="layui-input">
                     </div>
                     <div class="layui-form-mid layui-word-aux">请填写任务名称</div>
                 </div>
@@ -17,7 +17,7 @@
                     <label class="layui-form-label">执行周期</label>
                     <div class="layui-input-inline">
                         <input type="text" name="time" id="cron-add-time"
-                               lay-verify="required" placeholder="请选择或输入cron表达式" class="layui-input"/>
+                               lay-verify="required" placeholder="请选择或输入cron表达式" class="layui-input">
                     </div>
                     <div class="layui-form-mid layui-word-aux">请务必正确填写执行周期</div>
                 </div>
@@ -53,7 +53,7 @@
                        lay-filter="cron-status"
                        value="@{{ d.status }}" data-id="@{{ d.id }}"
                        @{{ d.status==
-                       1 ? 'checked' : '' }} />
+                       1 ? 'checked' : '' }}>
             </script>
         </div>
     </div>
@@ -154,7 +154,7 @@
                     ,
                     id: 'cron-log'
                     ,
-                    content: '任务名&nbsp;&nbsp;&nbsp;&nbsp;<div class="layui-input-inline" style="width: 190px;"><input type="text" name="cron-edit-name" placeholder="请输入任务名称" autocomplete="off" class="layui-input" value="' + data.name + '"/></div>&nbsp;&nbsp;&nbsp;&nbsp;执行周期&nbsp;&nbsp;&nbsp;&nbsp;<div class="layui-input-inline" style="width: 190px;"><input id="cron-edit-time-' + data.id + '" type="text" name="cron-edit-time" placeholder="请输入执行周期" autocomplete="off" class="layui-input" value="' + data.time + '"/></div><hr><div id="cron-edit-script-editor" style="height: 80%;">' + data.script + '</div><br><button id="cron-edit-' + data.id + '" class="layui-btn">保存</button>'
+                    content: '任务名&nbsp;&nbsp;&nbsp;&nbsp;<div class="layui-input-inline" style="width: 190px;"><input type="text" name="cron-edit-name" placeholder="请输入任务名称" autocomplete="off" class="layui-input" value="' + data.name + '"></div>&nbsp;&nbsp;&nbsp;&nbsp;执行周期&nbsp;&nbsp;&nbsp;&nbsp;<div class="layui-input-inline" style="width: 190px;"><input id="cron-edit-time-' + data.id + '" type="text" name="cron-edit-time" placeholder="请输入执行周期" autocomplete="off" class="layui-input" value="' + data.time + '"/></div><hr><div id="cron-edit-script-editor" style="height: 80%;">' + data.script + '</div><br><button id="cron-edit-' + data.id + '" class="layui-btn">保存</button>'
                     ,
                     success: function (layero, index) {
                         cronEditScriptEditor = ace.edit("cron-edit-script-editor", {

@@ -53,20 +53,20 @@ Date: 2022-12-01
             <div class="layui-inline">
                 <label class="layui-form-label">数据库名</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_name" autocomplete="off" class="layui-input"/>
+                    <input type="text" name="db_name" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库用户</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_username" autocomplete="off" class="layui-input"/>
+                    <input type="text" name="db_username" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
                 <label class="layui-form-label">数据库密码</label>
                 <div class="layui-input-inline">
                     <input id="add-website-db-password" type="text" name="db_password" autocomplete="off"
-                           class="layui-input"/>
+                           class="layui-input">
                 </div>
             </div>
         </div>

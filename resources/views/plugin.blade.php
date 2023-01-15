@@ -32,7 +32,7 @@
                        lay-filter="plugin-show-home"
                        value="@{{ d.show }}" data-plugin-slug="@{{ d.slug }}"
                        @{{ d.show==
-                       1 ? 'checked' : '' }} />
+                       1 ? 'checked' : '' }}>
             </script>
         </div>
     </div>
@@ -58,7 +58,7 @@
                 , {field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true}
                 , {
                     field: 'control',
-                    width: 160,
+                    width: 180,
                     title: '操作',
                     templet: '#panel-plugin-control',
                     fixed: 'right',

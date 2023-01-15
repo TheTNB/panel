@@ -31,7 +31,7 @@ Date: 2022-11-28
                         <input type="checkbox" name="run" lay-skin="switch" lay-text="ON|OFF"
                                lay-filter="website-run-checkbox"
                                value="@{{ d.status }}" data-website-name="@{{ d.name }}"
-                               @{{ d.status== 1 ? 'checked' : '' }} />
+                               @{{ d.status== 1 ? 'checked' : '' }}>
                     </script>
                     <!-- 网站SSL状态 -->
                     <script type="text/html" id="website-ssl">
