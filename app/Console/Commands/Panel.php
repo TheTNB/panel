@@ -138,21 +138,22 @@ class Panel extends Command
         }
         $this->info('正在下载面板...');
         shell_exec('wget -O /tmp/panel.zip https://api.panel.haozi.xyz/api/version/latest');
-        $this->info('正在备份数据库...');
-        shell_exec('\cp /www/panel/database/database.sqlite /tmp/database.sqlite');
         // 检查下载是否成功
         if (!file_exists('/tmp/panel.zip') || filesize('/tmp/panel.zip') < 4096) {
             $this->error('检测到面板新版本下载失败，已终止更新，请加QQ群：12370907 反馈处理');
             return;
         }
+        $this->info('正在备份数据库...');
+        shell_exec('rm -rf /tmp/database.sqlite');
+        if (!copy('/www/panel/database/database.sqlite', '/tmp/database.sqlite')) {
+            $this->error('备份数据库失败，已终止更新，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在备份插件...');
         shell_exec('rm -rf /tmp/plugins');
-        shell_exec('rm -rf /tmp/database.sqlite');
-        shell_exec('mkdir /tmp/plugins');
-        shell_exec('\cp -r /www/panel/plugins/* /tmp/plugins');
-        // 检查备份是否成功
-        if (!file_exists('/tmp/database.sqlite') || !is_dir('/tmp/plugins/Openresty')) {
-            $this->error('检测到面板旧配置备份失败，已终止更新，请加QQ群：12370907 反馈处理');
+        shell_exec('\cp -rf /www/panel/plugins /tmp/plugins');
+        if (!is_dir('/tmp/plugins/Openresty')) {
+            $this->error('检测到面板插件备份失败，已终止更新，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在删除旧版本...');
@@ -160,21 +161,23 @@ class Panel extends Command
         shell_exec('mkdir /www/panel');
         $this->info('正在解压新版本...');
         shell_exec('unzip -o /tmp/panel.zip -d /www/panel');
-        // 检查解压是否成功
         if (!file_exists('/www/panel/artisan')) {
             $this->error('检测到面板新版本解压失败，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在恢复数据库...');
         shell_exec('rm -rf /www/panel/database/database.sqlite');
-        shell_exec('\cp /tmp/database.sqlite /www/panel/database/database.sqlite');
-        // 检查恢复是否成功
-        if (!file_exists('/www/panel/database/database.sqlite')) {
+        if (!copy('/tmp/database.sqlite', '/www/panel/database/database.sqlite')) {
             $this->error('检测到面板数据库恢复失败，请加QQ群：12370907 反馈处理');
             return;
         }
         $this->info('正在恢复插件...');
-        shell_exec('\cp -r /tmp/plugins/* /www/panel/plugins');
+        shell_exec('rm -rf /www/panel/plugins');
+        shell_exec('\cp -rf /tmp/plugins /www/panel/plugins');
+        if (!is_dir('/www/panel/plugins/Openresty')) {
+            $this->error('检测到面板插件恢复失败，请加QQ群：12370907 反馈处理');
+            return;
+        }
         $this->info('正在更新面板数据库...');
         shell_exec('cd /www/panel && php-panel artisan migrate');
         $this->info('正在设置面板权限...');
