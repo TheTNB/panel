@@ -146,7 +146,10 @@ Date: 2022-11-30
                 </div>
                 <div class="layui-card-body layui-text layadmin-text">
                     <blockquote class="layui-elem-quote">
-                        <p>这是一个全新的项目，欢迎您的使用。如果遇到问题/Bug，请前往交流反馈QQ群：<a href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">12370907</a> 反馈给我，我们共同让她变得更完美。</p>
+                        <p style="color: red;">开发组祝大家2023新年快乐！新的一年永无Bug，永不宕机！</p>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote">
+                        <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">Q群12370907</a> / <a target="_blank" href="https://pd.qq.com/s/fyol46wfy">QQ频道</a> 寻求帮助</p>
                     </blockquote>
                 </div>
             </div>
