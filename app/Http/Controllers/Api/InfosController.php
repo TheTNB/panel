@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Plugin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class InfosController extends Controller
 {
@@ -291,6 +292,35 @@ class InfosController extends Controller
             'db_version' => $dbVersions,
             'php_version' => $php_versions
         );
+        return response()->json($res);
+    }
+
+    /**
+     * 检查更新
+     */
+    public function checkUpdate(): JsonResponse
+    {
+        $version = config('panel.version');
+        $remoteVersion = Http::get('https://api.panel.haozi.xyz/api/version/info')->json();
+
+        if ($remoteVersion['code'] != 0) {
+            $res['code'] = 1;
+            $res['msg'] = '获取远程版本信息失败';
+            $res['data'] = [];
+            return response()->json($res);
+        }
+
+        $res['code'] = 0;
+        $res['msg'] = 'success';
+        if (version_compare($version, $remoteVersion['data']['version'], '<')) {
+            $res['data'] = [
+                'version' => $remoteVersion['data']['version'],
+                'describe' => $remoteVersion['data']['describe'],
+            ];
+        } else {
+            $res['data'] = [];
+        }
+
         return response()->json($res);
     }
 }

@@ -61,6 +61,8 @@ Route::prefix('panel')->group(function () {
         Route::get('getHomePlugins', [InfosController::class, 'getHomePlugins']);
         // 已安装PHP和DB版本
         Route::get('getInstalledDbAndPhp', [InfosController::class, 'getInstalledDbAndPhp']);
+        // 检查更新
+        Route::get('checkUpdate', [InfosController::class, 'checkUpdate']);
 
     });
     // 网站管理

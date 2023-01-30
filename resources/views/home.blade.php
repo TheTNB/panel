@@ -14,9 +14,11 @@ Date: 2022-11-30
                                 <a style="background: #fff;" href="https://hzbk.net"
                                    title="耗子博客" target="_blank"><i class="layui-icon layui-icon-release"></i> 耗子博客</a>
                                 <a style="background: #fff;" href="https://weavatar.com"
-                                   title="WeAvatar" target="_blank"><i class="layui-icon layui-icon-release"></i> WeAvatar - 互联网公共头像服务</a>
+                                   title="WeAvatar" target="_blank"><i class="layui-icon layui-icon-release"></i>
+                                    WeAvatar - 互联网公共头像服务</a>
                                 <a style="background: #fff;" href="https://wepublish.cn"
-                                   title="WePublish" target="_blank"><i class="layui-icon layui-icon-release"></i> WePublish - WordPress的本土化版本</a>
+                                   title="WePublish" target="_blank"><i class="layui-icon layui-icon-release"></i>
+                                    WePublish - WordPress的本土化版本</a>
                             </div>
                         </div>
                     </div>
@@ -149,7 +151,9 @@ Date: 2022-11-30
                         <p style="color: red;">开发组祝大家2023新年快乐！新的一年永无Bug，永不宕机！</p>
                     </blockquote>
                     <blockquote class="layui-elem-quote">
-                        <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">Q群12370907</a> / <a target="_blank" href="https://pd.qq.com/s/fyol46wfy">QQ频道</a> 寻求帮助</p>
+                        <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a
+                                    href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">Q群12370907</a> / <a
+                                    target="_blank" href="https://pd.qq.com/s/fyol46wfy">QQ频道</a> 寻求帮助</p>
                     </blockquote>
                 </div>
             </div>
@@ -258,21 +262,46 @@ Date: 2022-11-30
         });
         // 监听更新按钮点击事件
         $('#update_panel').click(function () {
-            admin.popup({
-                title: '提示'
-                ,
-                shade: 0
-                ,
-                anim: -1
-                ,
-                area: ['400px', '200px']
-                ,
-                id: 'layadmin-layer-skin-update-panel'
-                ,
-                skin: 'layui-anim layui-anim-upbit'
-                ,
-                content: '请在SSH执行<span class="layui-badge-rim">panel update</span>以更新面板！'
+            index = layer.msg('正在获取版本信息...', {
+                icon: 16
+                , time: 0
             });
+            admin.req(
+                {
+                    url: '/api/panel/info/checkUpdate'
+                    , method: 'get'
+                    , success: function (result) {
+                        layer.close(index);
+                        if (result.code !== 0) {
+                            layer.msg('获取版本信息失败，请刷新重试！')
+                            return false;
+                        }
+                        if (result.data.version) {
+                            admin.popup({
+                                title: '提示'
+                                ,
+                                shade: 0
+                                ,
+                                anim: -1
+                                ,
+                                area: ['400px', '200px']
+                                ,
+                                id: 'layadmin-layer-skin-update-panel'
+                                ,
+                                skin: 'layui-anim layui-anim-upbit'
+                                ,
+                                content: '最新版本：' + result.data.version + '<br><br>更新日志：' + result.data.describe + '<br><br>请在SSH执行<span class="layui-badge-rim">panel update</span>以更新面板！'
+                            });
+                        } else {
+                            layer.msg('当前已是最新版本！')
+                        }
+                    }
+                    , error: function (xhr, status, error) {
+                        layer.close(index);
+                        layer.msg('获取版本信息失败，请刷新重试！')
+                    }
+                }
+            );
         });
     });
 </script>
