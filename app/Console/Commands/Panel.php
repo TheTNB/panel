@@ -377,7 +377,7 @@ class Panel extends Command
             // 备份MySQL数据库
             $password = Setting::query()->where('name', 'mysql_root_password')->value('value');
             $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql.zip';
-            $tempFile = '/tmp/'.$name.'_'.date('YmdHis').'.sql';
+            $tempFile = $name.'_'.date('YmdHis').'.sql';
             // 判断数据库是否存在
             $name = escapeshellarg($name);
             $check = shell_exec("mysql -u root -p".$password." -e 'use ".$name."' 2>&1");
@@ -385,22 +385,26 @@ class Panel extends Command
                 $this->error('数据库不存在');
                 return;
             }
-            shell_exec("mysqldump -u root -p".$password." ".$name." > ".$tempFile." 2>&1");
+            // 傻逼MySQL，瞎jb输出警告
+            //shell_exec("mysqldump -u root -p".$password." ".$name." 2> /dev/null > /tmp/".$tempFile);
+            putenv('MYSQL_PWD='.$password);
+            shell_exec("mysqldump -u root ".$name." > /tmp/".$tempFile);
             // zip压缩
-            shell_exec('zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
+            shell_exec('cd /tmp && zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
             // 移动文件
             if (file_exists($backupFile)) {
                 $this->error('检测到备份已存在，已跳过此次备份');
+                unlink('/tmp/'.$tempFile);
                 return;
             }
-            rename($tempFile.'.zip', $backupFile);
+            rename('/tmp/'.$tempFile.'.zip', $backupFile);
             // 删除临时文件
-            unlink($tempFile);
+            unlink('/tmp/'.$tempFile);
             $this->info('成功');
         } elseif ($type == 'postgresql') {
             // 备份PostgreSQL数据库
             $backupFile = $path.'/'.$name.'_'.date('YmdHis').'.sql.zip';
-            $tempFile = '/tmp/'.$name.'_'.date('YmdHis').'.sql';
+            $tempFile = $name.'_'.date('YmdHis').'.sql';
             // 判断数据库是否存在
             $check = shell_exec('su - postgres -c "psql -l" 2>&1');
             if (!str_contains($check, $name)) {
@@ -408,17 +412,18 @@ class Panel extends Command
                 return;
             }
             $name = escapeshellarg($name);
-            shell_exec('su - postgres -c "pg_dump '.$name.'" > '.$tempFile.' 2>&1');
+            shell_exec('su - postgres -c "pg_dump '.$name.'" > /tmp/'.$tempFile.' 2>&1');
             // zip压缩
-            shell_exec('zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
+            shell_exec('cd /tmp && zip -r '.$tempFile.'.zip '.escapeshellarg($tempFile).' 2>&1');
             // 移动文件
             if (file_exists($backupFile)) {
                 $this->error('检测到备份已存在，已跳过此次备份');
+                unlink('/tmp/'.$tempFile);
                 return;
             }
-            rename($tempFile.'.zip', $backupFile);
+            rename('/tmp/'.$tempFile.'.zip', $backupFile);
             // 删除临时文件
-            unlink($tempFile);
+            unlink('/tmp/'.$tempFile);
             $this->info('成功');
         } else {
             $this->error('参数错误');
