@@ -35,7 +35,7 @@
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <link href="{{asset('layui/css/layui.css')}}" rel="stylesheet">
-    <script src="https://cdnjs.cdn.wepublish.cn/ace/1.6.1/ace.js"></script>
+    <script src="https://cdnjs.cdn.haozi.net/ace/1.6.1/ace.js"></script>
 </head>
 <body>
 <div id="HaoZi_panel"></div>

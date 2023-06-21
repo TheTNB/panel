@@ -3,6 +3,8 @@
 
 #### 这是耗子Linux面板的开源仓库，基于Apache License 2.0协议进行开源，目前处于积极开发状态。
 
+#### 我们正在进行基于 Golang 的 V2 版本的开发，加入我们的 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[耗子](https://pd.qq.com/s/fyol46wfy) 获取最新动态。
+
 ## 运行环境
 
 | 系统            | 版本  |
