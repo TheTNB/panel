@@ -1,0 +1,277 @@
+<title>layer 组件特殊示例</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>组件</cite></a>
+        <a href="http://www.baidu.com/" target="_blank">layer</a>
+        <a><cite>特殊示例</cite></a>
+    </div>
+</div>
+
+<style>
+    /* 这段样式只是用于演示 */
+    #LAY-component-layer-special-demo .layui-card-body {
+        padding-top: 15px;
+    }
+</style>
+
+<div class="layui-fluid" id="LAY-component-layer-special-demo">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">场景</div>
+                <div class="layui-card-body">
+
+                    <div class="layui-btn-container layadmin-layer-demo">
+                        <button data-method="setTop" class="layui-btn layui-btn-primary">多窗口模式，层叠置顶 / Esc
+                            关闭
+                        </button>
+                        <button data-method="confirmTrans" class="layui-btn layui-btn-primary">配置一个透明的询问框
+                        </button>
+                        <button data-method="notice" class="layui-btn layui-btn-primary">示范一个公告层</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">坐标</div>
+                <div class="layui-card-body">
+
+                    <div class="layui-btn-container layadmin-layer-demo">
+                        <button data-method="offset" data-type="t" class="layui-btn layui-btn-primary">上弹出</button>
+                        <button data-method="offset" data-type="r" class="layui-btn layui-btn-primary">右弹出</button>
+                        <button data-method="offset" data-type="b" class="layui-btn layui-btn-primary">下弹出</button>
+                        <button data-method="offset" data-type="l" class="layui-btn layui-btn-primary">左弹出</button>
+                        <button data-method="offset" data-type="lt" class="layui-btn layui-btn-primary">左上弹出
+                        </button>
+                        <button data-method="offset" data-type="lb" class="layui-btn layui-btn-primary">左下弹出
+                        </button>
+                        <button data-method="offset" data-type="rt" class="layui-btn layui-btn-primary">右上弹出
+                        </button>
+                        <button data-method="offset" data-type="rb" class="layui-btn layui-btn-primary">右下弹出
+                        </button>
+                        <button data-method="offset" data-type="auto" class="layui-btn layui-btn-primary">居中弹出
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">抽屉</div>
+                <div class="layui-card-body">
+                    <p style="line-height: 32px;">从页面四个边缘弹出（抽屉效果）：</p>
+                    <div class="layui-btn-container">
+                        <button type="button" class="layui-btn layui-btn-primary" lay-on="test-offset-t">从上往下
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-primary" lay-on="test-offset-r">从右往左
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-primary" lay-on="test-offset-b">从下往上
+                        </button>
+                        <button type="button" class="layui-btn layui-btn-primary" lay-on="test-offset-l">从左往右
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  layui.use(['admin'], function () {
+    var $ = layui.$
+    var admin = layui.admin
+    var element = layui.element
+    var util = layui.util
+    var router = layui.router()
+
+    element.render()
+
+    var active = {
+      setTop: function () {
+        var that = this
+        //多窗口模式，层叠置顶
+        layer.open({
+          type: 1 //此处以iframe举例
+          ,
+          title: '当你选择该窗体时，即会在最顶端'
+          ,
+          area: ['390px', '260px']
+          ,
+          shade: 0
+          ,
+          maxmin: true
+          ,
+          offset: [ //为了演示，随机坐标
+            Math.random() * ($(window).height() - 300)
+            , Math.random() * ($(window).width() - 390)
+          ]
+          ,
+          content: '<div style="padding: 15px;">内容标记：' + new Date().getTime() + '，按 ESC 键可关闭。<br><br>当你的页面有很多很多 layer 窗口，你需要像 Window 窗体那样，点击某个窗口，该窗体就置顶在上面，那么 layer.setTop() 可以来轻松实现。它采用巧妙的逻辑，以使这种置顶的性能达到最优。</div>'
+
+          ,
+          btn: ['继续弹出', '全部关闭'] //只是为了演示
+          ,
+          yes: function () {
+            $(that).click()
+          }
+          ,
+          btn2: function () {
+            layer.closeAll()
+          }
+
+          ,
+          zIndex: layer.zIndex //重点1
+          ,
+          success: function (layero, index) {
+            layer.setTop(layero) //重点2. 保持选中窗口置顶
+
+            //记录索引，以便按 esc 键关闭。事件见代码最末尾处。
+            layer.escIndex = layer.escIndex || []
+            layer.escIndex.unshift(index)
+            //选中当前层时，将当前层索引放置在首位
+            layero.on('mousedown', function () {
+              var _index = layer.escIndex.indexOf(index)
+              if (_index !== -1) {
+                layer.escIndex.splice(_index, 1) //删除原有索引
+              }
+              layer.escIndex.unshift(index) //将索引插入到数组首位
+            })
+          }
+          ,
+          end: function () {
+            //更新索引
+            if (typeof layer.escIndex === 'object') {
+              layer.escIndex.splice(0, 1)
+            }
+          }
+        })
+      }
+      , confirmTrans: function () {
+        layer.closeAll()
+        layer.msg('大部分参数都是可以公用的<br>合理搭配，展示不一样的风格', {
+          time: 20 * 1000,
+          btn: ['明白了', '知道了', '哦']
+        })
+      }
+      , notice: function () {
+        layer.closeAll()
+        layer.open({
+          type: 1
+          ,
+          title: false
+          ,
+          closeBtn: false
+          ,
+          area: '300px;'
+          ,
+          shade: 0.8
+          ,
+          id: 'LAY_layuipro'
+          ,
+          btn: ['火速围观', '残忍拒绝']
+          ,
+          btnAlign: 'c'
+          ,
+          moveType: 1 //拖拽模式，0或者1
+          ,
+          content: '<div style="padding: 50px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;">你知道吗？亲！<br>layer ≠ layui<br><br> layer 只是作为 layui 的一个弹层模块，由于其用户基数较大，所以常常会有人以为 layui 是 <del>layerui</del><br><br>layer 虽然已被 layui 收编为内置的弹层模块，但仍然会作为一个独立组件全力维护、升级 ^_^</div>'
+          ,
+          success: function (layero) {
+            var btn = layero.find('.layui-layer-btn')
+            btn.find('.layui-layer-btn0').attr({
+              href: ''
+              , target: '_blank'
+            })
+          }
+        })
+      }
+      , offset: function (othis) {
+        var type = othis.data('type')
+          , text = othis.text()
+
+        layer.open({
+          type: 1
+          , offset: type
+          , id: 'layerDemo' + type
+          , content: '<div style="padding: 20px 100px;">' + text + '</div>'
+          , btn: '关闭全部'
+          , btnAlign: 'c'
+          , shade: 0
+          , yes: function () {
+            layer.closeAll()
+          }
+        })
+      }
+    }
+
+    $('#LAY-component-layer-special-demo .layadmin-layer-demo .layui-btn').on('click', function () {
+      var othis = $(this), method = othis.data('method')
+      active[method] ? active[method].call(this, othis) : ''
+    })
+
+    //多窗口模式 - esc 键
+    $(document).on('keyup', function (e) {
+      if (e.keyCode === 27) {
+        layer.close(layer.escIndex ? layer.escIndex[0] : 0)
+      }
+    })
+
+    // util 事件
+    util.on('lay-on', {
+      'test-offset-t': function () {
+        layer.open({
+          type: 1,
+          offset: 't',
+          anim: 'slideDown', // 从上往下
+          area: ['100%', '160px'],
+          shade: 0.1,
+          shadeClose: true,
+          id: 'ID-demo-layer-direction-t',
+          content: '<div style="padding: 16px;">任意 HTML 内容</div>'
+        })
+      },
+      'test-offset-r': function () {
+        layer.open({
+          type: 1,
+          offset: 'r',
+          anim: 'slideLeft', // 从右往左
+          area: ['320px', '100%'],
+          shade: 0.1,
+          shadeClose: true,
+          id: 'ID-demo-layer-direction-r',
+          content: '<div style="padding: 16px;">任意 HTML 内容</div>'
+        })
+      },
+      'test-offset-b': function () {
+        layer.open({
+          type: 1,
+          offset: 'b',
+          anim: 'slideUp', // 从下往上
+          area: ['100%', '160px'],
+          shade: 0.1,
+          shadeClose: true,
+          id: 'ID-demo-layer-direction-b',
+          content: '<div style="padding: 16px;">任意 HTML 内容</div>'
+        })
+      },
+      'test-offset-l': function () {
+        layer.open({
+          type: 1,
+          offset: 'l',
+          anim: 'slideRight', // 从左往右
+          area: ['320px', '100%'],
+          shade: 0.1,
+          shadeClose: true,
+          id: 'ID-demo-layer-direction-l',
+          content: '<div style="padding: 16px;">任意 HTML 内容</div>'
+        })
+      }
+    })
+
+  })
+</script>

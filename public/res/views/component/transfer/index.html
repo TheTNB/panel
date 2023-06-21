@@ -1,0 +1,183 @@
+<title>穿梭框组件</title>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>组件</cite></a>
+        <a><cite>穿梭框组件</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">基础效果</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo1"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">定义标题及数据源</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo2"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">初始右侧数据集合</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo3"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">显示搜索框</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo4"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">数据格式解析</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo5"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">穿梭时的回调</div>
+                <div class="layui-card-body">
+                    <div id="test-transfer-demo6"></div>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">实例调用</div>
+                <div class="layui-card-body">
+                    <div class="layui-btn-container">
+                        <button type="button" class="layui-btn" lay-demotransferactive="getData">获取右侧数据</button>
+                        <button type="button" class="layui-btn" lay-demotransferactive="reload">重载实例</button>
+                    </div>
+                    <div id="test-transfer-demo7"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  layui.use(['admin', 'transfer', 'layer', 'util'], function () {
+    var $ = layui.$
+      , transfer = layui.transfer
+      , layer = layui.layer
+      , util = layui.util
+
+    //模拟数据
+    var data1 = [
+      { 'value': '1', 'title': '李白' }
+      , { 'value': '2', 'title': '杜甫' }
+      , { 'value': '3', 'title': '苏轼' }
+      , { 'value': '4', 'title': '李清照' }
+      , { 'value': '5', 'title': '鲁迅', 'disabled': true }
+      , { 'value': '6', 'title': '巴金' }
+      , { 'value': '7', 'title': '冰心' }
+      , { 'value': '8', 'title': '矛盾' }
+      , { 'value': '9', 'title': '张三' }
+    ]
+
+      , data2 = [
+      { 'value': '1', 'title': '瓦罐汤' }
+      , { 'value': '2', 'title': '油酥饼' }
+      , { 'value': '3', 'title': '炸酱面' }
+      , { 'value': '4', 'title': '串串香', 'disabled': true }
+      , { 'value': '5', 'title': '豆腐脑' }
+      , { 'value': '6', 'title': '驴打滚' }
+      , { 'value': '7', 'title': '北京烤鸭' }
+      , { 'value': '8', 'title': '烤冷面' }
+      , { 'value': '9', 'title': '毛血旺', 'disabled': true }
+      , { 'value': '10', 'title': '肉夹馍' }
+      , { 'value': '11', 'title': '臊子面' }
+      , { 'value': '12', 'title': '凉皮' }
+      , { 'value': '13', 'title': '羊肉泡馍' }
+      , { 'value': '14', 'title': '冰糖葫芦', 'disabled': true }
+      , { 'value': '15', 'title': '狼牙土豆' }
+    ]
+
+    //基础效果
+    transfer.render({
+      elem: '#test-transfer-demo1'
+      , data: data1
+    })
+
+    //定义标题及数据源
+    transfer.render({
+      elem: '#test-transfer-demo2'
+      , title: ['候选文人', '获奖文人']  //自定义标题
+      , data: data1
+      //,width: 150 //定义宽度
+      , height: 210 //定义高度
+    })
+
+    //初始右侧数据
+    transfer.render({
+      elem: '#test-transfer-demo3'
+      , data: data2
+      , value: ['1', '3', '5', '7', '9', '11']
+    })
+
+    //显示搜索框
+    transfer.render({
+      elem: '#test-transfer-demo4'
+      , data: data1
+      , title: ['文本墨客', '获奖文人']
+      , showSearch: true
+    })
+
+    //数据格式解析
+    transfer.render({
+      elem: '#test-transfer-demo5'
+      , parseData: function (res) {
+        return {
+          'value': res.id //数据值
+          , 'title': res.name //数据标题
+          , 'disabled': res.disabled  //是否禁用
+          , 'checked': res.checked //是否选中
+        }
+      }
+      , data: [
+        { 'id': '1', 'name': '李白' }
+        , { 'id': '2', 'name': '杜甫' }
+        , { 'id': '3', 'name': '张三' }
+      ]
+      , height: 150
+    })
+
+    //穿梭时的回调
+    transfer.render({
+      elem: '#test-transfer-demo6'
+      , data: data1
+      , onchange: function (obj, index) {
+        var arr = ['左边', '右边']
+        layer.alert('来自 <strong>' + arr[index] + '</strong> 的数据：' + JSON.stringify(obj)) //获得被穿梭时的数据
+      }
+    })
+
+    //实例调用
+    transfer.render({
+      elem: '#test-transfer-demo7'
+      , data: data1
+      , id: 'key123' //定义唯一索引
+    })
+    //批量办法定事件
+    util.event('lay-demoTransferActive', {
+      getData: function (othis) {
+        var getData = transfer.getData('key123') //获取右侧数据
+        layer.alert(layui.util.escape(JSON.stringify(getData)))
+      }
+      , reload: function () {
+        //实例重载
+        transfer.reload('key123', {
+          title: ['文人', '喜欢的文人']
+          , value: ['2', '5', '9']
+          , showSearch: true
+        })
+      }
+    })
+  })
+</script>

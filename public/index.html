@@ -1,0 +1,52 @@
+<!--
+////////////////////////////////////////////////////////////////////
+//                          _ooOoo_                               //
+//                         o8888888o                              //
+//                         88" . "88                              //
+//                         (| ^_^ |)                              //
+//                         O\  =  /O                              //
+//                      ____/`---'\____                           //
+//                    .'  \\|     |//  `.                         //
+//                   /  \\|||  :  |||//  \                        //
+//                  /  _||||| -:- |||||-  \                       //
+//                  |   | \\\  -  /// |   |                       //
+//                  | \_|  ''\---/''  |   |                       //
+//                  \  .-\__  `-`  ___/-. /                       //
+//                ___`. .'  /--.--\  `. . ___                     //
+//             ."" '<  `.___\_<|>_/___.'  >'"".                   //
+//            | | :  `- \`.;`\ _ /`;.`/ - ` : | |                 //
+//            \  \ `-.   \_ __\ /__ _/   .-` /  /                 //
+//     ========`-.____`-.___\_____/___.-`____.-'========          //
+//                          `=---='                               //
+//     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^          //
+//         佛祖保佑          永无Bug          永不宕机                //
+//    Name：耗子Linux面板   Author：耗子   Date：2023-06-21           //
+////////////////////////////////////////////////////////////////////
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>加载中...</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="./res/layui/css/layui.css" rel="stylesheet">
+    <script src="https://cdnjs.cdn.haozi.net/ace/1.6.1/ace.js"></script>
+</head>
+<body>
+<div id="Panel_app"></div>
+<script src="./res/layui/layui.js"></script>
+<script>
+  layui.config({
+    base: 'res/', // 静态资源所在路径
+    version: new Date().getTime()
+  }).use('index', function () {
+    var layer = layui.layer
+    var admin = layui.admin
+
+  })
+</script>
+</body>
+</html>
