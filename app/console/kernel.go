@@ -3,6 +3,7 @@ package console
 import (
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/schedule"
+
 	"panel/app/console/commands"
 )
 

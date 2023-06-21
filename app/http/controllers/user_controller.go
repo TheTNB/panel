@@ -3,8 +3,9 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	models "panel/app/Models"
+
 	"panel/app/http/requests"
+	"panel/app/models"
 )
 
 type UserController struct {
@@ -88,7 +89,21 @@ func (r *UserController) Login(ctx http.Context) {
 }
 
 func (r *UserController) Info(ctx http.Context) {
+	user, ok := ctx.Value("user").(models.User)
+	if !ok {
+		ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
+			"code":    401,
+			"message": "登录已过期",
+		})
+		return
+	}
+
 	ctx.Response().Success().Json(http.Json{
-		"Hello": "Goravel",
+		"code":    0,
+		"message": "获取用户信息成功",
+		"data": http.Json{
+			"username": user.Username,
+			"email":    user.Email,
+		},
 	})
 }
