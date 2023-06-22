@@ -1,0 +1,23 @@
+name: Codecov
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  codecov:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Run tests with coverage
+        run: go test -v -coverprofile="coverage.out" ./...
+      - name: Upload coverage report to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.out
+          token: ${{ secrets.CODECOV }}

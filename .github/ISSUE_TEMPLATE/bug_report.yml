@@ -1,0 +1,137 @@
+name: 🐛 报告问题 (Bug Report)
+description: 创建一个报告以帮助我们改进 (Create a report to help us improve)
+title: "🐛 [Bug] "
+labels: [ "☢️ Bug", "bug" ]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **请仅使用 简体中文 或 英文 进行填写**
+        **Please only use Simplified Chinese or English to fill in**
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 在提问之前 (Before Asking)
+      description: |
+        提问之前，先回答几个小问题。
+        Before asking questions, answer a few quick questions.
+      options:
+        - label: 我已经搜索了现有的 Issues, Discussions 和 Google (I've searched the existing Issues, Discussions and Google)
+          required: true
+        - label: 我已经阅读了 README 中除版本记录以外的所有内容 (I've read everything in the README except the version notes)
+          required: true
+        - label: 我在提问题之前至少花费了 5 分钟来思考和准备 (I spend at least 5 minutes thinking and preparing before asking a question)
+          required: true
+        - label: 我没有改动过面板及系统的任何文件 (I have not changed any files of the panel and system)
+          required: false
+        - label: 这个问题可以被稳定复现 (The problem can be stably reproduced)
+          required: false
+        - label: 问题是在升级之后产生的 (The problem is generated after upgrading)
+          required: false
+  - type: dropdown
+    id: system
+    attributes:
+      label: 操作系统 (Operating System)
+      options:
+        - RockyLinux
+        - AlmaLinux
+        - Debian
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: system-version
+    attributes:
+      label: 操作系统版本 (Operating System Version)
+      description: |
+        请提供操作系统的版本号。
+        Please provide the version number of the operating system.
+      placeholder: "9.0"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 耗子面板版本 (HaoZi Panel Version)
+      placeholder: "2.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: describe
+    attributes:
+      label: 描述问题 (Describe The Problem)
+      description: |
+        简明概要地描述你遇到的问题。
+        Briefly describe the problem you are having.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 如何复现 (How To Reproduce)
+      description: |
+        重现该问题的详细步骤。
+        Detailed steps to reproduce the problem.
+      value: |
+        1. 安装面板
+        2. 设置 '...'
+        3. 点击 '...'
+        4. 出现问题
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为 (Expected Behavior)
+      description: |
+        简明概要地描述你期望发生的事情。
+        Briefly describe what you expect to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关日志 (Related Logs)
+      description: |
+        请复制并粘贴任何相关的日志输出。
+        Please copy and paste any relevant log output.
+        可以把文件拖入这个区域以添加日志文件。
+        Files can be dragged into this area to add log files.
+        面板日志文件可在 `/www/panel/storage/logs` 中找到。
+        Panel log files can be found in `/www/panel/storage/logs`.
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图 (Screenshots)
+      description: |
+        如果有，添加屏幕截图可帮助更快定位你的问题。
+        If so, adding screenshots can help locate your issue faster.
+        可以复制图片后在此区域内粘贴以添加图片。
+        Pictures can be copied and pasted in this area to add pictures.
+        如有必要，使用马赛克遮盖敏感信息。
+        Use a mosaic to obscure sensitive information if necessary.
+    validations:
+      required: false
+  - type: textarea
+    id: others
+    attributes:
+      label: 还有别的吗 (Anything Else)
+      description: |
+        运行环境？浏览器？软件版本？相关的配置？链接？参考资料？
+        Environment? Browser? Software version? Related configuration? Link? References?
+        任何能让我们对你所遇到的问题有更多了解的东西。
+        Anything that can give us more insight into the problem you're having.
+    validations:
+      required: false
+  - type: textarea
+    id: yellows
+    attributes:
+      label: 来点色图 (Porn Pictures)
+      description: |
+        如果你不提供色图而你的 Issue 中又有其他不符合标准的地方，那么你的 Issue 可能会被直接关闭。
+        If you don't provide some porn pictures and there are other non-conformities in your issue, then your issue may be closed directly.
+    validations:
+      required: false
