@@ -33,6 +33,9 @@ body:
     id: system
     attributes:
       label: 操作系统 (Operating System)
+      description: |
+        请提供安装面板的操作系统。
+        Please provide the operating system on which the panel is installed.
       options:
         - RockyLinux
         - AlmaLinux
@@ -54,6 +57,9 @@ body:
     id: version
     attributes:
       label: 耗子面板版本 (HaoZi Panel Version)
+      description: |
+        请提供耗子面板的版本号。
+        Please provide the version number of the panel.
       placeholder: "2.0.0"
     validations:
       required: true
