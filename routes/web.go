@@ -11,6 +11,10 @@ import (
 
 func Web() {
 	facades.Route().Prefix("api/panel").Group(func(r route.Route) {
+		r.Prefix("info").Group(func(r route.Route) {
+			infoController := controllers.NewInfoController()
+			r.Get("name", infoController.Name)
+		})
 		r.Prefix("user").Group(func(r route.Route) {
 			userController := controllers.NewUserController()
 			r.Post("login", userController.Login)

@@ -19,7 +19,7 @@ func (r *LoginRequest) Authorize(ctx http.Context) error {
 
 func (r *LoginRequest) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"login":    "required",
+		"username": "required",
 		"password": "required|min_len:8",
 		"captcha":  "captcha:true",
 	}
@@ -27,7 +27,7 @@ func (r *LoginRequest) Rules(ctx http.Context) map[string]string {
 
 func (r *LoginRequest) Messages(ctx http.Context) map[string]string {
 	return map[string]string{
-		"login.required":    "登录名不能为空",
+		"username.required": "登录名不能为空",
 		"password.required": "密码不能为空",
 		"password.min_len":  "密码长度不能小于 8 位",
 		"captcha.captcha":   "验证码错误",

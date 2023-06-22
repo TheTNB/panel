@@ -7,7 +7,7 @@
 
     <div class="layadmin-user-login-main">
         <div class="layadmin-user-login-box layadmin-user-login-header">
-            <h2 id="login-panel-name">{{ config('panel.name') }}</h2>
+            <h2 id="panel-login-name">加载中...</h2>
             <p></p>
         </div>
         <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
@@ -24,7 +24,6 @@
                        placeholder="密码" class="layui-input">
             </div>
             <div class="layui-form-item" style="margin-bottom: 20px;">
-                {{--<input type="checkbox" name="remember" id="remember" lay-skin="primary" title="记住我">--}}
                 <a target="_blank" href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH" class="layadmin-user-jump-change layadmin-link"
                    style="margin-top: 7px;">忘记密码？</a>
             </div>
@@ -42,13 +41,16 @@
 </div>
 
 <script>
-  layui.use(['admin', 'form', 'user'], function () {
+  layui.use(['admin', 'form'], function () {
     let $ = layui.$
       , setter = layui.setter
       , admin = layui.admin
       , form = layui.form
       , router = layui.router()
       , search = router.search;
+
+    // 设置面板名称
+    $('#panel-login-name').text(panel_name);
 
     // 判断并清除定时器
     if (typeof home_timer !== 'undefined') {
