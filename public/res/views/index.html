@@ -1,258 +1,104 @@
+<!--
+Name: 主页模板
+Author: 耗子
+Date: 2022-11-30
+-->
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
+        <div id="address1" class="layui-col-md12">
+            <div class="layui-collapse">
+                <div style="background: #fff;" class="layui-colla-content layui-show">
+                    <div class="text" style="overflow: hidden;height: 22px;">
+                        <div class="layui-carousel" id="home_ad" lay-filter="home_ad">
+                            <div carousel-item="">
+                                <a style="background: #fff;" href="https://hzbk.net"
+                                   title="耗子博客" target="_blank"><i class="layui-icon layui-icon-release"></i> 耗子博客</a>
+                                <a style="background: #fff;" href="https://weavatar.com"
+                                   title="WeAvatar" target="_blank"><i class="layui-icon layui-icon-release"></i>
+                                    WeAvatar - 互联网公共头像服务</a>
+                                <a style="background: #fff;" href="https://wepublish.cn"
+                                   title="WePublish" target="_blank"><i class="layui-icon layui-icon-release"></i>
+                                    WePublish - WordPress的本土化版本</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div id="monitor1" class="layui-col-md6">
+
+            <div class="layui-card">
+                <div class="layui-card-header">资源使用</div>
+                <div class="layui-card-body layadmin-takerates">
+                    <div class="layui-progress" lay-showPercent="yes" lay-filter="home_cpu">
+                        <h3 id="home_cpu">CPU信息加载中</h3>
+                        <div class="layui-progress-bar" lay-percent="0%"></div>
+                    </div>
+                    <div class="layui-progress" lay-showPercent="yes" lay-filter="home_mem">
+                        <h3 id="home_mem">内存信息加载中</h3>
+                        <div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="monitor2" class="layui-col-md3">
+
+            <div class="layui-card">
+                <div class="layui-card-header">系统负载</div>
+                <div class="layui-card-body layadmin-takerates">
+                    <div class="layui-progress" lay-showPercent="yes" lay-filter="uptime_1">
+                        <h3>近1分钟</h3>
+                        <div class="layui-progress-bar" lay-percent="0%"></div>
+                    </div>
+                    <div class="layui-progress" lay-showPercent="yes" lay-filter="uptime_5">
+                        <h3>近5分钟</h3>
+                        <div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md3">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    实时流量
+                    <span class="layui-badge layui-bg-blue layuiadmin-badge">发送 / 接收</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p style="text-align: center;"><b id="home_net_now">获取中...</b></p>
+                </div>
+                <div class="layui-card-header">
+                    累计流量
+                    <span class="layui-badge layui-bg-blue layuiadmin-badge">发送 / 接收</span>
+                </div>
+                <div class="layui-card-body layuiadmin-card-list">
+                    <p style="text-align: center;"><b id="home_net_total">获取中...</b></p>
+                </div>
+            </div>
+        </div>
         <div class="layui-col-md8">
-            <div class="layui-row layui-col-space15">
-                <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">快捷方式</div>
-                        <div class="layui-card-body">
+            <div class="layui-card">
+                <div class="layui-card-header">应用</div>
+                <div class="layui-card-body">
+                    <div class="layui-carousel layadmin-carousel layadmin-shortcut" lay-anim="">
+                        <div carousel-item="">
+                            <ul class="layui-row layui-col-space10 layui-this">
+                                <script type="text/html" template lay-url="/api/panel/info/getHomePlugins">
+                                    @{{#  layui.each(d.data, function(index, item){ }}
+                                    <li class="layui-col-xs4 layui-col-md2 layui-col-sm4">
+                                        <a lay-href="/plugin/@{{ item.slug }}">
+                                            <i class="layui-icon layui-icon-engine"></i>
+                                            <cite>@{{ item.name }}</cite>
+                                        </a>
+                                    </li>
+                                    @{{#  }); }}
+                                    @{{#  if(d.data.length === 0){ }}
+                                    这里好像啥也没有...
+                                    @{{#  } }}
+                                </script>
 
-                            <div class="layui-carousel layadmin-carousel layadmin-shortcut">
-                                <div carousel-item>
-                                    <ul class="layui-row layui-col-space10">
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="home/homepage1">
-                                                <i class="layui-icon layui-icon-console"></i>
-                                                <cite>主页一</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="home/homepage2">
-                                                <i class="layui-icon layui-icon-chart"></i>
-                                                <cite>主页二</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="component/layer/list">
-                                                <i class="layui-icon layui-icon-template-1"></i>
-                                                <cite>弹层</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="/senior/im/">
-                                                <i class="layui-icon layui-icon-chat"></i>
-                                                <cite>聊天</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="component/progress/index">
-                                                <i class="layui-icon layui-icon-find-fill"></i>
-                                                <cite>进度条</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="app/workorder/list">
-                                                <i class="layui-icon layui-icon-survey"></i>
-                                                <cite>工单</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="user/user/list">
-                                                <i class="layui-icon layui-icon-user"></i>
-                                                <cite>用户</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/system/website">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>设置</cite>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                    <ul class="layui-row layui-col-space10">
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs3">
-                                            <a lay-href="set/user/info">
-                                                <i class="layui-icon layui-icon-set"></i>
-                                                <cite>我的资料</cite>
-                                            </a>
-                                        </li>
-                                    </ul>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-col-md6">
-                    <div class="layui-card">
-                        <div class="layui-card-header">待办事项</div>
-                        <div class="layui-card-body">
-
-                            <div class="layui-carousel layadmin-carousel layadmin-backlog">
-                                <div carousel-item>
-                                    <ul class="layui-row layui-col-space10">
-                                        <li class="layui-col-xs6">
-                                            <a lay-href="app/content/comment" class="layadmin-backlog-body">
-                                                <h3>待审评论</h3>
-                                                <p><cite>66</cite></p>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs6">
-                                            <a lay-href="app/forum/list" class="layadmin-backlog-body">
-                                                <h3>待审帖子</h3>
-                                                <p><cite>12</cite></p>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs6">
-                                            <a lay-href="template/goodslist" class="layadmin-backlog-body">
-                                                <h3>待审商品</h3>
-                                                <p><cite>99</cite></p>
-                                            </a>
-                                        </li>
-                                        <li class="layui-col-xs6">
-                                            <a href="javascript:;" onclick="layer.tips('不跳转', this, {tips: 3});"
-                                               class="layadmin-backlog-body">
-                                                <h3>待发货</h3>
-                                                <p><cite>20</cite></p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                    <ul class="layui-row layui-col-space10">
-                                        <li class="layui-col-xs6">
-                                            <a href="javascript:;" class="layadmin-backlog-body">
-                                                <h3>待审友情链接</h3>
-                                                <p><cite style="color: #FF5722;">5</cite></p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="layui-col-md12">
-                    <div class="layui-card">
-                        <div class="layui-card-header">数据概览</div>
-                        <div class="layui-card-body">
-
-                            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade"
-                                 lay-filter="LAY-index-dataview">
-                                <div carousel-item id="LAY-index-dataview">
-                                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
-                                    <!--<div></div>-->
-                                    <div></div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="layui-card">
-                        <div class="layui-card-header">访客地区分布</div>
-                        <div class="layui-card-body">
-                            <div class="layui-row layui-col-space15">
-                                <div class="layui-col-sm4">
-                                    <table class="layui-table layuiadmin-page-table" lay-skin="line">
-                                        <thead>
-                                        <tr>
-                                            <th>排名</th>
-                                            <th>地区</th>
-                                            <th>人数</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>浙江</td>
-                                            <td>62310</td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>上海</td>
-                                            <td>59190</td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td>广东</td>
-                                            <td>55891</td>
-                                        </tr>
-                                        <tr>
-                                            <td>4</td>
-                                            <td>北京</td>
-                                            <td>51919</td>
-                                        </tr>
-                                        <tr>
-                                            <td>5</td>
-                                            <td>山东</td>
-                                            <td>39231</td>
-                                        </tr>
-                                        <tr>
-                                            <td>6</td>
-                                            <td>湖北</td>
-                                            <td>37109</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="layui-col-sm8">
-                                    <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade"
-                                         lay-filter="LAY-index-pagethree-home">
-                                        <div carousel-item id="LAY-index-pagethree-home">
-                                            <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="layui-card">
-                        <div class="layui-tab layui-tab-brief layadmin-latestData">
-                            <ul class="layui-tab-title">
-                                <li class="layui-this">今日热搜</li>
-                                <li>今日热帖</li>
                             </ul>
-                            <div class="layui-tab-content">
-                                <div class="layui-tab-item layui-show">
-                                    <table id="LAY-index-topSearch"></table>
-                                </div>
-                                <div class="layui-tab-item">
-                                    <table id="LAY-index-topCard"></table>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -261,137 +107,201 @@
 
         <div class="layui-col-md4">
             <div class="layui-card">
-                <div class="layui-card-header">版本信息</div>
+                <div class="layui-card-header">基本信息</div>
                 <div class="layui-card-body layui-text layadmin-version">
                     <table class="layui-table">
-                        <colgroup>
-                            <col width="100">
-                            <col>
-                        </colgroup>
                         <tbody>
                         <tr>
-                            <td>页面模式</td>
-                            <td>
-                                <script type="text/html" template>
-                                    {{ layui.admin.mode === 'spa' ? '单页面' : layui.admin.mode }}
-                                </script>
+                            <td>系统信息</td>
+                            <td id="home_os_name">
+                                获取中...
                             </td>
                         </tr>
                         <tr>
-                            <td>Version</td>
-                            <td>
-                                <script type="text/html" template>
-                                    v{{ layui.admin.v }}
-                                </script>
+                            <td>面板版本</td>
+                            <td id="home_panel_version">
+                                获取中...
                             </td>
                         </tr>
                         <tr>
-                            <td>Layui</td>
-                            <td>
-                                <script type="text/html" template>
-                                    v{{ layui.v }}
-                                </script>
+                            <td>运行时间</td>
+                            <td id="home_uptime">
+                                获取中...
                             </td>
                         </tr>
                         <tr>
-                            <td>主要特色</td>
-                            <td>单页面 / 响应式 / 清爽 / 极简</td>
+                            <td>操作</td>
+                            <td>
+                                <button id="update_panel" class="layui-btn layui-btn-xs">更新</button>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-
-            <div class="layui-card">
-                <div class="layui-card-header">效果报告</div>
-                <div class="layui-card-body layadmin-takerates">
-                    <div class="layui-progress" lay-showPercent="yes">
-                        <h3>转化率（日同比 28% <span class="layui-edge layui-edge-top" lay-tips="增长"
-                                                    lay-offset="-15"></span>）</h3>
-                        <div class="layui-progress-bar" lay-percent="65%"></div>
-                    </div>
-                    <div class="layui-progress" lay-showPercent="yes">
-                        <h3>签到率（日同比 11% <span class="layui-edge layui-edge-bottom" lay-tips="下降"
-                                                    lay-offset="-15"></span>）</h3>
-                        <div class="layui-progress-bar" lay-percent="32%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layui-card">
-                <div class="layui-card-header">进度占用</div>
-                <div class="layui-card-body layadmin-takerates">
-                    <div class="layui-progress" lay-showPercent="yes">
-                        <h3>CPU使用率</h3>
-                        <div class="layui-progress-bar" lay-percent="58%"></div>
-                    </div>
-                    <div class="layui-progress" lay-showPercent="yes">
-                        <h3>内存占用率</h3>
-                        <div class="layui-progress-bar layui-bg-red" lay-percent="90%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="layui-card">
-                <div class="layui-card-header">项目进展</div>
-                <div class="layui-card-body" style="padding: 22px 15px;">
-                    <table id="LAY-home-homepage-console"></table>
-                </div>
-            </div>
-
-            <div class="layui-card">
-                <div class="layui-card-header">产品动态</div>
-                <div class="layui-card-body">
-                    <div class="layui-carousel layadmin-carousel layadmin-news" data-autoplay="true" data-anim="fade"
-                         lay-filter="news">
-                        <div carousel-item>
-                            <div><a href="#" class="layui-bg-red">layuiAdmin 快速上手文档</a></div>
-                            <div><a href="#" class="layui-bg-green">layuiAdmin 技术问答专区</a></div>
-                            <div><a href="#" class="layui-bg-blue">layuiAdmin 模板官网</a></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        </div>
+        <div class="layui-col-md12">
             <div class="layui-card">
                 <div class="layui-card-header">
-                    模板心语
-                    <i class="layui-icon layui-icon-tips" lay-tips="要支持的噢" lay-offset="5"></i>
+                    关于面板
+                    <i class="layui-icon layui-icon-tips" lay-tips="你干嘛，哎哟！" lay-offset="5"></i>
                 </div>
                 <div class="layui-card-body layui-text layadmin-text">
                     <blockquote class="layui-elem-quote">
-                        <p>所谓“单页版”，即 SPA（单页面应用系统）开发模式，也就是所有的页面动作都是在一个宿主页面中完成，通常用于前后端分离。其中视图层全权由前端把控，数据一律走
-                            Ajax 异步请求。layuiAdmin 内部实现了一套基于 location.hash
-                            的路由和模板机制，这使得你可以很轻松地实现界面的跳转与渲染。另外注意的是，接口鉴权不再适用于传统的
-                            session 模式，一般需要采用
-                            JWT。总体来说，刚开始使用会相对有些复杂，但使用习惯后，项目会更易维护。</p>
-                        <p>子曰：君子不用防，小人防不住。</p>
-                        <p>请尊重知识产权，尊重他人劳动成果。</p>
+                        <p style="color: red;">开发组祝大家2023新年快乐！新的一年永无Bug，永不宕机！</p>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote">
+                        <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a
+                                href="https://jq.qq.com/?_wv=1027&amp;k=I1oJKSTH">Q群12370907</a> / <a
+                                target="_blank" href="https://pd.qq.com/s/fyol46wfy">QQ频道</a> 寻求帮助</p>
                     </blockquote>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
-
 <script>
-  //加载 modules 目录下的对应模块
-  /*
+  var home_timer;
+  var uptime_1 = '获取中', uptime_5 = '获取中', uptime_15 = '获取中';
 
-    小贴士：
-      这里 console 模块对应 的 console.js 并不会重复加载，
-      然而该页面的视图则是重新插入到容器，那如何保证能重新来控制视图？有两种方式：
-        1): 借助 layui.factory 方法获取 console 模块的工厂（回调函数）给 layui.use
-        2): 直接在 layui.use 方法的回调中书写业务代码，即:
-            layui.use('console', function(){
-              //同 console.js 中的 layui.define 回调中的代码
-            });
+  function refresh_home_info() {
+    layui.use(['index', 'jquery', 'admin'], function () {
+      let $ = layui.jquery
+        , admin = layui.admin
+        , element = layui.element;
 
-    这里我们采用的是方式1。其它很多视图中采用的其实都是方式2，因为更简单些，也减少了一个请求数。
+      let device = layui.device();
+      let cpu_info;
+      admin.req({
+        url: "/api/panel/info/getNowMonitor"
+        , method: 'get'
+        , success: function (result) {
+          if (result.code !== 0) {
+            console.log('耗子Linux面板：系统资源信息获取失败，接口返回' + result);
+            layer.msg('系统资源获取失败，请刷新重试！')
+            return false;
+          }
+          element.progress('home_cpu', result.data.cpu_use);
+          element.progress('home_mem', result.data.mem_use_p);
+          element.progress('uptime_1', result.data.uptime_1_p);
+          element.progress('uptime_5', result.data.uptime_5_p);
+          uptime_1 = result.data.uptime_1;
+          uptime_5 = result.data.uptime_5;
+          uptime_15 = result.data.uptime_15;
+          // 判断一下移动设备不显示CPU型号，放不下。。。
+          if (device.mobile) {
+            cpu_info = result.data.cpu_info.physical + 'CPU ' + result.data.cpu_info.cores + '核心 ' + result.data.cpu_info.siblings + '线程';
+          } else {
+            cpu_info = result.data.cpu_info.name + ' ' + result.data.cpu_info.physical + 'CPU ' + result.data.cpu_info.cores + '核心 ' + result.data.cpu_info.siblings + '线程';
+          }
+          $('#home_net_total').html(result.data.tx_total + ' / ' + result.data.rx_total);
+          $('#home_net_now').html(result.data.tx_now + '/s / ' + result.data.rx_now + '/s');
+          $('#home_cpu').text(cpu_info);
+          $('#home_mem').text('使用' + result.data.mem_use + 'MB / ' + '总计' + result.data.mem_total + 'MB');
+          element.render('progress');
+        }
+        , error: function (xhr, status, error) {
+          console.log('耗子Linux面板：ajax请求出错，错误' + error);
+        }
+      });
+    });
+  }
 
-  */
-  layui.use('console', layui.factory('console'))
+  // 先执行一次
+  refresh_home_info();
+  // 然后设置个定时器3s一次刷新
+  clearInterval(home_timer);
+  home_timer = setInterval(refresh_home_info, 3000);
+  // 获取系统信息，这部分信息无需更新。
+  layui.use(['index', 'jquery', 'admin', 'carousel'], function () {
+    let $ = layui.jquery
+      , admin = layui.admin
+      , element = layui.element
+      , carousel = layui.carousel;
+    carousel.render({
+      elem: '#home_ad'
+      , width: '100%'
+      , height: '200px'
+      , anim: 'fade'
+      , arrow: 'none'
+      , indicator: 'none'
+    });
+    admin.req({
+      url: "/api/panel/info/getSystemInfo"
+      , method: 'get'
+      , success: function (result) {
+        if (result.code !== 0) {
+          console.log('耗子Linux面板：系统信息获取失败，接口返回' + result);
+          layer.msg('系统信息获取失败，请刷新重试！')
+          return false;
+        }
+        $('#home_os_name').text(result.data.os_name);
+        $('#home_panel_version').text(result.data.panel_version);
+        $('#home_uptime').text('已不间断运行 ' + result.data.uptime + ' 天');
+      }
+      , error: function (xhr, status, error) {
+        console.log('耗子Linux面板：ajax请求出错，错误' + error);
+      }
+    });
+  });
+
+  // 监听鼠标悬停到uptime上的事件
+  // 用于显示1分钟、5分钟、15分钟的负载
+  layui.use(['jquery', 'layer'], function () {
+    let $ = layui.jquery
+      , layer = layui.layer
+      , admin = layui.admin;
+    $('#monitor2').hover(function () {
+      layer.tips('1分钟负载：' + uptime_1 + '<br>5分钟负载：' + uptime_5 + '<br>15分钟负载：' + uptime_15, '#monitor2', {
+        tips: 1,
+        time: 0
+      });
+    }, function () {
+      layer.closeAll('tips');
+    });
+    // 监听更新按钮点击事件
+    $('#update_panel').click(function () {
+      index = layer.msg('正在获取版本信息...', {
+        icon: 16
+        , time: 0
+      });
+      admin.req(
+        {
+          url: '/api/panel/info/checkUpdate'
+          , method: 'get'
+          , success: function (result) {
+            layer.close(index);
+            if (result.code !== 0) {
+              layer.msg('获取版本信息失败，请刷新重试！')
+              return false;
+            }
+            if (result.data.version) {
+              admin.popup({
+                title: '提示'
+                ,
+                shade: 0
+                ,
+                anim: -1
+                ,
+                area: ['400px', '200px']
+                ,
+                id: 'layadmin-layer-skin-update-panel'
+                ,
+                skin: 'layui-anim layui-anim-upbit'
+                ,
+                content: '最新版本：' + result.data.version + '<br><br>更新日志：' + result.data.describe + '<br><br>请在SSH执行<span class="layui-badge-rim">panel update</span>以更新面板！'
+              });
+            } else {
+              layer.msg('当前已是最新版本！')
+            }
+          }
+          , error: function (xhr, status, error) {
+            layer.close(index);
+            layer.msg('获取版本信息失败，请刷新重试！')
+          }
+        }
+      );
+    });
+  });
 </script>
-

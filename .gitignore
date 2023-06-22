@@ -1,6 +1,7 @@
 tmp
 .env
 .history
+.air.toml
 
 # Golang #
 # `go test -c` 生成的二进制文件
