@@ -72,7 +72,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("初始化成功")
-		break
 
 	case "getInfo":
 		var user models.User
@@ -114,7 +113,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
 		color.Greenln("面板端口: " + port)
-		break
 
 	case "getPort":
 		nginxConf, err := os.ReadFile("/www/server/nginx/conf/nginx.conf")
@@ -131,7 +129,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		port := match[1]
 		color.Greenln("面板端口: " + port)
-		break
 
 	case "writePlugin":
 		slug := arg1
@@ -154,7 +151,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("写入插件安装状态成功")
-		break
 
 	case "deletePlugin":
 		slug := arg1
@@ -170,7 +166,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("移除插件安装状态成功")
-		break
 
 	case "writeMysqlPassword":
 		password := arg1
@@ -192,7 +187,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("写入MySQL root密码成功")
-		break
 
 	case "cleanRunningTask":
 		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).Update("status", models.TaskStatusFailed)
@@ -202,7 +196,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("清理正在运行的任务成功")
-		break
 
 	case "backup":
 
@@ -242,7 +235,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("写入网站成功")
-		break
 
 	case "deleteSite":
 		name := arg1
@@ -258,7 +250,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("删除网站成功")
-		break
 
 	case "writeSetting":
 		key := arg1
@@ -280,7 +271,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("写入设置成功")
-		break
 
 	case "deleteSetting":
 		key := arg1
@@ -296,7 +286,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		color.Greenln("删除设置成功")
-		break
 
 	default:
 		color.Yellowln("耗子Linux面板命令行工具")
