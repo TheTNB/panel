@@ -11,5 +11,5 @@ type Website struct {
 	Path   string `gorm:"not null"`
 	Php    int    `gorm:"default:0;not null;index"`
 	Ssl    bool   `gorm:"default:false;not null;index"`
-	Remark string `gorm:"default:null"`
+	Remark string `gorm:"default:''"`
 }

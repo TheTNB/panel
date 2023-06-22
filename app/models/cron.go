@@ -10,6 +10,6 @@ type Cron struct {
 	Status bool   `gorm:"not null;default:false"`
 	Type   string `gorm:"not null"`
 	Time   string `gorm:"not null"`
-	Shell  string `gorm:"default:null"`
-	Log    string `gorm:"default:null"`
+	Shell  string `gorm:"default:''"`
+	Log    string `gorm:"default:''"`
 }

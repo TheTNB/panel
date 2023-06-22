@@ -11,6 +11,6 @@ type Database struct {
 	Host     string `gorm:"not null"`
 	Port     int    `gorm:"not null"`
 	Username string `gorm:"not null"`
-	Password string `gorm:"default:null"`
-	Remark   string `gorm:"default:null"`
+	Password string `gorm:"default:''"`
+	Remark   string `gorm:"default:''"`
 }

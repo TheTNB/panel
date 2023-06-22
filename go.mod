@@ -3,7 +3,7 @@ module panel
 go 1.18
 
 require (
-	github.com/goravel/framework v1.12.2
+	github.com/goravel/framework v1.12.3-0.20230622070736-f7260a71f319
 	google.golang.org/grpc v1.56.0
 )
 

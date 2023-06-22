@@ -87,10 +87,10 @@ func MD5(str string) string {
 
 // FormatBytes 格式化bytes
 func FormatBytes(size float64) string {
-	units := []string{"B", "KB", "MB", "GB", "TB"}
+	units := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"}
 
 	i := 0
-	for ; size >= 1024 && i < 4; i++ {
+	for ; size >= 1024 && i < len(units); i++ {
 		size /= 1024
 	}
 

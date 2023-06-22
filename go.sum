@@ -348,6 +348,8 @@ github.com/goravel/file-rotatelogs/v2 v2.4.1 h1:ogkeIFcTHSBRUBpZYiyJbpul8hkVXxHP
 github.com/goravel/file-rotatelogs/v2 v2.4.1/go.mod h1:euk9qr52WrzM8ICs1hecFcR4CZ/ZZOPdacHfvHgbOf0=
 github.com/goravel/framework v1.12.2 h1:2d+RQEVzcky6ff6LxlcPvnAj0tZPc0Y4yQAXQk88+nA=
 github.com/goravel/framework v1.12.2/go.mod h1:96GRS8270PKLfJU9zrrLE7XKlp20S2TJ9RB337jBMy4=
+github.com/goravel/framework v1.12.3-0.20230622070736-f7260a71f319 h1:xs7YlSAXdSJs0olT59PBwwj+3Rn5nTKASgNc+GUqsV8=
+github.com/goravel/framework v1.12.3-0.20230622070736-f7260a71f319/go.mod h1:96GRS8270PKLfJU9zrrLE7XKlp20S2TJ9RB337jBMy4=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
 github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDaL56wXCB/5+wF6uHfaI=

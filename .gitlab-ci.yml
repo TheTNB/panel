@@ -1,0 +1,52 @@
+image: golang:alpine
+
+# 在每个任务执行前运行
+before_script:
+  - mkdir -p .go
+  - go version
+  - go env -w GO111MODULE=on
+  - go env -w GOPROXY=https://goproxy.cn,direct
+
+.go_cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
+# 全局变量
+variables:
+  OUTPUT_NAME: "panel"
+  GO111MODULE: "on"
+  GOPROXY: "https://goproxy.cn,direct"
+
+stages:
+  - prepare
+  - build
+
+golangci_lint:
+  stage: prepare
+  image: golangci/golangci-lint:latest-alpine
+  extends: .go_cache
+  allow_failure: true
+  script:
+    - golangci-lint run --timeout 30m
+
+unit_test:
+  stage: prepare
+  extends: .go_cache
+  allow_failure: true
+  script:
+    - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
+
+build:
+  stage: build
+  extends: .go_cache
+  script:
+    - go mod download
+    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static -fpic"' -o $OUTPUT_NAME
+  artifacts:
+    name: "$OUTPUT_NAME"
+    paths:
+      - $OUTPUT_NAME
+    expire_in: 1 week
