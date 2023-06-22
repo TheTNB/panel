@@ -1,5 +1,12 @@
 # 耗子Linux面板
 
+[![Release](https://img.shields.io/github/release/HaoZi-Team/Panel.svg)](https://github.com/HaoZi-Team/Panel/releases)
+[![Test](https://github.com/HaoZi-Team/Panel/actions/workflows/test.yml/badge.svg)](https://github.com/HaoZi-Team/Panel/actions)
+[![Report Card](https://goreportcard.com/badge/github.com/HaoZi-Team/Panel)](https://goreportcard.com/report/github.com/HaoZi-Team/Panel)
+[![Codecov](https://codecov.io/gh/HaoZi-Team/Panel/branch/main/graph/badge.svg?token=XFT5NGNSRG)](https://codecov.io/gh/HaoZi-Team/Panel)
+[![Doc](https://img.shields.io/badge/go.dev-reference-brightgreen?logo=go&logoColor=white&style=flat)](https://pkg.go.dev/github.com/HaoZi-Team/Panel)
+![License](https://img.shields.io/github/license/HaoZi-Team/Panel)
+
 这是耗子Linux面板的开源仓库，基于Apache License 2.0协议进行开源，目前处于积极开发状态。
 
 #### 我们正在进行基于 Golang 的 V2 版本的开发，加入我们的 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[耗子](https://pd.qq.com/s/fyol46wfy) 获取最新动态。
@@ -23,6 +30,7 @@
 | Debian     | 12 |
 
 ## 安装面板
+
 
 ```shell
 TODO
