@@ -108,15 +108,17 @@ func Cut(begin, end, str string) string {
 
 // MonitoringInfo 监控信息
 type MonitoringInfo struct {
-	Cpus    []cpu.InfoStat                 `json:"cpus"`
-	Percent []float64                      `json:"percent"`
-	Load    *load.AvgStat                  `json:"load"`
-	Host    *host.InfoStat                 `json:"host"`
-	Mem     *mem.VirtualMemoryStat         `json:"mem"`
-	Swap    *mem.SwapMemoryStat            `json:"swap"`
-	Net     []net.IOCountersStat           `json:"net"`
-	Disk    map[string]disk.IOCountersStat `json:"disk"`
-	Process []*process.Process             `json:"process"`
+	Cpus      []cpu.InfoStat                 `json:"cpus"`
+	Percent   []float64                      `json:"percent"`
+	Load      *load.AvgStat                  `json:"load"`
+	Host      *host.InfoStat                 `json:"host"`
+	Mem       *mem.VirtualMemoryStat         `json:"mem"`
+	Swap      *mem.SwapMemoryStat            `json:"swap"`
+	Net       []net.IOCountersStat           `json:"net"`
+	DiskIO    map[string]disk.IOCountersStat `json:"disk_io"`
+	Disk      []disk.PartitionStat           `json:"disk"`
+	DiskUsage map[string]*disk.UsageStat     `json:"disk_usage"`
+	Process   []*process.Process             `json:"process"`
 }
 
 // GetMonitoringInfo 获取监控数据
@@ -129,8 +131,18 @@ func GetMonitoringInfo() MonitoringInfo {
 	res.Mem, _ = mem.VirtualMemory()
 	res.Swap, _ = mem.SwapMemory()
 	res.Net, _ = net.IOCounters(true)
-	res.Disk, _ = disk.IOCounters()
+	res.DiskIO, _ = disk.IOCounters()
+	res.Disk, _ = disk.Partitions(true)
 	res.Process, _ = process.Processes()
+
+	res.DiskUsage = make(map[string]*disk.UsageStat)
+	for _, partition := range res.Disk {
+		if strings.HasPrefix(partition.Mountpoint, "/dev") || strings.HasPrefix(partition.Mountpoint, "/sys") || strings.HasPrefix(partition.Mountpoint, "/proc") || strings.HasPrefix(partition.Mountpoint, "/run") || strings.HasPrefix(partition.Mountpoint, "/boot") || strings.HasPrefix(partition.Mountpoint, "/usr") {
+			continue
+		}
+		usage, _ := disk.Usage(partition.Mountpoint)
+		res.DiskUsage[partition.Mountpoint] = usage
+	}
 
 	return res
 }

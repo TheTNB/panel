@@ -1,7 +1,7 @@
 <!--
 Name: 主页模板
 Author: 耗子
-Date: 2022-11-30
+Date: 2023-06-22
 -->
 <div class="layui-fluid">
     <div class="layui-row layui-col-space15">
@@ -17,7 +17,7 @@ Date: 2022-11-30
                             WeAvatar - 互联网公共头像服务</a>
                         <a style="background: #fff;" href="https://wepublish.cn"
                            title="WePublish" target="_blank"><i class="layui-icon layui-icon-release"></i>
-                            WePublish - WordPress的本土化版本</a>
+                            WePublish - WordPress 本土化平台</a>
                     </div>
                 </div>
 
@@ -98,7 +98,6 @@ Date: 2022-11-30
                 </div>
             </div>
         </div>
-
         <div class="layui-col-md4">
             <div class="layui-card">
                 <div class="layui-card-header">基本信息</div>
@@ -134,7 +133,30 @@ Date: 2022-11-30
                 </div>
             </div>
         </div>
-        <div class="layui-col-md12">
+        <div class="layui-col-md8">
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    磁盘信息
+                    <i class="layui-icon layui-icon-tips" lay-tips="磁盘信息显示" lay-offset="5"></i>
+                </div>
+                <div class="layui-card-body layadmin-takerates">
+                    <script type="text/html" template lay-url="/api/panel/info/nowMonitor">
+                        {{#  layui.each(d.data.disk_usage, function(index, item){ }}
+                        {{#  item.usedPercent = Number(item.usedPercent).toFixed(2) }}
+                        <div class="layui-progress" lay-showPercent="yes">
+                            <h3>{{index}}</h3>
+                            <div class="layui-progress-bar" lay-percent="{{item.usedPercent}}%"></div>
+                        </div>
+                        {{#  }); }}
+                        {{#  if(d.data.length === 0){ }}
+                        这里好像啥也没有...
+                        {{#  } }}
+                        {{# layui.element.render('collapse') }}
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md4">
             <div class="layui-card">
                 <div class="layui-card-header">
                     关于面板
@@ -142,7 +164,7 @@ Date: 2022-11-30
                 </div>
                 <div class="layui-card-body layui-text layadmin-text">
                     <blockquote class="layui-elem-quote">
-                        <p style="color: red;">开发组祝大家2023新年快乐！新的一年永无Bug，永不宕机！</p>
+                        <p style="color: red;">开发组祝大家2023端午快乐！永无Bug，永不宕机！</p>
                     </blockquote>
                     <blockquote class="layui-elem-quote">
                         <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a
@@ -158,6 +180,7 @@ Date: 2022-11-30
 <script>
   var home_timer
   var uptime_1 = '获取中', uptime_5 = '获取中', uptime_15 = '获取中'
+  var net_send = 0, net_recv = 0, net_send_last = 0, net_recv_last = 0
 
   function formatBytes (size) {
     size = Number(size)
@@ -177,7 +200,7 @@ Date: 2022-11-30
     return num.toFixed(2) + '%'
   }
 
-  function refresh_home_info () {
+  function refresh_home_info (first = false) {
     layui.use(['index', 'jquery', 'admin'], function () {
       let $ = layui.jquery
         , admin = layui.admin
@@ -209,9 +232,26 @@ Date: 2022-11-30
           element.progress('uptime_1', uptime_1)
           element.progress('uptime_5', uptime_5)
 
+          // 计算网卡流量
+          for (let i = 0; i < result.data.net.length; i++) {
+            if (result.data.net[i].name === 'lo') {
+              continue
+            }
+            net_send += result.data.net[i].bytesSent
+            net_recv += result.data.net[i].bytesRecv
+          }
+          if (first) {
+            net_send_last = net_send
+            net_recv_last = net_recv
+          }
+          $('#home_net_now').html(formatBytes((net_send - net_send_last) / 3) + '/s / ' + formatBytes((net_recv - net_recv_last) / 3) + '/s')
+          $('#home_net_total').html(formatBytes(net_send) + ' / ' + formatBytes(net_recv))
+          net_send_last = net_send
+          net_recv_last = net_recv
+          net_send = 0
+          net_recv = 0
+
           cpu_info = result.data.cpus[0].modelName + ' ' + cores + '线程'
-          //$('#home_net_total').html(result.data.tx_total + ' / ' + result.data.rx_total)
-          //$('#home_net_now').html(result.data.tx_now + '/s / ' + result.data.rx_now + '/s')
           $('#home_cpu').text(cpu_info)
           $('#home_mem').text('使用 ' + formatBytes(result.data.mem.used) + ' / ' + '总计 ' + formatBytes(result.data.mem.total))
           element.render('progress')
@@ -221,7 +261,7 @@ Date: 2022-11-30
   }
 
   // 先执行一次
-  refresh_home_info()
+  refresh_home_info(true)
   // 然后设置个定时器3s一次刷新
   clearInterval(home_timer)
   home_timer = setInterval(refresh_home_info, 3000)
@@ -229,7 +269,6 @@ Date: 2022-11-30
   layui.use(['index', 'jquery', 'admin', 'carousel'], function () {
     let $ = layui.jquery
       , admin = layui.admin
-      , element = layui.element
       , carousel = layui.carousel
     carousel.render({
       elem: '#ad1-carousel'
