@@ -4,7 +4,7 @@
         <ul class="layui-nav layui-layout-left">
             <li class="layui-nav-item layadmin-flexible" lay-unselect>
                 <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
-                    <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+                    <i class="layui-icon layui-icon-shrink-right" id="Panel_app_flexible"></i>
                 </a>
             </li>
             <li class="layui-nav-item" lay-unselect>
@@ -17,8 +17,8 @@
 
             <li class="layui-nav-item" lay-unselect>
                 <a lay-href="task" layadmin-event="message">
-                    <script type="text/html" template lay-url="/api/panel/task/getStatus">
-                        {{# if(d.data){ }}
+                    <script type="text/html" template lay-url="/api/panel/task/status">
+                        {{# if(d.data.task){ }}
                         <i class="layui-icon layui-icon-loading-1 layui-anim layui-anim-rotate layui-anim-loop"></i>
                         {{# } else { }}
                         <i class="layui-icon layui-icon-component"></i>
@@ -43,7 +43,7 @@
                 </a>
             </li>
             <li style="margin-right: 15px;" class="layui-nav-item" lay-unselect>
-                <script type="text/html" template lay-url="/api/panel/user/getInfo"
+                <script type="text/html" template lay-url="/api/panel/user/info"
                         lay-done="layui.element.render('nav', 'layadmin-layout-right');">
                     <a href="javascript:;">
                         <cite>{{= d.data.username }}</cite>
@@ -61,11 +61,11 @@
     <!-- 侧边菜单 -->
     <div class="layui-side layui-side-menu">
         <div class="layui-side-scroll">
-            <script type="text/html" template lay-url="/api/panel/info/getMenu?v={{ layui.cache.version }}"
+            <script type="text/html" template lay-url="/api/panel/info/menu?v={{ layui.cache.version }}"
                     lay-done="layui.element.render('nav', 'layadmin-system-side-menu');" id="TPL_layout">
 
                 <div class="layui-logo" lay-href="">
-                    {{ config('panel.name') }}
+                    <span>{{ layui.setter.name }}</span>
                 </div>
 
                 <ul class="layui-nav layui-nav-tree" lay-shrink="all" id="LAY-system-side-menu" lay-filter="layadmin-system-side-menu">
@@ -141,7 +141,7 @@
     <!-- 页面标签 -->
     <script type="text/html" template lay-done="layui.element.render('nav', 'layadmin-pagetabs-nav')">
         {{# if(layui.setter.pageTabs){ }}
-        <div class="layadmin-pagetabs" id="LAY_app_tabs">
+        <div class="layadmin-pagetabs" id="Panel_app_tabs">
             <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
             <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
             <div class="layui-icon layadmin-tabs-control layui-icon-down">
@@ -157,7 +157,7 @@
                 </ul>
             </div>
             <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
-                <ul class="layui-tab-title" id="LAY_app_tabsheader">
+                <ul class="layui-tab-title" id="Panel_app_tabsheader">
                     <li lay-id="/"><i class="layui-icon layui-icon-home"></i></li>
                 </ul>
             </div>
@@ -167,7 +167,7 @@
 
 
     <!-- 主体内容 -->
-    <div class="layui-body" id="LAY_app_body">
+    <div class="layui-body" id="Panel_app_body">
         <div class="layadmin-tabsbody-item layui-show"></div>
     </div>
 

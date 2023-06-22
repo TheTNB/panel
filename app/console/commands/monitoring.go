@@ -44,14 +44,9 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		return nil
 	}
 
-	info, err := helpers.GetMonitoringInfo()
-	if err != nil {
-		facades.Log().Errorf("[面板] 系统监控失败: %s", err.Error())
-		color.Redf("[面板] 系统监控失败: %s", err.Error())
-		return nil
-	}
+	info := helpers.GetMonitoringInfo()
 
-	err = facades.Orm().Query().Create(&models.Monitor{
+	err := facades.Orm().Query().Create(&models.Monitor{
 		Info: info,
 	})
 	if err != nil {

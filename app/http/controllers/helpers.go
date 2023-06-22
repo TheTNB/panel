@@ -2,7 +2,7 @@ package controllers
 
 import "github.com/goravel/framework/contracts/http"
 
-func Success(ctx http.Context, data http.Json) {
+func Success(ctx http.Context, data any) {
 	ctx.Response().Success().Json(http.Json{
 		"code":    0,
 		"message": "success",

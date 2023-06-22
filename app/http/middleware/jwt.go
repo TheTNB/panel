@@ -13,7 +13,7 @@ import (
 // Jwt 确保通过 JWT 鉴权
 func Jwt() http.Middleware {
 	return func(ctx http.Context) {
-		token := ctx.Request().Header("Authorization", "")
+		token := ctx.Request().Input("access_token", "")
 		if len(token) == 0 {
 			ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
 				"code":    401,

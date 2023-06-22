@@ -40,19 +40,19 @@
 <script src="https://cdnjs.cdn.haozi.net/ace/1.6.1/ace.js"></script>
 <script src="https://cdnjs.cdn.haozi.net/echarts/5.4.2/echarts.min.js"></script>
 <script>
-  var panel_name = '耗子Linux面板'
   layui.config({
     base: 'res/', // 静态资源所在路径
     version: new Date().getTime()
-  }).use('index', function () {
+  }).use(['index', 'setter'], function () {
     var admin = layui.admin
+    var setter = layui.setter
     admin.req({
       url: '/api/panel/info/name',
       type: 'get',
       success: function (res) {
         if (res.code === 0) {
-          panel_name = res.data.name
-          document.title = panel_name
+          setter.name = res.data.name
+          document.title = setter.name
         }
       }
     })

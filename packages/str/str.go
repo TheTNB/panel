@@ -30,3 +30,12 @@ func Camel(s string) string {
 func LowerCamel(s string) string {
 	return strcase.ToLowerCamel(s)
 }
+
+func ContainsString(arr []string, str string) bool {
+	for _, s := range arr {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}
