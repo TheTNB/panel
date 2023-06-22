@@ -18,8 +18,7 @@ layui.define(['all'], function (exports) {
     pageTabs: true, // 是否开启页面选项卡功能。单页版不推荐开启
     refreshCurrPage: true, // 当跳转页面 url 与当前页 url 相同时，是否自动执行刷新
 
-    name: '耗子Linux面板',
-    tableName: 'HaoZiPanel', // 本地存储表名
+    name: '耗子Linux面板', tableName: 'HaoZiPanel', // 本地存储表名
     MOD_NAME: 'admin', // 模块事件名
 
     debug: true, // 是否开启调试模式。如开启，接口异常时会抛出异常 URL 等信息
@@ -36,20 +35,16 @@ layui.define(['all'], function (exports) {
       statusCode: {
         ok: 0, // 数据状态一切正常的状态码
         logout: 1001 // 登录状态失效的状态码
-      },
-      msgName: 'message', // 状态信息的字段名称
+      }, msgName: 'message', // 状态信息的字段名称
       dataName: 'data' // 数据详情的字段名称
     },
 
     // 独立页面路由，可随意添加（无需写参数）
-    indPage: [
-      '/user/login', // 登入页
+    indPage: ['/user/login', // 登入页
     ],
 
     // 配置业务模块目录中的特殊模块
-    extend: {
-      layim: 'layim/layim' // layim
-    },
+    extend: {},
 
     // 主题配置
     theme: {
@@ -59,91 +54,39 @@ layui.define(['all'], function (exports) {
         selected: '#16baaa', // 选中色
         alias: 'default' // 默认别名
       }, {
-        main: '#03152A',
-        selected: '#3B91FF',
-        alias: 'dark-blue' // 藏蓝
+        main: '#03152A', selected: '#3B91FF', alias: 'dark-blue' // 藏蓝
       }, {
-        main: '#2E241B',
-        selected: '#A48566',
-        alias: 'coffee' // 咖啡
+        main: '#2E241B', selected: '#A48566', alias: 'coffee' // 咖啡
       }, {
-        main: '#50314F',
-        selected: '#7A4D7B',
-        alias: 'purple-red' // 紫红
+        main: '#50314F', selected: '#7A4D7B', alias: 'purple-red' // 紫红
       }, {
-        main: '#344058',
-        logo: '#1E9FFF',
-        selected: '#1E9FFF',
-        alias: 'ocean' // 海洋
+        main: '#344058', logo: '#1E9FFF', selected: '#1E9FFF', alias: 'ocean' // 海洋
       }, {
-        main: '#3A3D49',
-        logo: '#2F9688',
-        selected: '#16b777',
-        alias: 'green' // 墨绿
+        main: '#3A3D49', logo: '#2F9688', selected: '#16b777', alias: 'green' // 墨绿
       }, {
-        main: '#20222A',
-        logo: '#F78400',
-        selected: '#F78400',
-        alias: 'red' // 橙色
+        main: '#20222A', logo: '#F78400', selected: '#F78400', alias: 'red' // 橙色
       }, {
-        main: '#28333E',
-        logo: '#AA3130',
-        selected: '#AA3130',
-        alias: 'fashion-red' // 时尚红
+        main: '#28333E', logo: '#AA3130', selected: '#AA3130', alias: 'fashion-red' // 时尚红
       }, {
-        main: '#24262F',
-        logo: '#3A3D49',
-        selected: '#16baaa',
-        alias: 'classic-black' // 经典黑
+        main: '#24262F', logo: '#3A3D49', selected: '#16baaa', alias: 'classic-black' // 经典黑
       }, {
-        logo: '#226A62',
-        header: '#2F9688',
-        alias: 'green-header' // 墨绿头
+        logo: '#226A62', header: '#2F9688', alias: 'green-header' // 墨绿头
       }, {
-        main: '#344058',
-        logo: '#0085E8',
-        selected: '#1E9FFF',
-        header: '#1E9FFF',
-        alias: 'ocean-header' // 海洋头
+        main: '#344058', logo: '#0085E8', selected: '#1E9FFF', header: '#1E9FFF', alias: 'ocean-header' // 海洋头
       }, {
-        header: '#393D49',
-        alias: 'classic-black-header' // 经典黑
+        header: '#393D49', alias: 'classic-black-header' // 经典黑
       }, {
-        main: '#50314F',
-        logo: '#50314F',
-        selected: '#7A4D7B',
-        header: '#50314F',
-        alias: 'purple-red-header' // 紫红头
+        main: '#50314F', logo: '#50314F', selected: '#7A4D7B', header: '#50314F', alias: 'purple-red-header' // 紫红头
       }, {
-        main: '#28333E',
-        logo: '#28333E',
-        selected: '#AA3130',
-        header: '#AA3130',
-        alias: 'fashion-red-header' // 时尚红头
+        main: '#28333E', logo: '#28333E', selected: '#AA3130', header: '#AA3130', alias: 'fashion-red-header' // 时尚红头
       }, {
-        main: '#28333E',
-        logo: '#16baaa',
-        selected: '#16baaa',
-        header: '#16baaa',
-        alias: 'green-header' // 墨绿头
+        main: '#28333E', logo: '#16baaa', selected: '#16baaa', header: '#16baaa', alias: 'green-header' // 墨绿头
       }, {
-        main: '#393D49',
-        logo: '#393D49',
-        selected: '#16baaa',
-        header: '#23262E',
-        alias: 'Classic-style1' // 经典风格1
+        main: '#393D49', logo: '#393D49', selected: '#16baaa', header: '#23262E', alias: 'Classic-style1' // 经典风格1
       }, {
-        main: '#001529',
-        logo: '#001529',
-        selected: '#1890FF',
-        header: '#1890FF',
-        alias: 'Classic-style2' // 经典风格2
+        main: '#001529', logo: '#001529', selected: '#1890FF', header: '#1890FF', alias: 'Classic-style2' // 经典风格2
       }, {
-        main: '#25282A',
-        logo: '#25282A',
-        selected: '#35BDB2',
-        header: '#35BDB2',
-        alias: 'Classic-style3' // 经典风格3
+        main: '#25282A', logo: '#25282A', selected: '#35BDB2', header: '#35BDB2', alias: 'Classic-style3' // 经典风格3
       }],
 
       // 初始的颜色索引，对应上面的配色方案数组索引
