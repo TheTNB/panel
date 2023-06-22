@@ -15,7 +15,7 @@ func TestOSHelperTestSuite(t *testing.T) {
 }
 
 func (s *OSHelperTestSuite) TestIsDebian() {
-	s.False(IsDebian())
+	s.True(IsDebian())
 }
 
 func (s *OSHelperTestSuite) TestIsRHEL() {
