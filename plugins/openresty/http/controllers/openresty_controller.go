@@ -145,7 +145,7 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 // Restart 重启OpenResty
 func (r *OpenRestyController) Restart(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl restart openresty")
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
 		facades.Log().Error("[OpenResty] 重启OpenResty失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "重启OpenResty失败")
@@ -153,7 +153,7 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 	}
 
 	cmd = exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	out, err = cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
