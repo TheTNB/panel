@@ -23,13 +23,6 @@ archives:
     builds:
       - panel
     format: zip
-    meta: true
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
-    builds_info:
-      group: root
-      owner: root
-      mode: 0644
-      mtime: 2008-01-02T15:04:05Z
     wrap_in_directory: false
     strip_parent_binary_folder: true
     rlcp: true

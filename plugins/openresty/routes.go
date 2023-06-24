@@ -22,6 +22,4 @@ func Route() {
 		route.Get("errorLog", openRestyController.ErrorLog)
 		route.Get("cleanErrorLog", openRestyController.ClearErrorLog)
 	})
-
-	facades.Route().StaticFile("panel/views/plugins/openresty.html", "plugins/openresty/public/views/openresty.html")
 }
