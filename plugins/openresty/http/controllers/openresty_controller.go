@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 
 	"panel/app/http/controllers"
 	"panel/packages/helpers"
@@ -31,6 +32,7 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
+		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -50,16 +52,18 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl reload openresty")
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 重载OpenResty失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
 		return
 	}
 
 	cmd = exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	out, err = cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
 	}
 
@@ -70,7 +74,7 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		controllers.Success(ctx, "重载OpenResty成功")
 	} else {
 		controllers.Error(ctx, 1, "重载OpenResty失败: "+string(out))
 	}
@@ -79,16 +83,18 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl start openresty")
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 启动OpenResty失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "启动OpenResty失败")
 		return
 	}
 
 	cmd = exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	out, err = cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
 	}
 
@@ -99,7 +105,7 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		controllers.Success(ctx, "启动OpenResty成功")
 	} else {
 		controllers.Error(ctx, 1, "启动OpenResty失败: "+string(out))
 	}
@@ -108,16 +114,18 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl stop openresty")
-	out, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 停止OpenResty失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "停止OpenResty失败")
 		return
 	}
 
 	cmd = exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	out, err = cmd.CombinedOutput()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
 	}
 
@@ -128,7 +136,7 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		controllers.Success(ctx, "停止OpenResty成功")
 	} else {
 		controllers.Error(ctx, 1, "停止OpenResty失败: "+string(out))
 	}
@@ -139,14 +147,16 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "systemctl restart openresty")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 重启OpenResty失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "重启OpenResty失败")
 		return
 	}
 
 	cmd = exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	out, err = cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		facades.Log().Error("[OpenResty] 获取OpenResty状态失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
 	}
 
@@ -157,7 +167,7 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		controllers.Success(ctx, "重启OpenResty成功")
 	} else {
 		controllers.Error(ctx, 1, "重启OpenResty失败: "+string(out))
 	}
@@ -190,6 +200,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 
 	err = os.WriteFile("/www/server/openresty/conf/nginx.conf", []byte(config), 0644)
 	if err != nil {
+		facades.Log().Error("[OpenResty] 保存OpenResty配置失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "保存OpenResty配置失败")
 		return
 	}
@@ -197,6 +208,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "openresty -t 2>&1")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
+		facades.Log().Error("[OpenResty] 检查OpenResty配置失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "检查OpenResty配置失败")
 		return
 	}
@@ -204,6 +216,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 	if !strings.Contains(string(out), "test is successful") {
 		err = os.WriteFile("/www/server/openresty/conf/nginx.conf", oldConfig, 0644)
 		if err != nil {
+			facades.Log().Error("[OpenResty] 保存OpenResty配置失败: " + err.Error())
 			controllers.Error(ctx, http.StatusInternalServerError, "保存OpenResty配置失败")
 			return
 		}
@@ -214,11 +227,12 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 	cmd = exec.Command("bash", "-c", "systemctl reload openresty")
 	_, err = cmd.CombinedOutput()
 	if err != nil {
+		facades.Log().Error("[OpenResty] 重载OpenResty配置失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty配置失败")
 		return
 	}
 
-	controllers.Success(ctx, true)
+	controllers.Success(ctx, "保存OpenResty配置成功")
 }
 
 // ErrorLog 获取错误日志
@@ -226,6 +240,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "tail -n 100 /www/wwwlogs/nginx_error.log")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
+		facades.Log().Error("[OpenResty] 获取OpenResty错误日志失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty错误日志失败")
 		return
 	}
@@ -238,11 +253,12 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "echo '' > /www/wwwlogs/nginx_error.log")
 	_, err := cmd.CombinedOutput()
 	if err != nil {
+		facades.Log().Error("[OpenResty] 清空OpenResty错误日志失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "清空OpenResty错误日志失败")
 		return
 	}
 
-	controllers.Success(ctx, true)
+	controllers.Success(ctx, "清空OpenResty错误日志成功")
 }
 
 // Load 获取负载
@@ -250,6 +266,7 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccessState() {
+		facades.Log().Error("[OpenResty] 获取OpenResty负载失败: " + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
 		return
 	}
@@ -260,7 +277,8 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	cmd := exec.Command("bash", "-c", "ps aux | grep nginx | grep 'worker process' | wc -l")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
+		facades.Log().Error("[OpenResty] 获取OpenResty工作进程失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty工作进程失败")
 		return
 	}
 	workers := strings.TrimSpace(string(out))
@@ -270,7 +288,8 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	cmd = exec.Command("bash", "-c", "ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	out, err = cmd.CombinedOutput()
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
+		facades.Log().Error("[OpenResty] 获取OpenResty内存占用失败: " + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty内存占用失败")
 		return
 	}
 	mem := helpers.FormatBytes(cast.ToFloat64(strings.TrimSpace(string(out))))
