@@ -4,7 +4,6 @@
 [![Test](https://github.com/HaoZi-Team/Panel/actions/workflows/test.yml/badge.svg)](https://github.com/HaoZi-Team/Panel/actions)
 [![Report Card](https://goreportcard.com/badge/github.com/HaoZi-Team/Panel)](https://goreportcard.com/report/github.com/HaoZi-Team/Panel)
 [![Codecov](https://codecov.io/gh/HaoZi-Team/Panel/branch/main/graph/badge.svg?token=XFT5NGNSRG)](https://codecov.io/gh/HaoZi-Team/Panel)
-[![Doc](https://img.shields.io/badge/go.dev-reference-brightgreen?logo=go&logoColor=white&style=flat)](https://pkg.go.dev/github.com/HaoZi-Team/Panel)
 ![License](https://img.shields.io/github/license/HaoZi-Team/Panel)
 
 这是耗子Linux面板的开源仓库，基于Apache License 2.0协议进行开源，目前处于积极开发状态。
@@ -21,7 +20,7 @@
 
 低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `RockyLinux` | `AlmaLinux`，维护周期更长。
 
-不在下表中的其他 `RHEL` 系统，可自行尝试安装，但不保证能够正常运行，且不提供技术支持。
+不在下表中的其他同版本的 `RHEL` 系统（OpenCloudOS、Anolis、CentOS Stream等），可自行尝试安装，但不保证能够正常运行，且不提供技术支持。
 
 | 系统         | 版本 |
 |------------|----|

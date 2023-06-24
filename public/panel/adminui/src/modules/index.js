@@ -154,7 +154,7 @@ layui.define('admin', function (exports) {
       if (admin.pageType === 'console') { //后台主体页
         renderPage()
       } else { //初始控制台结构
-        container.render('layout').done(function () {
+        container.render('ui/layout').done(function () {
           renderPage()
           layui.element.render()
 

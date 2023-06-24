@@ -79,3 +79,32 @@ func (r *InfoController) SystemInfo(ctx http.Context) {
 		"panel_version": facades.Config().GetString("panel.version"),
 	})
 }
+
+func (r *InfoController) InstalledDbAndPhp(ctx http.Context) {
+	var php []models.Plugin
+	err := facades.Orm().Query().Where("slug like ?", "php%").Find(&php)
+	if err != nil {
+		Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return
+	}
+
+	var mysql models.Plugin
+	mysqlInstalled := true
+	err = facades.Orm().Query().Where("slug like ?", "mysql%").FirstOrFail(&mysql)
+	if err != nil {
+		mysqlInstalled = false
+	}
+
+	var postgresql models.Plugin
+	postgresqlInstalled := true
+	err = facades.Orm().Query().Where("slug like ?", "postgresql%").FirstOrFail(&postgresql)
+	if err != nil {
+		postgresqlInstalled = false
+	}
+
+	Success(ctx, http.Json{
+		"php":        php,
+		"mysql":      mysqlInstalled,
+		"postgresql": postgresqlInstalled,
+	})
+}

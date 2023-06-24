@@ -11,7 +11,7 @@ func Success(ctx http.Context, data any) {
 }
 
 func Error(ctx http.Context, code int, message any) {
-	ctx.Response().Json(code, http.Json{
+	ctx.Response().Json(http.StatusOK, http.Json{
 		"code":    code,
 		"message": message,
 	})

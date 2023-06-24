@@ -3,8 +3,9 @@ package services
 import (
 	"testing"
 
-	"github.com/goravel/framework/testing/mock"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/goravel/framework/testing/mock"
 
 	"panel/app/models"
 )

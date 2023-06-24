@@ -201,9 +201,9 @@ layui.define(['laytpl', 'layer'], function (exports) {
         }
 
         if (e.status === 404) {
-          that.render('template/tips/404')
+          that.render('ui/404')
         } else {
-          that.render('template/tips/error')
+          that.render('ui/error')
         }
 
         that.render.isError = true

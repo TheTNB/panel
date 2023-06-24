@@ -18,6 +18,7 @@ func Web() {
 			r.Middleware(middleware.Jwt()).Get("homePlugins", infoController.HomePlugins)
 			r.Middleware(middleware.Jwt()).Get("nowMonitor", infoController.NowMonitor)
 			r.Middleware(middleware.Jwt()).Get("systemInfo", infoController.SystemInfo)
+			r.Middleware(middleware.Jwt()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
 		})
 		r.Prefix("user").Group(func(r route.Route) {
 			userController := controllers.NewUserController()
@@ -27,6 +28,10 @@ func Web() {
 		r.Prefix("task").Middleware(middleware.Jwt()).Group(func(r route.Route) {
 			taskController := controllers.NewTaskController()
 			r.Get("status", taskController.Status)
+		})
+		r.Prefix("website").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+			websiteController := controllers.NewWebsiteController()
+			r.Get("list", websiteController.List)
 		})
 	})
 
