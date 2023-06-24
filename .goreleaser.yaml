@@ -16,7 +16,6 @@ builds:
       - v3
     ldflags:
       - -s -w --extldflags "-static -fpic"
-
 archives:
   -
     id: panel-archive
@@ -30,5 +29,5 @@ archives:
       - LICENSE
       - public/*
       - storage/*
+      - database/*
       - .env.example
-    allow_different_binary_count: true
