@@ -1,4 +1,4 @@
-name: release
+name: Release
 on:
   push:
     tags:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 'latest'
+          go-version: 'stable'
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v4
         with:
