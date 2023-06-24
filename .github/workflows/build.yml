@@ -1,0 +1,71 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags '-s -w --extldflags "-static -fpic"' -o panel-amd64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: panel-amd64
+          path: panel-amd64
+  build-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags '-s -w --extldflags "-static -fpic"' -o panel-arm64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: panel-arm64
+          path: panel-arm64
+  build-s390x:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=s390x go build -ldflags '-s -w --extldflags "-static -fpic"' -o panel-s390x
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: panel-s390x
+          path: panel-s390x
+  build-loong64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v4
+        with:
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Build
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=loong64 go build -ldflags '-s -w --extldflags "-static -fpic"' -o panel-loong64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: panel-loong64
+          path: panel-loong64
