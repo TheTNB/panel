@@ -1,0 +1,41 @@
+project_name: panel
+builds:
+  -
+    id: panel
+    binary: panel
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - s390x
+    goamd64:
+      - v2
+      - v3
+    ldflags:
+      - -s -w --extldflags "-static -fpic"
+
+archives:
+  -
+    id: panel-archive
+    builds:
+      - panel
+    format: zip
+    meta: true
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    builds_info:
+      group: root
+      owner: root
+      mode: 0644
+      mtime: 2008-01-02T15:04:05Z
+    wrap_in_directory: false
+    strip_parent_binary_folder: true
+    rlcp: true
+    files:
+      - LICENSE
+      - public/*
+      - storage/*
+      - .env.example
+    allow_different_binary_count: true
