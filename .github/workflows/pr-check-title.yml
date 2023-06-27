@@ -1,0 +1,11 @@
+name: PR Check Title
+on:
+  pull_request:
+jobs:
+  pr-check-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Slashgear/action-check-pr-title@v4.3.0
+        with:
+          regexp: "^(.+)(?:(([^)s]+)))?: .{1,50}|Merge .{1,50})"
+          helpMessage: "Your PR title is invalid. Please follow the Conventional Commits specification: https://www.conventionalcommits.org/zh-hans/v1.0.0/"
