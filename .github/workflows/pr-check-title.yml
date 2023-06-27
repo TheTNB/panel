@@ -7,5 +7,5 @@ jobs:
     steps:
       - uses: Slashgear/action-check-pr-title@v4.3.0
         with:
-          regexp: "^(feat|fix|docs|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release|revert)\(\w+\)?!?:\s.+$|^Merge\s.+$"
+          regexp: "^(feat|fix|docs|style|refactor|perf|test|workflow|build|ci|chore|types|wip|release|revert)\\(.+\\)?!?:\\s.+$|^Merge\\s.+$"
           helpMessage: "Your PR title is invalid. Please follow the Conventional Commits specification: https://www.conventionalcommits.org/zh-hans/v1.0.0/"
