@@ -6,7 +6,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.3
-	github.com/goravel/framework v1.12.3
+	github.com/goravel/framework v1.12.4
 	github.com/iancoleman/strcase v0.2.0
 	github.com/imroc/req/v3 v3.37.1
 	github.com/mojocn/base64Captcha v1.3.5
@@ -145,7 +145,7 @@ require (
 	github.com/tklauser/numcpus v0.6.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/urfave/cli/v2 v2.25.6 // indirect
+	github.com/urfave/cli/v2 v2.25.7 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect

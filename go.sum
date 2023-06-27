@@ -356,8 +356,8 @@ github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c h1:obhFK91
 github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c/go.mod h1:YSWsLXlG16u5CWFaXNZHhEQD10+NwF3xfgDV816OwLE=
 github.com/goravel/file-rotatelogs/v2 v2.4.1 h1:ogkeIFcTHSBRUBpZYiyJbpul8hkVXxHPuDbOaP78O1M=
 github.com/goravel/file-rotatelogs/v2 v2.4.1/go.mod h1:euk9qr52WrzM8ICs1hecFcR4CZ/ZZOPdacHfvHgbOf0=
-github.com/goravel/framework v1.12.3 h1:gGP+7fV7qAoBVh6zz8C4caQX9Vs8XTmqSJdMa/S9BsI=
-github.com/goravel/framework v1.12.3/go.mod h1:96GRS8270PKLfJU9zrrLE7XKlp20S2TJ9RB337jBMy4=
+github.com/goravel/framework v1.12.4 h1:Pl03M+dpThPXOQ9JtTh9EYA5+iYwNt/Uouapu/X+T8k=
+github.com/goravel/framework v1.12.4/go.mod h1:1QnYFRvvIWV9FOsHxmLzCdpBXJ+K19gfSJ1iuPfhLD4=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
 github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDaL56wXCB/5+wF6uHfaI=
@@ -610,8 +610,8 @@ github.com/ugorji/go/codec v1.2.11/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZ
 github.com/unrolled/secure v1.13.0 h1:sdr3Phw2+f8Px8HE5sd1EHdj1aV3yUwed/uZXChLFsk=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/urfave/cli v1.22.5/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
-github.com/urfave/cli/v2 v2.25.6 h1:yuSkgDSZfH3L1CjF2/5fNNg2KbM47pY2EvjBq4ESQnU=
-github.com/urfave/cli/v2 v2.25.6/go.mod h1:8qnjx1vcq5s2/wpsqoZFndg2CE5tNFyrTvS6SinrnYQ=
+github.com/urfave/cli/v2 v2.25.7 h1:VAzn5oq403l5pHjc4OhD54+XGO9cdKVL/7lDjF+iKUs=
+github.com/urfave/cli/v2 v2.25.7/go.mod h1:8qnjx1vcq5s2/wpsqoZFndg2CE5tNFyrTvS6SinrnYQ=
 github.com/vishvananda/netlink v1.1.0/go.mod h1:cTgwzPIzzgDAYoQrMm0EdrjRUBkTqKYppBueQtXaqoE=
 github.com/vishvananda/netns v0.0.0-20191106174202-0a2b9b5464df/go.mod h1:JP3t17pCcGlemwknint6hfoeCVQrEMVwxRLRjXpq+BU=
 github.com/xdg-go/pbkdf2 v1.0.0 h1:Su7DPu48wXMwC3bs7MCNG+z4FhcyEuz5dlvchbq0B0c=
