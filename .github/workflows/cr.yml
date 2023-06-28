@@ -19,4 +19,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_API_ENDPOINT: https://api.openai-sb.com/v1
           MODEL: gpt-3.5-turbo
-          PROMPT: "Below is a code patch, please help me do a brief code review on it. Only answer important bug risks and/or improvement suggestions, Answer must be concisely and short: "
+          PROMPT: "Below is a code patch, please help me do a brief code review on it. Only answer important bug risks and/or important improvement suggestions, Answer must be concisely and short: "
