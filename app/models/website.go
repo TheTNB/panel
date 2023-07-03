@@ -1,15 +1,17 @@
 package models
 
 import (
-	"github.com/goravel/framework/database/orm"
+	"github.com/goravel/framework/support/carbon"
 )
 
 type Website struct {
-	orm.Model
-	Name   string `gorm:"unique;not null"`
-	Status bool   `gorm:"default:true;not null;index"`
-	Path   string `gorm:"not null"`
-	Php    int    `gorm:"default:0;not null;index"`
-	Ssl    bool   `gorm:"default:false;not null;index"`
-	Remark string `gorm:"default:''"`
+	ID        uint            `gorm:"primaryKey" json:"id"`
+	Name      string          `gorm:"unique;not null" json:"name"`
+	Status    bool            `gorm:"default:true;not null;index" json:"status"`
+	Path      string          `gorm:"not null" json:"path"`
+	Php       int             `gorm:"default:0;not null;index" json:"php"`
+	Ssl       bool            `gorm:"default:false;not null;index" json:"ssl"`
+	Remark    string          `gorm:"default:''" json:"remark"`
+	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
+	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
 }

@@ -1,11 +1,11 @@
 package models
 
-import (
-	"github.com/goravel/framework/database/orm"
-)
+import "github.com/goravel/framework/support/carbon"
 
 type Setting struct {
-	orm.Model
-	Key   string `gorm:"unique;not null"`
-	Value string `gorm:"default:''"`
+	ID        uint            `gorm:"primaryKey" json:"id"`
+	Key       string          `gorm:"unique;not null" json:"key"`
+	Value     string          `gorm:"default:''" json:"value"`
+	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
+	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
 }
