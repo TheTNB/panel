@@ -10,7 +10,6 @@ builds:
     goarch:
       - amd64
       - arm64
-      - s390x
     goamd64:
       - v2
       - v3
@@ -30,4 +29,5 @@ archives:
       - public/*
       - storage/*
       - database/*
+      - scripts/*
       - .env.example
