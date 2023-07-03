@@ -19,8 +19,8 @@ limitations under the License.
 HR="+----------------------------------------------------"
 
 ARCH=$(uname -m)
+OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-OS=$(source /etc/os-release && [[ "$ID" == "debian" ]] && echo "debian" || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]]; } && echo "centos" || echo "unknown")
 downloadUrl="https://dl.cdn.haozi.net"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
