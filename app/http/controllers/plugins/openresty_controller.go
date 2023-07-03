@@ -29,7 +29,9 @@ func NewOpenrestyController() *OpenRestyController {
 
 // Status 获取运行状态
 func (r *OpenRestyController) Status(ctx http.Context) {
-	Check(ctx, "openresty")
+	if !Check(ctx, "openresty") {
+		return
+	}
 
 	cmd := exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	out, err := cmd.CombinedOutput()
@@ -53,7 +55,9 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) {
-	Check(ctx, "openresty")
+	if !Check(ctx, "openresty") {
+		return
+	}
 
 	cmd := exec.Command("bash", "-c", "systemctl reload openresty")
 	_, err := cmd.CombinedOutput()
@@ -86,7 +90,9 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) {
-	Check(ctx, "openresty")
+	if !Check(ctx, "openresty") {
+		return
+	}
 
 	cmd := exec.Command("bash", "-c", "systemctl start openresty")
 	_, err := cmd.CombinedOutput()
@@ -119,7 +125,9 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) {
-	Check(ctx, "openresty")
+	if !Check(ctx, "openresty") {
+		return
+	}
 
 	cmd := exec.Command("bash", "-c", "systemctl stop openresty")
 	_, err := cmd.CombinedOutput()
@@ -152,6 +160,10 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 
 // Restart 重启OpenResty
 func (r *OpenRestyController) Restart(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	cmd := exec.Command("bash", "-c", "systemctl restart openresty")
 	_, err := cmd.CombinedOutput()
 	if err != nil {
@@ -183,6 +195,10 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 
 // GetConfig 获取配置
 func (r *OpenRestyController) GetConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	config, err := os.ReadFile("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty配置失败")
@@ -194,6 +210,10 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) {
 
 // SaveConfig 保存配置
 func (r *OpenRestyController) SaveConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
@@ -245,6 +265,10 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 
 // ErrorLog 获取错误日志
 func (r *OpenRestyController) ErrorLog(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	cmd := exec.Command("bash", "-c", "tail -n 100 /www/wwwlogs/nginx_error.log")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -258,6 +282,10 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 
 // ClearErrorLog 清空错误日志
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	cmd := exec.Command("bash", "-c", "echo '' > /www/wwwlogs/nginx_error.log")
 	_, err := cmd.CombinedOutput()
 	if err != nil {
@@ -271,6 +299,10 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 
 // Load 获取负载
 func (r *OpenRestyController) Load(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
+
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccessState() {
