@@ -7,6 +7,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
+	"panel/app/services"
 	"panel/packages/helpers"
 )
 
@@ -63,7 +64,20 @@ func (r *InfoController) HomePlugins(ctx http.Context) {
 		return
 	}
 
-	Success(ctx, plugins)
+	type pluginsData struct {
+		models.Plugin
+		Name string `json:"name"`
+	}
+
+	var pluginsJson []pluginsData
+	for _, plugin := range plugins {
+		pluginsJson = append(pluginsJson, pluginsData{
+			Plugin: plugin,
+			Name:   services.NewPluginImpl().GetBySlug(plugin.Slug).Name,
+		})
+	}
+
+	Success(ctx, pluginsJson)
 }
 
 func (r *InfoController) NowMonitor(ctx http.Context) {

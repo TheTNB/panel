@@ -1,5 +1,5 @@
 <script type="text/html" template>
-    <link rel="stylesheet" href="/res/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
+    <link rel="stylesheet" href="/panel/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
 </script>
 
 
@@ -52,14 +52,6 @@
     // 设置面板名称
     $('#panel-login-name').text(setter.name);
 
-    // 判断并清除定时器
-    if (typeof home_timer !== 'undefined') {
-      clearInterval(home_timer);
-    }
-    if (typeof install_plugin_timer !== 'undefined') {
-      clearInterval(install_plugin_timer);
-    }
-
     form.render();
 
     //提交
@@ -93,7 +85,8 @@
              * 所以这里强制刷新到主页
              * location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
              */
-            location.href = '/';
+            //location.href = '/';
+            location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
           });
         }
       });

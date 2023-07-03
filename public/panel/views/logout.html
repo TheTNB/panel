@@ -1,5 +1,5 @@
 <script type="text/html" template>
-    <link rel="stylesheet" href="/res/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
+    <link rel="stylesheet" href="/panel/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
 </script>
 
 
@@ -21,13 +21,6 @@
 <script>
   layui.use(['admin'], function () {
     let admin = layui.admin
-    // 判断并清除定时器
-    if (typeof home_timer !== 'undefined') {
-      clearInterval(home_timer)
-    }
-    if (typeof install_plugin_timer !== 'undefined') {
-      clearInterval(install_plugin_timer)
-    }
     setTimeout(function () {
       admin.exit()
       window.location = '/'

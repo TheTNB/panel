@@ -72,7 +72,7 @@
     table.on('tool(panel-plugin)', function (obj) {
       let data = obj.data
       if (obj.event === 'open') {
-        location.hash = '/plugin/' + data.slug
+        location.hash = '/plugins/' + data.slug
       } else if (obj.event === 'install') {
         layer.confirm('确定安装该插件吗？', function (index) {
           layer.close(index)

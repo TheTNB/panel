@@ -796,6 +796,12 @@ layui.define('view', function (exports) {
         admin.events.refresh()
       }
     }
+
+    // 清理所有定时器
+    var highestTimeoutId = setTimeout('')
+    for (var i = 0; i < highestTimeoutId; i++) {
+      clearTimeout(i)
+    }
   })
 
   //点击事件
