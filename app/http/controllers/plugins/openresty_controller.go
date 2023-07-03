@@ -1,4 +1,4 @@
-package controllers
+package plugins
 
 import (
 	"os"
@@ -29,6 +29,8 @@ func NewOpenrestyController() *OpenRestyController {
 
 // Status 获取运行状态
 func (r *OpenRestyController) Status(ctx http.Context) {
+	Check(ctx, "openresty")
+
 	cmd := exec.Command("bash", "-c", "systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -51,6 +53,8 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) {
+	Check(ctx, "openresty")
+
 	cmd := exec.Command("bash", "-c", "systemctl reload openresty")
 	_, err := cmd.CombinedOutput()
 	if err != nil {
@@ -82,6 +86,8 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) {
+	Check(ctx, "openresty")
+
 	cmd := exec.Command("bash", "-c", "systemctl start openresty")
 	_, err := cmd.CombinedOutput()
 	if err != nil {
@@ -113,6 +119,8 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) {
+	Check(ctx, "openresty")
+
 	cmd := exec.Command("bash", "-c", "systemctl stop openresty")
 	_, err := cmd.CombinedOutput()
 	if err != nil {

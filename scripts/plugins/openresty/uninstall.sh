@@ -1,4 +1,6 @@
-/*
+#!/bin/bash
+
+: '
 Copyright [2022] [HaoZi Technology Co., Ltd.]
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +14,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-*/
-package main
+'
 
-import (
-	"github.com/goravel/framework/facades"
-
-	"panel/bootstrap"
-)
-
-func main() {
-	// 启动框架
-	bootstrap.Boot()
-
-	// 启动 HTTP 服务
-	go func() {
-		if err := facades.Route().Run(); err != nil {
-			facades.Log().Errorf("Route run error: %v", err)
-		}
-	}()
-
-	select {}
-}
+HR="+----------------------------------------------------"

@@ -33,6 +33,14 @@ func Web() {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("list", websiteController.List)
 		})
+		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+			pluginController := controllers.NewPluginController()
+			r.Get("list", pluginController.List)
+			r.Post("install", pluginController.Install)
+			r.Post("uninstall", pluginController.Uninstall)
+			r.Post("update", pluginController.Update)
+			r.Post("updateShow", pluginController.UpdateShow)
+		})
 	})
 
 	facades.Route().Fallback(func(ctx http.Context) {

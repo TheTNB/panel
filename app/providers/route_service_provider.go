@@ -20,6 +20,7 @@ func (receiver *RouteServiceProvider) Boot(app foundation.Application) {
 	receiver.configureRateLimiting()
 
 	routes.Web()
+	routes.Plugin()
 }
 
 func (receiver *RouteServiceProvider) configureRateLimiting() {

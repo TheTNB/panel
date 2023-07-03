@@ -63,8 +63,10 @@ layui.define(['laytpl', 'layer'], function (exports) {
     delete options.success
     delete options.error
 
+    options.data = JSON.stringify(options.data)
+
     return $.ajax($.extend({
-      type: 'get', dataType: 'json', success: function (res) {
+      type: 'get', dataType: 'json', contentType: 'application/json', success: function (res) {
         var statusCode = response.statusCode
 
         //只有 response 的 code 一切正常才执行 done
