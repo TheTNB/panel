@@ -42,7 +42,7 @@ func (r *SettingImpl) Get(key string, defaultValue ...string) string {
 // Set 更新或创建设置
 func (r *SettingImpl) Set(key, value string) error {
 	var setting models.Setting
-	if err := facades.Orm().Query().Where("key", key).UpdateOrCreate(&setting, models.Setting{Key: key}, models.Setting{Value: value}); err != nil {
+	if err := facades.Orm().Query().UpdateOrCreate(&setting, models.Setting{Key: key}, models.Setting{Value: value}); err != nil {
 		return err
 	}
 

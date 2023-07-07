@@ -27,11 +27,11 @@ func (s *UserTestSuite) SetupTest() {
 
 func (s *UserTestSuite) TestCreate() {
 	mockOrm, mockDb, _, _ := mock.Orm()
-	mockOrm.On("Query").Return(mockDb)
+	mockOrm.On("Query").Return(mockDb).Once()
 	mockDb.On("Create", &models.User{
 		Username: "haozi",
 		Password: "123456",
-	}).Return(nil)
+	}).Return(nil).Once()
 	user, err := s.user.Create("haozi", "123456")
 	s.Nil(err)
 	s.Equal("haozi", user.Username)
