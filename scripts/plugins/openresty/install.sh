@@ -20,17 +20,22 @@ HR="+----------------------------------------------------"
 
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-downloadUrl="https://dl.cdn.haozi.net"
+downloadUrl="https://raw.githubusercontent.com/HaoZi-Team/Panel-Assets/main/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.1"
 
+# Check use proxy
+useProxy=${1}
+if [ "${useProxy}" == "--proxy" ]; then
+    downloadUrl="https://ghproxy.com/${downloadUrl}"
+fi
+
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    dnf install gcc gcc-c++ make tar unzip gd gd-devel git-core perl oniguruma oniguruma-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install gcc gcc-c++ make tar unzip gd gd-devel git-core perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
-    apt install gcc g++ make tar unzip libgd3 libgd-dev git perl libonig-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt install gcc g++ make tar unzip libgd3 libgd-dev git perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"
@@ -43,67 +48,60 @@ mkdir -p ${openrestyPath}
 cd ${openrestyPath}
 
 # 下载源码
-wget -T 120 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/panel/plugins/openresty/openresty-${openrestyVersion}.tar.gz
+wget -T 120 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
 tar -xvf openresty-${openrestyVersion}.tar.gz
 rm -f openresty-${openrestyVersion}.tar.gz
 mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -O openssl.tar.gz ${downloadUrl}/panel/plugins/openresty/openssl-1.1.1u.tar.gz
+wget -T 120 -O openssl.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
 tar -zxvf openssl.tar.gz
 rm -f openssl.tar.gz
 mv openssl-1.1.1u openssl
 rm -f openssl.tar.gz
 
 # pcre
-wget -T 60 -O pcre-8.45.tar.gz ${downloadUrl}/panel/plugins/openresty/pcre-8.45.tar.gz
+wget -T 60 -O pcre-8.45.tar.gz ${downloadUrl}/modules/pcre-8.45.tar.gz
 tar -zxvf pcre-8.45.tar.gz
 rm -f pcre-8.45.tar.gz
 mv pcre-8.45 pcre
 rm -f pcre-8.45.tar.gz
 
 # ngx_cache_purge
-wget -T 20 -O ngx_cache_purge.tar.gz ${downloadUrl}/panel/plugins/openresty/ngx_cache_purge-2.3.tar.gz
+wget -T 20 -O ngx_cache_purge.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
 tar -zxvf ngx_cache_purge.tar.gz
 rm -f ngx_cache_purge.tar.gz
 mv ngx_cache_purge-2.3 ngx_cache_purge
 rm -f ngx_cache_purge.tar.gz
 
 # nginx-sticky-module
-wget -T 20 -O nginx-sticky-module.zip ${downloadUrl}/panel/plugins/openresty/nginx-sticky-module.zip
+wget -T 20 -O nginx-sticky-module.zip ${downloadUrl}/modules/nginx-sticky-module.zip
 unzip -o nginx-sticky-module.zip
 rm -f nginx-sticky-module.zip
 
 # nginx-dav-ext-module
-wget -T 20 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/panel/plugins/openresty/nginx-dav-ext-module-3.0.0.tar.gz
+wget -T 20 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz
 tar -xvf nginx-dav-ext-module-3.0.0.tar.gz
 rm -f nginx-dav-ext-module-3.0.0.tar.gz
 mv nginx-dav-ext-module-3.0.0 nginx-dav-ext-module
 
 # waf
-cd ${openrestyPath}
-git clone -b lts https://ghproxy.com/https://github.com/ADD-SP/ngx_waf.git
-if [ "$?" != "0" ]; then
-    echo -e $HR
-    echo "错误：OpenResty waf拓展下载失败，请截图错误信息寻求帮助。"
-    rm -rf ${openrestyPath}
-    exit 1
-fi
-git clone -b v2.3.0 https://ghproxy.com/https://github.com/troydhanson/uthash.git
-if [ "$?" != "0" ]; then
-    echo -e $HR
-    echo "错误：OpenResty waf拓展uthash下载失败，请截图错误信息寻求帮助。"
-    rm -rf ${openrestyPath}
-    exit 1
-fi
+wget -T 20 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
+unzip -o ngx_waf.zip
+mv ngx_waf-6.1.9 ngx_waf
+rm -f ngx_waf.zip
+wget -T 60 -O uthash.zip ${downloadUrl}/modules/uthash-2.3.0.zip
+unzip -o uthash.zip
+mv uthash-2.3.0 uthash
+rm -f uthash.zip
 cd ngx_waf/inc
-wget -T 60 -O libinjection.zip ${downloadUrl}/panel/plugins/openresty/libinjection-3.10.0.zip
+wget -T 60 -O libinjection.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
 unzip -o libinjection.zip
 mv libinjection-3.10.0 libinjection
-rm -rf libinjection.zip
+rm -f libinjection.zip
 cd ../
-make -j${cpuCore}
+make -j$(nproc)
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：OpenResty waf拓展初始化失败，请截图错误信息寻求帮助。"
@@ -113,22 +111,24 @@ fi
 cd ${openrestyPath}/src
 
 # brotli
-wget -T 20 -O ngx_brotli.zip ${downloadUrl}/panel/plugins/openresty/ngx_brotli-1.0.0rc.zip
+wget -T 20 -O ngx_brotli.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
 unzip -o ngx_brotli.zip
 mv ngx_brotli-1.0.0rc ngx_brotli
+rm -f ngx_brotli.zip
 cd ngx_brotli/deps
 rm -rf brotli
-wget -T 20 -O brotli.zip ${downloadUrl}/panel/plugins/openresty/brotli-1.0.9.zip
+wget -T 20 -O brotli.zip ${downloadUrl}/modules/brotli-1.0.9.zip
 unzip -o brotli.zip
 mv brotli-1.0.9 brotli
+rm -f brotli.zip
 cd ${openrestyPath}/src
 
 cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
-export LIB_UTHASH=${openrestyPath}/uthash
+export LIB_UTHASH=${openrestyPath}/src/uthash
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-stream --with-stream_ssl_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
-make -j${cpuCore}
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-stream --with-stream_ssl_module --with-stream_sni --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/src/ngx_waf
+make -j$(nproc)
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "提示：OpenResty多线程编译失败，尝试单线程编译..."
@@ -249,9 +249,9 @@ http {
             access_log off;
         }
         location ~ ^/phpfpm_status/(?<version>\d+)$ {
-            fastcgi_pass unix:/tmp/php-cgi-$version.sock;
+            fastcgi_pass unix:/tmp/php-cgi-\$version.sock;
             include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $fastcgi_script_name;
+            fastcgi_param SCRIPT_FILENAME \$fastcgi_script_name;
         }
     }
     include /www/server/vhost/openresty/*.conf;
