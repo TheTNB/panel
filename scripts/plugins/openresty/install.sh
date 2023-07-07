@@ -20,7 +20,7 @@ HR="+----------------------------------------------------"
 
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://raw.githubusercontent.com/HaoZi-Team/Panel-Assets/main/openresty"
+downloadUrl="https://raw.githubusercontent.com/HaoZi-Team/Panel_Assets/main/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.1"
@@ -62,7 +62,7 @@ mv openssl-1.1.1u openssl
 rm -f openssl.tar.gz
 
 # pcre
-wget -T 60 -O pcre-8.45.tar.gz ${downloadUrl}/modules/pcre-8.45.tar.gz
+wget -T 60 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
 tar -zxvf pcre-8.45.tar.gz
 rm -f pcre-8.45.tar.gz
 mv pcre-8.45 pcre
