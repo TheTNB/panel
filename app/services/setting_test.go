@@ -39,7 +39,7 @@ func (s *SettingTestSuite) TestGet() {
 
 func (s *SettingTestSuite) TestSet() {
 	mockOrm, mockDb, _, _ := mock.Orm()
-	mockOrm.On("Query").Return(mockDb).Twice()
+	mockOrm.On("Query").Return(mockDb)
 	mockDb.On("Where", "key", "test").Return(mockDb).Once()
 	mockDb.On("UpdateOrCreate", &models.Setting{}, models.Setting{Key: "test"}, models.Setting{Value: "test"}).Return(nil).Once()
 	err := s.setting.Set("test", "test")
