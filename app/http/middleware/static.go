@@ -5,11 +5,13 @@ import (
 
 	contractshttp "github.com/goravel/framework/contracts/http"
 	frameworkhttp "github.com/goravel/framework/http"
+
+	"panel/app/services"
 )
 
 func Static() contractshttp.Middleware {
 	return func(ctx contractshttp.Context) {
-		static.Serve("/", static.LocalFile("./public", false))(ctx.(*frameworkhttp.GinContext).Instance())
+		static.Serve(services.NewSettingImpl().Get("panel_entrance", "/"), static.LocalFile("./public", false))(ctx.(*frameworkhttp.GinContext).Instance())
 
 		ctx.Request().Next()
 	}

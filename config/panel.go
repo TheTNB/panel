@@ -7,7 +7,7 @@ import (
 func init() {
 	config := facades.Config()
 	config.Add("panel", map[string]any{
-		"name":    "耗子Linux面板",
+		"name":    "耗子面板",
 		"version": "2.0.0",
 	})
 }

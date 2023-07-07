@@ -51,7 +51,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: "name", Value: "耗子Linux面板"}, {Key: "monitor", Value: "1"}, {Key: "monitor_days", Value: "30"}, {Key: "mysql_root_password", Value: ""}, {Key: "postgresql_root_password", Value: ""}}
+		settings := []models.Setting{{Key: "name", Value: "耗子Linux面板"}, {Key: "monitor", Value: "1"}, {Key: "monitor_days", Value: "30"}, {Key: "backup_path", Value: "/www/backup"}, {Key: "website_path", Value: "/www/wwwroot"}, {Key: "panel_entrance", Value: "/"}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")
@@ -108,20 +108,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
-
-		nginxConf, err := os.ReadFile("/www/server/nginx/conf/nginx.conf")
-		if err != nil {
-			color.Redln("获取面板端口失败，请检查Nginx主配置文件")
-			return nil
-		}
-		match := regexp.MustCompile(`listen\s+(\d+)`).FindStringSubmatch(string(nginxConf))
-		if len(match) < 2 {
-			color.Redln("获取面板端口失败，请检查Nginx主配置文件")
-			return nil
-		}
-
-		port := match[1]
-		color.Greenln("面板端口: " + port)
+		// color.Greenln("面板端口: " + port)
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get("panel_entrance", "/"))
 
 	case "getPort":
 		nginxConf, err := os.ReadFile("/www/server/nginx/conf/nginx.conf")
@@ -138,6 +126,9 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		port := match[1]
 		color.Greenln("面板端口: " + port)
+
+	case "getEntrance":
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get("panel_entrance", "/"))
 
 	case "writePlugin":
 		slug := arg1
@@ -297,11 +288,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("删除设置成功")
 
 	default:
-		color.Yellowln("耗子Linux面板命令行工具")
+		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
 		color.Greenln("请使用以下命令：")
 		color.Greenln("panel update 更新/修复面板到最新版本")
 		color.Greenln("panel getInfo 重新初始化面板账号信息")
 		color.Greenln("panel getPort 获取面板访问端口")
+		color.Greenln("panel getEntrance 获取面板访问入口")
 		color.Greenln("panel cleanRunningTask 强制清理面板正在运行的任务")
 		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} 备份网站/MySQL数据库/PostgreSQL数据库到指定目录")
 		color.Redln("以下命令请在开发者指导下使用：")
