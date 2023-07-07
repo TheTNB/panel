@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 jobs:
-  golangci:
+  lint:
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -15,8 +15,12 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: 'stable'
-      - name: golangci-lint
+          cache: false
+      - name: Lint
         uses: golangci/golangci-lint-action@v3
         with:
+          skip-cache: true
+          skip-pkg-cache: true
+          skip-build-cache: true
           version: latest
           args: --timeout=30m ./...

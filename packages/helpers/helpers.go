@@ -79,6 +79,9 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	}
 	defer os.Remove(file.Name())
 	_, err = file.Write(output)
+	if err != nil {
+		return info, errors.New("写入临时文件失败")
+	}
 	err = file.Close()
 	if err != nil {
 		return info, errors.New("关闭临时文件失败")
