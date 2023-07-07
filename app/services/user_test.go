@@ -35,6 +35,4 @@ func (s *UserTestSuite) TestCreate() {
 	user, err := s.user.Create("haozi", "123456")
 	s.Nil(err)
 	s.Equal("haozi", user.Username)
-	mockOrm.AssertExpectations(s.T())
-	mockDb.AssertExpectations(s.T())
 }

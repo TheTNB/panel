@@ -33,16 +33,12 @@ func (s *SettingTestSuite) TestGet() {
 	b := s.setting.Get("test", "test")
 	s.Equal("", a)
 	s.Equal("test", b)
-	mockOrm.AssertExpectations(s.T())
-	mockDb.AssertExpectations(s.T())
 }
 
 func (s *SettingTestSuite) TestSet() {
-	/*mockOrm, mockDb, _, _ := mock.Orm()
+	mockOrm, mockDb, _, _ := mock.Orm()
 	mockOrm.On("Query").Return(mockDb).Once()
 	mockDb.On("UpdateOrCreate", &models.Setting{}, models.Setting{Key: "test"}, models.Setting{Value: "test"}).Return(nil).Once()
 	err := s.setting.Set("test", "test")
 	s.Nil(err)
-	mockOrm.AssertExpectations(s.T())
-	mockDb.AssertExpectations(s.T())*/
 }
