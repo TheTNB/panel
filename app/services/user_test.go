@@ -31,7 +31,7 @@ func (s *UserTestSuite) TestCreate() {
 	mockDb.On("Create", &models.User{
 		Username: "haozi",
 		Password: "123456",
-	}).Return(nil).Once()
+	}).Return(nil)
 	user, err := s.user.Create("haozi", "123456")
 	s.Nil(err)
 	s.Equal("haozi", user.Username)

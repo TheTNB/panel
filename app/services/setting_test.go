@@ -25,12 +25,12 @@ func (s *SettingTestSuite) SetupTest() {
 
 func (s *SettingTestSuite) TestGet() {
 	mockOrm, mockDb, _, _ := mock.Orm()
-	mockOrm.On("Query").Return(mockDb).Twice()
-	mockDb.On("Where", "key", "test").Return(mockDb).Twice()
-	mockDb.On("FirstOrFail", &models.Setting{}).Return(nil).Once()
+	mockOrm.On("Query").Return(mockDb)
+	mockDb.On("Where", "key", "test").Return(mockDb)
+	mockDb.On("FirstOrFail", &models.Setting{}).Return(nil)
 	a := s.setting.Get("test")
 	s.Equal("", a)
-	mockDb.On("FirstOrFail", &models.Setting{}).Return(nil).Once()
+	mockDb.On("FirstOrFail", &models.Setting{}).Return(nil)
 	b := s.setting.Get("test", "test")
 	s.Equal("test", b)
 	mockOrm.AssertExpectations(s.T())
@@ -40,8 +40,8 @@ func (s *SettingTestSuite) TestGet() {
 func (s *SettingTestSuite) TestSet() {
 	mockOrm, mockDb, _, _ := mock.Orm()
 	mockOrm.On("Query").Return(mockDb)
-	mockDb.On("Where", "key", "test").Return(mockDb).Once()
-	mockDb.On("UpdateOrCreate", &models.Setting{}, models.Setting{Key: "test"}, models.Setting{Value: "test"}).Return(nil).Once()
+	mockDb.On("Where", "key", "test").Return(mockDb)
+	mockDb.On("UpdateOrCreate", &models.Setting{}, models.Setting{Key: "test"}, models.Setting{Value: "test"}).Return(nil)
 	err := s.setting.Set("test", "test")
 	s.Nil(err)
 	mockOrm.AssertExpectations(s.T())
