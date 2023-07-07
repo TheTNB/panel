@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 : '
 Copyright [2022] [HaoZi Technology Co., Ltd.]
@@ -17,7 +18,6 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
-
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 downloadUrl="https://raw.githubusercontent.com/HaoZi-Team/Panel_Assets/main/openresty"
@@ -33,9 +33,9 @@ fi
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    dnf install gcc gcc-c++ make tar unzip gd gd-devel git-core perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install gcc gcc-c++ make tar unzip gd gd-devel git-core flex perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
-    apt install gcc g++ make tar unzip libgd3 libgd-dev git perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt install gcc g++ make tar unzip libgd3 libgd-dev git flex perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"
@@ -127,7 +127,7 @@ cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-stream --with-stream_ssl_module --with-stream_sni --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/src/ngx_waf
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/src/ngx_waf
 make -j$(nproc)
 if [ "$?" != "0" ]; then
     echo -e $HR
@@ -199,6 +199,9 @@ http {
     client_max_body_size 200m;
     client_body_buffer_size 10M;
     client_body_in_file_only off;
+
+    variables_hash_max_size 2048;
+    variables_hash_bucket_size 128;
 
     sendfile on;
     tcp_nopush on;
@@ -351,3 +354,5 @@ EOF
 systemctl daemon-reload
 systemctl enable openresty.service
 systemctl start openresty.service
+
+panel writePlugin openresty
