@@ -333,7 +333,7 @@ chown www:www /www/wwwlogs/waf
 chmod 755 /www/wwwlogs/waf
 
 # 写入服务文件
-cat >/lib/systemd/system/openresty.service <<EOF
+cat >/etc/systemd/system/openresty.service <<EOF
 [Unit]
 Description=The OpenResty Application Platform
 After=syslog.target network-online.target remote-fs.target nss-lookup.target
@@ -356,3 +356,5 @@ systemctl enable openresty.service
 systemctl start openresty.service
 
 panel writePlugin openresty
+
+echo -e "${HR}\nOpenResty install completed.\n${HR}"

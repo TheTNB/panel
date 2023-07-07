@@ -17,3 +17,14 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
+
+systemctl stop openresty
+systemctl disable openresty
+rm -rf /etc/systemd/system/openresty.service
+systemctl daemon-reload
+pkill -9 nginx
+rm -rf /www/server/openresty
+
+panel deletePlugin openresty
+
+echo -e "${HR}\nOpenResty uninstall completed.\n${HR}"
