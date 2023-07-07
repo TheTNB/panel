@@ -73,6 +73,15 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln("初始化成功")
 
+	case "update":
+		err := helpers.UpdatePanel()
+		if err != nil {
+			color.Redln("更新失败: " + err.Error())
+			return nil
+		}
+
+		color.Greenln("更新成功")
+
 	case "getInfo":
 		var user models.User
 		err := facades.Orm().Query().Where("id", 1).FirstOrFail(&user)
