@@ -162,6 +162,7 @@ rm -f openresty-${openrestyVersion}.tar.gz
 rm -rf src
 mkdir -p /www/wwwroot/default
 mkdir -p /www/wwwlogs
+mkdir -p /www/server/vhost
 mkdir -p /www/server/vhost/openresty
 mkdir -p /www/server/vhost/openresty/rewrite
 mkdir -p /www/server/vhost/openresty/ssl

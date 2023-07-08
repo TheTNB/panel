@@ -30,4 +30,4 @@ archives:
       - storage/*
       - database/*
       - scripts/*
-      - .env.example
+      - panel-example.conf

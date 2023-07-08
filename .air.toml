@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "storage/temp"
 
 [build]
-bin = "./storage/temp/main.exe"
+bin = "./storage/temp/main.exe --env=panel.conf"
 cmd = "go build -o ./storage/temp/main.exe ."
 delay = 1000
 exclude_dir = ["storage", "database"]

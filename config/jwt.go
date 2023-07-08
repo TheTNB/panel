@@ -9,7 +9,7 @@ func init() {
 	config.Add("jwt", map[string]any{
 		// JWT Authentication Secret
 		//
-		// Don't forget to set this in your .env file, as it will be used to sign
+		// Don't forget to set this in your panel.conf file, as it will be used to sign
 		// your tokens. A helper command is provided for this:
 		// `go run . artisan jwt:secret`
 		"secret": config.Env("JWT_SECRET", ""),

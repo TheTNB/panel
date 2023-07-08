@@ -10,15 +10,15 @@ func init() {
 		// HTTP URL
 		"url": "http://localhost",
 		// HTTP Host
-		"host": "0.0.0.0",
+		"host": config.Env("APP_HOST", "0.0.0.0"),
 		// HTTP Port
-		"port": "8888",
+		"port": config.Env("APP_PORT", "8888"),
 		// HTTPS Configuration
 		"tls": map[string]any{
 			// HTTPS Host
-			"host": "0.0.0.0",
+			"host": config.Env("APP_HOST", "0.0.0.0"),
 			// HTTPS Port
-			"port": "8899",
+			"port": config.Env("APP_PORT", "8888"),
 			// SSL Certificate
 			"ssl": map[string]any{
 				// ca.pem

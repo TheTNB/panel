@@ -6,7 +6,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.3
-	github.com/goravel/framework v1.12.5
+	github.com/goravel/framework v1.12.1-0.20230708041054-23981ffb073e
 	github.com/iancoleman/strcase v0.2.0
 	github.com/imroc/req/v3 v3.37.2
 	github.com/mojocn/base64Captcha v1.3.5
@@ -51,7 +51,7 @@ require (
 	github.com/gaukas/godicttls v0.0.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.1 // indirect
-	github.com/glebarez/go-sqlite v1.21.1 // indirect
+	github.com/glebarez/go-sqlite v1.21.2 // indirect
 	github.com/glebarez/sqlite v1.8.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -160,22 +160,22 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.10.0 // indirect
+	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.11.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.9.0 // indirect
-	golang.org/x/text v0.10.0 // indirect
+	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/text v0.11.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	google.golang.org/api v0.122.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230525234025-438c736192d0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230525234020-1aefcd67740a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
-	google.golang.org/grpc v1.56.1 // indirect
+	google.golang.org/grpc v1.56.2 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -183,10 +183,10 @@ require (
 	gorm.io/driver/mysql v1.5.1 // indirect
 	gorm.io/driver/postgres v1.5.2 // indirect
 	gorm.io/driver/sqlserver v1.5.1 // indirect
-	gorm.io/gorm v1.25.1 // indirect
+	gorm.io/gorm v1.25.2 // indirect
 	gorm.io/plugin/dbresolver v1.4.1 // indirect
-	modernc.org/libc v1.22.3 // indirect
+	modernc.org/libc v1.22.5 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
-	modernc.org/sqlite v1.21.1 // indirect
+	modernc.org/sqlite v1.23.1 // indirect
 )
