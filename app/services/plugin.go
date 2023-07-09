@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
-	"panel/plugins/openresty"
+	"panel/app/plugins/openresty"
 )
 
 // PanelPlugin 插件元数据结构

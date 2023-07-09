@@ -1,4 +1,4 @@
-package plugins
+package openresty
 
 import (
 	"os"
@@ -14,22 +14,23 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/http/controllers"
+	"panel/app/http/controllers/plugins"
 	"panel/packages/helpers"
 )
 
 type OpenRestyController struct {
-	//Dependent services
+	// Dependent services
 }
 
 func NewOpenrestyController() *OpenRestyController {
 	return &OpenRestyController{
-		//Inject services
+		// Inject services
 	}
 }
 
 // Status 获取运行状态
 func (r *OpenRestyController) Status(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -55,7 +56,7 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -90,7 +91,7 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -125,7 +126,7 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -160,7 +161,7 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 
 // Restart 重启OpenResty
 func (r *OpenRestyController) Restart(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -195,7 +196,7 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 
 // GetConfig 获取配置
 func (r *OpenRestyController) GetConfig(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -210,7 +211,7 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) {
 
 // SaveConfig 保存配置
 func (r *OpenRestyController) SaveConfig(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -265,7 +266,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 
 // ErrorLog 获取错误日志
 func (r *OpenRestyController) ErrorLog(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -282,7 +283,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 
 // ClearErrorLog 清空错误日志
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
@@ -299,7 +300,7 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 
 // Load 获取负载
 func (r *OpenRestyController) Load(ctx http.Context) {
-	if !Check(ctx, "openresty") {
+	if !plugins.Check(ctx, "openresty") {
 		return
 	}
 
