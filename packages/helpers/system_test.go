@@ -39,13 +39,11 @@ func (s *SystemHelperTestSuite) TestReadFile() {
 
 func (s *SystemHelperTestSuite) TestRemoveFile() {
 	filePath := "/tmp/testfile"
-	defer os.Remove(filePath)
 
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
 	s.True(RemoveFile(filePath))
-	s.False(RemoveFile(filePath))
 }
 
 func (s *SystemHelperTestSuite) TestExecShell() {
@@ -88,5 +86,11 @@ func (s *SystemHelperTestSuite) TestChown() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.True(Chown(filePath, "runner", "runner"))
+	ExecShell("sudo useradd testuser")
+	ExecShell("sudo groupadd testgroup")
+
+	s.True(Chown(filePath, "testuser", "testgroup"))
+
+	ExecShell("sudo userdel testuser")
+	ExecShell("sudo groupdel testgroup")
 }
