@@ -90,7 +90,17 @@ func FormatBytes(size float64) string {
 
 // Cut 裁剪字符串
 func Cut(begin, end, str string) string {
-	b := utf8.RuneCountInString(str[:strings.Index(str, begin)]) + utf8.RuneCountInString(begin)
-	e := utf8.RuneCountInString(str[:strings.Index(str, end)]) - b
-	return string([]rune(str)[b : b+e])
+	bIndex := strings.Index(str, begin)
+	eIndex := strings.Index(str, end)
+	if bIndex == -1 || eIndex == -1 || bIndex > eIndex {
+		return ""
+	}
+
+	b := utf8.RuneCountInString(str[:bIndex]) + utf8.RuneCountInString(begin)
+	e := utf8.RuneCountInString(str[:eIndex])
+	if b > e {
+		return ""
+	}
+
+	return string([]rune(str)[b:e])
 }

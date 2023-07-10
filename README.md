@@ -43,7 +43,7 @@ TODO
 
 ## 问题反馈
 
-使用类问题，可在 [WePublish社区论坛](https://wepublish.cn/forum) 提问寻求帮助。
+使用类问题，可在 [WePublish社区论坛](https://wepublish.cn/forums) 提问寻求帮助。
 
 对于面板自身问题，可在 GitHub 的`Issues`
 页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
