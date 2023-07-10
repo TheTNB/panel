@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"os"
+	"os/user"
 	"testing"
 	"time"
 
@@ -86,11 +87,9 @@ func (s *SystemHelperTestSuite) TestChown() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	ExecShell("sudo useradd testuser")
-	ExecShell("sudo groupadd testgroup")
+	currentUser, err := user.Current()
+	groups, err := currentUser.GroupIds()
+	s.Nil(err)
 
-	s.True(Chown(filePath, "testuser", "testgroup"))
-
-	ExecShell("sudo userdel testuser")
-	ExecShell("sudo groupdel testgroup")
+	s.True(Chown(filePath, currentUser.Username, groups[0]))
 }

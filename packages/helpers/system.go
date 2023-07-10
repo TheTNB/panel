@@ -97,7 +97,7 @@ func Chmod(path string, permission os.FileMode) bool {
 
 // Chown 修改路径所有者
 func Chown(path, user, group string) bool {
-	cmd := exec.Command("sudo chown", "-R", user+":"+group, path)
+	cmd := exec.Command("chown", "-R", user+":"+group, path)
 
 	err := cmd.Run()
 	if err != nil {
