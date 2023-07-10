@@ -6,7 +6,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.3
-	github.com/goravel/framework v1.12.1-0.20230708041054-23981ffb073e
+	github.com/goravel/framework v1.12.1-0.20230710043919-4b0ca1d027f8
 	github.com/iancoleman/strcase v0.2.0
 	github.com/imroc/req/v3 v3.37.2
 	github.com/mojocn/base64Captcha v1.3.5
