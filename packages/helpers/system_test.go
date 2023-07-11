@@ -88,6 +88,7 @@ func (s *SystemHelperTestSuite) TestChown() {
 	s.Nil(err)
 
 	currentUser, err := user.Current()
+	s.Nil(err)
 	groups, err := currentUser.GroupIds()
 	s.Nil(err)
 

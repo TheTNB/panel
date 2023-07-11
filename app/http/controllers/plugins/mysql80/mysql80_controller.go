@@ -226,6 +226,7 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 		re := regexp.MustCompile(expression.regex)
 		matches := re.FindStringSubmatch(raw)
 		if len(matches) > 1 {
+			data[i] = make(map[string]string)
 			data[i] = map[string]string{"name": expression.name, "value": matches[1]}
 
 			if expression.name == "发送" || expression.name == "接收" {
