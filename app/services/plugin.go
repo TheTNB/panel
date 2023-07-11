@@ -3,6 +3,7 @@ package services
 
 import (
 	"github.com/goravel/framework/facades"
+	"panel/app/plugins/mysql80"
 
 	"panel/app/models"
 	"panel/app/plugins/openresty"
@@ -53,6 +54,15 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Version:     openresty.Version,
 		Requires:    openresty.Requires,
 		Excludes:    openresty.Excludes,
+	})
+	p = append(p, PanelPlugin{
+		Name:        mysql80.Name,
+		Author:      mysql80.Author,
+		Description: mysql80.Description,
+		Slug:        mysql80.Slug,
+		Version:     mysql80.Version,
+		Requires:    mysql80.Requires,
+		Excludes:    mysql80.Excludes,
 	})
 
 	return p
