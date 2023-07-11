@@ -6,13 +6,14 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.3
-	github.com/goravel/framework v1.12.1-0.20230710102458-737cce0f687c
+	github.com/goravel/framework v1.12.5
 	github.com/iancoleman/strcase v0.2.0
 	github.com/imroc/req/v3 v3.37.2
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cast v1.5.1
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 )
 
 require (
@@ -161,7 +162,6 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.11.0 // indirect
