@@ -3,9 +3,9 @@ package services
 
 import (
 	"github.com/goravel/framework/facades"
-	"panel/app/plugins/mysql80"
 
 	"panel/app/models"
+	"panel/app/plugins/mysql80"
 	"panel/app/plugins/openresty"
 )
 
