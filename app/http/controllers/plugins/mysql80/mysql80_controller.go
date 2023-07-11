@@ -197,8 +197,7 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 		return
 	}
 
-	var data map[int]map[string]string
-	data = make(map[int]map[string]string)
+	data := make(map[int]map[string]string)
 	expressions := []struct {
 		regex string
 		name  string
