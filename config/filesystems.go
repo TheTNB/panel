@@ -12,7 +12,7 @@ func init() {
 		// Here you may specify the default filesystem disk that should be used
 		// by the framework. The "local" disk, as well as a variety of cloud
 		// based disks are available to your application. Just store away!
-		"default": config.Env("FILESYSTEM_DISK", "local"),
+		"default": "local",
 
 		// Filesystem Disks
 		//
@@ -24,8 +24,8 @@ func init() {
 		"disks": map[string]any{
 			"local": map[string]any{
 				"driver": "local",
-				"root":   "storage/app",
-				"url":    "http://localhost/storage",
+				"root":   "/",
+				"url":    "http://localhost/",
 			},
 		},
 	})

@@ -93,3 +93,8 @@ func (s *SystemHelperTestSuite) TestChown() {
 
 	s.True(Chown(filePath, currentUser.Username, groups[0]))
 }
+
+func (s *SystemHelperTestSuite) TestExists() {
+	s.True(Exists("/tmp"))
+	s.False(Exists("/tmp/123"))
+}

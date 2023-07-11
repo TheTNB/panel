@@ -107,3 +107,9 @@ func Chown(path, user, group string) bool {
 
 	return true
 }
+
+// Exists 判断路径是否存在
+func Exists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
