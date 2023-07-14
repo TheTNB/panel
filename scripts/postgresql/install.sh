@@ -1,4 +1,5 @@
 #!/bin/bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 : '
 Copyright 2022 HaoZi Technology Co., Ltd.
@@ -17,14 +18,10 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
+postgresqlVersion="$1"
+setup_Path="/www"
+postgresqlPath="${setup_Path}/server/postgresql"
+os_Version=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\.?.*/\1/')
+ipLocation=$(curl -s https://ip.ping0.cc/geo)  # 获取IP位置
 
-systemctl stop openresty
-systemctl disable openresty
-rm -rf /etc/systemd/system/openresty.service
-systemctl daemon-reload
-pkill -9 nginx
-rm -rf /www/server/openresty
-
-panel deletePlugin openresty
-
-echo -e "${HR}\nOpenResty uninstall completed.\n${HR}"
+# TODO

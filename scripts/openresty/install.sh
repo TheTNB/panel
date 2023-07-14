@@ -20,22 +20,28 @@ limitations under the License.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://raw.githubusercontent.com/HaoZi-Team/Panel_Assets/main/openresty"
+downloadUrl="https://dl.cdn.haozi.net/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.1"
 
-# Check use proxy
-useProxy=${1}
-if [ "${useProxy}" == "--proxy" ]; then
-    downloadUrl="https://ghproxy.com/${downloadUrl}"
-fi
-
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    dnf install gcc gcc-c++ make tar unzip gd gd-devel git-core flex perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install dnf-plugins-core -y
+    dnf install epel-release -y
+    dnf config-manager --set-enabled epel
+    dnf config-manager --set-enabled PowerTools
+    dnf config-manager --set-enabled powertools
+    dnf config-manager --set-enabled CRB
+    dnf config-manager --set-enabled Crb
+    dnf config-manager --set-enabled crb
+    /usr/bin/crb enable
+    dnf makecache
+    dnf groupinstall "Development Tools" -y
+    dnf install tar unzip gd gd-devel git-core flex perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
-    apt install gcc g++ make tar unzip libgd3 libgd-dev git flex perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt update
+    apt install build-essential tar unzip libgd3 libgd-dev git flex perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"
@@ -49,7 +55,7 @@ cd ${openrestyPath}
 
 # 下载源码
 wget -T 120 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
-tar -xvf openresty-${openrestyVersion}.tar.gz
+tar -zxvf openresty-${openrestyVersion}.tar.gz
 rm -f openresty-${openrestyVersion}.tar.gz
 mv openresty-${openrestyVersion} src
 cd src
@@ -173,7 +179,7 @@ cat >${openrestyPath}/conf/nginx.conf <<EOF
 user www www;
 worker_processes auto;
 error_log /www/wwwlogs/openresty_error.log crit;
-pid /www/server/openresty/logs/nginx.pid;
+pid /www/server/openresty/nginx.pid;
 worker_rlimit_nofile 51200;
 
 stream {
@@ -342,7 +348,7 @@ Wants=network-online.target
 
 [Service]
 Type=forking
-PIDFile=/www/server/openresty/logs/nginx.pid
+PIDFile=/www/server/openresty/nginx.pid
 ExecStartPre=/www/server/openresty/sbin/nginx -t -c /www/server/openresty/conf/nginx.conf
 ExecStart=/www/server/openresty/sbin/nginx -c /www/server/openresty/conf/nginx.conf
 ExecReload=/www/server/openresty/sbin/nginx -s reload

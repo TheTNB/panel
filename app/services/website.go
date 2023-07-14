@@ -206,6 +206,7 @@ server
         error_log /dev/null;
         access_log /dev/null;
     }
+
     access_log /www/wwwlogs/%s.log;
     error_log /www/wwwlogs/%s.log;
 }
