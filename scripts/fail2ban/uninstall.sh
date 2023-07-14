@@ -18,10 +18,21 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
-postgresqlVersion="$1"
-setup_Path="/www"
-postgresqlPath="${setup_Path}/server/postgresql"
-os_Version=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\.?.*/\1/')
-ipLocation=$(curl -s https://ip.ping0.cc/geo)
+OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
-# TODO
+systemctl stop fail2ban
+systemctl disable fail2ban
+
+if [ "${OS}" == "centos" ]; then
+    dnf remove -y fail2ban
+elif [ "${OS}" == "debian" ]; then
+    apt install -y fail2ban
+else
+    echo -e $HR
+    echo "错误：不支持的操作系统"
+    exit 1
+fi
+
+rm -rf /etc/fail2ban
+
+panel deletePlugin fail2ban

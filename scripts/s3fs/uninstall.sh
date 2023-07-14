@@ -18,10 +18,16 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
-postgresqlVersion="$1"
-setup_Path="/www"
-postgresqlPath="${setup_Path}/server/postgresql"
-os_Version=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\.?.*/\1/')
-ipLocation=$(curl -s https://ip.ping0.cc/geo)
+OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
-# TODO
+if [ "${OS}" == "centos" ]; then
+    dnf remove -y s3fs-fuse
+elif [ "${OS}" == "debian" ]; then
+    apt remove -y s3fs
+else
+    echo -e $HR
+    echo "错误：不支持的操作系统"
+    exit 1
+fi
+
+panel deletePlugin s3fs
