@@ -40,7 +40,9 @@ layui.define(['all'], function (exports) {
     },
 
     // 独立页面路由，可随意添加（无需写参数）
-    indPage: ['/login', // 登入页
+    indPage: [
+        '/login',
+        '/logout',
     ],
 
     // 配置业务模块目录中的特殊模块

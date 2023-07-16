@@ -4,14 +4,13 @@ import (
 	"strconv"
 
 	"github.com/gookit/color"
-
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
 	"panel/app/models"
-	"panel/packages/helpers"
+	"panel/packages/helper"
 )
 
 type Monitoring struct {
@@ -44,7 +43,7 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		return nil
 	}
 
-	info := helpers.GetMonitoringInfo()
+	info := helper.GetMonitoringInfo()
 
 	err := facades.Orm().Query().Create(&models.Monitor{
 		Info: info,

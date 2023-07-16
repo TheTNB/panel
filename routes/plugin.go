@@ -6,6 +6,7 @@ import (
 
 	"panel/app/http/controllers/plugins/mysql80"
 	"panel/app/http/controllers/plugins/openresty"
+	"panel/app/http/controllers/plugins/php74"
 	"panel/app/http/middleware"
 )
 
@@ -52,5 +53,23 @@ func Plugin() {
 		route.Post("deleteUser", mysql80Controller.DeleteUser)
 		route.Post("setUserPassword", mysql80Controller.SetUserPassword)
 		route.Post("setUserPrivileges", mysql80Controller.SetUserPrivileges)
+	})
+	facades.Route().Prefix("api/plugins/php74").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		php74Controller := php74.NewPhp74Controller()
+		route.Get("status", php74Controller.Status)
+		route.Post("reload", php74Controller.Reload)
+		route.Post("start", php74Controller.Start)
+		route.Post("stop", php74Controller.Stop)
+		route.Post("restart", php74Controller.Restart)
+		route.Get("load", php74Controller.Load)
+		route.Get("config", php74Controller.GetConfig)
+		route.Post("config", php74Controller.SaveConfig)
+		route.Get("errorLog", php74Controller.ErrorLog)
+		route.Get("slowLog", php74Controller.SlowLog)
+		route.Get("clearErrorLog", php74Controller.ClearErrorLog)
+		route.Get("clearSlowLog", php74Controller.ClearSlowLog)
+		route.Get("extensions", php74Controller.GetExtensionList)
+		route.Post("installExtension", php74Controller.InstallExtension)
+		route.Post("uninstallExtension", php74Controller.UninstallExtension)
 	})
 }

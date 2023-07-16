@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"panel/app/models"
-	"panel/packages/helpers"
+	"panel/packages/helper"
 )
 
 type Website interface {
@@ -106,7 +106,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 		return w, err
 	}
 
-	helpers.Mkdir(website.Path, 0755)
+	helper.Mkdir(website.Path, 0755)
 
 	index := `
 <!DOCTYPE html>
@@ -123,7 +123,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 </html>
 
 `
-	helpers.WriteFile(website.Path+"/index.html", index, 0644)
+	helper.WriteFile(website.Path+"/index.html", index, 0644)
 
 	domainArr := strings.Split(website.Domain, "\n")
 	portList := ""
@@ -213,12 +213,12 @@ server
 
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	helpers.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", nginxConf, 0644)
-	helpers.WriteFile("/www/server/panel/vhost/openresty/rewrite/"+website.Name+".conf", "", 0644)
-	helpers.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".pem", "", 0644)
-	helpers.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".key", "", 0644)
+	helper.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", nginxConf, 0644)
+	helper.WriteFile("/www/server/panel/vhost/openresty/rewrite/"+website.Name+".conf", "", 0644)
+	helper.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".pem", "", 0644)
+	helper.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".key", "", 0644)
 
-	helpers.ExecShellAsync("systemctl reload openresty")
+	helper.ExecShellAsync("systemctl reload openresty")
 
 	// TODO 创建数据库
 
@@ -236,13 +236,13 @@ func (r *WebsiteImpl) Delete(name string) error {
 		return err
 	}
 
-	helpers.RemoveFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
-	helpers.RemoveFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
-	helpers.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".pem")
-	helpers.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".key")
-	helpers.RemoveFile(website.Path)
+	helper.RemoveFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	helper.RemoveFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
+	helper.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".pem")
+	helper.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".key")
+	helper.RemoveFile(website.Path)
 
-	helpers.ExecShellAsync("systemctl reload openresty")
+	helper.ExecShellAsync("systemctl reload openresty")
 
 	// TODO 删除数据库
 

@@ -16,7 +16,7 @@ import (
 	"panel/app/http/controllers"
 	"panel/app/http/controllers/plugins"
 	"panel/app/services"
-	"panel/packages/helpers"
+	"panel/packages/helper"
 )
 
 type Mysql80Controller struct {
@@ -35,7 +35,7 @@ func (r *Mysql80Controller) Status(ctx http.Context) {
 		return
 	}
 
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -55,8 +55,8 @@ func (r *Mysql80Controller) Reload(ctx http.Context) {
 		return
 	}
 
-	_ = helpers.ExecShell("systemctl reload mysql")
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	helper.ExecShell("systemctl reload mysql")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -76,8 +76,8 @@ func (r *Mysql80Controller) Restart(ctx http.Context) {
 		return
 	}
 
-	_ = helpers.ExecShell("systemctl restart mysql")
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	helper.ExecShell("systemctl restart mysql")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -97,8 +97,8 @@ func (r *Mysql80Controller) Start(ctx http.Context) {
 		return
 	}
 
-	_ = helpers.ExecShell("systemctl start mysql")
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	helper.ExecShell("systemctl start mysql")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -118,15 +118,15 @@ func (r *Mysql80Controller) Stop(ctx http.Context) {
 		return
 	}
 
-	_ = helpers.ExecShell("systemctl stop mysql")
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	helper.ExecShell("systemctl stop mysql")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
 	}
 
-	if status == "active" {
+	if status != "active" {
 		controllers.Success(ctx, true)
 	} else {
 		controllers.Success(ctx, false)
@@ -140,7 +140,7 @@ func (r *Mysql80Controller) GetConfig(ctx http.Context) {
 	}
 
 	// 获取配置
-	config := helpers.ReadFile("mysql80")
+	config := helper.ReadFile("mysql80")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 		return
@@ -161,7 +161,7 @@ func (r *Mysql80Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !helpers.WriteFile("mysql80", config, 0644) {
+	if !helper.WriteFile("mysql80", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 		return
 	}
@@ -181,13 +181,13 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 		return
 	}
 
-	status := helpers.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	status := helper.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if strings.TrimSpace(status) != "active" {
 		controllers.Error(ctx, http.StatusInternalServerError, "MySQL 已停止运行")
 		return
 	}
 
-	raw := helpers.ExecShell("mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	raw := helper.ExecShell("mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if strings.Contains(raw, "Access denied for user") {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
 		return
@@ -230,7 +230,7 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 			data[i] = map[string]string{"name": expression.name, "value": matches[1]}
 
 			if expression.name == "发送" || expression.name == "接收" {
-				data[i]["value"] = helpers.FormatBytes(cast.ToFloat64(matches[1]))
+				data[i]["value"] = helper.FormatBytes(cast.ToFloat64(matches[1]))
 			}
 		}
 	}
@@ -253,7 +253,7 @@ func (r *Mysql80Controller) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	log := helpers.ExecShell("tail -n 100 /www/server/mysql/mysql-error.log")
+	log := helper.ExecShell("tail -n 100 /www/server/mysql/mysql-error.log")
 	controllers.Success(ctx, log)
 }
 
@@ -263,7 +263,7 @@ func (r *Mysql80Controller) ClearErrorLog(ctx http.Context) {
 		return
 	}
 
-	helpers.ExecShell("echo '' > /www/server/mysql/mysql-error.log")
+	helper.ExecShell("echo '' > /www/server/mysql/mysql-error.log")
 	controllers.Success(ctx, "清空错误日志成功")
 }
 
@@ -273,7 +273,7 @@ func (r *Mysql80Controller) SlowLog(ctx http.Context) {
 		return
 	}
 
-	log := helpers.ExecShell("tail -n 100 /www/server/mysql/mysql-slow.log")
+	log := helper.ExecShell("tail -n 100 /www/server/mysql/mysql-slow.log")
 	controllers.Success(ctx, log)
 }
 
@@ -283,7 +283,7 @@ func (r *Mysql80Controller) ClearSlowLog(ctx http.Context) {
 		return
 	}
 
-	helpers.ExecShell("echo '' > /www/server/mysql/mysql-slow.log")
+	helper.ExecShell("echo '' > /www/server/mysql/mysql-slow.log")
 	controllers.Success(ctx, "清空慢查询日志成功")
 }
 
@@ -308,7 +308,7 @@ func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
 		return
 	}
 
-	out := helpers.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	out := helper.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -327,12 +327,12 @@ func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
 
 	oldRootPassword := r.setting.Get("mysql_root_password")
 	if oldRootPassword != rootPassword {
-		helpers.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
-		helpers.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
+		helper.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
+		helper.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
 		err := r.setting.Set("mysql_root_password", rootPassword)
 		if err != nil {
-			helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
-			helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+			helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
+			helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 			controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 			return
 		}
@@ -347,7 +347,7 @@ func (r *Mysql80Controller) DatabaseList(ctx http.Context) {
 		return
 	}
 
-	out := helpers.ExecShell("mysql -uroot -p" + r.setting.Get("mysql_root_password") + " -e \"show databases;\"")
+	out := helper.ExecShell("mysql -uroot -p" + r.setting.Get("mysql_root_password") + " -e \"show databases;\"")
 	databases := strings.Split(out, "\n")
 
 	databases = databases[1 : len(databases)-1]
@@ -397,10 +397,10 @@ func (r *Mysql80Controller) AddDatabase(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加数据库成功")
 }
@@ -425,7 +425,7 @@ func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 
 	rootPassword := r.setting.Get("mysql_root_password")
 	database := ctx.Request().Input("database")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
 	controllers.Success(ctx, "删除数据库成功")
 }
@@ -434,8 +434,8 @@ func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 func (r *Mysql80Controller) BackupList(ctx http.Context) {
 	backupPath := "/www/backup/mysql"
 
-	if !helpers.Exists(backupPath) {
-		helpers.Mkdir(backupPath, 0644)
+	if !helper.Exists(backupPath) {
+		helper.Mkdir(backupPath, 0644)
 	}
 
 	files, err := os.ReadDir(backupPath)
@@ -457,7 +457,7 @@ func (r *Mysql80Controller) BackupList(ctx http.Context) {
 
 		backupFiles = append(backupFiles, map[string]string{
 			"file": file.Name(),
-			"size": helpers.FormatBytes(float64(info.Size())),
+			"size": helper.FormatBytes(float64(info.Size())),
 		})
 	}
 
@@ -486,8 +486,8 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 	rootPassword := r.setting.Get("mysql_root_password")
 	database := ctx.Request().Input("database")
 	backupFile := backupPath + "/" + database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-	if !helpers.Exists(backupPath) {
-		helpers.Mkdir(backupPath, 0644)
+	if !helper.Exists(backupPath) {
+		helper.Mkdir(backupPath, 0644)
 	}
 	err = os.Setenv("MYSQL_PWD", rootPassword)
 	if err != nil {
@@ -496,9 +496,9 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 		return
 	}
 
-	helpers.ExecShell("mysqldump -uroot " + database + " > " + backupFile)
-	helpers.ExecShell("zip -r " + backupFile + ".zip " + backupFile)
-	helpers.RemoveFile(backupFile)
+	helper.ExecShell("mysqldump -uroot " + database + " > " + backupFile)
+	helper.ExecShell("zip -r " + backupFile + ".zip " + backupFile)
+	helper.RemoveFile(backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
 
 	controllers.Success(ctx, "备份成功")
@@ -524,7 +524,7 @@ func (r *Mysql80Controller) DeleteBackup(ctx http.Context) {
 
 	backupPath := "/www/backup/mysql"
 	file := ctx.Request().Input("file")
-	helpers.RemoveFile(backupPath + "/" + file)
+	helper.RemoveFile(backupPath + "/" + file)
 
 	controllers.Success(ctx, "删除备份成功")
 }
@@ -552,7 +552,7 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
 	rootPassword := r.setting.Get("mysql_root_password")
 	file := ctx.Request().Input("file")
 	backupFile := backupPath + "/" + file
-	if !helpers.Exists(backupFile) {
+	if !helper.Exists(backupFile) {
 		controllers.Error(ctx, http.StatusBadRequest, "备份文件不存在")
 		return
 	}
@@ -568,35 +568,35 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
 	ext := filepath.Ext(file)
 	switch ext {
 	case ".zip":
-		helpers.ExecShell("unzip -o " + backupFile + " -d " + backupPath)
+		helper.ExecShell("unzip -o " + backupFile + " -d " + backupPath)
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".gz":
 		if strings.HasSuffix(file, ".tar.gz") {
 			// 解压.tar.gz文件
-			helpers.ExecShell("tar -zxvf " + backupFile + " -C " + backupPath)
+			helper.ExecShell("tar -zxvf " + backupFile + " -C " + backupPath)
 			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
 		} else {
 			// 解压.gz文件
-			helpers.ExecShell("gzip -d " + backupFile)
+			helper.ExecShell("gzip -d " + backupFile)
 			backupFile = strings.TrimSuffix(backupFile, ext)
 		}
 	case ".bz2":
-		helpers.ExecShell("bzip2 -d " + backupFile)
+		helper.ExecShell("bzip2 -d " + backupFile)
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".tar":
-		helpers.ExecShell("tar -xvf " + backupFile + " -C " + backupPath)
+		helper.ExecShell("tar -xvf " + backupFile + " -C " + backupPath)
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".rar":
-		helpers.ExecShell("unrar x " + backupFile + " " + backupPath)
+		helper.ExecShell("unrar x " + backupFile + " " + backupPath)
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	}
 
-	if !helpers.Exists(backupFile) {
+	if !helper.Exists(backupFile) {
 		controllers.Error(ctx, http.StatusBadRequest, "自动解压备份文件失败，请手动解压")
 		return
 	}
 
-	helpers.ExecShell("mysql -uroot " + ctx.Request().Input("database") + " < " + backupFile)
+	helper.ExecShell("mysql -uroot " + ctx.Request().Input("database") + " < " + backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
 
 	controllers.Success(ctx, "还原成功")
@@ -615,7 +615,7 @@ func (r *Mysql80Controller) UserList(ctx http.Context) {
 	}
 
 	rootPassword := r.setting.Get("mysql_root_password")
-	out := helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e 'select user,host from mysql.user'")
+	out := helper.ExecShell("mysql -uroot -p" + rootPassword + " -e 'select user,host from mysql.user'")
 	rawUsers := strings.Split(out, "\n")
 	users := make([]User, 0)
 	for _, rawUser := range rawUsers {
@@ -624,7 +624,7 @@ func (r *Mysql80Controller) UserList(ctx http.Context) {
 			continue
 		}
 
-		out := helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e 'show grants for " + user[0] + "@" + user[1] + "'")
+		out := helper.ExecShell("mysql -uroot -p" + rootPassword + " -e 'show grants for " + user[0] + "@" + user[1] + "'")
 		rawPrivileges := strings.Split(out, "\n")
 		privileges := make([]string, 0)
 		for _, rawPrivilege := range rawPrivileges {
@@ -664,9 +664,9 @@ func (r *Mysql80Controller) AddUser(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加成功")
 }
@@ -691,7 +691,7 @@ func (r *Mysql80Controller) DeleteUser(ctx http.Context) {
 
 	rootPassword := r.setting.Get("mysql_root_password")
 	user := ctx.Request().Input("user")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
 	controllers.Success(ctx, "删除成功")
 }
@@ -718,8 +718,8 @@ func (r *Mysql80Controller) SetUserPassword(ctx http.Context) {
 	rootPassword := r.setting.Get("mysql_root_password")
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }
@@ -746,9 +746,9 @@ func (r *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 	rootPassword := r.setting.Get("mysql_root_password")
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	helpers.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }

@@ -7,6 +7,7 @@ import (
 	"panel/app/models"
 	"panel/app/plugins/mysql80"
 	"panel/app/plugins/openresty"
+	"panel/app/plugins/php74"
 )
 
 // PanelPlugin 插件元数据结构
@@ -63,6 +64,15 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Version:     mysql80.Version,
 		Requires:    mysql80.Requires,
 		Excludes:    mysql80.Excludes,
+	})
+	p = append(p, PanelPlugin{
+		Name:        php74.Name,
+		Author:      php74.Author,
+		Description: php74.Description,
+		Slug:        php74.Slug,
+		Version:     php74.Version,
+		Requires:    php74.Requires,
+		Excludes:    php74.Excludes,
 	})
 
 	return p

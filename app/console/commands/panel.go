@@ -13,7 +13,7 @@ import (
 
 	"panel/app/models"
 	"panel/app/services"
-	"panel/packages/helpers"
+	"panel/packages/helper"
 )
 
 type Panel struct {
@@ -58,7 +58,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		hash, err := facades.Hash().Make(helpers.RandomString(32))
+		hash, err := facades.Hash().Make(helper.RandomString(32))
 		if err != nil {
 			color.Redln("初始化失败")
 			return nil
@@ -74,7 +74,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("初始化成功")
 
 	case "update":
-		err := helpers.UpdatePanel()
+		err := helper.UpdatePanel()
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil
@@ -90,14 +90,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		password := helpers.RandomString(16)
+		password := helper.RandomString(16)
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
 			color.Redln("生成密码失败")
 			return nil
 		}
 
-		user.Username = helpers.RandomString(8)
+		user.Username = helper.RandomString(8)
 		user.Password = hash
 
 		err = facades.Orm().Query().Save(&user)

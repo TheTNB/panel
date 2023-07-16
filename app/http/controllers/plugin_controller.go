@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"github.com/goravel/framework/contracts/queue"
-	"github.com/goravel/framework/facades"
-	"panel/app/jobs"
 	"sync"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
 	"panel/app/services"
@@ -14,11 +12,13 @@ import (
 
 type PluginController struct {
 	plugin services.Plugin
+	task   services.Task
 }
 
 func NewPluginController() *PluginController {
 	return &PluginController{
 		plugin: services.NewPluginImpl(),
+		task:   services.NewTaskImpl(),
 	}
 }
 
@@ -116,7 +116,7 @@ func (r *PluginController) Install(ctx http.Context) {
 		return
 	}
 
-	processTask(task.ID)
+	r.task.Process(task.ID)
 	Success(ctx, "任务已提交")
 }
 
@@ -159,7 +159,7 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 		return
 	}
 
-	processTask(task.ID)
+	r.task.Process(task.ID)
 	Success(ctx, "任务已提交")
 }
 
@@ -202,7 +202,7 @@ func (r *PluginController) Update(ctx http.Context) {
 		return
 	}
 
-	processTask(task.ID)
+	r.task.Process(task.ID)
 	Success(ctx, "任务已提交")
 }
 
@@ -230,17 +230,4 @@ func (r *PluginController) UpdateShow(ctx http.Context) {
 	}
 
 	Success(ctx, "操作成功")
-}
-
-// processTask 处理任务
-func processTask(taskID uint) {
-	go func() {
-		err := facades.Queue().Job(&jobs.ProcessTask{}, []queue.Arg{
-			{Type: "uint", Value: taskID},
-		}).Dispatch()
-		if err != nil {
-			facades.Log().Error("[面板][PluginController] 运行任务失败: " + err.Error())
-			return
-		}
-	}()
 }
