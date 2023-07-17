@@ -12,6 +12,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
 	"golang.org/x/exp/slices"
+	"panel/app/models"
 
 	"panel/app/http/controllers"
 	"panel/app/http/controllers/plugins"
@@ -175,7 +176,7 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 		return
@@ -293,7 +294,7 @@ func (r *Mysql80Controller) GetRootPassword(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 		return
@@ -319,17 +320,17 @@ func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
 		return
 	}
 
-	rootPassword := ctx.Request().Input("mysql_root_password")
+	rootPassword := ctx.Request().Input(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码不能为空")
 		return
 	}
 
-	oldRootPassword := r.setting.Get("mysql_root_password")
+	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
 		helper.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
 		helper.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
-		err := r.setting.Set("mysql_root_password", rootPassword)
+		err := r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
 		if err != nil {
 			helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
 			helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
@@ -347,7 +348,7 @@ func (r *Mysql80Controller) DatabaseList(ctx http.Context) {
 		return
 	}
 
-	out := helper.ExecShell("mysql -uroot -p" + r.setting.Get("mysql_root_password") + " -e \"show databases;\"")
+	out := helper.ExecShell("mysql -uroot -p" + r.setting.Get(models.SettingKeyMysqlRootPassword) + " -e \"show databases;\"")
 	databases := strings.Split(out, "\n")
 
 	databases = databases[1 : len(databases)-1]
@@ -392,7 +393,7 @@ func (r *Mysql80Controller) AddDatabase(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
@@ -423,7 +424,7 @@ func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
@@ -483,7 +484,7 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 	}
 
 	backupPath := "/www/backup/mysql"
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	backupFile := backupPath + "/" + database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 	if !helper.Exists(backupPath) {
@@ -549,7 +550,7 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
 	}
 
 	backupPath := "/www/backup/mysql"
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	file := ctx.Request().Input("file")
 	backupFile := backupPath + "/" + file
 	if !helper.Exists(backupFile) {
@@ -614,7 +615,7 @@ func (r *Mysql80Controller) UserList(ctx http.Context) {
 		Privileges string `json:"privileges"`
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	out := helper.ExecShell("mysql -uroot -p" + rootPassword + " -e 'select user,host from mysql.user'")
 	rawUsers := strings.Split(out, "\n")
 	users := make([]User, 0)
@@ -660,7 +661,7 @@ func (r *Mysql80Controller) AddUser(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
@@ -689,7 +690,7 @@ func (r *Mysql80Controller) DeleteUser(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
@@ -715,7 +716,7 @@ func (r *Mysql80Controller) SetUserPassword(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
@@ -743,7 +744,7 @@ func (r *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get("mysql_root_password")
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
 	helper.ExecShell("mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")

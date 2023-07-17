@@ -51,7 +51,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: "name", Value: "耗子Linux面板"}, {Key: "monitor", Value: "1"}, {Key: "monitor_days", Value: "30"}, {Key: "backup_path", Value: "/www/backup"}, {Key: "website_path", Value: "/www/wwwroot"}, {Key: "panel_entrance", Value: "/"}}
+		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyPanelEntrance, Value: "/"}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")
@@ -176,7 +176,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		var setting models.Setting
 		err := facades.Orm().Query().UpdateOrCreate(&setting, models.Setting{
-			Key: "mysql_root_password",
+			Key: models.SettingKeyMysqlRootPassword,
 		}, models.Setting{
 			Value: password,
 		})
