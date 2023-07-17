@@ -171,6 +171,8 @@ github.com/glebarez/go-sqlite v1.21.2 h1:3a6LFC4sKahUunAmynQKLZceZCOzUthkRkEAl9g
 github.com/glebarez/go-sqlite v1.21.2/go.mod h1:sfxdZyhQjTM2Wry3gVYWaW072Ri1WMdWJi0k6+3382k=
 github.com/glebarez/sqlite v1.8.0 h1:02X12E2I/4C1n+v90yTqrjRa8yuo7c3KeHI3FRznCvc=
 github.com/glebarez/sqlite v1.8.0/go.mod h1:bpET16h1za2KOOMb8+jCp6UBP/iahDpfPQqSaYLTLx8=
+github.com/glebarez/sqlite v1.9.0 h1:Aj6bPA12ZEx5GbSF6XADmCkYXlljPNUY+Zf1EQxynXs=
+github.com/glebarez/sqlite v1.9.0/go.mod h1:YBYCoyupOao60lzp1MVBLEjZfgkq0tdB1voAQ09K9zw=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
@@ -358,6 +360,8 @@ github.com/goravel/file-rotatelogs/v2 v2.4.1 h1:ogkeIFcTHSBRUBpZYiyJbpul8hkVXxHP
 github.com/goravel/file-rotatelogs/v2 v2.4.1/go.mod h1:euk9qr52WrzM8ICs1hecFcR4CZ/ZZOPdacHfvHgbOf0=
 github.com/goravel/framework v1.12.1-0.20230710102458-737cce0f687c h1:KPggCIxAZghopvPXC0g0jCmFNbC+r5EawjHCcbfBOhQ=
 github.com/goravel/framework v1.12.1-0.20230710102458-737cce0f687c/go.mod h1:SBsBTY8KTqSDipGPEZXnRRC1mWzKmL55Eo1P5aHNDgY=
+github.com/goravel/framework v1.12.1-0.20230717105343-6ce864794883 h1:8+87CCYqt5O6GqAYmGWz/W6SXGKp6xyn+McMbtWgyug=
+github.com/goravel/framework v1.12.1-0.20230717105343-6ce864794883/go.mod h1:quBqUHAyZutEs/TFfm9b/caI+BtyF82njGhNIL1QJM0=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
 github.com/gorilla/sessions v1.2.1/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
 github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 h1:UH//fgunKIs4JdUbpDl1VZCDaL56wXCB/5+wF6uHfaI=

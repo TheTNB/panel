@@ -6,7 +6,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.3
-	github.com/goravel/framework v1.12.1-0.20230710102458-737cce0f687c
+	github.com/goravel/framework v1.12.1-0.20230717105343-6ce864794883
 	github.com/iancoleman/strcase v0.2.0
 	github.com/imroc/req/v3 v3.37.2
 	github.com/mojocn/base64Captcha v1.3.5
@@ -53,7 +53,7 @@ require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.9.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
-	github.com/glebarez/sqlite v1.8.0 // indirect
+	github.com/glebarez/sqlite v1.9.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
