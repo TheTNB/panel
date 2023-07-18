@@ -5,12 +5,12 @@ import (
 )
 
 type FileController struct {
-	//Dependent services
+	// Dependent services
 }
 
 func NewFileController() *FileController {
 	return &FileController{
-		//Inject services
+		// Inject services
 	}
 }
 

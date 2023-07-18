@@ -53,7 +53,7 @@ func (r *TaskController) List(ctx http.Context) {
 	})
 }
 
-func (r *TaskController) TaskLog(ctx http.Context) {
+func (r *TaskController) Log(ctx http.Context) {
 	var task models.Task
 	err := facades.Orm().Query().Where("id", ctx.Request().QueryInt("id")).FirstOrFail(&task)
 	if err != nil {
