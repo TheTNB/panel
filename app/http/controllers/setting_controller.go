@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"panel/packages/helper"
 
 	"panel/app/models"
 	"panel/app/services"
@@ -69,12 +70,9 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
-	err = r.setting.Set(models.SettingKeyPort, port)
-	if err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-
-		return
+	oldPort := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+	if oldPort != port {
+		helper.ExecShell("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
 	}
 	err = r.setting.Set(models.SettingKeyBackupPath, backupPath)
 	if err != nil {

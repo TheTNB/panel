@@ -2,7 +2,6 @@ package commands
 
 import (
 	"os"
-	"regexp"
 
 	"github.com/gookit/color"
 	"github.com/spf13/cast"
@@ -106,29 +105,19 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
+		port := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
-		// color.Greenln("面板端口: " + port)
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get("panel_entrance", "/"))
+		color.Greenln("面板端口: " + port)
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyPanelEntrance, "/"))
 
 	case "getPort":
-		nginxConf, err := os.ReadFile("/www/server/nginx/conf/nginx.conf")
-		if err != nil {
-			color.Redln("获取面板端口失败，请检查Nginx主配置文件")
-			return nil
-		}
-
-		match := regexp.MustCompile(`listen\s+(\d+)`).FindStringSubmatch(string(nginxConf))
-		if len(match) < 2 {
-			color.Redln("获取面板端口失败，请检查Nginx主配置文件")
-			return nil
-		}
-
-		port := match[1]
+		port := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get("panel_entrance", "/"))
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyPanelEntrance, "/"))
 
 	case "writePlugin":
 		slug := arg1

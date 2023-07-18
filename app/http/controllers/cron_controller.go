@@ -60,18 +60,14 @@ func (r *CronController) Add(ctx http.Context) {
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
 	if !helper.Exists(shellDir) {
-		if !helper.Mkdir(shellDir, 0644) {
-			facades.Log().Error("[面板][CronController] 创建计划任务目录失败 ", err)
-			Error(ctx, http.StatusInternalServerError, "系统内部错误")
-			return
-		}
+		facades.Log().Error("[面板][CronController] 计划任务目录不存在")
+		Error(ctx, http.StatusInternalServerError, "计划任务目录不存在")
+		return
 	}
 	if !helper.Exists(shellLogDir) {
-		if !helper.Mkdir(shellLogDir, 0644) {
-			facades.Log().Error("[面板][CronController] 创建计划任务日志目录失败 ", err)
-			Error(ctx, http.StatusInternalServerError, "系统内部错误")
-			return
-		}
+		facades.Log().Error("[面板][CronController] 计划任务日志目录不存在")
+		Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
+		return
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + helper.RandomString(16)
 	if !helper.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0644) {
