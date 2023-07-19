@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: ✏️ Feature
         if: github.event.label.name == '✏️ Feature'
-        uses: actions-cool/issues-helper@v3
+        uses: actions-cool/issues-tools@v3
         with:
           actions: 'create-comment'
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -30,7 +30,7 @@ jobs:
             "Talk is cheap, Show me the Code." - Linus Torvalds
       - name: ☢️ Bug
         if: github.event.label.name == '☢️ Bug'
-        uses: actions-cool/issues-helper@v3
+        uses: actions-cool/issues-tools@v3
         with:
           actions: 'create-comment'
           token: ${{ secrets.GITHUB_TOKEN }}

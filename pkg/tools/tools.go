@@ -1,5 +1,5 @@
-// Package helper 存放辅助方法
-package helper
+// Package tools 存放辅助方法
+package tools
 
 import (
 	"errors"

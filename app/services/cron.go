@@ -2,7 +2,7 @@ package services
 
 import (
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type Cron interface {
@@ -19,22 +19,22 @@ func NewCronImpl() *CronImpl {
 
 // AddToSystem 添加到系统
 func (r *CronImpl) AddToSystem(cron models.Cron) {
-	if helper.IsRHEL() {
-		helper.ExecShell("echo \"" + cron.Time + " " + cron.Shell + " >> " + cron.Log + " 2>&1\" >> /var/spool/cron/root")
+	if tools.IsRHEL() {
+		tools.ExecShell("echo \"" + cron.Time + " " + cron.Shell + " >> " + cron.Log + " 2>&1\" >> /var/spool/cron/root")
 	} else {
-		helper.ExecShell("echo \"" + cron.Time + " " + cron.Shell + " >> " + cron.Log + " 2>&1\" >> /var/spool/cron/crontabs/root")
+		tools.ExecShell("echo \"" + cron.Time + " " + cron.Shell + " >> " + cron.Log + " 2>&1\" >> /var/spool/cron/crontabs/root")
 	}
 
-	helper.ExecShell("systemctl restart crond")
+	tools.ExecShell("systemctl restart crond")
 }
 
 // DeleteFromSystem 从系统中删除
 func (r *CronImpl) DeleteFromSystem(cron models.Cron) {
-	if helper.IsRHEL() {
-		helper.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/root")
+	if tools.IsRHEL() {
+		tools.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/root")
 	} else {
-		helper.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/crontabs/root")
+		tools.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/crontabs/root")
 	}
 
-	helper.ExecShell("systemctl restart crond")
+	tools.ExecShell("systemctl restart crond")
 }

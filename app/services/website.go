@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type Website interface {
@@ -111,7 +111,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 		return w, err
 	}
 
-	helper.Mkdir(website.Path, 0755)
+	tools.Mkdir(website.Path, 0755)
 
 	index := `
 <!DOCTYPE html>
@@ -128,7 +128,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 </html>
 
 `
-	helper.WriteFile(website.Path+"/index.html", index, 0644)
+	tools.WriteFile(website.Path+"/index.html", index, 0644)
 
 	domainArr := strings.Split(website.Domain, "\n")
 	portList := ""
@@ -218,12 +218,12 @@ server
 
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	helper.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", nginxConf, 0644)
-	helper.WriteFile("/www/server/panel/vhost/openresty/rewrite/"+website.Name+".conf", "", 0644)
-	helper.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".pem", "", 0644)
-	helper.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".key", "", 0644)
+	tools.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", nginxConf, 0644)
+	tools.WriteFile("/www/server/panel/vhost/openresty/rewrite/"+website.Name+".conf", "", 0644)
+	tools.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".pem", "", 0644)
+	tools.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".key", "", 0644)
 
-	helper.ExecShellAsync("systemctl reload openresty")
+	tools.ExecShellAsync("systemctl reload openresty")
 
 	// TODO 创建数据库
 
@@ -241,13 +241,13 @@ func (r *WebsiteImpl) Delete(id int) error {
 		return err
 	}
 
-	helper.RemoveFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
-	helper.RemoveFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
-	helper.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".pem")
-	helper.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".key")
-	helper.RemoveFile(website.Path)
+	tools.RemoveFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	tools.RemoveFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
+	tools.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".pem")
+	tools.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".key")
+	tools.RemoveFile(website.Path)
 
-	helper.ExecShellAsync("systemctl reload openresty")
+	tools.ExecShellAsync("systemctl reload openresty")
 
 	// TODO 删除数据库
 
@@ -261,7 +261,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		return WebsiteSetting{}, err
 	}
 
-	config := helper.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	config := tools.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
 
 	var setting WebsiteSetting
 	setting.Name = website.Name
@@ -270,7 +270,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	setting.Php = website.Php
 	setting.Raw = config
 
-	ports := helper.Cut(config, "# port标记位开始", "# port标记位结束")
+	ports := tools.Cut(config, "# port标记位开始", "# port标记位结束")
 	matches := regexp.MustCompile(`listen\s+(.*);`).FindAllStringSubmatch(ports, -1)
 	for _, match := range matches {
 		if len(match) < 2 {
@@ -278,24 +278,24 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		}
 		setting.Ports = append(setting.Ports, match[1])
 	}
-	serverName := helper.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
+	serverName := tools.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
 	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)
 	if len(match) > 1 {
 		setting.Domains = strings.Split(match[1], " ")
 	}
-	root := helper.Cut(config, "# root标记位开始", "# root标记位结束")
+	root := tools.Cut(config, "# root标记位开始", "# root标记位结束")
 	match = regexp.MustCompile(`root\s+(.*);`).FindStringSubmatch(root)
 	if len(match) > 1 {
 		setting.Root = match[1]
 	}
-	index := helper.Cut(config, "# index标记位开始", "# index标记位结束")
+	index := tools.Cut(config, "# index标记位开始", "# index标记位结束")
 	match = regexp.MustCompile(`index\s+(.*);`).FindStringSubmatch(index)
 	if len(match) > 1 {
 		setting.Index = match[1]
 	}
 
-	if helper.Exists(setting.Root + "/.user.ini") {
-		userIni := helper.ReadFile(setting.Path + "/.user.ini")
+	if tools.Exists(setting.Root + "/.user.ini") {
+		userIni := tools.ReadFile(setting.Path + "/.user.ini")
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {
@@ -306,14 +306,14 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	}
 
 	if setting.Ssl {
-		ssl := helper.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
+		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		match = regexp.MustCompile(`ssl_certificate\s+(.*);`).FindStringSubmatch(ssl)
 		if len(match) > 1 {
-			setting.SslCertificate = helper.ReadFile(match[1])
+			setting.SslCertificate = tools.ReadFile(match[1])
 		}
 		match = regexp.MustCompile(`ssl_certificate_key\s+(.*);`).FindStringSubmatch(ssl)
 		if len(match) > 1 {
-			setting.SslCertificateKey = helper.ReadFile(match[1])
+			setting.SslCertificateKey = tools.ReadFile(match[1])
 		}
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
@@ -324,7 +324,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.Hsts = false
 	}
 
-	waf := helper.Cut(config, "# waf标记位开始", "# waf标记位结束")
+	waf := tools.Cut(config, "# waf标记位开始", "# waf标记位结束")
 	setting.Waf = strings.Contains(waf, "waf on;")
 	match = regexp.MustCompile(`waf_mode\s+(.+);`).FindStringSubmatch(waf)
 	if len(match) > 1 {
@@ -339,8 +339,8 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	setting.Rewrite = helper.ReadFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
-	setting.Log = helper.ExecShell("tail -n 100 /www/wwwlogs/" + website.Name + ".log")
+	setting.Rewrite = tools.ReadFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
+	setting.Log = tools.ExecShell("tail -n 100 /www/wwwlogs/" + website.Name + ".log")
 
 	return setting, nil
 }

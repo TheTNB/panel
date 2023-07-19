@@ -7,7 +7,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type SafeController struct {
@@ -27,16 +27,16 @@ func (r *SafeController) GetFirewallStatus(ctx http.Context) {
 func (r *SafeController) SetFirewallStatus(ctx http.Context) {
 	var out string
 	if ctx.Request().QueryBool("status") {
-		if helper.IsRHEL() {
-			out = helper.ExecShell("systemctl start firewalld")
+		if tools.IsRHEL() {
+			out = tools.ExecShell("systemctl start firewalld")
 		} else {
-			out = helper.ExecShell("echo y | ufw enable")
+			out = tools.ExecShell("echo y | ufw enable")
 		}
 	} else {
-		if helper.IsRHEL() {
-			out = helper.ExecShell("systemctl stop firewalld")
+		if tools.IsRHEL() {
+			out = tools.ExecShell("systemctl stop firewalld")
 		} else {
-			out = helper.ExecShell("ufw disable")
+			out = tools.ExecShell("ufw disable")
 		}
 	}
 
@@ -49,8 +49,8 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		return
 	}
 
-	if helper.IsRHEL() {
-		out := helper.ExecShell("firewall-cmd --list-all 2>&1")
+	if tools.IsRHEL() {
+		out := tools.ExecShell("firewall-cmd --list-all 2>&1")
 		match := regexp.MustCompile(`ports: (.*)`).FindStringSubmatch(out)
 		if len(match) == 0 {
 			Success(ctx, nil)
@@ -68,7 +68,7 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 
 		Success(ctx, rules)
 	} else {
-		out := helper.ExecShell("ufw status numbered | grep ALLOW | awk '{print $2}'")
+		out := tools.ExecShell("ufw status numbered | grep ALLOW | awk '{print $2}'")
 		if len(out) == 0 {
 			Success(ctx, nil)
 			return
@@ -102,14 +102,14 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) {
 		return
 	}
 
-	if helper.IsRHEL() {
-		helper.ExecShell("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
-		helper.ExecShell("firewall-cmd --add-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
-		helper.ExecShell("firewall-cmd --reload")
+	if tools.IsRHEL() {
+		tools.ExecShell("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
+		tools.ExecShell("firewall-cmd --add-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
+		tools.ExecShell("firewall-cmd --reload")
 	} else {
-		helper.ExecShell("ufw delete allow " + cast.ToString(port) + "/" + protocol)
-		helper.ExecShell("ufw allow " + cast.ToString(port) + "/" + protocol)
-		helper.ExecShell("ufw reload")
+		tools.ExecShell("ufw delete allow " + cast.ToString(port) + "/" + protocol)
+		tools.ExecShell("ufw allow " + cast.ToString(port) + "/" + protocol)
+		tools.ExecShell("ufw reload")
 	}
 
 	Success(ctx, nil)
@@ -128,12 +128,12 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) {
 		return
 	}
 
-	if helper.IsRHEL() {
-		helper.ExecShell("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
-		helper.ExecShell("firewall-cmd --reload")
+	if tools.IsRHEL() {
+		tools.ExecShell("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
+		tools.ExecShell("firewall-cmd --reload")
 	} else {
-		helper.ExecShell("ufw delete allow " + cast.ToString(port) + "/" + protocol)
-		helper.ExecShell("ufw reload")
+		tools.ExecShell("ufw delete allow " + cast.ToString(port) + "/" + protocol)
+		tools.ExecShell("ufw reload")
 	}
 
 	Success(ctx, nil)
@@ -142,15 +142,15 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) {
 func (r *SafeController) firewallStatus() bool {
 	var out string
 	var running bool
-	if helper.IsRHEL() {
-		out = helper.ExecShell("systemctl status firewalld | grep Active | awk '{print $3}'")
+	if tools.IsRHEL() {
+		out = tools.ExecShell("systemctl status firewalld | grep Active | awk '{print $3}'")
 		if out == "(running)" {
 			running = true
 		} else {
 			running = false
 		}
 	} else {
-		out = helper.ExecShell("ufw status | grep Status | awk '{print $2}'")
+		out = tools.ExecShell("ufw status | grep Status | awk '{print $2}'")
 		if out == "active" {
 			running = true
 		} else {
@@ -162,7 +162,7 @@ func (r *SafeController) firewallStatus() bool {
 }
 
 func (r *SafeController) GetSshStatus(ctx http.Context) {
-	out := helper.ExecShell("systemctl status sshd | grep Active | awk '{print $3}'")
+	out := tools.ExecShell("systemctl status sshd | grep Active | awk '{print $3}'")
 	running := false
 	if out == "(running)" {
 		running = true
@@ -173,18 +173,18 @@ func (r *SafeController) GetSshStatus(ctx http.Context) {
 
 func (r *SafeController) SetSshStatus(ctx http.Context) {
 	if ctx.Request().QueryBool("status") {
-		helper.ExecShell("systemctl enable sshd")
-		helper.ExecShell("systemctl start sshd")
+		tools.ExecShell("systemctl enable sshd")
+		tools.ExecShell("systemctl start sshd")
 	} else {
-		helper.ExecShell("systemctl stop sshd")
-		helper.ExecShell("systemctl disable sshd")
+		tools.ExecShell("systemctl stop sshd")
+		tools.ExecShell("systemctl disable sshd")
 	}
 
 	Success(ctx, nil)
 }
 
 func (r *SafeController) GetSshPort(ctx http.Context) {
-	out := helper.ExecShell("cat /etc/ssh/sshd_config | grep Port | awk '{print $2}'")
+	out := tools.ExecShell("cat /etc/ssh/sshd_config | grep Port | awk '{print $2}'")
 	Success(ctx, out)
 }
 
@@ -195,27 +195,27 @@ func (r *SafeController) SetSshPort(ctx http.Context) {
 		return
 	}
 
-	oldPort := helper.ExecShell("cat /etc/ssh/sshd_config | grep Port | awk '{print $2}'")
-	helper.ExecShell("sed -i 's/#Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
-	helper.ExecShell("sed -i 's/Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
+	oldPort := tools.ExecShell("cat /etc/ssh/sshd_config | grep Port | awk '{print $2}'")
+	tools.ExecShell("sed -i 's/#Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
+	tools.ExecShell("sed -i 's/Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
 
-	if status := helper.ExecShell("systemctl status sshd | grep Active | awk '{print $3}'"); status == "(running)" {
-		helper.ExecShell("systemctl restart sshd")
+	if status := tools.ExecShell("systemctl status sshd | grep Active | awk '{print $3}'"); status == "(running)" {
+		tools.ExecShell("systemctl restart sshd")
 	}
 
 	Success(ctx, nil)
 }
 
 func (r *SafeController) GetPingStatus(ctx http.Context) {
-	if helper.IsRHEL() {
-		out := helper.ExecShell("firewall-cmd --query-rich-rule='rule protocol value=icmp drop' 2>&1")
+	if tools.IsRHEL() {
+		out := tools.ExecShell("firewall-cmd --query-rich-rule='rule protocol value=icmp drop' 2>&1")
 		if out == "no" {
 			Success(ctx, true)
 		} else {
 			Success(ctx, false)
 		}
 	} else {
-		config := helper.ReadFile("/etc/ufw/before.rules")
+		config := tools.ReadFile("/etc/ufw/before.rules")
 		if strings.Contains(config, "-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT") {
 			Success(ctx, true)
 		} else {
@@ -225,20 +225,20 @@ func (r *SafeController) GetPingStatus(ctx http.Context) {
 }
 
 func (r *SafeController) SetPingStatus(ctx http.Context) {
-	if helper.IsRHEL() {
+	if tools.IsRHEL() {
 		if ctx.Request().QueryBool("status") {
-			helper.ExecShell("firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'")
+			tools.ExecShell("firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'")
 		} else {
-			helper.ExecShell("firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'")
+			tools.ExecShell("firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'")
 		}
-		helper.ExecShell("firewall-cmd --reload")
+		tools.ExecShell("firewall-cmd --reload")
 	} else {
 		if ctx.Request().QueryBool("status") {
-			helper.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules")
+			tools.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules")
 		} else {
-			helper.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules")
+			tools.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules")
 		}
-		helper.ExecShell("ufw reload")
+		tools.ExecShell("ufw reload")
 	}
 
 	Success(ctx, nil)

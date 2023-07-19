@@ -9,7 +9,7 @@ import (
 
 	"panel/app/models"
 	"panel/app/services"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type CronController struct {
@@ -59,23 +59,23 @@ func (r *CronController) Add(ctx http.Context) {
 	// 写入shell
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
-	if !helper.Exists(shellDir) {
+	if !tools.Exists(shellDir) {
 		facades.Log().Error("[面板][CronController] 计划任务目录不存在")
 		Error(ctx, http.StatusInternalServerError, "计划任务目录不存在")
 		return
 	}
-	if !helper.Exists(shellLogDir) {
+	if !tools.Exists(shellLogDir) {
 		facades.Log().Error("[面板][CronController] 计划任务日志目录不存在")
 		Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 		return
 	}
-	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + helper.RandomString(16)
-	if !helper.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0644) {
+	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
+	if !tools.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0644) {
 		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
-	helper.ExecShell("dos2unix " + shellDir + shellFile + ".sh")
+	tools.ExecShell("dos2unix " + shellDir + shellFile + ".sh")
 
 	var cron models.Cron
 	cron.Name = ctx.Request().Input("name")
@@ -122,12 +122,12 @@ func (r *CronController) Update(ctx http.Context) {
 		return
 	}
 
-	if !helper.WriteFile(cron.Shell, ctx.Request().Input("script"), 0644) {
+	if !tools.WriteFile(cron.Shell, ctx.Request().Input("script"), 0644) {
 		facades.Log().Error("[面板][CronController] 更新计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
-	helper.ExecShell("dos2unix " + cron.Shell)
+	tools.ExecShell("dos2unix " + cron.Shell)
 
 	r.cron.DeleteFromSystem(cron)
 	if cron.Status {
@@ -226,12 +226,12 @@ func (r *CronController) Log(ctx http.Context) {
 		return
 	}
 
-	if !helper.Exists(cron.Log) {
+	if !tools.Exists(cron.Log) {
 		Error(ctx, http.StatusBadRequest, "日志文件不存在")
 		return
 	}
 
 	Success(ctx, http.Json{
-		"log": helper.ReadFile(cron.Log),
+		"log": tools.ReadFile(cron.Log),
 	})
 }

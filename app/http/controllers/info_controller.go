@@ -8,7 +8,7 @@ import (
 
 	"panel/app/models"
 	"panel/app/services"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type MenuItem struct {
@@ -81,11 +81,11 @@ func (r *InfoController) HomePlugins(ctx http.Context) {
 }
 
 func (r *InfoController) NowMonitor(ctx http.Context) {
-	Success(ctx, helper.GetMonitoringInfo())
+	Success(ctx, tools.GetMonitoringInfo())
 }
 
 func (r *InfoController) SystemInfo(ctx http.Context) {
-	monitorInfo := helper.GetMonitoringInfo()
+	monitorInfo := tools.GetMonitoringInfo()
 
 	Success(ctx, http.Json{
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,

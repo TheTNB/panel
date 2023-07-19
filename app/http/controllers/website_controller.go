@@ -9,7 +9,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 
 	"panel/app/services"
 )
@@ -107,8 +107,8 @@ func (c *WebsiteController) Delete(ctx http.Context) {
 }
 
 func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
-	index := helper.ReadFile("/www/server/openresty/html/index.html")
-	stop := helper.ReadFile("/www/server/openresty/html/stop.html")
+	index := tools.ReadFile("/www/server/openresty/html/index.html")
+	stop := tools.ReadFile("/www/server/openresty/html/stop.html")
 
 	Success(ctx, http.Json{
 		"index": index,
@@ -120,13 +120,13 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
-	if !helper.WriteFile("/www/server/openresty/html/index.html", index, 0644) {
+	if !tools.WriteFile("/www/server/openresty/html/index.html", index, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
 
-	if !helper.WriteFile("/www/server/openresty/html/stop.html", stop, 0644) {
+	if !tools.WriteFile("/www/server/openresty/html/stop.html", stop, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
@@ -178,16 +178,16 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	}
 
 	// 原文
-	raw := helper.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	raw := tools.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
 	if strings.TrimSpace(raw) != strings.TrimSpace(ctx.Request().Input("raw")) {
-		helper.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
+		tools.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
 		Success(ctx, nil)
 		return
 	}
 
 	// 目录
 	path := ctx.Request().Input("path")
-	if !helper.Exists(path) {
+	if !tools.Exists(path) {
 		Error(ctx, http.StatusBadRequest, "网站目录不存在")
 		return
 	}
@@ -207,7 +207,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		domain += " " + v
 	}
 	domain += ";"
-	domainConfigOld := helper.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
+	domainConfigOld := tools.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
 	if len(strings.TrimSpace(domainConfigOld)) == 0 {
 		Error(ctx, http.StatusBadRequest, "配置文件中缺少server_name标记位")
 		return
@@ -235,7 +235,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 			port.WriteString("    listen " + v + ";")
 		}
 	}
-	portConfigOld := helper.Cut(raw, "# port标记位开始", "# port标记位结束")
+	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
 	if len(strings.TrimSpace(portConfigOld)) == 0 {
 		Error(ctx, http.StatusBadRequest, "配置文件中缺少port标记位")
 		return
@@ -243,7 +243,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
 
 	// 运行目录
-	root := helper.Cut(raw, "# root标记位开始", "# root标记位结束")
+	root := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
 	if len(strings.TrimSpace(root)) == 0 {
 		Error(ctx, http.StatusBadRequest, "配置文件中缺少root标记位")
 		return
@@ -257,7 +257,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	raw = strings.Replace(raw, root, rootNew, -1)
 
 	// 默认文件
-	index := helper.Cut(raw, "# index标记位开始", "# index标记位结束")
+	index := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
 	if len(strings.TrimSpace(index)) == 0 {
 		Error(ctx, http.StatusBadRequest, "配置文件中缺少index标记位")
 		return
@@ -275,10 +275,10 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		path += "/"
 	}
 	if ctx.Request().InputBool("open_basedir") {
-		helper.WriteFile(path+".user.ini", "open_basedir="+path+":/tmp/", 0644)
+		tools.WriteFile(path+".user.ini", "open_basedir="+path+":/tmp/", 0644)
 	} else {
-		if helper.Exists(path + ".user.ini") {
-			helper.RemoveFile(path + ".user.ini")
+		if tools.Exists(path + ".user.ini") {
+			tools.RemoveFile(path + ".user.ini")
 		}
 	}
 
@@ -296,7 +296,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
     waf_cache ` + wafCache + `;
     
 `
-	wafConfigOld := helper.Cut(raw, "# waf标记位开始", "# waf标记位结束")
+	wafConfigOld := tools.Cut(raw, "# waf标记位开始", "# waf标记位结束")
 	if len(strings.TrimSpace(wafConfigOld)) != 0 {
 		raw = strings.Replace(raw, wafConfigOld, "", -1)
 	}
@@ -306,8 +306,8 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	ssl := ctx.Request().InputBool("ssl")
 	website.Ssl = ssl
 	if ssl {
-		helper.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
-		helper.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
+		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
+		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
 		sslConfig := `
 # ssl标记位开始
     ssl_certificate /www/server/vhost/ssl/` + website.Name + `.pem;
@@ -342,13 +342,13 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 
 `
 		}
-		sslConfigOld := helper.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
 			raw = strings.Replace(raw, sslConfigOld, "", -1)
 		}
 		raw = strings.Replace(raw, "# ssl标记位开始", sslConfig, -1)
 	} else {
-		sslConfigOld := helper.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
 			raw = strings.Replace(raw, sslConfigOld, "", -1)
 		}
@@ -356,7 +356,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 
 	if website.Php != ctx.Request().InputInt("php") {
 		website.Php = ctx.Request().InputInt("php")
-		phpConfigOld := helper.Cut(raw, "# php标记位开始", "# php标记位结束")
+		phpConfigOld := tools.Cut(raw, "# php标记位开始", "# php标记位结束")
 		phpConfig := `
     include enable-php` + strconv.Itoa(website.Php) + `.conf;
     
@@ -373,9 +373,9 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	helper.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	helper.WriteFile("/www/server/vhost/rewrite/"+website.Name+".conf", ctx.Request().Input("rewrite"), 0644)
-	helper.ExecShell("systemctl reload openresty")
+	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.WriteFile("/www/server/vhost/rewrite/"+website.Name+".conf", ctx.Request().Input("rewrite"), 0644)
+	tools.ExecShell("systemctl reload openresty")
 
 	Success(ctx, nil)
 }
@@ -395,7 +395,7 @@ func (c *WebsiteController) ClearSiteLpg(ctx http.Context) {
 		return
 	}
 
-	helper.RemoveFile("/www/wwwlogs/" + website.Name + ".log")
+	tools.RemoveFile("/www/wwwlogs/" + website.Name + ".log")
 
 	Success(ctx, nil)
 }
@@ -544,9 +544,9 @@ server
 
 `, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	helper.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	helper.WriteFile("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644)
-	helper.ExecShell("systemctl reload openresty")
+	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.WriteFile("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644)
+	tools.ExecShell("systemctl reload openresty")
 
 	Success(ctx, nil)
 }
@@ -572,10 +572,10 @@ func (c *WebsiteController) SetStatus(ctx http.Context) {
 		return
 	}
 
-	raw := helper.ReadFile("/www/server/vhost/" + website.Name + ".conf")
+	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
 
 	// 运行目录
-	rootConfig := helper.Cut(raw, "# root标记位开始", "# root标记位结束")
+	rootConfig := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
 	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(rootConfig)
 	if len(match) == 2 {
 		if website.Status {
@@ -587,7 +587,7 @@ func (c *WebsiteController) SetStatus(ctx http.Context) {
 	}
 
 	// 默认文件
-	indexConfig := helper.Cut(raw, "# index标记位开始", "# index标记位结束")
+	indexConfig := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
 	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(indexConfig)
 	if len(match) == 2 {
 		if website.Status {
@@ -598,8 +598,8 @@ func (c *WebsiteController) SetStatus(ctx http.Context) {
 		}
 	}
 
-	helper.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	helper.ExecShell("systemctl reload openresty")
+	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.ExecShell("systemctl reload openresty")
 
 	Success(ctx, nil)
 }

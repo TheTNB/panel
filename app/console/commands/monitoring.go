@@ -10,7 +10,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type Monitoring struct {
@@ -43,7 +43,7 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		return nil
 	}
 
-	info := helper.GetMonitoringInfo()
+	info := tools.GetMonitoringInfo()
 
 	err := facades.Orm().Query().Create(&models.Monitor{
 		Info: info,

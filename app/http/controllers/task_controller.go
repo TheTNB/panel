@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type TaskController struct {
@@ -62,7 +62,7 @@ func (r *TaskController) Log(ctx http.Context) {
 		return
 	}
 
-	log := helper.ExecShell("tail -n 30 " + task.Log)
+	log := tools.ExecShell("tail -n 30 " + task.Log)
 
 	Success(ctx, log)
 }

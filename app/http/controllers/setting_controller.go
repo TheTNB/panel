@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 
 	"panel/app/models"
 	"panel/app/services"
@@ -70,9 +70,9 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
-	oldPort := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+	oldPort := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 	if oldPort != port {
-		helper.ExecShell("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+		tools.ExecShell("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
 	}
 	err = r.setting.Set(models.SettingKeyBackupPath, backupPath)
 	if err != nil {

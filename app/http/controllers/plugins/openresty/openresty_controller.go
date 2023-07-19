@@ -12,7 +12,7 @@ import (
 
 	"panel/app/http/controllers"
 	"panel/app/http/controllers/plugins"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type OpenRestyController struct {
@@ -31,7 +31,7 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 		return
 	}
 
-	out := helper.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
+	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -51,8 +51,8 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 		return
 	}
 
-	helper.ExecShell("systemctl reload openresty")
-	out := helper.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl reload openresty")
+	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -72,8 +72,8 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 		return
 	}
 
-	helper.ExecShell("systemctl start openresty")
-	out := helper.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl start openresty")
+	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -93,8 +93,8 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 		return
 	}
 
-	helper.ExecShell("systemctl stop openresty")
-	out := helper.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl stop openresty")
+	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -114,8 +114,8 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 		return
 	}
 
-	helper.ExecShell("systemctl restart openresty")
-	out := helper.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl restart openresty")
+	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -135,7 +135,7 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) {
 		return
 	}
 
-	config := helper.ReadFile("/www/server/openresty/conf/nginx.conf")
+	config := tools.ReadFile("/www/server/openresty/conf/nginx.conf")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty配置失败")
 		return
@@ -156,7 +156,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !helper.WriteFile("/www/server/openresty/conf/nginx.conf", config, 0644) {
+	if !tools.WriteFile("/www/server/openresty/conf/nginx.conf", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "保存OpenResty配置失败")
 		return
 	}
@@ -170,7 +170,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	out := helper.ExecShell("tail -n 100 /www/wwwlogs/nginx_error.log")
+	out := tools.ExecShell("tail -n 100 /www/wwwlogs/nginx_error.log")
 	controllers.Success(ctx, out)
 }
 
@@ -180,7 +180,7 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 		return
 	}
 
-	_ = helper.ExecShell("echo '' > /www/wwwlogs/nginx_error.log")
+	_ = tools.ExecShell("echo '' > /www/wwwlogs/nginx_error.log")
 	controllers.Success(ctx, "清空OpenResty错误日志成功")
 }
 
@@ -201,13 +201,13 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	raw := resp.String()
 	var data map[int]map[string]any
 
-	out := helper.ExecShell("ps aux | grep nginx | grep 'worker process' | wc -l")
+	out := tools.ExecShell("ps aux | grep nginx | grep 'worker process' | wc -l")
 	workers := strings.TrimSpace(out)
 	data[0]["name"] = "工作进程"
 	data[0]["value"] = workers
 
-	out = helper.ExecShell("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
-	mem := helper.FormatBytes(cast.ToFloat64(strings.TrimSpace(out)))
+	out = tools.ExecShell("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
+	mem := tools.FormatBytes(cast.ToFloat64(strings.TrimSpace(out)))
 	data[1]["name"] = "内存占用"
 	data[1]["value"] = mem
 

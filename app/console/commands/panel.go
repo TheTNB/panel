@@ -12,7 +12,7 @@ import (
 
 	"panel/app/models"
 	"panel/app/services"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type Panel struct {
@@ -57,7 +57,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		hash, err := facades.Hash().Make(helper.RandomString(32))
+		hash, err := facades.Hash().Make(tools.RandomString(32))
 		if err != nil {
 			color.Redln("初始化失败")
 			return nil
@@ -73,7 +73,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("初始化成功")
 
 	case "update":
-		err := helper.UpdatePanel()
+		err := tools.UpdatePanel()
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil
@@ -89,14 +89,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		password := helper.RandomString(16)
+		password := tools.RandomString(16)
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
 			color.Redln("生成密码失败")
 			return nil
 		}
 
-		user.Username = helper.RandomString(8)
+		user.Username = tools.RandomString(8)
 		user.Password = hash
 
 		err = facades.Orm().Query().Save(&user)
@@ -105,7 +105,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		port := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+		port := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
@@ -113,7 +113,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyPanelEntrance, "/"))
 
 	case "getPort":
-		port := helper.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+		port := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":

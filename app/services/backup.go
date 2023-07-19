@@ -8,7 +8,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	"panel/app/models"
-	"panel/packages/helper"
+	"panel/pkg/tools"
 )
 
 type Backup interface {
@@ -51,7 +51,7 @@ func (s *BackupImpl) WebsiteList() ([]BackupFile, error) {
 		}
 		backupList = append(backupList, BackupFile{
 			Name: file.Name(),
-			Size: helper.FormatBytes(float64(info.Size())),
+			Size: tools.FormatBytes(float64(info.Size())),
 		})
 	}
 
@@ -65,12 +65,12 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 	}
 
 	backupPath += "/website"
-	if !helper.Exists(backupPath) {
-		helper.Mkdir(backupPath, 0644)
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
 	}
 
 	backupFile := backupPath + "/" + website.Name + carbon.Now().ToShortDateTimeString() + ".zip"
-	helper.ExecShell("cd " + website.Path + " && zip -r " + backupFile + " .")
+	tools.ExecShell("cd " + website.Path + " && zip -r " + backupFile + " .")
 
 	return nil
 }
