@@ -89,7 +89,7 @@ func FormatBytes(size float64) string {
 }
 
 // Cut 裁剪字符串
-func Cut(begin, end, str string) string {
+func Cut(str, begin, end string) string {
 	bIndex := strings.Index(str, begin)
 	eIndex := strings.Index(str, end)
 	if bIndex == -1 || eIndex == -1 || bIndex > eIndex {

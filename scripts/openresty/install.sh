@@ -169,9 +169,9 @@ rm -rf src
 mkdir -p /www/wwwroot/default
 mkdir -p /www/wwwlogs
 mkdir -p /www/server/vhost
-mkdir -p /www/server/vhost/openresty
-mkdir -p /www/server/vhost/openresty/rewrite
-mkdir -p /www/server/vhost/openresty/ssl
+mkdir -p /www/server/vhost
+mkdir -p /www/server/vhost/rewrite
+mkdir -p /www/server/vhost/ssl
 
 # 写入主配置文件
 cat >${openrestyPath}/conf/nginx.conf <<EOF
@@ -264,7 +264,7 @@ http {
             fastcgi_param SCRIPT_FILENAME \$fastcgi_script_name;
         }
     }
-    include /www/server/vhost/openresty/*.conf;
+    include /www/server/vhost/*.conf;
 }
 EOF
 # 写入pathinfo配置文件
@@ -318,7 +318,7 @@ chown -R www:www /www/wwwroot
 chmod -R 644 /www/server/vhost
 
 # 写入无php配置文件
-echo "" >${openrestyPath}/conf/enable-php-00.conf
+echo "" >${openrestyPath}/conf/enable-php-0.conf
 # 写入代理默认配置文件
 cat >${openrestyPath}/conf/proxy.conf <<EOF
 proxy_temp_path ${openrestyPath}/proxy_temp_dir;

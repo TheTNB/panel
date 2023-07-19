@@ -57,7 +57,7 @@ if [ -d "/www/server/php/82" ]; then
 fi
 
 # 写入 phpMyAdmin 配置文件
-cat >/www/server/vhost/openresty/phpmyadmin.conf <<EOF
+cat >/www/server/vhost/phpmyadmin.conf <<EOF
 # 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
 # 有自定义配置需求的，请将自定义的配置写在各标记位下方。
 server
@@ -100,8 +100,8 @@ server
 }
 EOF
 # 设置文件权限
-chown -R root:root /www/server/vhost/openresty/phpmyadmin.conf
-chmod -R 644 /www/server/vhost/openresty/phpmyadmin.conf
+chown -R root:root /www/server/vhost/phpmyadmin.conf
+chmod -R 644 /www/server/vhost/phpmyadmin.conf
 
 # 放行端口
 firewall-cmd --permanent --zone=public --add-port=888/tcp >/dev/null 2>&1

@@ -22,7 +22,7 @@ setupPath="/www"
 phpmyadminPath="${setupPath}/wwwroot/phpmyadmin"
 
 
-rm -rf /www/server/vhost/openresty/phpmyadmin.conf
+rm -rf /www/server/vhost/phpmyadmin.conf
 rm -rf ${phpmyadminPath}
 panel deletePlugin phpmyadmin
 systemctl reload openresty

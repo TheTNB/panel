@@ -60,5 +60,5 @@ func (s *StringHelperTestSuite) TestFormatBytes() {
 }
 
 func (s *StringHelperTestSuite) TestCut() {
-	s.Equal("aoZ", Cut("H", "i", "HaoZi"))
+	s.Equal("aoZ", Cut("HaoZi", "H", "i"))
 }

@@ -4,6 +4,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/goravel/framework/facades"
@@ -14,7 +15,10 @@ import (
 )
 
 type Website interface {
-	List() ([]models.Website, error)
+	List(page int, limit int) (int64, []models.Website, error)
+	Add(website PanelWebsite) (models.Website, error)
+	Delete(id int) error
+	GetConfig(id int) (WebsiteSetting, error)
 }
 
 type PanelWebsite struct {
@@ -40,6 +44,7 @@ type WebsiteSetting struct {
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
+	Php               int      `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
 	Ssl               bool     `json:"ssl"`
 	SslCertificate    string   `json:"ssl_certificate"`
@@ -192,7 +197,7 @@ server
     #error_page 502 /502.html;
 
     # 伪静态规则引入，修改后将导致面板设置的伪静态规则失效
-    include /www/server/vhost/openresty/rewrite/%s.conf;
+    include /www/server/vhost/rewrite/%s.conf;
 
     # 面板默认禁止访问部分敏感目录，可自行修改
     location ~ ^/(\.user.ini|\.htaccess|\.git|\.svn)
@@ -226,9 +231,9 @@ server
 }
 
 // Delete 删除网站
-func (r *WebsiteImpl) Delete(name string) error {
+func (r *WebsiteImpl) Delete(id int) error {
 	var website models.Website
-	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
+	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
 		return err
 	}
 
@@ -247,4 +252,95 @@ func (r *WebsiteImpl) Delete(name string) error {
 	// TODO 删除数据库
 
 	return nil
+}
+
+// GetConfig 获取网站配置
+func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
+	var website models.Website
+	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
+		return WebsiteSetting{}, err
+	}
+
+	config := helper.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+
+	var setting WebsiteSetting
+	setting.Name = website.Name
+	setting.Path = website.Path
+	setting.Ssl = website.Ssl
+	setting.Php = website.Php
+	setting.Raw = config
+
+	ports := helper.Cut(config, "# port标记位开始", "# port标记位结束")
+	matches := regexp.MustCompile(`listen\s+(.*);`).FindAllStringSubmatch(ports, -1)
+	for _, match := range matches {
+		if len(match) < 2 {
+			continue
+		}
+		setting.Ports = append(setting.Ports, match[1])
+	}
+	serverName := helper.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
+	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)
+	if len(match) > 1 {
+		setting.Domains = strings.Split(match[1], " ")
+	}
+	root := helper.Cut(config, "# root标记位开始", "# root标记位结束")
+	match = regexp.MustCompile(`root\s+(.*);`).FindStringSubmatch(root)
+	if len(match) > 1 {
+		setting.Root = match[1]
+	}
+	index := helper.Cut(config, "# index标记位开始", "# index标记位结束")
+	match = regexp.MustCompile(`index\s+(.*);`).FindStringSubmatch(index)
+	if len(match) > 1 {
+		setting.Index = match[1]
+	}
+
+	if helper.Exists(setting.Root + "/.user.ini") {
+		userIni := helper.ReadFile(setting.Path + "/.user.ini")
+		if strings.Contains(userIni, "open_basedir") {
+			setting.OpenBasedir = true
+		} else {
+			setting.OpenBasedir = false
+		}
+	} else {
+		setting.OpenBasedir = false
+	}
+
+	if setting.Ssl {
+		ssl := helper.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
+		match = regexp.MustCompile(`ssl_certificate\s+(.*);`).FindStringSubmatch(ssl)
+		if len(match) > 1 {
+			setting.SslCertificate = helper.ReadFile(match[1])
+		}
+		match = regexp.MustCompile(`ssl_certificate_key\s+(.*);`).FindStringSubmatch(ssl)
+		if len(match) > 1 {
+			setting.SslCertificateKey = helper.ReadFile(match[1])
+		}
+		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
+		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
+	} else {
+		setting.SslCertificate = ""
+		setting.SslCertificateKey = ""
+		setting.HttpRedirect = false
+		setting.Hsts = false
+	}
+
+	waf := helper.Cut(config, "# waf标记位开始", "# waf标记位结束")
+	setting.Waf = strings.Contains(waf, "waf on;")
+	match = regexp.MustCompile(`waf_mode\s+(.+);`).FindStringSubmatch(waf)
+	if len(match) > 1 {
+		setting.WafMode = match[1]
+	}
+	match = regexp.MustCompile(`waf_cc_deny\s+(.+);`).FindStringSubmatch(waf)
+	if len(match) > 1 {
+		setting.WafCcDeny = match[1]
+	}
+	match = regexp.MustCompile(`waf_cache\s+(.+);`).FindStringSubmatch(waf)
+	if len(match) > 1 {
+		setting.WafCache = match[1]
+	}
+
+	setting.Rewrite = helper.ReadFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
+	setting.Log = helper.ExecShell("tail -n 100 /www/wwwlogs/" + website.Name + ".log")
+
+	return setting, nil
 }
