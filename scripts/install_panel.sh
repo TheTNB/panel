@@ -215,7 +215,7 @@ Wants=network.target
 [Service]
 Type=simple
 WorkingDirectory=${setup_Path}/panel/
-ExecStart=./panel --env="panel.conf"
+ExecStart=/www/panel/panel --env="/www/panel/panel.conf"
 ExecReload=kill -s HUP \$MAINPID
 ExecStop=kill -s QUIT \$MAINPID
 User=root
