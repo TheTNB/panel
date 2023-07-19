@@ -180,6 +180,7 @@ Init_Panel() {
     cp panel-example.conf panel.conf
     ${setup_Path}/panel/panel --env="panel.conf" artisan key:generate
     ${setup_Path}/panel/panel --env="panel.conf" artisan jwt:secret
+    ${setup_Path}/panel/panel --env="panel.conf" artisan migrate
     chmod -R 700 ${setup_Path}/panel
     cp scripts/panel.sh /usr/bin/panel
     chmod -R 700 /usr/bin/panel
