@@ -48,7 +48,7 @@ func (r *InfoController) Menu(ctx http.Context) {
 		{Name: "website", Title: "网站管理", Icon: "layui-icon-website", Jump: "website/list"},
 		{Name: "monitor", Title: "资源监控", Icon: "layui-icon-chart-screen", Jump: "monitor"},
 		{Name: "safe", Title: "系统安全", Icon: "layui-icon-auz", Jump: "safe"},
-		{Name: "file", Title: "文件管理", Icon: "layui-icon-file", Jump: "file"},
+		/*{Name: "file", Title: "文件管理", Icon: "layui-icon-file", Jump: "file"},*/
 		{Name: "cron", Title: "计划任务", Icon: "layui-icon-date", Jump: "cron"},
 		{Name: "plugin", Title: "插件中心", Icon: "layui-icon-app", Jump: "plugin"},
 		{Name: "setting", Title: "面板设置", Icon: "layui-icon-set", Jump: "setting"},
