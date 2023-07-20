@@ -105,7 +105,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		port := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+		port := tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
