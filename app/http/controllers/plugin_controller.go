@@ -108,7 +108,7 @@ func (r *PluginController) Install(ctx http.Context) {
 	var task models.Task
 	task.Name = "安装插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/plugins/" + plugin.Slug + "/install.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/install.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
@@ -151,7 +151,7 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 	var task models.Task
 	task.Name = "卸载插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/plugins/" + plugin.Slug + "/uninstall.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/uninstall.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
@@ -194,7 +194,7 @@ func (r *PluginController) Update(ctx http.Context) {
 	var task models.Task
 	task.Name = "更新插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/plugins/" + plugin.Slug + "/update.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/update.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())

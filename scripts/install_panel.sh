@@ -198,12 +198,13 @@ Init_Panel() {
         firewall-cmd --reload
     elif [ "${OS}" == "debian" ]; then
         apt install ufw -y
-        sudo ufw enable
-        sudo ufw allow 22/tcp
-        sudo ufw allow 80/tcp
-        sudo ufw allow 443/tcp
-        sudo ufw allow 8888/tcp
-        sudo ufw allow ${sshPort}/tcp
+        echo y | ufw enable
+        ufw allow 22/tcp
+        ufw allow 80/tcp
+        ufw allow 443/tcp
+        ufw allow 8888/tcp
+        ufw allow ${sshPort}/tcp
+        ufw reload
     fi
     # 写入服务文件
     cat >/etc/systemd/system/panel.service <<EOF
