@@ -43,7 +43,7 @@ Date: 2023-06-24
                             </div>
                             <div class="layui-tab-item">
                                 <div class="layui-btn-container">
-                                    <button id="openresty-clean-error-log" class="layui-btn">清空日志</button>
+                                    <button id="openresty-clear-error-log" class="layui-btn">清空日志</button>
                                 </div>
                                 <pre id="openresty-error-log" class="layui-code">
                                     获取中...
@@ -141,54 +141,50 @@ Date: 2023-06-24
 
     // 事件监听
     $('#openresty-start').click(function () {
-      admin.popup({
-        title: '<span style="color: red;">警告</span>'
-        ,
-        shade: 0
-        ,
-        anim: -1
-        ,
-        area: ['300px', '200px']
-        ,
-        id: 'layadmin-layer-skin-openresty-start'
-        ,
-        skin: 'layui-anim layui-anim-upbit'
-        ,
-        content: '面板的正常访问依赖OpenResty，因此不支持在面板启动OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">systemctl start nginx</span>以启动OpenResty！'
-      })
+        index = layer.msg('正在启动OpenResty...', { icon: 16, time: 0, shade: 0.3 })
+        admin.req({
+            url: '/api/plugins/openresty/start'
+            , method: 'post'
+            , success: function (result) {
+                layer.close(index)
+                if (result.code !== 0) {
+                    return false
+                }
+                admin.events.refresh()
+                layer.alert('OpenResty启动成功！')
+            }
+        })
     })
     $('#openresty-stop').click(function () {
-      admin.popup({
-        title: '<span style="color: red;">警告</span>'
-        ,
-        shade: 0
-        ,
-        anim: -1
-        ,
-        area: ['300px', '200px']
-        ,
-        id: 'layadmin-layer-skin-openresty-stop'
-        ,
-        skin: 'layui-anim layui-anim-upbit'
-        ,
-        content: '面板的正常访问依赖OpenResty，因此不支持在面板停止OpenResty，如您确需操作，请在SSH执行<span class="layui-badge-rim">systemctl stop nginx</span>以停止OpenResty！'
-      })
+        layer.confirm('停止OpenResty将导致网站无法访问，是否继续停止？', {
+            btn: ['停止', '取消']
+        }, function () {
+            index = layer.msg('正在停止OpenResty...', { icon: 16, time: 0, shade: 0.3 })
+            admin.req({
+                url: '/api/plugins/openresty/stop'
+                , method: 'post'
+                , success: function (result) {
+                    layer.close(index)
+                    if (result.code !== 0) {
+                        return false
+                    }
+                    admin.events.refresh()
+                    layer.alert('OpenResty停止成功！')
+                }
+            })
+        })
     })
     $('#openresty-restart').click(function () {
-      layer.confirm('重启OpenResty有可能导致面板短时间无法访问，是否继续重启？', {
+      layer.confirm('重启OpenResty将导致网站短时间无法访问，是否继续重启？', {
         btn: ['重启', '取消']
       }, function () {
-        index = layer.msg('正在重启OpenResty...', { icon: 16, time: 0 })
+        index = layer.msg('正在重启OpenResty...', { icon: 16, time: 0, shade: 0.3 })
         admin.req({
           url: '/api/plugins/openresty/restart'
           , method: 'post'
-          , beforeSend: function () {
-            layer.msg('已发送重启请求，请稍后刷新确认重启状态。')
-          }
           , success: function (result) {
             layer.close(index)
             if (result.code !== 0) {
-              console.log('耗子Linux面板：OpenResty重启失败，接口返回' + result)
               return false
             }
             admin.events.refresh()
@@ -198,22 +194,22 @@ Date: 2023-06-24
       })
     })
     $('#openresty-reload').click(function () {
-      index = layer.msg('正在重载OpenResty...', { icon: 16, time: 0 })
+      index = layer.msg('正在重载OpenResty...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
         url: '/api/plugins/openresty/reload'
         , method: 'post'
         , success: function (result) {
           layer.close(index)
           if (result.code !== 0) {
-            console.log('耗子Linux面板：OpenResty重载失败，接口返回' + result)
             return false
           }
+          admin.events.refresh()
           layer.alert('OpenResty重载成功！')
         }
       })
     })
     $('#openresty-config-save').click(function () {
-      index = layer.msg('正在保存OpenResty主配置...', { icon: 16, time: 0 })
+      index = layer.msg('正在保存OpenResty主配置...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
         url: '/api/plugins/openresty/config'
         , method: 'post'
@@ -223,17 +219,16 @@ Date: 2023-06-24
         , success: function (result) {
           layer.close(index)
           if (result.code !== 0) {
-            console.log('耗子Linux面板：OpenResty配置保存失败，接口返回' + result)
             return false
           }
           layer.alert('OpenResty配置保存成功！')
         }
       })
     })
-    $('#openresty-clean-error-log').click(function () {
-      index = layer.msg('正在清空OpenResty错误日志...', { icon: 16, time: 0 })
+    $('#openresty-clear-error-log').click(function () {
+      index = layer.msg('正在清空OpenResty错误日志...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
-        url: '/api/plugins/openresty/cleanErrorLog'
+        url: '/api/plugins/openresty/clearErrorLog'
         , method: 'post'
         , success: function (result) {
           layer.close(index)

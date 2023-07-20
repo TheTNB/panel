@@ -170,6 +170,11 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 		return
 	}
 
+	if !tools.Exists("/www/wwwlogs/nginx_error.log") {
+		controllers.Success(ctx, "")
+		return
+	}
+
 	out := tools.ExecShell("tail -n 100 /www/wwwlogs/nginx_error.log")
 	controllers.Success(ctx, out)
 }
@@ -180,7 +185,7 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 		return
 	}
 
-	_ = tools.ExecShell("echo '' > /www/wwwlogs/nginx_error.log")
+	tools.ExecShell("echo '' > /www/wwwlogs/nginx_error.log")
 	controllers.Success(ctx, "清空OpenResty错误日志成功")
 }
 
@@ -199,42 +204,64 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	}
 
 	raw := resp.String()
-	var data map[int]map[string]any
+	type nginxStatus struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	}
+	var data []nginxStatus
 
 	out := tools.ExecShell("ps aux | grep nginx | grep 'worker process' | wc -l")
 	workers := strings.TrimSpace(out)
-	data[0]["name"] = "工作进程"
-	data[0]["value"] = workers
+	data = append(data, nginxStatus{
+		Name:  "工作进程",
+		Value: workers,
+	})
 
 	out = tools.ExecShell("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	mem := tools.FormatBytes(cast.ToFloat64(strings.TrimSpace(out)))
-	data[1]["name"] = "内存占用"
-	data[1]["value"] = mem
+	data = append(data, nginxStatus{
+		Name:  "内存占用",
+		Value: mem,
+	})
 
 	match := regexp.MustCompile(`Active connections:\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 2 {
-		data[2]["name"] = "活跃连接数"
-		data[2]["value"] = match[1]
+		data = append(data, nginxStatus{
+			Name:  "活跃连接数",
+			Value: match[1],
+		})
 	}
 
 	match = regexp.MustCompile(`server accepts handled requests\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 4 {
-		data[3]["name"] = "总连接次数"
-		data[3]["value"] = match[1]
-		data[4]["name"] = "总握手次数"
-		data[4]["value"] = match[2]
-		data[5]["name"] = "总请求次数"
-		data[5]["value"] = match[3]
+		data = append(data, nginxStatus{
+			Name:  "总连接次数",
+			Value: match[1],
+		})
+		data = append(data, nginxStatus{
+			Name:  "总握手次数",
+			Value: match[2],
+		})
+		data = append(data, nginxStatus{
+			Name:  "总请求次数",
+			Value: match[3],
+		})
 	}
 
 	match = regexp.MustCompile(`Reading:\s+(\d+)\s+Writing:\s+(\d+)\s+Waiting:\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 4 {
-		data[6]["name"] = "请求数"
-		data[6]["value"] = match[1]
-		data[7]["name"] = "响应数"
-		data[7]["value"] = match[2]
-		data[8]["name"] = "驻留进程"
-		data[8]["value"] = match[3]
+		data = append(data, nginxStatus{
+			Name:  "请求数",
+			Value: match[1],
+		})
+		data = append(data, nginxStatus{
+			Name:  "响应数",
+			Value: match[2],
+		})
+		data = append(data, nginxStatus{
+			Name:  "驻留进程",
+			Value: match[3],
+		})
 	}
 
 	controllers.Success(ctx, data)

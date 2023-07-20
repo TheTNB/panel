@@ -362,6 +362,6 @@ systemctl daemon-reload
 systemctl enable openresty.service
 systemctl start openresty.service
 
-panel writePlugin openresty
+panel writePlugin openresty ${openrestyVersion}
 
 echo -e "${HR}\nOpenResty install completed.\n${HR}"

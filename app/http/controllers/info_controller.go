@@ -122,3 +122,42 @@ func (r *InfoController) InstalledDbAndPhp(ctx http.Context) {
 		"postgresql": postgresqlInstalled,
 	})
 }
+
+func (r *InfoController) CheckUpdate(ctx http.Context) {
+	version := facades.Config().GetString("panel.version")
+	remote, err := tools.GetLatestPanelVersion()
+	if err != nil {
+		Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
+		return
+	}
+
+	if version == remote.Version {
+		Success(ctx, http.Json{
+			"update":  false,
+			"version": remote.Version,
+			"name":    remote.Name,
+			"body":    remote.Body,
+			"date":    remote.Date,
+		})
+		return
+	}
+
+	Success(ctx, http.Json{
+		"update":  true,
+		"version": remote.Version,
+		"name":    remote.Name,
+		"body":    remote.Body,
+		"date":    remote.Date,
+	})
+}
+
+func (r *InfoController) Update(ctx http.Context) {
+	proxy := ctx.Request().InputBool("proxy")
+	err := tools.UpdatePanel(proxy)
+	if err != nil {
+		Error(ctx, http.StatusInternalServerError, "更新失败")
+		return
+	}
+
+	Success(ctx, nil)
+}

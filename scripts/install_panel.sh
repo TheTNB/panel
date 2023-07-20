@@ -58,8 +58,7 @@ Prepare_system() {
         exit 1
     fi
 
-    wwwUserCheck=$(cat /etc/passwd | grep www)
-    if [ "${wwwUserCheck}" == "" ]; then
+    if ! id -u "www" >/dev/null 2>&1; then
         groupadd www
         useradd -s /sbin/nologin -g www www
     fi

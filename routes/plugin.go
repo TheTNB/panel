@@ -23,7 +23,7 @@ func Plugin() {
 		route.Get("config", openRestyController.GetConfig)
 		route.Post("config", openRestyController.SaveConfig)
 		route.Get("errorLog", openRestyController.ErrorLog)
-		route.Get("clearErrorLog", openRestyController.ClearErrorLog)
+		route.Post("clearErrorLog", openRestyController.ClearErrorLog)
 	})
 	facades.Route().Prefix("api/plugins/mysql80").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		mysql80Controller := mysql80.NewMysql80Controller()

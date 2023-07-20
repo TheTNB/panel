@@ -320,22 +320,50 @@ Date: 2023-06-22
               layer.msg('获取版本信息失败，请刷新重试！')
               return false
             }
-            if (result.data.version) {
-              admin.popup({
-                title: '提示'
-                ,
-                shade: 0
-                ,
-                anim: -1
-                ,
-                area: ['400px', '200px']
-                ,
-                id: 'layadmin-layer-skin-update-panel'
-                ,
-                skin: 'layui-anim layui-anim-upbit'
-                ,
-                content: '最新版本：' + result.data.version + '<br><br>更新日志：' + result.data.describe + '<br><br>请在SSH执行<span class="layui-badge-rim">panel update</span>以更新面板！'
-              })
+            if (result.data.update) {
+                layer.confirm('更新日期: <br>'+new Date(result.data.date).toLocaleString()+'<br>更新日志: <pre>'+result.data.body+'</pre>', {
+                    title: '最新版本: '+result.data.version+' ，是否更新？',
+                    btn: ['更新', '取消']
+                }, function () {
+                    let proxy = false
+                    layer.confirm('对于大陆服务器，建议使用代理进行更新', {
+                        title: '是否使用代理更新？',
+                        btn: ['是', '否']
+                    }, function () {
+                        proxy = true
+                        index = layer.msg('正在更新...', { icon: 16, time: 0, shade: 0.3 })
+                        admin.req({
+                            url: '/api/panel/info/update'
+                            , method: 'post'
+                            , data: { proxy: proxy }
+                            , success: function (result) {
+                                layer.close(index)
+                                if (result.code !== 0) {
+                                    return false
+                                }
+                                layer.alert('更新成功！')
+                                location.href = '/';
+                            }
+                        })
+                    }, function(){
+                        proxy = false
+                        index = layer.msg('正在更新...', { icon: 16, time: 0, shade: 0.3 })
+                        admin.req({
+                            url: '/api/panel/info/update'
+                            , method: 'post'
+                            , data: { proxy: proxy }
+                            , success: function (result) {
+                                layer.close(index)
+                                if (result.code !== 0) {
+                                    return false
+                                }
+                                layer.alert('更新成功！')
+                                location.href = '/';
+                            }
+                        })
+                    })
+
+                })
             } else {
               layer.msg('当前已是最新版本！')
             }

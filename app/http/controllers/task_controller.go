@@ -69,7 +69,7 @@ func (r *TaskController) Log(ctx http.Context) {
 
 func (r *TaskController) Delete(ctx http.Context) {
 	var task models.Task
-	_, err := facades.Orm().Query().Where("id", ctx.Request().QueryInt("id")).Delete(&task)
+	_, err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).Delete(&task)
 	if err != nil {
 		facades.Log().Error("[面板][TaskController] 删除任务失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")

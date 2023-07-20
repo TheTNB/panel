@@ -5,9 +5,11 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/gookit/color"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -114,17 +116,52 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 }
 
 // UpdatePanel 更新面板
-func UpdatePanel() error {
+func UpdatePanel(proxy bool) error {
 	panelInfo, err := GetLatestPanelVersion()
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command("/bin/bash", "-c", "wget -O panel.tar.gz "+panelInfo.DownloadUrl+" && tar -zxvf panel.tar.gz && rm -rf panel.tar.gz && chmod +x panel && ./panel artisan migrate")
-	_, err = cmd.Output()
-	if err != nil {
-		return errors.New("更新面板失败")
+	color.Greenln("最新版本: " + panelInfo.Version)
+	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
+	color.Greenln("使用代理: " + strconv.FormatBool(proxy))
+
+	color.Greenln("备份面板配置...")
+	ExecShell("cp -f /www/panel/database/panel.db /tmp/panel.db.bak")
+	ExecShell("cp -f /www/panel/panel.conf /tmp/panel.conf.bak")
+	if !Exists("/tmp/panel.db.bak") || !Exists("/tmp/panel.conf.bak") {
+		return errors.New("备份面板配置失败")
 	}
+	color.Greenln("备份完成")
+
+	color.Greenln("清理旧版本...")
+	ExecShell("rm -rf /www/panel/*")
+	color.Greenln("清理完成")
+
+	color.Greenln("正在下载...")
+	if proxy {
+		ExecShell("wget -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
+	} else {
+		ExecShell("wget -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
+	}
+	color.Greenln("下载完成")
+
+	color.Greenln("更新新版本...")
+	ExecShell("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel")
+	color.Greenln("更新完成")
+
+	color.Greenln("恢复面板配置...")
+	ExecShell("cp -f /tmp/panel.db.bak /www/panel/database/panel.db")
+	ExecShell("cp -f /tmp/panel.conf.bak /www/panel/panel.conf")
+	if !Exists("/www/panel/database/panel.db") || !Exists("/www/panel/panel.conf") {
+		return errors.New("恢复面板配置失败")
+	}
+	ExecShell("/www/panel/panel --env=panel.conf artisan migrate")
+	color.Greenln("恢复完成")
+
+	color.Greenln("重启面板...")
+	ExecShell("systemctl restart panel")
+	color.Greenln("重启完成")
 
 	return nil
 }

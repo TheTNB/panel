@@ -73,7 +73,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("初始化成功")
 
 	case "update":
-		err := tools.UpdatePanel()
+		input := arg1
+		proxy := false
+		if input == "y" || input == "Y" || input == "yes" || input == "Yes" {
+			proxy = true
+		}
+		err := tools.UpdatePanel(cast.ToBool(proxy))
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil
@@ -279,7 +284,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	default:
 		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
 		color.Greenln("请使用以下命令：")
-		color.Greenln("panel update 更新/修复面板到最新版本")
+		color.Greenln("panel update {proxy} 更新/修复面板到最新版本")
 		color.Greenln("panel getInfo 重新初始化面板账号信息")
 		color.Greenln("panel getPort 获取面板访问端口")
 		color.Greenln("panel getEntrance 获取面板访问入口")
@@ -287,7 +292,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} 备份网站/MySQL数据库/PostgreSQL数据库到指定目录")
 		color.Redln("以下命令请在开发者指导下使用：")
 		color.Yellowln("panel init 初始化面板")
-		color.Yellowln("panel writePlugin {slug} 写入插件安装状态")
+		color.Yellowln("panel writePlugin {slug} {version} 写入插件安装状态")
 		color.Yellowln("panel deletePlugin {slug} 移除插件安装状态")
 		color.Yellowln("panel writeMysqlPassword {password} 写入MySQL root密码")
 		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板")

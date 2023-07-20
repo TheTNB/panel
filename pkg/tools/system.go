@@ -51,7 +51,7 @@ func ExecShell(shell string) string {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 执行命令 $s 失败: %s", shell, err.Error())
+		facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
 		return ""
 	}
 
@@ -64,13 +64,13 @@ func ExecShellAsync(shell string) {
 
 	err := cmd.Start()
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 执行命令 $s 失败: %s", shell, err.Error())
+		facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
 	}
 
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			facades.Log().Errorf("[面板][Helpers] 执行命令 $s 失败: %s", shell, err.Error())
+			facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
 		}
 	}()
 }
