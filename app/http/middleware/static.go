@@ -11,7 +11,7 @@ import (
 
 func Static() contractshttp.Middleware {
 	return func(ctx contractshttp.Context) {
-		static.Serve(services.NewSettingImpl().Get("panel_entrance", "/"), static.LocalFile("/www/panel/public", false))(ctx.(*frameworkhttp.GinContext).Instance())
+		static.Serve(services.NewSettingImpl().Get("entrance", "/"), static.LocalFile("/www/panel/public", false))(ctx.(*frameworkhttp.GinContext).Instance())
 
 		ctx.Request().Next()
 	}

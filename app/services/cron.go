@@ -1,6 +1,8 @@
 package services
 
 import (
+	"strings"
+
 	"panel/app/models"
 	"panel/pkg/tools"
 )
@@ -24,17 +26,15 @@ func (r *CronImpl) AddToSystem(cron models.Cron) {
 	} else {
 		tools.ExecShell("echo \"" + cron.Time + " " + cron.Shell + " >> " + cron.Log + " 2>&1\" >> /var/spool/cron/crontabs/root")
 	}
-
-	tools.ExecShell("systemctl restart crond")
 }
 
 // DeleteFromSystem 从系统中删除
 func (r *CronImpl) DeleteFromSystem(cron models.Cron) {
+	// 需要转义Shell路径的/为\/
+	cron.Shell = strings.ReplaceAll(cron.Shell, "/", "\\/")
 	if tools.IsRHEL() {
 		tools.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/root")
 	} else {
 		tools.ExecShell("sed -i '/" + cron.Shell + "/d' /var/spool/cron/crontabs/root")
 	}
-
-	tools.ExecShell("systemctl restart crond")
 }

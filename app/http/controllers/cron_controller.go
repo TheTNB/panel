@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"regexp"
 	"strconv"
 
 	"github.com/goravel/framework/contracts/http"
@@ -44,7 +45,7 @@ func (r *CronController) List(ctx http.Context) {
 func (r *CronController) Add(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":   "required|min_len:1|max_len:255",
-		"time":   "required|regex:^((\\*|\\d+|\\d+-\\d+|\\d+\\/\\d+|\\d+-\\d+\\/\\d+|\\*\\/\\d+)(\\,(\\*|\\d+|\\d+-\\d+|\\d+\\/\\d+|\\d+-\\d+\\/\\d+|\\*\\/\\d+))*\\s?){5}$",
+		"time":   "required",
 		"script": "required",
 	})
 	if err != nil {
@@ -53,6 +54,12 @@ func (r *CronController) Add(ctx http.Context) {
 	}
 	if validator.Fails() {
 		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		return
+	}
+
+	// 单独验证时间格式
+	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(ctx.Request().Input("time")) {
+		Error(ctx, http.StatusBadRequest, "时间格式错误")
 		return
 	}
 
@@ -70,7 +77,7 @@ func (r *CronController) Add(ctx http.Context) {
 		return
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if !tools.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0644) {
+	if !tools.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0700) {
 		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
@@ -99,11 +106,22 @@ func (r *CronController) Add(ctx http.Context) {
 	})
 }
 
+// Script 获取脚本内容
+func (r *CronController) Script(ctx http.Context) {
+	var cron models.Cron
+	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
+	if err != nil {
+		Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return
+	}
+
+	Success(ctx, tools.ReadFile(cron.Shell))
+}
+
 func (r *CronController) Update(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
-		"id":     "required|int",
 		"name":   "required|min_len:1|max_len:255",
-		"time":   "required|regex:^((\\*|\\d+|\\d+-\\d+|\\d+\\/\\d+|\\d+-\\d+\\/\\d+|\\*\\/\\d+)(\\,(\\*|\\d+|\\d+-\\d+|\\d+\\/\\d+|\\d+-\\d+\\/\\d+|\\*\\/\\d+))*\\s?){5}$",
+		"time":   "required",
 		"script": "required",
 	})
 	if err != nil {
@@ -115,10 +133,30 @@ func (r *CronController) Update(ctx http.Context) {
 		return
 	}
 
+	// 单独验证时间格式
+	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(ctx.Request().Input("time")) {
+		Error(ctx, http.StatusBadRequest, "时间格式错误")
+		return
+	}
+
 	var cron models.Cron
 	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return
+	}
+
+	if !cron.Status {
+		Error(ctx, http.StatusBadRequest, "计划任务已禁用")
+		return
+	}
+
+	cron.Time = ctx.Request().Input("time")
+	cron.Name = ctx.Request().Input("name")
+	err = facades.Orm().Query().Save(&cron)
+	if err != nil {
+		facades.Log().Error("[面板][CronController] 更新计划任务失败 ", err)
+		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
 
@@ -138,24 +176,15 @@ func (r *CronController) Update(ctx http.Context) {
 }
 
 func (r *CronController) Delete(ctx http.Context) {
-	validator, err := ctx.Request().Validate(map[string]string{
-		"id": "required|int",
-	})
-	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
-	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
-		return
-	}
-
 	var cron models.Cron
-	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
+	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, "计划任务不存在")
 		return
 	}
+
+	r.cron.DeleteFromSystem(cron)
+	tools.RemoveFile(cron.Shell)
 
 	_, err = facades.Orm().Query().Delete(&cron)
 	if err != nil {
@@ -164,22 +193,19 @@ func (r *CronController) Delete(ctx http.Context) {
 		return
 	}
 
-	r.cron.DeleteFromSystem(cron)
-
 	Success(ctx, nil)
 }
 
 func (r *CronController) Status(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
-		"id":     "required|int",
-		"status": "required|in:true,false",
+		"status": "bool",
 	})
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -191,7 +217,7 @@ func (r *CronController) Status(ctx http.Context) {
 	}
 
 	cron.Status = ctx.Request().InputBool("status")
-	_, err = facades.Orm().Query().Update(&cron)
+	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 更新计划任务状态失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
@@ -207,20 +233,8 @@ func (r *CronController) Status(ctx http.Context) {
 }
 
 func (r *CronController) Log(ctx http.Context) {
-	validator, err := ctx.Request().Validate(map[string]string{
-		"id": "required|int",
-	})
-	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
-	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
-		return
-	}
-
 	var cron models.Cron
-	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
+	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, "计划任务不存在")
 		return
@@ -231,7 +245,5 @@ func (r *CronController) Log(ctx http.Context) {
 		return
 	}
 
-	Success(ctx, http.Json{
-		"log": tools.ReadFile(cron.Log),
-	})
+	Success(ctx, tools.ReadFile(cron.Log))
 }

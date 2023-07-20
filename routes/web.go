@@ -49,6 +49,7 @@ func Web() {
 		r.Prefix("cron").Middleware(middleware.Jwt()).Group(func(r route.Route) {
 			cronController := controllers.NewCronController()
 			r.Get("list", cronController.List)
+			r.Get("script", cronController.Script)
 			r.Post("add", cronController.Add)
 			r.Post("update", cronController.Update)
 			r.Post("delete", cronController.Delete)

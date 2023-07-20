@@ -209,7 +209,7 @@ Date: 2023-06-22
       let cpu_info
       admin.req({
         url: '/api/panel/info/nowMonitor'
-        , method: 'get'
+        , type: 'get'
         , success: function (result) {
           if (result.code !== 0) {
             layer.msg('系统资源获取失败，请刷新重试！')
@@ -276,7 +276,7 @@ Date: 2023-06-22
     })
     admin.req({
       url: '/api/panel/info/systemInfo'
-      , method: 'get'
+      , type: 'get'
       , success: function (result) {
         if (result.code !== 0) {
           console.log('耗子Linux面板：系统信息获取失败，接口返回' + result)
@@ -313,7 +313,7 @@ Date: 2023-06-22
       admin.req(
         {
           url: '/api/panel/info/checkUpdate'
-          , method: 'get'
+          , type: 'get'
           , success: function (result) {
             layer.close(index)
             if (result.code !== 0) {
@@ -331,35 +331,19 @@ Date: 2023-06-22
                         btn: ['是', '否']
                     }, function () {
                         proxy = true
-                        index = layer.msg('正在更新...', { icon: 16, time: 0, shade: 0.3 })
+                        index = layer.msg('正在更新，稍后请手动刷新...', { icon: 16, time: 0, shade: 0.3 })
                         admin.req({
                             url: '/api/panel/info/update'
-                            , method: 'post'
+                            , type: 'post'
                             , data: { proxy: proxy }
-                            , success: function (result) {
-                                layer.close(index)
-                                if (result.code !== 0) {
-                                    return false
-                                }
-                                layer.alert('更新成功！')
-                                location.href = '/';
-                            }
                         })
                     }, function(){
                         proxy = false
-                        index = layer.msg('正在更新...', { icon: 16, time: 0, shade: 0.3 })
+                        index = layer.msg('正在更新，稍后请手动刷新...', { icon: 16, time: 0, shade: 0.3 })
                         admin.req({
                             url: '/api/panel/info/update'
-                            , method: 'post'
+                            , type: 'post'
                             , data: { proxy: proxy }
-                            , success: function (result) {
-                                layer.close(index)
-                                if (result.code !== 0) {
-                                    return false
-                                }
-                                layer.alert('更新成功！')
-                                location.href = '/';
-                            }
                         })
                     })
 

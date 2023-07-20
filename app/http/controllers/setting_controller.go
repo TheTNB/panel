@@ -46,9 +46,10 @@ func (r *SettingController) List(ctx http.Context) {
 
 		return
 	}
-
 	result["username"] = user.Username
 	result["email"] = user.Email
+
+	result["port"] = tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 
 	Success(ctx, result)
 }
@@ -58,7 +59,7 @@ func (r *SettingController) Save(ctx http.Context) {
 	port := ctx.Request().Input("port")
 	backupPath := ctx.Request().Input("backup_path")
 	websitePath := ctx.Request().Input("website_path")
-	panelEntrance := ctx.Request().Input("panel_entrance")
+	entrance := ctx.Request().Input("entrance")
 	username := ctx.Request().Input("username")
 	email := ctx.Request().Input("email")
 	password := ctx.Request().Input("password")
@@ -70,9 +71,12 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
-	oldPort := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+	oldPort := tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if oldPort != port {
 		tools.ExecShell("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+	}
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
 	}
 	err = r.setting.Set(models.SettingKeyBackupPath, backupPath)
 	if err != nil {
@@ -81,6 +85,10 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
+	if !tools.Exists(websitePath) {
+		tools.Mkdir(websitePath, 0755)
+		tools.Chown(websitePath, "www", "www")
+	}
 	err = r.setting.Set(models.SettingKeyWebsitePath, websitePath)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
@@ -88,7 +96,7 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
-	err = r.setting.Set(models.SettingKeyPanelEntrance, panelEntrance)
+	err = r.setting.Set(models.SettingKeyEntrance, entrance)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
@@ -105,8 +113,12 @@ func (r *SettingController) Save(ctx http.Context) {
 		return
 	}
 
-	user.Username = username
-	user.Email = email
+	if len(username) > 0 {
+		user.Username = username
+	}
+	if len(email) > 0 {
+		user.Email = email
+	}
 	if len(password) > 0 {
 		hash, err := facades.Hash().Make(password)
 		if err != nil {

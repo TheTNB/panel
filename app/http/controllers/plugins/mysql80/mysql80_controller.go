@@ -31,7 +31,7 @@ func NewMysql80Controller() *Mysql80Controller {
 }
 
 // Status 获取运行状态
-func (r *Mysql80Controller) Status(ctx http.Context) {
+func (c *Mysql80Controller) Status(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -51,7 +51,7 @@ func (r *Mysql80Controller) Status(ctx http.Context) {
 }
 
 // Reload 重载配置
-func (r *Mysql80Controller) Reload(ctx http.Context) {
+func (c *Mysql80Controller) Reload(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -72,7 +72,7 @@ func (r *Mysql80Controller) Reload(ctx http.Context) {
 }
 
 // Restart 重启服务
-func (r *Mysql80Controller) Restart(ctx http.Context) {
+func (c *Mysql80Controller) Restart(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -93,7 +93,7 @@ func (r *Mysql80Controller) Restart(ctx http.Context) {
 }
 
 // Start 启动服务
-func (r *Mysql80Controller) Start(ctx http.Context) {
+func (c *Mysql80Controller) Start(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -114,7 +114,7 @@ func (r *Mysql80Controller) Start(ctx http.Context) {
 }
 
 // Stop 停止服务
-func (r *Mysql80Controller) Stop(ctx http.Context) {
+func (c *Mysql80Controller) Stop(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -135,7 +135,7 @@ func (r *Mysql80Controller) Stop(ctx http.Context) {
 }
 
 // GetConfig 获取配置
-func (r *Mysql80Controller) GetConfig(ctx http.Context) {
+func (c *Mysql80Controller) GetConfig(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -151,7 +151,7 @@ func (r *Mysql80Controller) GetConfig(ctx http.Context) {
 }
 
 // SaveConfig 保存配置
-func (r *Mysql80Controller) SaveConfig(ctx http.Context) {
+func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -171,12 +171,12 @@ func (r *Mysql80Controller) SaveConfig(ctx http.Context) {
 }
 
 // Load 获取负载
-func (r *Mysql80Controller) Load(ctx http.Context) {
+func (c *Mysql80Controller) Load(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 		return
@@ -249,7 +249,7 @@ func (r *Mysql80Controller) Load(ctx http.Context) {
 }
 
 // ErrorLog 获取错误日志
-func (r *Mysql80Controller) ErrorLog(ctx http.Context) {
+func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -259,7 +259,7 @@ func (r *Mysql80Controller) ErrorLog(ctx http.Context) {
 }
 
 // ClearErrorLog 清空错误日志
-func (r *Mysql80Controller) ClearErrorLog(ctx http.Context) {
+func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -269,7 +269,7 @@ func (r *Mysql80Controller) ClearErrorLog(ctx http.Context) {
 }
 
 // SlowLog 获取慢查询日志
-func (r *Mysql80Controller) SlowLog(ctx http.Context) {
+func (c *Mysql80Controller) SlowLog(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -279,7 +279,7 @@ func (r *Mysql80Controller) SlowLog(ctx http.Context) {
 }
 
 // ClearSlowLog 清空慢查询日志
-func (r *Mysql80Controller) ClearSlowLog(ctx http.Context) {
+func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -289,12 +289,12 @@ func (r *Mysql80Controller) ClearSlowLog(ctx http.Context) {
 }
 
 // GetRootPassword 获取root密码
-func (r *Mysql80Controller) GetRootPassword(ctx http.Context) {
+func (c *Mysql80Controller) GetRootPassword(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 		return
@@ -304,7 +304,7 @@ func (r *Mysql80Controller) GetRootPassword(ctx http.Context) {
 }
 
 // SetRootPassword 设置root密码
-func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
+func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -326,11 +326,11 @@ func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
 		return
 	}
 
-	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	oldRootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
 		tools.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
 		tools.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
-		err := r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
+		err := c.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
 		if err != nil {
 			tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
 			tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
@@ -343,12 +343,12 @@ func (r *Mysql80Controller) SetRootPassword(ctx http.Context) {
 }
 
 // DatabaseList 获取数据库列表
-func (r *Mysql80Controller) DatabaseList(ctx http.Context) {
+func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
 
-	out := tools.ExecShell("mysql -uroot -p" + r.setting.Get(models.SettingKeyMysqlRootPassword) + " -e \"show databases;\"")
+	out := tools.ExecShell("mysql -uroot -p" + c.setting.Get(models.SettingKeyMysqlRootPassword) + " -e \"show databases;\"")
 	databases := strings.Split(out, "\n")
 
 	databases = databases[1 : len(databases)-1]
@@ -374,7 +374,7 @@ func (r *Mysql80Controller) DatabaseList(ctx http.Context) {
 }
 
 // AddDatabase 添加数据库
-func (r *Mysql80Controller) AddDatabase(ctx http.Context) {
+func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -393,7 +393,7 @@ func (r *Mysql80Controller) AddDatabase(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
@@ -407,7 +407,7 @@ func (r *Mysql80Controller) AddDatabase(ctx http.Context) {
 }
 
 // DeleteDatabase 删除数据库
-func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
+func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -424,7 +424,7 @@ func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
@@ -432,8 +432,8 @@ func (r *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 }
 
 // BackupList 获取备份列表
-func (r *Mysql80Controller) BackupList(ctx http.Context) {
-	backupPath := "/www/backup/mysql"
+func (c *Mysql80Controller) BackupList(ctx http.Context) {
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 
 	if !tools.Exists(backupPath) {
 		tools.Mkdir(backupPath, 0644)
@@ -466,7 +466,7 @@ func (r *Mysql80Controller) BackupList(ctx http.Context) {
 }
 
 // CreateBackup 创建备份
-func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
+func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -483,8 +483,8 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 		return
 	}
 
-	backupPath := "/www/backup/mysql"
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	backupFile := backupPath + "/" + database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 	if !tools.Exists(backupPath) {
@@ -498,7 +498,7 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 	}
 
 	tools.ExecShell("mysqldump -uroot " + database + " > " + backupFile)
-	tools.ExecShell("zip -r " + backupFile + ".zip " + backupFile)
+	tools.ExecShell("zip -c " + backupFile + ".zip " + backupFile)
 	tools.RemoveFile(backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
 
@@ -506,7 +506,7 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) {
 }
 
 // DeleteBackup 删除备份
-func (r *Mysql80Controller) DeleteBackup(ctx http.Context) {
+func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -523,7 +523,7 @@ func (r *Mysql80Controller) DeleteBackup(ctx http.Context) {
 		return
 	}
 
-	backupPath := "/www/backup/mysql"
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	file := ctx.Request().Input("file")
 	tools.RemoveFile(backupPath + "/" + file)
 
@@ -531,7 +531,7 @@ func (r *Mysql80Controller) DeleteBackup(ctx http.Context) {
 }
 
 // RestoreBackup 还原备份
-func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
+func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -549,8 +549,8 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
 		return
 	}
 
-	backupPath := "/www/backup/mysql"
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	file := ctx.Request().Input("file")
 	backupFile := backupPath + "/" + file
 	if !tools.Exists(backupFile) {
@@ -604,7 +604,7 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) {
 }
 
 // UserList 用户列表
-func (r *Mysql80Controller) UserList(ctx http.Context) {
+func (c *Mysql80Controller) UserList(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -615,7 +615,7 @@ func (r *Mysql80Controller) UserList(ctx http.Context) {
 		Privileges string `json:"privileges"`
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	out := tools.ExecShell("mysql -uroot -p" + rootPassword + " -e 'select user,host from mysql.user'")
 	rawUsers := strings.Split(out, "\n")
 	users := make([]User, 0)
@@ -642,7 +642,7 @@ func (r *Mysql80Controller) UserList(ctx http.Context) {
 }
 
 // AddUser 添加用户
-func (r *Mysql80Controller) AddUser(ctx http.Context) {
+func (c *Mysql80Controller) AddUser(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -661,7 +661,7 @@ func (r *Mysql80Controller) AddUser(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
@@ -673,7 +673,7 @@ func (r *Mysql80Controller) AddUser(ctx http.Context) {
 }
 
 // DeleteUser 删除用户
-func (r *Mysql80Controller) DeleteUser(ctx http.Context) {
+func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -690,7 +690,7 @@ func (r *Mysql80Controller) DeleteUser(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
@@ -698,7 +698,7 @@ func (r *Mysql80Controller) DeleteUser(ctx http.Context) {
 }
 
 // SetUserPassword 设置用户密码
-func (r *Mysql80Controller) SetUserPassword(ctx http.Context) {
+func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -716,7 +716,7 @@ func (r *Mysql80Controller) SetUserPassword(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
@@ -726,7 +726,7 @@ func (r *Mysql80Controller) SetUserPassword(ctx http.Context) {
 }
 
 // SetUserPrivileges 设置用户权限
-func (r *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
+func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 	if !plugins.Check(ctx, "mysql80") {
 		return
 	}
@@ -744,7 +744,7 @@ func (r *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 		return
 	}
 
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
 	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")

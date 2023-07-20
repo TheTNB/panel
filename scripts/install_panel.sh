@@ -120,14 +120,14 @@ Prepare_system() {
         dnf config-manager --set-enabled crb
         /usr/bin/crb enable
         dnf makecache
-        dnf install -y curl wget zip unzip tar git jq git-core
+        dnf install -y curl wget zip unzip tar git jq git-core dox2unix
     elif [ "${OS}" == "debian" ]; then
         if [[ ${ipLocation} =~ "中国" ]]; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
         apt update
-        apt install -y curl wget zip unzip tar git jq git
+        apt install -y curl wget zip unzip tar git jq git dox2unix
     else
         echo -e $HR
         echo "错误：该系统不支持安装耗子面板，请更换Debian12/RHEL9安装。"
@@ -156,10 +156,10 @@ Auto_Swap() {
 }
 
 Init_Panel() {
+    mkdir ${setup_Path}/server
     mkdir ${setup_Path}/server/cron
     mkdir ${setup_Path}/server/cron/logs
-    chmod -R 644 ${setup_Path}/server/cron
-    chmod -R 644 ${setup_Path}/server/cron/logs
+    chmod -R 644 ${setup_Path}/server
     mkdir ${setup_Path}/panel
     rm -rf ${setup_Path}/panel/*
     # 下载面板zip包并解压

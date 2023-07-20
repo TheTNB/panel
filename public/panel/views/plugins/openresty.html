@@ -68,7 +68,7 @@ Date: 2023-06-24
 
     admin.req({
       url: '/api/plugins/openresty/status'
-      , method: 'get'
+      , type: 'get'
       , success: function (result) {
         if (result.code !== 0) {
           console.log('耗子Linux面板：OpenResty运行状态获取失败，接口返回' + result)
@@ -86,7 +86,7 @@ Date: 2023-06-24
     // 获取openresty错误日志并渲染
     admin.req({
       url: '/api/plugins/openresty/errorLog'
-      , method: 'get'
+      , type: 'get'
       , success: function (result) {
         if (result.code !== 0) {
           console.log('耗子Linux面板：OpenResty错误日志获取失败，接口返回' + result)
@@ -114,7 +114,7 @@ Date: 2023-06-24
     // 获取openresty配置并渲染
     admin.req({
       url: '/api/plugins/openresty/config'
-      , method: 'get'
+      , type: 'get'
       , success: function (result) {
         if (result.code !== 0) {
           console.log('耗子Linux面板：OpenResty主配置获取失败，接口返回' + result)
@@ -144,7 +144,7 @@ Date: 2023-06-24
         index = layer.msg('正在启动OpenResty...', { icon: 16, time: 0, shade: 0.3 })
         admin.req({
             url: '/api/plugins/openresty/start'
-            , method: 'post'
+            , type: 'post'
             , success: function (result) {
                 layer.close(index)
                 if (result.code !== 0) {
@@ -162,7 +162,7 @@ Date: 2023-06-24
             index = layer.msg('正在停止OpenResty...', { icon: 16, time: 0, shade: 0.3 })
             admin.req({
                 url: '/api/plugins/openresty/stop'
-                , method: 'post'
+                , type: 'post'
                 , success: function (result) {
                     layer.close(index)
                     if (result.code !== 0) {
@@ -181,7 +181,7 @@ Date: 2023-06-24
         index = layer.msg('正在重启OpenResty...', { icon: 16, time: 0, shade: 0.3 })
         admin.req({
           url: '/api/plugins/openresty/restart'
-          , method: 'post'
+          , type: 'post'
           , success: function (result) {
             layer.close(index)
             if (result.code !== 0) {
@@ -197,7 +197,7 @@ Date: 2023-06-24
       index = layer.msg('正在重载OpenResty...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
         url: '/api/plugins/openresty/reload'
-        , method: 'post'
+        , type: 'post'
         , success: function (result) {
           layer.close(index)
           if (result.code !== 0) {
@@ -212,7 +212,7 @@ Date: 2023-06-24
       index = layer.msg('正在保存OpenResty主配置...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
         url: '/api/plugins/openresty/config'
-        , method: 'post'
+        , type: 'post'
         , data: {
           config: openresty_config_editor.getValue()
         }
@@ -229,7 +229,7 @@ Date: 2023-06-24
       index = layer.msg('正在清空OpenResty错误日志...', { icon: 16, time: 0, shade: 0.3 })
       admin.req({
         url: '/api/plugins/openresty/clearErrorLog'
-        , method: 'post'
+        , type: 'post'
         , success: function (result) {
           layer.close(index)
           if (result.code !== 0) {

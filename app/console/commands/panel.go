@@ -50,7 +50,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyPanelEntrance, Value: "/"}}
+		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyEntrance, Value: "/"}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")
@@ -115,14 +115,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
 		color.Greenln("面板端口: " + port)
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyPanelEntrance, "/"))
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyEntrance, "/"))
 
 	case "getPort":
 		port := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyPanelEntrance, "/"))
+		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyEntrance, "/"))
 
 	case "writePlugin":
 		slug := arg1

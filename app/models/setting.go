@@ -8,7 +8,7 @@ const (
 	SettingKeyMonitorDays       = "monitor_days"
 	SettingKeyBackupPath        = "backup_path"
 	SettingKeyWebsitePath       = "website_path"
-	SettingKeyPanelEntrance     = "panel_entrance"
+	SettingKeyEntrance          = "entrance"
 	SettingKeyMysqlRootPassword = "mysql_root_password"
 )
 

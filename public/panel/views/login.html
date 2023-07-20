@@ -66,7 +66,7 @@
       admin.req({
         url: '/api/panel/user/login'
         , data: obj.field
-        , method: 'post'
+        , type: 'post'
         , done: function (res) {
           // 请求成功后，写入 access_token
           layui.data(setter.tableName, {

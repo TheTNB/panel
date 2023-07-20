@@ -63,7 +63,7 @@ layui.define(['laytpl', 'layer'], function (exports) {
     delete options.success
     delete options.error
 
-    if (options.method === 'post' || options.method === 'put' || options.method === 'delete' || options.method === 'patch' || options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE' || options.method === 'PATCH') {
+    if (options.type === 'post' || options.type === 'put' || options.type === 'delete' || options.type === 'patch' || options.type === 'POST' || options.type === 'PUT' || options.type === 'DELETE' || options.type === 'PATCH') {
       options.contentType = 'application/json'
       options.data = JSON.stringify(options.data)
     }

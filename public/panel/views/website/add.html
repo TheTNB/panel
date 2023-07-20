@@ -73,7 +73,7 @@ Date: 2023-06-24
             <label class="layui-form-label">目录</label>
             <div class="layui-input-block">
                 <input type="text" name="path"
-                       placeholder="请输入网站根目录（不填默认为/www/wwwroot/网站名）"
+                       placeholder="请输入网站根目录（不填默认为建站目录/网站名）"
                        autocomplete="off" class="layui-input">
             </div>
         </div>
@@ -139,7 +139,7 @@ Date: 2023-06-24
         }
         admin.req({
           url: '/api/panel/website/add'
-          , method: 'post'
+          , type: 'post'
           , data: data.field
           , success: function (result) {
             if (result.code !== 0) {

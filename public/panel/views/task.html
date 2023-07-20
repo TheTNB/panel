@@ -56,7 +56,7 @@ Date: 2023-07-21
                 , $ = layui.jquery;
             admin.req({
                 url: "/api/panel/task/log?id=" + d.data.items[0].id
-                , method: 'get'
+                , type: 'get'
                 , success: function (result) {
                     if (result.code !== 0) {
                         $('#plugin-install-log').html('实时安装日志获取失败，请刷新重试！');
@@ -90,7 +90,9 @@ Date: 2023-07-21
                 , {field: 'name', width: '100%', title: '任务名'}
             ]]
             , page: true
-            , text: '耗子Linux面板：数据加载出现异常！'
+            , text: {
+                none: '无数据'
+            }
             , parseData: function (res) {
                 return {
                     "code": res.code,
@@ -117,7 +119,9 @@ Date: 2023-07-21
                 }
             ]]
             , page: true
-            , text: '耗子Linux面板：数据加载出现异常！'
+            , text: {
+                none: '无数据'
+            }
             , parseData: function (res) {
                 return {
                     "code": res.code,

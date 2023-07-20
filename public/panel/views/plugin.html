@@ -35,150 +35,152 @@
 </div>
 
 <script>
-  layui.use(['admin', 'table', 'jquery'], function () {
-    var $ = layui.$
-      , form = layui.form
-      , table = layui.table
-      , admin = layui.admin
+    layui.use(['admin', 'table', 'jquery'], function () {
+        var $ = layui.$
+            , form = layui.form
+            , table = layui.table
+            , admin = layui.admin
 
-    table.render({
-      elem: '#panel-plugin'
-      , url: '/api/panel/plugin/list'
-      , cols: [[
-        { field: 'slug', hide: true, title: 'Slug' }
-        , { field: 'name', width: 150, title: '插件名', sort: true }
-        , { field: 'description', title: '描述' }
-        , { field: 'author', width: 100, title: '作者' }
-        , { field: 'installed_version', width: 140, title: '已装版本' }
-        , { field: 'version', width: 140, title: '最新版本' }
-        , { field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true }
-        , {
-          field: 'control',
-          width: 180,
-          title: '操作',
-          templet: '#panel-plugin-control',
-          fixed: 'right',
-          align: 'left'
-        }
-      ]]
-      , page: false
-      , text: '耗子Linux面板：数据加载出现异常！'
-      , done: function () {
-        //element.render('progress');
-      }
-    })
-
-    // 工具条
-    table.on('tool(panel-plugin)', function (obj) {
-      let data = obj.data
-      if (obj.event === 'open') {
-        location.hash = '/plugins/' + data.slug
-      } else if (obj.event === 'install') {
-        layer.confirm('确定安装该插件吗？', function (index) {
-          layer.close(index)
-          admin.req({
-            url: '/api/panel/plugin/install',
-            type: 'POST',
-            data: {
-              slug: data.slug
+        table.render({
+            elem: '#panel-plugin'
+            , url: '/api/panel/plugin/list'
+            , cols: [[
+                {field: 'slug', hide: true, title: 'Slug'}
+                , {field: 'name', width: 150, title: '插件名', sort: true}
+                , {field: 'description', title: '描述'}
+                , {field: 'author', width: 100, title: '作者'}
+                , {field: 'installed_version', width: 140, title: '已装版本'}
+                , {field: 'version', width: 140, title: '最新版本'}
+                , {field: 'show', title: '首页显示', width: 90, templet: '#plugin-show', unresize: true}
+                , {
+                    field: 'control',
+                    width: 180,
+                    title: '操作',
+                    templet: '#panel-plugin-control',
+                    fixed: 'right',
+                    align: 'left'
+                }
+            ]]
+            , page: false
+            , text: {
+                none: '无数据'
             }
-            , success: function (res) {
-              if (res.code === 0) {
-                table.reload('panel-plugin')
-                layer.msg('安装：' + data.name + ' 成功加入任务队列', {
-                  icon: 1,
-                  time: 1000
-                })
-              } else {
-                layer.msg(res.msg, { icon: 2, time: 1000 })
-              }
+            , done: function () {
+                //element.render('progress');
             }
-          })
         })
-      } else if (obj.event === 'uninstall') {
-        layer.confirm('确定卸载该插件吗？', function (index) {
-          layer.close(index)
-          admin.req({
-            url: '/api/panel/plugin/uninstall',
-            type: 'POST',
-            data: {
-              slug: data.slug
-            }
-            , success: function (res) {
-              if (res.code === 0) {
-                table.reload('panel-plugin')
-                layer.msg('卸载：' + data.name + ' 成功加入任务队列', {
-                  icon: 1,
-                  time: 1000
+
+        // 工具条
+        table.on('tool(panel-plugin)', function (obj) {
+            let data = obj.data
+            if (obj.event === 'open') {
+                location.hash = '/plugins/' + data.slug
+            } else if (obj.event === 'install') {
+                layer.confirm('确定安装该插件吗？', function (index) {
+                    layer.close(index)
+                    admin.req({
+                        url: '/api/panel/plugin/install',
+                        type: 'POST',
+                        data: {
+                            slug: data.slug
+                        }
+                        , success: function (res) {
+                            if (res.code === 0) {
+                                table.reload('panel-plugin')
+                                layer.msg('安装：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
+                                })
+                            } else {
+                                layer.msg(res.msg, {icon: 2, time: 1000})
+                            }
+                        }
+                    })
                 })
-              } else {
-                layer.msg(res.msg, { icon: 2, time: 1000 })
-              }
-            }
-          })
-        })
-      } else if (obj.event === 'update') {
-        layer.confirm('确定升级该插件吗？', function (index) {
-          layer.close(index)
-          admin.req({
-            url: '/api/panel/plugin/update',
-            type: 'POST',
-            data: {
-              slug: data.slug
-            }
-            , success: function (res) {
-              if (res.code === 0) {
-                table.reload('panel-plugin')
-                layer.msg('升级：' + data.name + ' 成功加入任务队列', {
-                  icon: 1,
-                  time: 1000
+            } else if (obj.event === 'uninstall') {
+                layer.confirm('确定卸载该插件吗？', function (index) {
+                    layer.close(index)
+                    admin.req({
+                        url: '/api/panel/plugin/uninstall',
+                        type: 'POST',
+                        data: {
+                            slug: data.slug
+                        }
+                        , success: function (res) {
+                            if (res.code === 0) {
+                                table.reload('panel-plugin')
+                                layer.msg('卸载：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
+                                })
+                            } else {
+                                layer.msg(res.msg, {icon: 2, time: 1000})
+                            }
+                        }
+                    })
                 })
-              } else {
-                layer.msg(res.msg, { icon: 2, time: 1000 })
-              }
+            } else if (obj.event === 'update') {
+                layer.confirm('确定升级该插件吗？', function (index) {
+                    layer.close(index)
+                    admin.req({
+                        url: '/api/panel/plugin/update',
+                        type: 'POST',
+                        data: {
+                            slug: data.slug
+                        }
+                        , success: function (res) {
+                            if (res.code === 0) {
+                                table.reload('panel-plugin')
+                                layer.msg('升级：' + data.name + ' 成功加入任务队列', {
+                                    icon: 1,
+                                    time: 1000
+                                })
+                            } else {
+                                layer.msg(res.msg, {icon: 2, time: 1000})
+                            }
+                        }
+                    })
+                })
             }
-          })
         })
-      }
+
+        form.on('switch(plugin-show-home)', function (obj) {
+            let $ = layui.$
+            let plugin_slug = $(this).data('plugin-slug')
+            let show = obj.elem.checked ? 1 : 0
+
+            admin.req({
+                url: '/api/panel/plugin/updateShow',
+                type: 'POST',
+                data: {
+                    slug: plugin_slug,
+                    show: show
+                }
+                , success: function (res) {
+                    if (res.code === 0) {
+                        layer.msg('设置成功', {icon: 1, time: 1000})
+                    } else {
+                        // 还原开关状态
+                        obj.elem.checked = !obj.elem.checked
+                        form.render('checkbox')
+                        layer.msg(res.msg, {icon: 2, time: 1000})
+                    }
+                }
+                , error: function (xhr, status, error) {
+                    console.log('耗子Linux面板：ajax请求出错，错误' + error)
+                }
+            })
+        })
+        /*form.render(null, 'plugin-form');
+
+        //搜索
+        form.on('submit(plugin-search-submit)', function (data) {
+            var field = data.field;
+
+            //执行重载
+            table.reload('plugin-search-submit', {
+                where: field
+            });
+        });*/
     })
-
-    form.on('switch(plugin-show-home)', function (obj) {
-      let $ = layui.$
-      let plugin_slug = $(this).data('plugin-slug')
-      let show = obj.elem.checked ? 1 : 0
-
-      admin.req({
-        url: '/api/panel/plugin/updateShow',
-        type: 'POST',
-        data: {
-          slug: plugin_slug,
-          show: show
-        }
-        , success: function (res) {
-          if (res.code === 0) {
-            layer.msg('设置成功', { icon: 1, time: 1000 })
-          } else {
-            // 还原开关状态
-            obj.elem.checked = !obj.elem.checked
-            form.render('checkbox')
-            layer.msg(res.msg, { icon: 2, time: 1000 })
-          }
-        }
-        , error: function (xhr, status, error) {
-          console.log('耗子Linux面板：ajax请求出错，错误' + error)
-        }
-      })
-    })
-    /*form.render(null, 'plugin-form');
-
-    //搜索
-    form.on('submit(plugin-search-submit)', function (data) {
-        var field = data.field;
-
-        //执行重载
-        table.reload('plugin-search-submit', {
-            where: field
-        });
-    });*/
-  })
 </script>

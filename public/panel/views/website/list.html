@@ -54,7 +54,7 @@ Date: 2023-06-24
     // 获取已安装的PHP和DB版本
     admin.req({
       url: '/api/panel/info/installedDbAndPhp'
-      , method: 'get'
+      , type: 'get'
       , success: function (result) {
         php = result.data.php
         mysql = result.data.mysql
@@ -124,7 +124,7 @@ Date: 2023-06-24
         layer.confirm('删除网站将一并删除站点目录（不包括数据库），是否继续？', function (index) {
           admin.req({
             url: '/api/panel/website/delete'
-            , method: 'post'
+            , type: 'post'
             , data: data
             , success: function (result) {
               if (result.code !== 0) {
@@ -143,7 +143,7 @@ Date: 2023-06-24
 
         admin.req({
           url: '/api/panel/website/getSiteSettings?name=' + data.name
-          , method: 'get'
+          , type: 'get'
           , beforeSend: function (request) {
             layer.load()
           }
@@ -197,7 +197,7 @@ Date: 2023-06-24
         , data = obj.data // 得到行数据
       admin.req({
         url: '/api/panel/website/updateSiteNote'
-        , method: 'post'
+        , type: 'post'
         , data: {
           name: data.name,
           note: value
@@ -221,7 +221,7 @@ Date: 2023-06-24
 
       admin.req({
         url: '/api/panel/website/setSiteStatus'
-        , method: 'post'
+        , type: 'post'
         , data: {
           name: website_name,
           status: status

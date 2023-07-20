@@ -61,10 +61,13 @@ type WebsiteSetting struct {
 }
 
 type WebsiteImpl struct {
+	setting Setting
 }
 
 func NewWebsiteImpl() *WebsiteImpl {
-	return &WebsiteImpl{}
+	return &WebsiteImpl{
+		setting: NewSettingImpl(),
+	}
 }
 
 // List 列出网站
@@ -88,7 +91,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 
 	// path为空时，设置默认值
 	if len(website.Path) == 0 {
-		website.Path = "/www/wwwroot/" + website.Name
+		website.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + website.Name
 	}
 	// path不为/开头时，返回错误
 	if website.Path[0] != '/' {
