@@ -166,7 +166,8 @@ func (c *InfoController) Update(ctx http.Context) {
 	proxy := ctx.Request().InputBool("proxy")
 	err := tools.UpdatePanel(proxy)
 	if err != nil {
-		Error(ctx, http.StatusInternalServerError, "更新失败")
+		facades.Log().Error("[面板][InfoController] 更新面板失败 ", err.Error())
+		Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
 		return
 	}
 

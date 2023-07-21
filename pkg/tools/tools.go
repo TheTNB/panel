@@ -10,12 +10,14 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/goravel/framework/facades"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
+	"panel/app/models"
 )
 
 // MonitoringInfo 监控信息
@@ -117,6 +119,12 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 
 // UpdatePanel 更新面板
 func UpdatePanel(proxy bool) error {
+	var task models.Task
+	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
+	if err == nil {
+		return errors.New("面板有任务正在执行，禁止更新")
+	}
+
 	panelInfo, err := GetLatestPanelVersion()
 	if err != nil {
 		return err
