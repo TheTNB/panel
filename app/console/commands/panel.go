@@ -182,14 +182,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln("写入MySQL root密码成功")
 
-	case "cleanRunningTask":
-		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).Update("status", models.TaskStatusFailed)
+	case "cleanTask":
+		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).Update("status", models.TaskStatusFailed)
 		if err != nil {
-			color.Redln("清理正在运行的任务失败")
+			color.Redln("清理任务失败")
 			return nil
 		}
 
-		color.Greenln("清理正在运行的任务成功")
+		color.Greenln("清理任务成功")
 
 	case "backup":
 
@@ -288,7 +288,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("panel getInfo 重新初始化面板账号信息")
 		color.Greenln("panel getPort 获取面板访问端口")
 		color.Greenln("panel getEntrance 获取面板访问入口")
-		color.Greenln("panel cleanRunningTask 强制清理面板正在运行的任务")
+		color.Greenln("panel cleanTask 清理面板运行中和等待中的任务")
 		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} 备份网站/MySQL数据库/PostgreSQL数据库到指定目录")
 		color.Redln("以下命令请在开发者指导下使用：")
 		color.Yellowln("panel init 初始化面板")
