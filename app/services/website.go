@@ -116,8 +116,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 
 	tools.Mkdir(website.Path, 0755)
 
-	index := `
-<!DOCTYPE html>
+	index := `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -162,8 +161,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 		}
 	}
 
-	nginxConf := fmt.Sprintf(`
-# 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
+	nginxConf := fmt.Sprintf(`# 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
 # 有自定义配置需求的，请将自定义的配置写在各标记位下方。
 server
 {
@@ -189,7 +187,7 @@ server
 
     # waf标记位开始
     waf on;
-    waf_rule_path /www/server/nginx/ngx_waf/assets/rules/;
+    waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
     waf_mode DYNAMIC;
     waf_cc_deny rate=1000r/m duration=60m;
     waf_cache capacity=50;
@@ -221,12 +219,12 @@ server
 
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	tools.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", nginxConf, 0644)
-	tools.WriteFile("/www/server/panel/vhost/openresty/rewrite/"+website.Name+".conf", "", 0644)
-	tools.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".pem", "", 0644)
-	tools.WriteFile("/www/server/panel/vhost/openresty/ssl/"+website.Name+".key", "", 0644)
+	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644)
+	tools.WriteFile("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644)
+	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644)
+	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", "", 0644)
 
-	tools.ExecShellAsync("systemctl reload openresty")
+	tools.ExecShell("systemctl reload openresty")
 
 	// TODO 创建数据库
 
@@ -236,7 +234,7 @@ server
 // Delete 删除网站
 func (r *WebsiteImpl) Delete(id int) error {
 	var website models.Website
-	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
+	if err := facades.Orm().Query().Where("id", id).FirstOrFail(&website); err != nil {
 		return err
 	}
 
@@ -244,13 +242,13 @@ func (r *WebsiteImpl) Delete(id int) error {
 		return err
 	}
 
-	tools.RemoveFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
-	tools.RemoveFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
-	tools.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".pem")
-	tools.RemoveFile("/www/server/panel/vhost/openresty/ssl/" + website.Name + ".key")
+	tools.RemoveFile("/www/server/vhost/" + website.Name + ".conf")
+	tools.RemoveFile("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	tools.RemoveFile("/www/server/vhost/ssl/" + website.Name + ".pem")
+	tools.RemoveFile("/www/server/vhost/ssl/" + website.Name + ".key")
 	tools.RemoveFile(website.Path)
 
-	tools.ExecShellAsync("systemctl reload openresty")
+	tools.ExecShell("systemctl reload openresty")
 
 	// TODO 删除数据库
 
@@ -264,7 +262,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		return WebsiteSetting{}, err
 	}
 
-	config := tools.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	config := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
 
 	var setting WebsiteSetting
 	setting.Name = website.Name
@@ -342,7 +340,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	setting.Rewrite = tools.ReadFile("/www/server/panel/vhost/openresty/rewrite/" + website.Name + ".conf")
+	setting.Rewrite = tools.ReadFile("/www/server/vhost/rewrite/" + website.Name + ".conf")
 	setting.Log = tools.ExecShell("tail -n 100 /www/wwwlogs/" + website.Name + ".log")
 
 	return setting, nil

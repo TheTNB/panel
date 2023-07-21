@@ -8,4 +8,7 @@ var (
 	Version     = "8.0.29"
 	Requires    = []string{}
 	Excludes    = []string{}
+	Install     = `bash /www/panel/scripts/php/install.sh 80`
+	Uninstall   = `bash /www/panel/scripts/php/uninstall.sh 80`
+	Update      = `bash /www/panel/scripts/php/install.sh 80`
 )

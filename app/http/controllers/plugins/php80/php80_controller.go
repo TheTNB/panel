@@ -1,4 +1,4 @@
-package php74
+package php80
 
 import (
 	"fmt"
@@ -16,21 +16,21 @@ import (
 	"panel/pkg/tools"
 )
 
-type Php74Controller struct {
+type Php80Controller struct {
 	setting services.Setting
 	task    services.Task
 	version string
 }
 
-func NewPhp74Controller() *Php74Controller {
-	return &Php74Controller{
+func NewPhp80Controller() *Php80Controller {
+	return &Php80Controller{
 		setting: services.NewSettingImpl(),
 		task:    services.NewTaskImpl(),
-		version: "74",
+		version: "80",
 	}
 }
 
-func (c *Php74Controller) Status(ctx http.Context) {
+func (c *Php80Controller) Status(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -49,7 +49,7 @@ func (c *Php74Controller) Status(ctx http.Context) {
 	}
 }
 
-func (c *Php74Controller) Reload(ctx http.Context) {
+func (c *Php80Controller) Reload(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -69,7 +69,7 @@ func (c *Php74Controller) Reload(ctx http.Context) {
 	}
 }
 
-func (c *Php74Controller) Start(ctx http.Context) {
+func (c *Php80Controller) Start(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -89,7 +89,7 @@ func (c *Php74Controller) Start(ctx http.Context) {
 	}
 }
 
-func (c *Php74Controller) Stop(ctx http.Context) {
+func (c *Php80Controller) Stop(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -109,7 +109,7 @@ func (c *Php74Controller) Stop(ctx http.Context) {
 	}
 }
 
-func (c *Php74Controller) Restart(ctx http.Context) {
+func (c *Php80Controller) Restart(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -129,7 +129,7 @@ func (c *Php74Controller) Restart(ctx http.Context) {
 	}
 }
 
-func (c *Php74Controller) GetConfig(ctx http.Context) {
+func (c *Php80Controller) GetConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -138,7 +138,7 @@ func (c *Php74Controller) GetConfig(ctx http.Context) {
 	controllers.Success(ctx, config)
 }
 
-func (c *Php74Controller) SaveConfig(ctx http.Context) {
+func (c *Php80Controller) SaveConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -148,7 +148,7 @@ func (c *Php74Controller) SaveConfig(ctx http.Context) {
 	c.Reload(ctx)
 }
 
-func (c *Php74Controller) Load(ctx http.Context) {
+func (c *Php80Controller) Load(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -184,7 +184,7 @@ func (c *Php74Controller) Load(ctx http.Context) {
 	controllers.Success(ctx, data)
 }
 
-func (c *Php74Controller) ErrorLog(ctx http.Context) {
+func (c *Php80Controller) ErrorLog(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -193,7 +193,7 @@ func (c *Php74Controller) ErrorLog(ctx http.Context) {
 	controllers.Success(ctx, log)
 }
 
-func (c *Php74Controller) SlowLog(ctx http.Context) {
+func (c *Php80Controller) SlowLog(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -202,7 +202,7 @@ func (c *Php74Controller) SlowLog(ctx http.Context) {
 	controllers.Success(ctx, log)
 }
 
-func (c *Php74Controller) ClearErrorLog(ctx http.Context) {
+func (c *Php80Controller) ClearErrorLog(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -211,7 +211,7 @@ func (c *Php74Controller) ClearErrorLog(ctx http.Context) {
 	controllers.Success(ctx, true)
 }
 
-func (c *Php74Controller) ClearSlowLog(ctx http.Context) {
+func (c *Php80Controller) ClearSlowLog(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -227,7 +227,7 @@ type Extension struct {
 	Installed   bool   `json:"installed"`
 }
 
-func (c *Php74Controller) GetExtensionList(ctx http.Context) {
+func (c *Php80Controller) GetExtensionList(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -236,7 +236,7 @@ func (c *Php74Controller) GetExtensionList(ctx http.Context) {
 	controllers.Success(ctx, extensions)
 }
 
-func (c *Php74Controller) InstallExtension(ctx http.Context) {
+func (c *Php80Controller) InstallExtension(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -276,7 +276,7 @@ func (c *Php74Controller) InstallExtension(ctx http.Context) {
 	controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
 }
 
-func (c *Php74Controller) UninstallExtension(ctx http.Context) {
+func (c *Php80Controller) UninstallExtension(ctx http.Context) {
 	if !controllers.Check(ctx, "php"+c.version) {
 		return
 	}
@@ -316,7 +316,7 @@ func (c *Php74Controller) UninstallExtension(ctx http.Context) {
 	controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
 }
 
-func (c *Php74Controller) GetExtensions() []Extension {
+func (c *Php80Controller) GetExtensions() []Extension {
 	var extensions []Extension
 	extensions = append(extensions, Extension{
 		Name:        "OPcache",

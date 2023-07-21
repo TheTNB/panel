@@ -36,6 +36,6 @@ groupdel mysql
 sed -i '#export PATH=/www/server/mysql#d' /etc/profile
 source /etc/profile
 
-panel deletePlugin mysql
+panel deletePlugin mysql${1}
 
-echo -e "${HR}\nMySQL uninstall completed.\n${HR}"
+echo -e "${HR}\nMySQL-${1} 卸载完成\n${HR}"

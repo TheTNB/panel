@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/goravel/framework/facades"
 )
@@ -55,7 +56,7 @@ func ExecShell(shell string) string {
 		return ""
 	}
 
-	return string(output)
+	return strings.TrimSpace(string(output))
 }
 
 // ExecShellAsync 异步执行 shell 命令

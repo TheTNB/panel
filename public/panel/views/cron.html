@@ -143,7 +143,7 @@ Date: 2023-07-21
                                 if (res.code === 0) {
                                     $('#cron-log-view').html(res.data);
                                 } else {
-                                    layer.msg(res.msg, {icon: 2, time: 1000});
+                                    layer.msg(res.message, {icon: 2, time: 1000});
                                 }
                             }
                         });
@@ -195,7 +195,7 @@ Date: 2023-07-21
                                                     table.reload('panel-cron');
                                                     layer.close(index);
                                                 } else {
-                                                    layer.msg(res.msg, {icon: 2, time: 1000});
+                                                    layer.msg(res.message, {icon: 2, time: 1000});
                                                 }
                                             }
                                         });
@@ -225,7 +225,7 @@ Date: 2023-07-21
                                     time: 1000
                                 });
                             } else {
-                                layer.msg(res.msg, {icon: 2, time: 1000});
+                                layer.msg(res.message, {icon: 2, time: 1000});
                             }
                         }
                     });
@@ -249,7 +249,7 @@ Date: 2023-07-21
                     if (res.code === 0) {
                         layer.msg('设置成功', {icon: 1, time: 1000});
                     } else {
-                        layer.msg(res.msg, {icon: 2, time: 1000});
+                        layer.msg(res.message, {icon: 2, time: 1000});
                     }
                 }
             });

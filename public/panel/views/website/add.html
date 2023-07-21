@@ -25,9 +25,8 @@ Date: 2023-06-24
                 <label class="layui-form-label">PHP版本</label>
                 <div class="layui-input-block">
                     <select name="php" lay-filter="add-website-php">
-                        <option value="00" selected="">不使用</option>
                         {{# layui.each(d.params.php, function(index, item){ }}
-                        <option value="{{ item }}">{{ item }}</option>
+                        <option value="{{ item.slug }}">{{ item.name }}</option>
                         {{# }); }}
                     </select>
                 </div>
@@ -57,7 +56,7 @@ Date: 2023-06-24
             <div class="layui-inline">
                 <label class="layui-form-label">数据库用户</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="db_username" autocomplete="off" class="layui-input">
+                    <input type="text" name="db_user" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-inline">
@@ -122,11 +121,11 @@ Date: 2023-06-24
         if (data.value === 'mysql') {
           $('#add-website-db-info').show()
           $('input[name="db_name"]').val($('input[name="name"]').val() + '_mysql')
-          $('input[name="db_username"]').val($('input[name="name"]').val() + '_mysql')
+          $('input[name="db_user"]').val($('input[name="name"]').val() + '_mysql')
         } else if (data.value === 'postgresql') {
           $('#add-website-db-info').show()
           $('input[name="db_name"]').val($('input[name="name"]').val() + '_postgresql')
-          $('input[name="db_username"]').val($('input[name="name"]').val() + '_postgresql')
+          $('input[name="db_user"]').val($('input[name="name"]').val() + '_postgresql')
         }
       })
       // 提交

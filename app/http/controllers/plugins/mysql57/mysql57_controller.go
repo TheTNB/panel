@@ -1,4 +1,4 @@
-package mysql80
+package mysql57
 
 import (
 	"fmt"
@@ -19,19 +19,19 @@ import (
 	"panel/pkg/tools"
 )
 
-type Mysql80Controller struct {
+type Mysql57Controller struct {
 	setting services.Setting
 }
 
-func NewMysql80Controller() *Mysql80Controller {
-	return &Mysql80Controller{
+func NewMysql57Controller() *Mysql57Controller {
+	return &Mysql57Controller{
 		setting: services.NewSettingImpl(),
 	}
 }
 
 // Status 获取运行状态
-func (c *Mysql80Controller) Status(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Status(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -49,8 +49,8 @@ func (c *Mysql80Controller) Status(ctx http.Context) {
 }
 
 // Reload 重载配置
-func (c *Mysql80Controller) Reload(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Reload(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -69,8 +69,8 @@ func (c *Mysql80Controller) Reload(ctx http.Context) {
 }
 
 // Restart 重启服务
-func (c *Mysql80Controller) Restart(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Restart(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -89,8 +89,8 @@ func (c *Mysql80Controller) Restart(ctx http.Context) {
 }
 
 // Start 启动服务
-func (c *Mysql80Controller) Start(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Start(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -109,8 +109,8 @@ func (c *Mysql80Controller) Start(ctx http.Context) {
 }
 
 // Stop 停止服务
-func (c *Mysql80Controller) Stop(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Stop(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -129,13 +129,13 @@ func (c *Mysql80Controller) Stop(ctx http.Context) {
 }
 
 // GetConfig 获取配置
-func (c *Mysql80Controller) GetConfig(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) GetConfig(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
 	// 获取配置
-	config := tools.ReadFile("mysql80")
+	config := tools.ReadFile("mysql57")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 		return
@@ -145,8 +145,8 @@ func (c *Mysql80Controller) GetConfig(ctx http.Context) {
 }
 
 // SaveConfig 保存配置
-func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) SaveConfig(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -156,7 +156,7 @@ func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile("mysql80", config, 0644) {
+	if !tools.WriteFile("mysql57", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 		return
 	}
@@ -165,8 +165,8 @@ func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
 }
 
 // Load 获取负载
-func (c *Mysql80Controller) Load(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) Load(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -243,8 +243,8 @@ func (c *Mysql80Controller) Load(ctx http.Context) {
 }
 
 // ErrorLog 获取错误日志
-func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) ErrorLog(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -253,8 +253,8 @@ func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
 }
 
 // ClearErrorLog 清空错误日志
-func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) ClearErrorLog(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -263,8 +263,8 @@ func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) {
 }
 
 // SlowLog 获取慢查询日志
-func (c *Mysql80Controller) SlowLog(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) SlowLog(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -273,8 +273,8 @@ func (c *Mysql80Controller) SlowLog(ctx http.Context) {
 }
 
 // ClearSlowLog 清空慢查询日志
-func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) ClearSlowLog(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -283,8 +283,8 @@ func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) {
 }
 
 // GetRootPassword 获取root密码
-func (c *Mysql80Controller) GetRootPassword(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) GetRootPassword(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -298,8 +298,8 @@ func (c *Mysql80Controller) GetRootPassword(ctx http.Context) {
 }
 
 // SetRootPassword 设置root密码
-func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) SetRootPassword(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -336,8 +336,8 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 }
 
 // DatabaseList 获取数据库列表
-func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) DatabaseList(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -367,8 +367,8 @@ func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
 }
 
 // AddDatabase 添加数据库
-func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) AddDatabase(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -400,8 +400,8 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 }
 
 // DeleteDatabase 删除数据库
-func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) DeleteDatabase(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -425,7 +425,7 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 }
 
 // BackupList 获取备份列表
-func (c *Mysql80Controller) BackupList(ctx http.Context) {
+func (c *Mysql57Controller) BackupList(ctx http.Context) {
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 
 	if !tools.Exists(backupPath) {
@@ -459,8 +459,8 @@ func (c *Mysql80Controller) BackupList(ctx http.Context) {
 }
 
 // CreateBackup 创建备份
-func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) CreateBackup(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -485,7 +485,7 @@ func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
 	}
 	err = os.Setenv("MYSQL_PWD", rootPassword)
 	if err != nil {
-		facades.Log().Error("[MySQL80] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
+		facades.Log().Error("[MySQL57] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "备份失败")
 		return
 	}
@@ -499,8 +499,8 @@ func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
 }
 
 // DeleteBackup 删除备份
-func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) DeleteBackup(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -524,8 +524,8 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
 }
 
 // RestoreBackup 还原备份
-func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) RestoreBackup(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -553,7 +553,7 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 
 	err = os.Setenv("MYSQL_PWD", rootPassword)
 	if err != nil {
-		facades.Log().Error("[MySQL80] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
+		facades.Log().Error("[MYSQL57] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "还原失败")
 		return
 	}
@@ -597,8 +597,8 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 }
 
 // UserList 用户列表
-func (c *Mysql80Controller) UserList(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) UserList(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -635,8 +635,8 @@ func (c *Mysql80Controller) UserList(ctx http.Context) {
 }
 
 // AddUser 添加用户
-func (c *Mysql80Controller) AddUser(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) AddUser(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -666,8 +666,8 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) {
 }
 
 // DeleteUser 删除用户
-func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) DeleteUser(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -691,8 +691,8 @@ func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
 }
 
 // SetUserPassword 设置用户密码
-func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) SetUserPassword(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 
@@ -719,8 +719,8 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 }
 
 // SetUserPrivileges 设置用户权限
-func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
-	if !controllers.Check(ctx, "mysql80") {
+func (c *Mysql57Controller) SetUserPrivileges(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
 		return
 	}
 

@@ -117,7 +117,6 @@ Date: 2023-07-21
         form.render();
         $('#setting-api-token').hide();
 
-        // ajax获取设置项并赋值
         admin.req({
             url: "/api/panel/setting/list"
             , type: 'get'
@@ -127,7 +126,6 @@ Date: 2023-07-21
                     layer.msg('系统信息获取失败，请刷新重试！')
                     return false;
                 }
-                console.log(result)
                 form.val("panel_setting",
                     result.data
                 );

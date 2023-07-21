@@ -23,7 +23,9 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://dl.cdn.haozi.net/panel/php"
 setupPath="/www"
 phpVersion="${1}"
+phpVersionCode=""
 phpPath="${setupPath}/server/php/${phpVersion}"
+cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
@@ -55,19 +57,20 @@ cd ${phpPath}
 
 # 下载源码
 if [ "${phpVersion}" == "74" ]; then
-    wget -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-7.4.33.tar.gz
+    phpVersionCode="7.4.33"
 elif [ "${phpVersion}" == "80" ]; then
-    wget -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-8.0.29.tar.gz
+    phpVersionCode="8.0.29"
 elif [ "${phpVersion}" == "81" ]; then
-    wget -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-8.1.21.tar.gz
+    phpVersionCode="8.1.21"
 elif [ "${phpVersion}" == "82" ]; then
-    wget -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-8.2.8.tar.gz
+    phpVersionCode="8.2.8"
 else
     echo -e $HR
     echo "错误：PHP-${phpVersion}不支持，请检查版本号是否正确。"
     exit 1
 fi
 
+wget -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-${phpVersionCode}.tar.gz
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：PHP-${phpVersion}下载失败，请检查网络是否正常。"
@@ -101,7 +104,11 @@ cd src
 ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp
 
 # 编译安装
-make -j${nproc}
+if [[ "${cpuCore}" -gt "1" ]]; then
+    make -j2
+else
+    make
+fi
 make install
 if [ ! -f "${phpPath}/bin/php" ]; then
     echo -e $HR
@@ -242,6 +249,6 @@ systemctl daemon-reload
 systemctl enable php-fpm-${phpVersion}.service
 systemctl start php-fpm-${phpVersion}.service
 
-panel writePlugin php${phpVersion}
+panel writePlugin php${phpVersion} ${phpVersionCode}
 
-echo -e "${HR}\nPHP-${phpVersion} 安装成功！\n${HR}"
+echo -e "${HR}\nPHP-${phpVersion} 安装完成\n${HR}"

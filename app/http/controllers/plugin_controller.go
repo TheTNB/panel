@@ -80,35 +80,53 @@ func (r *PluginController) List(ctx http.Context) {
 // Install 安装插件
 func (r *PluginController) Install(ctx http.Context) {
 	slug := ctx.Request().Input("slug")
-	plugins := r.plugin.All()
-
-	var plugin services.PanelPlugin
-	check := false
-	for _, item := range plugins {
-		if item.Slug == slug {
-			check = true
-			plugin = item
-			break
-		}
-	}
-	if !check {
-		Error(ctx, http.StatusBadRequest, "插件不存在")
-		return
-	}
-
-	var installedPlugin models.Plugin
-	if err := facades.Orm().Query().Where("slug", slug).First(&installedPlugin); err != nil {
+	plugin := r.plugin.GetBySlug(slug)
+	installedPlugin := r.plugin.GetInstalledBySlug(slug)
+	installedPlugins, err := r.plugin.AllInstalled()
+	if err != nil {
+		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
+
 	if installedPlugin.ID != 0 {
 		Error(ctx, http.StatusBadRequest, "插件已安装")
+		return
+	}
+
+	var lock sync.RWMutex
+	pluginsMap := make(map[string]bool)
+
+	for _, p := range installedPlugins {
+		lock.Lock()
+		pluginsMap[p.Slug] = true
+		lock.Unlock()
+	}
+
+	for _, require := range plugin.Requires {
+		lock.RLock()
+		_, requireFound := pluginsMap[require]
+		lock.RUnlock()
+		if !requireFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
+			return
+		}
+	}
+
+	for _, exclude := range plugin.Excludes {
+		lock.RLock()
+		_, excludeFound := pluginsMap[exclude]
+		lock.RUnlock()
+		if excludeFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
+			return
+		}
 	}
 
 	var task models.Task
 	task.Name = "安装插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/install.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = plugin.Install + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
@@ -123,35 +141,53 @@ func (r *PluginController) Install(ctx http.Context) {
 // Uninstall 卸载插件
 func (r *PluginController) Uninstall(ctx http.Context) {
 	slug := ctx.Request().Input("slug")
-	plugins := r.plugin.All()
-
-	var plugin services.PanelPlugin
-	check := false
-	for _, item := range plugins {
-		if item.Slug == slug {
-			check = true
-			plugin = item
-			break
-		}
-	}
-	if !check {
-		Error(ctx, http.StatusBadRequest, "插件不存在")
-		return
-	}
-
-	var installedPlugin models.Plugin
-	if err := facades.Orm().Query().Where("slug", slug).First(&installedPlugin); err != nil {
+	plugin := r.plugin.GetBySlug(slug)
+	installedPlugin := r.plugin.GetInstalledBySlug(slug)
+	installedPlugins, err := r.plugin.AllInstalled()
+	if err != nil {
+		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
+
 	if installedPlugin.ID == 0 {
 		Error(ctx, http.StatusBadRequest, "插件未安装")
+		return
+	}
+
+	var lock sync.RWMutex
+	pluginsMap := make(map[string]bool)
+
+	for _, p := range installedPlugins {
+		lock.Lock()
+		pluginsMap[p.Slug] = true
+		lock.Unlock()
+	}
+
+	for _, require := range plugin.Requires {
+		lock.RLock()
+		_, requireFound := pluginsMap[require]
+		lock.RUnlock()
+		if !requireFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
+			return
+		}
+	}
+
+	for _, exclude := range plugin.Excludes {
+		lock.RLock()
+		_, excludeFound := pluginsMap[exclude]
+		lock.RUnlock()
+		if excludeFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
+			return
+		}
 	}
 
 	var task models.Task
 	task.Name = "卸载插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/uninstall.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = plugin.Uninstall + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
@@ -166,35 +202,53 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 // Update 更新插件
 func (r *PluginController) Update(ctx http.Context) {
 	slug := ctx.Request().Input("slug")
-	plugins := r.plugin.All()
-
-	var plugin services.PanelPlugin
-	check := false
-	for _, item := range plugins {
-		if item.Slug == slug {
-			check = true
-			plugin = item
-			break
-		}
-	}
-	if !check {
-		Error(ctx, http.StatusBadRequest, "插件不存在")
-		return
-	}
-
-	var installedPlugin models.Plugin
-	if err := facades.Orm().Query().Where("slug", slug).First(&installedPlugin); err != nil {
+	plugin := r.plugin.GetBySlug(slug)
+	installedPlugin := r.plugin.GetInstalledBySlug(slug)
+	installedPlugins, err := r.plugin.AllInstalled()
+	if err != nil {
+		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
+
 	if installedPlugin.ID == 0 {
 		Error(ctx, http.StatusBadRequest, "插件未安装")
+		return
+	}
+
+	var lock sync.RWMutex
+	pluginsMap := make(map[string]bool)
+
+	for _, p := range installedPlugins {
+		lock.Lock()
+		pluginsMap[p.Slug] = true
+		lock.Unlock()
+	}
+
+	for _, require := range plugin.Requires {
+		lock.RLock()
+		_, requireFound := pluginsMap[require]
+		lock.RUnlock()
+		if !requireFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
+			return
+		}
+	}
+
+	for _, exclude := range plugin.Excludes {
+		lock.RLock()
+		_, excludeFound := pluginsMap[exclude]
+		lock.RUnlock()
+		if excludeFound {
+			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
+			return
+		}
 	}
 
 	var task models.Task
 	task.Name = "更新插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = "bash /www/panel/scripts/" + plugin.Slug + "/update.sh >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = plugin.Update + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())

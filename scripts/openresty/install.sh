@@ -24,6 +24,7 @@ downloadUrl="https://dl.cdn.haozi.net/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.1"
+cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
@@ -93,14 +94,15 @@ rm -f nginx-dav-ext-module-3.0.0.tar.gz
 mv nginx-dav-ext-module-3.0.0 nginx-dav-ext-module
 
 # waf
-wget -T 20 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
-unzip -o ngx_waf.zip
-mv ngx_waf-6.1.9 ngx_waf
-rm -f ngx_waf.zip
 wget -T 60 -O uthash.zip ${downloadUrl}/modules/uthash-2.3.0.zip
 unzip -o uthash.zip
 mv uthash-2.3.0 uthash
 rm -f uthash.zip
+cd ../
+wget -T 20 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
+unzip -o ngx_waf.zip
+mv ngx_waf-6.1.9 ngx_waf
+rm -f ngx_waf.zip
 cd ngx_waf/inc
 wget -T 60 -O libinjection.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
 unzip -o libinjection.zip
@@ -133,18 +135,17 @@ cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/src/ngx_waf
-make -j$(nproc)
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-O2 -std=gnu99" --with-cpu-opt="amd64" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
+if [[ "${cpuCore}" -gt "1" ]]; then
+    make -j2
+else
+    make
+fi
 if [ "$?" != "0" ]; then
     echo -e $HR
-    echo "提示：OpenResty多线程编译失败，尝试单线程编译..."
-    make
-    if [ "$?" != "0" ]; then
-        echo -e $HR
-        echo "错误：OpenResty编译失败，请截图错误信息寻求帮助。"
-        rm -rf ${openrestyPath}
-        exit 1
-    fi
+    echo "错误：OpenResty编译失败，请截图错误信息寻求帮助。"
+    rm -rf ${openrestyPath}
+    exit 1
 fi
 make install
 if [ ! -f "${openrestyPath}/nginx/sbin/nginx" ]; then
@@ -364,4 +365,4 @@ systemctl start openresty.service
 
 panel writePlugin openresty ${openrestyVersion}
 
-echo -e "${HR}\nOpenResty install completed.\n${HR}"
+echo -e "${HR}\nOpenResty 安装完成\n${HR}"

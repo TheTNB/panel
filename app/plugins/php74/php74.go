@@ -8,4 +8,7 @@ var (
 	Version     = "7.4.33"
 	Requires    = []string{}
 	Excludes    = []string{}
+	Install     = `bash /www/panel/scripts/php/install.sh 74`
+	Uninstall   = `bash /www/panel/scripts/php/uninstall.sh 74`
+	Update      = `bash /www/panel/scripts/php/install.sh 74`
 )

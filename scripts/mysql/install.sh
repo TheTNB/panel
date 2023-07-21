@@ -26,10 +26,11 @@ setupPath="/www"
 mysqlPath="${setupPath}/server/mysql"
 mysqlVersion=""
 mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
+cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
-if [[ "${1}" == "8.0" ]]; then
+if [[ "${1}" == "80" ]]; then
     mysqlVersion="8.0.33"
-elif [[ "${1}" == "5.7" ]]; then
+elif [[ "${1}" == "57" ]]; then
     mysqlVersion="5.7.42"
 else
     echo -e $HR
@@ -37,7 +38,7 @@ else
     exit 1
 fi
 
-if [[ "${memTotal}" -lt "4096" ]] && [[ "${1}" == "8.0" ]]; then
+if [[ "${memTotal}" -lt "4096" ]] && [[ "${1}" == "80" ]]; then
     echo -e $HR
     echo "错误：这点内存(${memTotal}M)还想装 MySQL 8.0？洗洗睡吧！"
     exit 1
@@ -102,7 +103,12 @@ cd src
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_EXTRA_CHARSETS=all -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} -DWITH_SSL=/usr/local/openssl-1.1 -DWITH_BOOST=../boost
-make -j$(nproc)
+
+if [[ "${cpuCore}" -gt "1" ]]; then
+    make -j2
+else
+    make
+fi
 
 # 安装
 make install
@@ -175,14 +181,13 @@ interactive-timeout
 EOF
 
 # 根据CPU核心数确定写入线程数
-cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '${cpuCore}'/g' ${mysqlPath}/conf/my.cnf
 sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '${cpuCore}'/g' ${mysqlPath}/conf/my.cnf
 
-if [[ "${1}" == "8.0" ]]; then
+if [[ "${1}" == "80" ]]; then
     sed -i '/query_cache_size/d' ${mysqlPath}/conf/my.cnf
 fi
-if [[ "${1}" == "5.7" ]]; then
+if [[ "${1}" == "57" ]]; then
     sed -i '/innodb_redo_log_capacity/d' ${mysqlPath}/conf/my.cnf
 fi
 
@@ -269,8 +274,8 @@ chmod -R 755 ${mysqlPath}
 rm -rf ${mysqlPath}/src
 rm -rf ${mysqlPath}/data
 mkdir -p ${mysqlPath}/data
-chown -R mysql:mysql ${mysqlPath}/data
-chmod -R 755 ${mysqlPath}/data
+chown -R mysql:mysql ${mysqlPath}
+chmod -R 755 ${mysqlPath}
 
 ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath} --datadir=${mysqlPath}/data
 
@@ -279,7 +284,7 @@ source /etc/profile
 
 # 启动
 cp ${mysqlPath}/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
-sed -i "#ExecStartPre#d" /etc/systemd/system/mysqld.service
+sed -i "/ExecStartPre/d" /etc/systemd/system/mysqld.service
 
 systemctl daemon-reload
 systemctl enable mysqld
@@ -287,4 +292,7 @@ systemctl start mysqld
 
 ${mysqlPath}/bin/mysqladmin -u root password ${mysqlPassword}
 
-echo "mysql root password: ${mysqlPassword}"
+panel writePlugin mysqsl${1} ${mysqlVersion}
+panel writeMysqlPassword ${mysqlPassword}
+
+echo -e "${HR}\nMySQL-${1} 安装完成\n${HR}"

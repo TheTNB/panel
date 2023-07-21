@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
@@ -19,16 +20,16 @@ type MenuItem struct {
 }
 
 type InfoController struct {
-	// Dependent services
+	plugin services.Plugin
 }
 
 func NewInfoController() *InfoController {
 	return &InfoController{
-		// Inject services
+		plugin: services.NewPluginImpl(),
 	}
 }
 
-func (r *InfoController) Name(ctx http.Context) {
+func (c *InfoController) Name(ctx http.Context) {
 	var setting models.Setting
 	err := facades.Orm().Query().Where("key", "name").First(&setting)
 	if err != nil {
@@ -42,7 +43,7 @@ func (r *InfoController) Name(ctx http.Context) {
 	})
 }
 
-func (r *InfoController) Menu(ctx http.Context) {
+func (c *InfoController) Menu(ctx http.Context) {
 	Success(ctx, []MenuItem{
 		{Name: "home", Title: "主页", Icon: "layui-icon-home", Jump: "/"},
 		{Name: "website", Title: "网站管理", Icon: "layui-icon-website", Jump: "website/list"},
@@ -55,7 +56,7 @@ func (r *InfoController) Menu(ctx http.Context) {
 	})
 }
 
-func (r *InfoController) HomePlugins(ctx http.Context) {
+func (c *InfoController) HomePlugins(ctx http.Context) {
 	var plugins []models.Plugin
 	err := facades.Orm().Query().Where("show", 1).Find(&plugins)
 	if err != nil {
@@ -80,11 +81,11 @@ func (r *InfoController) HomePlugins(ctx http.Context) {
 	Success(ctx, pluginsJson)
 }
 
-func (r *InfoController) NowMonitor(ctx http.Context) {
+func (c *InfoController) NowMonitor(ctx http.Context) {
 	Success(ctx, tools.GetMonitoringInfo())
 }
 
-func (r *InfoController) SystemInfo(ctx http.Context) {
+func (c *InfoController) SystemInfo(ctx http.Context) {
 	monitorInfo := tools.GetMonitoringInfo()
 
 	Success(ctx, http.Json{
@@ -94,7 +95,7 @@ func (r *InfoController) SystemInfo(ctx http.Context) {
 	})
 }
 
-func (r *InfoController) InstalledDbAndPhp(ctx http.Context) {
+func (c *InfoController) InstalledDbAndPhp(ctx http.Context) {
 	var php []models.Plugin
 	err := facades.Orm().Query().Where("slug like ?", "php%").Find(&php)
 	if err != nil {
@@ -116,14 +117,24 @@ func (r *InfoController) InstalledDbAndPhp(ctx http.Context) {
 		postgresqlInstalled = false
 	}
 
+	type data struct {
+		Slug string `json:"slug"`
+		Name string `json:"name"`
+	}
+	var phpData []data
+	phpData = append(phpData, data{Slug: "0", Name: "不使用"})
+	for _, p := range php {
+		phpData = append(phpData, data{Slug: strings.ReplaceAll(p.Slug, "php", ""), Name: c.plugin.GetBySlug(p.Slug).Name})
+	}
+
 	Success(ctx, http.Json{
-		"php":        php,
+		"php":        phpData,
 		"mysql":      mysqlInstalled,
 		"postgresql": postgresqlInstalled,
 	})
 }
 
-func (r *InfoController) CheckUpdate(ctx http.Context) {
+func (c *InfoController) CheckUpdate(ctx http.Context) {
 	version := facades.Config().GetString("panel.version")
 	remote, err := tools.GetLatestPanelVersion()
 	if err != nil {
@@ -151,7 +162,7 @@ func (r *InfoController) CheckUpdate(ctx http.Context) {
 	})
 }
 
-func (r *InfoController) Update(ctx http.Context) {
+func (c *InfoController) Update(ctx http.Context) {
 	proxy := ctx.Request().InputBool("proxy")
 	err := tools.UpdatePanel(proxy)
 	if err != nil {

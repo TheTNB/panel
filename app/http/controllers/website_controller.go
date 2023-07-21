@@ -8,10 +8,10 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	"panel/app/models"
-	"panel/pkg/tools"
 
+	"panel/app/models"
 	"panel/app/services"
+	"panel/pkg/tools"
 )
 
 type WebsiteController struct {
@@ -46,15 +46,18 @@ func (c *WebsiteController) List(ctx http.Context) {
 }
 
 func (c *WebsiteController) Add(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
 		"domain":      "required",
 		"php":         "required",
 		"db":          "required",
-		"db_type":     "required_if:db,1",
-		"db_name":     "required_if:db,1",
-		"db_user":     "required_if:db,1",
-		"db_password": "required_if:db,1",
+		"db_type":     "required_if:db,true",
+		"db_name":     "required_if:db,true",
+		"db_user":     "required_if:db,true",
+		"db_password": "required_if:db,true",
 	})
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, err.Error())
@@ -66,11 +69,14 @@ func (c *WebsiteController) Add(ctx http.Context) {
 	}
 
 	var website services.PanelWebsite
-	err = ctx.Request().Bind(&website)
-	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
-		return
-	}
+	website.Name = ctx.Request().Input("name")
+	website.Domain = ctx.Request().Input("domain")
+	website.Php = ctx.Request().InputInt("php")
+	website.Db = ctx.Request().InputBool("db")
+	website.DbType = ctx.Request().Input("db_type")
+	website.DbName = ctx.Request().Input("db_name")
+	website.DbUser = ctx.Request().Input("db_user")
+	website.DbPassword = ctx.Request().Input("db_password")
 
 	newSite, err := c.website.Add(website)
 	if err != nil {
@@ -83,23 +89,14 @@ func (c *WebsiteController) Add(ctx http.Context) {
 }
 
 func (c *WebsiteController) Delete(ctx http.Context) {
-	validator, err := ctx.Request().Validate(map[string]string{
-		"id": "required|int",
-	})
-	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
+	if !Check(ctx, "openresty") {
 		return
 	}
-	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
-		return
-	}
-
 	id := ctx.Request().InputInt("id")
-	err = c.website.Delete(id)
+	err := c.website.Delete(id)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 删除网站失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		Error(ctx, http.StatusInternalServerError, "删除网站失败: "+err.Error())
 		return
 	}
 
@@ -107,6 +104,9 @@ func (c *WebsiteController) Delete(ctx http.Context) {
 }
 
 func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	index := tools.ReadFile("/www/server/openresty/html/index.html")
 	stop := tools.ReadFile("/www/server/openresty/html/stop.html")
 
@@ -117,6 +117,9 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
 }
 
 func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
@@ -136,6 +139,9 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
 }
 
 func (c *WebsiteController) GetConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
 		Error(ctx, http.StatusBadRequest, "参数错误")
@@ -153,21 +159,40 @@ func (c *WebsiteController) GetConfig(ctx http.Context) {
 }
 
 func (c *WebsiteController) SaveConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	validator, err := ctx.Request().Validate(map[string]string{
-		"id": "required|int",
+		"id":                  "required",
+		"domains":             "required",
+		"ports":               "required",
+		"hsts":                "bool",
+		"ssl":                 "bool",
+		"http_redirect":       "bool",
+		"open_basedir":        "bool",
+		"waf":                 "required",
+		"waf_cache":           "required",
+		"waf_mode":            "required",
+		"waf_cc_deny":         "required",
+		"index":               "required",
+		"path":                "required",
+		"root":                "required",
+		"raw":                 "required",
+		"php":                 "required",
+		"ssl_certificate":     "required_if:ssl,true",
+		"ssl_certificate_key": "required_if:ssl,true",
 	})
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
-	id := ctx.Request().InputInt("id")
 	var website models.Website
-	if facades.Orm().Query().Where("id", id).FirstOrFail(&website) != nil {
+	if facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&website) != nil {
 		Error(ctx, http.StatusBadRequest, "网站不存在")
 		return
 	}
@@ -178,9 +203,9 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	}
 
 	// 原文
-	raw := tools.ReadFile("/www/server/panel/vhost/openresty/" + website.Name + ".conf")
+	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
 	if strings.TrimSpace(raw) != strings.TrimSpace(ctx.Request().Input("raw")) {
-		tools.WriteFile("/www/server/panel/vhost/openresty/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
+		tools.WriteFile("/www/server/vhost/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
 		Success(ctx, nil)
 		return
 	}
@@ -195,7 +220,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 
 	// 域名
 	domain := "server_name"
-	domains := strings.Split(ctx.Request().Input("domain"), "\n")
+	domains := strings.Split(ctx.Request().Input("domains"), "\n")
 	if len(domains) == 0 {
 		Error(ctx, http.StatusBadRequest, "域名不能为空")
 		return
@@ -216,7 +241,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 
 	// 端口
 	var port strings.Builder
-	ports := strings.Split(ctx.Request().Input("port"), "\n")
+	ports := strings.Split(ctx.Request().Input("ports"), "\n")
 	if len(ports) == 0 {
 		Error(ctx, http.StatusBadRequest, "端口不能为空")
 		return
@@ -287,15 +312,13 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	wafMode := ctx.Request().Input("waf_mode", "DYNAMIC")
 	wafCcDeny := ctx.Request().Input("waf_cc_deny", "rate=1000r/m duration=60m")
 	wafCache := ctx.Request().Input("waf_cache", "capacity=50")
-	wafConfig := `
-# waf标记位开始
+	wafConfig := `# waf标记位开始
     waf ` + waf + `;
     waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
     waf_mode ` + wafMode + `;
     waf_cc_deny ` + wafCcDeny + `;
     waf_cache ` + wafCache + `;
-    
-`
+    `
 	wafConfigOld := tools.Cut(raw, "# waf标记位开始", "# waf标记位结束")
 	if len(strings.TrimSpace(wafConfigOld)) != 0 {
 		raw = strings.Replace(raw, wafConfigOld, "", -1)
@@ -308,8 +331,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	if ssl {
 		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
 		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
-		sslConfig := `
-# ssl标记位开始
+		sslConfig := `# ssl标记位开始
     ssl_certificate /www/server/vhost/ssl/` + website.Name + `.pem;
     ssl_certificate_key /www/server/vhost/ssl/` + website.Name + `.key;
     ssl_session_timeout 1d;
@@ -318,28 +340,21 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
-
-`
+    `
 		if ctx.Request().InputBool("http_redirect") {
-			sslConfig += `
-
-    # http重定向标记位开始
+			sslConfig += `# http重定向标记位开始
     if (\$server_port !~ 443){
         return 301 https://\$host\$request_uri;
     }
     error_page 497  https://\$host\$request_uri;
     # http重定向标记位结束
-
-`
+    `
 		}
 		if ctx.Request().InputBool("hsts") {
-			sslConfig += `
-
-    # hsts标记位开始
+			sslConfig += `# hsts标记位开始
     add_header Strict-Transport-Security "max-age=63072000" always;
     # hsts标记位结束
-
-`
+    `
 		}
 		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
@@ -349,7 +364,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	} else {
 		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
-			raw = strings.Replace(raw, sslConfigOld, "", -1)
+			raw = strings.Replace(raw, sslConfigOld, "\n    ", -1)
 		}
 	}
 
@@ -379,7 +394,10 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	Success(ctx, nil)
 }
 
-func (c *WebsiteController) ClearSiteLpg(ctx http.Context) {
+func (c *WebsiteController) ClearLog(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
 		Error(ctx, http.StatusBadRequest, "参数错误")
@@ -426,7 +444,6 @@ func (c *WebsiteController) UpdateRemark(ctx http.Context) {
 }
 
 func (c *WebsiteController) BackupList(ctx http.Context) {
-
 	backupList, err := c.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站备份列表失败 ", err)
@@ -463,6 +480,9 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) {
 }
 
 func (c *WebsiteController) ResetConfig(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
 		Error(ctx, http.StatusBadRequest, "参数错误")
@@ -511,7 +531,7 @@ server
 
     # waf标记位开始
     waf on;
-    waf_rule_path /www/server/nginx/ngx_waf/assets/rules/;
+    waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
     waf_mode DYNAMIC;
     waf_cc_deny rate=1000r/m duration=60m;
     waf_cache capacity=50;
@@ -550,7 +570,10 @@ server
 	Success(ctx, nil)
 }
 
-func (c *WebsiteController) SetStatus(ctx http.Context) {
+func (c *WebsiteController) Status(ctx http.Context) {
+	if !Check(ctx, "openresty") {
+		return
+	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
 		Error(ctx, http.StatusBadRequest, "参数错误")
@@ -574,26 +597,26 @@ func (c *WebsiteController) SetStatus(ctx http.Context) {
 	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
 
 	// 运行目录
-	rootConfig := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
+	rootConfig := tools.Cut(raw, "# root标记位开始\n", "# root标记位结束")
 	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(rootConfig)
 	if len(match) == 2 {
 		if website.Status {
 			root := regexp.MustCompile(`# root\s+(.+);`).FindStringSubmatch(rootConfig)
-			raw = strings.ReplaceAll(raw, rootConfig, "root "+root[1]+";")
+			raw = strings.ReplaceAll(raw, rootConfig, "    root "+root[1]+";\n    ")
 		} else {
-			raw = strings.ReplaceAll(raw, rootConfig, "root /www/server/openresty/html;\n# root "+match[1]+";\n")
+			raw = strings.ReplaceAll(raw, rootConfig, "    root /www/server/openresty/html;\n    # root "+match[1]+";\n    ")
 		}
 	}
 
 	// 默认文件
-	indexConfig := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
+	indexConfig := tools.Cut(raw, "# index标记位开始\n", "# index标记位结束")
 	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(indexConfig)
 	if len(match) == 2 {
 		if website.Status {
 			index := regexp.MustCompile(`# index\s+(.+);`).FindStringSubmatch(indexConfig)
-			raw = strings.ReplaceAll(raw, indexConfig, "index "+index[1]+";")
+			raw = strings.ReplaceAll(raw, indexConfig, "    index "+index[1]+";\n    ")
 		} else {
-			raw = strings.ReplaceAll(raw, indexConfig, "index stop.html;\n# index "+match[1]+";\n")
+			raw = strings.ReplaceAll(raw, indexConfig, "    index stop.html;\n    # index "+match[1]+";\n    ")
 		}
 	}
 

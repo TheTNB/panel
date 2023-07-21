@@ -2,7 +2,6 @@ package openresty
 
 import (
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/goravel/framework/contracts/http"
@@ -11,7 +10,6 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
-	"panel/app/http/controllers/plugins"
 	"panel/pkg/tools"
 )
 
@@ -27,12 +25,11 @@ func NewOpenrestyController() *OpenRestyController {
 
 // Status 获取运行状态
 func (r *OpenRestyController) Status(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
-	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
@@ -47,13 +44,12 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
 	tools.ExecShell("systemctl reload openresty")
-	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
@@ -62,19 +58,18 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 	if status == "active" {
 		controllers.Success(ctx, "重载OpenResty成功")
 	} else {
-		controllers.Error(ctx, 1, "重载OpenResty失败: "+string(out))
+		controllers.Error(ctx, 1, "重载OpenResty失败: "+status)
 	}
 }
 
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
 	tools.ExecShell("systemctl start openresty")
-	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
@@ -83,19 +78,18 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 	if status == "active" {
 		controllers.Success(ctx, "启动OpenResty成功")
 	} else {
-		controllers.Error(ctx, 1, "启动OpenResty失败: "+string(out))
+		controllers.Error(ctx, 1, "启动OpenResty失败: "+status)
 	}
 }
 
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
 	tools.ExecShell("systemctl stop openresty")
-	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
@@ -104,19 +98,18 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 	if status != "active" {
 		controllers.Success(ctx, "停止OpenResty成功")
 	} else {
-		controllers.Error(ctx, 1, "停止OpenResty失败: "+string(out))
+		controllers.Error(ctx, 1, "停止OpenResty失败: "+status)
 	}
 }
 
 // Restart 重启OpenResty
 func (r *OpenRestyController) Restart(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
 	tools.ExecShell("systemctl restart openresty")
-	out := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
 		return
@@ -125,13 +118,13 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 	if status == "active" {
 		controllers.Success(ctx, "重启OpenResty成功")
 	} else {
-		controllers.Error(ctx, 1, "重启OpenResty失败: "+string(out))
+		controllers.Error(ctx, 1, "重启OpenResty失败: "+status)
 	}
 }
 
 // GetConfig 获取配置
 func (r *OpenRestyController) GetConfig(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
@@ -146,7 +139,7 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) {
 
 // SaveConfig 保存配置
 func (r *OpenRestyController) SaveConfig(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
@@ -166,7 +159,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 
 // ErrorLog 获取错误日志
 func (r *OpenRestyController) ErrorLog(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
@@ -181,7 +174,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 
 // ClearErrorLog 清空错误日志
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
@@ -191,7 +184,7 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 
 // Load 获取负载
 func (r *OpenRestyController) Load(ctx http.Context) {
-	if !plugins.Check(ctx, "openresty") {
+	if !controllers.Check(ctx, "openresty") {
 		return
 	}
 
@@ -210,15 +203,14 @@ func (r *OpenRestyController) Load(ctx http.Context) {
 	}
 	var data []nginxStatus
 
-	out := tools.ExecShell("ps aux | grep nginx | grep 'worker process' | wc -l")
-	workers := strings.TrimSpace(out)
+	workers := tools.ExecShell("ps aux | grep nginx | grep 'worker process' | wc -l")
 	data = append(data, nginxStatus{
 		Name:  "工作进程",
 		Value: workers,
 	})
 
-	out = tools.ExecShell("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
-	mem := tools.FormatBytes(cast.ToFloat64(strings.TrimSpace(out)))
+	out := tools.ExecShell("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
+	mem := tools.FormatBytes(cast.ToFloat64(out))
 	data = append(data, nginxStatus{
 		Name:  "内存占用",
 		Value: mem,

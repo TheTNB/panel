@@ -28,4 +28,4 @@ rm -rf /www/server/openresty
 
 panel deletePlugin openresty
 
-echo -e "${HR}\nOpenResty uninstall completed.\n${HR}"
+echo -e "${HR}\nOpenResty 卸载完成\n${HR}"

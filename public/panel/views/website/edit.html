@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 编辑
 Author: 耗子
-Date: 2023-06-24
+Date: 2023-07-21
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <div class="layui-tab" lay-filter="website-edit-tab">
@@ -17,22 +17,62 @@ Date: 2023-06-24
         <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
                 <!-- 域名绑定 -->
-                <div class="layui-form layui-form-pane">
+                <div class="layui-form">
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label">域名</label>
                         <div class="layui-input-block">
-                            <textarea name="domain" lay-verify="required"
-                                      placeholder="请输入域名，一行一个支持泛域名"
-                                      class="layui-textarea">{{ d.params.config.domain }}</textarea>
+                            <div class="layui-input-inline" id="domains">
+                                {{# layui.each(d.params.config.domains, function(index, item){ }}
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="domains[]" lay-verify="required" value="{{ item }}"
+                                               class="layui-input" style="width: 200%;">
+                                    </div>
+                                    <div class="layui-input-block" style="margin-left: 480px">
+                                        <button type="button"
+                                                class="layui-btn layui-btn-danger layui-btn-sm removeclass"><i
+                                                class="layui-icon">&#xe67e;</i></button>
+                                    </div>
+                                </div>
+                                {{# }); }}
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block" style="margin-left: 480px">
+                                    <button id="add-domain" type="button"
+                                            class="layui-btn layui-btn-warm layui-btn-sm">
+                                        <i class="layui-icon">&#xe654;</i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr>
                     <div class="layui-form-item layui-form-text">
                         <label class="layui-form-label">端口</label>
                         <div class="layui-input-block">
-                            <textarea name="port" lay-verify="required"
-                                      placeholder="请输入访问端口，一行一个"
-                                      class="layui-textarea">{{ d.params.config.port }}</textarea>
+                            <div class="layui-input-inline" id="ports">
+                                {{# layui.each(d.params.config.ports, function(index, item){ }}
+                                <div class="layui-form-item">
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="ports[]" lay-verify="required" value="{{ item }}"
+                                               class="layui-input" style="width: 200%;">
+                                    </div>
+                                    <div class="layui-input-block" style="margin-left: 480px">
+                                        <button type="button"
+                                                class="layui-btn layui-btn-danger layui-btn-sm removeclass"><i
+                                                class="layui-icon">&#xe67e;</i></button>
+                                    </div>
+                                </div>
+                                {{# }); }}
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-input-block" style="margin-left: 480px">
+                                    <button id="add-port" type="button"
+                                            class="layui-btn layui-btn-warm layui-btn-sm">
+                                        <i class="layui-icon">&#xe654;</i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -66,11 +106,11 @@ Date: 2023-06-24
                         <label class="layui-form-label">PHP版本</label>
                         <div class="layui-input-block">
                             <select name="php" lay-filter="website-php">
-                                {{# layui.each(d.params.php_version, function(index, item){ }}
+                                {{# layui.each(d.params.php, function(index, item){ }}
                                 {{# if(item == d.params.config.php){ }}
-                                <option value="{{ item }}" selected="">{{ item }}</option>
+                                <option value="{{ item.slug }}" selected="">{{ item.name }}</option>
                                 {{# }else{ }}
-                                <option value="{{ item }}">{{ item }}</option>
+                                <option value="{{ item.slug }}">{{ item.name }}</option>
                                 {{# } }}
                                 {{# }); }}
                             </select>
@@ -80,7 +120,7 @@ Date: 2023-06-24
                         <label class="layui-form-label">防跨站攻击</label>
                         <div class="layui-input-block">
                             <input type="checkbox" name="open_basedir" lay-skin="switch" lay-text="ON|OFF"
-                                   {{ d.params.config.open_basedir== 1 ? 'checked' : '' }}>
+                                   {{ d.params.config.open_basedir ? 'checked' : '' }}>
                         </div>
                     </div>
                 </div>
@@ -97,7 +137,7 @@ Date: 2023-06-24
                         <label class="layui-form-label">总开关</label>
                         <div class="layui-input-inline">
                             <input type="checkbox" name="waf" lay-skin="switch" lay-text="ON|OFF"
-                                   {{ d.params.config.waf== 1 ? 'checked' : '' }}>
+                                   {{ d.params.config.waf ? 'checked' : '' }}>
                         </div>
                         <div class="layui-form-mid layui-word-aux">只有打开了总开关，下面的设置才会生效！</div>
                     </div>
@@ -132,7 +172,7 @@ Date: 2023-06-24
                         <label class="layui-form-label">总开关</label>
                         <div class="layui-input-inline">
                             <input type="checkbox" name="ssl" lay-skin="switch" lay-text="ON|OFF"
-                                   {{ d.params.config.ssl== 1 ? 'checked' : '' }}>
+                                   {{ d.params.config.ssl ? 'checked' : '' }}>
                         </div>
                         <div class="layui-form-mid layui-word-aux">只有打开了总开关，下面的设置才会生效！</div>
                     </div>
@@ -142,25 +182,25 @@ Date: 2023-06-24
                             <label class="layui-form-label">HTTP跳转</label>
                             <div class="layui-input-block">
                                 <input type="checkbox" name="http_redirect" lay-skin="switch" lay-text="ON|OFF"
-                                       {{ d.params.config.http_redirect== 1 ? 'checked' : '' }}>
+                                       {{ d.params.config.http_redirect ? 'checked' : '' }}>
                             </div>
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">HSTS</label>
                             <div class="layui-input-inline">
                                 <input type="checkbox" name="hsts" lay-skin="switch" lay-text="ON|OFF"
-                                       {{ d.params.config.hsts== 1 ? 'checked' : '' }}>
+                                       {{ d.params.config.hsts ? 'checked' : '' }}>
                             </div>
                         </div>
-                        <div class="layui-inline">
+                        <!--<div class="layui-inline">
                             <div class="layui-input-inline">
                                 <button id="issue-ssl" class="layui-btn layui-btn-sm">签发免费SSL证书</button>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
 
                     <div class="layui-form-item layui-form-text">
-                        {{# if(d.params.config.ssl == 1){ }}
+                        {{# if(d.params.config.ssl){ }}
                         <label class="layui-form-label">证书 <span style="color: red; float: right;">剩余有效期：{{ d.params.config.ssl_date }}天</span></label>
                         {{# }else{ }}
                         <label class="layui-form-label">证书</label>
@@ -195,7 +235,7 @@ Date: 2023-06-24
                     <br>
                     如果你修改了原文，那么点击保存后，其余的修改将不会生效！
                 </blockquote>
-                <div id="config-editor" style="height: 400px;">{{ d.params.config.config_raw }}</div>
+                <div id="config-editor" style="height: 400px;">{{ d.params.config.raw }}</div>
             </div>
             <div class="layui-tab-item">
                 <!-- 访问日志 -->
@@ -209,171 +249,205 @@ Date: 2023-06-24
     </div>
 </script>
 <script>
-  let rewriteEditor = ''
-  let configEditor = ''
-  layui.data.sendParams = function (params) {
-    layui.use(['admin', 'form', 'laydate', 'code'], function () {
-      var $ = layui.$
-        , admin = layui.admin
-        , layer = layui.layer
-        , code = layui.code
-        , form = layui.form
-        , element = layui.element
-      form.render()
-      element.render()
-      element.on('tab(website-edit-tab)', function (data) {
-        if (data.index === 6) {
-          // 隐藏保存按钮
-          $('.layui-footer').hide()
-        } else {
-          $('.layui-footer').show()
-        }
-      })
-      rewriteEditor = ace.edit('rewrite-editor', {
-        mode: 'ace/mode/nginx',
-        selectionStyle: 'text'
-      })
-      configEditor = ace.edit('config-editor', {
-        mode: 'ace/mode/nginx',
-        selectionStyle: 'text'
-      })
-      code({
-        elem: '#website-log'
-        , encode: true
-        , about: false
+    let rewriteEditor = ''
+    let configEditor = ''
+    layui.data.sendParams = function (params) {
+        layui.use(['admin', 'form', 'laydate', 'code'], function () {
+            var $ = layui.$
+                , admin = layui.admin
+                , layer = layui.layer
+                , code = layui.code
+                , form = layui.form
+                , element = layui.element
+            form.render()
+            element.render()
+            element.on('tab(website-edit-tab)', function (data) {
+                if (data.index === 6) {
+                    // 隐藏保存按钮
+                    $('.layui-footer').hide()
+                } else {
+                    $('.layui-footer').show()
+                }
+            })
+            rewriteEditor = ace.edit('rewrite-editor', {
+                mode: 'ace/mode/nginx',
+                selectionStyle: 'text'
+            })
+            configEditor = ace.edit('config-editor', {
+                mode: 'ace/mode/nginx',
+                selectionStyle: 'text'
+            })
+            code({
+                elem: '#website-log'
+                , encode: true
+                , about: false
 
-      })
+            })
 
-      $('#clean-site-log').click(function () {
-        layer.confirm('确定要清空日志吗？', function (index) {
-          layer.close(index)
-          layer.load()
-          admin.req({
-            url: '/api/panel/website/clearSiteLog'
-            , type: 'post'
-            , data: { name: params.config.name }
-            , success: function (res) {
-              layer.closeAll('loading')
-              if (res.code === 0) {
-                layer.msg('已清空', { icon: 1 })
-                setTimeout(function () {
-                  admin.render()
-                }, 1000)
-              } else {
-                layer.msg(res.msg, { icon: 2 })
-              }
-            }
-          })
-        })
-      })
-
-      $('#save-site-config').click(function () {
-        layer.load()
-        var port = $('textarea[name="port"]').val()
-        var reg = new RegExp(/\n443.*\n?/)
-        // 如果开启了https，就自动添加443端口
-        if ($('input[name="ssl"]').prop('checked') && !reg.test(port)) {
-          port = port + '\n443'
-        }
-        // 如果关闭了https，就自动删除443端口
-        if (!$('input[name="ssl"]').prop('checked') && reg.test(port)) {
-          // 正则替换
-          port = port.replace(/443.*\n?/, '')
-        }
-        admin.req({
-          url: '/api/panel/website/saveSiteSettings'
-          , type: 'post'
-          , data: {
-            name: params.config.name,
-            config: {
-              domain: $('textarea[name="domain"]').val(),
-              port: port,
-              ssl: $('input[name="ssl"]').prop('checked') ? 1 : 0,
-              http_redirect: $('input[name="http_redirect"]').prop('checked') ? 1 : 0,
-              hsts: $('input[name="hsts"]').prop('checked') ? 1 : 0,
-              ssl_certificate: $('textarea[name="ssl_certificate"]').val(),
-              ssl_certificate_key: $('textarea[name="ssl_certificate_key"]').val(),
-              path: $('input[name="path"]').val(),
-              root: $('input[name="root"]').val(),
-              index: $('input[name="index"]').val(),
-              php: $('select[name="php"]').val(),
-              open_basedir: $('input[name="open_basedir"]').prop('checked') ? 1 : 0,
-              waf: $('input[name="waf"]').prop('checked') ? 1 : 0,
-              waf_mode: $('input[name="waf_mode"]').val(),
-              waf_cc_deny: $('input[name="waf_cc_deny"]').val(),
-              waf_cache: $('input[name="waf_cache"]').val(),
-              rewrite: rewriteEditor.getValue(),
-              config_raw: configEditor.getValue()
-            }
-          }
-          , success: function (res) {
-            layer.closeAll('loading')
-            if (res.code === 0) {
-              layer.msg('保存成功', { icon: 1 })
-              setTimeout(function () {
-                admin.render()
-              }, 1000)
-            } else {
-              layer.msg(res.msg, { icon: 2 })
-            }
-          }
-        })
-      })
-
-      // 重置配置
-      $('#site-config-restore').click(function () {
-        layer.confirm('高风险操作，网站配置重置后所有配置均需重新设置，确定要重置配置吗？', function (index) {
-          index = layer.msg('重置网站配置', {
-            icon: 16
-            , time: 0
-          })
-          admin.req({
-            url: '/api/panel/website/resetSiteConfig'
-            , type: 'post'
-            , data: { name: params.config.name }
-            , success: function (res) {
-              layer.close(index)
-              if (res.code === 0) {
-                layer.alert('重置成功，你需要重新添加域名/端口绑定，设置各配置参数！', function (index) {
-                  admin.render()
-                  layer.close(index)
+            $('#clean-site-log').click(function () {
+                layer.confirm('确定要清空日志吗？', function (index) {
+                    layer.close(index)
+                    layer.load()
+                    admin.req({
+                        url: '/api/panel/website/clearSiteLog'
+                        , type: 'post'
+                        , data: {name: params.config.name}
+                        , success: function (res) {
+                            layer.closeAll('loading')
+                            if (res.code === 0) {
+                                layer.msg('已清空', {icon: 1})
+                                setTimeout(function () {
+                                    admin.render()
+                                }, 1000)
+                            } else {
+                                layer.msg(res.message, {icon: 2})
+                            }
+                        }
+                    })
                 })
-              } else {
-                layer.msg(res.msg, { icon: 2 })
-              }
-            }
-          })
-        })
-      })
+            })
 
-      // 监听签发证书按钮
-      $('#issue-ssl').click(function () {
-        layer.confirm('确定要申请签发免费SSL证书吗？', function (index) {
-          index = layer.msg('正在签发证书，可能需要较长时间，请勿操作...', {
-            icon: 16
-            , time: 0
-          })
-          admin.req({
-            url: '/api/panel/website/issueSsl'
-            , type: 'post'
-            , data: {
-              name: params.config.name
-              , type: 'lets'
-            }
-            , success: function (res) {
-              layer.close(index)
-              if (res.code === 0) {
-                layer.msg('签发成功', { icon: 1 })
-                setTimeout(function () {
-                  admin.render()
-                }, 1000)
-              } else {
-                layer.alert(res.msg, { icon: 2 })
-              }
-            }
-          })
+            $('#save-site-config').click(function () {
+                layer.load()
+                let ports = $("input[name='ports[]']").map(function () {
+                    return $(this).val();
+                }).get()
+
+                let domains = $("input[name='domains[]']").map(function () {
+                    return $(this).val();
+                }).get()
+
+                admin.req({
+                    url: '/api/panel/website/config'
+                    , type: 'post'
+                    , data: {
+                        id: params.id,
+                        domains: domains.join('\n'),
+                        ports: ports.join('\n'),
+                        ssl: $('input[name="ssl"]').prop('checked'),
+                        http_redirect: $('input[name="http_redirect"]').prop('checked'),
+                        hsts: $('input[name="hsts"]').prop('checked'),
+                        ssl_certificate: $('textarea[name="ssl_certificate"]').val(),
+                        ssl_certificate_key: $('textarea[name="ssl_certificate_key"]').val(),
+                        path: $('input[name="path"]').val(),
+                        root: $('input[name="root"]').val(),
+                        index: $('input[name="index"]').val(),
+                        php: $('select[name="php"]').val(),
+                        open_basedir: $('input[name="open_basedir"]').prop('checked'),
+                        waf: $('input[name="waf"]').prop('checked') ? 'on' : 'off',
+                        waf_mode: $('input[name="waf_mode"]').val(),
+                        waf_cc_deny: $('input[name="waf_cc_deny"]').val(),
+                        waf_cache: $('input[name="waf_cache"]').val(),
+                        rewrite: rewriteEditor.getValue(),
+                        raw: configEditor.getValue()
+                    }
+                    , success: function (res) {
+                        layer.closeAll('loading')
+                        if (res.code === 0) {
+                            layer.msg('保存成功', {icon: 1})
+                            setTimeout(function () {
+                                admin.render()
+                            }, 1000)
+                        } else {
+                            layer.msg(res.message, {icon: 2})
+                        }
+                    }
+                })
+            })
+
+            // 重置配置
+            $('#site-config-restore').click(function () {
+                layer.confirm('高风险操作，网站配置重置后所有配置均需重新设置，确定要重置配置吗？', function (index) {
+                    index = layer.msg('重置网站配置', {
+                        icon: 16
+                        , time: 0
+                    })
+                    admin.req({
+                        url: '/api/panel/website/resetConfig'
+                        , type: 'post'
+                        , data: {id: params.id}
+                        , success: function (res) {
+                            layer.close(index)
+                            if (res.code === 0) {
+                                layer.alert('重置成功，你需要重新添加域名/端口绑定，设置各配置参数！', function (index) {
+                                    admin.render()
+                                    layer.close(index)
+                                })
+                            } else {
+                                layer.msg(res.message, {icon: 2})
+                            }
+                        }
+                    })
+                })
+            })
+
+            // 监听签发证书按钮
+            $('#issue-ssl').click(function () {
+                layer.confirm('确定要申请签发免费SSL证书吗？', function (index) {
+                    index = layer.msg('正在签发证书，可能需要较长时间，请勿操作...', {
+                        icon: 16
+                        , time: 0
+                    })
+                    admin.req({
+                        url: '/api/panel/website/issueSsl'
+                        , type: 'post'
+                        , data: {
+                            name: params.config.name
+                            , type: 'lets'
+                        }
+                        , success: function (res) {
+                            layer.close(index)
+                            if (res.code === 0) {
+                                layer.msg('签发成功', {icon: 1})
+                                setTimeout(function () {
+                                    admin.render()
+                                }, 1000)
+                            } else {
+                                layer.alert(res.message, {icon: 2})
+                            }
+                        }
+                    })
+                })
+            })
+
+            // 动态添加input输入框
+            $("#add-domain").click(function () {
+                var str = '<div class="layui-form-item">' +
+                    '<div class="layui-input-inline">' +
+                    '<input type="text" name="domains[]" placeholder="example.com" lay-verify="required"' +
+                    'class="layui-input" style="width: 200%;">' +
+                    '</div>' +
+                    '<div class="layui-input-block" style="margin-left: 480px">' +
+                    '<button type="button" class="layui-btn layui-btn-danger layui-btn-sm removeclass"><i class="layui-icon">&#xe67e;</i></button>' +
+                    '</div>' +
+                    '</div>';
+
+                $("#domains").append(str);
+
+                form.render();
+            });
+            $("#add-port").click(function () {
+                var str = '<div class="layui-form-item">' +
+                    '<div class="layui-input-inline">' +
+                    '<input type="text" name="ports[]" placeholder="443 ssl" lay-verify="required"' +
+                    'class="layui-input" style="width: 200%;">' +
+                    '</div>' +
+                    '<div class="layui-input-block" style="margin-left: 480px">' +
+                    '<button type="button" class="layui-btn layui-btn-danger layui-btn-sm removeclass"><i class="layui-icon">&#xe67e;</i></button>' +
+                    '</div>' +
+                    '</div>';
+
+                $("#ports").append(str);
+
+                form.render();
+            });
+
+            //删除动态添加的input输入框
+            $("body").on('click', ".removeclass", function () {
+                let parentEle = $(this).parent().parent();
+                parentEle.remove();
+                form.render();
+            });
         })
-      })
-    })
-  }
+    }
 </script>

@@ -8,4 +8,7 @@ var (
 	Version     = "1.21.4.1"
 	Requires    = []string{}
 	Excludes    = []string{}
+	Install     = "bash /www/panel/scripts/openresty/install.sh"
+	Uninstall   = "bash /www/panel/scripts/openresty/uninstall.sh"
+	Update      = "bash /www/panel/scripts/openresty/install.sh"
 )

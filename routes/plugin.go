@@ -3,6 +3,8 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+	"panel/app/http/controllers/plugins/mysql57"
+	"panel/app/http/controllers/plugins/php80"
 
 	"panel/app/http/controllers/plugins/mysql80"
 	"panel/app/http/controllers/plugins/openresty"
@@ -24,6 +26,35 @@ func Plugin() {
 		route.Post("config", openRestyController.SaveConfig)
 		route.Get("errorLog", openRestyController.ErrorLog)
 		route.Post("clearErrorLog", openRestyController.ClearErrorLog)
+	})
+	facades.Route().Prefix("api/plugins/mysql57").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		mysql57Controller := mysql57.NewMysql57Controller()
+		route.Get("status", mysql57Controller.Status)
+		route.Post("reload", mysql57Controller.Reload)
+		route.Post("start", mysql57Controller.Start)
+		route.Post("stop", mysql57Controller.Stop)
+		route.Post("restart", mysql57Controller.Restart)
+		route.Get("load", mysql57Controller.Load)
+		route.Get("config", mysql57Controller.GetConfig)
+		route.Post("config", mysql57Controller.SaveConfig)
+		route.Get("errorLog", mysql57Controller.ErrorLog)
+		route.Get("clearErrorLog", mysql57Controller.ClearErrorLog)
+		route.Get("slowLog", mysql57Controller.SlowLog)
+		route.Get("clearSlowLog", mysql57Controller.ClearSlowLog)
+		route.Get("rootPassword", mysql57Controller.GetRootPassword)
+		route.Post("rootPassword", mysql57Controller.SetRootPassword)
+		route.Get("database", mysql57Controller.DatabaseList)
+		route.Post("addDatabase", mysql57Controller.AddDatabase)
+		route.Post("deleteDatabase", mysql57Controller.DeleteDatabase)
+		route.Get("backup", mysql57Controller.BackupList)
+		route.Post("createBackup", mysql57Controller.CreateBackup)
+		route.Post("deleteBackup", mysql57Controller.DeleteBackup)
+		route.Post("restoreBackup", mysql57Controller.RestoreBackup)
+		route.Get("user", mysql57Controller.UserList)
+		route.Post("addUser", mysql57Controller.AddUser)
+		route.Post("deleteUser", mysql57Controller.DeleteUser)
+		route.Post("setUserPassword", mysql57Controller.SetUserPassword)
+		route.Post("setUserPrivileges", mysql57Controller.SetUserPrivileges)
 	})
 	facades.Route().Prefix("api/plugins/mysql80").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		mysql80Controller := mysql80.NewMysql80Controller()
@@ -71,5 +102,23 @@ func Plugin() {
 		route.Get("extensions", php74Controller.GetExtensionList)
 		route.Post("installExtension", php74Controller.InstallExtension)
 		route.Post("uninstallExtension", php74Controller.UninstallExtension)
+	})
+	facades.Route().Prefix("api/plugins/php80").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		php80Controller := php80.NewPhp80Controller()
+		route.Get("status", php80Controller.Status)
+		route.Post("reload", php80Controller.Reload)
+		route.Post("start", php80Controller.Start)
+		route.Post("stop", php80Controller.Stop)
+		route.Post("restart", php80Controller.Restart)
+		route.Get("load", php80Controller.Load)
+		route.Get("config", php80Controller.GetConfig)
+		route.Post("config", php80Controller.SaveConfig)
+		route.Get("errorLog", php80Controller.ErrorLog)
+		route.Get("slowLog", php80Controller.SlowLog)
+		route.Get("clearErrorLog", php80Controller.ClearErrorLog)
+		route.Get("clearSlowLog", php80Controller.ClearSlowLog)
+		route.Get("extensions", php80Controller.GetExtensionList)
+		route.Post("installExtension", php80Controller.InstallExtension)
+		route.Post("uninstallExtension", php80Controller.UninstallExtension)
 	})
 }

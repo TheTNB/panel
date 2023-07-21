@@ -1,7 +1,7 @@
 <!--
 Name: 任务中心
 Author: 耗子
-Date: 2023-07-21
+Date: 2023-07-22
 -->
 
 <title>任务中心</title>
@@ -73,7 +73,7 @@ Date: 2023-07-21
             render_plugin_install_log(d);
             setInterval(function () {
                 render_plugin_install_log(d);
-            }, 1000);
+            }, 2000);
         }
 
     };
@@ -151,7 +151,7 @@ Date: 2023-07-21
                                     table.reload('panel-task-finished-table');
                                 });
                             } else {
-                                layer.msg(res.msg, {icon: 2, time: 1000});
+                                layer.msg(res.message, {icon: 2, time: 1000});
                             }
                         }
                     });

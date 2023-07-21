@@ -5,9 +5,11 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
+	"panel/app/plugins/mysql57"
 	"panel/app/plugins/mysql80"
 	"panel/app/plugins/openresty"
 	"panel/app/plugins/php74"
+	"panel/app/plugins/php80"
 )
 
 // PanelPlugin 插件元数据结构
@@ -19,11 +21,16 @@ type PanelPlugin struct {
 	Version     string
 	Requires    []string
 	Excludes    []string
+	Install     string
+	Uninstall   string
+	Update      string
 }
 
 type Plugin interface {
 	AllInstalled() ([]models.Plugin, error)
 	All() []PanelPlugin
+	GetBySlug(slug string) PanelPlugin
+	GetInstalledBySlug(slug string) models.Plugin
 }
 
 type PluginImpl struct {
@@ -55,6 +62,21 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Version:     openresty.Version,
 		Requires:    openresty.Requires,
 		Excludes:    openresty.Excludes,
+		Install:     openresty.Install,
+		Uninstall:   openresty.Uninstall,
+		Update:      openresty.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        mysql57.Name,
+		Author:      mysql57.Author,
+		Description: mysql57.Description,
+		Slug:        mysql57.Slug,
+		Version:     mysql57.Version,
+		Requires:    mysql57.Requires,
+		Excludes:    mysql57.Excludes,
+		Install:     mysql57.Install,
+		Uninstall:   mysql57.Uninstall,
+		Update:      mysql57.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        mysql80.Name,
@@ -64,6 +86,9 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Version:     mysql80.Version,
 		Requires:    mysql80.Requires,
 		Excludes:    mysql80.Excludes,
+		Install:     mysql80.Install,
+		Uninstall:   mysql80.Uninstall,
+		Update:      mysql80.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        php74.Name,
@@ -73,6 +98,21 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Version:     php74.Version,
 		Requires:    php74.Requires,
 		Excludes:    php74.Excludes,
+		Install:     php74.Install,
+		Uninstall:   php74.Uninstall,
+		Update:      php74.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        php80.Name,
+		Author:      php80.Author,
+		Description: php80.Description,
+		Slug:        php80.Slug,
+		Version:     php80.Version,
+		Requires:    php80.Requires,
+		Excludes:    php80.Excludes,
+		Install:     php80.Install,
+		Uninstall:   php80.Uninstall,
+		Update:      php80.Update,
 	})
 
 	return p

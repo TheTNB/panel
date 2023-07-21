@@ -8,8 +8,10 @@ import (
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
+	"github.com/spf13/cast"
 
 	"panel/app/models"
+	"panel/app/services"
 	"panel/pkg/tools"
 )
 
@@ -36,10 +38,8 @@ func (receiver *Monitoring) Extend() command.Extend {
 // Handle Execute the console command.
 func (receiver *Monitoring) Handle(ctx console.Context) error {
 	var setting models.Setting
-	if err := facades.Orm().Query().Where("key", "monitor").First(&setting); err != nil {
-		return nil
-	}
-	if setting.Value == "0" || len(setting.Value) == 0 {
+	monitor := services.NewSettingImpl().Get(models.SettingKeyMonitor)
+	if !cast.ToBool(monitor) {
 		return nil
 	}
 

@@ -30,6 +30,6 @@ systemctl daemon-reload
 rm -rf ${phpPath}
 rm -f /usr/bin/php-${phpVersion}
 
-panel deletePlugin openresty
+panel deletePlugin php${phpVersion}
 
-echo -e "${HR}\nPHP uninstall completed.\n${HR}"
+echo -e "${HR}\nPHP-${phpVersion} 卸载完成\n${HR}"

@@ -8,4 +8,7 @@ var (
 	Version     = "5.7.42"
 	Requires    = []string{}
 	Excludes    = []string{"mysql80"}
+	Install     = `bash /www/panel/scripts/mysql/install.sh 57`
+	Uninstall   = `bash /www/panel/scripts/mysql/uninstall.sh 57`
+	Update      = `echo "not support now"`
 )

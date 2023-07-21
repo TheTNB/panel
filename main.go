@@ -32,5 +32,8 @@ func main() {
 		}
 	}()
 
+	// 启动计划任务
+	go facades.Schedule().Run()
+
 	select {}
 }
