@@ -58,7 +58,7 @@ Prepare_system() {
         exit 1
     fi
 
-    if ! id -u "www" >/dev/null 2>&1; then
+    if ! id -u "www" > /dev/null 2>&1; then
         groupadd www
         useradd -s /sbin/nologin -g www www
     fi
@@ -67,29 +67,29 @@ Prepare_system() {
     ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
     [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-    setenforce 0 >/dev/null 2>&1
+    setenforce 0 > /dev/null 2>&1
 
     ulimit -n 204800
-    echo 6553560 >/proc/sys/fs/file-max
+    echo 6553560 > /proc/sys/fs/file-max
     checkSoftNofile=$(cat /etc/security/limits.conf | grep '^* soft nofile .*$')
     checkHardNofile=$(cat /etc/security/limits.conf | grep '^* hard nofile .*$')
     checkSoftNproc=$(cat /etc/security/limits.conf | grep '^* soft nproc .*$')
     checkHardNproc=$(cat /etc/security/limits.conf | grep '^* hard nproc .*$')
     checkFsFileMax=$(cat /etc/sysctl.conf | grep '^fs.file-max.*$')
     if [ "${checkSoftNofile}" == "" ]; then
-        echo "* soft nofile 204800" >>/etc/security/limits.conf
+        echo "* soft nofile 204800" >> /etc/security/limits.conf
     fi
     if [ "${checkHardNofile}" == "" ]; then
-        echo "* hard nofile 204800" >>/etc/security/limits.conf
+        echo "* hard nofile 204800" >> /etc/security/limits.conf
     fi
     if [ "${checkSoftNproc}" == "" ]; then
-        echo "* soft nproc 204800" >>/etc/security/limits.conf
+        echo "* soft nproc 204800" >> /etc/security/limits.conf
     fi
     if [ "${checkHardNproc}" == "" ]; then
-        echo "* hard nproc 204800 " >>/etc/security/limits.conf
+        echo "* hard nproc 204800 " >> /etc/security/limits.conf
     fi
     if [ "${checkFsFileMax}" == "" ]; then
-        echo fs.file-max = 6553560 >>/etc/sysctl.conf
+        echo fs.file-max = 6553560 >> /etc/sysctl.conf
     fi
 
     if [ "${OS}" == "centos" ]; then
@@ -133,6 +133,12 @@ Prepare_system() {
         echo "错误：该系统不支持安装耗子面板，请更换Debian12/RHEL9安装。"
         exit 1
     fi
+
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：安装面板依赖软件失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
 }
 
 Auto_Swap() {
@@ -152,7 +158,7 @@ Auto_Swap() {
     chmod 600 $swapFile
     mkswap -f $swapFile
     swapon $swapFile
-    echo "$swapFile    swap    swap    defaults    0 0" >>/etc/fstab
+    echo "$swapFile    swap    swap    defaults    0 0" >> /etc/fstab
 }
 
 Init_Panel() {
@@ -172,6 +178,11 @@ Init_Panel() {
         echo "错误：该系统架构不支持安装耗子面板，请更换x86_64/aarch64架构安装。"
         exit 1
     fi
+    if [ "$?" != "0" ] || [ "${panelZip}" == "" ]; then
+        echo -e $HR
+        echo "错误：获取面板下载链接失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
     wget -O ${setup_Path}/panel/panel.zip "${download_Url}${panelZip}"
     cd ${setup_Path}/panel
     unzip -o panel.zip
@@ -188,12 +199,12 @@ Init_Panel() {
         yum install firewalld -y
         systemctl enable firewalld
         systemctl start firewalld
-        firewall-cmd --set-default-zone=public >/dev/null 2>&1
-        firewall-cmd --permanent --zone=public --add-port=22/tcp >/dev/null 2>&1
-        firewall-cmd --permanent --zone=public --add-port=80/tcp >/dev/null 2>&1
-        firewall-cmd --permanent --zone=public --add-port=443/tcp >/dev/null 2>&1
-        firewall-cmd --permanent --zone=public --add-port=8888/tcp >/dev/null 2>&1
-        firewall-cmd --permanent --zone=public --add-port=${sshPort}/tcp >/dev/null 2>&1
+        firewall-cmd --set-default-zone=public > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=22/tcp > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=80/tcp > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=443/tcp > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=8888/tcp > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=${sshPort}/tcp > /dev/null 2>&1
         firewall-cmd --reload
     elif [ "${OS}" == "debian" ]; then
         apt install ufw -y
@@ -205,8 +216,13 @@ Init_Panel() {
         ufw allow ${sshPort}/tcp
         ufw reload
     fi
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：防火墙放行失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
     # 写入服务文件
-    cat >/etc/systemd/system/panel.service <<EOF
+    cat > /etc/systemd/system/panel.service << EOF
 [Unit]
 Description=HaoZi Panel
 After=syslog.target network.target
@@ -240,21 +256,21 @@ clear
 echo -e $LOGO
 
 # 安装确认
-read -p "面板将安装至${setup_Path}目录，请输入 y 并回车以开始安装：" install
+read -p "面板将安装至 ${setup_Path} 目录，请输入 y 并回车以开始安装：" install
 if [ "$install" != 'y' ]; then
     echo "输入不正确，已退出安装。"
     exit
 fi
 
 #代理设置
-read -p "是否使用GitHub代理安装？(y/n)" proxy
+read -p "是否使用GitHub代理安装(建议大陆机器使用)？(y/n)" proxy
 if [ "$proxy" == 'y' ]; then
     download_Url="https://ghproxy.com/"
 fi
 
 clear
 echo -e $LOGO
-echo '安装面板依赖软件（如报错请检查 Dnf/Yum 源是否正常）'
+echo '安装面板依赖软件（如报错请检查 APT/Yum 源是否正常）'
 echo -e $HR
 sleep 3s
 Prepare_system
