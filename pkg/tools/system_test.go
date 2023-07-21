@@ -48,7 +48,7 @@ func (s *SystemHelperTestSuite) TestRemoveFile() {
 }
 
 func (s *SystemHelperTestSuite) TestExecShell() {
-	s.Equal("test\n", ExecShell("echo 'test'"))
+	s.Equal("test", ExecShell("echo 'test'"))
 }
 
 func (s *SystemHelperTestSuite) TestExecShellAsync() {

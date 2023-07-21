@@ -32,13 +32,13 @@
 
 
 ```shell
-TODO
+bash <(curl -sSL https://dl.cdn.haozi.net/panel/install_panel.sh)
 ```
 
 ## 日常维护
 
 ```shell
-TODO
+panel xxx
 ```
 
 ## 问题反馈
