@@ -1,5 +1,5 @@
 <script type="text/html" template>
-    <link rel="stylesheet" href="/panel/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
+    <link rel="stylesheet" href="panel/adminui/src/css/login.css?v={{ layui.admin.v }}" media="all">
 </script>
 
 
@@ -19,11 +19,11 @@
 </div>
 
 <script>
-  layui.use(['admin'], function () {
-    let admin = layui.admin
-    setTimeout(function () {
-      admin.exit()
-      window.location = '/'
-    }, 3000)
-  })
+    layui.use(['admin'], function () {
+        let admin = layui.admin
+        setTimeout(function () {
+            admin.exit()
+            location.hash = '/login'
+        }, 3000)
+    })
 </script>
