@@ -120,14 +120,14 @@ Prepare_system() {
         dnf config-manager --set-enabled crb
         /usr/bin/crb enable
         dnf makecache
-        dnf install -y curl wget zip unzip tar git jq git-core dox2unix
+        dnf install -y curl wget zip unzip tar git jq git-core dos2unix
     elif [ "${OS}" == "debian" ]; then
         if [[ ${ipLocation} =~ "中国" ]]; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
         apt update
-        apt install -y curl wget zip unzip tar git jq git dox2unix
+        apt install -y curl wget zip unzip tar git jq git dos2unix
     else
         echo -e $HR
         echo "错误：该系统不支持安装耗子面板，请更换Debian12/RHEL9安装。"
