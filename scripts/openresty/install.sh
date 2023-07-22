@@ -175,7 +175,7 @@ mkdir -p /www/server/vhost/rewrite
 mkdir -p /www/server/vhost/ssl
 
 # 写入主配置文件
-cat >${openrestyPath}/conf/nginx.conf <<EOF
+cat > ${openrestyPath}/conf/nginx.conf << EOF
 # 该文件为OpenResty主配置文件，不建议随意修改！
 user www www;
 worker_processes auto;
@@ -269,7 +269,7 @@ http {
 }
 EOF
 # 写入pathinfo配置文件
-cat >${openrestyPath}/conf/pathinfo.conf <<EOF
+cat > ${openrestyPath}/conf/pathinfo.conf << EOF
 set \$real_script_name \$fastcgi_script_name;
 if (\$fastcgi_script_name ~ "^(.+?\.php)(/.+)$") {
     set \$real_script_name \$1;
@@ -280,7 +280,7 @@ fastcgi_param SCRIPT_NAME \$real_script_name;
 fastcgi_param PATH_INFO \$path_info;
 EOF
 # 写入默认站点页
-cat >${openrestyPath}/html/index.html <<EOF
+cat > ${openrestyPath}/html/index.html << EOF
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -296,7 +296,7 @@ cat >${openrestyPath}/html/index.html <<EOF
 EOF
 
 # 写入站点停止页
-cat >${openrestyPath}/html/stop.html <<EOF
+cat > ${openrestyPath}/html/stop.html << EOF
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -319,9 +319,28 @@ chown -R www:www /www/wwwroot
 chmod -R 644 /www/server/vhost
 
 # 写入无php配置文件
-echo "" >${openrestyPath}/conf/enable-php-0.conf
+echo "" > ${openrestyPath}/conf/enable-php-0.conf
+
+# 自动为所有PHP版本创建配置文件
+cd ${setupPath}/server/php
+phpList=$(ls -l | grep ^d | awk '{print $NF}')
+for phpVersion in ${phpList}; do
+    if [ -d "${setupPath}/server/php/${phpVersion}" ]; then
+        # 写入PHP配置文件
+        cat > ${openrestyPath}/conf/enable-php-${phpVersion}.conf << EOF
+location ~ \.php$ {
+    try_files \$uri =404;
+    fastcgi_pass unix:/tmp/php-cgi-${phpVersion}.sock;
+    fastcgi_index index.php;
+    include fastcgi.conf;
+    include pathinfo.conf;
+}
+EOF
+    fi
+done
+
 # 写入代理默认配置文件
-cat >${openrestyPath}/conf/proxy.conf <<EOF
+cat > ${openrestyPath}/conf/proxy.conf << EOF
 proxy_temp_path ${openrestyPath}/proxy_temp_dir;
 proxy_cache_path ${openrestyPath}/proxy_cache_dir levels=1:2 keys_zone=cache_one:20m inactive=1d max_size=5g;
 proxy_connect_timeout 60;
@@ -341,7 +360,7 @@ chown www:www /www/wwwlogs/waf
 chmod 755 /www/wwwlogs/waf
 
 # 写入服务文件
-cat >/etc/systemd/system/openresty.service <<EOF
+cat > /etc/systemd/system/openresty.service << EOF
 [Unit]
 Description=The OpenResty Application Platform
 After=syslog.target network-online.target remote-fs.target nss-lookup.target
