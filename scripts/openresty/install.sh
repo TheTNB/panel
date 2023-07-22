@@ -25,21 +25,19 @@ setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.1"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+ipLocation=$(curl -s https://ip.ping0.cc/geo)
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    dnf install dnf-plugins-core -y
-    dnf install epel-release -y
-    dnf config-manager --set-enabled epel
-    dnf config-manager --set-enabled PowerTools
-    dnf config-manager --set-enabled powertools
-    dnf config-manager --set-enabled CRB
-    dnf config-manager --set-enabled Crb
-    dnf config-manager --set-enabled crb
-    /usr/bin/crb enable
-    dnf makecache
+    # EPEL 9 仓库中目前没有 GeoIP-devel 包，暂时使用 Remi 仓库
+    dnf install https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+    if [[ ${ipLocation} =~ "中国" ]]; then
+        sed -e 's!^#mirrorlist=!mirrorlist=!g' -e 's!^mirrorlist=!#mirrorlist=!g' -e 's!^#baseurl=!baseurl=!g' -e 's!http://rpms.remirepo.net/enterprise!https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise!g' -i /etc/yum.repos.d/remi*
+    fi
+
+    dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
     apt update
     apt install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y

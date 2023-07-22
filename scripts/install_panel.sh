@@ -103,7 +103,7 @@ Prepare_system() {
                 -i.bak \
                 /etc/yum.repos.d/[Aa]lmalinux*.repo
 
-            dnf makecache
+            dnf makecache -y
         fi
         dnf install dnf-plugins-core -y
         dnf install epel-release -y
@@ -111,7 +111,7 @@ Prepare_system() {
         if [[ ${ipLocation} =~ "中国" ]]; then
             sed -i 's|^#baseurl=https://download.example/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
             sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
-            dnf makecache
+            dnf makecache -y
         fi
         dnf config-manager --set-enabled PowerTools
         dnf config-manager --set-enabled powertools
@@ -119,14 +119,14 @@ Prepare_system() {
         dnf config-manager --set-enabled Crb
         dnf config-manager --set-enabled crb
         /usr/bin/crb enable
-        dnf makecache
+        dnf makecache -y
         dnf install -y curl wget zip unzip tar git jq git-core dos2unix
     elif [ "${OS}" == "debian" ]; then
         if [[ ${ipLocation} =~ "中国" ]]; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
-        apt update
+        apt update -y
         apt install -y curl wget zip unzip tar git jq git dos2unix
     else
         echo -e $HR

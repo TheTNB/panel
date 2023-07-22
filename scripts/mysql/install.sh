@@ -46,18 +46,9 @@ fi
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    dnf install dnf-plugins-core -y
-    dnf install epel-release -y
-    dnf config-manager --set-enabled epel
-    dnf config-manager --set-enabled PowerTools
-    dnf config-manager --set-enabled powertools
-    dnf config-manager --set-enabled CRB
-    dnf config-manager --set-enabled Crb
-    dnf config-manager --set-enabled crb
-    /usr/bin/crb enable
-    dnf makecache
+    dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf -y
+    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel -y
 elif [ "${OS}" == "debian" ]; then
     apt update
     apt install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
@@ -103,15 +94,33 @@ cd src
 mkdir build
 cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_EXTRA_CHARSETS=all -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} -DWITH_SSL=/usr/local/openssl-1.1 -DWITH_BOOST=../boost
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：MySQL 编译初始化失败，请截图错误信息寻求帮助。"
+    rm -rf ${mysqlPath}
+    exit 1
+fi
 
 if [[ "${cpuCore}" -gt "1" ]]; then
     make -j2
 else
     make
 fi
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：MySQL 编译失败，请截图错误信息寻求帮助。"
+    rm -rf ${mysqlPath}
+    exit 1
+fi
 
 # 安装
 make install
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：MySQL 安装失败，请截图错误信息寻求帮助。"
+    rm -rf ${mysqlPath}
+    exit 1
+fi
 
 # 配置
 mkdir ${mysqlPath}/conf
