@@ -10,6 +10,7 @@ import (
 	"panel/app/plugins/openresty"
 	"panel/app/plugins/php74"
 	"panel/app/plugins/php80"
+	"panel/app/plugins/phpmyadmin"
 )
 
 // PanelPlugin 插件元数据结构
@@ -113,6 +114,18 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     php80.Install,
 		Uninstall:   php80.Uninstall,
 		Update:      php80.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        phpmyadmin.Name,
+		Author:      phpmyadmin.Author,
+		Description: phpmyadmin.Description,
+		Slug:        phpmyadmin.Slug,
+		Version:     phpmyadmin.Version,
+		Requires:    phpmyadmin.Requires,
+		Excludes:    phpmyadmin.Excludes,
+		Install:     phpmyadmin.Install,
+		Uninstall:   phpmyadmin.Uninstall,
+		Update:      phpmyadmin.Update,
 	})
 
 	return p

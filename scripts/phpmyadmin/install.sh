@@ -22,7 +22,7 @@ ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 downloadUrl="https://dl.cdn.haozi.net/panel/phpmyadmin"
 setupPath="/www"
-phpmyadminPath="${setupPath}/wwwroot/phpmyadmin"
+phpmyadminPath="${setupPath}/server/phpmyadmin"
 phpmyadminVersion="5.2.1"
 randomDir="$(cat /dev/urandom | head -n 16 | md5sum | head -c 10)"
 
@@ -45,7 +45,10 @@ chmod -R 755 ${phpmyadminPath}
 rm -rf phpmyadmin.zip
 
 # 判断PHP版本
-phpVersion="74"
+phpVersion=""
+if [ -d "/www/server/php/74" ]; then
+    phpVersion="74"
+fi
 if [ -d "/www/server/php/80" ]; then
     phpVersion="80"
 fi
@@ -54,6 +57,13 @@ if [ -d "/www/server/php/81" ]; then
 fi
 if [ -d "/www/server/php/82" ]; then
     phpVersion="82"
+fi
+
+if [ "${phpVersion}" == "" ]; then
+    echo -e $HR
+    echo "错误：未安装 PHP"
+    rm -rf ${phpmyadminPath}
+    exit 1
 fi
 
 # 写入 phpMyAdmin 配置文件
@@ -72,7 +82,7 @@ server
     index index.php;
     # index标记位结束
     # root标记位开始
-    root /www/wwwroot/phpmyadmin;
+    root /www/server/phpmyadmin;
     # root标记位结束
 
     # php标记位开始
@@ -102,10 +112,19 @@ EOF
 # 设置文件权限
 chown -R root:root /www/server/vhost/phpmyadmin.conf
 chmod -R 644 /www/server/vhost/phpmyadmin.conf
+chmod -R 755 ${phpmyadminPath}
+chown -R www:www ${phpmyadminPath}
 
 # 放行端口
-firewall-cmd --permanent --zone=public --add-port=888/tcp >/dev/null 2>&1
-firewall-cmd --reload
+if [ "${OS}" == "centos" ]; then
+    firewall-cmd --permanent --zone=public --add-port=888/tcp >/dev/null 2>&1
+    firewall-cmd --reload
+elif [ "${OS}" == "debian" ]; then
+    ufw allow 888/tcp >/dev/null 2>&1
+    ufw reload
+fi
 
-panel writePlugin phpmyadmin
+panel writePlugin phpmyadmin 5.2.1
 systemctl reload openresty
+
+echo -e "${HR}\phpMyAdmin 安装完成\n${HR}"

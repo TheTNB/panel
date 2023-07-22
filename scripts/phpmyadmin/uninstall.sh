@@ -19,12 +19,12 @@ limitations under the License.
 
 HR="+----------------------------------------------------"
 setupPath="/www"
-phpmyadminPath="${setupPath}/wwwroot/phpmyadmin"
+phpmyadminPath="${setupPath}/server/phpmyadmin"
 
 
-rm -rf /www/server/vhost/phpmyadmin.conf
+rm -rf ${setupPath}/server/vhost/phpmyadmin.conf
 rm -rf ${phpmyadminPath}
 panel deletePlugin phpmyadmin
 systemctl reload openresty
 
-echo -e "${HR}\phpMyAdmin uninstall completed.\n${HR}"
+echo -e "${HR}\phpMyAdmin 卸载完成\n${HR}"

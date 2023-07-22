@@ -3,12 +3,13 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	"panel/app/http/controllers/plugins/mysql57"
-	"panel/app/http/controllers/plugins/php80"
 
+	"panel/app/http/controllers/plugins/mysql57"
 	"panel/app/http/controllers/plugins/mysql80"
 	"panel/app/http/controllers/plugins/openresty"
 	"panel/app/http/controllers/plugins/php74"
+	"panel/app/http/controllers/plugins/php80"
+	"panel/app/http/controllers/plugins/phpmyadmin"
 	"panel/app/http/middleware"
 )
 
@@ -122,5 +123,10 @@ func Plugin() {
 		route.Get("extensions", php80Controller.GetExtensionList)
 		route.Post("installExtension", php80Controller.InstallExtension)
 		route.Post("uninstallExtension", php80Controller.UninstallExtension)
+	})
+	facades.Route().Prefix("api/plugins/phpmyadmin").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		phpMyAdminController := phpmyadmin.NewPhpMyAdminController()
+		route.Get("info", phpMyAdminController.Info)
+		route.Post("port", phpMyAdminController.SetPort)
 	})
 }
