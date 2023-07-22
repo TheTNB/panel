@@ -130,12 +130,7 @@ Date: 2023-06-24
       })
       // 提交
       form.on('submit(add-website-submit)', function (data) {
-        // 判断db_type是否为空
-        if (data.field.db_type === '') {
-          data.field.db = 0
-        } else {
-          data.field.db = 1
-        }
+        data.field.db = data.field.db_type !== '';
         admin.req({
           url: '/api/panel/website/add'
           , type: 'post'
@@ -153,7 +148,6 @@ Date: 2023-06-24
               , btn: ['确定']
               , yes: function (index) {
                 layer.closeAll()
-                //location.reload();
               }
             })
           }

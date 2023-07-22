@@ -128,7 +128,6 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 <p>当您看到此页面，说明您的网站已创建成功。</p>
 </body>
 </html>
-
 `
 	tools.WriteFile(website.Path+"/index.html", index, 0644)
 
@@ -216,7 +215,6 @@ server
     access_log /www/wwwlogs/%s.log;
     error_log /www/wwwlogs/%s.log;
 }
-
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
 	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644)
@@ -224,9 +222,20 @@ server
 	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644)
 	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", "", 0644)
 
+	tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755)
+	tools.Chmod(website.Path, 0755)
+	tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www")
+	tools.Chown(website.Path, "www", "www")
+
 	tools.ExecShell("systemctl reload openresty")
 
-	// TODO 创建数据库
+	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	if website.Db && website.DbType == "mysql" {
+		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + website.DbName + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
+		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + website.DbUser + "'@'localhost' IDENTIFIED BY '" + website.DbPassword + "';\"")
+		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + website.DbName + ".* TO '" + website.DbUser + "'@'localhost';\"")
+		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	}
 
 	return w, nil
 }
@@ -249,8 +258,6 @@ func (r *WebsiteImpl) Delete(id int) error {
 	tools.RemoveFile(website.Path)
 
 	tools.ExecShell("systemctl reload openresty")
-
-	// TODO 删除数据库
 
 	return nil
 }
