@@ -154,7 +154,7 @@ Auto_Swap() {
 
     # 设置swap
     swapFile="${setup_Path}/swap"
-    dd if=/dev/zero of=$swapFile bs=1M count=2048
+    dd if=/dev/zero of=$swapFile bs=1M count=4096
     chmod 600 $swapFile
     mkswap -f $swapFile
     swapon $swapFile
