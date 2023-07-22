@@ -154,7 +154,7 @@ func (c *Php80Controller) Load(ctx http.Context) {
 	}
 
 	client := req.C().SetTimeout(10 * time.Second)
-	resp, err := client.R().Get("http://127.0.0.1/phpfpm_" + c.version + "_status")
+	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + c.version)
 	if err != nil || !resp.IsSuccessState() {
 		facades.Log().Error("获取PHP-" + c.version + "运行状态失败")
 		controllers.Error(ctx, http.StatusInternalServerError, "[PHP-"+c.version+"] 获取运行状态失败")
@@ -258,7 +258,7 @@ func (c *Php80Controller) InstallExtension(ctx http.Context) {
 			var task models.Task
 			task.Name = "安装PHP-" + c.version + "扩展-" + item.Name
 			task.Status = models.TaskStatusWaiting
-			task.Shell = "bash /www/panel/scripts/php_extensions/" + item.Slug + ".sh install " + c.version + ">> /tmp/" + item.Slug + ".log 2>&1"
+			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' install ` + c.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + c.version + "] 创建安装拓展任务失败：" + err.Error())
@@ -298,7 +298,7 @@ func (c *Php80Controller) UninstallExtension(ctx http.Context) {
 			var task models.Task
 			task.Name = "卸载PHP-" + c.version + "扩展-" + item.Name
 			task.Status = models.TaskStatusWaiting
-			task.Shell = "bash /www/panel/scripts/php_extensions/" + item.Slug + ".sh uninstall " + c.version + ">> /tmp/" + item.Slug + ".log 2>&1"
+			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' uninstall ` + c.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + c.version + "] 创建卸载拓展任务失败：" + err.Error())
@@ -361,7 +361,7 @@ func (c *Php80Controller) GetExtensions() []Extension {
 	for _, item := range rawExtensionList {
 		if !strings.Contains(item, "[") && item != "" {
 			for i := range extensions {
-				if extensions[i].Name == item {
+				if extensions[i].Slug == item {
 					extensions[i].Installed = true
 				}
 			}

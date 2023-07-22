@@ -39,10 +39,10 @@ if [ "${OS}" == "centos" ]; then
     /usr/bin/crb enable
     dnf makecache
     dnf groupinstall "Development Tools" -y
-    dnf install tar unzip gd gd-devel git-core flex perl perl-CPAN oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel libtermcap-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
     apt update
-    apt install build-essential tar unzip libgd3 libgd-dev git flex perl perl-modules libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"

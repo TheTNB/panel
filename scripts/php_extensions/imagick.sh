@@ -18,6 +18,7 @@ limitations under the License.
 '
 
 HR="+----------------------------------------------------"
+OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
 downloadUrl="https://dl.cdn.haozi.net/panel/php_extensions"
 action="$1"
@@ -34,7 +35,15 @@ Install() {
     fi
 
     # 安装依赖
-    dnf install ImageMagick ImageMagick-devel -y
+    if [ "${OS}" == "centos" ]; then
+        dnf install ImageMagick ImageMagick-devel -y
+    elif [ "${OS}" == "debian" ]; then
+        apt install imagemagick libmagickwand-dev
+    else
+        echo -e $HR
+        echo "错误：耗子Linux面板不支持该系统"
+        exit 1
+    fi
 
     cd /www/server/php/${phpVersion}/src/ext
     rm -rf imagick

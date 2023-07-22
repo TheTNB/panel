@@ -163,8 +163,15 @@ func (c *InfoController) CheckUpdate(ctx http.Context) {
 }
 
 func (c *InfoController) Update(ctx http.Context) {
+	var task models.Task
+	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
+	if err == nil {
+		Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
+		return
+	}
+
 	proxy := ctx.Request().InputBool("proxy")
-	err := tools.UpdatePanel(proxy)
+	err = tools.UpdatePanel(proxy)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 更新面板失败 ", err.Error())
 		Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())

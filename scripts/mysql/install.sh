@@ -266,16 +266,13 @@ elif [[ ${memTotal} -ge 32768 ]]; then
     sed -i "s#^innodb_log_buffer_size.*#innodb_log_buffer_size = 512M#" ${mysqlPath}/conf/my.cnf
 fi
 
-chmod 644 ${mysqlPath}/conf/my.cnf
-chown -R mysql:mysql ${mysqlPath}
-chmod -R 755 ${mysqlPath}
-
 # 初始化
 rm -rf ${mysqlPath}/src
 rm -rf ${mysqlPath}/data
 mkdir -p ${mysqlPath}/data
 chown -R mysql:mysql ${mysqlPath}
 chmod -R 755 ${mysqlPath}
+chmod 644 ${mysqlPath}/conf/my.cnf
 
 ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath} --datadir=${mysqlPath}/data
 
@@ -284,7 +281,7 @@ source /etc/profile
 
 # 启动
 cp ${mysqlPath}/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
-sed -i "/ExecStartPre/d" /etc/systemd/system/mysqld.service
+sed -i '/ExecStartPre/d' /etc/systemd/system/mysqld.service
 
 systemctl daemon-reload
 systemctl enable mysqld
@@ -292,7 +289,7 @@ systemctl start mysqld
 
 ${mysqlPath}/bin/mysqladmin -u root password ${mysqlPassword}
 
-panel writePlugin mysqsl${1} ${mysqlVersion}
+panel writePlugin mysql${1} ${mysqlVersion}
 panel writeMysqlPassword ${mysqlPassword}
 
 echo -e "${HR}\nMySQL-${1} 安装完成\n${HR}"

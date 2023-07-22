@@ -1,6 +1,7 @@
 package mysql57
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,8 +12,6 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
-	"golang.org/x/exp/slices"
-
 	"panel/app/http/controllers"
 	"panel/app/models"
 	"panel/app/services"
@@ -35,7 +34,7 @@ func (c *Mysql57Controller) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -54,8 +53,8 @@ func (c *Mysql57Controller) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload mysql")
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl reload mysqld")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -74,8 +73,8 @@ func (c *Mysql57Controller) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart mysql")
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl restart mysqld")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -94,8 +93,8 @@ func (c *Mysql57Controller) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start mysql")
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl start mysqld")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -114,8 +113,8 @@ func (c *Mysql57Controller) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop mysql")
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.ExecShell("systemctl stop mysqld")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -135,7 +134,7 @@ func (c *Mysql57Controller) GetConfig(ctx http.Context) {
 	}
 
 	// 获取配置
-	config := tools.ReadFile("mysql57")
+	config := tools.ReadFile("/www/server/mysql/conf/my.cnf")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 		return
@@ -156,7 +155,7 @@ func (c *Mysql57Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile("mysql57", config, 0644) {
+	if !tools.WriteFile("/www/server/mysql/conf/my.cnf", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 		return
 	}
@@ -197,24 +196,24 @@ func (c *Mysql57Controller) Load(ctx http.Context) {
 		regex string
 		name  string
 	}{
-		{`Uptime\s+\|\s+(\d+)\s+\|`, "总查询次数"},
-		{`Queries\s+\|\s+(\d+)\s+\|`, "总连接次数"},
-		{`Connections\s+\|\s+(\d+)\s+\|`, "每秒事务"},
-		{`Com_commit\s+\|\s+(\d+)\s+\|`, "每秒回滚"},
-		{`Com_rollback\s+\|\s+(\d+)\s+\|`, "发送"},
-		{`Bytes_sent\s+\|\s+(\d+)\s+\|`, "接收"},
-		{`Bytes_received\s+\|\s+(\d+)\s+\|`, "活动连接数"},
-		{`Threads_connected\s+\|\s+(\d+)\s+\|`, "峰值连接数"},
-		{`Max_used_connections\s+\|\s+(\d+)\s+\|`, "索引命中率"},
-		{`Key_read_requests\s+\|\s+(\d+)\s+\|`, "Innodb索引命中率"},
-		{`Innodb_buffer_pool_reads\s+\|\s+(\d+)\s+\|`, "创建临时表到磁盘"},
-		{`Created_tmp_disk_tables\s+\|\s+(\d+)\s+\|`, "已打开的表"},
-		{`Open_tables\s+\|\s+(\d+)\s+\|`, "没有使用索引的量"},
-		{`Select_full_join\s+\|\s+(\d+)\s+\|`, "没有索引的JOIN量"},
-		{`Select_full_range_join\s+\|\s+(\d+)\s+\|`, "没有索引的子查询量"},
-		{`Select_range_check\s+\|\s+(\d+)\s+\|`, "排序后的合并次数"},
-		{`Sort_merge_passes\s+\|\s+(\d+)\s+\|`, "锁表次数"},
-		{`Table_locks_waited\s+\|\s+(\d+)\s+\|`, ""},
+		{`Uptime\s+\|\s+(\d+)\s+\|`, "运行时间"},
+		{`Queries\s+\|\s+(\d+)\s+\|`, "总查询次数"},
+		{`Connections\s+\|\s+(\d+)\s+\|`, "总连接次数"},
+		{`Com_commit\s+\|\s+(\d+)\s+\|`, "每秒事务"},
+		{`Com_rollback\s+\|\s+(\d+)\s+\|`, "每秒回滚"},
+		{`Bytes_sent\s+\|\s+(\d+)\s+\|`, "发送"},
+		{`Bytes_received\s+\|\s+(\d+)\s+\|`, "接收"},
+		{`Threads_connected\s+\|\s+(\d+)\s+\|`, "活动连接数"},
+		{`Max_used_connections\s+\|\s+(\d+)\s+\|`, "峰值连接数"},
+		{`Key_read_requests\s+\|\s+(\d+)\s+\|`, "索引命中率"},
+		{`Innodb_buffer_pool_reads\s+\|\s+(\d+)\s+\|`, "Innodb索引命中率"},
+		{`Created_tmp_disk_tables\s+\|\s+(\d+)\s+\|`, "创建临时表到磁盘"},
+		{`Open_tables\s+\|\s+(\d+)\s+\|`, "已打开的表"},
+		{`Select_full_join\s+\|\s+(\d+)\s+\|`, "没有使用索引的量"},
+		{`Select_full_range_join\s+\|\s+(\d+)\s+\|`, "没有索引的JOIN量"},
+		{`Select_range_check\s+\|\s+(\d+)\s+\|`, "没有索引的子查询量"},
+		{`Sort_merge_passes\s+\|\s+(\d+)\s+\|`, "排序后的合并次数"},
+		{`Table_locks_waited\s+\|\s+(\d+)\s+\|`, "锁表次数"},
 	}
 
 	for i, expression := range expressions {
@@ -234,7 +233,7 @@ func (c *Mysql57Controller) Load(ctx http.Context) {
 	readRequests := cast.ToFloat64(data[9]["value"])
 	reads := cast.ToFloat64(data[10]["value"])
 	data[9]["value"] = fmt.Sprintf("%.2f%%", readRequests/(reads+readRequests)*100)
-	// Innodb索引命中率
+	// Innodb 索引命中率
 	bufferPoolReads := cast.ToFloat64(data[11]["value"])
 	bufferPoolReadRequests := cast.ToFloat64(data[12]["value"])
 	data[10]["value"] = fmt.Sprintf("%.2f%%", bufferPoolReadRequests/(bufferPoolReads+bufferPoolReadRequests)*100)
@@ -303,7 +302,7 @@ func (c *Mysql57Controller) SetRootPassword(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status mysql | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -341,29 +340,45 @@ func (c *Mysql57Controller) DatabaseList(ctx http.Context) {
 		return
 	}
 
-	out := tools.ExecShell("mysql -uroot -p" + c.setting.Get(models.SettingKeyMysqlRootPassword) + " -e \"show databases;\"")
-	databases := strings.Split(out, "\n")
+	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
+	type database struct {
+		Name string `json:"name"`
+	}
 
-	databases = databases[1 : len(databases)-1]
-	systemDatabases := []string{"information_schema", "mysql", "performance_schema", "sys"}
+	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+	if err != nil {
+		facades.Log().Error("[MySQL57] 连接数据库失败" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
+		return
+	}
+	defer db.Close()
 
-	var userDatabases []string
-	for _, db := range databases {
-		if !slices.Contains(systemDatabases, db) {
-			userDatabases = append(userDatabases, db)
+	rows, err := db.Query("SHOW DATABASES")
+	if err != nil {
+		facades.Log().Error("[MySQL57] 获取数据库列表失败" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
+		return
+	}
+	defer rows.Close()
+
+	var databases []database
+	for rows.Next() {
+		var d database
+		err := rows.Scan(&d.Name)
+		if err != nil {
+			continue
 		}
+
+		databases = append(databases, d)
 	}
 
-	type Database struct {
-		Name string
+	if err := rows.Err(); err != nil {
+		facades.Log().Error("[MySQL57] 获取数据库列表失败" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
+		return
 	}
 
-	var dbStructs []Database
-	for _, db := range userDatabases {
-		dbStructs = append(dbStructs, Database{Name: db})
-	}
-
-	controllers.Success(ctx, dbStructs)
+	controllers.Success(ctx, databases)
 }
 
 // AddDatabase 添加数据库
@@ -375,14 +390,14 @@ func (c *Mysql57Controller) AddDatabase(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255|regex:^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*(_|[^\\w])).+$",
+		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -413,7 +428,7 @@ func (c *Mysql57Controller) DeleteDatabase(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -458,6 +473,38 @@ func (c *Mysql57Controller) BackupList(ctx http.Context) {
 	controllers.Success(ctx, backupFiles)
 }
 
+// UploadBackup 上传备份
+func (c *Mysql57Controller) UploadBackup(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
+		return
+	}
+
+	// TODO 框架 Bug ? 下面会 panic
+	controllers.Error(ctx, http.StatusBadRequest, "暂不支持")
+	return
+
+	file, err := ctx.Request().File("file")
+	if err != nil {
+		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return
+	}
+
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	name := file.GetClientOriginalName()
+	extension := file.GetClientOriginalExtension()
+	_, err = file.Store(backupPath + "/" + name + "." + extension)
+	if err != nil {
+		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return
+	}
+
+	controllers.Success(ctx, "上传文件成功")
+}
+
 // CreateBackup 创建备份
 func (c *Mysql57Controller) CreateBackup(ctx http.Context) {
 	if !controllers.Check(ctx, "mysql57") {
@@ -472,14 +519,14 @@ func (c *Mysql57Controller) CreateBackup(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	backupFile := backupPath + "/" + database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
+	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 	if !tools.Exists(backupPath) {
 		tools.Mkdir(backupPath, 0644)
 	}
@@ -490,9 +537,9 @@ func (c *Mysql57Controller) CreateBackup(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("mysqldump -uroot " + database + " > " + backupFile)
-	tools.ExecShell("zip -c " + backupFile + ".zip " + backupFile)
-	tools.RemoveFile(backupFile)
+	tools.ExecShell("mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile)
+	tools.ExecShell("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
+	tools.RemoveFile(backupPath + "/" + backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
 
 	controllers.Success(ctx, "备份成功")
@@ -512,7 +559,7 @@ func (c *Mysql57Controller) DeleteBackup(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -538,7 +585,7 @@ func (c *Mysql57Controller) RestoreBackup(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -602,36 +649,66 @@ func (c *Mysql57Controller) UserList(ctx http.Context) {
 		return
 	}
 
-	type User struct {
-		Username   string `json:"username"`
-		Host       string `json:"host"`
-		Privileges string `json:"privileges"`
+	type user struct {
+		User   string   `json:"user"`
+		Host   string   `json:"host"`
+		Grants []string `json:"grants"`
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
-	out := tools.ExecShell("mysql -uroot -p" + rootPassword + " -e 'select user,host from mysql.user'")
-	rawUsers := strings.Split(out, "\n")
-	users := make([]User, 0)
-	for _, rawUser := range rawUsers {
-		user := strings.Split(rawUser, "\t")
-		if user[0] == "root" || user[0] == "mysql.sys" || user[0] == "mysql.infoschema" || user[0] == "mysql.session" {
+	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+	if err != nil {
+		facades.Log().Error("[MYSQL57] 连接数据库失败：" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT user, host FROM mysql.user")
+	if err != nil {
+		facades.Log().Error("[MYSQL57] 查询数据库失败：" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "查询数据库失败")
+	}
+	defer rows.Close()
+
+	var userGrants []user
+
+	for rows.Next() {
+		var u user
+		err := rows.Scan(&u.User, &u.Host)
+		if err != nil {
 			continue
 		}
 
-		out := tools.ExecShell("mysql -uroot -p" + rootPassword + " -e 'show grants for " + user[0] + "@" + user[1] + "'")
-		rawPrivileges := strings.Split(out, "\n")
-		privileges := make([]string, 0)
-		for _, rawPrivilege := range rawPrivileges {
-			if rawPrivilege == "" {
+		// 查询用户权限
+		grantsRows, err := db.Query(fmt.Sprintf("SHOW GRANTS FOR '%s'@'%s'", u.User, u.Host))
+		if err != nil {
+			continue
+		}
+		defer grantsRows.Close()
+
+		for grantsRows.Next() {
+			var grant string
+			err := grantsRows.Scan(&grant)
+			if err != nil {
 				continue
 			}
-			privilege := rawPrivilege[6:strings.Index(rawPrivilege, " TO")]
-			privileges = append(privileges, privilege)
+
+			u.Grants = append(u.Grants, grant)
 		}
-		users = append(users, User{Username: user[0], Host: user[1], Privileges: strings.Join(privileges, " | ")})
+
+		if err := grantsRows.Err(); err != nil {
+			continue
+		}
+
+		userGrants = append(userGrants, u)
 	}
 
-	controllers.Success(ctx, users)
+	if err := rows.Err(); err != nil {
+		controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
+		return
+	}
+
+	controllers.Success(ctx, userGrants)
 }
 
 // AddUser 添加用户
@@ -643,14 +720,14 @@ func (c *Mysql57Controller) AddUser(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255|regex:^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*(_|[^\\w])).+$",
+		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -679,7 +756,7 @@ func (c *Mysql57Controller) DeleteUser(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -698,14 +775,14 @@ func (c *Mysql57Controller) SetUserPassword(ctx http.Context) {
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255|regex:^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*(_|[^\\w])).+$",
+		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -733,7 +810,7 @@ func (c *Mysql57Controller) SetUserPrivileges(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 

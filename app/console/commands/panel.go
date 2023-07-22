@@ -4,11 +4,10 @@ import (
 	"os"
 
 	"github.com/gookit/color"
-	"github.com/spf13/cast"
-
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/goravel/framework/facades"
+	"github.com/spf13/cast"
 
 	"panel/app/models"
 	"panel/app/services"
@@ -73,12 +72,19 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("初始化成功")
 
 	case "update":
+		var task models.Task
+		err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
+		if err == nil {
+			color.Redln("当前有任务正在执行，禁止更新")
+			return nil
+		}
+
 		input := arg1
 		proxy := false
 		if input == "y" || input == "Y" || input == "yes" || input == "Yes" {
 			proxy = true
 		}
-		err := tools.UpdatePanel(cast.ToBool(proxy))
+		err = tools.UpdatePanel(cast.ToBool(proxy))
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil

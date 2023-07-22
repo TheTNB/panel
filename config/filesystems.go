@@ -24,7 +24,7 @@ func init() {
 		"disks": map[string]any{
 			"local": map[string]any{
 				"driver": "local",
-				"root":   "/",
+				"root":   "storage/app",
 				"url":    "http://localhost/",
 			},
 		},

@@ -64,7 +64,7 @@ func (c *WebsiteController) Add(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -372,9 +372,8 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		website.Php = ctx.Request().InputInt("php")
 		phpConfigOld := tools.Cut(raw, "# php标记位开始", "# php标记位结束")
 		phpConfig := `
-    include enable-php` + strconv.Itoa(website.Php) + `.conf;
-    
-`
+    include enable-php-` + strconv.Itoa(website.Php) + `.conf;
+    `
 		if len(strings.TrimSpace(phpConfigOld)) != 0 {
 			raw = strings.Replace(raw, phpConfigOld, phpConfig, -1)
 		}

@@ -174,7 +174,7 @@ pm.min_spare_servers = 5
 pm.max_spare_servers = 10
 request_terminate_timeout = 100
 request_slowlog_timeout = 30
-pm.status_path = /phpfpm_${phpVersion}_status
+pm.status_path = /phpfpm_status/${phpVersion}
 slowlog = var/log/slow.log
 EOF
 

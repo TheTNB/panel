@@ -53,7 +53,7 @@ func (r *CronController) Add(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 
@@ -129,7 +129,7 @@ func (r *CronController) Update(ctx http.Context) {
 		return
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().All())
+		Error(ctx, http.StatusBadRequest, validator.Errors().One())
 		return
 	}
 

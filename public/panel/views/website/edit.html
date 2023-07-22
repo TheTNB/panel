@@ -107,7 +107,7 @@ Date: 2023-07-21
                         <div class="layui-input-block">
                             <select name="php" lay-filter="website-php">
                                 {{# layui.each(d.params.php, function(index, item){ }}
-                                {{# if(item == d.params.config.php){ }}
+                                {{# if(item.slug == d.params.config.php){ }}
                                 <option value="{{ item.slug }}" selected="">{{ item.name }}</option>
                                 {{# }else{ }}
                                 <option value="{{ item.slug }}">{{ item.name }}</option>

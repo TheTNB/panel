@@ -165,7 +165,7 @@ Init_Panel() {
     mkdir ${setup_Path}/server
     mkdir ${setup_Path}/server/cron
     mkdir ${setup_Path}/server/cron/logs
-    chmod -R 644 ${setup_Path}/server
+    chmod -R 755 ${setup_Path}/server
     mkdir ${setup_Path}/panel
     rm -rf ${setup_Path}/panel/*
     # 下载面板zip包并解压
