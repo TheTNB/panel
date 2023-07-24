@@ -3,15 +3,13 @@ package mysql80
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
+
 	"panel/app/http/controllers"
 	"panel/app/models"
 	"panel/app/services"
@@ -20,11 +18,13 @@ import (
 
 type Mysql80Controller struct {
 	setting services.Setting
+	backup  services.Backup
 }
 
 func NewMysql80Controller() *Mysql80Controller {
 	return &Mysql80Controller{
 		setting: services.NewSettingImpl(),
+		backup:  services.NewBackupImpl(),
 	}
 }
 
@@ -441,36 +441,14 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 
 // BackupList 获取备份列表
 func (c *Mysql80Controller) BackupList(ctx http.Context) {
-	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-
-	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
-	}
-
-	files, err := os.ReadDir(backupPath)
+	backupList, err := c.backup.MysqlList()
 	if err != nil {
+		facades.Log().Error("[MySQL80] 获取备份列表失败：" + err.Error())
 		controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 		return
 	}
 
-	var backupFiles []map[string]string
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-
-		info, err := file.Info()
-		if err != nil {
-			continue
-		}
-
-		backupFiles = append(backupFiles, map[string]string{
-			"file": file.Name(),
-			"size": tools.FormatBytes(float64(info.Size())),
-		})
-	}
-
-	controllers.Success(ctx, backupFiles)
+	controllers.Success(ctx, backupList)
 }
 
 // UploadBackup 上传备份
@@ -518,24 +496,13 @@ func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
 		return
 	}
 
-	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
-	}
-	err = os.Setenv("MYSQL_PWD", rootPassword)
+	err = c.backup.MysqlBackup(database)
 	if err != nil {
-		facades.Log().Error("[MySQL80] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "备份失败")
+		facades.Log().Error("[MYSQL80] 创建备份失败：" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
 		return
 	}
-
-	tools.ExecShell("mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile)
-	tools.ExecShell("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
-	tools.RemoveFile(backupPath + "/" + backupFile)
-	_ = os.Unsetenv("MYSQL_PWD")
 
 	controllers.Success(ctx, "备份成功")
 }
@@ -547,7 +514,7 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"file": "required|min_len:1|max_len:255",
+		"name": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, err.Error())
@@ -559,8 +526,8 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-	file := ctx.Request().Input("file")
-	tools.RemoveFile(backupPath + "/" + file)
+	fileName := ctx.Request().Input("name")
+	tools.RemoveFile(backupPath + "/" + fileName)
 
 	controllers.Success(ctx, "删除备份成功")
 }
@@ -572,7 +539,7 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"file":     "required|min_len:1|max_len:255",
+		"name":     "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
@@ -584,56 +551,12 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 		return
 	}
 
-	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
-	file := ctx.Request().Input("file")
-	backupFile := backupPath + "/" + file
-	if !tools.Exists(backupFile) {
-		controllers.Error(ctx, http.StatusBadRequest, "备份文件不存在")
-		return
-	}
-
-	err = os.Setenv("MYSQL_PWD", rootPassword)
+	err = c.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("name"))
 	if err != nil {
-		facades.Log().Error("[MYSQL80] 设置环境变量 MYSQL_PWD 失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "还原失败")
+		facades.Log().Error("[MYSQL80] 还原失败：" + err.Error())
+		controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 		return
 	}
-
-	// 获取文件拓展名
-	ext := filepath.Ext(file)
-	switch ext {
-	case ".zip":
-		tools.ExecShell("unzip -o " + backupFile + " -d " + backupPath)
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".gz":
-		if strings.HasSuffix(file, ".tar.gz") {
-			// 解压.tar.gz文件
-			tools.ExecShell("tar -zxvf " + backupFile + " -C " + backupPath)
-			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
-		} else {
-			// 解压.gz文件
-			tools.ExecShell("gzip -d " + backupFile)
-			backupFile = strings.TrimSuffix(backupFile, ext)
-		}
-	case ".bz2":
-		tools.ExecShell("bzip2 -d " + backupFile)
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".tar":
-		tools.ExecShell("tar -xvf " + backupFile + " -C " + backupPath)
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".rar":
-		tools.ExecShell("unrar x " + backupFile + " " + backupPath)
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	}
-
-	if !tools.Exists(backupFile) {
-		controllers.Error(ctx, http.StatusBadRequest, "自动解压备份文件失败，请手动解压")
-		return
-	}
-
-	tools.ExecShell("mysql -uroot " + ctx.Request().Input("database") + " < " + backupFile)
-	_ = os.Unsetenv("MYSQL_PWD")
 
 	controllers.Success(ctx, "还原成功")
 }
