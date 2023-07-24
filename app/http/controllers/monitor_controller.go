@@ -159,8 +159,8 @@ func (r *MonitorController) List(ctx http.Context) {
 		data.Mem.Used = append(data.Mem.Used, fmt.Sprintf("%.2f", float64(monitor.Info.Mem.Used)/1024/1024))
 		data.Swap.Used = append(data.Swap.Used, fmt.Sprintf("%.2f", float64(monitor.Info.Swap.Used)/1024/1024))
 		data.Swap.Free = append(data.Swap.Free, fmt.Sprintf("%.2f", float64(monitor.Info.Swap.Free)/1024/1024))
-		data.Net.Sent = append(data.Net.Sent, fmt.Sprintf("%.2f", float64(bytesSent2/1024)))
-		data.Net.Recv = append(data.Net.Recv, fmt.Sprintf("%.2f", float64(bytesRecv2/1024)))
+		data.Net.Sent = append(data.Net.Sent, fmt.Sprintf("%.2f", float64(bytesSent2/1024/1024)))
+		data.Net.Recv = append(data.Net.Recv, fmt.Sprintf("%.2f", float64(bytesRecv2/1024/1024)))
 
 		// 监控频率为 1 分钟，所以这里除以 60 即可得到每秒的流量
 		data.Net.Tx = append(data.Net.Tx, fmt.Sprintf("%.2f", float64(bytesSent2-bytesSent)/60/1024/1024))
