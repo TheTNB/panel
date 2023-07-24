@@ -479,10 +479,6 @@ func (c *Mysql57Controller) UploadBackup(ctx http.Context) {
 		return
 	}
 
-	// TODO 框架 Bug ? 下面会 panic
-	controllers.Error(ctx, http.StatusBadRequest, "暂不支持")
-	return
-
 	file, err := ctx.Request().File("file")
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
@@ -495,8 +491,7 @@ func (c *Mysql57Controller) UploadBackup(ctx http.Context) {
 	}
 
 	name := file.GetClientOriginalName()
-	extension := file.GetClientOriginalExtension()
-	_, err = file.Store(backupPath + "/" + name + "." + extension)
+	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
 		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
 		return

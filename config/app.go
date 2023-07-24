@@ -9,6 +9,7 @@ import (
 	"github.com/goravel/framework/database"
 	"github.com/goravel/framework/event"
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/filesystem"
 	"github.com/goravel/framework/hash"
 	"github.com/goravel/framework/http"
 	"github.com/goravel/framework/log"
@@ -77,6 +78,7 @@ func init() {
 			&auth.ServiceProvider{},
 			&hash.ServiceProvider{},
 			&crypt.ServiceProvider{},
+			&filesystem.ServiceProvider{},
 			&validation.ServiceProvider{},
 			&providers.AppServiceProvider{},
 			&providers.AuthServiceProvider{},
