@@ -28,6 +28,7 @@ func NewWebsiteController() *WebsiteController {
 	}
 }
 
+// List 网站列表
 func (c *WebsiteController) List(ctx http.Context) {
 	limit := ctx.Request().QueryInt("limit")
 	page := ctx.Request().QueryInt("page")
@@ -45,6 +46,7 @@ func (c *WebsiteController) List(ctx http.Context) {
 	})
 }
 
+// Add 添加网站
 func (c *WebsiteController) Add(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -88,6 +90,7 @@ func (c *WebsiteController) Add(ctx http.Context) {
 	Success(ctx, newSite)
 }
 
+// Delete 删除网站
 func (c *WebsiteController) Delete(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -103,6 +106,7 @@ func (c *WebsiteController) Delete(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// GetDefaultConfig 获取默认配置
 func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -116,6 +120,7 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
 	})
 }
 
+// SaveDefaultConfig 保存默认配置
 func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -138,6 +143,7 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// GetConfig 获取配置
 func (c *WebsiteController) GetConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -158,6 +164,7 @@ func (c *WebsiteController) GetConfig(ctx http.Context) {
 	Success(ctx, config)
 }
 
+// SaveConfig 保存配置
 func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -393,6 +400,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// ClearLog 清空日志
 func (c *WebsiteController) ClearLog(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -416,6 +424,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// UpdateRemark 更新备注
 func (c *WebsiteController) UpdateRemark(ctx http.Context) {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
@@ -442,6 +451,7 @@ func (c *WebsiteController) UpdateRemark(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// BackupList 备份列表
 func (c *WebsiteController) BackupList(ctx http.Context) {
 	backupList, err := c.backup.WebsiteList()
 	if err != nil {
@@ -453,6 +463,7 @@ func (c *WebsiteController) BackupList(ctx http.Context) {
 	Success(ctx, backupList)
 }
 
+// CreateBackup 创建备份
 func (c *WebsiteController) CreateBackup(ctx http.Context) {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
@@ -478,6 +489,82 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) {
 	Success(ctx, nil)
 }
 
+// UploadBackup 上传备份
+func (c *WebsiteController) UploadBackup(ctx http.Context) {
+	file, err := ctx.Request().File("file")
+	if err != nil {
+		Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return
+	}
+
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	name := file.GetClientOriginalName()
+	_, err = file.StoreAs(backupPath, name)
+	if err != nil {
+		Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return
+	}
+
+	Success(ctx, "上传文件成功")
+}
+
+// RestoreBackup 还原备份
+func (c *WebsiteController) RestoreBackup(ctx http.Context) {
+	id := ctx.Request().InputInt("id")
+	if id == 0 {
+		Error(ctx, http.StatusBadRequest, "参数错误")
+		return
+	}
+	fileName := ctx.Request().Input("name")
+	if len(fileName) == 0 {
+		Error(ctx, http.StatusBadRequest, "参数错误")
+		return
+	}
+
+	website := models.Website{}
+	err := facades.Orm().Query().Where("id", id).Get(&website)
+	if err != nil {
+		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
+		Error(ctx, http.StatusInternalServerError, "获取网站信息失败: "+err.Error())
+		return
+	}
+
+	err = c.backup.WebsiteRestore(website, fileName)
+	if err != nil {
+		facades.Log().Error("[面板][WebsiteController] 还原网站失败 ", err)
+		Error(ctx, http.StatusInternalServerError, "还原网站失败: "+err.Error())
+		return
+	}
+
+	Success(ctx, nil)
+}
+
+// DeleteBackup 删除备份
+func (c *WebsiteController) DeleteBackup(ctx http.Context) {
+	fileName := ctx.Request().Input("name")
+	if len(fileName) == 0 {
+		Error(ctx, http.StatusBadRequest, "参数错误")
+		return
+	}
+
+	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	if !tools.RemoveFile(backupPath + "/" + fileName) {
+		Error(ctx, http.StatusInternalServerError, "删除备份失败")
+		return
+	}
+
+	Success(ctx, nil)
+}
+
+// ResetConfig 重置配置
 func (c *WebsiteController) ResetConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
@@ -569,6 +656,7 @@ server
 	Success(ctx, nil)
 }
 
+// Status 网站状态
 func (c *WebsiteController) Status(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return

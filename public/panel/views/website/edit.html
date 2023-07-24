@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 编辑
 Author: 耗子
-Date: 2023-07-21
+Date: 2023-07-24
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <div class="layui-tab" lay-filter="website-edit-tab">
@@ -321,7 +321,7 @@ Date: 2023-07-21
                     url: '/api/panel/website/config'
                     , type: 'post'
                     , data: {
-                        id: params.id,
+                        id: params.data.id,
                         domains: domains.join('\n'),
                         ports: ports.join('\n'),
                         ssl: $('input[name="ssl"]').prop('checked'),
@@ -365,7 +365,7 @@ Date: 2023-07-21
                     admin.req({
                         url: '/api/panel/website/resetConfig'
                         , type: 'post'
-                        , data: {id: params.id}
+                        , data: {id: params.data.id}
                         , success: function (res) {
                             layer.close(index)
                             if (res.code === 0) {

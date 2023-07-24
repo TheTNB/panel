@@ -14,6 +14,7 @@ import (
 type Backup interface {
 	WebsiteList() ([]BackupFile, error)
 	WebSiteBackup(website models.Website) error
+	WebsiteRestore(website models.Website, backupFile string) error
 }
 
 type BackupFile struct {
@@ -38,6 +39,9 @@ func (s *BackupImpl) WebsiteList() ([]BackupFile, error) {
 	}
 
 	path += "/website"
+	if !tools.Exists(path) {
+		tools.Mkdir(path, 0644)
+	}
 
 	files, err := os.ReadDir(path)
 	if err != nil {
@@ -69,8 +73,32 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 		tools.Mkdir(backupPath, 0644)
 	}
 
-	backupFile := backupPath + "/" + website.Name + carbon.Now().ToShortDateTimeString() + ".zip"
-	tools.ExecShell("cd " + website.Path + " && zip -r " + backupFile + " .")
+	backupFile := backupPath + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
+	tools.ExecShell(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`)
+
+	return nil
+}
+
+func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) error {
+	backupPath := s.setting.Get(models.SettingKeyBackupPath)
+	if len(backupPath) == 0 {
+		return errors.New("未正确配置备份路径")
+	}
+
+	backupPath += "/website"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	backupFile = backupPath + "/" + backupFile
+	if !tools.Exists(backupFile) {
+		return errors.New("备份文件不存在")
+	}
+
+	tools.ExecShell(`rm -rf '` + website.Path + `/*'`)
+	tools.ExecShell(`unzip -o '` + backupFile + `' -d '` + website.Path + `' 2>&1`)
+	tools.Chmod(website.Path, 0755)
+	tools.Chown(website.Path, "www", "www")
 
 	return nil
 }

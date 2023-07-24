@@ -348,7 +348,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	}
 
 	setting.Rewrite = tools.ReadFile("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	setting.Log = tools.ExecShell("tail -n 100 /www/wwwlogs/" + website.Name + ".log")
+	setting.Log = tools.ExecShell(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
 
 	return setting, nil
 }
