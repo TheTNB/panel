@@ -114,3 +114,13 @@ func Exists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
 }
+
+// Empty 判断路径是否为空
+func Empty(path string) bool {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return true
+	}
+
+	return len(files) == 0
+}

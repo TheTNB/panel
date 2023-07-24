@@ -14,23 +14,6 @@ func TestStringHelperTestSuite(t *testing.T) {
 	suite.Run(t, &StringHelperTestSuite{})
 }
 
-func (s *StringHelperTestSuite) TestEmpty() {
-	s.True(Empty(""))
-	s.True(Empty(nil))
-	s.True(Empty([]string{}))
-	s.True(Empty(map[string]string{}))
-	s.True(Empty(0))
-	s.True(Empty(0.0))
-	s.True(Empty(false))
-
-	s.False(Empty(" "))
-	s.False(Empty([]string{"Panel"}))
-	s.False(Empty(map[string]string{"Panel": "HaoZi"}))
-	s.False(Empty(1))
-	s.False(Empty(1.0))
-	s.False(Empty(true))
-}
-
 func (s *StringHelperTestSuite) TestFirstElement() {
 	s.Equal("HaoZi", FirstElement([]string{"HaoZi"}))
 }

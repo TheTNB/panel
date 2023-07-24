@@ -99,3 +99,8 @@ func (s *SystemHelperTestSuite) TestExists() {
 	s.True(Exists("/tmp"))
 	s.False(Exists("/tmp/123"))
 }
+
+func (s *SystemHelperTestSuite) TestEmpty() {
+	s.True(Empty("/tmp/123"))
+	s.False(Empty("/tmp"))
+}

@@ -30,4 +30,4 @@ else
     exit 1
 fi
 
-panel writePlugin s3fs
+panel writePlugin s3fs 1.9

@@ -10,6 +10,7 @@ import (
 	"panel/app/http/controllers/plugins/php74"
 	"panel/app/http/controllers/plugins/php80"
 	"panel/app/http/controllers/plugins/phpmyadmin"
+	"panel/app/http/controllers/plugins/s3fs"
 	"panel/app/http/middleware"
 )
 
@@ -128,5 +129,11 @@ func Plugin() {
 		phpMyAdminController := phpmyadmin.NewPhpMyAdminController()
 		route.Get("info", phpMyAdminController.Info)
 		route.Post("port", phpMyAdminController.SetPort)
+	})
+	facades.Route().Prefix("api/plugins/s3fs").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		s3fsController := s3fs.NewS3fsController()
+		route.Get("list", s3fsController.List)
+		route.Post("add", s3fsController.Add)
+		route.Post("delete", s3fsController.Delete)
 	})
 }
