@@ -129,6 +129,9 @@ func (r *MonitorController) List(ctx http.Context) {
 	var bytesSent2 uint64
 	var bytesRecv2 uint64
 	for _, net := range monitors[0].Info.Net {
+		if net.Name == "lo" {
+			continue
+		}
 		bytesSent += net.BytesSent
 		bytesRecv += net.BytesRecv
 	}
@@ -141,6 +144,9 @@ func (r *MonitorController) List(ctx http.Context) {
 			continue
 		}
 		for _, net := range monitor.Info.Net {
+			if net.Name == "lo" {
+				continue
+			}
 			bytesSent2 += net.BytesSent
 			bytesRecv2 += net.BytesRecv
 		}
@@ -157,11 +163,13 @@ func (r *MonitorController) List(ctx http.Context) {
 		data.Net.Recv = append(data.Net.Recv, fmt.Sprintf("%.2f", float64(bytesRecv2/1024)))
 
 		// 监控频率为 1 分钟，所以这里除以 60 即可得到每秒的流量
-		data.Net.Tx = append(data.Net.Tx, fmt.Sprintf("%.2f", float64(bytesSent2-bytesSent)/60/1024))
-		data.Net.Rx = append(data.Net.Rx, fmt.Sprintf("%.2f", float64(bytesRecv2-bytesRecv)/60/1024))
+		data.Net.Tx = append(data.Net.Tx, fmt.Sprintf("%.2f", float64(bytesSent2-bytesSent)/60/1024/1024))
+		data.Net.Rx = append(data.Net.Rx, fmt.Sprintf("%.2f", float64(bytesRecv2-bytesRecv)/60/1024/1024))
 
 		bytesSent = bytesSent2
 		bytesRecv = bytesRecv2
+		bytesSent2 = 0
+		bytesRecv2 = 0
 	}
 
 	Success(ctx, data)
