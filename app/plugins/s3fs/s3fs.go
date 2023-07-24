@@ -2,7 +2,6 @@ package s3fs
 
 var (
 	Name        = "S3fs"
-	Author      = "耗子"
 	Description = "S3fs 通过 FUSE 挂载兼容 S3 标准的存储桶，例如Amazon S3、阿里云OSS、腾讯云COS、七牛云Kodo等。"
 	Slug        = "s3fs"
 	Version     = "1.9"

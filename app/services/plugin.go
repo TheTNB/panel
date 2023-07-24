@@ -17,7 +17,6 @@ import (
 // PanelPlugin 插件元数据结构
 type PanelPlugin struct {
 	Name        string
-	Author      string
 	Description string
 	Slug        string
 	Version     string
@@ -58,7 +57,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 
 	p = append(p, PanelPlugin{
 		Name:        openresty.Name,
-		Author:      openresty.Author,
 		Description: openresty.Description,
 		Slug:        openresty.Slug,
 		Version:     openresty.Version,
@@ -70,7 +68,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        mysql57.Name,
-		Author:      mysql57.Author,
 		Description: mysql57.Description,
 		Slug:        mysql57.Slug,
 		Version:     mysql57.Version,
@@ -82,7 +79,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        mysql80.Name,
-		Author:      mysql80.Author,
 		Description: mysql80.Description,
 		Slug:        mysql80.Slug,
 		Version:     mysql80.Version,
@@ -94,7 +90,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        php74.Name,
-		Author:      php74.Author,
 		Description: php74.Description,
 		Slug:        php74.Slug,
 		Version:     php74.Version,
@@ -106,7 +101,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        php80.Name,
-		Author:      php80.Author,
 		Description: php80.Description,
 		Slug:        php80.Slug,
 		Version:     php80.Version,
@@ -118,7 +112,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        phpmyadmin.Name,
-		Author:      phpmyadmin.Author,
 		Description: phpmyadmin.Description,
 		Slug:        phpmyadmin.Slug,
 		Version:     phpmyadmin.Version,
@@ -130,7 +123,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 	})
 	p = append(p, PanelPlugin{
 		Name:        s3fs.Name,
-		Author:      s3fs.Author,
 		Description: s3fs.Description,
 		Slug:        s3fs.Slug,
 		Version:     s3fs.Version,

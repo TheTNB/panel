@@ -41,7 +41,6 @@ func (r *PluginController) List(ctx http.Context) {
 
 	type plugin struct {
 		Name             string   `json:"name"`
-		Author           string   `json:"author"`
 		Description      string   `json:"description"`
 		Slug             string   `json:"slug"`
 		Version          string   `json:"version"`
@@ -62,7 +61,6 @@ func (r *PluginController) List(ctx http.Context) {
 		}
 		p = append(p, plugin{
 			Name:             item.Name,
-			Author:           item.Author,
 			Description:      item.Description,
 			Slug:             item.Slug,
 			Version:          item.Version,

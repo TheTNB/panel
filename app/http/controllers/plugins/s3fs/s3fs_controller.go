@@ -191,8 +191,8 @@ func (c *S3fsController) Delete(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`fusermount -u '` + mount.Path + `'`)
-	tools.ExecShell(`umount '` + mount.Path + `'`)
+	tools.ExecShell(`fusermount -u '` + mount.Path + `' 2>&1`)
+	tools.ExecShell(`umount '` + mount.Path + `' 2>&1`)
 	tools.ExecShell(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`)
 	check := tools.ExecShell("mount -a 2>&1")
 	if len(check) != 0 {
