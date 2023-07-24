@@ -8,9 +8,9 @@
 
 这是耗子Linux面板的开源仓库，基于Apache License 2.0协议进行开源，目前处于积极开发状态。
 
-#### 我们正在进行基于 Golang 的 V2 版本的开发，加入我们的 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[耗子](https://pd.qq.com/s/fyol46wfy) 获取最新动态。
+#### 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[耗子](https://pd.qq.com/s/fyol46wfy)
 
-广告： [`WeAvatar` —统一头像服务](https://weavatar.com)
+广告： [`WeAvatar` 多端多元化的统一头像服务](https://weavatar.com)
 
 ## 运行环境
 
@@ -38,7 +38,7 @@ bash <(curl -sSL https://dl.cdn.haozi.net/panel/install_panel.sh)
 ## 日常维护
 
 ```shell
-panel xxx
+panel
 ```
 
 ## 问题反馈
@@ -54,13 +54,17 @@ panel xxx
 
 ### 服务器
 
-- [盾云](https://www.ddunyun.com/)
+- [盾云](https://www.ddunyun.com/aff/PNYAXMKI)
 
 ### CDN
 
 - [盾云CDN](http://cdn.ddunyun.com/)
 
-- [又拍云](https://www.upyun.com/)
+- [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
+
+### DevOps
+
+- [极狐GitLab](https://www.jihulab.com/)
 
 #### 接受云资源和资金赞助，可通过QQ群咨询联系
 
