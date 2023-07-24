@@ -16,6 +16,7 @@ Date: 2023-07-22
                             <li class="layui-this">进行中</li>
                             <li>等待中</li>
                             <li>已完成</li>
+                            <li>已失败</li>
                         </ul>
                         <div class="layui-tab-content">
                             <div class="layui-tab-item layui-show">
@@ -38,6 +39,12 @@ Date: 2023-07-22
                             <div class="layui-tab-item">
                                 <table id="panel-task-finished" lay-filter="panel-task-finished"></table>
                                 <script type="text/html" id="panel-task-finished-control-tpl">
+                                    <a class="layui-btn layui-btn-xs" lay-event="remove">移除</a>
+                                </script>
+                            </div>
+                            <div class="layui-tab-item">
+                                <table id="panel-task-failed" lay-filter="panel-task-failed"></table>
+                                <script type="text/html" id="panel-task-failed-control-tpl">
                                     <a class="layui-btn layui-btn-xs" lay-event="remove">移除</a>
                                 </script>
                             </div>
@@ -131,8 +138,6 @@ Date: 2023-07-22
                 };
             }
         });
-
-        // 工具条
         table.on('tool(panel-task-finished)', function (obj) {
             let data = obj.data;
             if (obj.event === 'remove') {
@@ -147,8 +152,60 @@ Date: 2023-07-22
                         , success: function (res) {
                             if (res.code == 0) {
                                 layer.msg('移除任务：' + data.name + ' 成功！', {icon: 1, time: 1000}, function () {
-                                    // 重载表格
                                     table.reload('panel-task-finished-table');
+                                });
+                            } else {
+                                layer.msg(res.message, {icon: 2, time: 1000});
+                            }
+                        }
+                    });
+                });
+            }
+        });
+
+        table.render({
+            elem: '#panel-task-failed'
+            , id: 'panel-task-failed-table'
+            , url: '/api/panel/task/list?status=failed'
+            , cols: [[
+                {field: 'id', hide: true, title: 'ID', sort: true}
+                , {field: 'name', width: '80%', title: '任务名'}
+                , {
+                    field: 'control',
+                    title: '操作',
+                    templet: '#panel-task-failed-control-tpl',
+                    fixed: 'right',
+                    align: 'center'
+                }
+            ]]
+            , page: true
+            , text: {
+                none: '无数据'
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": res.data.total,
+                    "data": res.data.items
+                };
+            }
+        });
+        table.on('tool(panel-task-failed)', function (obj) {
+            let data = obj.data;
+            if (obj.event === 'remove') {
+                layer.confirm('确定移除该记录吗？', function (index) {
+                    layer.close(index);
+                    admin.req({
+                        url: '/api/panel/task/delete',
+                        type: 'post',
+                        data: {
+                            id: data.id
+                        }
+                        , success: function (res) {
+                            if (res.code == 0) {
+                                layer.msg('移除任务：' + data.name + ' 成功！', {icon: 1, time: 1000}, function () {
+                                    table.reload('panel-task-failed-table');
                                 });
                             } else {
                                 layer.msg(res.message, {icon: 2, time: 1000});
