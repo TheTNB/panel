@@ -7,23 +7,25 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
-
+	"github.com/spf13/cast"
 	"panel/app/models"
 	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type CronController struct {
-	cron services.Cron
+	cron    services.Cron
+	setting services.Setting
 }
 
 func NewCronController() *CronController {
 	return &CronController{
-		cron: services.NewCronImpl(),
+		cron:    services.NewCronImpl(),
+		setting: services.NewSettingImpl(),
 	}
 }
 
-func (r *CronController) List(ctx http.Context) {
+func (c *CronController) List(ctx http.Context) {
 	limit := ctx.Request().QueryInt("limit")
 	page := ctx.Request().QueryInt("page")
 
@@ -42,11 +44,13 @@ func (r *CronController) List(ctx http.Context) {
 	})
 }
 
-func (r *CronController) Add(ctx http.Context) {
+func (c *CronController) Add(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
-		"name":   "required|min_len:1|max_len:255",
-		"time":   "required",
-		"script": "required",
+		"name":        "required|min_len:1|max_len:255",
+		"time":        "required",
+		"script":      "required",
+		"type":        "required|in:shell,backup,cutoff",
+		"backup_type": "required_if:type,backup|in:website,mysql,postgresql",
 	})
 	if err != nil {
 		Error(ctx, http.StatusBadRequest, err.Error())
@@ -63,7 +67,46 @@ func (r *CronController) Add(ctx http.Context) {
 		return
 	}
 
-	// 写入shell
+	shell := ctx.Request().Input("script")
+	cronType := ctx.Request().Input("type")
+	if cronType == "backup" {
+		backupType := ctx.Request().Input("backup_type")
+		backupName := ctx.Request().Input("backup_database")
+		if backupType == "website" {
+			backupName = ctx.Request().Input("website")
+		}
+		backupPath := ctx.Request().Input("backup_path", c.setting.Get(models.SettingKeyBackupPath)+"/"+backupType)
+		backupSave := ctx.Request().InputInt("save", 10)
+		shell = `#!/bin/bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+
+# 耗子面板 - 数据备份脚本
+
+type=` + backupType + `
+path=` + backupPath + `
+name=` + backupName + `
+save=` + cast.ToString(backupSave) + `
+
+# 执行备份
+panel backup ${type} ${name} ${path} ${save} 2>&1
+`
+	}
+	if cronType == "cutoff" {
+		website := ctx.Request().Input("website")
+		save := ctx.Request().InputInt("save", 180)
+		shell = `#!/bin/bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
+
+# 耗子面板 - 日志切割脚本
+
+name=` + website + `
+save=` + cast.ToString(save) + `
+
+# 执行切割
+panel cutoff ${name} ${save} 2>&1
+`
+	}
+
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
 	if !tools.Exists(shellDir) {
@@ -77,7 +120,7 @@ func (r *CronController) Add(ctx http.Context) {
 		return
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if !tools.WriteFile(shellDir+shellFile+".sh", ctx.Request().Input("script"), 0700) {
+	if !tools.WriteFile(shellDir+shellFile+".sh", shell, 0700) {
 		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
@@ -86,7 +129,7 @@ func (r *CronController) Add(ctx http.Context) {
 
 	var cron models.Cron
 	cron.Name = ctx.Request().Input("name")
-	cron.Type = "shell"
+	cron.Type = ctx.Request().Input("type")
 	cron.Status = true
 	cron.Time = ctx.Request().Input("time")
 	cron.Shell = shellDir + shellFile + ".sh"
@@ -99,7 +142,7 @@ func (r *CronController) Add(ctx http.Context) {
 		return
 	}
 
-	r.cron.AddToSystem(cron)
+	c.cron.AddToSystem(cron)
 
 	Success(ctx, http.Json{
 		"id": cron.ID,
@@ -107,7 +150,7 @@ func (r *CronController) Add(ctx http.Context) {
 }
 
 // Script 获取脚本内容
-func (r *CronController) Script(ctx http.Context) {
+func (c *CronController) Script(ctx http.Context) {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
@@ -118,7 +161,7 @@ func (r *CronController) Script(ctx http.Context) {
 	Success(ctx, tools.ReadFile(cron.Shell))
 }
 
-func (r *CronController) Update(ctx http.Context) {
+func (c *CronController) Update(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":   "required|min_len:1|max_len:255",
 		"time":   "required",
@@ -167,15 +210,15 @@ func (r *CronController) Update(ctx http.Context) {
 	}
 	tools.ExecShell("dos2unix " + cron.Shell)
 
-	r.cron.DeleteFromSystem(cron)
+	c.cron.DeleteFromSystem(cron)
 	if cron.Status {
-		r.cron.AddToSystem(cron)
+		c.cron.AddToSystem(cron)
 	}
 
 	Success(ctx, nil)
 }
 
-func (r *CronController) Delete(ctx http.Context) {
+func (c *CronController) Delete(ctx http.Context) {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
@@ -183,7 +226,7 @@ func (r *CronController) Delete(ctx http.Context) {
 		return
 	}
 
-	r.cron.DeleteFromSystem(cron)
+	c.cron.DeleteFromSystem(cron)
 	tools.RemoveFile(cron.Shell)
 
 	_, err = facades.Orm().Query().Delete(&cron)
@@ -196,7 +239,7 @@ func (r *CronController) Delete(ctx http.Context) {
 	Success(ctx, nil)
 }
 
-func (r *CronController) Status(ctx http.Context) {
+func (c *CronController) Status(ctx http.Context) {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"status": "bool",
 	})
@@ -224,15 +267,15 @@ func (r *CronController) Status(ctx http.Context) {
 		return
 	}
 
-	r.cron.DeleteFromSystem(cron)
+	c.cron.DeleteFromSystem(cron)
 	if cron.Status {
-		r.cron.AddToSystem(cron)
+		c.cron.AddToSystem(cron)
 	}
 
 	Success(ctx, nil)
 }
 
-func (r *CronController) Log(ctx http.Context) {
+func (c *CronController) Log(ctx http.Context) {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {

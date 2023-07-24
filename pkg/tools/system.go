@@ -124,3 +124,29 @@ func Empty(path string) bool {
 
 	return len(files) == 0
 }
+
+// Mv 移动路径
+func Mv(src, dst string) bool {
+	cmd := exec.Command("mv", src, dst)
+
+	err := cmd.Run()
+	if err != nil {
+		facades.Log().Errorf("[面板][Helpers] 移动 %s 到 %s 失败: %s", src, dst, err.Error())
+		return false
+	}
+
+	return true
+}
+
+// Cp 复制路径
+func Cp(src, dst string) bool {
+	cmd := exec.Command("cp", "-r", src, dst)
+
+	err := cmd.Run()
+	if err != nil {
+		facades.Log().Errorf("[面板][Helpers] 复制 %s 到 %s 失败: %s", src, dst, err.Error())
+		return false
+	}
+
+	return true
+}

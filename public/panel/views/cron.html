@@ -9,14 +9,83 @@ Date: 2023-07-21
     <div class="layui-card">
         <div class="layui-card-header">添加计划任务</div>
         <div class="layui-card-body">
+            <blockquote class="layui-elem-quote">
+                <p>面板的计划任务均基于脚本运行，若任务类型满足不了需求，可自行修改对应的脚本。</p>
+            </blockquote>
             <form class="layui-form" action="" lay-filter="cron-add-form">
                 <div class="layui-form-item">
+                    <label class="layui-form-label">任务类型</label>
+                    <div class="layui-input-inline">
+                        <select name="type" lay-verify="required" lay-filter="cron-type">
+                            <option value="shell">运行脚本</option>
+                            <option value="backup">备份数据</option>
+                            <option value="cutoff">切割日志</option>
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">请选择任务类型</div>
+                </div>
+                <div class="layui-form-item" id="cron-add-name-input">
                     <label class="layui-form-label">任务名</label>
                     <div class="layui-input-inline">
                         <input type="text" name="name" lay-verify="required" placeholder="请输入任务名称"
                                autocomplete="off" class="layui-input">
                     </div>
                     <div class="layui-form-mid layui-word-aux">请填写任务名称</div>
+                </div>
+                <div class="layui-form-item" id="cron-add-backup-type-input" style="display: none;">
+                    <label class="layui-form-label">备份类型</label>
+                    <div class="layui-input-block">
+                        <input type="radio" lay-filter="cron-add-backup-type-radio" name="backup_type" value="website"
+                               title="网站目录" checked="">
+                        <input type="radio" lay-filter="cron-add-backup-type-radio" name="backup_type" value="mysql"
+                               title="MySQL数据库">
+                        <input type="radio" lay-filter="cron-add-backup-type-radio" name="backup_type"
+                               value="postgresql"
+                               title="PostgreSQL数据库">
+                    </div>
+                </div>
+                <div class="layui-form-item" id="cron-add-website-input" style="display: none;">
+                    <label class="layui-form-label">网站</label>
+                    <div class="layui-input-inline">
+                        <script type="text/html" template lay-url="/api/panel/website/list?page=1&limit=10000">
+                            <select name="website" lay-filter="cron-add-website">
+                                {{# layui.each(d.data.items, function(index, item){ }}
+                                {{# if(index == 0){ }}
+                                <option value="{{ item.name }}" selected="">{{ item.name }}</option>
+                                {{# }else{ }}
+                                <option value="{{ item.name }}">{{ item.name }}</option>
+                                {{# } }}
+                                {{# }); }}
+                            </select>
+                        </script>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">请选择网站</div>
+                </div>
+                <div class="layui-form-item" id="cron-add-backup-database-input" style="display: none;">
+                    <label class="layui-form-label">数据库名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="backup_database" placeholder="请输入数据库名"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">请填写数据库名</div>
+                </div>
+                <div class="layui-form-item" id="cron-add-backup-path-input" style="display: none;">
+                    <label class="layui-form-label">保存目录</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="backup_path" placeholder=""
+                               autocomplete="off" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">
+                        目录可以为对象存储挂载目录，不填则默认为面板设置的备份目录
+                    </div>
+                </div>
+                <div class="layui-form-item" id="cron-add-save-input" style="display: none;">
+                    <label class="layui-form-label">保留份数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" name="save" placeholder="10"
+                               autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">请填写保留份数，会自动清理过剩的副本</div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">执行周期</label>
@@ -26,11 +95,12 @@ Date: 2023-07-21
                     </div>
                     <div class="layui-form-mid layui-word-aux">请务必正确填写执行周期</div>
                 </div>
-                <div class="layui-form-item layui-form-text">
+                <div class="layui-form-item layui-form-text" id="cron-add-shell">
                     <label class="layui-form-label">脚本内容</label>
                     <div class="layui-input-block">
                         <div id="cron-add-script-editor"
-                             style="height: 250px;"># 在此输入你要执行的脚本内容</div>
+                             style="height: 250px;"># 在此输入你要执行的脚本内容
+                        </div>
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -52,13 +122,22 @@ Date: 2023-07-21
                 <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                 <a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="del">删除</a>
             </script>
+            <!-- 任务类型 -->
+            <script type="text/html" id="cron-table-type">
+                {{# if(d.type == 'shell'){ }}
+                运行脚本
+                {{# }else if(d.type == 'backup'){ }}
+                备份数据
+                {{# }else if(d.type == 'cutoff'){ }}
+                切割日志
+                {{# } }}
+            </script>
             <!-- 运行开关 -->
             <script type="text/html" id="cron-table-status">
                 <input type="checkbox" name="cron-status" lay-skin="switch" lay-text="ON|OFF"
                        lay-filter="cron-status"
                        value="{{ d.status }}" data-id="{{ d.id }}"
-                       {{ d.status==
-                       1 ? 'checked' : '' }}>
+                       {{ d.status ? 'checked' : '' }}>
             </script>
         </div>
     </div>
@@ -94,10 +173,11 @@ Date: 2023-07-21
             , cols: [[
                 {field: 'id', hide: true, title: 'ID'}
                 , {field: 'name', width: 150, title: '任务名', sort: true}
-                , {field: 'type', width: 150, title: '任务类型', sort: true}
+                , {field: 'type', width: 150, title: '任务类型', templet: '#cron-table-type', sort: true}
                 , {field: 'status', title: '启用', width: 100, templet: '#cron-table-status', unresize: true}
                 , {field: 'time', width: 200, title: '任务周期（cron表达式）'}
-                , {field: 'updated_at', title: '上次运行时间'}
+                , {field: 'created_at', title: '创建时间'}
+                , {field: 'updated_at', title: '最后更新时间'}
                 , {
                     field: 'edit',
                     width: 180,
@@ -120,8 +200,6 @@ Date: 2023-07-21
                 };
             }
         });
-
-        // 工具条
         table.on('tool(panel-cron)', function (obj) {
             let data = obj.data;
             if (obj.event === 'log') {
@@ -233,6 +311,46 @@ Date: 2023-07-21
             }
         });
 
+        form.on('select(cron-type)', function (data) {
+            if (data.value === 'shell') {
+                $("#cron-add-backup-type-input").hide();
+                $("#cron-add-save-input").hide();
+                $('#cron-add-website-input').hide();
+                $('#cron-add-backup-database-input').hide();
+                $('#cron-add-backup-path-input').hide();
+                $("#cron-add-shell").show();
+            } else if (data.value === 'backup') {
+                let selectedType = $('input[name="backup_type"]:checked').val();
+                if (selectedType === 'website') {
+                    $('#cron-add-website-input').show();
+                    $('#cron-add-backup-database-input').hide();
+                } else {
+                    $('#cron-add-website-input').hide();
+                    $('#cron-add-backup-database-input').show();
+                }
+                $("#cron-add-backup-type-input").show();
+                $('#cron-add-backup-path-input').show();
+                $("#cron-add-save-input").show();
+                $("#cron-add-shell").hide();
+            } else if (data.value === 'cutoff') {
+                $('#cron-add-website-input').show();
+                $('#cron-add-save-input').show();
+                $("#cron-add-shell").hide();
+                $('#cron-add-backup-database-input').hide();
+                $("#cron-add-backup-type-input").hide();
+                $('#cron-add-backup-path-input').hide();
+            }
+        });
+        form.on('radio(cron-add-backup-type-radio)', function (data) {
+            if (data.value == 'website') {
+                $('#cron-add-website-input').show();
+                $('#cron-add-backup-database-input').hide();
+            } else {
+                $('#cron-add-website-input').hide();
+                $('#cron-add-backup-database-input').show();
+            }
+        });
+
         form.on('switch(cron-status)', function (obj) {
             let $ = layui.$;
             let id = $(this).data('id');
@@ -263,7 +381,6 @@ Date: 2023-07-21
                 , data: data.field
                 , success: function (result) {
                     if (result.code !== 0) {
-                        console.log('耗子Linux面板：计划任务添加失败，接口返回' + result);
                         layer.msg('计划任务添加失败！')
                         return false;
                     }
@@ -274,7 +391,6 @@ Date: 2023-07-21
                         , btn: ['确定']
                         , yes: function (index) {
                             layer.closeAll();
-                            //location.reload();
                         }
                     });
                 }
