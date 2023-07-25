@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+	"panel/app/http/controllers/plugins/supervisor"
 
 	"panel/app/http/controllers/plugins/mysql57"
 	"panel/app/http/controllers/plugins/mysql80"
@@ -135,5 +136,28 @@ func Plugin() {
 		route.Get("list", s3fsController.List)
 		route.Post("add", s3fsController.Add)
 		route.Post("delete", s3fsController.Delete)
+	})
+	facades.Route().Prefix("api/plugins/supervisor").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		supervisorController := supervisor.NewSupervisorController()
+		route.Get("status", supervisorController.Status)
+		route.Post("start", supervisorController.Start)
+		route.Post("stop", supervisorController.Stop)
+		route.Post("restart", supervisorController.Restart)
+		route.Post("reload", supervisorController.Reload)
+		route.Get("log", supervisorController.Log)
+		route.Post("clearLog", supervisorController.ClearLog)
+		route.Get("config", supervisorController.Config)
+		route.Post("config", supervisorController.SaveConfig)
+		route.Get("processes", supervisorController.Processes)
+		route.Post("startProcess", supervisorController.StartProcess)
+		route.Post("stopProcess", supervisorController.StopProcess)
+		route.Post("restartProcess", supervisorController.RestartProcess)
+		route.Get("processLog", supervisorController.ProcessLog)
+		route.Post("clearProcessLog", supervisorController.ClearProcessLog)
+		route.Get("processConfig", supervisorController.ProcessConfig)
+		route.Post("processConfig", supervisorController.SaveProcessConfig)
+		route.Post("deleteProcess", supervisorController.DeleteProcess)
+		route.Post("addProcess", supervisorController.AddProcess)
+
 	})
 }

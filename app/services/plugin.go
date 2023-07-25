@@ -12,6 +12,7 @@ import (
 	"panel/app/plugins/php80"
 	"panel/app/plugins/phpmyadmin"
 	"panel/app/plugins/s3fs"
+	"panel/app/plugins/supervisor"
 )
 
 // PanelPlugin 插件元数据结构
@@ -131,6 +132,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     s3fs.Install,
 		Uninstall:   s3fs.Uninstall,
 		Update:      s3fs.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        supervisor.Name,
+		Description: supervisor.Description,
+		Slug:        supervisor.Slug,
+		Version:     supervisor.Version,
+		Requires:    supervisor.Requires,
+		Excludes:    supervisor.Excludes,
+		Install:     supervisor.Install,
+		Uninstall:   supervisor.Uninstall,
+		Update:      supervisor.Update,
 	})
 
 	return p

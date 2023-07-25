@@ -205,7 +205,7 @@ Date: 2023-07-21
             if (obj.event === 'log') {
                 // 打开日志弹窗
                 admin.popup({
-                    title: '日志'
+                    title: '日志 - ' + data.name
                     ,
                     area: ['80%', '80%']
                     ,
@@ -214,10 +214,12 @@ Date: 2023-07-21
                     content: '<pre id="cron-log-view" style="overflow: auto; height: 95%;border: 0 none; line-height:23px; padding: 15px; margin: 0; white-space: pre-wrap; background-color: rgb(51,51,51); color:#f1f1f1; border-radius:0;"></pre>'
                     ,
                     success: function (layero, index) {
+                        index2 = layer.msg('正在获取日志...', {icon: 16, time: 0, shade: 0.3});
                         admin.req({
                             url: '/api/panel/cron/log?id=' + data.id
                             , type: 'GET'
                             , success: function (res) {
+                                layer.close(index2);
                                 if (res.code === 0) {
                                     $('#cron-log-view').html(res.data);
                                 } else {
@@ -236,7 +238,7 @@ Date: 2023-07-21
                     , success: function (res) {
                         if (res.code === 0) {
                             admin.popup({
-                                title: '编辑'
+                                title: '编辑 - ' + data.name
                                 ,
                                 area: ['80%', '80%']
                                 ,
@@ -258,6 +260,7 @@ Date: 2023-07-21
                                         }
                                     });
                                     $('#cron-edit-' + data.id).click(function () {
+                                        index2 = layer.msg('正在保存...', {icon: 16, time: 0, shade: 0.3});
                                         admin.req({
                                             url: '/api/panel/cron/update'
                                             , type: 'POST'
@@ -271,6 +274,7 @@ Date: 2023-07-21
                                                 if (res.code === 0) {
                                                     layer.msg('保存成功', {icon: 1, time: 1000});
                                                     table.reload('panel-cron');
+                                                    layer.close(index2);
                                                     layer.close(index);
                                                 } else {
                                                     layer.msg(res.message, {icon: 2, time: 1000});

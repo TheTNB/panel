@@ -35,8 +35,7 @@ func (c *Php80Controller) Status(ctx http.Context) {
 		return
 	}
 
-	out := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
+	status := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 		return

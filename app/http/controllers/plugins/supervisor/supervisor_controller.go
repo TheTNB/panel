@@ -1,0 +1,390 @@
+package supervisor
+
+import (
+	"strconv"
+	"strings"
+
+	"github.com/goravel/framework/contracts/http"
+	"panel/pkg/tools"
+
+	"panel/app/http/controllers"
+)
+
+type SupervisorController struct {
+	ServiceName string
+}
+
+func NewSupervisorController() *SupervisorController {
+	var serviceName string
+	if tools.IsRHEL() {
+		serviceName = "supervisord"
+	} else {
+		serviceName = "supervisor"
+	}
+
+	return &SupervisorController{
+		ServiceName: serviceName,
+	}
+}
+
+// Status 状态
+func (r *SupervisorController) Status(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	if status == "active" {
+		controllers.Success(ctx, true)
+	} else {
+		controllers.Success(ctx, false)
+	}
+}
+
+// Start 启动
+func (r *SupervisorController) Start(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	tools.ExecShell(`systemctl start ` + r.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	if status == "active" {
+		controllers.Success(ctx, true)
+	} else {
+		controllers.Success(ctx, false)
+	}
+}
+
+// Stop 停止
+func (r *SupervisorController) Stop(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	tools.ExecShell(`systemctl stop ` + r.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	if status != "active" {
+		controllers.Success(ctx, true)
+	} else {
+		controllers.Success(ctx, false)
+	}
+}
+
+// Restart 重启
+func (r *SupervisorController) Restart(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	tools.ExecShell(`systemctl restart ` + r.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	if status == "active" {
+		controllers.Success(ctx, true)
+	} else {
+		controllers.Success(ctx, false)
+	}
+}
+
+// Reload 重载
+func (r *SupervisorController) Reload(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	tools.ExecShell(`systemctl reload ` + r.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	if status == "active" {
+		controllers.Success(ctx, true)
+	} else {
+		controllers.Success(ctx, false)
+	}
+}
+
+// Log 日志
+func (r *SupervisorController) Log(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	log := tools.ExecShell(`tail -n 200 /var/log/supervisor/supervisord.log`)
+	controllers.Success(ctx, log)
+}
+
+// ClearLog 清空日志
+func (r *SupervisorController) ClearLog(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	tools.ExecShell(`echo "" > /var/log/supervisor/supervisord.log`)
+	controllers.Success(ctx, nil)
+}
+
+// Config 获取配置
+func (r *SupervisorController) Config(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	var config string
+	if tools.IsRHEL() {
+		config = tools.ReadFile(`/etc/supervisord.conf`)
+	} else {
+		config = tools.ReadFile(`/etc/supervisor/supervisord.conf`)
+	}
+	controllers.Success(ctx, config)
+}
+
+// SaveConfig 保存配置
+func (r *SupervisorController) SaveConfig(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	config := ctx.Request().Input("config")
+	if tools.IsRHEL() {
+		tools.WriteFile(`/etc/supervisord.conf`, config, 0644)
+	} else {
+		tools.WriteFile(`/etc/supervisor/supervisord.conf`, config, 0644)
+	}
+
+	tools.ExecShell(`systemctl restart ` + r.ServiceName)
+	controllers.Success(ctx, nil)
+}
+
+// Processes 进程列表
+func (r *SupervisorController) Processes(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+
+	type process struct {
+		Name   string `json:"name"`
+		Status string `json:"status"`
+		Pid    string `json:"pid"`
+		Uptime string `json:"uptime"`
+	}
+
+	out := tools.ExecShell(`supervisorctl status | awk '{print $1}'`)
+	var processList []process
+	for _, line := range strings.Split(out, "\n") {
+		if len(line) == 0 {
+			continue
+		}
+
+		var p process
+		p.Name = line
+		p.Status = tools.ExecShell(`supervisorctl status ` + line + ` | awk '{print $2}'`)
+		if p.Status == "RUNNING" {
+			p.Pid = strings.ReplaceAll(tools.ExecShell(`supervisorctl status `+line+` | awk '{print $4}'`), ",", "")
+			p.Uptime = tools.ExecShell(`supervisorctl status ` + line + ` | awk '{print $6}'`)
+		} else {
+			p.Pid = "-"
+			p.Uptime = "-"
+		}
+		processList = append(processList, p)
+	}
+
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(processList) {
+		controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []process{},
+		})
+		return
+	}
+	if endIndex > len(processList) {
+		endIndex = len(processList)
+	}
+	pagedProcessList := processList[startIndex:endIndex]
+
+	controllers.Success(ctx, http.Json{
+		"total": len(processList),
+		"items": pagedProcessList,
+	})
+}
+
+// StartProcess 启动进程
+func (r *SupervisorController) StartProcess(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	tools.ExecShell(`supervisorctl start ` + process)
+	controllers.Success(ctx, nil)
+}
+
+// StopProcess 停止进程
+func (r *SupervisorController) StopProcess(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	tools.ExecShell(`supervisorctl stop ` + process)
+	controllers.Success(ctx, nil)
+}
+
+// RestartProcess 重启进程
+func (r *SupervisorController) RestartProcess(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	tools.ExecShell(`supervisorctl restart ` + process)
+	controllers.Success(ctx, nil)
+}
+
+// ProcessLog 进程日志
+func (r *SupervisorController) ProcessLog(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	var logPath string
+	if tools.IsRHEL() {
+		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+	} else {
+		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+	}
+
+	log := tools.ExecShell(`tail -n 200 ` + logPath)
+	controllers.Success(ctx, log)
+}
+
+// ClearProcessLog 清空进程日志
+func (r *SupervisorController) ClearProcessLog(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	var logPath string
+	if tools.IsRHEL() {
+		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+	} else {
+		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+	}
+
+	tools.ExecShell(`echo "" > ` + logPath)
+	controllers.Success(ctx, nil)
+}
+
+// ProcessConfig 获取进程配置
+func (r *SupervisorController) ProcessConfig(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Query("process")
+	var config string
+	if tools.IsRHEL() {
+		config = tools.ReadFile(`/etc/supervisord.d/` + process + `.conf`)
+	} else {
+		config = tools.ReadFile(`/etc/supervisor/conf.d/` + process + `.conf`)
+	}
+
+	controllers.Success(ctx, config)
+}
+
+// SaveProcessConfig 保存进程配置
+func (r *SupervisorController) SaveProcessConfig(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	config := ctx.Request().Input("config")
+	if tools.IsRHEL() {
+		tools.WriteFile(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
+	} else {
+		tools.WriteFile(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
+	}
+	tools.ExecShell(`supervisorctl reread`)
+	tools.ExecShell(`supervisorctl update`)
+	tools.ExecShell(`supervisorctl start ` + process)
+
+	controllers.Success(ctx, nil)
+}
+
+// AddProcess 添加进程
+func (r *SupervisorController) AddProcess(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	validator, err := ctx.Request().Validate(map[string]string{
+		"name":    "required|alpha_dash",
+		"user":    "required|alpha_dash",
+		"path":    "required",
+		"command": "required",
+		"num":     "required",
+	})
+	if err != nil {
+		controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return
+	}
+	if validator.Fails() {
+		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return
+	}
+
+	name := ctx.Request().Input("name")
+	user := ctx.Request().Input("user")
+	path := ctx.Request().Input("path")
+	command := ctx.Request().Input("command")
+	num := ctx.Request().InputInt("num", 1)
+	config := `[program:` + name + `]
+command=` + command + `
+process_name=%(program_name)s
+directory=` + path + `
+autostart=true
+autorestart=true
+user=` + user + `
+numprocs=` + strconv.Itoa(num) + `
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/` + name + `.log
+stdout_logfile_maxbytes=2MB
+`
+	if tools.IsRHEL() {
+		tools.WriteFile(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
+	} else {
+		tools.WriteFile(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
+	}
+	tools.ExecShell(`supervisorctl reread`)
+	tools.ExecShell(`supervisorctl update`)
+	tools.ExecShell(`supervisorctl start ` + name)
+
+	controllers.Success(ctx, nil)
+}
+
+// DeleteProcess 删除进程
+func (r *SupervisorController) DeleteProcess(ctx http.Context) {
+	if !controllers.Check(ctx, "supervisor") {
+		return
+	}
+
+	process := ctx.Request().Input("process")
+	tools.ExecShell(`supervisorctl stop ` + process)
+	var logPath string
+	if tools.IsRHEL() {
+		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		tools.RemoveFile(`/etc/supervisord.d/` + process + `.conf`)
+	} else {
+		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		tools.RemoveFile(`/etc/supervisor/conf.d/` + process + `.conf`)
+	}
+	tools.RemoveFile(logPath)
+	tools.ExecShell(`supervisorctl reread`)
+	tools.ExecShell(`supervisorctl update`)
+
+	controllers.Success(ctx, nil)
+}
