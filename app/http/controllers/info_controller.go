@@ -51,6 +51,7 @@ func (c *InfoController) Menu(ctx http.Context) {
 		{Name: "safe", Title: "系统安全", Icon: "layui-icon-auz", Jump: "safe"},
 		/*{Name: "file", Title: "文件管理", Icon: "layui-icon-file", Jump: "file"},*/
 		{Name: "cron", Title: "计划任务", Icon: "layui-icon-date", Jump: "cron"},
+		{Name: "ssh", Title: "SSH", Icon: "layui-icon-layer", Jump: "ssh"},
 		{Name: "plugin", Title: "插件中心", Icon: "layui-icon-app", Jump: "plugin"},
 		{Name: "setting", Title: "面板设置", Icon: "layui-icon-set", Jump: "setting"},
 	})
