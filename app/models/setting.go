@@ -10,6 +10,10 @@ const (
 	SettingKeyWebsitePath       = "website_path"
 	SettingKeyEntrance          = "entrance"
 	SettingKeyMysqlRootPassword = "mysql_root_password"
+	SettingKeySshHost           = "ssh_host"
+	SettingKeySshPort           = "ssh_port"
+	SettingKeySshUser           = "ssh_user"
+	SettingKeySshPassword       = "ssh_password"
 )
 
 type Setting struct {

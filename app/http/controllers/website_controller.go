@@ -55,7 +55,7 @@ func (c *WebsiteController) Add(ctx http.Context) {
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
 		"domain":      "required",
 		"php":         "required",
-		"db":          "required",
+		"db":          "bool",
 		"db_type":     "required_if:db,true",
 		"db_name":     "required_if:db,true",
 		"db_user":     "required_if:db,true",

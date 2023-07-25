@@ -114,7 +114,7 @@ Date: 2023-06-24
       })
 
       form.on('select(add-website-db)', function (data) {
-        if (data.value === '') {
+        if (data.value === "false") {
           $('#add-website-db-info').hide()
           return false
         }
@@ -130,7 +130,7 @@ Date: 2023-06-24
       })
       // 提交
       form.on('submit(add-website-submit)', function (data) {
-        data.field.db = data.field.db_type !== '';
+        data.field.db = data.field.db_type !== "false";
         admin.req({
           url: '/api/panel/website/add'
           , type: 'post'

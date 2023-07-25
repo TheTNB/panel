@@ -95,6 +95,12 @@ func Web() {
 			r.Get("list", monitorController.List)
 			r.Get("switchAndDays", monitorController.SwitchAndDays)
 		})
+		r.Prefix("ssh").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+			sshController := controllers.NewSshController()
+			r.Get("info", sshController.GetInfo)
+			r.Post("info", sshController.UpdateInfo)
+			r.Get("session", sshController.Session)
+		})
 		r.Prefix("setting").Middleware(middleware.Jwt()).Group(func(r route.Route) {
 			settingController := controllers.NewSettingController()
 			r.Get("list", settingController.List)
