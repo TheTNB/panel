@@ -112,16 +112,14 @@ func (r *SshController) Session(ctx http.Context) {
 	}
 	defer ws.Close()
 
-	var config *ssh.SSHClientConfig
-	config = ssh.SSHClientConfigPassword(
+	config := ssh.SSHClientConfigPassword(
 		r.setting.Get(models.SettingKeySshHost)+":"+r.setting.Get(models.SettingKeySshPort),
 		r.setting.Get(models.SettingKeySshUser),
 		r.setting.Get(models.SettingKeySshPassword),
 	)
-
 	client, err := ssh.NewSSHClient(config)
 	if err != nil {
-		ws.WriteControl(websocket.CloseMessage,
+		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
 		return
 	}
@@ -129,7 +127,7 @@ func (r *SshController) Session(ctx http.Context) {
 
 	turn, err := ssh.NewTurn(ws, client)
 	if err != nil {
-		ws.WriteControl(websocket.CloseMessage,
+		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
 		return
 	}
