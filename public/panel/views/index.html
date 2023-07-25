@@ -126,6 +126,7 @@ Date: 2023-06-22
                             <td>操作</td>
                             <td>
                                 <button id="update_panel" class="layui-btn layui-btn-xs">更新</button>
+                                <button id="restart_panel" class="layui-btn layui-btn-xs">重启</button>
                             </td>
                         </tr>
                         </tbody>
@@ -178,182 +179,195 @@ Date: 2023-06-22
 </div>
 
 <script>
-  var uptime_1 = '获取中', uptime_5 = '获取中', uptime_15 = '获取中'
-  var net_send = 0, net_recv = 0, net_send_last = 0, net_recv_last = 0
+    var uptime_1 = '获取中', uptime_5 = '获取中', uptime_15 = '获取中'
+    var net_send = 0, net_recv = 0, net_send_last = 0, net_recv_last = 0
 
-  function formatBytes (size) {
-    size = Number(size)
-    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-    var i = 0
+    function formatBytes(size) {
+        size = Number(size)
+        var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+        var i = 0
 
-    while (size >= 1024 && i < units.length) {
-      size /= 1024
-      i++
+        while (size >= 1024 && i < units.length) {
+            size /= 1024
+            i++
+        }
+
+        return size.toFixed(2) + ' ' + units[i]
     }
 
-    return size.toFixed(2) + ' ' + units[i]
-  }
+    function formatPercentage(num) {
+        num = Number(num)
+        return num.toFixed(2) + '%'
+    }
 
-  function formatPercentage (num) {
-    num = Number(num)
-    return num.toFixed(2) + '%'
-  }
+    function refresh_home_info(first = false) {
+        layui.use(['index', 'jquery', 'admin'], function () {
+            let $ = layui.jquery
+                , admin = layui.admin
+                , element = layui.element
 
-  function refresh_home_info (first = false) {
-    layui.use(['index', 'jquery', 'admin'], function () {
-      let $ = layui.jquery
-        , admin = layui.admin
-        , element = layui.element
+            let device = layui.device()
+            let cpu_info
+            admin.req({
+                url: '/api/panel/info/nowMonitor'
+                , type: 'get'
+                , success: function (result) {
+                    if (result.code !== 0) {
+                        layer.msg('系统资源获取失败，请刷新重试！')
+                        return false
+                    }
+                    element.progress('home_cpu', formatPercentage(result.data.percent[0]))
+                    element.progress('home_mem', formatPercentage(result.data.mem.usedPercent))
 
-      let device = layui.device()
-      let cpu_info
-      admin.req({
-        url: '/api/panel/info/nowMonitor'
-        , type: 'get'
-        , success: function (result) {
-          if (result.code !== 0) {
-            layer.msg('系统资源获取失败，请刷新重试！')
-            return false
-          }
-          element.progress('home_cpu', formatPercentage(result.data.percent[0]))
-          element.progress('home_mem', formatPercentage(result.data.mem.usedPercent))
+                    // 计算核心数
+                    let cores = 0
+                    for (let i = 0; i < result.data.cpus.length; i++) {
+                        cores += result.data.cpus[i].cores
+                    }
 
-          // 计算核心数
-          let cores = 0
-          for (let i = 0; i < result.data.cpus.length; i++) {
-            cores += result.data.cpus[i].cores
-          }
+                    // 计算负载百分比
+                    uptime_1 = formatPercentage(result.data.load.load1 / cores * 100)
+                    uptime_5 = formatPercentage(result.data.load.load5 / cores * 100)
+                    uptime_15 = formatPercentage(result.data.load.load15 / cores * 100)
+                    element.progress('uptime_1', uptime_1)
+                    element.progress('uptime_5', uptime_5)
 
-          // 计算负载百分比
-          uptime_1 = formatPercentage(result.data.load.load1 / cores * 100)
-          uptime_5 = formatPercentage(result.data.load.load5 / cores * 100)
-          uptime_15 = formatPercentage(result.data.load.load15 / cores * 100)
-          element.progress('uptime_1', uptime_1)
-          element.progress('uptime_5', uptime_5)
+                    // 计算网卡流量
+                    for (let i = 0; i < result.data.net.length; i++) {
+                        if (result.data.net[i].name === 'lo') {
+                            continue
+                        }
+                        net_send += result.data.net[i].bytesSent
+                        net_recv += result.data.net[i].bytesRecv
+                    }
+                    if (first) {
+                        net_send_last = net_send
+                        net_recv_last = net_recv
+                    }
+                    $('#home_net_now').html(formatBytes((net_send - net_send_last) / 3) + '/s / ' + formatBytes((net_recv - net_recv_last) / 3) + '/s')
+                    $('#home_net_total').html(formatBytes(net_send) + ' / ' + formatBytes(net_recv))
+                    net_send_last = net_send
+                    net_recv_last = net_recv
+                    net_send = 0
+                    net_recv = 0
 
-          // 计算网卡流量
-          for (let i = 0; i < result.data.net.length; i++) {
-            if (result.data.net[i].name === 'lo') {
-              continue
+                    cpu_info = result.data.cpus[0].modelName + ' ' + cores + '线程'
+                    $('#home_cpu').text(cpu_info)
+                    $('#home_mem').text('使用 ' + formatBytes(result.data.mem.used) + ' / ' + '总计 ' + formatBytes(result.data.mem.total))
+                    element.render('progress')
+                }
+            })
+        })
+    }
+
+    refresh_home_info(true)
+    setInterval(refresh_home_info, 3000)
+    // 获取系统信息，这部分信息无需更新。
+    layui.use(['index', 'jquery', 'admin', 'carousel'], function () {
+        let $ = layui.jquery
+            , admin = layui.admin
+            , carousel = layui.carousel
+        carousel.render({
+            elem: '#ad1-carousel'
+            , width: '100%'
+            , height: '22px'
+            , anim: 'fade'
+            , arrow: 'none'
+            , indicator: 'none'
+        })
+        admin.req({
+            url: '/api/panel/info/systemInfo'
+            , type: 'get'
+            , success: function (result) {
+                if (result.code !== 0) {
+                    console.log('耗子Linux面板：系统信息获取失败，接口返回' + result)
+                    layer.msg('系统信息获取失败，请刷新重试！')
+                    return false
+                }
+                $('#home_os_name').text(result.data.os_name)
+                $('#home_panel_version').text(result.data.panel_version)
+                $('#home_uptime').text('已不间断运行 ' + result.data.uptime + ' 天')
             }
-            net_send += result.data.net[i].bytesSent
-            net_recv += result.data.net[i].bytesRecv
-          }
-          if (first) {
-            net_send_last = net_send
-            net_recv_last = net_recv
-          }
-          $('#home_net_now').html(formatBytes((net_send - net_send_last) / 3) + '/s / ' + formatBytes((net_recv - net_recv_last) / 3) + '/s')
-          $('#home_net_total').html(formatBytes(net_send) + ' / ' + formatBytes(net_recv))
-          net_send_last = net_send
-          net_recv_last = net_recv
-          net_send = 0
-          net_recv = 0
-
-          cpu_info = result.data.cpus[0].modelName + ' ' + cores + '线程'
-          $('#home_cpu').text(cpu_info)
-          $('#home_mem').text('使用 ' + formatBytes(result.data.mem.used) + ' / ' + '总计 ' + formatBytes(result.data.mem.total))
-          element.render('progress')
-        }
-      })
+        })
     })
-  }
 
-  refresh_home_info(true)
-  setInterval(refresh_home_info, 3000)
-  // 获取系统信息，这部分信息无需更新。
-  layui.use(['index', 'jquery', 'admin', 'carousel'], function () {
-    let $ = layui.jquery
-      , admin = layui.admin
-      , carousel = layui.carousel
-    carousel.render({
-      elem: '#ad1-carousel'
-      , width: '100%'
-      , height: '22px'
-      , anim: 'fade'
-      , arrow: 'none'
-      , indicator: 'none'
-    })
-    admin.req({
-      url: '/api/panel/info/systemInfo'
-      , type: 'get'
-      , success: function (result) {
-        if (result.code !== 0) {
-          console.log('耗子Linux面板：系统信息获取失败，接口返回' + result)
-          layer.msg('系统信息获取失败，请刷新重试！')
-          return false
-        }
-        $('#home_os_name').text(result.data.os_name)
-        $('#home_panel_version').text(result.data.panel_version)
-        $('#home_uptime').text('已不间断运行 ' + result.data.uptime + ' 天')
-      }
-    })
-  })
+    layui.use(['jquery', 'layer'], function () {
+        let $ = layui.jquery
+            , layer = layui.layer
+            , admin = layui.admin
+        // 监听鼠标悬停到uptime上的事件
+        // 用于显示1分钟、5分钟、15分钟的负载
+        $('#monitor2').hover(function () {
+            layer.tips('1分钟负载：' + uptime_1 + '<br>5分钟负载：' + uptime_5 + '<br>15分钟负载：' + uptime_15, '#monitor2', {
+                tips: 1,
+                time: 0
+            })
+        }, function () {
+            layer.closeAll('tips')
+        })
 
-  layui.use(['jquery', 'layer'], function () {
-    let $ = layui.jquery
-      , layer = layui.layer
-      , admin = layui.admin
-    // 监听鼠标悬停到uptime上的事件
-    // 用于显示1分钟、5分钟、15分钟的负载
-    $('#monitor2').hover(function () {
-      layer.tips('1分钟负载：' + uptime_1 + '<br>5分钟负载：' + uptime_5 + '<br>15分钟负载：' + uptime_15, '#monitor2', {
-        tips: 1,
-        time: 0
-      })
-    }, function () {
-      layer.closeAll('tips')
-    })
-    // 监听更新按钮点击事件
-    $('#update_panel').click(function () {
-      index = layer.msg('正在获取版本信息...', {
-        icon: 16
-        , time: 0
-      })
-      admin.req(
-        {
-          url: '/api/panel/info/checkUpdate'
-          , type: 'get'
-          , success: function (result) {
-            layer.close(index)
-            if (result.code !== 0) {
-              layer.msg('获取版本信息失败，请刷新重试！')
-              return false
-            }
-            if (result.data.update) {
-                layer.confirm('更新日期: <br>'+new Date(result.data.date).toLocaleString()+'<br>更新日志: <pre>'+result.data.body+'</pre>', {
-                    title: '最新版本: '+result.data.version+' ，是否更新？',
-                    btn: ['更新', '取消']
-                }, function () {
-                    let proxy = false
-                    layer.confirm('对于大陆服务器，建议使用代理进行更新', {
-                        title: '是否使用代理更新？',
-                        btn: ['是', '否']
-                    }, function () {
-                        proxy = true
-                        index = layer.msg('正在更新，稍后请手动刷新...', { icon: 16, time: 0, shade: 0.3 })
-                        admin.req({
-                            url: '/api/panel/info/update'
-                            , type: 'post'
-                            , data: { proxy: proxy }
-                        })
-                    }, function(){
-                        proxy = false
-                        index = layer.msg('正在更新，稍后请手动刷新...', { icon: 16, time: 0, shade: 0.3 })
-                        admin.req({
-                            url: '/api/panel/info/update'
-                            , type: 'post'
-                            , data: { proxy: proxy }
-                        })
-                    })
+        $('#update_panel').click(function () {
+            index = layer.msg('正在获取版本信息...', {
+                icon: 16
+                , time: 0
+            })
+            admin.req(
+                {
+                    url: '/api/panel/info/checkUpdate'
+                    , type: 'get'
+                    , success: function (result) {
+                        layer.close(index)
+                        if (result.code !== 0) {
+                            layer.msg('获取版本信息失败，请刷新重试！')
+                            return false
+                        }
+                        if (result.data.update) {
+                            layer.confirm('更新日期: <br>' + new Date(result.data.date).toLocaleString() + '<br>更新日志: <pre>' + result.data.body + '</pre>', {
+                                title: '最新版本: ' + result.data.version + ' ，是否更新？',
+                                btn: ['更新', '取消']
+                            }, function () {
+                                let proxy = false
+                                layer.confirm('对于大陆服务器，建议使用代理进行更新', {
+                                    title: '是否使用代理更新？',
+                                    btn: ['是', '否']
+                                }, function () {
+                                    proxy = true
+                                    index = layer.msg('正在更新，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
+                                    admin.req({
+                                        url: '/api/panel/info/update'
+                                        , type: 'post'
+                                        , data: {proxy: proxy}
+                                    })
+                                }, function () {
+                                    proxy = false
+                                    index = layer.msg('正在更新，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
+                                    admin.req({
+                                        url: '/api/panel/info/update'
+                                        , type: 'post'
+                                        , data: {proxy: proxy}
+                                    })
+                                })
 
+                            })
+                        } else {
+                            layer.msg('当前已是最新版本！')
+                        }
+                    }
+                }
+            )
+        })
+
+        $('#restart_panel').click(function () {
+            layer.confirm('真的要重启吗？', {
+                btn: ['是', '否']
+            }, function () {
+                proxy = true
+                index = layer.msg('正在重启，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
+                admin.req({
+                    url: '/api/panel/info/restart'
+                    , type: 'post'
                 })
-            } else {
-              layer.msg('当前已是最新版本！')
-            }
-          }
-        }
-      )
+            })
+        })
     })
-  })
 </script>

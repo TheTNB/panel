@@ -22,6 +22,7 @@ func Web() {
 			r.Middleware(middleware.Jwt()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
 			r.Middleware(middleware.Jwt()).Get("checkUpdate", infoController.CheckUpdate)
 			r.Middleware(middleware.Jwt()).Post("update", infoController.Update)
+			r.Middleware(middleware.Jwt()).Post("restart", infoController.Restart)
 		})
 		r.Prefix("user").Group(func(r route.Route) {
 			userController := controllers.NewUserController()

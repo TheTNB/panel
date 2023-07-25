@@ -180,3 +180,15 @@ func (c *InfoController) Update(ctx http.Context) {
 
 	Success(ctx, nil)
 }
+
+func (c *InfoController) Restart(ctx http.Context) {
+	var task models.Task
+	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
+	if err == nil {
+		Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")
+		return
+	}
+
+	tools.ExecShell("systemctl restart panel")
+	Success(ctx, nil)
+}
