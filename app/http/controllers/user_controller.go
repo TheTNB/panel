@@ -39,7 +39,7 @@ func (r *UserController) Login(ctx http.Context) {
 	}
 
 	if user.ID == 0 || !facades.Hash().Check(loginRequest.Password, user.Password) {
-		Error(ctx, http.StatusUnauthorized, "用户名或密码错误")
+		Error(ctx, http.StatusForbidden, "用户名或密码错误")
 		return
 	}
 
