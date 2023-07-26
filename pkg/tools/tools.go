@@ -107,7 +107,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		downloadUrlOutput, _ := downloadUrl.Output()
 		info.DownloadUrl = strings.TrimSpace(string(downloadUrlOutput))
 	} else {
-		downloadUrl := exec.Command("/bin/bash", "-c", "jq -r '.assets[] | select(.name | contains(\"amd64v3\")) | .browser_download_url' "+fileName)
+		downloadUrl := exec.Command("/bin/bash", "-c", "jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' "+fileName)
 		downloadUrlOutput, _ := downloadUrl.Output()
 		info.DownloadUrl = strings.TrimSpace(string(downloadUrlOutput))
 	}
