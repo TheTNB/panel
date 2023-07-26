@@ -30,7 +30,7 @@ ipLocation=$(curl -s https://ip.ping0.cc/geo)
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
     # EPEL 9 仓库中目前没有 GeoIP-devel 包，暂时使用 Remi 仓库
-    dnf install https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+    dnf install https://rpms.remirepo.net/enterprise/remi-release-9.rpm -y
     if [[ ${ipLocation} =~ "中国" ]]; then
         sed -e 's!^#mirrorlist=!mirrorlist=!g' -e 's!^mirrorlist=!#mirrorlist=!g' -e 's!^#baseurl=!baseurl=!g' -e 's!http://rpms.remirepo.net/enterprise!https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise!g' -i /etc/yum.repos.d/remi*
     fi
