@@ -289,7 +289,7 @@ Date: 2023-07-24
                     layer.close(index)
                     layer.load()
                     admin.req({
-                        url: '/api/panel/website/clearSiteLog'
+                        url: '/api/panel/website/clearLog'
                         , type: 'post'
                         , data: {name: params.config.name}
                         , success: function (res) {

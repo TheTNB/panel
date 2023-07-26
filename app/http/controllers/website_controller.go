@@ -285,7 +285,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		Error(ctx, http.StatusBadRequest, "配置文件中root标记位格式错误")
 		return
 	}
-	rootNew := strings.Replace(root, match[1], path, -1)
+	rootNew := strings.Replace(root, match[1], ctx.Request().Input("root"), -1)
 	raw = strings.Replace(raw, root, rootNew, -1)
 
 	// 默认文件
