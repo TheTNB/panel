@@ -10,6 +10,8 @@ import (
 	"panel/app/plugins/openresty"
 	"panel/app/plugins/php74"
 	"panel/app/plugins/php80"
+	"panel/app/plugins/php81"
+	"panel/app/plugins/php82"
 	"panel/app/plugins/phpmyadmin"
 	"panel/app/plugins/s3fs"
 	"panel/app/plugins/supervisor"
@@ -110,6 +112,28 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     php80.Install,
 		Uninstall:   php80.Uninstall,
 		Update:      php80.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        php81.Name,
+		Description: php81.Description,
+		Slug:        php81.Slug,
+		Version:     php81.Version,
+		Requires:    php81.Requires,
+		Excludes:    php81.Excludes,
+		Install:     php81.Install,
+		Uninstall:   php81.Uninstall,
+		Update:      php81.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        php82.Name,
+		Description: php82.Description,
+		Slug:        php82.Slug,
+		Version:     php82.Version,
+		Requires:    php82.Requires,
+		Excludes:    php82.Excludes,
+		Install:     php82.Install,
+		Uninstall:   php82.Uninstall,
+		Update:      php82.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        phpmyadmin.Name,

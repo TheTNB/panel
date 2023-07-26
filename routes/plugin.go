@@ -3,15 +3,17 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	"panel/app/http/controllers/plugins/supervisor"
 
 	"panel/app/http/controllers/plugins/mysql57"
 	"panel/app/http/controllers/plugins/mysql80"
 	"panel/app/http/controllers/plugins/openresty"
 	"panel/app/http/controllers/plugins/php74"
 	"panel/app/http/controllers/plugins/php80"
+	"panel/app/http/controllers/plugins/php81"
+	"panel/app/http/controllers/plugins/php82"
 	"panel/app/http/controllers/plugins/phpmyadmin"
 	"panel/app/http/controllers/plugins/s3fs"
+	"panel/app/http/controllers/plugins/supervisor"
 	"panel/app/http/middleware"
 )
 
@@ -125,6 +127,42 @@ func Plugin() {
 		route.Get("extensions", php80Controller.GetExtensionList)
 		route.Post("installExtension", php80Controller.InstallExtension)
 		route.Post("uninstallExtension", php80Controller.UninstallExtension)
+	})
+	facades.Route().Prefix("api/plugins/php81").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		php81Controller := php81.NewPhp81Controller()
+		route.Get("status", php81Controller.Status)
+		route.Post("reload", php81Controller.Reload)
+		route.Post("start", php81Controller.Start)
+		route.Post("stop", php81Controller.Stop)
+		route.Post("restart", php81Controller.Restart)
+		route.Get("load", php81Controller.Load)
+		route.Get("config", php81Controller.GetConfig)
+		route.Post("config", php81Controller.SaveConfig)
+		route.Get("errorLog", php81Controller.ErrorLog)
+		route.Get("slowLog", php81Controller.SlowLog)
+		route.Post("clearErrorLog", php81Controller.ClearErrorLog)
+		route.Post("clearSlowLog", php81Controller.ClearSlowLog)
+		route.Get("extensions", php81Controller.GetExtensionList)
+		route.Post("installExtension", php81Controller.InstallExtension)
+		route.Post("uninstallExtension", php81Controller.UninstallExtension)
+	})
+	facades.Route().Prefix("api/plugins/php82").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		php82Controller := php82.NewPhp82Controller()
+		route.Get("status", php82Controller.Status)
+		route.Post("reload", php82Controller.Reload)
+		route.Post("start", php82Controller.Start)
+		route.Post("stop", php82Controller.Stop)
+		route.Post("restart", php82Controller.Restart)
+		route.Get("load", php82Controller.Load)
+		route.Get("config", php82Controller.GetConfig)
+		route.Post("config", php82Controller.SaveConfig)
+		route.Get("errorLog", php82Controller.ErrorLog)
+		route.Get("slowLog", php82Controller.SlowLog)
+		route.Post("clearErrorLog", php82Controller.ClearErrorLog)
+		route.Post("clearSlowLog", php82Controller.ClearSlowLog)
+		route.Get("extensions", php82Controller.GetExtensionList)
+		route.Post("installExtension", php82Controller.InstallExtension)
+		route.Post("uninstallExtension", php82Controller.UninstallExtension)
 	})
 	facades.Route().Prefix("api/plugins/phpmyadmin").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		phpMyAdminController := phpmyadmin.NewPhpMyAdminController()
