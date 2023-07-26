@@ -320,12 +320,13 @@ chmod -R 644 /www/server/vhost
 echo "" > ${openrestyPath}/conf/enable-php-0.conf
 
 # 自动为所有PHP版本创建配置文件
-cd ${setupPath}/server/php
-phpList=$(ls -l | grep ^d | awk '{print $NF}')
-for phpVersion in ${phpList}; do
-    if [ -d "${setupPath}/server/php/${phpVersion}" ]; then
-        # 写入PHP配置文件
-        cat > ${openrestyPath}/conf/enable-php-${phpVersion}.conf << EOF
+if [ -d "${setupPath}/server/php" ]; then
+    cd ${setupPath}/server/php
+    phpList=$(ls -l | grep ^d | awk '{print $NF}')
+    for phpVersion in ${phpList}; do
+        if [ -d "${setupPath}/server/php/${phpVersion}" ]; then
+            # 写入PHP配置文件
+            cat > ${openrestyPath}/conf/enable-php-${phpVersion}.conf << EOF
 location ~ \.php$ {
     try_files \$uri =404;
     fastcgi_pass unix:/tmp/php-cgi-${phpVersion}.sock;
@@ -334,8 +335,9 @@ location ~ \.php$ {
     include pathinfo.conf;
 }
 EOF
-    fi
-done
+        fi
+    done
+fi
 
 # 写入代理默认配置文件
 cat > ${openrestyPath}/conf/proxy.conf << EOF
