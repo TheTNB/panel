@@ -28,7 +28,7 @@ func Jwt() http.Middleware {
 				token, err = facades.Auth().Refresh(ctx)
 				if err != nil {
 					// Refresh time exceeded
-					ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
+					ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
 						"code":    401,
 						"message": "登录已过期",
 					})
@@ -37,7 +37,7 @@ func Jwt() http.Middleware {
 
 				token = "Bearer " + token
 			} else {
-				ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
+				ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
 					"code":    401,
 					"message": "登录已过期",
 				})
