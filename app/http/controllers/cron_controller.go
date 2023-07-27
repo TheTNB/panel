@@ -75,7 +75,10 @@ func (c *CronController) Add(ctx http.Context) {
 		if backupType == "website" {
 			backupName = ctx.Request().Input("website")
 		}
-		backupPath := ctx.Request().Input("backup_path", c.setting.Get(models.SettingKeyBackupPath)+"/"+backupType)
+		backupPath := ctx.Request().Input("backup_path")
+		if len(backupName) == 0 {
+			backupPath = c.setting.Get(models.SettingKeyBackupPath) + "/" + backupType
+		}
 		backupSave := ctx.Request().InputInt("save", 10)
 		shell = `#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
