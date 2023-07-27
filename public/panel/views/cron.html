@@ -343,6 +343,7 @@ Date: 2023-07-21
                 $("#cron-add-backup-type-input").hide();
                 $('#cron-add-backup-path-input').hide();
             }
+            form.render();
         });
         form.on('radio(cron-add-backup-type-radio)', function (data) {
             if (data.value == 'website') {
@@ -352,6 +353,7 @@ Date: 2023-07-21
                 $('#cron-add-website-input').hide();
                 $('#cron-add-backup-database-input').show();
             }
+            form.render();
         });
 
         form.on('switch(cron-status)', function (obj) {
