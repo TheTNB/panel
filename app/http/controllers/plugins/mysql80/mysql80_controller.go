@@ -181,7 +181,7 @@ func (c *Mysql80Controller) Load(ctx http.Context) {
 		return
 	}
 
-	raw := tools.ExecShell("mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	raw := tools.ExecShell("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if strings.Contains(raw, "Access denied for user") {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
 		return
@@ -320,12 +320,12 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 
 	oldRootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
-		tools.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
-		tools.ExecShell("mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
+		tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
+		tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
 		err := c.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
 		if err != nil {
-			tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
-			tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+			tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
+			tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 			controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 			return
 		}
@@ -406,10 +406,10 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加数据库成功")
 }
@@ -434,7 +434,7 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
 	controllers.Success(ctx, "删除数据库成功")
 }
@@ -653,9 +653,9 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加成功")
 }
@@ -680,7 +680,7 @@ func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
 	controllers.Success(ctx, "删除成功")
 }
@@ -707,8 +707,8 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }
@@ -735,9 +735,9 @@ func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }

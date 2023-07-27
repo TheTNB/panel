@@ -155,7 +155,7 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 		return err
 	}
 
-	tools.ExecShell("mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile)
+	tools.ExecShell("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile)
 	tools.ExecShell("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
 	tools.RemoveFile(backupPath + "/" + backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
@@ -207,7 +207,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return errors.New("自动解压失败，请手动解压")
 	}
 
-	tools.ExecShell("mysql -uroot " + database + " < " + backupFile)
+	tools.ExecShell("/www/server/mysql/bin/mysql -uroot " + database + " < " + backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
 
 	return nil
