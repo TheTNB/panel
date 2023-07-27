@@ -303,14 +303,15 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	raw = strings.Replace(raw, index, indexNew, -1)
 
 	// 防跨站
-	if !strings.HasSuffix(path, "/") {
-		path += "/"
+	root = ctx.Request().Input("root")
+	if !strings.HasSuffix(root, "/") {
+		root += "/"
 	}
 	if ctx.Request().InputBool("open_basedir") {
-		tools.WriteFile(path+".user.ini", "open_basedir="+path+":/tmp/", 0644)
+		tools.WriteFile(root+".user.ini", "open_basedir="+path+":/tmp/", 0644)
 	} else {
-		if tools.Exists(path + ".user.ini") {
-			tools.RemoveFile(path + ".user.ini")
+		if tools.Exists(root + ".user.ini") {
+			tools.RemoveFile(root + ".user.ini")
 		}
 	}
 
