@@ -335,9 +335,9 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	// SSL
 	ssl := ctx.Request().InputBool("ssl")
 	website.Ssl = ssl
+	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
+	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
 	if ssl {
-		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
-		tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
 		sslConfig := `# ssl标记位开始
     ssl_certificate /www/server/vhost/ssl/` + website.Name + `.pem;
     ssl_certificate_key /www/server/vhost/ssl/` + website.Name + `.key;
@@ -350,10 +350,10 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
     `
 		if ctx.Request().InputBool("http_redirect") {
 			sslConfig += `# http重定向标记位开始
-    if (\$server_port !~ 443){
-        return 301 https://\$host\$request_uri;
+    if ($server_port !~ 443){
+        return 301 https://$host$request_uri;
     }
-    error_page 497  https://\$host\$request_uri;
+    error_page 497  https://$host$request_uri;
     # http重定向标记位结束
     `
 		}

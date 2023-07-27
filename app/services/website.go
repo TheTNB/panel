@@ -231,10 +231,10 @@ server
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + website.DbName + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
-		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + website.DbUser + "'@'localhost' IDENTIFIED BY '" + website.DbPassword + "';\"")
-		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + website.DbName + ".* TO '" + website.DbUser + "'@'localhost';\"")
-		tools.ExecShell("mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
+		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
+		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
+		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
 	}
 
 	return w, nil
