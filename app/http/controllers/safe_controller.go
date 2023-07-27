@@ -221,8 +221,8 @@ func (r *SafeController) SetSshPort(ctx http.Context) {
 
 func (r *SafeController) GetPingStatus(ctx http.Context) {
 	if tools.IsRHEL() {
-		out := tools.ExecShell(`firewall-cmd --query-rich-rule='rule protocol value=icmp drop'`)
-		if strings.Contains(out, "no") {
+		out := tools.ExecShell(`firewall-cmd --list-all 2>&1`)
+		if !strings.Contains(out, `rule protocol value="icmp" drop`) {
 			Success(ctx, true)
 		} else {
 			Success(ctx, false)
