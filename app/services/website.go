@@ -313,21 +313,13 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
+	setting.SslCertificate = tools.ReadFile("/www/server/vhost/ssl/" + website.Name + ".pem")
+	setting.SslCertificateKey = tools.ReadFile("/www/server/vhost/ssl/" + website.Name + ".key")
 	if setting.Ssl {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
-		match = regexp.MustCompile(`ssl_certificate\s+(.*);`).FindStringSubmatch(ssl)
-		if len(match) > 1 {
-			setting.SslCertificate = tools.ReadFile(match[1])
-		}
-		match = regexp.MustCompile(`ssl_certificate_key\s+(.*);`).FindStringSubmatch(ssl)
-		if len(match) > 1 {
-			setting.SslCertificateKey = tools.ReadFile(match[1])
-		}
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
 	} else {
-		setting.SslCertificate = ""
-		setting.SslCertificateKey = ""
 		setting.HttpRedirect = false
 		setting.Hsts = false
 	}
