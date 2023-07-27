@@ -221,8 +221,8 @@ func (r *SafeController) SetSshPort(ctx http.Context) {
 
 func (r *SafeController) GetPingStatus(ctx http.Context) {
 	if tools.IsRHEL() {
-		out := tools.ExecShell("firewall-cmd --query-rich-rule='rule protocol value=icmp drop' 2>&1")
-		if out == "no" {
+		out := tools.ExecShell(`firewall-cmd --query-rich-rule='rule protocol value=icmp drop'`)
+		if strings.Contains(out, "no") {
 			Success(ctx, true)
 		} else {
 			Success(ctx, false)
@@ -240,18 +240,18 @@ func (r *SafeController) GetPingStatus(ctx http.Context) {
 func (r *SafeController) SetPingStatus(ctx http.Context) {
 	if tools.IsRHEL() {
 		if ctx.Request().InputBool("status") {
-			tools.ExecShell("firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'")
+			tools.ExecShell(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
 		} else {
-			tools.ExecShell("firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'")
+			tools.ExecShell(`firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'`)
 		}
-		tools.ExecShell("firewall-cmd --reload")
+		tools.ExecShell(`firewall-cmd --reload`)
 	} else {
 		if ctx.Request().InputBool("status") {
-			tools.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules")
+			tools.ExecShell(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules`)
 		} else {
-			tools.ExecShell("sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules")
+			tools.ExecShell(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules`)
 		}
-		tools.ExecShell("ufw reload")
+		tools.ExecShell(`ufw reload`)
 	}
 
 	Success(ctx, nil)
