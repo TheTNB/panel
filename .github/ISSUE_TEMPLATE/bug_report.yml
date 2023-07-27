@@ -58,7 +58,7 @@ body:
     attributes:
       label: 耗子面板版本 (HaoZi Panel Version)
       description: |
-        请提供耗子面板的版本号。
+        请提供面板的版本号。
         Please provide the version number of the panel.
       placeholder: "2.0.0"
     validations:

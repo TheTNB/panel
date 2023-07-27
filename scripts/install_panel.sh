@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '
 
-LOGO="+----------------------------------------------------\n| 耗子面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
+LOGO="+----------------------------------------------------\n| 耗子Linux面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
 HR="+----------------------------------------------------"
 download_Url=""
 setup_Path="/www"
@@ -35,26 +35,26 @@ Prepare_system() {
     OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
     if [ "${OS}" == "unknown" ]; then
         echo -e $HR
-        echo "错误：该系统不支持安装耗子面板，请更换Debian12/RHEL9安装。"
+        echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
         exit 1
     fi
     if [ "${ARCH}" != "x86_64" ] && [ "${ARCH}" != "aarch64" ]; then
         echo -e $HR
-        echo "错误：该系统架构不支持安装耗子面板，请更换x86_64/aarch64架构安装。"
+        echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
         exit 1
     fi
 
     is64bit=$(getconf LONG_BIT)
     if [ "${is64bit}" != '64' ]; then
         echo -e $HR
-        echo "错误：32位系统不支持安装耗子面板，请更换64位系统安装。"
+        echo "错误：32位系统不支持安装耗子Linux面板，请更换64位系统安装。"
         exit 1
     fi
 
     isInstalled=$(systemctl status panel 2>&1 | grep "Active")
     if [ "${isInstalled}" != "" ]; then
         echo -e $HR
-        echo "错误：耗子面板已安装，请勿重复安装。"
+        echo "错误：耗子Linux面板已安装，请勿重复安装。"
         exit 1
     fi
 
@@ -130,7 +130,7 @@ Prepare_system() {
         apt install -y curl wget zip unzip tar git jq git dos2unix
     else
         echo -e $HR
-        echo "错误：该系统不支持安装耗子面板，请更换Debian12/RHEL9安装。"
+        echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
         exit 1
     fi
 
@@ -175,7 +175,7 @@ Init_Panel() {
         panelZip=$(curl "https://api.github.com/repos/HaoZi-Team/Panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
     else
         echo -e $HR
-        echo "错误：该系统架构不支持安装耗子面板，请更换x86_64/aarch64架构安装。"
+        echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
         exit 1
     fi
     if [ "$?" != "0" ] || [ "${panelZip}" == "" ]; then
