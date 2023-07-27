@@ -94,7 +94,8 @@ Date: 2023-07-22
             , url: '/api/panel/task/list?status=waiting'
             , cols: [[
                 {field: 'id', hide: true, title: 'ID', sort: true}
-                , {field: 'name', width: '100%', title: '任务名'}
+                , {field: 'name', fixed: 'left', title: '任务名'}
+                , {field: 'created_at', title: '创建时间', width: 200}
             ]]
             , page: true
             , text: {
@@ -116,13 +117,15 @@ Date: 2023-07-22
             , url: '/api/panel/task/list?status=finished'
             , cols: [[
                 {field: 'id', hide: true, title: 'ID', sort: true}
-                , {field: 'name', width: '80%', title: '任务名'}
+                , {field: 'name', fixed: 'left', title: '任务名'}
+                , {field: 'created_at', title: '创建时间', width: 200}
+                , {field: 'updated_at', title: '完成时间', width: 200}
                 , {
-                    field: 'control',
-                    title: '操作',
-                    templet: '#panel-task-finished-control-tpl',
-                    fixed: 'right',
-                    align: 'center'
+                    field: 'control'
+                    , title: '操作'
+                    , width: 100
+                    , templet: '#panel-task-finished-control-tpl'
+                    , align: 'center'
                 }
             ]]
             , page: true
@@ -169,13 +172,16 @@ Date: 2023-07-22
             , url: '/api/panel/task/list?status=failed'
             , cols: [[
                 {field: 'id', hide: true, title: 'ID', sort: true}
-                , {field: 'name', width: '80%', title: '任务名'}
+                , {field: 'name', fixed: 'left', title: '任务名'}
+                , {field: 'created_at', title: '创建时间', width: 200}
+                , {field: 'updated_at', title: '完成时间', width: 200}
                 , {
-                    field: 'control',
-                    title: '操作',
-                    templet: '#panel-task-failed-control-tpl',
-                    fixed: 'right',
-                    align: 'center'
+                    field: 'control'
+                    , title: '操作'
+                    , width: 100
+                    , templet: '#panel-task-failed-control-tpl'
+                    , fixed: 'right'
+                    , align: 'center'
                 }
             ]]
             , page: true
