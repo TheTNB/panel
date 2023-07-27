@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
@@ -125,6 +126,11 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) {
 	var phpData []data
 	phpData = append(phpData, data{Slug: "0", Name: "不使用"})
 	for _, p := range php {
+		match := regexp.MustCompile(`php(\d+)`).FindStringSubmatch(p.Slug)
+		if len(match) == 0 {
+			continue
+		}
+
 		phpData = append(phpData, data{Slug: strings.ReplaceAll(p.Slug, "php", ""), Name: c.plugin.GetBySlug(p.Slug).Name})
 	}
 
