@@ -69,7 +69,7 @@ type PanelInfo struct {
 func GetLatestPanelVersion() (PanelInfo, error) {
 	var info PanelInfo
 
-	cmd := exec.Command("/bin/bash", "-c", "curl \"https://api.github.com/repos/HaoZi-Team/Panel/releases/latest\"")
+	cmd := exec.Command("/bin/bash", "-c", "curl \"https://api.github.com/repos/haozi-team/panel/releases/latest\"")
 	output, err := cmd.Output()
 	if err != nil {
 		return info, errors.New("获取最新版本失败")

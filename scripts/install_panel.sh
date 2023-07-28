@@ -170,9 +170,9 @@ Init_Panel() {
     rm -rf ${setup_Path}/panel/*
     # 下载面板zip包并解压
     if [ "${ARCH}" == "x86_64" ]; then
-        panelZip=$(curl "https://api.github.com/repos/HaoZi-Team/Panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
+        panelZip=$(curl "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
     elif [ "${ARCH}" == "aarch64" ]; then
-        panelZip=$(curl "https://api.github.com/repos/HaoZi-Team/Panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
+        panelZip=$(curl "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
     else
         echo -e $HR
         echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"

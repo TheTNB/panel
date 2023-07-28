@@ -1,10 +1,10 @@
 # 耗子Linux面板
 
-[![Release](https://img.shields.io/github/release/HaoZi-Team/Panel.svg)](https://github.com/HaoZi-Team/Panel/releases)
-[![Test](https://github.com/HaoZi-Team/Panel/actions/workflows/test.yml/badge.svg)](https://github.com/HaoZi-Team/Panel/actions)
-[![Report Card](https://goreportcard.com/badge/github.com/HaoZi-Team/Panel)](https://goreportcard.com/report/github.com/HaoZi-Team/Panel)
-[![Codecov](https://codecov.io/gh/HaoZi-Team/Panel/branch/main/graph/badge.svg?token=XFT5NGNSRG)](https://codecov.io/gh/HaoZi-Team/Panel)
-![License](https://img.shields.io/github/license/HaoZi-Team/Panel)
+[![Release](https://img.shields.io/github/release/haozi-team/panel.svg)](https://github.com/haozi-team/panel/releases)
+[![Test](https://github.com/haozi-team/panel/actions/workflows/test.yml/badge.svg)](https://github.com/haozi-team/panel/actions)
+[![Report Card](https://goreportcard.com/badge/github.com/haozi-team/panel)](https://goreportcard.com/report/github.com/haozi-team/panel)
+[![Codecov](https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG)](https://codecov.io/gh/haozi-team/panel)
+![License](https://img.shields.io/github/license/haozi-team/panel)
 
 这是耗子Linux面板的开源仓库，基于Apache License 2.0协议进行开源，目前处于积极开发状态。
 
@@ -70,4 +70,4 @@ panel
 
 ## Star 趋势
 
-[![Star 趋势](https://starchart.cc/HaoZi-Team/Panel.svg)](https://starchart.cc/HaoZi-Team/Panel)
+[![Star 趋势](https://starchart.cc/haozi-team/panel.svg)](https://starchart.cc/haozi-team/panel)
