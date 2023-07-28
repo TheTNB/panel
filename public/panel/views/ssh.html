@@ -80,6 +80,7 @@ Date: 2023-07-25
                         return false;
                     }
                     layer.alert('SSH信息保存成功！')
+                    admin.events.refresh()
                 }
             });
             return false;
