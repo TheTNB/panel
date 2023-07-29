@@ -3,8 +3,8 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	"panel/app/http/controllers/plugins/fail2ban"
 
+	"panel/app/http/controllers/plugins/fail2ban"
 	"panel/app/http/controllers/plugins/mysql57"
 	"panel/app/http/controllers/plugins/mysql80"
 	"panel/app/http/controllers/plugins/openresty"
