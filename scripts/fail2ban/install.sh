@@ -39,7 +39,7 @@ fi
 # 修改 fail2ban 配置文件
 sed -i 's!# logtarget.*!logtarget = /var/log/fail2ban.log!' /etc/fail2ban/fail2ban.conf
 sed -i 's!logtarget\s*=.*!logtarget = /var/log/fail2ban.log!' /etc/fail2ban/jail.conf
-cat >/etc/fail2ban/jail.local <<EOF
+cat > /etc/fail2ban/jail.local << EOF
 [DEFAULT]
 ignoreip = 127.0.0.1/8
 bantime = 600
@@ -78,8 +78,8 @@ if [ "${sshPort}" == "" ]; then
     sshPort="22"
 fi
 sed -i "s/port = 22/port = ${sshPort}/g" /etc/fail2ban/jail.local
-if [ -f "/etc/pure-ftpd/pure-ftpd.conf" ]; then
-    ftpPort=$(cat /etc/pure-ftpd/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}')
+if [ -f "/www/server/pure-ftpd/etc/pure-ftpd.conf" ]; then
+    ftpPort=$(cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}')
 fi
 if [ "${ftpPort}" == "" ]; then
     ftpPort="21"
@@ -87,10 +87,17 @@ if [ "${ftpPort}" == "" ]; then
 else
     sed -i "s/port = 21/port = ${ftpPort}/g" /etc/fail2ban/jail.local
 fi
+
+# Debian 的特殊处理
+if [ "${OS}" == "debian" ]; then
+    sed -i "s/\/var\/log\/secure/\/var\/log\/auth.log/g" /etc/fail2ban/jail.local
+    sed -i "s/banaction = firewallcmd-ipset/banaction = ufw/g" /etc/fail2ban/jail.local
+fi
+
 # 启动 fail2ban
 systemctl unmask fail2ban
 systemctl daemon-reload
 systemctl enable fail2ban
 systemctl restart fail2ban
 
-panel writePlugin fail2ban
+panel writePlugin fail2ban 1.0.0

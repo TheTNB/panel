@@ -20,13 +20,8 @@ limitations under the License.
 HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
-fail2ban-client unban --all
-fail2ban-client stop
-systemctl stop fail2ban
-systemctl disable fail2ban
-
 if [ "${OS}" == "centos" ]; then
-    dnf remove -y fail2ban
+    dnf install -y fail2ban
 elif [ "${OS}" == "debian" ]; then
     apt install -y fail2ban
 else
@@ -35,6 +30,8 @@ else
     exit 1
 fi
 
-rm -rf /etc/fail2ban
-
-panel deletePlugin fail2ban
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：fail2ban安装失败，请截图错误信息寻求帮助。"
+    exit 1
+fi

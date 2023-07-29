@@ -5,6 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
+	"panel/app/plugins/fail2ban"
 	"panel/app/plugins/mysql57"
 	"panel/app/plugins/mysql80"
 	"panel/app/plugins/openresty"
@@ -167,6 +168,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     supervisor.Install,
 		Uninstall:   supervisor.Uninstall,
 		Update:      supervisor.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        fail2ban.Name,
+		Description: fail2ban.Description,
+		Slug:        fail2ban.Slug,
+		Version:     fail2ban.Version,
+		Requires:    fail2ban.Requires,
+		Excludes:    fail2ban.Excludes,
+		Install:     fail2ban.Install,
+		Uninstall:   fail2ban.Uninstall,
+		Update:      fail2ban.Update,
 	})
 
 	return p

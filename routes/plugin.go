@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+	"panel/app/http/controllers/plugins/fail2ban"
 
 	"panel/app/http/controllers/plugins/mysql57"
 	"panel/app/http/controllers/plugins/mysql80"
@@ -197,5 +198,20 @@ func Plugin() {
 		route.Post("deleteProcess", supervisorController.DeleteProcess)
 		route.Post("addProcess", supervisorController.AddProcess)
 
+	})
+	facades.Route().Prefix("api/plugins/fail2ban").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		fail2banController := fail2ban.NewFail2banController()
+		route.Get("status", fail2banController.Status)
+		route.Post("start", fail2banController.Start)
+		route.Post("stop", fail2banController.Stop)
+		route.Post("restart", fail2banController.Restart)
+		route.Post("reload", fail2banController.Reload)
+		route.Get("list", fail2banController.List)
+		route.Post("add", fail2banController.Add)
+		route.Post("delete", fail2banController.Delete)
+		route.Get("ban", fail2banController.BanList)
+		route.Post("unban", fail2banController.Unban)
+		route.Post("whiteList", fail2banController.SetWhiteList)
+		route.Get("whiteList", fail2banController.GetWhiteList)
 	})
 }
