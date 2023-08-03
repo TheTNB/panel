@@ -8,6 +8,8 @@
 
 这是耗子Linux面板，一种使用GO开发的轻量Linux服务器运维管理面板。
 
+严禁使用耗子Linux面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
+
 #### 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[pd.qq.com/s/fyol46wfy](https://pd.qq.com/s/fyol46wfy)
 
 广告： [`WeAvatar` 多端多元化的统一头像服务](https://weavatar.com)
