@@ -28,4 +28,6 @@ pkill -9 pure-ftpd
 rm -rf /www/server/pure-ftpd
 rm -f /usr/bin/pure-pw
 
+panel deletePlugin pureftpd
+
 echo -e "${HR}\nPure-Ftpd 卸载完成\n${HR}"
