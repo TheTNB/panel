@@ -204,7 +204,7 @@ func (c *PureFtpdController) Add(ctx http.Context) {
 		return
 	}
 
-	tools.Chmod(path, 755)
+	tools.Chmod(path, 0755)
 	tools.Chown(path, "www", "www")
 	tools.ExecShell(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
 	tools.ExecShell("pure-pw mkdb")
