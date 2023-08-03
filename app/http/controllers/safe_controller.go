@@ -48,6 +48,8 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		Success(ctx, nil)
 		return
 	}
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
 
 	if tools.IsRHEL() {
 		out := tools.ExecShell("firewall-cmd --list-all 2>&1")
@@ -66,7 +68,24 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 			})
 		}
 
-		Success(ctx, rules)
+		startIndex := (page - 1) * limit
+		endIndex := page * limit
+		if startIndex > len(rules) {
+			Success(ctx, http.Json{
+				"total": 0,
+				"items": []map[string]string{},
+			})
+			return
+		}
+		if endIndex > len(rules) {
+			endIndex = len(rules)
+		}
+		pagedRules := rules[startIndex:endIndex]
+
+		Success(ctx, http.Json{
+			"total": len(rules),
+			"items": pagedRules,
+		})
 	} else {
 		out := tools.ExecShell("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
 		if len(out) == 0 {
@@ -82,7 +101,24 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 			})
 		}
 
-		Success(ctx, rules)
+		startIndex := (page - 1) * limit
+		endIndex := page * limit
+		if startIndex > len(rules) {
+			Success(ctx, http.Json{
+				"total": 0,
+				"items": []map[string]string{},
+			})
+			return
+		}
+		if endIndex > len(rules) {
+			endIndex = len(rules)
+		}
+		pagedRules := rules[startIndex:endIndex]
+
+		Success(ctx, http.Json{
+			"total": len(rules),
+			"items": pagedRules,
+		})
 	}
 }
 

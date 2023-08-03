@@ -13,6 +13,7 @@ import (
 	"panel/app/http/controllers/plugins/php81"
 	"panel/app/http/controllers/plugins/php82"
 	"panel/app/http/controllers/plugins/phpmyadmin"
+	"panel/app/http/controllers/plugins/pureftpd"
 	"panel/app/http/controllers/plugins/s3fs"
 	"panel/app/http/controllers/plugins/supervisor"
 	"panel/app/http/middleware"
@@ -169,6 +170,20 @@ func Plugin() {
 		phpMyAdminController := phpmyadmin.NewPhpMyAdminController()
 		route.Get("info", phpMyAdminController.Info)
 		route.Post("port", phpMyAdminController.SetPort)
+	})
+	facades.Route().Prefix("api/plugins/pureftpd").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		pureFtpdController := pureftpd.NewPureFtpdController()
+		route.Get("status", pureFtpdController.Status)
+		route.Post("reload", pureFtpdController.Reload)
+		route.Post("start", pureFtpdController.Start)
+		route.Post("stop", pureFtpdController.Stop)
+		route.Post("restart", pureFtpdController.Restart)
+		route.Get("list", pureFtpdController.List)
+		route.Post("add", pureFtpdController.Add)
+		route.Post("delete", pureFtpdController.Delete)
+		route.Post("changePassword", pureFtpdController.ChangePassword)
+		route.Get("port", pureFtpdController.GetPort)
+		route.Post("port", pureFtpdController.SetPort)
 	})
 	facades.Route().Prefix("api/plugins/s3fs").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		s3fsController := s3fs.NewS3fsController()

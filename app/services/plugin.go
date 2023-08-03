@@ -14,6 +14,7 @@ import (
 	"panel/app/plugins/php81"
 	"panel/app/plugins/php82"
 	"panel/app/plugins/phpmyadmin"
+	"panel/app/plugins/pureftpd"
 	"panel/app/plugins/s3fs"
 	"panel/app/plugins/supervisor"
 )
@@ -146,6 +147,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     phpmyadmin.Install,
 		Uninstall:   phpmyadmin.Uninstall,
 		Update:      phpmyadmin.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        pureftpd.Name,
+		Description: pureftpd.Description,
+		Slug:        pureftpd.Slug,
+		Version:     pureftpd.Version,
+		Requires:    pureftpd.Requires,
+		Excludes:    pureftpd.Excludes,
+		Install:     pureftpd.Install,
+		Uninstall:   pureftpd.Uninstall,
+		Update:      pureftpd.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        s3fs.Name,

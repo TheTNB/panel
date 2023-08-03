@@ -203,6 +203,15 @@ Date: 2022-07-22
                 {field: 'name', title: '库名', fixed: 'left', unresize: true, sort: true}
                 , {fixed: 'right', title: '操作', toolbar: '#mysql-database-list-control', width: 150}
             ]]
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": res.data.total,
+                    "data": res.data.items
+                };
+            }
+            , page: true
         });
         // 头工具栏事件
         table.on('toolbar(mysql-database-list)', function (obj) {
@@ -272,6 +281,15 @@ Date: 2022-07-22
                 , {field: 'grants', title: '权限'}
                 , {fixed: 'right', title: '操作', toolbar: '#mysql-user-list-control', width: 150}
             ]]
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": res.data.total,
+                    "data": res.data.items
+                };
+            }
+            , page: true
         });
         // 头工具栏事件
         table.on('toolbar(mysql-user-list)', function (obj) {

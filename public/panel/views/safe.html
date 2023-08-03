@@ -1,7 +1,7 @@
 <!--
 Name: 系统安全
 Author: 耗子
-Date: 2023-07-21
+Date: 2023-08-03
 -->
 <title>系统安全</title>
 
@@ -218,6 +218,15 @@ Date: 2023-07-21
                 , {field: 'protocol', title: '协议', sort: true}
                 , {fixed: 'right', title: '操作', toolbar: '#safe-port-setting', width: 150}
             ]]
+            , parseData: function (res) {
+                return {
+                    "code": res.code,
+                    "msg": res.message,
+                    "count": res.data.total,
+                    "data": res.data.items
+                };
+            }
+            , page: true
         });
         table.on('tool(safe-port)', function (obj) {
             let data = obj.data;

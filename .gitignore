@@ -1,8 +1,6 @@
 tmp
-.env
-.history
-.air.toml
-panel.conf
+/.air.toml
+/panel.conf
 
 # Golang #
 # `go test -c` 生成的二进制文件
@@ -23,7 +21,7 @@ _cgo_export.*
 *.exe
 *.o
 *.so
-panel
+/panel
 
 # 压缩包 #
 # Git 自带压缩,如果这些压缩包里有代码,建议解压后 commit

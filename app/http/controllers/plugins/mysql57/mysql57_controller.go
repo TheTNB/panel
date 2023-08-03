@@ -378,7 +378,26 @@ func (c *Mysql57Controller) DatabaseList(ctx http.Context) {
 		return
 	}
 
-	controllers.Success(ctx, databases)
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(databases) {
+		controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
+		return
+	}
+	if endIndex > len(databases) {
+		endIndex = len(databases)
+	}
+	pagedDatabases := databases[startIndex:endIndex]
+
+	controllers.Success(ctx, http.Json{
+		"total": len(databases),
+		"items": pagedDatabases,
+	})
 }
 
 // AddDatabase 添加数据库
@@ -626,7 +645,26 @@ func (c *Mysql57Controller) UserList(ctx http.Context) {
 		return
 	}
 
-	controllers.Success(ctx, userGrants)
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(userGrants) {
+		controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []user{},
+		})
+		return
+	}
+	if endIndex > len(userGrants) {
+		endIndex = len(userGrants)
+	}
+	pagedUserGrants := userGrants[startIndex:endIndex]
+
+	controllers.Success(ctx, http.Json{
+		"total": len(userGrants),
+		"items": pagedUserGrants,
+	})
 }
 
 // AddUser 添加用户

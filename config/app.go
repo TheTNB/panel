@@ -51,7 +51,7 @@ func init() {
 		// Here you may specify the default timezone for your application.
 		// Example: UTC, Asia/Shanghai
 		// More: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-		"timezone": carbon.UTC,
+		"timezone": carbon.PRC,
 
 		// Encryption Key
 		//
