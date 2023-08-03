@@ -62,6 +62,10 @@ panel
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 
+- [AnyCast.Ai](https://www.anycast.ai/)
+
+- [迅捷盾](https://console.fastdun.com/)
+
 ### DevOps
 
 - [极狐GitLab](https://www.jihulab.com/)

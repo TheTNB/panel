@@ -55,7 +55,10 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		out := tools.ExecShell("firewall-cmd --list-all 2>&1")
 		match := regexp.MustCompile(`ports: (.*)`).FindStringSubmatch(out)
 		if len(match) == 0 {
-			Success(ctx, nil)
+			Success(ctx, http.Json{
+				"total": 0,
+				"items": []map[string]string{},
+			})
 			return
 		}
 		ports := strings.Split(match[1], " ")
@@ -89,7 +92,10 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 	} else {
 		out := tools.ExecShell("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
 		if len(out) == 0 {
-			Success(ctx, nil)
+			Success(ctx, http.Json{
+				"total": 0,
+				"items": []map[string]string{},
+			})
 			return
 		}
 		var rules []map[string]string
