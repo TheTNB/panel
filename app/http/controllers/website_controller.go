@@ -213,6 +213,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
 	if strings.TrimSpace(raw) != strings.TrimSpace(ctx.Request().Input("raw")) {
 		tools.WriteFile("/www/server/vhost/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
+		tools.ExecShell("systemctl reload openresty")
 		Success(ctx, nil)
 		return
 	}
