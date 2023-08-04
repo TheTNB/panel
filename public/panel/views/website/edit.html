@@ -316,6 +316,15 @@ Date: 2023-07-24
                 let domains = $("input[name='domains[]']").map(function () {
                     return $(this).val();
                 }).get()
+                var reg = new RegExp(/\n443.*\n?/);
+                // 如果开启了https，就自动添加443端口
+                if ($('input[name="ssl"]').prop('checked') && !reg.test(ports)) {
+                    ports = ports + '\n443 ssl http2';
+                }
+                // 如果关闭了https，就自动删除443端口
+                if (!$('input[name="ssl"]').prop('checked') && reg.test(ports)) {
+                    ports = ports.replace(/443.*\n?/, '');
+                }
 
                 admin.req({
                     url: '/api/panel/website/config'

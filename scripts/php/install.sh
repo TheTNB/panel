@@ -223,8 +223,8 @@ sed -i 's/display_errors = Off/display_errors = On/g' ${phpPath}/etc/php.ini
 sed -i 's/error_reporting =.*/error_reporting = E_ALL \& \~E_NOTICE/g' ${phpPath}/etc/php.ini
 
 # 设置SSL根证书
-sed -i "s#;openssl.cafile=#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#" ${phpPath}/etc/php.ini
-sed -i "s#;curl.cainfo =#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#" ${phpPath}/etc/php.ini
+#sed -i "s#;openssl.cafile=#openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt#" ${phpPath}/etc/php.ini
+#sed -i "s#;curl.cainfo =#curl.cainfo = /etc/pki/tls/certs/ca-bundle.crt#" ${phpPath}/etc/php.ini
 
 # 关闭php外显
 sed -i 's/expose_php = On/expose_php = Off/g' ${phpPath}/etc/php.ini
