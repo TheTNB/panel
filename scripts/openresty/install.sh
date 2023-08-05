@@ -23,7 +23,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://dl.cdn.haozi.net/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
-openrestyVersion="1.21.4.1"
+openrestyVersion="1.21.4.2"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 ipLocation=$(curl -s https://ip.ping0.cc/geo)
 
