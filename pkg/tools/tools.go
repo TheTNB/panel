@@ -147,7 +147,7 @@ func UpdatePanel(proxy bool) error {
 	color.Greenln("下载完成")
 
 	color.Greenln("更新新版本...")
-	ExecShell("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel")
+	ExecShell("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel && bash scripts/update_panel.sh")
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
@@ -158,6 +158,8 @@ func UpdatePanel(proxy bool) error {
 	}
 	ExecShell("/www/panel/panel --env=panel.conf artisan migrate")
 	color.Greenln("恢复完成")
+
+	ExecShell("panel writeSetting version " + panelInfo.Version)
 
 	color.Greenln("重启面板...")
 	ExecShell("systemctl restart panel")

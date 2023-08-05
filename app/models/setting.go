@@ -4,6 +4,7 @@ import "github.com/goravel/framework/support/carbon"
 
 const (
 	SettingKeyName              = "name"
+	SettingKeyVersion           = "version"
 	SettingKeyMonitor           = "monitor"
 	SettingKeyMonitorDays       = "monitor_days"
 	SettingKeyBackupPath        = "backup_path"

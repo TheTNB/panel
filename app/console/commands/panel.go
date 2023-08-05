@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -55,7 +56,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyEntrance, Value: "/"}}
+		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyEntrance, Value: "/"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")
@@ -457,6 +458,20 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln("写入设置成功")
 
+	case "getSetting":
+		key := arg1
+		if len(key) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		var setting models.Setting
+		if err := facades.Orm().Query().Where("key", key).FirstOrFail(&setting); err != nil {
+			return nil
+		}
+
+		fmt.Printf("%s", setting.Value)
+
 	case "deleteSetting":
 		key := arg1
 		if len(key) == 0 {
@@ -490,6 +505,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Yellowln("panel writeMysqlPassword {password} 写入MySQL root密码")
 		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板")
 		color.Yellowln("panel deleteSite {name} 删除面板网站数据")
+		color.Yellowln("panel getSetting {name} 获取面板设置数据")
 		color.Yellowln("panel writeSetting {name} {value} 写入 / 更新面板设置数据")
 		color.Yellowln("panel deleteSetting {name} 删除面板设置数据")
 	}
