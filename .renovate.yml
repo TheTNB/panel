@@ -1,0 +1,33 @@
+variables:
+  RENOVATE_BASE_DIR: $CI_PROJECT_DIR/renovate
+  RENOVATE_ENDPOINT: $CI_API_V4_URL
+  RENOVATE_PLATFORM: gitlab
+  RENOVATE_ONBOARDING_CONFIG: '{"$$schema": "https://docs.renovatebot.com/renovate-schema.json", "extends": ["config:base"] }'
+  RENOVATE_OPTIMIZE_FOR_DISABLED: 'true'
+  RENOVATE_REPOSITORY_CACHE: 'enabled'
+  RENOVATE_REQUIRE_CONFIG: 'required'
+  RENOVATE_ONBOARDING: 'false'
+  RENOVATE_IGNORE_PR_AUTHOR: 'true'
+  RENOVATE_EXTENDS: 'github>whitesource/merge-confidence:beta'
+  RENOVATE_LOG_FILE: renovate-log.ndjson
+  RENOVATE_LOG_FILE_LEVEL: debug
+  LOG_LEVEL: info
+
+default:
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}-renovate
+    paths:
+      - renovate/cache/renovate/repository/
+
+renovate:
+  stage: deploy
+  resource_group: production
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  script:
+    - renovate $RENOVATE_EXTRA_FLAGS
+  artifacts:
+    when: always
+    expire_in: 1d
+    paths:
+      - '$RENOVATE_LOG_FILE'
