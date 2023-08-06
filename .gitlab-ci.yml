@@ -50,7 +50,3 @@ build:
     paths:
       - $OUTPUT_NAME
     expire_in: 1 week
-
-include:
-  - project: 'renovate-bot/renovate-runner'
-    file: '/templates/renovate.gitlab-ci.yml'
