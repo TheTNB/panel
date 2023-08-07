@@ -9,7 +9,7 @@ require (
 	github.com/gookit/color v1.5.4
 	github.com/goravel/framework v1.12.1-0.20230726100652-342097efc4ce
 	github.com/gorilla/websocket v1.5.0
-	github.com/iancoleman/strcase v0.2.0
+	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.37.2
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/shirou/gopsutil v3.21.11+incompatible
