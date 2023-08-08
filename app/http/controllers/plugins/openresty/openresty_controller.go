@@ -24,7 +24,7 @@ func NewOpenrestyController() *OpenRestyController {
 }
 
 // Status 获取运行状态
-func (r *OpenRestyController) Status(ctx http.Context) {
+func (c *OpenRestyController) Status(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -43,7 +43,7 @@ func (r *OpenRestyController) Status(ctx http.Context) {
 }
 
 // Reload 重载配置
-func (r *OpenRestyController) Reload(ctx http.Context) {
+func (c *OpenRestyController) Reload(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -63,7 +63,7 @@ func (r *OpenRestyController) Reload(ctx http.Context) {
 }
 
 // Start 启动OpenResty
-func (r *OpenRestyController) Start(ctx http.Context) {
+func (c *OpenRestyController) Start(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -83,7 +83,7 @@ func (r *OpenRestyController) Start(ctx http.Context) {
 }
 
 // Stop 停止OpenResty
-func (r *OpenRestyController) Stop(ctx http.Context) {
+func (c *OpenRestyController) Stop(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -103,7 +103,7 @@ func (r *OpenRestyController) Stop(ctx http.Context) {
 }
 
 // Restart 重启OpenResty
-func (r *OpenRestyController) Restart(ctx http.Context) {
+func (c *OpenRestyController) Restart(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -123,7 +123,7 @@ func (r *OpenRestyController) Restart(ctx http.Context) {
 }
 
 // GetConfig 获取配置
-func (r *OpenRestyController) GetConfig(ctx http.Context) {
+func (c *OpenRestyController) GetConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -138,7 +138,7 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) {
 }
 
 // SaveConfig 保存配置
-func (r *OpenRestyController) SaveConfig(ctx http.Context) {
+func (c *OpenRestyController) SaveConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -154,11 +154,11 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	controllers.Success(ctx, "保存OpenResty配置成功")
+	c.Reload(ctx)
 }
 
 // ErrorLog 获取错误日志
-func (r *OpenRestyController) ErrorLog(ctx http.Context) {
+func (c *OpenRestyController) ErrorLog(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -173,7 +173,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) {
 }
 
 // ClearErrorLog 清空错误日志
-func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
+func (c *OpenRestyController) ClearErrorLog(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}
@@ -183,7 +183,7 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) {
 }
 
 // Load 获取负载
-func (r *OpenRestyController) Load(ctx http.Context) {
+func (c *OpenRestyController) Load(ctx http.Context) {
 	if !controllers.Check(ctx, "openresty") {
 		return
 	}

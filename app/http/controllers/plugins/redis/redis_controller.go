@@ -153,9 +153,7 @@ func (c *RedisController) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart redis")
-
-	controllers.Success(ctx, nil)
+	c.Restart(ctx)
 }
 
 // Load 获取负载

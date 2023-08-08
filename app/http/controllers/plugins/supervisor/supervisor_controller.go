@@ -28,12 +28,12 @@ func NewSupervisorController() *SupervisorController {
 }
 
 // Status 状态
-func (r *SupervisorController) Status(ctx http.Context) {
+func (c *SupervisorController) Status(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
 
-	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -42,13 +42,13 @@ func (r *SupervisorController) Status(ctx http.Context) {
 }
 
 // Start 启动
-func (r *SupervisorController) Start(ctx http.Context) {
+func (c *SupervisorController) Start(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
 
-	tools.ExecShell(`systemctl start ` + r.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.ExecShell(`systemctl start ` + c.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -57,13 +57,13 @@ func (r *SupervisorController) Start(ctx http.Context) {
 }
 
 // Stop 停止
-func (r *SupervisorController) Stop(ctx http.Context) {
+func (c *SupervisorController) Stop(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
 
-	tools.ExecShell(`systemctl stop ` + r.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.ExecShell(`systemctl stop ` + c.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status != "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -72,13 +72,13 @@ func (r *SupervisorController) Stop(ctx http.Context) {
 }
 
 // Restart 重启
-func (r *SupervisorController) Restart(ctx http.Context) {
+func (c *SupervisorController) Restart(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
 
-	tools.ExecShell(`systemctl restart ` + r.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.ExecShell(`systemctl restart ` + c.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -87,13 +87,13 @@ func (r *SupervisorController) Restart(ctx http.Context) {
 }
 
 // Reload 重载
-func (r *SupervisorController) Reload(ctx http.Context) {
+func (c *SupervisorController) Reload(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
 
-	tools.ExecShell(`systemctl reload ` + r.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + r.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.ExecShell(`systemctl reload ` + c.ServiceName)
+	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -102,7 +102,7 @@ func (r *SupervisorController) Reload(ctx http.Context) {
 }
 
 // Log 日志
-func (r *SupervisorController) Log(ctx http.Context) {
+func (c *SupervisorController) Log(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -112,7 +112,7 @@ func (r *SupervisorController) Log(ctx http.Context) {
 }
 
 // ClearLog 清空日志
-func (r *SupervisorController) ClearLog(ctx http.Context) {
+func (c *SupervisorController) ClearLog(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -122,7 +122,7 @@ func (r *SupervisorController) ClearLog(ctx http.Context) {
 }
 
 // Config 获取配置
-func (r *SupervisorController) Config(ctx http.Context) {
+func (c *SupervisorController) Config(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -137,7 +137,7 @@ func (r *SupervisorController) Config(ctx http.Context) {
 }
 
 // SaveConfig 保存配置
-func (r *SupervisorController) SaveConfig(ctx http.Context) {
+func (c *SupervisorController) SaveConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -149,12 +149,11 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) {
 		tools.WriteFile(`/etc/supervisor/supervisord.conf`, config, 0644)
 	}
 
-	tools.ExecShell(`systemctl restart ` + r.ServiceName)
-	controllers.Success(ctx, nil)
+	c.Restart(ctx)
 }
 
 // Processes 进程列表
-func (r *SupervisorController) Processes(ctx http.Context) {
+func (c *SupervisorController) Processes(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -210,7 +209,7 @@ func (r *SupervisorController) Processes(ctx http.Context) {
 }
 
 // StartProcess 启动进程
-func (r *SupervisorController) StartProcess(ctx http.Context) {
+func (c *SupervisorController) StartProcess(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -221,7 +220,7 @@ func (r *SupervisorController) StartProcess(ctx http.Context) {
 }
 
 // StopProcess 停止进程
-func (r *SupervisorController) StopProcess(ctx http.Context) {
+func (c *SupervisorController) StopProcess(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -232,7 +231,7 @@ func (r *SupervisorController) StopProcess(ctx http.Context) {
 }
 
 // RestartProcess 重启进程
-func (r *SupervisorController) RestartProcess(ctx http.Context) {
+func (c *SupervisorController) RestartProcess(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -243,7 +242,7 @@ func (r *SupervisorController) RestartProcess(ctx http.Context) {
 }
 
 // ProcessLog 进程日志
-func (r *SupervisorController) ProcessLog(ctx http.Context) {
+func (c *SupervisorController) ProcessLog(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -261,7 +260,7 @@ func (r *SupervisorController) ProcessLog(ctx http.Context) {
 }
 
 // ClearProcessLog 清空进程日志
-func (r *SupervisorController) ClearProcessLog(ctx http.Context) {
+func (c *SupervisorController) ClearProcessLog(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -279,7 +278,7 @@ func (r *SupervisorController) ClearProcessLog(ctx http.Context) {
 }
 
 // ProcessConfig 获取进程配置
-func (r *SupervisorController) ProcessConfig(ctx http.Context) {
+func (c *SupervisorController) ProcessConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -296,7 +295,7 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) {
 }
 
 // SaveProcessConfig 保存进程配置
-func (r *SupervisorController) SaveProcessConfig(ctx http.Context) {
+func (c *SupervisorController) SaveProcessConfig(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -316,7 +315,7 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) {
 }
 
 // AddProcess 添加进程
-func (r *SupervisorController) AddProcess(ctx http.Context) {
+func (c *SupervisorController) AddProcess(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}
@@ -367,7 +366,7 @@ stdout_logfile_maxbytes=2MB
 }
 
 // DeleteProcess 删除进程
-func (r *SupervisorController) DeleteProcess(ctx http.Context) {
+func (c *SupervisorController) DeleteProcess(ctx http.Context) {
 	if !controllers.Check(ctx, "supervisor") {
 		return
 	}

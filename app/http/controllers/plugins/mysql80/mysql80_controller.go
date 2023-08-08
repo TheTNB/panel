@@ -160,7 +160,7 @@ func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	controllers.Success(ctx, "保存MySQL配置成功")
+	c.Restart(ctx)
 }
 
 // Load 获取负载
