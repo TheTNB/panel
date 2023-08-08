@@ -14,6 +14,7 @@ import (
 	"panel/app/http/controllers/plugins/php82"
 	"panel/app/http/controllers/plugins/phpmyadmin"
 	"panel/app/http/controllers/plugins/pureftpd"
+	"panel/app/http/controllers/plugins/redis"
 	"panel/app/http/controllers/plugins/s3fs"
 	"panel/app/http/controllers/plugins/supervisor"
 	"panel/app/http/middleware"
@@ -184,6 +185,17 @@ func Plugin() {
 		route.Post("changePassword", pureFtpdController.ChangePassword)
 		route.Get("port", pureFtpdController.GetPort)
 		route.Post("port", pureFtpdController.SetPort)
+	})
+	facades.Route().Prefix("api/plugins/redis").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		redisController := redis.NewRedisController()
+		route.Get("status", redisController.Status)
+		route.Post("reload", redisController.Reload)
+		route.Post("start", redisController.Start)
+		route.Post("stop", redisController.Stop)
+		route.Post("restart", redisController.Restart)
+		route.Get("load", redisController.Load)
+		route.Get("config", redisController.GetConfig)
+		route.Post("config", redisController.SaveConfig)
 	})
 	facades.Route().Prefix("api/plugins/s3fs").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		s3fsController := s3fs.NewS3fsController()

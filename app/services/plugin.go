@@ -15,6 +15,7 @@ import (
 	"panel/app/plugins/php82"
 	"panel/app/plugins/phpmyadmin"
 	"panel/app/plugins/pureftpd"
+	"panel/app/plugins/redis"
 	"panel/app/plugins/s3fs"
 	"panel/app/plugins/supervisor"
 )
@@ -158,6 +159,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     pureftpd.Install,
 		Uninstall:   pureftpd.Uninstall,
 		Update:      pureftpd.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        redis.Name,
+		Description: redis.Description,
+		Slug:        redis.Slug,
+		Version:     redis.Version,
+		Requires:    redis.Requires,
+		Excludes:    redis.Excludes,
+		Install:     redis.Install,
+		Uninstall:   redis.Uninstall,
+		Update:      redis.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        s3fs.Name,
