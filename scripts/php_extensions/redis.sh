@@ -36,7 +36,7 @@ Install() {
     cd /www/server/php/${phpVersion}/src/ext
     rm -rf phpredis
     rm -rf phpredis.tar.gz
-    wget -O phpredis.tar.gz ${downloadUrl}/php-ext/phpredis-${phpredisVersion}.tar.gz
+    wget -O phpredis.tar.gz ${downloadUrl}/phpredis-${phpredisVersion}.tar.gz
     tar -zxvf phpredis.tar.gz
     mv phpredis-${phpredisVersion} phpredis
     cd phpredis
