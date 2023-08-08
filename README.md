@@ -8,7 +8,7 @@
 
 这是耗子Linux面板，一种使用GO开发的轻量Linux服务器运维管理面板。
 
-严禁使用耗子Linux面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
+通知：严禁使用耗子Linux面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
 
 #### 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[pd.qq.com/s/fyol46wfy](https://pd.qq.com/s/fyol46wfy)
 
@@ -22,7 +22,7 @@
 
 低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `RockyLinux` | `AlmaLinux`，维护周期更长。
 
-不在下表中的其他系统（OpenCloudOS、Anolis、CentOS Stream、Debian等），可自行尝试安装，但不保证能够正常运行，且不提供技术支持。
+不在下表中的其他系统（OpenCloudOS 8、Anolis 8、CentOS Stream 8/9、Debian 11等），可自行尝试安装，但不保证能够正常运行，且不提供技术支持（理论上不会有大问题）。
 
 | 系统         | 版本 |
 |------------|----|
@@ -33,7 +33,7 @@
 
 ## 安装面板
 
-安装面板前，你需要了解LNMP环境的基本知识，以及如何处理常见的LNMP环境问题，我们不建议**0基础**的用户安装和使用耗子Linux面板。
+安装面板前，你需要了解LNMP环境的基本知识，以及如何处理常见的LNMP环境问题，我们不建议0基础的用户安装和使用耗子Linux面板。
 
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
@@ -65,11 +65,10 @@ panel
 
 ### 创建 PR
 
-- 如果您对该流程不太了解，可以查看[这篇文章](https://docs.github.com/en/get-started/quickstart/contributing-to-projects)；
 - 在开发过程中，如果遇到问题可以随时在 Issue 中详尽描述该问题，以进一步沟通，但在此之前请确保自己已通过 Google
   等方式尽可能的尝试解决问题；
+- PR 须提交至我们的极狐GitLab仓库[https://jihulab.com/haozi-team/panel](https://jihulab.com/haozi-team/panel)
 - 当 PR 开发完毕后，请为其添加 `🚀 Review Ready` 标签，维护者将及时进行评审；
-- PR 合并后，如果描述设置正确，Issue 将被自动关闭；
 - 我们非常欢迎您的贡献，将在下次发版时将您添加到首页贡献者中；❤️
 
 ## 赞助商
