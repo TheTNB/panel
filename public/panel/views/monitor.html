@@ -1,7 +1,6 @@
 <!--
 Name: 资源监控
-Author: 耗子
-Date: 2023-07-21
+Date: 2023-08-13
 -->
 <title>资源监控</title>
 
@@ -93,18 +92,16 @@ Date: 2023-07-21
 <script>
     layui.use(['admin', 'view', 'form', 'element', 'carousel'], function () {
         var admin = layui.admin;
-        var view = layui.view;
         var $ = layui.jquery;
         var form = layui.form;
         var laydate = layui.laydate;
 
-        // 渲染时间选择器
         // 默认开始时间为今天0点，结束时间为当前时间
         var startDate = new Date(new Date().setHours(0, 0, 0, 0));
         var endDate = new Date();
         // 拼接时间字符串
-        var startStr = startDate.getFullYear() + '-' + (startDate.getMonth() + 1) + '-' + startDate.getDate() + ' ' + startDate.getHours() + ':' + startDate.getMinutes() + ':' + startDate.getSeconds();
-        var endStr = endDate.getFullYear() + '-' + (endDate.getMonth() + 1) + '-' + endDate.getDate() + ' ' + endDate.getHours() + ':' + endDate.getMinutes() + ':' + endDate.getSeconds();
+        var startStr = startDate.getFullYear() + '-' + startDate.getMonth() + '-' + startDate.getDate() + ' ' + startDate.getHours() + ':' + startDate.getMinutes() + ':' + startDate.getSeconds();
+        var endStr = endDate.getFullYear() + '-' + endDate.getMonth() + '-' + endDate.getDate() + ' ' + endDate.getHours() + ':' + endDate.getMinutes() + ':' + endDate.getSeconds();
         laydate.render({
             elem: '#monitor-date'
             , type: 'datetime'
@@ -139,7 +136,6 @@ Date: 2023-07-21
                 }
             }
         });
-        // 监听switch开关：是否开启监控
         form.on('switch(monitor)', function (data) {
             admin.req({
                 url: '/api/panel/monitor/switch',
@@ -155,7 +151,6 @@ Date: 2023-07-21
                 }
             });
         });
-        // 监听保存天数按钮
         $('#save_monitor_date').click(function () {
             var days = $('input[name="monitor-save-days"]').val();
             if (days == '') {
@@ -176,8 +171,6 @@ Date: 2023-07-21
                 }
             });
         });
-
-        // 监听清除监控数据按钮
         $('#clear_monitor_record').click(function () {
             layer.confirm('确定要清除监控数据吗？', function (index) {
                 admin.req({
@@ -202,12 +195,10 @@ Date: 2023-07-21
         getMonitorData(startDate.getTime(), endDate.getTime());
     });
 
-
     // 获取监控数据
     function getMonitorData(startDate, endDate) {
         layui.use(['admin'], function () {
             let admin = layui.admin;
-            // 获取监控数据
             admin.req({
                 url: '/api/panel/monitor/list?start=' + startDate + '&end=' + endDate,
                 type: 'get',
