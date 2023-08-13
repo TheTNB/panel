@@ -460,6 +460,10 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 
 // BackupList 获取备份列表
 func (c *Mysql80Controller) BackupList(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql80") {
+		return
+	}
+
 	backupList, err := c.backup.MysqlList()
 	if err != nil {
 		facades.Log().Error("[MySQL80] 获取备份列表失败：" + err.Error())

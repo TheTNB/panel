@@ -460,6 +460,10 @@ func (c *Mysql57Controller) DeleteDatabase(ctx http.Context) {
 
 // BackupList 获取备份列表
 func (c *Mysql57Controller) BackupList(ctx http.Context) {
+	if !controllers.Check(ctx, "mysql57") {
+		return
+	}
+
 	backupList, err := c.backup.MysqlList()
 	if err != nil {
 		facades.Log().Error("[MySQL57] 获取备份列表失败：" + err.Error())
