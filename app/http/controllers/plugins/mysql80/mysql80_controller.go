@@ -247,7 +247,7 @@ func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 100 /www/server/mysql/mysql-error.log")
+	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/mysql/mysql-error.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -267,7 +267,7 @@ func (c *Mysql80Controller) SlowLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 100 /www/server/mysql/mysql-slow.log")
+	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/mysql/mysql-slow.log"))
 	controllers.Success(ctx, log)
 }
 

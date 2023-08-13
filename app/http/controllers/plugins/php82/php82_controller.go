@@ -188,7 +188,7 @@ func (c *Php82Controller) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log")
+	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -197,7 +197,7 @@ func (c *Php82Controller) SlowLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log")
+	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log"))
 	controllers.Success(ctx, log)
 }
 

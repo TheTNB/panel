@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"text/template"
 	"unicode/utf8"
 )
 
@@ -77,4 +78,9 @@ func Cut(str, begin, end string) string {
 	}
 
 	return string([]rune(str)[b:e])
+}
+
+// Escape 转义字符串
+func Escape(str string) string {
+	return template.HTMLEscapeString(str)
 }
