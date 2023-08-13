@@ -150,3 +150,30 @@ func Cp(src, dst string) bool {
 
 	return true
 }
+
+// Size 获取路径大小
+func Size(path string) int64 {
+	var size int64
+
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+		size += info.Size()
+		return nil
+	})
+	if err != nil {
+		facades.Log().Errorf("[面板][Helpers] 获取路径 %s 大小失败: %s", path, err.Error())
+		return 0
+	}
+
+	return size
+}
+
+// FileSize 获取文件大小
+func FileSize(path string) int64 {
+	info, err := os.Stat(path)
+	if err != nil {
+		facades.Log().Errorf("[面板][Helpers] 获取文件 %s 大小失败: %s", path, err.Error())
+		return 0
+	}
+
+	return info.Size()
+}

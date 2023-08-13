@@ -63,8 +63,7 @@ Prepare_system() {
         useradd -s /sbin/nologin -g www www
     fi
 
-    rm -rf /etc/localtime
-    ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+    timedatectl set-timezone Asia/Shanghai
 
     [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
     setenforce 0 > /dev/null 2>&1

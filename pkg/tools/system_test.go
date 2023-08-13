@@ -104,3 +104,13 @@ func (s *SystemHelperTestSuite) TestEmpty() {
 	s.True(Empty("/tmp/123"))
 	s.False(Empty("/tmp"))
 }
+
+func (s *SystemHelperTestSuite) TestSize() {
+	s.Equal(int64(0), Size("/tmp/123"))
+	s.NotEqual(int64(0), Size("/tmp"))
+}
+
+func (s *SystemHelperTestSuite) TestFileSize() {
+	s.Equal(int64(0), FileSize("/tmp/123"))
+	s.NotEqual(int64(0), FileSize("/tmp"))
+}
