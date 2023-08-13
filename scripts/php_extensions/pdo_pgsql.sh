@@ -33,7 +33,7 @@ Install() {
 
     cd /www/server/php/${phpVersion}/src/ext/pdo_pgsql
     /www/server/php/${phpVersion}/bin/phpize
-    ./configure --with-php-config=/www/server/php/${phpVersion}/bin/php-config --with-pdo-pgsql=/usr/pgsql-15
+    ./configure --with-php-config=/www/server/php/${phpVersion}/bin/php-config --with-pdo-pgsql=/www/server/postgresql
     make
     if [ "$?" != "0" ]; then
         echo -e $HR
