@@ -14,6 +14,7 @@ import (
 	"panel/app/plugins/php81"
 	"panel/app/plugins/php82"
 	"panel/app/plugins/phpmyadmin"
+	"panel/app/plugins/postgresql15"
 	"panel/app/plugins/pureftpd"
 	"panel/app/plugins/redis"
 	"panel/app/plugins/s3fs"
@@ -93,6 +94,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     mysql80.Install,
 		Uninstall:   mysql80.Uninstall,
 		Update:      mysql80.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        postgresql15.Name,
+		Description: postgresql15.Description,
+		Slug:        postgresql15.Slug,
+		Version:     postgresql15.Version,
+		Requires:    postgresql15.Requires,
+		Excludes:    postgresql15.Excludes,
+		Install:     postgresql15.Install,
+		Uninstall:   postgresql15.Uninstall,
+		Update:      postgresql15.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        php74.Name,

@@ -380,7 +380,7 @@ EOF
 
 systemctl daemon-reload
 systemctl enable openresty.service
-systemctl start openresty.service
+systemctl restart openresty.service
 
 panel writePlugin openresty ${openrestyVersion}
 

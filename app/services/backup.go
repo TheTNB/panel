@@ -20,6 +20,9 @@ type Backup interface {
 	MysqlList() ([]BackupFile, error)
 	MysqlBackup(database string) error
 	MysqlRestore(database string, backupFile string) error
+	PostgresqlList() ([]BackupFile, error)
+	PostgresqlBackup(database string) error
+	PostgresqlRestore(database string, backupFile string) error
 }
 
 type BackupFile struct {
@@ -209,6 +212,95 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 
 	tools.ExecShell("/www/server/mysql/bin/mysql -uroot " + database + " < " + backupFile)
 	_ = os.Unsetenv("MYSQL_PWD")
+
+	return nil
+}
+
+// PostgresqlList PostgreSQL备份列表
+func (s *BackupImpl) PostgresqlList() ([]BackupFile, error) {
+	backupPath := s.setting.Get(models.SettingKeyBackupPath)
+	if len(backupPath) == 0 {
+		return []BackupFile{}, nil
+	}
+
+	backupPath += "/postgresql"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	files, err := os.ReadDir(backupPath)
+	if err != nil {
+		return []BackupFile{}, err
+	}
+	var backupList []BackupFile
+	for _, file := range files {
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+		backupList = append(backupList, BackupFile{
+			Name: file.Name(),
+			Size: tools.FormatBytes(float64(info.Size())),
+		})
+	}
+
+	return backupList, nil
+}
+
+// PostgresqlBackup PostgreSQL备份
+func (s *BackupImpl) PostgresqlBackup(database string) error {
+	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
+	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
+	if !tools.Exists(backupPath) {
+		tools.Mkdir(backupPath, 0644)
+	}
+
+	tools.ExecShell(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile)
+	tools.ExecShell("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
+	tools.RemoveFile(backupPath + "/" + backupFile)
+
+	return nil
+}
+
+// PostgresqlRestore PostgreSQL恢复
+func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error {
+	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
+	ext := filepath.Ext(backupFile)
+	backupFile = backupPath + "/" + backupFile
+	if !tools.Exists(backupFile) {
+		return errors.New("备份文件不存在")
+	}
+
+	switch ext {
+	case ".zip":
+		tools.ExecShell("unzip -o " + backupFile + " -d " + backupPath)
+		backupFile = strings.TrimSuffix(backupFile, ext)
+	case ".gz":
+		if strings.HasSuffix(backupFile, ".tar.gz") {
+			// 解压.tar.gz文件
+			tools.ExecShell("tar -zxvf " + backupFile + " -C " + backupPath)
+			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
+		} else {
+			// 解压.gz文件
+			tools.ExecShell("gzip -d " + backupFile)
+			backupFile = strings.TrimSuffix(backupFile, ext)
+		}
+	case ".bz2":
+		tools.ExecShell("bzip2 -d " + backupFile)
+		backupFile = strings.TrimSuffix(backupFile, ext)
+	case ".tar":
+		tools.ExecShell("tar -xvf " + backupFile + " -C " + backupPath)
+		backupFile = strings.TrimSuffix(backupFile, ext)
+	case ".rar":
+		tools.ExecShell("unrar x " + backupFile + " " + backupPath)
+		backupFile = strings.TrimSuffix(backupFile, ext)
+	}
+
+	if !tools.Exists(backupFile) {
+		return errors.New("自动解压失败，请手动解压")
+	}
+
+	tools.ExecShell(`su - postgres -c "psql ` + database + `" < ` + backupFile)
 
 	return nil
 }

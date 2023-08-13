@@ -13,6 +13,7 @@ import (
 	"panel/app/http/controllers/plugins/php81"
 	"panel/app/http/controllers/plugins/php82"
 	"panel/app/http/controllers/plugins/phpmyadmin"
+	"panel/app/http/controllers/plugins/postgresql15"
 	"panel/app/http/controllers/plugins/pureftpd"
 	"panel/app/http/controllers/plugins/redis"
 	"panel/app/http/controllers/plugins/s3fs"
@@ -94,6 +95,33 @@ func Plugin() {
 		route.Post("deleteUser", mysql80Controller.DeleteUser)
 		route.Post("userPassword", mysql80Controller.SetUserPassword)
 		route.Post("userPrivileges", mysql80Controller.SetUserPrivileges)
+	})
+	facades.Route().Prefix("api/plugins/postgresql15").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		postgresql15Controller := postgresql15.NewPostgresql15Controller()
+		route.Get("status", postgresql15Controller.Status)
+		route.Post("reload", postgresql15Controller.Reload)
+		route.Post("start", postgresql15Controller.Start)
+		route.Post("stop", postgresql15Controller.Stop)
+		route.Post("restart", postgresql15Controller.Restart)
+		route.Get("load", postgresql15Controller.Load)
+		route.Get("config", postgresql15Controller.GetConfig)
+		route.Post("config", postgresql15Controller.SaveConfig)
+		route.Get("userConfig", postgresql15Controller.GetUserConfig)
+		route.Post("userConfig", postgresql15Controller.SaveUserConfig)
+		route.Get("log", postgresql15Controller.Log)
+		route.Post("clearLog", postgresql15Controller.ClearLog)
+		route.Get("database", postgresql15Controller.DatabaseList)
+		route.Post("addDatabase", postgresql15Controller.AddDatabase)
+		route.Post("deleteDatabase", postgresql15Controller.DeleteDatabase)
+		route.Get("backup", postgresql15Controller.BackupList)
+		route.Post("createBackup", postgresql15Controller.CreateBackup)
+		route.Post("uploadBackup", postgresql15Controller.UploadBackup)
+		route.Post("deleteBackup", postgresql15Controller.DeleteBackup)
+		route.Post("restoreBackup", postgresql15Controller.RestoreBackup)
+		route.Get("user", postgresql15Controller.UserList)
+		route.Post("addUser", postgresql15Controller.AddUser)
+		route.Post("deleteUser", postgresql15Controller.DeleteUser)
+		route.Post("userPassword", postgresql15Controller.SetUserPassword)
 	})
 	facades.Route().Prefix("api/plugins/php74").Middleware(middleware.Jwt()).Group(func(route route.Route) {
 		php74Controller := php74.NewPhp74Controller()
