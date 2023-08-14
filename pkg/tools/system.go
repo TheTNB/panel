@@ -154,10 +154,14 @@ func Cp(src, dst string) (bool, error) {
 func Size(path string) (int64, error) {
 	var size int64
 
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(path, func(filePath string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
 		size += info.Size()
 		return nil
 	})
+
 	if err != nil {
 		return 0, err
 	}
