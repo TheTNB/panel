@@ -18,6 +18,7 @@ import (
 	"panel/app/http/controllers/plugins/redis"
 	"panel/app/http/controllers/plugins/s3fs"
 	"panel/app/http/controllers/plugins/supervisor"
+	"panel/app/http/controllers/plugins/toolbox"
 	"panel/app/http/middleware"
 )
 
@@ -268,5 +269,17 @@ func Plugin() {
 		route.Post("unban", fail2banController.Unban)
 		route.Post("whiteList", fail2banController.SetWhiteList)
 		route.Get("whiteList", fail2banController.GetWhiteList)
+	})
+	facades.Route().Prefix("api/plugins/toolbox").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+		toolboxController := toolbox.NewToolBoxController()
+		route.Get("dns", toolboxController.GetDNS)
+		route.Post("dns", toolboxController.SetDNS)
+		route.Get("swap", toolboxController.GetSWAP)
+		route.Post("swap", toolboxController.SetSWAP)
+		route.Get("timezone", toolboxController.GetTimezone)
+		route.Post("timezone", toolboxController.SetTimezone)
+		route.Get("hosts", toolboxController.GetHosts)
+		route.Post("hosts", toolboxController.SetHosts)
+		route.Post("rootPassword", toolboxController.SetRootPassword)
 	})
 }
