@@ -343,7 +343,7 @@ Date: 2023-07-24
                 }
                 // 如果关闭了https，就自动删除443端口
                 if (!$('input[name="ssl"]').prop('checked') && reg.test(ports)) {
-                    ports = ports.replace(/443.*\n?/, '');
+                    ports = ports.replace(/\n443.*\n?/, '');
                 }
 
                 admin.req({
