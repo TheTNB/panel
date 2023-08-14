@@ -2,6 +2,8 @@
 package services
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"regexp"
@@ -49,6 +51,11 @@ type WebsiteSetting struct {
 	Ssl               bool     `json:"ssl"`
 	SslCertificate    string   `json:"ssl_certificate"`
 	SslCertificateKey string   `json:"ssl_certificate_key"`
+	SslNotBefore      string   `json:"ssl_not_before"`
+	SslNotAfter       string   `json:"ssl_not_after"`
+	SSlDNSNames       []string `json:"ssl_dns_names"`
+	SslIssuer         string   `json:"ssl_issuer"`
+	SslOCSPServer     []string `json:"ssl_ocsp_server"`
 	HttpRedirect      bool     `json:"http_redirect"`
 	Hsts              bool     `json:"hsts"`
 	Waf               bool     `json:"waf"`
@@ -319,6 +326,19 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
+
+		certData := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+		block, _ := pem.Decode([]byte(certData))
+		if block != nil {
+			cert, err := x509.ParseCertificate(block.Bytes)
+			if err == nil {
+				setting.SslNotBefore = cert.NotBefore.Format("2006-01-02 15:04:05")
+				setting.SslNotAfter = cert.NotAfter.Format("2006-01-02 15:04:05")
+				setting.SslIssuer = cert.Issuer.CommonName
+				setting.SslOCSPServer = cert.OCSPServer
+				setting.SSlDNSNames = cert.DNSNames
+			}
+		}
 	} else {
 		setting.HttpRedirect = false
 		setting.Hsts = false

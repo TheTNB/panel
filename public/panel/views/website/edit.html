@@ -201,7 +201,27 @@ Date: 2023-07-24
 
                     <div class="layui-form-item layui-form-text">
                         {{# if(d.params.config.ssl){ }}
-                        <label class="layui-form-label">证书 <span style="color: red; float: right;">剩余有效期：{{ d.params.config.ssl_date }}天</span></label>
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            有效期:
+                            <span class="layui-badge">{{ d.params.config.ssl_not_before }} ~ {{ d.params.config.ssl_not_after }}</span>
+                        </blockquote>
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            域名:
+                            {{# layui.each(d.params.config.ssl_dns_names, function(index, item){ }}
+                            <span class="layui-badge layui-bg-blue">{{ item }}</span>
+                            {{# }); }}
+                        </blockquote>
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            签发者:
+                            <span class="layui-badge layui-bg-orange">{{ d.params.config.ssl_issuer }}</span>
+                        </blockquote>
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            OCSP:
+                            {{# layui.each(d.params.config.ssl_ocsp_server, function(index, item){ }}
+                            <span class="layui-badge layui-bg-blue">{{ item }}</span>
+                            {{# }); }}
+                        </blockquote>
+                        <label class="layui-form-label">证书</label>
                         {{# }else{ }}
                         <label class="layui-form-label">证书</label>
                         {{# } }}
@@ -311,11 +331,11 @@ Date: 2023-07-24
                 layer.load()
                 let ports = $("input[name='ports[]']").map(function () {
                     return $(this).val();
-                }).get()
+                }).get().join('\n')
 
                 let domains = $("input[name='domains[]']").map(function () {
                     return $(this).val();
-                }).get()
+                }).get().join('\n')
                 var reg = new RegExp(/\n443.*\n?/);
                 // 如果开启了https，就自动添加443端口
                 if ($('input[name="ssl"]').prop('checked') && !reg.test(ports)) {
@@ -331,8 +351,8 @@ Date: 2023-07-24
                     , type: 'post'
                     , data: {
                         id: params.data.id,
-                        domains: domains.join('\n'),
-                        ports: ports.join('\n'),
+                        domains: domains,
+                        ports: ports,
                         ssl: $('input[name="ssl"]').prop('checked'),
                         http_redirect: $('input[name="http_redirect"]').prop('checked'),
                         hsts: $('input[name="hsts"]').prop('checked'),
