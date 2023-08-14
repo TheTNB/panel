@@ -17,45 +17,45 @@ func TestSystemHelperTestSuite(t *testing.T) {
 	suite.Run(t, &SystemHelperTestSuite{})
 }
 
-func (s *SystemHelperTestSuite) TestWriteFile() {
+func (s *SystemHelperTestSuite) TestWrite() {
 	filePath := "/tmp/testfile"
 	defer os.Remove(filePath)
 
-	s.True(WriteFile(filePath, "test data", 0644))
+	s.True(Write(filePath, "test data", 0644))
 	s.FileExists(filePath)
 
 	content, _ := os.ReadFile(filePath)
 	s.Equal("test data", string(content))
 }
 
-func (s *SystemHelperTestSuite) TestReadFile() {
+func (s *SystemHelperTestSuite) TestRead() {
 	filePath := "/tmp/testfile"
 	defer os.Remove(filePath)
 
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.Equal("test data", ReadFile(filePath))
+	s.Equal("test data", Read(filePath))
 }
 
-func (s *SystemHelperTestSuite) TestRemoveFile() {
+func (s *SystemHelperTestSuite) TestRemove() {
 	filePath := "/tmp/testfile"
 
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.True(RemoveFile(filePath))
+	s.True(Remove(filePath))
 }
 
-func (s *SystemHelperTestSuite) TestExecShell() {
-	s.Equal("test", ExecShell("echo 'test'"))
+func (s *SystemHelperTestSuite) TestExec() {
+	s.Equal("test", Exec("echo 'test'"))
 }
 
-func (s *SystemHelperTestSuite) TestExecShellAsync() {
+func (s *SystemHelperTestSuite) TestExecAsync() {
 	command := "echo 'test' > /tmp/testfile"
 	defer os.Remove("/tmp/testfile")
 
-	ExecShellAsync(command)
+	ExecAsync(command)
 
 	time.Sleep(time.Second)
 
@@ -105,12 +105,36 @@ func (s *SystemHelperTestSuite) TestEmpty() {
 	s.False(Empty("/tmp"))
 }
 
+func (s *SystemHelperTestSuite) TestMv() {
+	filePath := "/tmp/testfile"
+	defer os.Remove(filePath)
+
+	err := os.WriteFile(filePath, []byte("test data"), 0644)
+	s.Nil(err)
+
+	s.True(Mv(filePath, "/tmp/testfile2"))
+	s.False(Exists(filePath))
+}
+
+func (s *SystemHelperTestSuite) TestCp() {
+	filePath := "/tmp/testfile"
+	defer os.Remove(filePath)
+
+	err := os.WriteFile(filePath, []byte("test data"), 0644)
+	s.Nil(err)
+
+	s.True(Cp(filePath, "/tmp/testfile2"))
+	s.True(Exists(filePath))
+}
+
 func (s *SystemHelperTestSuite) TestSize() {
-	s.Equal(int64(0), Size("/tmp/123"))
-	s.NotEqual(int64(0), Size("/tmp"))
+	size, err := Size("/tmp/123")
+	s.Equal(int64(0), size)
+	s.Error(err)
 }
 
 func (s *SystemHelperTestSuite) TestFileSize() {
-	s.Equal(int64(0), FileSize("/tmp/123"))
-	s.NotEqual(int64(0), FileSize("/tmp"))
+	size, err := FileSize("/tmp/123")
+	s.Equal(int64(0), size)
+	s.Error(err)
 }

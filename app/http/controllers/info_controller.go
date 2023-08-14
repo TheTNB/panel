@@ -196,6 +196,6 @@ func (c *InfoController) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart panel")
+	tools.Exec("systemctl restart panel")
 	Success(ctx, nil)
 }

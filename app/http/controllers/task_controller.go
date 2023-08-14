@@ -62,7 +62,7 @@ func (r *TaskController) Log(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 30 " + task.Log)
+	log := tools.Exec("tail -n 30 " + task.Log)
 
 	Success(ctx, log)
 }

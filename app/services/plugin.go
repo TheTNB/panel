@@ -19,6 +19,7 @@ import (
 	"panel/app/plugins/redis"
 	"panel/app/plugins/s3fs"
 	"panel/app/plugins/supervisor"
+	"panel/app/plugins/toolbox"
 )
 
 // PanelPlugin 插件元数据结构
@@ -215,6 +216,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     fail2ban.Install,
 		Uninstall:   fail2ban.Uninstall,
 		Update:      fail2ban.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        toolbox.Name,
+		Description: toolbox.Description,
+		Slug:        toolbox.Slug,
+		Version:     toolbox.Version,
+		Requires:    toolbox.Requires,
+		Excludes:    toolbox.Excludes,
+		Install:     toolbox.Install,
+		Uninstall:   toolbox.Uninstall,
+		Update:      toolbox.Update,
 	})
 
 	return p

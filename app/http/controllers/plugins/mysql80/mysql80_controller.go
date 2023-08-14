@@ -34,7 +34,7 @@ func (c *Mysql80Controller) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -53,8 +53,8 @@ func (c *Mysql80Controller) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload mysqld")
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl reload mysqld")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -73,8 +73,8 @@ func (c *Mysql80Controller) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart mysqld")
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl restart mysqld")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -93,8 +93,8 @@ func (c *Mysql80Controller) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start mysqld")
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl start mysqld")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -113,8 +113,8 @@ func (c *Mysql80Controller) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop mysqld")
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl stop mysqld")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -134,7 +134,7 @@ func (c *Mysql80Controller) GetConfig(ctx http.Context) {
 	}
 
 	// 获取配置
-	config := tools.ReadFile("/www/server/mysql/conf/my.cnf")
+	config := tools.Read("/www/server/mysql/conf/my.cnf")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 		return
@@ -155,7 +155,7 @@ func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile("/www/server/mysql/conf/my.cnf", config, 0644) {
+	if !tools.Write("/www/server/mysql/conf/my.cnf", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 		return
 	}
@@ -175,13 +175,13 @@ func (c *Mysql80Controller) Load(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if status != "active" {
 		controllers.Error(ctx, http.StatusInternalServerError, "MySQL 已停止运行")
 		return
 	}
 
-	raw := tools.ExecShell("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	raw := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if strings.Contains(raw, "Access denied for user") {
 		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
 		return
@@ -247,7 +247,7 @@ func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/mysql/mysql-error.log"))
+	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -257,7 +257,7 @@ func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("echo '' > /www/server/mysql/mysql-error.log")
+	tools.Exec("echo '' > /www/server/mysql/mysql-error.log")
 	controllers.Success(ctx, "清空错误日志成功")
 }
 
@@ -267,7 +267,7 @@ func (c *Mysql80Controller) SlowLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/mysql/mysql-slow.log"))
+	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -277,7 +277,7 @@ func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("echo '' > /www/server/mysql/mysql-slow.log")
+	tools.Exec("echo '' > /www/server/mysql/mysql-slow.log")
 	controllers.Success(ctx, "清空慢查询日志成功")
 }
 
@@ -302,7 +302,7 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 		return
@@ -320,12 +320,12 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 
 	oldRootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
-		tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
-		tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
+		tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
+		tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
 		err := c.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
 		if err != nil {
-			tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
-			tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
+			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 			controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 			return
 		}
@@ -425,10 +425,10 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加数据库成功")
 }
@@ -453,7 +453,7 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
 	controllers.Success(ctx, "删除数据库成功")
 }
@@ -550,7 +550,7 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	fileName := ctx.Request().Input("name")
-	tools.RemoveFile(backupPath + "/" + fileName)
+	tools.Remove(backupPath + "/" + fileName)
 
 	controllers.Success(ctx, "删除备份成功")
 }
@@ -695,9 +695,9 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "添加成功")
 }
@@ -722,7 +722,7 @@ func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
 	controllers.Success(ctx, "删除成功")
 }
@@ -749,8 +749,8 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }
@@ -777,9 +777,9 @@ func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.ExecShell("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
+	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
 	controllers.Success(ctx, "修改成功")
 }

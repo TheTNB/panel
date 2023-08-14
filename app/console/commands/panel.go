@@ -123,7 +123,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		port := tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		port := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
@@ -131,7 +131,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyEntrance, "/"))
 
 	case "getPort":
-		port := tools.ExecShell("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+		port := tools.Exec("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":
@@ -243,7 +243,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			}
 
 			backupFile := path + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
-			tools.ExecShell(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`)
+			tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`)
 			color.Greenln("|-备份成功")
 
 		case "mysql":
@@ -259,21 +259,24 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Greenln("|-目标MySQL数据库: " + name)
 			color.Greenln("|-开始导出")
-			tools.ExecShell(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`)
+			tools.Exec(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`)
 			color.Greenln("|-导出成功")
 			color.Greenln("|-开始压缩")
-			tools.ExecShell("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
-			tools.RemoveFile("/tmp/" + backupFile)
+			tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
+			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
-			tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip")
+			if _, err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+				color.Redln("|-移动失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-移动成功")
 			_ = os.Unsetenv("MYSQL_PWD")
 			color.Greenln("|-备份成功")
 
 		case "postgresql":
 			backupFile := name + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-			check := tools.ExecShell(`su - postgres -c "psql -l" 2>&1`)
+			check := tools.Exec(`su - postgres -c "psql -l" 2>&1`)
 			if strings.Contains(check, name) {
 				color.Redln("|-数据库不存在")
 				color.Greenln(hr)
@@ -282,14 +285,17 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Greenln("|-目标PostgreSQL数据库: " + name)
 			color.Greenln("|-开始导出")
-			tools.ExecShell(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`)
+			tools.Exec(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`)
 			color.Greenln("|-导出成功")
 			color.Greenln("|-开始压缩")
-			tools.ExecShell("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
-			tools.RemoveFile("/tmp/" + backupFile)
+			tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
+			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
-			tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip")
+			if _, err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+				color.Redln("|-移动失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-移动成功")
 			color.Greenln("|-备份成功")
 		}
@@ -316,7 +322,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join(path, filteredFiles[i].Name())
 			color.Yellowln("|-清理备份: " + fileToDelete)
-			tools.RemoveFile(fileToDelete)
+			tools.Remove(fileToDelete)
 		}
 		color.Greenln("|-清理完成")
 		color.Greenln(hr)
@@ -352,8 +358,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		backupPath := "/www/wwwlogs/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".log.zip"
-		tools.ExecShell(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log")
-		tools.ExecShell(`echo "" > ` + logPath)
+		tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log")
+		tools.Exec(`echo "" > ` + logPath)
 		color.Greenln("|-切割成功")
 
 		color.Greenln(hr)
@@ -378,7 +384,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join("/www/wwwlogs", filteredFiles[i].Name())
 			color.Yellowln("|-清理日志: " + fileToDelete)
-			tools.RemoveFile(fileToDelete)
+			tools.Remove(fileToDelete)
 		}
 		color.Greenln("|-清理完成")
 		color.Greenln(hr)

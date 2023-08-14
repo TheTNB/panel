@@ -35,7 +35,7 @@ func (c *Php74Controller) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 		return
@@ -53,8 +53,8 @@ func (c *Php74Controller) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload php-fpm-" + c.version)
-	out := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl reload php-fpm-" + c.version)
+	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
@@ -73,8 +73,8 @@ func (c *Php74Controller) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start php-fpm-" + c.version)
-	out := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl start php-fpm-" + c.version)
+	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
@@ -93,8 +93,8 @@ func (c *Php74Controller) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop php-fpm-" + c.version)
-	out := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl stop php-fpm-" + c.version)
+	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
@@ -113,8 +113,8 @@ func (c *Php74Controller) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart php-fpm-" + c.version)
-	out := tools.ExecShell("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl restart php-fpm-" + c.version)
+	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
@@ -133,7 +133,7 @@ func (c *Php74Controller) GetConfig(ctx http.Context) {
 		return
 	}
 
-	config := tools.ReadFile("/www/server/php/" + c.version + "/etc/php.ini")
+	config := tools.Read("/www/server/php/" + c.version + "/etc/php.ini")
 	controllers.Success(ctx, config)
 }
 
@@ -143,7 +143,7 @@ func (c *Php74Controller) SaveConfig(ctx http.Context) {
 	}
 
 	config := ctx.Request().Input("config")
-	tools.WriteFile("/www/server/php/"+c.version+"/etc/php.ini", config, 0644)
+	tools.Write("/www/server/php/"+c.version+"/etc/php.ini", config, 0644)
 	c.Reload(ctx)
 }
 
@@ -188,7 +188,7 @@ func (c *Php74Controller) ErrorLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log"))
+	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -197,7 +197,7 @@ func (c *Php74Controller) SlowLog(ctx http.Context) {
 		return
 	}
 
-	log := tools.Escape(tools.ExecShell("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log"))
+	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log"))
 	controllers.Success(ctx, log)
 }
 
@@ -206,7 +206,7 @@ func (c *Php74Controller) ClearErrorLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("echo '' > /www/server/php/" + c.version + "/var/log/php-fpm.log")
+	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/php-fpm.log")
 	controllers.Success(ctx, true)
 }
 
@@ -215,7 +215,7 @@ func (c *Php74Controller) ClearSlowLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("echo '' > /www/server/php/" + c.version + "/var/log/slow.log")
+	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/slow.log")
 	controllers.Success(ctx, true)
 }
 
@@ -354,7 +354,7 @@ func (c *Php74Controller) GetExtensions() []Extension {
 		Installed:   false,
 	})
 
-	raw := tools.ExecShell("/www/server/php/" + c.version + "/bin/php -m")
+	raw := tools.Exec("/www/server/php/" + c.version + "/bin/php -m")
 	rawExtensionList := strings.Split(raw, "\n")
 
 	for _, item := range rawExtensionList {

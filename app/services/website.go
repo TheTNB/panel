@@ -129,7 +129,7 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 </body>
 </html>
 `
-	tools.WriteFile(website.Path+"/index.html", index, 0644)
+	tools.Write(website.Path+"/index.html", index, 0644)
 
 	domainArr := strings.Split(website.Domain, "\n")
 	portList := ""
@@ -217,24 +217,24 @@ server
 }
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644)
-	tools.WriteFile("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644)
-	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644)
-	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", "", 0644)
+	tools.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644)
+	tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644)
+	tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644)
+	tools.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644)
 
 	tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755)
 	tools.Chmod(website.Path, 0755)
 	tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www")
 	tools.Chown(website.Path, "www", "www")
 
-	tools.ExecShell("systemctl reload openresty")
+	tools.Exec("systemctl reload openresty")
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
-		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
-		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
-		tools.ExecShell(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
+		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
+		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
+		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
+		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
 	}
 
 	return w, nil
@@ -251,13 +251,13 @@ func (r *WebsiteImpl) Delete(id int) error {
 		return err
 	}
 
-	tools.RemoveFile("/www/server/vhost/" + website.Name + ".conf")
-	tools.RemoveFile("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	tools.RemoveFile("/www/server/vhost/ssl/" + website.Name + ".pem")
-	tools.RemoveFile("/www/server/vhost/ssl/" + website.Name + ".key")
-	tools.RemoveFile(website.Path)
+	tools.Remove("/www/server/vhost/" + website.Name + ".conf")
+	tools.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	tools.Remove("/www/server/vhost/ssl/" + website.Name + ".pem")
+	tools.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
+	tools.Remove(website.Path)
 
-	tools.ExecShell("systemctl reload openresty")
+	tools.Exec("systemctl reload openresty")
 
 	return nil
 }
@@ -269,7 +269,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		return WebsiteSetting{}, err
 	}
 
-	config := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
+	config := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 
 	var setting WebsiteSetting
 	setting.Name = website.Name
@@ -303,7 +303,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	}
 
 	if tools.Exists(setting.Root + "/.user.ini") {
-		userIni := tools.ReadFile(setting.Path + "/.user.ini")
+		userIni := tools.Read(setting.Path + "/.user.ini")
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {
@@ -313,8 +313,8 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
-	setting.SslCertificate = tools.ReadFile("/www/server/vhost/ssl/" + website.Name + ".pem")
-	setting.SslCertificateKey = tools.ReadFile("/www/server/vhost/ssl/" + website.Name + ".key")
+	setting.SslCertificate = tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+	setting.SslCertificateKey = tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
 	if setting.Ssl {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
@@ -339,8 +339,8 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	setting.Rewrite = tools.ReadFile("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	setting.Log = tools.Escape(tools.ExecShell(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`))
+	setting.Rewrite = tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	setting.Log = tools.Escape(tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`))
 
 	return setting, nil
 }

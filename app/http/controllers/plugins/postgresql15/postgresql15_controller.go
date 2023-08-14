@@ -36,7 +36,7 @@ func (c *Postgresql15Controller) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 		return
@@ -55,8 +55,8 @@ func (c *Postgresql15Controller) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload postgresql")
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl reload postgresql")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 		return
@@ -75,8 +75,8 @@ func (c *Postgresql15Controller) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart postgresql")
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl restart postgresql")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 		return
@@ -95,8 +95,8 @@ func (c *Postgresql15Controller) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start postgresql")
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl start postgresql")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 		return
@@ -115,8 +115,8 @@ func (c *Postgresql15Controller) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop postgresql")
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl stop postgresql")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 		return
@@ -136,7 +136,7 @@ func (c *Postgresql15Controller) GetConfig(ctx http.Context) {
 	}
 
 	// 获取配置
-	config := tools.ReadFile("/www/server/postgresql/data/postgresql.conf")
+	config := tools.Read("/www/server/postgresql/data/postgresql.conf")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 		return
@@ -152,7 +152,7 @@ func (c *Postgresql15Controller) GetUserConfig(ctx http.Context) {
 	}
 
 	// 获取配置
-	config := tools.ReadFile("/www/server/postgresql/data/pg_hba.conf")
+	config := tools.Read("/www/server/postgresql/data/pg_hba.conf")
 	if len(config) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 		return
@@ -173,7 +173,7 @@ func (c *Postgresql15Controller) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile("/www/server/postgresql/data/postgresql.conf", config, 0644) {
+	if !tools.Write("/www/server/postgresql/data/postgresql.conf", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 		return
 	}
@@ -193,7 +193,7 @@ func (c *Postgresql15Controller) SaveUserConfig(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile("/www/server/postgresql/data/pg_hba.conf", config, 0644) {
+	if !tools.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644) {
 		controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 		return
 	}
@@ -207,18 +207,18 @@ func (c *Postgresql15Controller) Load(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if status != "active" {
 		controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL 已停止运行")
 		return
 	}
 
 	data := []Info{
-		{"启动时间", carbon.Parse(tools.ExecShell(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)).ToDateTimeString()},
-		{"进程 PID", tools.ExecShell(`echo "select pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
-		{"进程数", tools.ExecShell(`ps aux | grep postgres | grep -v grep | wc -l`)},
-		{"总连接数", tools.ExecShell(`echo "SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
-		{"空间占用", tools.ExecShell(`echo "select pg_size_pretty(pg_database_size('postgres'));" | su - postgres -c "psql" | sed -n 3p`)},
+		{"启动时间", carbon.Parse(tools.Exec(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)).ToDateTimeString()},
+		{"进程 PID", tools.Exec(`echo "select pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
+		{"进程数", tools.Exec(`ps aux | grep postgres | grep -v grep | wc -l`)},
+		{"总连接数", tools.Exec(`echo "SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
+		{"空间占用", tools.Exec(`echo "select pg_size_pretty(pg_database_size('postgres'));" | su - postgres -c "psql" | sed -n 3p`)},
 	}
 
 	controllers.Success(ctx, data)
@@ -230,7 +230,7 @@ func (c *Postgresql15Controller) Log(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
+	log := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
 	controllers.Success(ctx, log)
 }
 
@@ -240,7 +240,7 @@ func (c *Postgresql15Controller) ClearLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
+	tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
 	controllers.Success(ctx, nil)
 }
 
@@ -250,13 +250,13 @@ func (c *Postgresql15Controller) DatabaseList(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
 	if status != "active" {
 		controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL 已停止运行")
 		return
 	}
 
-	raw := tools.ExecShell(`echo "\l" | su - postgres -c "psql"`)
+	raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
 	databases := strings.Split(raw, "\n")
 	databases = databases[3 : len(databases)-1]
 
@@ -326,12 +326,12 @@ func (c *Postgresql15Controller) AddDatabase(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	tools.ExecShell(`echo "CREATE DATABASE ` + database + `;" | su - postgres -c "psql"`)
-	tools.ExecShell(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
-	tools.ExecShell(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
+	tools.Exec(`echo "CREATE DATABASE ` + database + `;" | su - postgres -c "psql"`)
+	tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
+	tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
 
 	userConfig := "host    " + database + "    " + user + "    127.0.0.1/32    scram-sha-256"
-	tools.ExecShell(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+	tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
 
 	c.Reload(ctx)
 }
@@ -355,7 +355,7 @@ func (c *Postgresql15Controller) DeleteDatabase(ctx http.Context) {
 	}
 
 	database := ctx.Request().Input("database")
-	tools.ExecShell(`echo "DROP DATABASE ` + database + `;" | su - postgres -c "psql"`)
+	tools.Exec(`echo "DROP DATABASE ` + database + `;" | su - postgres -c "psql"`)
 
 	controllers.Success(ctx, nil)
 }
@@ -452,7 +452,7 @@ func (c *Postgresql15Controller) DeleteBackup(ctx http.Context) {
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	fileName := ctx.Request().Input("name")
-	tools.RemoveFile(backupPath + "/" + fileName)
+	tools.Remove(backupPath + "/" + fileName)
 
 	controllers.Success(ctx, nil)
 }
@@ -497,7 +497,7 @@ func (c *Postgresql15Controller) UserList(ctx http.Context) {
 		Role string `json:"role"`
 	}
 
-	raw := tools.ExecShell(`echo "\du" | su - postgres -c "psql"`)
+	raw := tools.Exec(`echo "\du" | su - postgres -c "psql"`)
 	users := strings.Split(raw, "\n")
 	if len(users) < 4 {
 		controllers.Error(ctx, http.StatusInternalServerError, "用户列表为空")
@@ -563,11 +563,11 @@ func (c *Postgresql15Controller) AddUser(ctx http.Context) {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	tools.ExecShell(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
-	tools.ExecShell(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
+	tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
+	tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
 
 	userConfig := "host    " + database + "    " + user + "    127.0.0.1/32    scram-sha-256"
-	tools.ExecShell(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+	tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
 
 	c.Reload(ctx)
 }
@@ -591,8 +591,8 @@ func (c *Postgresql15Controller) DeleteUser(ctx http.Context) {
 	}
 
 	user := ctx.Request().Input("user")
-	tools.ExecShell(`echo "DROP USER ` + user + `;" | su - postgres -c "psql"`)
-	tools.ExecShell(`sed -i '/` + user + `/d' /www/server/postgresql/data/pg_hba.conf`)
+	tools.Exec(`echo "DROP USER ` + user + `;" | su - postgres -c "psql"`)
+	tools.Exec(`sed -i '/` + user + `/d' /www/server/postgresql/data/pg_hba.conf`)
 
 	c.Reload(ctx)
 }
@@ -618,7 +618,7 @@ func (c *Postgresql15Controller) SetUserPassword(ctx http.Context) {
 
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	tools.ExecShell(`echo "ALTER USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
+	tools.Exec(`echo "ALTER USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
 
 	controllers.Success(ctx, nil)
 }

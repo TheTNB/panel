@@ -125,17 +125,17 @@ func (c *S3fsController) Add(ctx http.Context) {
 
 	id := carbon.Now().TimestampMilli()
 	password := ak + ":" + sk
-	tools.WriteFile("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600)
-	tools.ExecShell(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
-	check := tools.ExecShell("mount -a 2>&1")
+	tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600)
+	tools.Exec(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
+	check := tools.Exec("mount -a 2>&1")
 	if len(check) != 0 {
-		tools.ExecShell(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
+		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
 		controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
 		return
 	}
-	check2 := tools.ExecShell("df -h | grep " + path + " 2>&1")
+	check2 := tools.Exec("df -h | grep " + path + " 2>&1")
 	if len(check2) == 0 {
-		tools.ExecShell(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
+		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
 		controllers.Error(ctx, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
 		return
 	}
@@ -191,15 +191,15 @@ func (c *S3fsController) Delete(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`fusermount -u '` + mount.Path + `' 2>&1`)
-	tools.ExecShell(`umount '` + mount.Path + `' 2>&1`)
-	tools.ExecShell(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`)
-	check := tools.ExecShell("mount -a 2>&1")
+	tools.Exec(`fusermount -u '` + mount.Path + `' 2>&1`)
+	tools.Exec(`umount '` + mount.Path + `' 2>&1`)
+	tools.Exec(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`)
+	check := tools.Exec("mount -a 2>&1")
 	if len(check) != 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
 		return
 	}
-	tools.RemoveFile("/etc/passwd-s3fs-" + cast.ToString(mount.ID))
+	tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID))
 
 	var newS3fsList []s3fs
 	for _, s := range s3fsList {

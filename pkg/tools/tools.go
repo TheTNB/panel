@@ -127,42 +127,42 @@ func UpdatePanel(proxy bool) error {
 	color.Greenln("使用代理: " + strconv.FormatBool(proxy))
 
 	color.Greenln("备份面板配置...")
-	ExecShell("cp -f /www/panel/database/panel.db /tmp/panel.db.bak")
-	ExecShell("cp -f /www/panel/panel.conf /tmp/panel.conf.bak")
+	Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak")
+	Exec("cp -f /www/panel/panel.conf /tmp/panel.conf.bak")
 	if !Exists("/tmp/panel.db.bak") || !Exists("/tmp/panel.conf.bak") {
 		return errors.New("备份面板配置失败")
 	}
 	color.Greenln("备份完成")
 
 	color.Greenln("清理旧版本...")
-	ExecShell("rm -rf /www/panel/*")
+	Exec("rm -rf /www/panel/*")
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
 	if proxy {
-		ExecShell("wget -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
+		Exec("wget -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
 	} else {
-		ExecShell("wget -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
+		Exec("wget -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
 	}
 	color.Greenln("下载完成")
 
 	color.Greenln("更新新版本...")
-	ExecShell("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel && bash scripts/update_panel.sh")
+	Exec("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel && bash scripts/update_panel.sh")
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
-	ExecShell("cp -f /tmp/panel.db.bak /www/panel/database/panel.db")
-	ExecShell("cp -f /tmp/panel.conf.bak /www/panel/panel.conf")
+	Exec("cp -f /tmp/panel.db.bak /www/panel/database/panel.db")
+	Exec("cp -f /tmp/panel.conf.bak /www/panel/panel.conf")
 	if !Exists("/www/panel/database/panel.db") || !Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板配置失败")
 	}
-	ExecShell("/www/panel/panel --env=panel.conf artisan migrate")
+	Exec("/www/panel/panel --env=panel.conf artisan migrate")
 	color.Greenln("恢复完成")
 
-	ExecShell("panel writeSetting version " + panelInfo.Version)
+	Exec("panel writeSetting version " + panelInfo.Version)
 
 	color.Greenln("重启面板...")
-	ExecShell("systemctl restart panel")
+	Exec("systemctl restart panel")
 	color.Greenln("重启完成")
 
 	return nil

@@ -9,8 +9,8 @@ import (
 	"github.com/goravel/framework/facades"
 )
 
-// WriteFile 写入文件
-func WriteFile(path string, data string, permission os.FileMode) bool {
+// Write 写入文件
+func Write(path string, data string, permission os.FileMode) bool {
 	if err := os.MkdirAll(filepath.Dir(path), permission); err != nil {
 		facades.Log().Errorf("[面板][Helpers] 创建目录失败: %s", err.Error())
 		return false
@@ -25,8 +25,8 @@ func WriteFile(path string, data string, permission os.FileMode) bool {
 	return true
 }
 
-// ReadFile 读取文件
-func ReadFile(path string) string {
+// Read 读取文件
+func Read(path string) string {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		facades.Log().Errorf("[面板][Helpers] 读取文件 %s 失败: %s", path, err.Error())
@@ -36,8 +36,8 @@ func ReadFile(path string) string {
 	return string(data)
 }
 
-// RemoveFile 删除文件
-func RemoveFile(path string) bool {
+// Remove 删除文件
+func Remove(path string) bool {
 	if err := os.Remove(path); err != nil {
 		facades.Log().Errorf("[面板][Helpers] 删除文件 %s 失败: %s", path, err.Error())
 		return false
@@ -46,8 +46,8 @@ func RemoveFile(path string) bool {
 	return true
 }
 
-// ExecShell 执行 shell 命令
-func ExecShell(shell string) string {
+// Exec 执行 shell 命令
+func Exec(shell string) string {
 	cmd := exec.Command("bash", "-c", shell)
 
 	output, err := cmd.CombinedOutput()
@@ -59,8 +59,8 @@ func ExecShell(shell string) string {
 	return strings.TrimSpace(string(output))
 }
 
-// ExecShellAsync 异步执行 shell 命令
-func ExecShellAsync(shell string) {
+// ExecAsync 异步执行 shell 命令
+func ExecAsync(shell string) {
 	cmd := exec.Command("bash", "-c", shell)
 
 	err := cmd.Start()
@@ -126,33 +126,32 @@ func Empty(path string) bool {
 }
 
 // Mv 移动路径
-func Mv(src, dst string) bool {
+func Mv(src, dst string) (bool, error) {
 	cmd := exec.Command("mv", src, dst)
 
 	err := cmd.Run()
 	if err != nil {
 		facades.Log().Errorf("[面板][Helpers] 移动 %s 到 %s 失败: %s", src, dst, err.Error())
-		return false
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
 
 // Cp 复制路径
-func Cp(src, dst string) bool {
+func Cp(src, dst string) (bool, error) {
 	cmd := exec.Command("cp", "-r", src, dst)
 
 	err := cmd.Run()
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 复制 %s 到 %s 失败: %s", src, dst, err.Error())
-		return false
+		return false, err
 	}
 
-	return true
+	return true, nil
 }
 
 // Size 获取路径大小
-func Size(path string) int64 {
+func Size(path string) (int64, error) {
 	var size int64
 
 	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
@@ -160,20 +159,18 @@ func Size(path string) int64 {
 		return nil
 	})
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 获取路径 %s 大小失败: %s", path, err.Error())
-		return 0
+		return 0, err
 	}
 
-	return size
+	return size, nil
 }
 
 // FileSize 获取文件大小
-func FileSize(path string) int64 {
+func FileSize(path string) (int64, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 获取文件 %s 大小失败: %s", path, err.Error())
-		return 0
+		return 0, err
 	}
 
-	return info.Size()
+	return info.Size(), nil
 }

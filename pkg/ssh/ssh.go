@@ -68,5 +68,5 @@ func NewSSHClient(conf *SSHClientConfig) (*ssh.Client, error) {
 }
 
 func getKey(keyPath string) (ssh.Signer, error) {
-	return ssh.ParsePrivateKey([]byte(tools.ReadFile(keyPath)))
+	return ssh.ParsePrivateKey([]byte(tools.Read(keyPath)))
 }

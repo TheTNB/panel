@@ -40,7 +40,7 @@ func (c *PhpMyAdminController) Info(ctx http.Context) {
 		return
 	}
 
-	conf := tools.ReadFile("/www/server/vhost/phpmyadmin.conf")
+	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	match := regexp.MustCompile(`listen\s+(\d+);`).FindStringSubmatch(conf)
 	if len(match) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 端口")
@@ -64,18 +64,18 @@ func (c *PhpMyAdminController) SetPort(ctx http.Context) {
 		return
 	}
 
-	conf := tools.ReadFile("/www/server/vhost/phpmyadmin.conf")
+	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+port+";")
-	tools.WriteFile("/www/server/vhost/phpmyadmin.conf", conf, 0644)
+	tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644)
 
 	if tools.IsRHEL() {
-		tools.ExecShell("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent")
-		tools.ExecShell("firewall-cmd --reload")
+		tools.Exec("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent")
+		tools.Exec("firewall-cmd --reload")
 	} else {
-		tools.ExecShell("ufw allow " + port + "/tcp")
-		tools.ExecShell("ufw reload")
+		tools.Exec("ufw allow " + port + "/tcp")
+		tools.Exec("ufw reload")
 	}
-	tools.ExecShell("systemctl reload openresty")
+	tools.Exec("systemctl reload openresty")
 
 	controllers.Success(ctx, nil)
 }

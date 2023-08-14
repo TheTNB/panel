@@ -123,12 +123,12 @@ panel cutoff ${name} ${save} 2>&1
 		return
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if !tools.WriteFile(shellDir+shellFile+".sh", shell, 0700) {
+	if !tools.Write(shellDir+shellFile+".sh", shell, 0700) {
 		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
-	tools.ExecShell("dos2unix " + shellDir + shellFile + ".sh")
+	tools.Exec("dos2unix " + shellDir + shellFile + ".sh")
 
 	var cron models.Cron
 	cron.Name = ctx.Request().Input("name")
@@ -161,7 +161,7 @@ func (c *CronController) Script(ctx http.Context) {
 		return
 	}
 
-	Success(ctx, tools.ReadFile(cron.Shell))
+	Success(ctx, tools.Read(cron.Shell))
 }
 
 func (c *CronController) Update(ctx http.Context) {
@@ -206,12 +206,12 @@ func (c *CronController) Update(ctx http.Context) {
 		return
 	}
 
-	if !tools.WriteFile(cron.Shell, ctx.Request().Input("script"), 0644) {
+	if !tools.Write(cron.Shell, ctx.Request().Input("script"), 0644) {
 		facades.Log().Error("[面板][CronController] 更新计划任务脚本失败 ", err)
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
-	tools.ExecShell("dos2unix " + cron.Shell)
+	tools.Exec("dos2unix " + cron.Shell)
 
 	c.cron.DeleteFromSystem(cron)
 	if cron.Status {
@@ -230,7 +230,7 @@ func (c *CronController) Delete(ctx http.Context) {
 	}
 
 	c.cron.DeleteFromSystem(cron)
-	tools.RemoveFile(cron.Shell)
+	tools.Remove(cron.Shell)
 
 	_, err = facades.Orm().Query().Delete(&cron)
 	if err != nil {
@@ -291,5 +291,5 @@ func (c *CronController) Log(ctx http.Context) {
 		return
 	}
 
-	Success(ctx, tools.ReadFile(cron.Log))
+	Success(ctx, tools.Read(cron.Log))
 }

@@ -111,8 +111,8 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
 	if !Check(ctx, "openresty") {
 		return
 	}
-	index := tools.ReadFile("/www/server/openresty/html/index.html")
-	stop := tools.ReadFile("/www/server/openresty/html/stop.html")
+	index := tools.Read("/www/server/openresty/html/index.html")
+	stop := tools.Read("/www/server/openresty/html/stop.html")
 
 	Success(ctx, http.Json{
 		"index": index,
@@ -128,13 +128,13 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
-	if !tools.WriteFile("/www/server/openresty/html/index.html", index, 0644) {
+	if !tools.Write("/www/server/openresty/html/index.html", index, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
 	}
 
-	if !tools.WriteFile("/www/server/openresty/html/stop.html", stop, 0644) {
+	if !tools.Write("/www/server/openresty/html/stop.html", stop, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
 		Error(ctx, http.StatusInternalServerError, "系统内部错误")
 		return
@@ -210,10 +210,10 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	}
 
 	// 原文
-	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
+	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 	if strings.TrimSpace(raw) != strings.TrimSpace(ctx.Request().Input("raw")) {
-		tools.WriteFile("/www/server/vhost/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
-		tools.ExecShell("systemctl reload openresty")
+		tools.Write("/www/server/vhost/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
+		tools.Exec("systemctl reload openresty")
 		Success(ctx, nil)
 		return
 	}
@@ -309,10 +309,10 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		root += "/"
 	}
 	if ctx.Request().InputBool("open_basedir") {
-		tools.WriteFile(root+".user.ini", "open_basedir="+path+":/tmp/", 0644)
+		tools.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644)
 	} else {
 		if tools.Exists(root + ".user.ini") {
-			tools.RemoveFile(root + ".user.ini")
+			tools.Remove(root + ".user.ini")
 		}
 	}
 
@@ -337,8 +337,8 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	// SSL
 	ssl := ctx.Request().InputBool("ssl")
 	website.Ssl = ssl
-	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
-	tools.WriteFile("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
+	tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", ctx.Request().Input("ssl_certificate"), 0644)
+	tools.Write("/www/server/vhost/ssl/"+website.Name+".key", ctx.Request().Input("ssl_certificate_key"), 0644)
 	if ssl {
 		sslConfig := `# ssl标记位开始
     ssl_certificate /www/server/vhost/ssl/` + website.Name + `.pem;
@@ -395,9 +395,9 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		return
 	}
 
-	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	tools.WriteFile("/www/server/vhost/rewrite/"+website.Name+".conf", ctx.Request().Input("rewrite"), 0644)
-	tools.ExecShell("systemctl reload openresty")
+	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", ctx.Request().Input("rewrite"), 0644)
+	tools.Exec("systemctl reload openresty")
 
 	Success(ctx, nil)
 }
@@ -421,7 +421,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) {
 		return
 	}
 
-	tools.RemoveFile("/www/wwwlogs/" + website.Name + ".log")
+	tools.Remove("/www/wwwlogs/" + website.Name + ".log")
 
 	Success(ctx, nil)
 }
@@ -558,7 +558,7 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) {
 		tools.Mkdir(backupPath, 0644)
 	}
 
-	if !tools.RemoveFile(backupPath + "/" + fileName) {
+	if !tools.Remove(backupPath + "/" + fileName) {
 		Error(ctx, http.StatusInternalServerError, "删除备份失败")
 		return
 	}
@@ -651,9 +651,9 @@ server
 
 `, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	tools.WriteFile("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644)
-	tools.ExecShell("systemctl reload openresty")
+	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644)
+	tools.Exec("systemctl reload openresty")
 
 	Success(ctx, nil)
 }
@@ -683,7 +683,7 @@ func (c *WebsiteController) Status(ctx http.Context) {
 		return
 	}
 
-	raw := tools.ReadFile("/www/server/vhost/" + website.Name + ".conf")
+	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 
 	// 运行目录
 	rootConfig := tools.Cut(raw, "# root标记位开始\n", "# root标记位结束")
@@ -709,8 +709,8 @@ func (c *WebsiteController) Status(ctx http.Context) {
 		}
 	}
 
-	tools.WriteFile("/www/server/vhost/"+website.Name+".conf", raw, 0644)
-	tools.ExecShell("systemctl reload openresty")
+	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
+	tools.Exec("systemctl reload openresty")
 
 	Success(ctx, nil)
 }

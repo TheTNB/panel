@@ -28,7 +28,7 @@ func (c *PureFtpdController) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 		return
@@ -47,8 +47,8 @@ func (c *PureFtpdController) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload pure-ftpd")
-	status := tools.ExecShell("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl reload pure-ftpd")
+	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 		return
@@ -67,8 +67,8 @@ func (c *PureFtpdController) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart pure-ftpd")
-	status := tools.ExecShell("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl restart pure-ftpd")
+	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 		return
@@ -87,8 +87,8 @@ func (c *PureFtpdController) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start pure-ftpd")
-	status := tools.ExecShell("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl start pure-ftpd")
+	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 		return
@@ -107,8 +107,8 @@ func (c *PureFtpdController) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop pure-ftpd")
-	status := tools.ExecShell("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl stop pure-ftpd")
+	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 		return
@@ -127,7 +127,7 @@ func (c *PureFtpdController) List(ctx http.Context) {
 		return
 	}
 
-	listRaw := tools.ExecShell("pure-pw list")
+	listRaw := tools.Exec("pure-pw list")
 	if len(listRaw) == 0 {
 		controllers.Success(ctx, http.Json{
 			"total": 0,
@@ -206,8 +206,8 @@ func (c *PureFtpdController) Add(ctx http.Context) {
 
 	tools.Chmod(path, 0755)
 	tools.Chown(path, "www", "www")
-	tools.ExecShell(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
-	tools.ExecShell("pure-pw mkdb")
+	tools.Exec(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
+	tools.Exec("pure-pw mkdb")
 
 	controllers.Success(ctx, nil)
 }
@@ -232,8 +232,8 @@ func (c *PureFtpdController) Delete(ctx http.Context) {
 
 	username := ctx.Request().Input("username")
 
-	tools.ExecShell("pure-pw userdel " + username + " -m")
-	tools.ExecShell("pure-pw mkdb")
+	tools.Exec("pure-pw userdel " + username + " -m")
+	tools.Exec("pure-pw mkdb")
 
 	controllers.Success(ctx, nil)
 }
@@ -260,8 +260,8 @@ func (c *PureFtpdController) ChangePassword(ctx http.Context) {
 	username := ctx.Request().Input("username")
 	password := ctx.Request().Input("password")
 
-	tools.ExecShell(`yes '` + password + `' | pure-pw passwd ` + username + ` -m`)
-	tools.ExecShell("pure-pw mkdb")
+	tools.Exec(`yes '` + password + `' | pure-pw passwd ` + username + ` -m`)
+	tools.Exec("pure-pw mkdb")
 
 	controllers.Success(ctx, nil)
 }
@@ -272,7 +272,7 @@ func (c *PureFtpdController) GetPort(ctx http.Context) {
 		return
 	}
 
-	port := tools.ExecShell(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
+	port := tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 	if len(port) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
 		return
@@ -300,15 +300,15 @@ func (c *PureFtpdController) SetPort(ctx http.Context) {
 	}
 
 	port := ctx.Request().Input("port")
-	tools.ExecShell(`sed -i "s/Bind.*/Bind 0.0.0.0,` + port + `/g" /www/server/pure-ftpd/etc/pure-ftpd.conf`)
+	tools.Exec(`sed -i "s/Bind.*/Bind 0.0.0.0,` + port + `/g" /www/server/pure-ftpd/etc/pure-ftpd.conf`)
 	if tools.IsRHEL() {
-		tools.ExecShell("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent")
-		tools.ExecShell("firewall-cmd --reload")
+		tools.Exec("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent")
+		tools.Exec("firewall-cmd --reload")
 	} else {
-		tools.ExecShell("ufw allow " + port + "/tcp")
-		tools.ExecShell("ufw reload")
+		tools.Exec("ufw allow " + port + "/tcp")
+		tools.Exec("ufw reload")
 	}
-	tools.ExecShell("systemctl restart pure-ftpd")
+	tools.Exec("systemctl restart pure-ftpd")
 
 	controllers.Success(ctx, nil)
 }

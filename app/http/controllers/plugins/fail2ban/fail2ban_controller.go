@@ -39,7 +39,7 @@ func (c *Fail2banController) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
+	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
 		return
@@ -58,8 +58,8 @@ func (c *Fail2banController) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl reload fail2ban")
-	status := tools.ExecShell("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl reload fail2ban")
+	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
 		return
@@ -78,8 +78,8 @@ func (c *Fail2banController) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl restart fail2ban")
-	status := tools.ExecShell("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl restart fail2ban")
+	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
 		return
@@ -98,8 +98,8 @@ func (c *Fail2banController) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl start fail2ban")
-	status := tools.ExecShell("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl start fail2ban")
+	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
 		return
@@ -118,8 +118,8 @@ func (c *Fail2banController) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("systemctl stop fail2ban")
-	status := tools.ExecShell("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
+	tools.Exec("systemctl stop fail2ban")
+	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
 		return
@@ -140,7 +140,7 @@ func (c *Fail2banController) List(ctx http.Context) {
 
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
-	raw := tools.ReadFile("/etc/fail2ban/jail.local")
+	raw := tools.Read("/etc/fail2ban/jail.local")
 	if len(raw) == 0 {
 		controllers.Error(ctx, http.StatusBadRequest, "Fail2ban 规则为空")
 		return
@@ -231,7 +231,7 @@ func (c *Fail2banController) Add(ctx http.Context) {
 	jailWebsiteMode := ctx.Request().Input("website_mode")
 	jailWebsitePath := ctx.Request().Input("website_path")
 
-	raw := tools.ReadFile("/etc/fail2ban/jail.local")
+	raw := tools.Read("/etc/fail2ban/jail.local")
 	if strings.Contains(raw, "["+jailName+"]") || (strings.Contains(raw, "["+jailName+"]"+"-cc") && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailName+"]"+"-path") && jailWebsiteMode == "path") {
 		controllers.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
 		return
@@ -273,7 +273,7 @@ logpath = /www/wwwlogs/` + website.Name + `.log
 # ` + jailName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
-		tools.WriteFile("/etc/fail2ban/jail.local", raw, 0644)
+		tools.Write("/etc/fail2ban/jail.local", raw, 0644)
 
 		var filter string
 		if jailWebsiteMode == "cc" {
@@ -289,7 +289,7 @@ failregex = ^<HOST>\s-.*\s` + jailWebsitePath + `.*HTTP/.*$
 ignoreregex =
 `
 		}
-		tools.WriteFile("/etc/fail2ban/filter.d/haozi-"+jailName+"-"+jailWebsiteMode+".conf", filter, 0644)
+		tools.Write("/etc/fail2ban/filter.d/haozi-"+jailName+"-"+jailWebsiteMode+".conf", filter, 0644)
 
 	case "service":
 		var logPath string
@@ -303,15 +303,15 @@ ignoreregex =
 				logPath = "/var/log/secure"
 			}
 			filter = "sshd"
-			port = tools.ExecShell("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
+			port = tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 		case "mysql":
 			logPath = "/www/server/mysql/mysql-error.log"
 			filter = "mysqld-auth"
-			port = tools.ExecShell("cat /www/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'")
+			port = tools.Exec("cat /www/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'")
 		case "pure-ftpd":
 			logPath = "/var/log/messages"
 			filter = "pure-ftpd"
-			port = tools.ExecShell(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
+			port = tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 		default:
 			controllers.Error(ctx, http.StatusUnprocessableEntity, "未知服务")
 			return
@@ -335,10 +335,10 @@ logpath = ` + logPath + `
 # ` + jailName + `-END
 `
 		raw += rule
-		tools.WriteFile("/etc/fail2ban/jail.local", raw, 0644)
+		tools.Write("/etc/fail2ban/jail.local", raw, 0644)
 	}
 
-	tools.ExecShell("fail2ban-client reload")
+	tools.Exec("fail2ban-client reload")
 	controllers.Success(ctx, nil)
 }
 
@@ -349,7 +349,7 @@ func (c *Fail2banController) Delete(ctx http.Context) {
 	}
 
 	jailName := ctx.Request().Input("name")
-	raw := tools.ReadFile("/etc/fail2ban/jail.local")
+	raw := tools.Read("/etc/fail2ban/jail.local")
 	if !strings.Contains(raw, "["+jailName+"]") {
 		controllers.Error(ctx, http.StatusUnprocessableEntity, "规则不存在")
 		return
@@ -358,9 +358,9 @@ func (c *Fail2banController) Delete(ctx http.Context) {
 	rule := tools.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 	raw = strings.Replace(raw, "\n# "+jailName+"-START"+rule+"# "+jailName+"-END", "", -1)
 	raw = strings.TrimSpace(raw)
-	tools.WriteFile("/etc/fail2ban/jail.local", raw, 0644)
+	tools.Write("/etc/fail2ban/jail.local", raw, 0644)
 
-	tools.ExecShell("fail2ban-client reload")
+	tools.Exec("fail2ban-client reload")
 	controllers.Success(ctx, nil)
 }
 
@@ -376,9 +376,9 @@ func (c *Fail2banController) BanList(ctx http.Context) {
 		return
 	}
 
-	currentlyBan := tools.ExecShell(`fail2ban-client status ` + name + ` | grep "Currently banned" | awk '{print $4}'`)
-	totalBan := tools.ExecShell(`fail2ban-client status ` + name + ` | grep "Total banned" | awk '{print $4}'`)
-	bannedIp := tools.ExecShell(`fail2ban-client status ` + name + ` | grep "Banned IP list" | awk -F ":" '{print $2}'`)
+	currentlyBan := tools.Exec(`fail2ban-client status ` + name + ` | grep "Currently banned" | awk '{print $4}'`)
+	totalBan := tools.Exec(`fail2ban-client status ` + name + ` | grep "Total banned" | awk '{print $4}'`)
+	bannedIp := tools.Exec(`fail2ban-client status ` + name + ` | grep "Banned IP list" | awk -F ":" '{print $2}'`)
 	bannedIpList := strings.Split(bannedIp, " ")
 
 	var list []map[string]string
@@ -411,7 +411,7 @@ func (c *Fail2banController) Unban(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell("fail2ban-client set " + name + " unbanip " + ip)
+	tools.Exec("fail2ban-client set " + name + " unbanip " + ip)
 	controllers.Success(ctx, nil)
 }
 
@@ -427,7 +427,7 @@ func (c *Fail2banController) SetWhiteList(ctx http.Context) {
 		return
 	}
 
-	raw := tools.ReadFile("/etc/fail2ban/jail.local")
+	raw := tools.Read("/etc/fail2ban/jail.local")
 	// 正则替换
 	reg := regexp.MustCompile(`ignoreip\s*=\s*.*\n`)
 	if reg.MatchString(raw) {
@@ -437,8 +437,8 @@ func (c *Fail2banController) SetWhiteList(ctx http.Context) {
 		return
 	}
 
-	tools.WriteFile("/etc/fail2ban/jail.local", raw, 0644)
-	tools.ExecShell("fail2ban-client reload")
+	tools.Write("/etc/fail2ban/jail.local", raw, 0644)
+	tools.Exec("fail2ban-client reload")
 	controllers.Success(ctx, nil)
 }
 
@@ -448,7 +448,7 @@ func (c *Fail2banController) GetWhiteList(ctx http.Context) {
 		return
 	}
 
-	raw := tools.ReadFile("/etc/fail2ban/jail.local")
+	raw := tools.Read("/etc/fail2ban/jail.local")
 	reg := regexp.MustCompile(`ignoreip\s*=\s*(.*)\n`)
 	if reg.MatchString(raw) {
 		ignoreIp := reg.FindStringSubmatch(raw)[1]

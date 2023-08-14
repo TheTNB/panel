@@ -49,7 +49,7 @@ func (r *SettingController) List(ctx http.Context) {
 	result["username"] = user.Username
 	result["email"] = user.Email
 
-	result["port"] = tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	result["port"] = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 
 	Success(ctx, result)
 }
@@ -71,9 +71,9 @@ func (r *SettingController) Save(ctx http.Context) {
 
 		return
 	}
-	oldPort := tools.ExecShell(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	oldPort := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if oldPort != port {
-		tools.ExecShell("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
 	}
 	if !tools.Exists(backupPath) {
 		tools.Mkdir(backupPath, 0644)

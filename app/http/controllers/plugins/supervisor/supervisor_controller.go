@@ -33,7 +33,7 @@ func (c *SupervisorController) Status(ctx http.Context) {
 		return
 	}
 
-	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -47,8 +47,8 @@ func (c *SupervisorController) Start(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`systemctl start ` + c.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.Exec(`systemctl start ` + c.ServiceName)
+	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -62,8 +62,8 @@ func (c *SupervisorController) Stop(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`systemctl stop ` + c.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.Exec(`systemctl stop ` + c.ServiceName)
+	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status != "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -77,8 +77,8 @@ func (c *SupervisorController) Restart(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`systemctl restart ` + c.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.Exec(`systemctl restart ` + c.ServiceName)
+	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -92,8 +92,8 @@ func (c *SupervisorController) Reload(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`systemctl reload ` + c.ServiceName)
-	status := tools.ExecShell(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
+	tools.Exec(`systemctl reload ` + c.ServiceName)
+	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
 		controllers.Success(ctx, true)
 	} else {
@@ -107,7 +107,7 @@ func (c *SupervisorController) Log(ctx http.Context) {
 		return
 	}
 
-	log := tools.ExecShell(`tail -n 200 /var/log/supervisor/supervisord.log`)
+	log := tools.Exec(`tail -n 200 /var/log/supervisor/supervisord.log`)
 	controllers.Success(ctx, log)
 }
 
@@ -117,7 +117,7 @@ func (c *SupervisorController) ClearLog(ctx http.Context) {
 		return
 	}
 
-	tools.ExecShell(`echo "" > /var/log/supervisor/supervisord.log`)
+	tools.Exec(`echo "" > /var/log/supervisor/supervisord.log`)
 	controllers.Success(ctx, nil)
 }
 
@@ -129,9 +129,9 @@ func (c *SupervisorController) Config(ctx http.Context) {
 
 	var config string
 	if tools.IsRHEL() {
-		config = tools.ReadFile(`/etc/supervisord.conf`)
+		config = tools.Read(`/etc/supervisord.conf`)
 	} else {
-		config = tools.ReadFile(`/etc/supervisor/supervisord.conf`)
+		config = tools.Read(`/etc/supervisor/supervisord.conf`)
 	}
 	controllers.Success(ctx, config)
 }
@@ -144,9 +144,9 @@ func (c *SupervisorController) SaveConfig(ctx http.Context) {
 
 	config := ctx.Request().Input("config")
 	if tools.IsRHEL() {
-		tools.WriteFile(`/etc/supervisord.conf`, config, 0644)
+		tools.Write(`/etc/supervisord.conf`, config, 0644)
 	} else {
-		tools.WriteFile(`/etc/supervisor/supervisord.conf`, config, 0644)
+		tools.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
 	}
 
 	c.Restart(ctx)
@@ -168,7 +168,7 @@ func (c *SupervisorController) Processes(ctx http.Context) {
 		Uptime string `json:"uptime"`
 	}
 
-	out := tools.ExecShell(`supervisorctl status | awk '{print $1}'`)
+	out := tools.Exec(`supervisorctl status | awk '{print $1}'`)
 	var processList []process
 	for _, line := range strings.Split(out, "\n") {
 		if len(line) == 0 {
@@ -177,10 +177,10 @@ func (c *SupervisorController) Processes(ctx http.Context) {
 
 		var p process
 		p.Name = line
-		p.Status = tools.ExecShell(`supervisorctl status ` + line + ` | awk '{print $2}'`)
+		p.Status = tools.Exec(`supervisorctl status ` + line + ` | awk '{print $2}'`)
 		if p.Status == "RUNNING" {
-			p.Pid = strings.ReplaceAll(tools.ExecShell(`supervisorctl status `+line+` | awk '{print $4}'`), ",", "")
-			p.Uptime = tools.ExecShell(`supervisorctl status ` + line + ` | awk '{print $6}'`)
+			p.Pid = strings.ReplaceAll(tools.Exec(`supervisorctl status `+line+` | awk '{print $4}'`), ",", "")
+			p.Uptime = tools.Exec(`supervisorctl status ` + line + ` | awk '{print $6}'`)
 		} else {
 			p.Pid = "-"
 			p.Uptime = "-"
@@ -215,7 +215,7 @@ func (c *SupervisorController) StartProcess(ctx http.Context) {
 	}
 
 	process := ctx.Request().Input("process")
-	tools.ExecShell(`supervisorctl start ` + process)
+	tools.Exec(`supervisorctl start ` + process)
 	controllers.Success(ctx, nil)
 }
 
@@ -226,7 +226,7 @@ func (c *SupervisorController) StopProcess(ctx http.Context) {
 	}
 
 	process := ctx.Request().Input("process")
-	tools.ExecShell(`supervisorctl stop ` + process)
+	tools.Exec(`supervisorctl stop ` + process)
 	controllers.Success(ctx, nil)
 }
 
@@ -237,7 +237,7 @@ func (c *SupervisorController) RestartProcess(ctx http.Context) {
 	}
 
 	process := ctx.Request().Input("process")
-	tools.ExecShell(`supervisorctl restart ` + process)
+	tools.Exec(`supervisorctl restart ` + process)
 	controllers.Success(ctx, nil)
 }
 
@@ -250,12 +250,12 @@ func (c *SupervisorController) ProcessLog(ctx http.Context) {
 	process := ctx.Request().Input("process")
 	var logPath string
 	if tools.IsRHEL() {
-		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
 	} else {
-		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
 	}
 
-	log := tools.ExecShell(`tail -n 200 ` + logPath)
+	log := tools.Exec(`tail -n 200 ` + logPath)
 	controllers.Success(ctx, log)
 }
 
@@ -268,12 +268,12 @@ func (c *SupervisorController) ClearProcessLog(ctx http.Context) {
 	process := ctx.Request().Input("process")
 	var logPath string
 	if tools.IsRHEL() {
-		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
 	} else {
-		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
 	}
 
-	tools.ExecShell(`echo "" > ` + logPath)
+	tools.Exec(`echo "" > ` + logPath)
 	controllers.Success(ctx, nil)
 }
 
@@ -286,9 +286,9 @@ func (c *SupervisorController) ProcessConfig(ctx http.Context) {
 	process := ctx.Request().Query("process")
 	var config string
 	if tools.IsRHEL() {
-		config = tools.ReadFile(`/etc/supervisord.d/` + process + `.conf`)
+		config = tools.Read(`/etc/supervisord.d/` + process + `.conf`)
 	} else {
-		config = tools.ReadFile(`/etc/supervisor/conf.d/` + process + `.conf`)
+		config = tools.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
 	}
 
 	controllers.Success(ctx, config)
@@ -303,13 +303,13 @@ func (c *SupervisorController) SaveProcessConfig(ctx http.Context) {
 	process := ctx.Request().Input("process")
 	config := ctx.Request().Input("config")
 	if tools.IsRHEL() {
-		tools.WriteFile(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
+		tools.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
 	} else {
-		tools.WriteFile(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
+		tools.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
 	}
-	tools.ExecShell(`supervisorctl reread`)
-	tools.ExecShell(`supervisorctl update`)
-	tools.ExecShell(`supervisorctl start ` + process)
+	tools.Exec(`supervisorctl reread`)
+	tools.Exec(`supervisorctl update`)
+	tools.Exec(`supervisorctl start ` + process)
 
 	controllers.Success(ctx, nil)
 }
@@ -354,13 +354,13 @@ stdout_logfile=/var/log/supervisor/` + name + `.log
 stdout_logfile_maxbytes=2MB
 `
 	if tools.IsRHEL() {
-		tools.WriteFile(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
+		tools.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
 	} else {
-		tools.WriteFile(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
+		tools.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
 	}
-	tools.ExecShell(`supervisorctl reread`)
-	tools.ExecShell(`supervisorctl update`)
-	tools.ExecShell(`supervisorctl start ` + name)
+	tools.Exec(`supervisorctl reread`)
+	tools.Exec(`supervisorctl update`)
+	tools.Exec(`supervisorctl start ` + name)
 
 	controllers.Success(ctx, nil)
 }
@@ -372,18 +372,18 @@ func (c *SupervisorController) DeleteProcess(ctx http.Context) {
 	}
 
 	process := ctx.Request().Input("process")
-	tools.ExecShell(`supervisorctl stop ` + process)
+	tools.Exec(`supervisorctl stop ` + process)
 	var logPath string
 	if tools.IsRHEL() {
-		logPath = tools.ExecShell(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
-		tools.RemoveFile(`/etc/supervisord.d/` + process + `.conf`)
+		logPath = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		tools.Remove(`/etc/supervisord.d/` + process + `.conf`)
 	} else {
-		logPath = tools.ExecShell(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
-		tools.RemoveFile(`/etc/supervisor/conf.d/` + process + `.conf`)
+		logPath = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		tools.Remove(`/etc/supervisor/conf.d/` + process + `.conf`)
 	}
-	tools.RemoveFile(logPath)
-	tools.ExecShell(`supervisorctl reread`)
-	tools.ExecShell(`supervisorctl update`)
+	tools.Remove(logPath)
+	tools.Exec(`supervisorctl reread`)
+	tools.Exec(`supervisorctl update`)
 
 	controllers.Success(ctx, nil)
 }
