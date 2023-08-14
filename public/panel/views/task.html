@@ -69,6 +69,11 @@ Date: 2023-07-22
                         $('#plugin-install-log').html('实时安装日志获取失败，请刷新重试！');
                         return false;
                     }
+                    if (result.data.includes('完成') || result.data.includes('错误')) {
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);
+                    }
                     $('#plugin-install-log').html(result.data);
                 }
             })
