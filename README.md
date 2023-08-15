@@ -85,8 +85,6 @@ panel
 
 - [AnyCast.Ai](https://www.anycast.ai/)
 
-- [迅捷盾](https://console.fastdun.com/)
-
 ### DevOps
 
 - [极狐GitLab](https://www.jihulab.com/)
