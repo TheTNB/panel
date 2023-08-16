@@ -40,10 +40,10 @@ if [ "${OS}" == "centos" ]; then
     /usr/bin/crb enable
     dnf makecache
     dnf groupinstall "Development Tools" -y
-    dnf install autoconf glibc-headers gdbm-devel gd gd-devel perl oniguruma-devel libsodium-devel libxml2-devel sqlite-devel libzip-devel bzip2-devel xz-devel libpng-devel libjpeg-devel libwebp-devel freetype-devel gmp-devel openssl-devel readline-devel libxslt-devel libcurl-devel pkgconfig libedit-devel zlib-devel pcre-devel crontabs libicu libicu-devel c-ares -y
+    dnf install autoconf glibc-headers gdbm-devel gd gd-devel perl oniguruma-devel libsodium-devel libxml2-devel sqlite-devel libzip-devel bzip2-devel xz-devel libpng-devel libjpeg-devel libwebp-devel libavif-devel freetype-devel gmp-devel openssl-devel readline-devel libxslt-devel libcurl-devel pkgconfig libedit-devel zlib-devel pcre-devel crontabs libicu libicu-devel c-ares -y
 elif [ "${OS}" == "debian" ]; then
     apt update
-    apt install build-essential autoconf libc6-dev libgdbm-dev libgd-tools libgd-dev perl libonig-dev libsodium-dev libxml2-dev libsqlite3-dev libzip-dev libbz2-dev liblzma-dev libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev libgmp-dev libssl-dev libreadline-dev libxslt1-dev libcurl4-openssl-dev pkg-config libedit-dev zlib1g-dev libpcre3-dev cron libicu-dev libc-ares2 libc-ares-dev -y
+    apt install build-essential autoconf libc6-dev libgdbm-dev libgd-tools libgd-dev perl libonig-dev libsodium-dev libxml2-dev libsqlite3-dev libzip-dev libbz2-dev liblzma-dev libpng-dev libjpeg-dev libwebp-dev libavif-dev libfreetype6-dev libgmp-dev libssl-dev libreadline-dev libxslt1-dev libcurl4-openssl-dev pkg-config libedit-dev zlib1g-dev libpcre3-dev cron libicu-dev libc-ares2 libc-ares-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"
@@ -101,7 +101,11 @@ fi
 
 # 配置
 cd src
-./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp
+if [ "${phpVersion}" == "81" ] || [ "${phpVersion}" == "82" ]; then
+    ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp --with-avif
+else
+    ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp
+fi
 
 # 编译安装
 if [[ "${cpuCore}" -gt "1" ]]; then
@@ -135,10 +139,10 @@ fi
 cd ../../
 
 # 写入拓展标记位
-echo ";下方标记位禁止删除，否则将导致PHP拓展无法正常安装！" >>${phpPath}/etc/php.ini
-echo ";haozi" >>${phpPath}/etc/php.ini
+echo ";下方标记位禁止删除，否则将导致PHP拓展无法正常安装！" >> ${phpPath}/etc/php.ini
+echo ";haozi" >> ${phpPath}/etc/php.ini
 # 写入zip拓展到php配置
-echo "extension=zip" >>${phpPath}/etc/php.ini
+echo "extension=zip" >> ${phpPath}/etc/php.ini
 
 # 设置软链接
 rm -f /usr/bin/php-${phpVersion}
@@ -152,7 +156,7 @@ ln -sf ${phpPath}/bin/pecl /usr/bin/pecl
 ln -sf ${phpPath}/sbin/php-fpm /usr/bin/php-fpm-${phpVersion}
 
 # 设置fpm
-cat >${phpPath}/etc/php-fpm.conf <<EOF
+cat > ${phpPath}/etc/php-fpm.conf << EOF
 [global]
 pid = ${phpPath}/var/run/php-fpm.pid
 error_log = ${phpPath}/var/log/php-fpm.log
@@ -230,7 +234,7 @@ sed -i 's/error_reporting =.*/error_reporting = E_ALL \& \~E_NOTICE/g' ${phpPath
 sed -i 's/expose_php = On/expose_php = Off/g' ${phpPath}/etc/php.ini
 
 # 写入openresty 调用php配置文件
-cat >/www/server/openresty/conf/enable-php-${phpVersion}.conf <<EOF
+cat > /www/server/openresty/conf/enable-php-${phpVersion}.conf << EOF
 location ~ \.php$ {
     try_files \$uri =404;
     fastcgi_pass unix:/tmp/php-cgi-${phpVersion}.sock;
