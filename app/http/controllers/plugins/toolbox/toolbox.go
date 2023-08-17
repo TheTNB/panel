@@ -116,6 +116,7 @@ func (c *ToolBoxController) SetSWAP(ctx http.Context) {
 
 		tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size))
 		tools.Exec("mkswap -f /www/swap")
+		tools.Chmod("/www/swap", 0600)
 		tools.Exec("swapon /www/swap")
 		tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab")
 	}
