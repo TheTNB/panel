@@ -114,9 +114,13 @@ func (c *ToolBoxController) SetSWAP(ctx http.Context) {
 			return
 		}
 
-		tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size))
-		tools.Exec("mkswap -f /www/swap")
-		tools.Chmod("/www/swap", 0600)
+		if strings.Contains(tools.Exec("df -T /www | awk '{print $2}' | tail -n 1"), "btrfs") {
+			tools.Exec("btrfs filesystem mkswapfile --size " + cast.ToString(size) + "M --uuid clear /www/swap")
+		} else {
+			tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size))
+			tools.Exec("mkswap -f /www/swap")
+			tools.Chmod("/www/swap", 0600)
+		}
 		tools.Exec("swapon /www/swap")
 		tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab")
 	}
