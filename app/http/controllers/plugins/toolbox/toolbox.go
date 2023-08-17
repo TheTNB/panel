@@ -109,7 +109,7 @@ func (c *ToolBoxController) SetSWAP(ctx http.Context) {
 
 	if size > 1 {
 		free := tools.Exec("df -k /www | awk '{print $4}' | tail -n 1")
-		if cast.ToInt64(free) < int64(size)*1024*1024 {
+		if cast.ToInt64(free)*1024 < int64(size)*1024*1024 {
 			controllers.Error(ctx, http.StatusBadRequest, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
 			return
 		}
