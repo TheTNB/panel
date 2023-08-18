@@ -126,7 +126,7 @@ Prepare_system() {
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
         apt update -y
-        apt install -y curl wget zip unzip tar git jq git dos2unix
+        apt install -y curl wget zip unzip tar git jq git dos2unix rsyslog
     else
         echo -e $HR
         echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
