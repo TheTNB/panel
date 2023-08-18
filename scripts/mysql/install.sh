@@ -50,8 +50,8 @@ if [ "${OS}" == "centos" ]; then
     dnf groupinstall "Development Tools" -y
     dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel -y
 elif [ "${OS}" == "debian" ]; then
-    apt update
-    apt install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
+    apt-get update
+    apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"

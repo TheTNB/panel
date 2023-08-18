@@ -37,8 +37,8 @@ if [ "${OS}" == "centos" ]; then
     dnf groupinstall "Development Tools" -y
     dnf install systemd-devel openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
-    apt update
-    apt install build-essential libsystemd-dev libssl-dev -y
+    apt-get update
+    apt-get install build-essential libsystemd-dev libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"

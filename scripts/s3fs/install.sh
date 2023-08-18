@@ -23,7 +23,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 if [ "${OS}" == "centos" ]; then
     dnf install -y s3fs-fuse
 elif [ "${OS}" == "debian" ]; then
-    apt install -y s3fs
+    apt-get install -y s3fs
 else
     echo -e $HR
     echo "错误：不支持的操作系统"

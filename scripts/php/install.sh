@@ -42,8 +42,8 @@ if [ "${OS}" == "centos" ]; then
     dnf groupinstall "Development Tools" -y
     dnf install autoconf glibc-headers gdbm-devel gd gd-devel perl oniguruma-devel libsodium-devel libxml2-devel sqlite-devel libzip-devel bzip2-devel xz-devel libpng-devel libjpeg-devel libwebp-devel libavif-devel freetype-devel gmp-devel openssl-devel readline-devel libxslt-devel libcurl-devel pkgconfig libedit-devel zlib-devel pcre-devel crontabs libicu libicu-devel c-ares -y
 elif [ "${OS}" == "debian" ]; then
-    apt update
-    apt install build-essential autoconf libc6-dev libgdbm-dev libgd-tools libgd-dev perl libonig-dev libsodium-dev libxml2-dev libsqlite3-dev libzip-dev libbz2-dev liblzma-dev libpng-dev libjpeg-dev libwebp-dev libavif-dev libfreetype6-dev libgmp-dev libssl-dev libreadline-dev libxslt1-dev libcurl4-openssl-dev pkg-config libedit-dev zlib1g-dev libpcre3-dev cron libicu-dev libc-ares2 libc-ares-dev -y
+    apt-get update
+    apt-get install build-essential autoconf libc6-dev libgdbm-dev libgd-tools libgd-dev perl libonig-dev libsodium-dev libxml2-dev libsqlite3-dev libzip-dev libbz2-dev liblzma-dev libpng-dev libjpeg-dev libwebp-dev libavif-dev libfreetype6-dev libgmp-dev libssl-dev libreadline-dev libxslt1-dev libcurl4-openssl-dev pkg-config libedit-dev zlib1g-dev libpcre3-dev cron libicu-dev libc-ares2 libc-ares-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"

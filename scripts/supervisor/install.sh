@@ -26,7 +26,7 @@ if [ "${OS}" == "centos" ]; then
     systemctl enable supervisord
     systemctl start supervisord
 elif [ "${OS}" == "debian" ]; then
-    apt install -y supervisor
+    apt-get install -y supervisor
     systemctl enable supervisor
     systemctl start supervisor
 else

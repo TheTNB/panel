@@ -38,7 +38,7 @@ Install() {
     if [ "${OS}" == "centos" ]; then
         dnf install ImageMagick ImageMagick-devel -y
     elif [ "${OS}" == "debian" ]; then
-        apt install imagemagick libmagickwand-dev -y
+        apt-get install imagemagick libmagickwand-dev -y
     else
         echo -e $HR
         echo "错误：耗子Linux面板不支持该系统"

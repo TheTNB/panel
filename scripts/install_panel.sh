@@ -125,8 +125,8 @@ Prepare_system() {
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
-        apt update -y
-        apt install -y curl wget zip unzip tar git jq git dos2unix rsyslog
+        apt-get update -y
+        apt-get install -y curl wget zip unzip tar git jq git dos2unix rsyslog
     else
         echo -e $HR
         echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
@@ -206,7 +206,7 @@ Init_Panel() {
         firewall-cmd --permanent --zone=public --add-port=${sshPort}/tcp > /dev/null 2>&1
         firewall-cmd --reload
     elif [ "${OS}" == "debian" ]; then
-        apt install ufw -y
+        apt-get install ufw -y
         echo y | ufw enable
         ufw allow 22/tcp
         ufw allow 80/tcp

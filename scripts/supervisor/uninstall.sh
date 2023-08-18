@@ -23,7 +23,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 if [ "${OS}" == "centos" ]; then
     dnf remove -y supervisor
 elif [ "${OS}" == "debian" ]; then
-    apt remove -y supervisor
+    apt-get remove -y supervisor
 else
     echo -e $HR
     echo "错误：不支持的操作系统"
