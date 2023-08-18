@@ -91,6 +91,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
+cd ${postgresqlPath}
 rm -rf ${postgresqlPath}/src
 
 # 配置

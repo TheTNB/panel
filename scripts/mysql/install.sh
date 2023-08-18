@@ -276,6 +276,7 @@ elif [[ ${memTotal} -ge 32768 ]]; then
 fi
 
 # 初始化
+cd ${mysqlPath}
 rm -rf ${mysqlPath}/src
 rm -rf ${mysqlPath}/data
 mkdir -p ${mysqlPath}/data
