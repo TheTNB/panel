@@ -52,7 +52,7 @@ func (c *WebsiteController) Add(ctx http.Context) {
 		return
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
-		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$",
+		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name",
 		"domain":      "required",
 		"php":         "required",
 		"db":          "bool",
