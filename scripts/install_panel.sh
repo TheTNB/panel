@@ -153,7 +153,12 @@ Auto_Swap() {
 
     # 设置swap
     swapFile="${setup_Path}/swap"
-    dd if=/dev/zero of=$swapFile bs=1M count=4096
+    btrfsCheck=$(df -T /www | awk '{print $2}' | tail -n 1)
+    if [ "${btrfsCheck}" == "btrfs" ]; then
+        btrfs filesystem mkswapfile --size 4G --uuid clear ${swapFile}
+    else
+        dd if=/dev/zero of=$swapFile bs=1M count=4096
+    fi
     chmod 600 $swapFile
     mkswap -f $swapFile
     swapon $swapFile
@@ -183,8 +188,18 @@ Init_Panel() {
         exit 1
     fi
     wget -O ${setup_Path}/panel/panel.zip "${download_Url}${panelZip}"
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：下载面板失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
     cd ${setup_Path}/panel
     unzip -o panel.zip
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：解压面板失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
     rm -rf panel.zip
     cp panel-example.conf panel.conf
     ${setup_Path}/panel/panel --env="panel.conf" artisan key:generate
@@ -242,6 +257,11 @@ EOF
     systemctl daemon-reload
     systemctl enable panel.service
     systemctl start panel.service
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：面板启动失败，请截图错误信息寻求帮助。"
+        exit 1
+    fi
 
     clear
     echo -e $LOGO
@@ -267,7 +287,6 @@ if [ "$proxy" == 'y' ]; then
     download_Url="https://ghproxy.com/"
 fi
 
-clear
 echo -e $LOGO
 echo '安装面板依赖软件（如报错请检查 APT/Yum 源是否正常）'
 echo -e $HR
@@ -275,7 +294,6 @@ sleep 3s
 Prepare_system
 Auto_Swap
 
-clear
 echo -e $LOGO
 echo '安装面板运行环境（视网络情况可能需要较长时间）'
 echo -e $HR
