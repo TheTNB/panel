@@ -9,7 +9,7 @@ import (
 	"panel/app/http/middleware"
 )
 
-func Web() {
+func Api() {
 	facades.Route().StaticFile("favicon.ico", "/www/panel/public/favicon.ico")
 	facades.Route().Prefix("api/panel").Group(func(r route.Router) {
 		r.Prefix("info").Group(func(r route.Router) {
