@@ -32,8 +32,9 @@ func NewPostgresql15Controller() *Postgresql15Controller {
 
 // Status 获取运行状态
 func (c *Postgresql15Controller) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
@@ -50,8 +51,9 @@ func (c *Postgresql15Controller) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *Postgresql15Controller) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload postgresql")
@@ -69,8 +71,9 @@ func (c *Postgresql15Controller) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (c *Postgresql15Controller) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart postgresql")
@@ -88,8 +91,9 @@ func (c *Postgresql15Controller) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (c *Postgresql15Controller) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start postgresql")
@@ -107,8 +111,9 @@ func (c *Postgresql15Controller) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (c *Postgresql15Controller) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop postgresql")
@@ -126,8 +131,9 @@ func (c *Postgresql15Controller) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (c *Postgresql15Controller) GetConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	// 获取配置
@@ -141,8 +147,9 @@ func (c *Postgresql15Controller) GetConfig(ctx http.Context) http.Response {
 
 // GetUserConfig 获取用户配置
 func (c *Postgresql15Controller) GetUserConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	// 获取配置
@@ -156,8 +163,9 @@ func (c *Postgresql15Controller) GetUserConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *Postgresql15Controller) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -174,8 +182,9 @@ func (c *Postgresql15Controller) SaveConfig(ctx http.Context) http.Response {
 
 // SaveUserConfig 保存用户配置
 func (c *Postgresql15Controller) SaveUserConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -192,8 +201,9 @@ func (c *Postgresql15Controller) SaveUserConfig(ctx http.Context) http.Response 
 
 // Load 获取负载
 func (c *Postgresql15Controller) Load(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
@@ -214,8 +224,9 @@ func (c *Postgresql15Controller) Load(ctx http.Context) http.Response {
 
 // Log 获取日志
 func (c *Postgresql15Controller) Log(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	log := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
@@ -224,8 +235,9 @@ func (c *Postgresql15Controller) Log(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (c *Postgresql15Controller) ClearLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
@@ -234,8 +246,9 @@ func (c *Postgresql15Controller) ClearLog(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (c *Postgresql15Controller) DatabaseList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
@@ -290,8 +303,9 @@ func (c *Postgresql15Controller) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (c *Postgresql15Controller) AddDatabase(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -322,8 +336,9 @@ func (c *Postgresql15Controller) AddDatabase(ctx http.Context) http.Response {
 
 // DeleteDatabase 删除数据库
 func (c *Postgresql15Controller) DeleteDatabase(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -344,8 +359,9 @@ func (c *Postgresql15Controller) DeleteDatabase(ctx http.Context) http.Response 
 
 // BackupList 获取备份列表
 func (c *Postgresql15Controller) BackupList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	backupList, err := c.backup.PostgresqlList()
@@ -359,8 +375,9 @@ func (c *Postgresql15Controller) BackupList(ctx http.Context) http.Response {
 
 // UploadBackup 上传备份
 func (c *Postgresql15Controller) UploadBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	file, err := ctx.Request().File("file")
@@ -384,8 +401,9 @@ func (c *Postgresql15Controller) UploadBackup(ctx http.Context) http.Response {
 
 // CreateBackup 创建备份
 func (c *Postgresql15Controller) CreateBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -410,8 +428,9 @@ func (c *Postgresql15Controller) CreateBackup(ctx http.Context) http.Response {
 
 // DeleteBackup 删除备份
 func (c *Postgresql15Controller) DeleteBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -433,8 +452,9 @@ func (c *Postgresql15Controller) DeleteBackup(ctx http.Context) http.Response {
 
 // RestoreBackup 还原备份
 func (c *Postgresql15Controller) RestoreBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -459,8 +479,9 @@ func (c *Postgresql15Controller) RestoreBackup(ctx http.Context) http.Response {
 
 // UserList 用户列表
 func (c *Postgresql15Controller) UserList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	type user struct {
@@ -511,8 +532,9 @@ func (c *Postgresql15Controller) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (c *Postgresql15Controller) AddUser(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -541,8 +563,9 @@ func (c *Postgresql15Controller) AddUser(ctx http.Context) http.Response {
 
 // DeleteUser 删除用户
 func (c *Postgresql15Controller) DeleteUser(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -564,8 +587,9 @@ func (c *Postgresql15Controller) DeleteUser(ctx http.Context) http.Response {
 
 // SetUserPassword 设置用户密码
 func (c *Postgresql15Controller) SetUserPassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "postgresql15") {
-		return nil
+	check := controllers.Check(ctx, "postgresql15")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{

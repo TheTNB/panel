@@ -4,7 +4,7 @@ var (
 	Name        = "PHP-8.1"
 	Description = "PHP 是世界上最好的语言！"
 	Slug        = "php81"
-	Version     = "8.1.21"
+	Version     = "8.1.23"
 	Requires    = []string{}
 	Excludes    = []string{}
 	Install     = `bash /www/panel/scripts/php/install.sh 81`

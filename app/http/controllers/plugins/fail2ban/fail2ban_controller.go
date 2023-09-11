@@ -35,8 +35,9 @@ type Jail struct {
 
 // Status 获取运行状态
 func (c *Fail2banController) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status fail2ban | grep Active | grep -v grep | awk '{print $2}'")
@@ -53,8 +54,9 @@ func (c *Fail2banController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *Fail2banController) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload fail2ban")
@@ -72,8 +74,9 @@ func (c *Fail2banController) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (c *Fail2banController) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart fail2ban")
@@ -91,8 +94,9 @@ func (c *Fail2banController) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (c *Fail2banController) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start fail2ban")
@@ -110,8 +114,9 @@ func (c *Fail2banController) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (c *Fail2banController) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop fail2ban")
@@ -129,8 +134,9 @@ func (c *Fail2banController) Stop(ctx http.Context) http.Response {
 
 // List 所有 Fail2ban 规则
 func (c *Fail2banController) List(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -193,8 +199,9 @@ func (c *Fail2banController) List(ctx http.Context) http.Response {
 
 // Add 添加 Fail2ban 规则
 func (c *Fail2banController) Add(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -329,8 +336,9 @@ logpath = ` + logPath + `
 
 // Delete 删除规则
 func (c *Fail2banController) Delete(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	jailName := ctx.Request().Input("name")
@@ -350,8 +358,9 @@ func (c *Fail2banController) Delete(ctx http.Context) http.Response {
 
 // BanList 获取封禁列表
 func (c *Fail2banController) BanList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	name := ctx.Request().Query("name")
@@ -383,8 +392,9 @@ func (c *Fail2banController) BanList(ctx http.Context) http.Response {
 
 // Unban 解封
 func (c *Fail2banController) Unban(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	name := ctx.Request().Input("name")
@@ -399,8 +409,9 @@ func (c *Fail2banController) Unban(ctx http.Context) http.Response {
 
 // SetWhiteList 设置白名单
 func (c *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	ip := ctx.Request().Input("ip")
@@ -424,8 +435,9 @@ func (c *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 
 // GetWhiteList 获取白名单
 func (c *Fail2banController) GetWhiteList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "fail2ban") {
-		return nil
+	check := controllers.Check(ctx, "fail2ban")
+	if check != nil {
+		return check
 	}
 
 	raw := tools.Read("/etc/fail2ban/jail.local")

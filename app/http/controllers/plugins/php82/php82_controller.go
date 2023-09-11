@@ -31,8 +31,9 @@ func NewPhp82Controller() *Php82Controller {
 }
 
 func (c *Php82Controller) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
@@ -48,8 +49,9 @@ func (c *Php82Controller) Status(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload php-fpm-" + c.version)
@@ -67,8 +69,9 @@ func (c *Php82Controller) Reload(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start php-fpm-" + c.version)
@@ -86,8 +89,9 @@ func (c *Php82Controller) Start(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop php-fpm-" + c.version)
@@ -105,8 +109,9 @@ func (c *Php82Controller) Stop(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart php-fpm-" + c.version)
@@ -124,8 +129,9 @@ func (c *Php82Controller) Restart(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) GetConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	config := tools.Read("/www/server/php/" + c.version + "/etc/php.ini")
@@ -133,8 +139,9 @@ func (c *Php82Controller) GetConfig(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -143,8 +150,9 @@ func (c *Php82Controller) SaveConfig(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) Load(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	client := req.C().SetTimeout(10 * time.Second)
@@ -178,8 +186,9 @@ func (c *Php82Controller) Load(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) ErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log"))
@@ -187,8 +196,9 @@ func (c *Php82Controller) ErrorLog(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) SlowLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log"))
@@ -196,8 +206,9 @@ func (c *Php82Controller) SlowLog(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) ClearErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/php-fpm.log")
@@ -205,8 +216,9 @@ func (c *Php82Controller) ClearErrorLog(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) ClearSlowLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/slow.log")
@@ -221,8 +233,9 @@ type Extension struct {
 }
 
 func (c *Php82Controller) GetExtensionList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	extensions := c.GetExtensions()
@@ -230,8 +243,9 @@ func (c *Php82Controller) GetExtensionList(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) InstallExtension(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	slug := ctx.Request().Input("slug")
@@ -266,8 +280,9 @@ func (c *Php82Controller) InstallExtension(ctx http.Context) http.Response {
 }
 
 func (c *Php82Controller) UninstallExtension(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "php"+c.version) {
-		return nil
+	check := controllers.Check(ctx, "php"+c.version)
+	if check != nil {
+		return check
 	}
 
 	slug := ctx.Request().Input("slug")

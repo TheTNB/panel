@@ -29,8 +29,9 @@ func NewSupervisorController() *SupervisorController {
 
 // Status 状态
 func (c *SupervisorController) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
@@ -43,8 +44,9 @@ func (c *SupervisorController) Status(ctx http.Context) http.Response {
 
 // Start 启动
 func (c *SupervisorController) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec(`systemctl start ` + c.ServiceName)
@@ -58,8 +60,9 @@ func (c *SupervisorController) Start(ctx http.Context) http.Response {
 
 // Stop 停止
 func (c *SupervisorController) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec(`systemctl stop ` + c.ServiceName)
@@ -73,8 +76,9 @@ func (c *SupervisorController) Stop(ctx http.Context) http.Response {
 
 // Restart 重启
 func (c *SupervisorController) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec(`systemctl restart ` + c.ServiceName)
@@ -88,8 +92,9 @@ func (c *SupervisorController) Restart(ctx http.Context) http.Response {
 
 // Reload 重载
 func (c *SupervisorController) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec(`systemctl reload ` + c.ServiceName)
@@ -103,8 +108,9 @@ func (c *SupervisorController) Reload(ctx http.Context) http.Response {
 
 // Log 日志
 func (c *SupervisorController) Log(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	log := tools.Exec(`tail -n 200 /var/log/supervisor/supervisord.log`)
@@ -113,8 +119,9 @@ func (c *SupervisorController) Log(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (c *SupervisorController) ClearLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec(`echo "" > /var/log/supervisor/supervisord.log`)
@@ -123,8 +130,9 @@ func (c *SupervisorController) ClearLog(ctx http.Context) http.Response {
 
 // Config 获取配置
 func (c *SupervisorController) Config(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	var config string
@@ -138,8 +146,9 @@ func (c *SupervisorController) Config(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *SupervisorController) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -154,8 +163,9 @@ func (c *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 
 // Processes 进程列表
 func (c *SupervisorController) Processes(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -209,8 +219,9 @@ func (c *SupervisorController) Processes(ctx http.Context) http.Response {
 
 // StartProcess 启动进程
 func (c *SupervisorController) StartProcess(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -220,8 +231,9 @@ func (c *SupervisorController) StartProcess(ctx http.Context) http.Response {
 
 // StopProcess 停止进程
 func (c *SupervisorController) StopProcess(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -231,8 +243,9 @@ func (c *SupervisorController) StopProcess(ctx http.Context) http.Response {
 
 // RestartProcess 重启进程
 func (c *SupervisorController) RestartProcess(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -242,8 +255,9 @@ func (c *SupervisorController) RestartProcess(ctx http.Context) http.Response {
 
 // ProcessLog 进程日志
 func (c *SupervisorController) ProcessLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -260,8 +274,9 @@ func (c *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 
 // ClearProcessLog 清空进程日志
 func (c *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -278,8 +293,9 @@ func (c *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 
 // ProcessConfig 获取进程配置
 func (c *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Query("process")
@@ -295,8 +311,9 @@ func (c *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 
 // SaveProcessConfig 保存进程配置
 func (c *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")
@@ -315,8 +332,9 @@ func (c *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 
 // AddProcess 添加进程
 func (c *SupervisorController) AddProcess(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -364,8 +382,9 @@ stdout_logfile_maxbytes=2MB
 
 // DeleteProcess 删除进程
 func (c *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "supervisor") {
-		return nil
+	check := controllers.Check(ctx, "supervisor")
+	if check != nil {
+		return check
 	}
 
 	process := ctx.Request().Input("process")

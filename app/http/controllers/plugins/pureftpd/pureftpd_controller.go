@@ -24,8 +24,9 @@ func NewPureFtpdController() *PureFtpdController {
 
 // Status 获取运行状态
 func (c *PureFtpdController) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
@@ -42,8 +43,9 @@ func (c *PureFtpdController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *PureFtpdController) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload pure-ftpd")
@@ -61,8 +63,9 @@ func (c *PureFtpdController) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (c *PureFtpdController) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart pure-ftpd")
@@ -80,8 +83,9 @@ func (c *PureFtpdController) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (c *PureFtpdController) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start pure-ftpd")
@@ -99,8 +103,9 @@ func (c *PureFtpdController) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (c *PureFtpdController) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop pure-ftpd")
@@ -118,8 +123,9 @@ func (c *PureFtpdController) Stop(ctx http.Context) http.Response {
 
 // List 获取用户列表
 func (c *PureFtpdController) List(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	listRaw := tools.Exec("pure-pw list")
@@ -167,8 +173,9 @@ func (c *PureFtpdController) List(ctx http.Context) http.Response {
 
 // Add 添加用户
 func (c *PureFtpdController) Add(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -204,8 +211,9 @@ func (c *PureFtpdController) Add(ctx http.Context) http.Response {
 
 // Delete 删除用户
 func (c *PureFtpdController) Delete(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -228,8 +236,9 @@ func (c *PureFtpdController) Delete(ctx http.Context) http.Response {
 
 // ChangePassword 修改密码
 func (c *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -254,8 +263,9 @@ func (c *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 
 // GetPort 获取端口
 func (c *PureFtpdController) GetPort(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	port := tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
@@ -268,8 +278,9 @@ func (c *PureFtpdController) GetPort(ctx http.Context) http.Response {
 
 // SetPort 设置端口
 func (c *PureFtpdController) SetPort(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "pureftpd") {
-		return nil
+	check := controllers.Check(ctx, "pureftpd")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{

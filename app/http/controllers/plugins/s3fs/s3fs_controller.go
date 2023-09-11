@@ -32,8 +32,9 @@ func NewS3fsController() *S3fsController {
 
 // List 所有 S3fs 挂载
 func (c *S3fsController) List(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "s3fs") {
-		return nil
+	check := controllers.Check(ctx, "s3fs")
+	if check != nil {
+		return check
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -66,8 +67,9 @@ func (c *S3fsController) List(ctx http.Context) http.Response {
 
 // Add 添加 S3fs 挂载
 func (c *S3fsController) Add(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "s3fs") {
-		return nil
+	check := controllers.Check(ctx, "s3fs")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -119,13 +121,13 @@ func (c *S3fsController) Add(ctx http.Context) http.Response {
 	password := ak + ":" + sk
 	tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600)
 	tools.Exec(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
-	check := tools.Exec("mount -a 2>&1")
-	if len(check) != 0 {
+	mountCheck := tools.Exec("mount -a 2>&1")
+	if len(mountCheck) != 0 {
 		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
-		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
+		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+mountCheck)
 	}
-	check2 := tools.Exec("df -h | grep " + path + " 2>&1")
-	if len(check2) == 0 {
+	dfCheck := tools.Exec("df -h | grep " + path + " 2>&1")
+	if len(dfCheck) == 0 {
 		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
 		return controllers.Error(ctx, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
 	}
@@ -150,8 +152,9 @@ func (c *S3fsController) Add(ctx http.Context) http.Response {
 
 // Delete 删除 S3fs 挂载
 func (c *S3fsController) Delete(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "s3fs") {
-		return nil
+	check := controllers.Check(ctx, "s3fs")
+	if check != nil {
+		return check
 	}
 
 	id := ctx.Request().Input("id")
@@ -179,9 +182,9 @@ func (c *S3fsController) Delete(ctx http.Context) http.Response {
 	tools.Exec(`fusermount -u '` + mount.Path + `' 2>&1`)
 	tools.Exec(`umount '` + mount.Path + `' 2>&1`)
 	tools.Exec(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`)
-	check := tools.Exec("mount -a 2>&1")
-	if len(check) != 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
+	mountCheck := tools.Exec("mount -a 2>&1")
+	if len(mountCheck) != 0 {
+		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+mountCheck)
 	}
 	tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID))
 

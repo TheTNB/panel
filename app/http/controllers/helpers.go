@@ -25,19 +25,17 @@ func Error(ctx http.Context, code int, message any) http.Response {
 }
 
 // Check 检查插件是否可用
-func Check(ctx http.Context, slug string) bool {
+func Check(ctx http.Context, slug string) http.Response {
 	plugin := services.NewPluginImpl().GetBySlug(slug)
 	installedPlugin := services.NewPluginImpl().GetInstalledBySlug(slug)
 	installedPlugins, err := services.NewPluginImpl().AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][插件] 获取已安装插件失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return false
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	if installedPlugin.Version != plugin.Version || installedPlugin.Slug != plugin.Slug {
-		Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要更新至 "+plugin.Version+" 版本")
-		return false
+		return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要更新至 "+plugin.Version+" 版本")
 	}
 
 	var lock sync.RWMutex
@@ -54,8 +52,7 @@ func Check(ctx http.Context, slug string) bool {
 		_, requireFound := pluginsMap[require]
 		lock.RUnlock()
 		if !requireFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-			return false
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
@@ -64,10 +61,9 @@ func Check(ctx http.Context, slug string) bool {
 		_, excludeFound := pluginsMap[exclude]
 		lock.RUnlock()
 		if excludeFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-			return false
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
 	}
 
-	return true
+	return nil
 }

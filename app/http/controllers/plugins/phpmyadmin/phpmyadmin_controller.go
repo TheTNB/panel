@@ -19,8 +19,9 @@ func NewPhpMyAdminController() *PhpMyAdminController {
 }
 
 func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "phpmyadmin") {
-		return nil
+	check := controllers.Check(ctx, "phpmyadmin")
+	if check != nil {
+		return check
 	}
 
 	files, err := os.ReadDir("/www/server/phpmyadmin")
@@ -51,8 +52,9 @@ func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
 }
 
 func (c *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "phpmyadmin") {
-		return nil
+	check := controllers.Check(ctx, "phpmyadmin")
+	if check != nil {
+		return check
 	}
 
 	port := ctx.Request().Input("port")

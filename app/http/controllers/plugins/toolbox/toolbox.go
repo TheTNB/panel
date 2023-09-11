@@ -21,8 +21,9 @@ func NewToolBoxController() *ToolBoxController {
 
 // GetDNS 获取 DNS 信息
 func (c *ToolBoxController) GetDNS(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	raw := tools.Read("/etc/resolv.conf")
@@ -41,8 +42,9 @@ func (c *ToolBoxController) GetDNS(ctx http.Context) http.Response {
 
 // SetDNS 设置 DNS 信息
 func (c *ToolBoxController) SetDNS(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	dns1 := ctx.Request().Input("dns1")
@@ -62,8 +64,9 @@ func (c *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 
 // GetSWAP 获取 SWAP 信息
 func (c *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	var total, size, used, free string
@@ -93,8 +96,9 @@ func (c *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 
 // SetSWAP 设置 SWAP 信息
 func (c *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	size := ctx.Request().InputInt("size")
@@ -127,8 +131,9 @@ func (c *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 
 // GetTimezone 获取时区
 func (c *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	raw := tools.Exec("LC_ALL=C timedatectl | grep zone")
@@ -148,8 +153,9 @@ func (c *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 
 // SetTimezone 设置时区
 func (c *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	timezone := ctx.Request().Input("timezone")
@@ -164,8 +170,9 @@ func (c *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 
 // GetHosts 获取 hosts 信息
 func (c *ToolBoxController) GetHosts(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	return controllers.Success(ctx, tools.Read("/etc/hosts"))
@@ -173,8 +180,9 @@ func (c *ToolBoxController) GetHosts(ctx http.Context) http.Response {
 
 // SetHosts 设置 hosts 信息
 func (c *ToolBoxController) SetHosts(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	hosts := ctx.Request().Input("hosts")
@@ -189,8 +197,9 @@ func (c *ToolBoxController) SetHosts(ctx http.Context) http.Response {
 
 // SetRootPassword 设置 root 密码
 func (c *ToolBoxController) SetRootPassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "toolbox") {
-		return nil
+	check := controllers.Check(ctx, "toolbox")
+	if check != nil {
+		return check
 	}
 
 	password := ctx.Request().Input("password")

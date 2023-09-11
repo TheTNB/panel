@@ -47,8 +47,9 @@ func (c *WebsiteController) List(ctx http.Context) http.Response {
 
 // Add 添加网站
 func (c *WebsiteController) Add(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name",
@@ -88,8 +89,9 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 
 // Delete 删除网站
 func (c *WebsiteController) Delete(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	id := ctx.Request().InputInt("id")
 	err := c.website.Delete(id)
@@ -103,8 +105,9 @@ func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 
 // GetDefaultConfig 获取默认配置
 func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	index := tools.Read("/www/server/openresty/html/index.html")
 	stop := tools.Read("/www/server/openresty/html/stop.html")
@@ -117,8 +120,9 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 
 // SaveDefaultConfig 保存默认配置
 func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
@@ -138,8 +142,9 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
@@ -157,8 +162,9 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"id":                  "required",
@@ -379,8 +385,9 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
@@ -526,8 +533,9 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 
 // ResetConfig 重置配置
 func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
@@ -615,8 +623,9 @@ server
 
 // Status 网站状态
 func (c *WebsiteController) Status(ctx http.Context) http.Response {
-	if !Check(ctx, "openresty") {
-		return nil
+	check := Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {

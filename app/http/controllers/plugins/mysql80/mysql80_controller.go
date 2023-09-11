@@ -30,8 +30,9 @@ func NewMysql80Controller() *Mysql80Controller {
 
 // Status 获取运行状态
 func (c *Mysql80Controller) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
@@ -48,8 +49,9 @@ func (c *Mysql80Controller) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *Mysql80Controller) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload mysqld")
@@ -67,8 +69,9 @@ func (c *Mysql80Controller) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (c *Mysql80Controller) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart mysqld")
@@ -86,8 +89,9 @@ func (c *Mysql80Controller) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (c *Mysql80Controller) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start mysqld")
@@ -105,8 +109,9 @@ func (c *Mysql80Controller) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (c *Mysql80Controller) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop mysqld")
@@ -124,8 +129,9 @@ func (c *Mysql80Controller) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (c *Mysql80Controller) GetConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	// 获取配置
@@ -139,8 +145,9 @@ func (c *Mysql80Controller) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *Mysql80Controller) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -157,8 +164,9 @@ func (c *Mysql80Controller) SaveConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (c *Mysql80Controller) Load(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -231,8 +239,9 @@ func (c *Mysql80Controller) Load(ctx http.Context) http.Response {
 
 // ErrorLog 获取错误日志
 func (c *Mysql80Controller) ErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log"))
@@ -241,8 +250,9 @@ func (c *Mysql80Controller) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/server/mysql/mysql-error.log")
@@ -251,8 +261,9 @@ func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) http.Response {
 
 // SlowLog 获取慢查询日志
 func (c *Mysql80Controller) SlowLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log"))
@@ -261,8 +272,9 @@ func (c *Mysql80Controller) SlowLog(ctx http.Context) http.Response {
 
 // ClearSlowLog 清空慢查询日志
 func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/server/mysql/mysql-slow.log")
@@ -271,8 +283,9 @@ func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) http.Response {
 
 // GetRootPassword 获取root密码
 func (c *Mysql80Controller) GetRootPassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -285,8 +298,9 @@ func (c *Mysql80Controller) GetRootPassword(ctx http.Context) http.Response {
 
 // SetRootPassword 设置root密码
 func (c *Mysql80Controller) SetRootPassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
@@ -319,8 +333,9 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (c *Mysql80Controller) DatabaseList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -381,8 +396,9 @@ func (c *Mysql80Controller) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (c *Mysql80Controller) AddDatabase(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -412,8 +428,9 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) http.Response {
 
 // DeleteDatabase 删除数据库
 func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -435,8 +452,9 @@ func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) http.Response {
 
 // BackupList 获取备份列表
 func (c *Mysql80Controller) BackupList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	backupList, err := c.backup.MysqlList()
@@ -450,8 +468,9 @@ func (c *Mysql80Controller) BackupList(ctx http.Context) http.Response {
 
 // UploadBackup 上传备份
 func (c *Mysql80Controller) UploadBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	file, err := ctx.Request().File("file")
@@ -475,8 +494,9 @@ func (c *Mysql80Controller) UploadBackup(ctx http.Context) http.Response {
 
 // CreateBackup 创建备份
 func (c *Mysql80Controller) CreateBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -501,8 +521,9 @@ func (c *Mysql80Controller) CreateBackup(ctx http.Context) http.Response {
 
 // DeleteBackup 删除备份
 func (c *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -524,8 +545,9 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
 
 // RestoreBackup 还原备份
 func (c *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -550,8 +572,9 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
 
 // UserList 用户列表
 func (c *Mysql80Controller) UserList(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	type user struct {
@@ -635,8 +658,9 @@ func (c *Mysql80Controller) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (c *Mysql80Controller) AddUser(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -664,8 +688,9 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) http.Response {
 
 // DeleteUser 删除用户
 func (c *Mysql80Controller) DeleteUser(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -687,8 +712,9 @@ func (c *Mysql80Controller) DeleteUser(ctx http.Context) http.Response {
 
 // SetUserPassword 设置用户密码
 func (c *Mysql80Controller) SetUserPassword(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -713,8 +739,9 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) http.Response {
 
 // SetUserPrivileges 设置用户权限
 func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "mysql80") {
-		return nil
+	check := controllers.Check(ctx, "mysql80")
+	if check != nil {
+		return check
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{

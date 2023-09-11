@@ -23,8 +23,9 @@ func NewRedisController() *RedisController {
 
 // Status 获取运行状态
 func (c *RedisController) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
@@ -41,8 +42,9 @@ func (c *RedisController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *RedisController) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload redis")
@@ -60,8 +62,9 @@ func (c *RedisController) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (c *RedisController) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart redis")
@@ -79,8 +82,9 @@ func (c *RedisController) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (c *RedisController) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start redis")
@@ -98,8 +102,9 @@ func (c *RedisController) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (c *RedisController) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop redis")
@@ -117,8 +122,9 @@ func (c *RedisController) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (c *RedisController) GetConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	// 获取配置
@@ -132,8 +138,9 @@ func (c *RedisController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *RedisController) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -150,8 +157,9 @@ func (c *RedisController) SaveConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (c *RedisController) Load(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "redis") {
-		return nil
+	check := controllers.Check(ctx, "redis")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")

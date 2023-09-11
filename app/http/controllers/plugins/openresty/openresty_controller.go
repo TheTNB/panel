@@ -25,8 +25,9 @@ func NewOpenrestyController() *OpenRestyController {
 
 // Status 获取运行状态
 func (c *OpenRestyController) Status(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	status := tools.Exec("systemctl status openresty | grep Active | grep -v grep | awk '{print $2}'")
@@ -43,8 +44,9 @@ func (c *OpenRestyController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (c *OpenRestyController) Reload(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl reload openresty")
@@ -62,8 +64,9 @@ func (c *OpenRestyController) Reload(ctx http.Context) http.Response {
 
 // Start 启动OpenResty
 func (c *OpenRestyController) Start(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl start openresty")
@@ -81,8 +84,9 @@ func (c *OpenRestyController) Start(ctx http.Context) http.Response {
 
 // Stop 停止OpenResty
 func (c *OpenRestyController) Stop(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl stop openresty")
@@ -100,8 +104,9 @@ func (c *OpenRestyController) Stop(ctx http.Context) http.Response {
 
 // Restart 重启OpenResty
 func (c *OpenRestyController) Restart(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("systemctl restart openresty")
@@ -119,8 +124,9 @@ func (c *OpenRestyController) Restart(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (c *OpenRestyController) GetConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	config := tools.Read("/www/server/openresty/conf/nginx.conf")
@@ -133,8 +139,9 @@ func (c *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (c *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	config := ctx.Request().Input("config")
@@ -151,8 +158,9 @@ func (c *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 
 // ErrorLog 获取错误日志
 func (c *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	if !tools.Exists("/www/wwwlogs/nginx_error.log") {
@@ -165,8 +173,9 @@ func (c *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (c *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	tools.Exec("echo '' > /www/wwwlogs/nginx_error.log")
@@ -175,8 +184,9 @@ func (c *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (c *OpenRestyController) Load(ctx http.Context) http.Response {
-	if !controllers.Check(ctx, "openresty") {
-		return nil
+	check := controllers.Check(ctx, "openresty")
+	if check != nil {
+		return check
 	}
 
 	client := req.C().SetTimeout(10 * time.Second)
