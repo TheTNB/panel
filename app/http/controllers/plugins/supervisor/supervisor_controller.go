@@ -28,103 +28,103 @@ func NewSupervisorController() *SupervisorController {
 }
 
 // Status 状态
-func (c *SupervisorController) Status(ctx http.Context) {
+func (c *SupervisorController) Status(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Start 启动
-func (c *SupervisorController) Start(ctx http.Context) {
+func (c *SupervisorController) Start(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	tools.Exec(`systemctl start ` + c.ServiceName)
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Stop 停止
-func (c *SupervisorController) Stop(ctx http.Context) {
+func (c *SupervisorController) Stop(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	tools.Exec(`systemctl stop ` + c.ServiceName)
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status != "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Restart 重启
-func (c *SupervisorController) Restart(ctx http.Context) {
+func (c *SupervisorController) Restart(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	tools.Exec(`systemctl restart ` + c.ServiceName)
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Reload 重载
-func (c *SupervisorController) Reload(ctx http.Context) {
+func (c *SupervisorController) Reload(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	tools.Exec(`systemctl reload ` + c.ServiceName)
 	status := tools.Exec(`systemctl status ` + c.ServiceName + ` | grep Active | grep -v grep | awk '{print $2}'`)
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Log 日志
-func (c *SupervisorController) Log(ctx http.Context) {
+func (c *SupervisorController) Log(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	log := tools.Exec(`tail -n 200 /var/log/supervisor/supervisord.log`)
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
 // ClearLog 清空日志
-func (c *SupervisorController) ClearLog(ctx http.Context) {
+func (c *SupervisorController) ClearLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	tools.Exec(`echo "" > /var/log/supervisor/supervisord.log`)
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // Config 获取配置
-func (c *SupervisorController) Config(ctx http.Context) {
+func (c *SupervisorController) Config(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	var config string
@@ -133,13 +133,13 @@ func (c *SupervisorController) Config(ctx http.Context) {
 	} else {
 		config = tools.Read(`/etc/supervisor/supervisord.conf`)
 	}
-	controllers.Success(ctx, config)
+	return controllers.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
-func (c *SupervisorController) SaveConfig(ctx http.Context) {
+func (c *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	config := ctx.Request().Input("config")
@@ -149,13 +149,13 @@ func (c *SupervisorController) SaveConfig(ctx http.Context) {
 		tools.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
 	}
 
-	c.Restart(ctx)
+	return c.Restart(ctx)
 }
 
 // Processes 进程列表
-func (c *SupervisorController) Processes(ctx http.Context) {
+func (c *SupervisorController) Processes(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -191,60 +191,59 @@ func (c *SupervisorController) Processes(ctx http.Context) {
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
 	if startIndex > len(processList) {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []process{},
 		})
-		return
 	}
 	if endIndex > len(processList) {
 		endIndex = len(processList)
 	}
 	pagedProcessList := processList[startIndex:endIndex]
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"total": len(processList),
 		"items": pagedProcessList,
 	})
 }
 
 // StartProcess 启动进程
-func (c *SupervisorController) StartProcess(ctx http.Context) {
+func (c *SupervisorController) StartProcess(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
 	tools.Exec(`supervisorctl start ` + process)
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // StopProcess 停止进程
-func (c *SupervisorController) StopProcess(ctx http.Context) {
+func (c *SupervisorController) StopProcess(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
 	tools.Exec(`supervisorctl stop ` + process)
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // RestartProcess 重启进程
-func (c *SupervisorController) RestartProcess(ctx http.Context) {
+func (c *SupervisorController) RestartProcess(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
 	tools.Exec(`supervisorctl restart ` + process)
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // ProcessLog 进程日志
-func (c *SupervisorController) ProcessLog(ctx http.Context) {
+func (c *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
@@ -256,13 +255,13 @@ func (c *SupervisorController) ProcessLog(ctx http.Context) {
 	}
 
 	log := tools.Exec(`tail -n 200 ` + logPath)
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
 // ClearProcessLog 清空进程日志
-func (c *SupervisorController) ClearProcessLog(ctx http.Context) {
+func (c *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
@@ -274,13 +273,13 @@ func (c *SupervisorController) ClearProcessLog(ctx http.Context) {
 	}
 
 	tools.Exec(`echo "" > ` + logPath)
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // ProcessConfig 获取进程配置
-func (c *SupervisorController) ProcessConfig(ctx http.Context) {
+func (c *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Query("process")
@@ -291,13 +290,13 @@ func (c *SupervisorController) ProcessConfig(ctx http.Context) {
 		config = tools.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
 	}
 
-	controllers.Success(ctx, config)
+	return controllers.Success(ctx, config)
 }
 
 // SaveProcessConfig 保存进程配置
-func (c *SupervisorController) SaveProcessConfig(ctx http.Context) {
+func (c *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
@@ -311,13 +310,13 @@ func (c *SupervisorController) SaveProcessConfig(ctx http.Context) {
 	tools.Exec(`supervisorctl update`)
 	tools.Exec(`supervisorctl start ` + process)
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // AddProcess 添加进程
-func (c *SupervisorController) AddProcess(ctx http.Context) {
+func (c *SupervisorController) AddProcess(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -328,12 +327,10 @@ func (c *SupervisorController) AddProcess(ctx http.Context) {
 		"num":     "required",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	name := ctx.Request().Input("name")
@@ -362,13 +359,13 @@ stdout_logfile_maxbytes=2MB
 	tools.Exec(`supervisorctl update`)
 	tools.Exec(`supervisorctl start ` + name)
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // DeleteProcess 删除进程
-func (c *SupervisorController) DeleteProcess(ctx http.Context) {
+func (c *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "supervisor") {
-		return
+		return nil
 	}
 
 	process := ctx.Request().Input("process")
@@ -385,5 +382,5 @@ func (c *SupervisorController) DeleteProcess(ctx http.Context) {
 	tools.Exec(`supervisorctl reread`)
 	tools.Exec(`supervisorctl update`)
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }

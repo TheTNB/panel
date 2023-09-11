@@ -31,9 +31,9 @@ func NewS3fsController() *S3fsController {
 }
 
 // List 所有 S3fs 挂载
-func (c *S3fsController) List(ctx http.Context) {
+func (c *S3fsController) List(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "s3fs") {
-		return
+		return nil
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -42,34 +42,32 @@ func (c *S3fsController) List(ctx http.Context) {
 	var s3fsList []s3fs
 	err := sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, "获取 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "获取 S3fs 挂载失败")
 	}
 
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
 	if startIndex > len(s3fsList) {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []s3fs{},
 		})
-		return
 	}
 	if endIndex > len(s3fsList) {
 		endIndex = len(s3fsList)
 	}
 	pagedS3fsList := s3fsList[startIndex:endIndex]
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"total": len(s3fsList),
 		"items": pagedS3fsList,
 	})
 }
 
 // Add 添加 S3fs 挂载
-func (c *S3fsController) Add(ctx http.Context) {
+func (c *S3fsController) Add(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "s3fs") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -80,12 +78,10 @@ func (c *S3fsController) Add(ctx http.Context) {
 		"path":   "required|regex:^/[a-zA-Z0-9_-]+$",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	ak := ctx.Request().Input("ak")
@@ -96,8 +92,7 @@ func (c *S3fsController) Add(ctx http.Context) {
 
 	// 检查下地域节点中是否包含bucket，如果包含了，肯定是错误的
 	if strings.Contains(url, bucket) {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, "地域节点不能包含 Bucket 名称")
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "地域节点不能包含 Bucket 名称")
 	}
 
 	// 检查挂载目录是否存在且为空
@@ -105,21 +100,18 @@ func (c *S3fsController) Add(ctx http.Context) {
 		tools.Mkdir(path, 0755)
 	}
 	if !tools.Empty(path) {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录必须为空")
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录必须为空")
 	}
 
 	var s3fsList []s3fs
 	err = sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
 
 	for _, s := range s3fsList {
 		if s.Path == path {
-			controllers.Error(ctx, http.StatusUnprocessableEntity, "路径已存在")
-			return
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "路径已存在")
 		}
 	}
 
@@ -130,14 +122,12 @@ func (c *S3fsController) Add(ctx http.Context) {
 	check := tools.Exec("mount -a 2>&1")
 	if len(check) != 0 {
 		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
-		controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
 	}
 	check2 := tools.Exec("df -h | grep " + path + " 2>&1")
 	if len(check2) == 0 {
 		tools.Exec(`sed -i 's@^s3fs#` + bucket + `\s` + path + `.*$@@g' /etc/fstab`)
-		controllers.Error(ctx, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
 	}
 
 	s3fsList = append(s3fsList, s3fs{
@@ -148,35 +138,31 @@ func (c *S3fsController) Add(ctx http.Context) {
 	})
 	json, err := sonic.MarshalString(s3fsList)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
 	}
 	err = c.setting.Set("s3fs", json)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
 	}
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // Delete 删除 S3fs 挂载
-func (c *S3fsController) Delete(ctx http.Context) {
+func (c *S3fsController) Delete(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "s3fs") {
-		return
+		return nil
 	}
 
 	id := ctx.Request().Input("id")
 	if len(id) == 0 {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不能为空")
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不能为空")
 	}
 
 	var s3fsList []s3fs
 	err := sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
 
 	var mount s3fs
@@ -187,8 +173,7 @@ func (c *S3fsController) Delete(ctx http.Context) {
 		}
 	}
 	if mount.ID == 0 {
-		controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不存在")
-		return
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不存在")
 	}
 
 	tools.Exec(`fusermount -u '` + mount.Path + `' 2>&1`)
@@ -196,8 +181,7 @@ func (c *S3fsController) Delete(ctx http.Context) {
 	tools.Exec(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`)
 	check := tools.Exec("mount -a 2>&1")
 	if len(check) != 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+check)
 	}
 	tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID))
 
@@ -209,14 +193,12 @@ func (c *S3fsController) Delete(ctx http.Context) {
 	}
 	json, err := sonic.MarshalString(newS3fsList)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
 	}
 	err = c.setting.Set("s3fs", json)
 	if err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
 	}
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }

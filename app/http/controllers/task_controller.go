@@ -17,22 +17,23 @@ func NewTaskController() *TaskController {
 	}
 }
 
-func (r *TaskController) Status(ctx http.Context) {
+// Status 获取当前任务状态
+func (r *TaskController) Status(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusWaiting).OrWhere("status", models.TaskStatusRunning).FirstOrFail(&task)
 	if err == nil {
-		Success(ctx, http.Json{
+		return Success(ctx, http.Json{
 			"task": true,
 		})
-		return
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"task": false,
 	})
 }
 
-func (r *TaskController) List(ctx http.Context) {
+// List 获取任务列表
+func (r *TaskController) List(ctx http.Context) http.Response {
 	status := ctx.Request().Query("status")
 	if len(status) == 0 {
 		status = models.TaskStatusWaiting
@@ -43,38 +44,37 @@ func (r *TaskController) List(ctx http.Context) {
 	err := facades.Orm().Query().Where("status", status).Paginate(ctx.Request().QueryInt("page"), ctx.Request().QueryInt("limit"), &tasks, &total)
 	if err != nil {
 		facades.Log().Error("[面板][TaskController] 查询任务列表失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"total": total,
 		"items": tasks,
 	})
 }
 
-func (r *TaskController) Log(ctx http.Context) {
+// Log 获取任务日志
+func (r *TaskController) Log(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("id", ctx.Request().QueryInt("id")).FirstOrFail(&task)
 	if err != nil {
 		facades.Log().Error("[面板][TaskController] 查询任务失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	log := tools.Exec("tail -n 30 " + task.Log)
 
-	Success(ctx, log)
+	return Success(ctx, log)
 }
 
-func (r *TaskController) Delete(ctx http.Context) {
+// Delete 删除任务
+func (r *TaskController) Delete(ctx http.Context) http.Response {
 	var task models.Task
 	_, err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).Delete(&task)
 	if err != nil {
 		facades.Log().Error("[面板][TaskController] 删除任务失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }

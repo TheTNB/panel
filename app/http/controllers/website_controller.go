@@ -29,27 +29,26 @@ func NewWebsiteController() *WebsiteController {
 }
 
 // List 网站列表
-func (c *WebsiteController) List(ctx http.Context) {
+func (c *WebsiteController) List(ctx http.Context) http.Response {
 	limit := ctx.Request().QueryInt("limit")
 	page := ctx.Request().QueryInt("page")
 
 	total, websites, err := c.website.List(page, limit)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站列表失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"total": total,
 		"items": websites,
 	})
 }
 
 // Add 添加网站
-func (c *WebsiteController) Add(ctx http.Context) {
+func (c *WebsiteController) Add(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name",
@@ -62,12 +61,10 @@ func (c *WebsiteController) Add(ctx http.Context) {
 		"db_password": "required_if:db,true",
 	})
 	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	var website services.PanelWebsite
@@ -83,91 +80,85 @@ func (c *WebsiteController) Add(ctx http.Context) {
 	newSite, err := c.website.Add(website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 添加网站失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, newSite)
+	return Success(ctx, newSite)
 }
 
 // Delete 删除网站
-func (c *WebsiteController) Delete(ctx http.Context) {
+func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	id := ctx.Request().InputInt("id")
 	err := c.website.Delete(id)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 删除网站失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "删除网站失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "删除网站失败: "+err.Error())
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // GetDefaultConfig 获取默认配置
-func (c *WebsiteController) GetDefaultConfig(ctx http.Context) {
+func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	index := tools.Read("/www/server/openresty/html/index.html")
 	stop := tools.Read("/www/server/openresty/html/stop.html")
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"index": index,
 		"stop":  stop,
 	})
 }
 
 // SaveDefaultConfig 保存默认配置
-func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) {
+func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
 	if !tools.Write("/www/server/openresty/html/index.html", index, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	if !tools.Write("/www/server/openresty/html/stop.html", stop, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // GetConfig 获取配置
-func (c *WebsiteController) GetConfig(ctx http.Context) {
+func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	config, err := c.website.GetConfig(id)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站配置失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, config)
+	return Success(ctx, config)
 }
 
 // SaveConfig 保存配置
-func (c *WebsiteController) SaveConfig(ctx http.Context) {
+func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"id":                  "required",
@@ -190,23 +181,19 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 		"ssl_certificate_key": "required_if:ssl,true",
 	})
 	if err != nil {
-		Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	var website models.Website
 	if facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&website) != nil {
-		Error(ctx, http.StatusBadRequest, "网站不存在")
-		return
+		return Error(ctx, http.StatusBadRequest, "网站不存在")
 	}
 
 	if !website.Status {
-		Error(ctx, http.StatusBadRequest, "网站已停用，请先启用")
-		return
+		return Error(ctx, http.StatusBadRequest, "网站已停用，请先启用")
 	}
 
 	// 原文
@@ -214,15 +201,13 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	if strings.TrimSpace(raw) != strings.TrimSpace(ctx.Request().Input("raw")) {
 		tools.Write("/www/server/vhost/"+website.Name+".conf", ctx.Request().Input("raw"), 0644)
 		tools.Exec("systemctl reload openresty")
-		Success(ctx, nil)
-		return
+		return Success(ctx, nil)
 	}
 
 	// 目录
 	path := ctx.Request().Input("path")
 	if !tools.Exists(path) {
-		Error(ctx, http.StatusBadRequest, "网站目录不存在")
-		return
+		return Error(ctx, http.StatusBadRequest, "网站目录不存在")
 	}
 	website.Path = path
 
@@ -230,8 +215,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	domain := "server_name"
 	domains := strings.Split(ctx.Request().Input("domains"), "\n")
 	if len(domains) == 0 {
-		Error(ctx, http.StatusBadRequest, "域名不能为空")
-		return
+		return Error(ctx, http.StatusBadRequest, "域名不能为空")
 	}
 	for _, v := range domains {
 		if v == "" {
@@ -242,8 +226,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	domain += ";"
 	domainConfigOld := tools.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
 	if len(strings.TrimSpace(domainConfigOld)) == 0 {
-		Error(ctx, http.StatusBadRequest, "配置文件中缺少server_name标记位")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中缺少server_name标记位")
 	}
 	raw = strings.Replace(raw, domainConfigOld, "\n    "+domain+"\n    ", -1)
 
@@ -251,13 +234,11 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	var port strings.Builder
 	ports := strings.Split(ctx.Request().Input("ports"), "\n")
 	if len(ports) == 0 {
-		Error(ctx, http.StatusBadRequest, "端口不能为空")
-		return
+		return Error(ctx, http.StatusBadRequest, "端口不能为空")
 	}
 	for i, v := range ports {
 		if _, err := strconv.Atoi(v); err != nil && v != "443 ssl http2" {
-			Error(ctx, http.StatusBadRequest, "端口格式错误")
-			return
+			return Error(ctx, http.StatusBadRequest, "端口格式错误")
 		}
 		if v == "443" && ctx.Request().InputBool("ssl") {
 			v = "443 ssl http2"
@@ -270,21 +251,18 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	}
 	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
 	if len(strings.TrimSpace(portConfigOld)) == 0 {
-		Error(ctx, http.StatusBadRequest, "配置文件中缺少port标记位")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中缺少port标记位")
 	}
 	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
 
 	// 运行目录
 	root := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
 	if len(strings.TrimSpace(root)) == 0 {
-		Error(ctx, http.StatusBadRequest, "配置文件中缺少root标记位")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中缺少root标记位")
 	}
 	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(root)
 	if len(match) != 2 {
-		Error(ctx, http.StatusBadRequest, "配置文件中root标记位格式错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中root标记位格式错误")
 	}
 	rootNew := strings.Replace(root, match[1], ctx.Request().Input("root"), -1)
 	raw = strings.Replace(raw, root, rootNew, -1)
@@ -292,13 +270,11 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	// 默认文件
 	index := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
 	if len(strings.TrimSpace(index)) == 0 {
-		Error(ctx, http.StatusBadRequest, "配置文件中缺少index标记位")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中缺少index标记位")
 	}
 	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(index)
 	if len(match) != 2 {
-		Error(ctx, http.StatusBadRequest, "配置文件中index标记位格式错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "配置文件中index标记位格式错误")
 	}
 	indexNew := strings.Replace(index, match[1], ctx.Request().Input("index"), -1)
 	raw = strings.Replace(raw, index, indexNew, -1)
@@ -391,112 +367,101 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) {
 	err = facades.Orm().Query().Save(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
 	tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", ctx.Request().Input("rewrite"), 0644)
 	tools.Exec("systemctl reload openresty")
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // ClearLog 清空日志
-func (c *WebsiteController) ClearLog(ctx http.Context) {
+func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	tools.Remove("/www/wwwlogs/" + website.Name + ".log")
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // UpdateRemark 更新备注
-func (c *WebsiteController) UpdateRemark(ctx http.Context) {
+func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	website.Remark = ctx.Request().Input("remark")
 	err = facades.Orm().Query().Save(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站备注失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // BackupList 备份列表
-func (c *WebsiteController) BackupList(ctx http.Context) {
+func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 	backupList, err := c.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站备份列表失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, backupList)
+	return Success(ctx, backupList)
 }
 
 // CreateBackup 创建备份
-func (c *WebsiteController) CreateBackup(ctx http.Context) {
+func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "获取网站信息失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "获取网站信息失败: "+err.Error())
 	}
 
 	err = c.backup.WebSiteBackup(website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 备份网站失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "备份网站失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "备份网站失败: "+err.Error())
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // UploadBackup 上传备份
-func (c *WebsiteController) UploadBackup(ctx http.Context) {
+func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		Error(ctx, http.StatusBadRequest, "上传文件失败")
-		return
+		return Error(ctx, http.StatusBadRequest, "上传文件失败")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
@@ -507,50 +472,44 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		Error(ctx, http.StatusBadRequest, "上传文件失败")
-		return
+		return Error(ctx, http.StatusBadRequest, "上传文件失败")
 	}
 
-	Success(ctx, "上传文件成功")
+	return Success(ctx, "上传文件成功")
 }
 
 // RestoreBackup 还原备份
-func (c *WebsiteController) RestoreBackup(ctx http.Context) {
+func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 	fileName := ctx.Request().Input("name")
 	if len(fileName) == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "获取网站信息失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "获取网站信息失败: "+err.Error())
 	}
 
 	err = c.backup.WebsiteRestore(website, fileName)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 还原网站失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "还原网站失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "还原网站失败: "+err.Error())
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // DeleteBackup 删除备份
-func (c *WebsiteController) DeleteBackup(ctx http.Context) {
+func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	fileName := ctx.Request().Input("name")
 	if len(fileName) == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
@@ -559,37 +518,33 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) {
 	}
 
 	if !tools.Remove(backupPath + "/" + fileName) {
-		Error(ctx, http.StatusInternalServerError, "删除备份失败")
-		return
+		return Error(ctx, http.StatusInternalServerError, "删除备份失败")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // ResetConfig 重置配置
-func (c *WebsiteController) ResetConfig(ctx http.Context) {
+func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", id).Get(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	website.Status = true
 	website.Ssl = false
 	if err := facades.Orm().Query().Save(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	raw := fmt.Sprintf(`
@@ -655,32 +610,29 @@ server
 	tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644)
 	tools.Exec("systemctl reload openresty")
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
 // Status 网站状态
-func (c *WebsiteController) Status(ctx http.Context) {
+func (c *WebsiteController) Status(ctx http.Context) http.Response {
 	if !Check(ctx, "openresty") {
-		return
+		return nil
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", id).Get(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	website.Status = ctx.Request().InputBool("status")
 	if err := facades.Orm().Query().Save(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
@@ -712,5 +664,5 @@ func (c *WebsiteController) Status(ctx http.Context) {
 	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
 	tools.Exec("systemctl reload openresty")
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }

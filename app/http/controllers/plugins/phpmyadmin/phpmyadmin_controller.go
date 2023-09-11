@@ -18,15 +18,14 @@ func NewPhpMyAdminController() *PhpMyAdminController {
 	return &PhpMyAdminController{}
 }
 
-func (c *PhpMyAdminController) Info(ctx http.Context) {
+func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "phpmyadmin") {
-		return
+		return nil
 	}
 
 	files, err := os.ReadDir("/www/server/phpmyadmin")
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
 	}
 
 	var phpmyadmin string
@@ -36,32 +35,29 @@ func (c *PhpMyAdminController) Info(ctx http.Context) {
 		}
 	}
 	if len(phpmyadmin) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
 	}
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	match := regexp.MustCompile(`listen\s+(\d+);`).FindStringSubmatch(conf)
 	if len(match) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 端口")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 端口")
 	}
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"phpmyadmin": phpmyadmin,
 		"port":       match[1],
 	})
 }
 
-func (c *PhpMyAdminController) SetPort(ctx http.Context) {
+func (c *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "phpmyadmin") {
-		return
+		return nil
 	}
 
 	port := ctx.Request().Input("port")
 	if len(port) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "端口不能为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "端口不能为空")
 	}
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
@@ -77,5 +73,5 @@ func (c *PhpMyAdminController) SetPort(ctx http.Context) {
 	}
 	tools.Exec("systemctl reload openresty")
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }

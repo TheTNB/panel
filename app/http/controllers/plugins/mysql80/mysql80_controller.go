@@ -29,166 +29,154 @@ func NewMysql80Controller() *Mysql80Controller {
 }
 
 // Status 获取运行状态
-func (c *Mysql80Controller) Status(ctx http.Context) {
+func (c *Mysql80Controller) Status(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Reload 重载配置
-func (c *Mysql80Controller) Reload(ctx http.Context) {
+func (c *Mysql80Controller) Reload(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl reload mysqld")
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Restart 重启服务
-func (c *Mysql80Controller) Restart(ctx http.Context) {
+func (c *Mysql80Controller) Restart(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl restart mysqld")
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Start 启动服务
-func (c *Mysql80Controller) Start(ctx http.Context) {
+func (c *Mysql80Controller) Start(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl start mysqld")
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Stop 停止服务
-func (c *Mysql80Controller) Stop(ctx http.Context) {
+func (c *Mysql80Controller) Stop(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl stop mysqld")
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
 	if status != "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // GetConfig 获取配置
-func (c *Mysql80Controller) GetConfig(ctx http.Context) {
+func (c *Mysql80Controller) GetConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	// 获取配置
 	config := tools.Read("/www/server/mysql/conf/my.cnf")
 	if len(config) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 	}
 
-	controllers.Success(ctx, config)
+	return controllers.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
-func (c *Mysql80Controller) SaveConfig(ctx http.Context) {
+func (c *Mysql80Controller) SaveConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/mysql/conf/my.cnf", config, 0644) {
-		controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 	}
 
-	c.Restart(ctx)
+	return c.Restart(ctx)
 }
 
 // Load 获取负载
-func (c *Mysql80Controller) Load(ctx http.Context) {
+func (c *Mysql80Controller) Load(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if status != "active" {
-		controllers.Error(ctx, http.StatusInternalServerError, "MySQL 已停止运行")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 已停止运行")
 	}
 
 	raw := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if strings.Contains(raw, "Access denied for user") {
-		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
 	}
 	if !strings.Contains(raw, "Uptime") {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
 
 	data := make(map[int]map[string]string)
@@ -238,84 +226,80 @@ func (c *Mysql80Controller) Load(ctx http.Context) {
 	bufferPoolReadRequests := cast.ToFloat64(data[12]["value"])
 	data[10]["value"] = fmt.Sprintf("%.2f%%", bufferPoolReadRequests/(bufferPoolReads+bufferPoolReadRequests)*100)
 
-	controllers.Success(ctx, data)
+	return controllers.Success(ctx, data)
 }
 
 // ErrorLog 获取错误日志
-func (c *Mysql80Controller) ErrorLog(ctx http.Context) {
+func (c *Mysql80Controller) ErrorLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log"))
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
 // ClearErrorLog 清空错误日志
-func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) {
+func (c *Mysql80Controller) ClearErrorLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("echo '' > /www/server/mysql/mysql-error.log")
-	controllers.Success(ctx, "清空错误日志成功")
+	return controllers.Success(ctx, "清空错误日志成功")
 }
 
 // SlowLog 获取慢查询日志
-func (c *Mysql80Controller) SlowLog(ctx http.Context) {
+func (c *Mysql80Controller) SlowLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log"))
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
 // ClearSlowLog 清空慢查询日志
-func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) {
+func (c *Mysql80Controller) ClearSlowLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	tools.Exec("echo '' > /www/server/mysql/mysql-slow.log")
-	controllers.Success(ctx, "清空慢查询日志成功")
+	return controllers.Success(ctx, "清空慢查询日志成功")
 }
 
 // GetRootPassword 获取root密码
-func (c *Mysql80Controller) GetRootPassword(ctx http.Context) {
+func (c *Mysql80Controller) GetRootPassword(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
 	}
 
-	controllers.Success(ctx, rootPassword)
+	return controllers.Success(ctx, rootPassword)
 }
 
 // SetRootPassword 设置root密码
-func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
+func (c *Mysql80Controller) SetRootPassword(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 	if status != "active" {
-		controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
 	}
 
 	rootPassword := ctx.Request().Input(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码不能为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码不能为空")
 	}
 
 	oldRootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -326,18 +310,17 @@ func (c *Mysql80Controller) SetRootPassword(ctx http.Context) {
 		if err != nil {
 			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
 			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
-			controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
-			return
+			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 		}
 	}
 
-	controllers.Success(ctx, "设置root密码成功")
+	return controllers.Success(ctx, "设置root密码成功")
 }
 
 // DatabaseList 获取数据库列表
-func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
+func (c *Mysql80Controller) DatabaseList(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -348,16 +331,14 @@ func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
 		facades.Log().Error("[MySQL80] 连接数据库失败" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SHOW DATABASES")
 	if err != nil {
 		facades.Log().Error("[MySQL80] 获取数据库列表失败" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 	defer rows.Close()
 
@@ -374,8 +355,7 @@ func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
 
 	if err := rows.Err(); err != nil {
 		facades.Log().Error("[MySQL80] 获取数据库列表失败" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -383,27 +363,26 @@ func (c *Mysql80Controller) DatabaseList(ctx http.Context) {
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
 	if startIndex > len(databases) {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []database{},
 		})
-		return
 	}
 	if endIndex > len(databases) {
 		endIndex = len(databases)
 	}
 	pagedDatabases := databases[startIndex:endIndex]
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"total": len(databases),
 		"items": pagedDatabases,
 	})
 }
 
 // AddDatabase 添加数据库
-func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
+func (c *Mysql80Controller) AddDatabase(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -412,12 +391,10 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -430,60 +407,56 @@ func (c *Mysql80Controller) AddDatabase(ctx http.Context) {
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
-	controllers.Success(ctx, "添加数据库成功")
+	return controllers.Success(ctx, "添加数据库成功")
 }
 
 // DeleteDatabase 删除数据库
-func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) {
+func (c *Mysql80Controller) DeleteDatabase(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
 
-	controllers.Success(ctx, "删除数据库成功")
+	return controllers.Success(ctx, "删除数据库成功")
 }
 
 // BackupList 获取备份列表
-func (c *Mysql80Controller) BackupList(ctx http.Context) {
+func (c *Mysql80Controller) BackupList(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	backupList, err := c.backup.MysqlList()
 	if err != nil {
 		facades.Log().Error("[MySQL80] 获取备份列表失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
-	controllers.Success(ctx, backupList)
+	return controllers.Success(ctx, backupList)
 }
 
 // UploadBackup 上传备份
-func (c *Mysql80Controller) UploadBackup(ctx http.Context) {
+func (c *Mysql80Controller) UploadBackup(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
@@ -494,71 +467,65 @@ func (c *Mysql80Controller) UploadBackup(ctx http.Context) {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
 	}
 
-	controllers.Success(ctx, "上传文件成功")
+	return controllers.Success(ctx, "上传文件成功")
 }
 
 // CreateBackup 创建备份
-func (c *Mysql80Controller) CreateBackup(ctx http.Context) {
+func (c *Mysql80Controller) CreateBackup(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	database := ctx.Request().Input("database")
 	err = c.backup.MysqlBackup(database)
 	if err != nil {
 		facades.Log().Error("[MYSQL80] 创建备份失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
 	}
 
-	controllers.Success(ctx, "备份成功")
+	return controllers.Success(ctx, "备份成功")
 }
 
 // DeleteBackup 删除备份
-func (c *Mysql80Controller) DeleteBackup(ctx http.Context) {
+func (c *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	fileName := ctx.Request().Input("name")
 	tools.Remove(backupPath + "/" + fileName)
 
-	controllers.Success(ctx, "删除备份成功")
+	return controllers.Success(ctx, "删除备份成功")
 }
 
 // RestoreBackup 还原备份
-func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
+func (c *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -566,28 +533,25 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	err = c.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("name"))
 	if err != nil {
 		facades.Log().Error("[MYSQL80] 还原失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 	}
 
-	controllers.Success(ctx, "还原成功")
+	return controllers.Success(ctx, "还原成功")
 }
 
 // UserList 用户列表
-func (c *Mysql80Controller) UserList(ctx http.Context) {
+func (c *Mysql80Controller) UserList(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	type user struct {
@@ -600,14 +564,14 @@ func (c *Mysql80Controller) UserList(ctx http.Context) {
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
 		facades.Log().Error("[MYSQL80] 连接数据库失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT user, host FROM mysql.user")
 	if err != nil {
 		facades.Log().Error("[MYSQL80] 查询数据库失败：" + err.Error())
-		controllers.Error(ctx, http.StatusInternalServerError, "查询数据库失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "查询数据库失败")
 	}
 	defer rows.Close()
 
@@ -645,8 +609,7 @@ func (c *Mysql80Controller) UserList(ctx http.Context) {
 	}
 
 	if err := rows.Err(); err != nil {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -654,27 +617,26 @@ func (c *Mysql80Controller) UserList(ctx http.Context) {
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
 	if startIndex > len(userGrants) {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []user{},
 		})
-		return
 	}
 	if endIndex > len(userGrants) {
 		endIndex = len(userGrants)
 	}
 	pagedUserGrants := userGrants[startIndex:endIndex]
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"total": len(userGrants),
 		"items": pagedUserGrants,
 	})
 }
 
 // AddUser 添加用户
-func (c *Mysql80Controller) AddUser(ctx http.Context) {
+func (c *Mysql80Controller) AddUser(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -683,12 +645,10 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -699,38 +659,36 @@ func (c *Mysql80Controller) AddUser(ctx http.Context) {
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
-	controllers.Success(ctx, "添加成功")
+	return controllers.Success(ctx, "添加成功")
 }
 
 // DeleteUser 删除用户
-func (c *Mysql80Controller) DeleteUser(ctx http.Context) {
+func (c *Mysql80Controller) DeleteUser(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
 
-	controllers.Success(ctx, "删除成功")
+	return controllers.Success(ctx, "删除成功")
 }
 
 // SetUserPassword 设置用户密码
-func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
+func (c *Mysql80Controller) SetUserPassword(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -738,12 +696,10 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -752,13 +708,13 @@ func (c *Mysql80Controller) SetUserPassword(ctx http.Context) {
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
-	controllers.Success(ctx, "修改成功")
+	return controllers.Success(ctx, "修改成功")
 }
 
 // SetUserPrivileges 设置用户权限
-func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
+func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "mysql80") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -766,12 +722,10 @@ func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 		"database": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -781,5 +735,5 @@ func (c *Mysql80Controller) SetUserPrivileges(ctx http.Context) {
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
 	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
 
-	controllers.Success(ctx, "修改成功")
+	return controllers.Success(ctx, "修改成功")
 }

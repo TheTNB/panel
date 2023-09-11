@@ -30,134 +30,128 @@ func NewPhp82Controller() *Php82Controller {
 	}
 }
 
-func (c *Php82Controller) Status(ctx http.Context) {
+func (c *Php82Controller) Status(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
-func (c *Php82Controller) Reload(ctx http.Context) {
+func (c *Php82Controller) Reload(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl reload php-fpm-" + c.version)
 	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
-func (c *Php82Controller) Start(ctx http.Context) {
+func (c *Php82Controller) Start(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl start php-fpm-" + c.version)
 	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
-func (c *Php82Controller) Stop(ctx http.Context) {
+func (c *Php82Controller) Stop(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl stop php-fpm-" + c.version)
 	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 	}
 
 	if status != "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
-func (c *Php82Controller) Restart(ctx http.Context) {
+func (c *Php82Controller) Restart(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl restart php-fpm-" + c.version)
 	out := tools.Exec("systemctl status php-fpm-" + c.version + " | grep Active | grep -v grep | awk '{print $2}'")
 	status := strings.TrimSpace(out)
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+c.version+"运行状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
-func (c *Php82Controller) GetConfig(ctx http.Context) {
+func (c *Php82Controller) GetConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	config := tools.Read("/www/server/php/" + c.version + "/etc/php.ini")
-	controllers.Success(ctx, config)
+	return controllers.Success(ctx, config)
 }
 
-func (c *Php82Controller) SaveConfig(ctx http.Context) {
+func (c *Php82Controller) SaveConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	config := ctx.Request().Input("config")
 	tools.Write("/www/server/php/"+c.version+"/etc/php.ini", config, 0644)
-	c.Reload(ctx)
+	return c.Reload(ctx)
 }
 
-func (c *Php82Controller) Load(ctx http.Context) {
+func (c *Php82Controller) Load(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + c.version)
 	if err != nil || !resp.IsSuccessState() {
 		facades.Log().Error("获取PHP-" + c.version + "运行状态失败")
-		controllers.Error(ctx, http.StatusInternalServerError, "[PHP-"+c.version+"] 获取运行状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "[PHP-"+c.version+"] 获取运行状态失败")
 	}
 
 	raw := resp.String()
@@ -180,43 +174,43 @@ func (c *Php82Controller) Load(ctx http.Context) {
 		}
 	}
 
-	controllers.Success(ctx, data)
+	return controllers.Success(ctx, data)
 }
 
-func (c *Php82Controller) ErrorLog(ctx http.Context) {
+func (c *Php82Controller) ErrorLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/php-fpm.log"))
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
-func (c *Php82Controller) SlowLog(ctx http.Context) {
+func (c *Php82Controller) SlowLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + c.version + "/var/log/slow.log"))
-	controllers.Success(ctx, log)
+	return controllers.Success(ctx, log)
 }
 
-func (c *Php82Controller) ClearErrorLog(ctx http.Context) {
+func (c *Php82Controller) ClearErrorLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/php-fpm.log")
-	controllers.Success(ctx, true)
+	return controllers.Success(ctx, true)
 }
 
-func (c *Php82Controller) ClearSlowLog(ctx http.Context) {
+func (c *Php82Controller) ClearSlowLog(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	tools.Exec("echo '' > /www/server/php/" + c.version + "/var/log/slow.log")
-	controllers.Success(ctx, true)
+	return controllers.Success(ctx, true)
 }
 
 type Extension struct {
@@ -226,32 +220,30 @@ type Extension struct {
 	Installed   bool   `json:"installed"`
 }
 
-func (c *Php82Controller) GetExtensionList(ctx http.Context) {
+func (c *Php82Controller) GetExtensionList(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	extensions := c.GetExtensions()
-	controllers.Success(ctx, extensions)
+	return controllers.Success(ctx, extensions)
 }
 
-func (c *Php82Controller) InstallExtension(ctx http.Context) {
+func (c *Php82Controller) InstallExtension(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	extensions := c.GetExtensions()
 	for _, item := range extensions {
 		if item.Slug == slug {
 			if item.Installed {
-				controllers.Error(ctx, http.StatusBadRequest, "扩展已安装")
-				return
+				return controllers.Error(ctx, http.StatusBadRequest, "扩展已安装")
 			}
 
 			var task models.Task
@@ -261,37 +253,33 @@ func (c *Php82Controller) InstallExtension(ctx http.Context) {
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + c.version + "] 创建安装拓展任务失败：" + err.Error())
-				controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
-				return
+				return controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
 			}
 
 			c.task.Process(task.ID)
 
-			controllers.Success(ctx, true)
-			return
+			return controllers.Success(ctx, true)
 		}
 	}
 
-	controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
+	return controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
 }
 
-func (c *Php82Controller) UninstallExtension(ctx http.Context) {
+func (c *Php82Controller) UninstallExtension(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "php"+c.version) {
-		return
+		return nil
 	}
 
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	extensions := c.GetExtensions()
 	for _, item := range extensions {
 		if item.Slug == slug {
 			if !item.Installed {
-				controllers.Error(ctx, http.StatusBadRequest, "扩展未安装")
-				return
+				return controllers.Error(ctx, http.StatusBadRequest, "扩展未安装")
 			}
 
 			var task models.Task
@@ -301,18 +289,16 @@ func (c *Php82Controller) UninstallExtension(ctx http.Context) {
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + c.version + "] 创建卸载拓展任务失败：" + err.Error())
-				controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
-				return
+				return controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
 			}
 
 			c.task.Process(task.ID)
 
-			controllers.Success(ctx, true)
-			return
+			return controllers.Success(ctx, true)
 		}
 	}
 
-	controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
+	return controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
 }
 
 func (c *Php82Controller) GetExtensions() []Extension {

@@ -20,11 +20,13 @@ func NewSafeController() *SafeController {
 	}
 }
 
-func (r *SafeController) GetFirewallStatus(ctx http.Context) {
-	Success(ctx, r.firewallStatus())
+// GetFirewallStatus 获取防火墙状态
+func (r *SafeController) GetFirewallStatus(ctx http.Context) http.Response {
+	return Success(ctx, r.firewallStatus())
 }
 
-func (r *SafeController) SetFirewallStatus(ctx http.Context) {
+// SetFirewallStatus 设置防火墙状态
+func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 	var out string
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
@@ -40,13 +42,13 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) {
 		}
 	}
 
-	Success(ctx, out)
+	return Success(ctx, out)
 }
 
-func (r *SafeController) GetFirewallRules(ctx http.Context) {
+// GetFirewallRules 获取防火墙规则
+func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 	if !r.firewallStatus() {
-		Success(ctx, nil)
-		return
+		return Success(ctx, nil)
 	}
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
@@ -55,11 +57,10 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		out := tools.Exec("firewall-cmd --list-all 2>&1")
 		match := regexp.MustCompile(`ports: (.*)`).FindStringSubmatch(out)
 		if len(match) == 0 {
-			Success(ctx, http.Json{
+			return Success(ctx, http.Json{
 				"total": 0,
 				"items": []map[string]string{},
 			})
-			return
 		}
 		ports := strings.Split(match[1], " ")
 		var rules []map[string]string
@@ -74,29 +75,27 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		startIndex := (page - 1) * limit
 		endIndex := page * limit
 		if startIndex > len(rules) {
-			Success(ctx, http.Json{
+			return Success(ctx, http.Json{
 				"total": 0,
 				"items": []map[string]string{},
 			})
-			return
 		}
 		if endIndex > len(rules) {
 			endIndex = len(rules)
 		}
 		pagedRules := rules[startIndex:endIndex]
 
-		Success(ctx, http.Json{
+		return Success(ctx, http.Json{
 			"total": len(rules),
 			"items": pagedRules,
 		})
 	} else {
 		out := tools.Exec("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
 		if len(out) == 0 {
-			Success(ctx, http.Json{
+			return Success(ctx, http.Json{
 				"total": 0,
 				"items": []map[string]string{},
 			})
-			return
 		}
 		var rules []map[string]string
 		for _, port := range strings.Split(out, "\n") {
@@ -110,35 +109,33 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) {
 		startIndex := (page - 1) * limit
 		endIndex := page * limit
 		if startIndex > len(rules) {
-			Success(ctx, http.Json{
+			return Success(ctx, http.Json{
 				"total": 0,
 				"items": []map[string]string{},
 			})
-			return
 		}
 		if endIndex > len(rules) {
 			endIndex = len(rules)
 		}
 		pagedRules := rules[startIndex:endIndex]
 
-		Success(ctx, http.Json{
+		return Success(ctx, http.Json{
 			"total": len(rules),
 			"items": pagedRules,
 		})
 	}
 }
 
-func (r *SafeController) AddFirewallRule(ctx http.Context) {
+// AddFirewallRule 添加防火墙规则
+func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 	if !r.firewallStatus() {
-		Error(ctx, http.StatusBadRequest, "防火墙未启动")
-		return
+		return Error(ctx, http.StatusBadRequest, "防火墙未启动")
 	}
 
 	port := ctx.Request().InputInt("port", 0)
 	protocol := ctx.Request().Input("protocol", "")
 	if port == 0 || protocol == "" {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	if tools.IsRHEL() {
@@ -151,20 +148,19 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) {
 		tools.Exec("ufw reload")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
-func (r *SafeController) DeleteFirewallRule(ctx http.Context) {
+// DeleteFirewallRule 删除防火墙规则
+func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 	if !r.firewallStatus() {
-		Error(ctx, http.StatusBadRequest, "防火墙未启动")
-		return
+		return Error(ctx, http.StatusBadRequest, "防火墙未启动")
 	}
 
 	port := ctx.Request().InputInt("port", 0)
 	protocol := ctx.Request().Input("protocol", "")
 	if port == 0 || protocol == "" {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	if tools.IsRHEL() {
@@ -175,9 +171,10 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) {
 		tools.Exec("ufw reload")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
+// firewallStatus 获取防火墙状态
 func (r *SafeController) firewallStatus() bool {
 	var out string
 	var running bool
@@ -200,7 +197,8 @@ func (r *SafeController) firewallStatus() bool {
 	return running
 }
 
-func (r *SafeController) GetSshStatus(ctx http.Context) {
+// GetSshStatus 获取 SSH 状态
+func (r *SafeController) GetSshStatus(ctx http.Context) http.Response {
 	var out string
 	if tools.IsRHEL() {
 		out = tools.Exec("systemctl status sshd | grep Active | awk '{print $3}'")
@@ -213,10 +211,11 @@ func (r *SafeController) GetSshStatus(ctx http.Context) {
 		running = true
 	}
 
-	Success(ctx, running)
+	return Success(ctx, running)
 }
 
-func (r *SafeController) SetSshStatus(ctx http.Context) {
+// SetSshStatus 设置 SSH 状态
+func (r *SafeController) SetSshStatus(ctx http.Context) http.Response {
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
 			tools.Exec("systemctl enable sshd")
@@ -235,19 +234,20 @@ func (r *SafeController) SetSshStatus(ctx http.Context) {
 		}
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
-func (r *SafeController) GetSshPort(ctx http.Context) {
+// GetSshPort 获取 SSH 端口
+func (r *SafeController) GetSshPort(ctx http.Context) http.Response {
 	out := tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
-	Success(ctx, out)
+	return Success(ctx, out)
 }
 
-func (r *SafeController) SetSshPort(ctx http.Context) {
+// SetSshPort 设置 SSH 端口
+func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 	port := ctx.Request().InputInt("port", 0)
 	if port == 0 {
-		Error(ctx, http.StatusBadRequest, "参数错误")
-		return
+		return Error(ctx, http.StatusBadRequest, "参数错误")
 	}
 
 	oldPort := tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
@@ -258,28 +258,30 @@ func (r *SafeController) SetSshPort(ctx http.Context) {
 		tools.Exec("systemctl restart sshd")
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
-func (r *SafeController) GetPingStatus(ctx http.Context) {
+// GetPingStatus 获取 Ping 状态
+func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
 	if tools.IsRHEL() {
 		out := tools.Exec(`firewall-cmd --list-all 2>&1`)
 		if !strings.Contains(out, `rule protocol value="icmp" drop`) {
-			Success(ctx, true)
+			return Success(ctx, true)
 		} else {
-			Success(ctx, false)
+			return Success(ctx, false)
 		}
 	} else {
 		config := tools.Read("/etc/ufw/before.rules")
 		if strings.Contains(config, "-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT") {
-			Success(ctx, true)
+			return Success(ctx, true)
 		} else {
-			Success(ctx, false)
+			return Success(ctx, false)
 		}
 	}
 }
 
-func (r *SafeController) SetPingStatus(ctx http.Context) {
+// SetPingStatus 设置 Ping 状态
+func (r *SafeController) SetPingStatus(ctx http.Context) http.Response {
 	if tools.IsRHEL() {
 		if ctx.Request().InputBool("status") {
 			tools.Exec(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
@@ -296,5 +298,5 @@ func (r *SafeController) SetPingStatus(ctx http.Context) {
 		tools.Exec(`ufw reload`)
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }

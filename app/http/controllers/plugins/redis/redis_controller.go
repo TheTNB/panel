@@ -22,156 +22,146 @@ func NewRedisController() *RedisController {
 }
 
 // Status 获取运行状态
-func (c *RedisController) Status(ctx http.Context) {
+func (c *RedisController) Status(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Reload 重载配置
-func (c *RedisController) Reload(ctx http.Context) {
+func (c *RedisController) Reload(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl reload redis")
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Restart 重启服务
-func (c *RedisController) Restart(ctx http.Context) {
+func (c *RedisController) Restart(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl restart redis")
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Start 启动服务
-func (c *RedisController) Start(ctx http.Context) {
+func (c *RedisController) Start(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl start redis")
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Stop 停止服务
-func (c *RedisController) Stop(ctx http.Context) {
+func (c *RedisController) Stop(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl stop redis")
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 
 	if status != "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // GetConfig 获取配置
-func (c *RedisController) GetConfig(ctx http.Context) {
+func (c *RedisController) GetConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	// 获取配置
 	config := tools.Read("/www/server/redis/redis.conf")
 	if len(config) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
 	}
 
-	controllers.Success(ctx, config)
+	return controllers.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
-func (c *RedisController) SaveConfig(ctx http.Context) {
+func (c *RedisController) SaveConfig(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/redis/redis.conf", config, 0644) {
-		controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 
-	c.Restart(ctx)
+	return c.Restart(ctx)
 }
 
 // Load 获取负载
-func (c *RedisController) Load(ctx http.Context) {
+func (c *RedisController) Load(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "redis") {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
 	if status != "active" {
-		controllers.Error(ctx, http.StatusInternalServerError, "Redis 已停止运行")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "Redis 已停止运行")
 	}
 
 	raw := tools.Exec("redis-cli info")
 	if len(raw) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取Redis负载失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis负载失败")
 	}
 
 	infoLines := strings.Split(raw, "\n")
@@ -200,5 +190,5 @@ func (c *RedisController) Load(ctx http.Context) {
 		{"最近一次 fork() 操作耗费的毫秒数", dataRaw["latest_fork_usec"]},
 	}
 
-	controllers.Success(ctx, data)
+	return controllers.Success(ctx, data)
 }

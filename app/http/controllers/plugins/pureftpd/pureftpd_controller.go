@@ -23,117 +23,111 @@ func NewPureFtpdController() *PureFtpdController {
 }
 
 // Status 获取运行状态
-func (c *PureFtpdController) Status(ctx http.Context) {
+func (c *PureFtpdController) Status(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Reload 重载配置
-func (c *PureFtpdController) Reload(ctx http.Context) {
+func (c *PureFtpdController) Reload(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl reload pure-ftpd")
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Restart 重启服务
-func (c *PureFtpdController) Restart(ctx http.Context) {
+func (c *PureFtpdController) Restart(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl restart pure-ftpd")
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Start 启动服务
-func (c *PureFtpdController) Start(ctx http.Context) {
+func (c *PureFtpdController) Start(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl start pure-ftpd")
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 	}
 
 	if status == "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // Stop 停止服务
-func (c *PureFtpdController) Stop(ctx http.Context) {
+func (c *PureFtpdController) Stop(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	tools.Exec("systemctl stop pure-ftpd")
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
 	}
 
 	if status != "active" {
-		controllers.Success(ctx, true)
+		return controllers.Success(ctx, true)
 	} else {
-		controllers.Success(ctx, false)
+		return controllers.Success(ctx, false)
 	}
 }
 
 // List 获取用户列表
-func (c *PureFtpdController) List(ctx http.Context) {
+func (c *PureFtpdController) List(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	listRaw := tools.Exec("pure-pw list")
 	if len(listRaw) == 0 {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []User{},
 		})
-		return
 	}
 
 	listArr := strings.Split(listRaw, "\n")
@@ -155,27 +149,26 @@ func (c *PureFtpdController) List(ctx http.Context) {
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
 	if startIndex > len(users) {
-		controllers.Success(ctx, http.Json{
+		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []User{},
 		})
-		return
 	}
 	if endIndex > len(users) {
 		endIndex = len(users)
 	}
 	pagedUsers := users[startIndex:endIndex]
 
-	controllers.Success(ctx, http.Json{
+	return controllers.Success(ctx, http.Json{
 		"total": len(users),
 		"items": pagedUsers,
 	})
 }
 
 // Add 添加用户
-func (c *PureFtpdController) Add(ctx http.Context) {
+func (c *PureFtpdController) Add(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -184,12 +177,10 @@ func (c *PureFtpdController) Add(ctx http.Context) {
 		"path":     "required",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -200,8 +191,7 @@ func (c *PureFtpdController) Add(ctx http.Context) {
 		path = "/" + path
 	}
 	if !tools.Exists(path) {
-		controllers.Error(ctx, http.StatusBadRequest, "目录不存在")
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, "目录不存在")
 	}
 
 	tools.Chmod(path, 0755)
@@ -209,25 +199,23 @@ func (c *PureFtpdController) Add(ctx http.Context) {
 	tools.Exec(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
 	tools.Exec("pure-pw mkdb")
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // Delete 删除用户
-func (c *PureFtpdController) Delete(ctx http.Context) {
+func (c *PureFtpdController) Delete(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"username": "required",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -235,13 +223,13 @@ func (c *PureFtpdController) Delete(ctx http.Context) {
 	tools.Exec("pure-pw userdel " + username + " -m")
 	tools.Exec("pure-pw mkdb")
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // ChangePassword 修改密码
-func (c *PureFtpdController) ChangePassword(ctx http.Context) {
+func (c *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
@@ -249,12 +237,10 @@ func (c *PureFtpdController) ChangePassword(ctx http.Context) {
 		"password": "required|min_len:6",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -263,40 +249,37 @@ func (c *PureFtpdController) ChangePassword(ctx http.Context) {
 	tools.Exec(`yes '` + password + `' | pure-pw passwd ` + username + ` -m`)
 	tools.Exec("pure-pw mkdb")
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }
 
 // GetPort 获取端口
-func (c *PureFtpdController) GetPort(ctx http.Context) {
+func (c *PureFtpdController) GetPort(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	port := tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 	if len(port) == 0 {
-		controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
-		return
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
 	}
 
-	controllers.Success(ctx, port)
+	return controllers.Success(ctx, port)
 }
 
 // SetPort 设置端口
-func (c *PureFtpdController) SetPort(ctx http.Context) {
+func (c *PureFtpdController) SetPort(ctx http.Context) http.Response {
 	if !controllers.Check(ctx, "pureftpd") {
-		return
+		return nil
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
 		"port": "required",
 	})
 	if err != nil {
-		controllers.Error(ctx, http.StatusBadRequest, err.Error())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
 	}
 	if validator.Fails() {
-		controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
-		return
+		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
 	port := ctx.Request().Input("port")
@@ -310,5 +293,5 @@ func (c *PureFtpdController) SetPort(ctx http.Context) {
 	}
 	tools.Exec("systemctl restart pure-ftpd")
 
-	controllers.Success(ctx, nil)
+	return controllers.Success(ctx, nil)
 }

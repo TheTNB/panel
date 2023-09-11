@@ -30,22 +30,23 @@ func NewInfoController() *InfoController {
 	}
 }
 
-func (c *InfoController) Name(ctx http.Context) {
+// Name 获取面板名称
+func (c *InfoController) Name(ctx http.Context) http.Response {
 	var setting models.Setting
 	err := facades.Orm().Query().Where("key", "name").First(&setting)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 查询面板名称失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"name": setting.Value,
 	})
 }
 
-func (c *InfoController) Menu(ctx http.Context) {
-	Success(ctx, []MenuItem{
+// Menu 获取面板菜单
+func (c *InfoController) Menu(ctx http.Context) http.Response {
+	return Success(ctx, []MenuItem{
 		{Name: "home", Title: "主页", Icon: "layui-icon-home", Jump: "/"},
 		{Name: "website", Title: "网站管理", Icon: "layui-icon-website", Jump: "website/list"},
 		{Name: "monitor", Title: "资源监控", Icon: "layui-icon-chart-screen", Jump: "monitor"},
@@ -58,13 +59,13 @@ func (c *InfoController) Menu(ctx http.Context) {
 	})
 }
 
-func (c *InfoController) HomePlugins(ctx http.Context) {
+// HomePlugins 获取首页插件
+func (c *InfoController) HomePlugins(ctx http.Context) http.Response {
 	var plugins []models.Plugin
 	err := facades.Orm().Query().Where("show", 1).Find(&plugins)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 查询首页插件失败 ", err)
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	type pluginsData struct {
@@ -80,29 +81,31 @@ func (c *InfoController) HomePlugins(ctx http.Context) {
 		})
 	}
 
-	Success(ctx, pluginsJson)
+	return Success(ctx, pluginsJson)
 }
 
-func (c *InfoController) NowMonitor(ctx http.Context) {
-	Success(ctx, tools.GetMonitoringInfo())
+// NowMonitor 获取当前监控信息
+func (c *InfoController) NowMonitor(ctx http.Context) http.Response {
+	return Success(ctx, tools.GetMonitoringInfo())
 }
 
-func (c *InfoController) SystemInfo(ctx http.Context) {
+// SystemInfo 获取系统信息
+func (c *InfoController) SystemInfo(ctx http.Context) http.Response {
 	monitorInfo := tools.GetMonitoringInfo()
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
 		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
 		"panel_version": facades.Config().GetString("panel.version"),
 	})
 }
 
-func (c *InfoController) InstalledDbAndPhp(ctx http.Context) {
+// InstalledDbAndPhp 获取已安装的数据库和 PHP 版本
+func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 	var php []models.Plugin
 	err := facades.Orm().Query().Where("slug like ?", "php%").Find(&php)
 	if err != nil {
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	var mysql models.Plugin
@@ -134,33 +137,32 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) {
 		phpData = append(phpData, data{Slug: strings.ReplaceAll(p.Slug, "php", ""), Name: c.plugin.GetBySlug(p.Slug).Name})
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"php":        phpData,
 		"mysql":      mysqlInstalled,
 		"postgresql": postgresqlInstalled,
 	})
 }
 
-func (c *InfoController) CheckUpdate(ctx http.Context) {
+// CheckUpdate 检查面板更新
+func (c *InfoController) CheckUpdate(ctx http.Context) http.Response {
 	version := facades.Config().GetString("panel.version")
 	remote, err := tools.GetLatestPanelVersion()
 	if err != nil {
-		Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
-		return
+		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
 	if version == remote.Version {
-		Success(ctx, http.Json{
+		return Success(ctx, http.Json{
 			"update":  false,
 			"version": remote.Version,
 			"name":    remote.Name,
 			"body":    remote.Body,
 			"date":    remote.Date,
 		})
-		return
 	}
 
-	Success(ctx, http.Json{
+	return Success(ctx, http.Json{
 		"update":  true,
 		"version": remote.Version,
 		"name":    remote.Name,
@@ -169,33 +171,32 @@ func (c *InfoController) CheckUpdate(ctx http.Context) {
 	})
 }
 
-func (c *InfoController) Update(ctx http.Context) {
+// Update 更新面板
+func (c *InfoController) Update(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 	if err == nil {
-		Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
-		return
+		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
 	}
 
 	proxy := ctx.Request().InputBool("proxy")
 	err = tools.UpdatePanel(proxy)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 更新面板失败 ", err.Error())
-		Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
-		return
+		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
 	}
 
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }
 
-func (c *InfoController) Restart(ctx http.Context) {
+// Restart 重启面板
+func (c *InfoController) Restart(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 	if err == nil {
-		Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")
-		return
+		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")
 	}
 
 	tools.Exec("systemctl restart panel")
-	Success(ctx, nil)
+	return Success(ctx, nil)
 }

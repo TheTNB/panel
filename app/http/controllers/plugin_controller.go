@@ -23,11 +23,11 @@ func NewPluginController() *PluginController {
 }
 
 // List 列出所有插件
-func (r *PluginController) List(ctx http.Context) {
+func (r *PluginController) List(ctx http.Context) http.Response {
 	plugins := r.plugin.All()
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	var lock sync.RWMutex
@@ -72,24 +72,22 @@ func (r *PluginController) List(ctx http.Context) {
 		})
 	}
 
-	Success(ctx, p)
+	return Success(ctx, p)
 }
 
 // Install 安装插件
-func (r *PluginController) Install(ctx http.Context) {
+func (r *PluginController) Install(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 	plugin := r.plugin.GetBySlug(slug)
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	if installedPlugin.ID != 0 {
-		Error(ctx, http.StatusBadRequest, "插件已安装")
-		return
+		return Error(ctx, http.StatusBadRequest, "插件已安装")
 	}
 
 	var lock sync.RWMutex
@@ -106,8 +104,7 @@ func (r *PluginController) Install(ctx http.Context) {
 		_, requireFound := pluginsMap[require]
 		lock.RUnlock()
 		if !requireFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
@@ -116,8 +113,7 @@ func (r *PluginController) Install(ctx http.Context) {
 		_, excludeFound := pluginsMap[exclude]
 		lock.RUnlock()
 		if excludeFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
 	}
 
@@ -128,29 +124,26 @@ func (r *PluginController) Install(ctx http.Context) {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	r.task.Process(task.ID)
-	Success(ctx, "任务已提交")
+	return Success(ctx, "任务已提交")
 }
 
 // Uninstall 卸载插件
-func (r *PluginController) Uninstall(ctx http.Context) {
+func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 	plugin := r.plugin.GetBySlug(slug)
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	if installedPlugin.ID == 0 {
-		Error(ctx, http.StatusBadRequest, "插件未安装")
-		return
+		return Error(ctx, http.StatusBadRequest, "插件未安装")
 	}
 
 	var lock sync.RWMutex
@@ -167,8 +160,7 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 		_, requireFound := pluginsMap[require]
 		lock.RUnlock()
 		if !requireFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
@@ -177,8 +169,7 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 		_, excludeFound := pluginsMap[exclude]
 		lock.RUnlock()
 		if excludeFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
 	}
 
@@ -189,29 +180,26 @@ func (r *PluginController) Uninstall(ctx http.Context) {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	r.task.Process(task.ID)
-	Success(ctx, "任务已提交")
+	return Success(ctx, "任务已提交")
 }
 
 // Update 更新插件
-func (r *PluginController) Update(ctx http.Context) {
+func (r *PluginController) Update(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 	plugin := r.plugin.GetBySlug(slug)
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	if installedPlugin.ID == 0 {
-		Error(ctx, http.StatusBadRequest, "插件未安装")
-		return
+		return Error(ctx, http.StatusBadRequest, "插件未安装")
 	}
 
 	var lock sync.RWMutex
@@ -228,8 +216,7 @@ func (r *PluginController) Update(ctx http.Context) {
 		_, requireFound := pluginsMap[require]
 		lock.RUnlock()
 		if !requireFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
@@ -238,8 +225,7 @@ func (r *PluginController) Update(ctx http.Context) {
 		_, excludeFound := pluginsMap[exclude]
 		lock.RUnlock()
 		if excludeFound {
-			Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-			return
+			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
 	}
 
@@ -250,36 +236,32 @@ func (r *PluginController) Update(ctx http.Context) {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	r.task.Process(task.ID)
-	Success(ctx, "任务已提交")
+	return Success(ctx, "任务已提交")
 }
 
 // UpdateShow 更新插件首页显示状态
-func (r *PluginController) UpdateShow(ctx http.Context) {
+func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 	show := ctx.Request().InputBool("show")
 
 	var plugin models.Plugin
 	if err := facades.Orm().Query().Where("slug", slug).First(&plugin); err != nil {
 		facades.Log().Error("[面板][PluginController] 查询插件失败: " + err.Error())
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 	if plugin.ID == 0 {
-		Error(ctx, http.StatusBadRequest, "插件未安装")
-		return
+		return Error(ctx, http.StatusBadRequest, "插件未安装")
 	}
 
 	plugin.Show = show
 	if err := facades.Orm().Query().Save(&plugin); err != nil {
 		facades.Log().Error("[面板][PluginController] 更新插件失败: " + err.Error())
-		Error(ctx, http.StatusInternalServerError, "系统内部错误")
-		return
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	Success(ctx, "操作成功")
+	return Success(ctx, "操作成功")
 }
