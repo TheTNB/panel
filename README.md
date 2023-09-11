@@ -79,15 +79,17 @@ panel
 
 ### CDN
 
-- [盾云CDN](http://cdn.ddunyun.com/)
-
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
+
+- [又拍云](https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral)
 
 - [AnyCast.Ai](https://www.anycast.ai/)
 
+- [盾云CDN](http://cdn.ddunyun.com/)
+
 ### 对象存储
 
-- [无畏云科技](https://www.sctes.com/)
+- [又拍云](https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral)
 
 ### DevOps
 
@@ -108,7 +110,8 @@ panel
 
 安全性是我们最关心的问题之一，我们已在生产环境广泛应用耗子Linux面板。
 
-耗子Linux面板采用业界多种方案尽可能保证面板的安全性，但是我们不能保证面板的绝对安全性，**因此我们不对面板的安全性做任何保证**。
+耗子Linux面板采用业界多种方案尽可能保证面板的安全性，但是我们不能保证面板的绝对安全性，**因此我们不对面板的安全性做任何保证
+**。
 
 如果您在使用面板的过程中发现任何安全问题，请勿提交 Issue，可通过以下方式直接联系我们：
 
