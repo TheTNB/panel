@@ -24,7 +24,7 @@ import (
 
 // Plugin 加载插件路由
 func Plugin() {
-	facades.Route().Prefix("api/plugins/openresty").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/openresty").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		openRestyController := openresty.NewOpenrestyController()
 		route.Get("status", openRestyController.Status)
 		route.Post("reload", openRestyController.Reload)
@@ -37,7 +37,7 @@ func Plugin() {
 		route.Get("errorLog", openRestyController.ErrorLog)
 		route.Post("clearErrorLog", openRestyController.ClearErrorLog)
 	})
-	facades.Route().Prefix("api/plugins/mysql57").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/mysql57").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		mysql57Controller := mysql57.NewMysql57Controller()
 		route.Get("status", mysql57Controller.Status)
 		route.Post("reload", mysql57Controller.Reload)
@@ -67,7 +67,7 @@ func Plugin() {
 		route.Post("userPassword", mysql57Controller.SetUserPassword)
 		route.Post("userPrivileges", mysql57Controller.SetUserPrivileges)
 	})
-	facades.Route().Prefix("api/plugins/mysql80").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/mysql80").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		mysql80Controller := mysql80.NewMysql80Controller()
 		route.Get("status", mysql80Controller.Status)
 		route.Post("reload", mysql80Controller.Reload)
@@ -97,7 +97,7 @@ func Plugin() {
 		route.Post("userPassword", mysql80Controller.SetUserPassword)
 		route.Post("userPrivileges", mysql80Controller.SetUserPrivileges)
 	})
-	facades.Route().Prefix("api/plugins/postgresql15").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/postgresql15").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		postgresql15Controller := postgresql15.NewPostgresql15Controller()
 		route.Get("status", postgresql15Controller.Status)
 		route.Post("reload", postgresql15Controller.Reload)
@@ -124,7 +124,7 @@ func Plugin() {
 		route.Post("deleteUser", postgresql15Controller.DeleteUser)
 		route.Post("userPassword", postgresql15Controller.SetUserPassword)
 	})
-	facades.Route().Prefix("api/plugins/php74").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/php74").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		php74Controller := php74.NewPhp74Controller()
 		route.Get("status", php74Controller.Status)
 		route.Post("reload", php74Controller.Reload)
@@ -142,7 +142,7 @@ func Plugin() {
 		route.Post("installExtension", php74Controller.InstallExtension)
 		route.Post("uninstallExtension", php74Controller.UninstallExtension)
 	})
-	facades.Route().Prefix("api/plugins/php80").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/php80").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		php80Controller := php80.NewPhp80Controller()
 		route.Get("status", php80Controller.Status)
 		route.Post("reload", php80Controller.Reload)
@@ -160,7 +160,7 @@ func Plugin() {
 		route.Post("installExtension", php80Controller.InstallExtension)
 		route.Post("uninstallExtension", php80Controller.UninstallExtension)
 	})
-	facades.Route().Prefix("api/plugins/php81").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/php81").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		php81Controller := php81.NewPhp81Controller()
 		route.Get("status", php81Controller.Status)
 		route.Post("reload", php81Controller.Reload)
@@ -178,7 +178,7 @@ func Plugin() {
 		route.Post("installExtension", php81Controller.InstallExtension)
 		route.Post("uninstallExtension", php81Controller.UninstallExtension)
 	})
-	facades.Route().Prefix("api/plugins/php82").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/php82").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		php82Controller := php82.NewPhp82Controller()
 		route.Get("status", php82Controller.Status)
 		route.Post("reload", php82Controller.Reload)
@@ -196,12 +196,12 @@ func Plugin() {
 		route.Post("installExtension", php82Controller.InstallExtension)
 		route.Post("uninstallExtension", php82Controller.UninstallExtension)
 	})
-	facades.Route().Prefix("api/plugins/phpmyadmin").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/phpmyadmin").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		phpMyAdminController := phpmyadmin.NewPhpMyAdminController()
 		route.Get("info", phpMyAdminController.Info)
 		route.Post("port", phpMyAdminController.SetPort)
 	})
-	facades.Route().Prefix("api/plugins/pureftpd").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/pureftpd").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		pureFtpdController := pureftpd.NewPureFtpdController()
 		route.Get("status", pureFtpdController.Status)
 		route.Post("reload", pureFtpdController.Reload)
@@ -215,7 +215,7 @@ func Plugin() {
 		route.Get("port", pureFtpdController.GetPort)
 		route.Post("port", pureFtpdController.SetPort)
 	})
-	facades.Route().Prefix("api/plugins/redis").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/redis").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		redisController := redis.NewRedisController()
 		route.Get("status", redisController.Status)
 		route.Post("reload", redisController.Reload)
@@ -226,13 +226,13 @@ func Plugin() {
 		route.Get("config", redisController.GetConfig)
 		route.Post("config", redisController.SaveConfig)
 	})
-	facades.Route().Prefix("api/plugins/s3fs").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/s3fs").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		s3fsController := s3fs.NewS3fsController()
 		route.Get("list", s3fsController.List)
 		route.Post("add", s3fsController.Add)
 		route.Post("delete", s3fsController.Delete)
 	})
-	facades.Route().Prefix("api/plugins/supervisor").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/supervisor").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		supervisorController := supervisor.NewSupervisorController()
 		route.Get("status", supervisorController.Status)
 		route.Post("start", supervisorController.Start)
@@ -255,7 +255,7 @@ func Plugin() {
 		route.Post("addProcess", supervisorController.AddProcess)
 
 	})
-	facades.Route().Prefix("api/plugins/fail2ban").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/fail2ban").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		fail2banController := fail2ban.NewFail2banController()
 		route.Get("status", fail2banController.Status)
 		route.Post("start", fail2banController.Start)
@@ -270,7 +270,7 @@ func Plugin() {
 		route.Post("whiteList", fail2banController.SetWhiteList)
 		route.Get("whiteList", fail2banController.GetWhiteList)
 	})
-	facades.Route().Prefix("api/plugins/toolbox").Middleware(middleware.Jwt()).Group(func(route route.Route) {
+	facades.Route().Prefix("api/plugins/toolbox").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		toolboxController := toolbox.NewToolBoxController()
 		route.Get("dns", toolboxController.GetDNS)
 		route.Post("dns", toolboxController.SetDNS)

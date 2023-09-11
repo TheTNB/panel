@@ -11,8 +11,9 @@ import (
 
 func Web() {
 	facades.Route().StaticFile("favicon.ico", "/www/panel/public/favicon.ico")
-	facades.Route().Prefix("api/panel").Group(func(r route.Route) {
-		r.Prefix("info").Group(func(r route.Route) {
+	facades.Route().StaticFile("favicon.ico", "/www/panel/public/favicon.ico")
+	facades.Route().Prefix("api/panel").Group(func(r route.Router) {
+		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
 			r.Get("name", infoController.Name)
 			r.Middleware(middleware.Jwt()).Get("menu", infoController.Menu)
@@ -24,19 +25,19 @@ func Web() {
 			r.Middleware(middleware.Jwt()).Post("update", infoController.Update)
 			r.Middleware(middleware.Jwt()).Post("restart", infoController.Restart)
 		})
-		r.Prefix("user").Group(func(r route.Route) {
+		r.Prefix("user").Group(func(r route.Router) {
 			userController := controllers.NewUserController()
 			r.Post("login", userController.Login)
 			r.Middleware(middleware.Jwt()).Get("info", userController.Info)
 		})
-		r.Prefix("task").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("task").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			taskController := controllers.NewTaskController()
 			r.Get("status", taskController.Status)
 			r.Get("list", taskController.List)
 			r.Get("log", taskController.Log)
 			r.Post("delete", taskController.Delete)
 		})
-		r.Prefix("website").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("website").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("list", websiteController.List)
 			r.Post("add", websiteController.Add)
@@ -55,7 +56,7 @@ func Web() {
 			r.Post("resetConfig", websiteController.ResetConfig)
 			r.Post("status", websiteController.Status)
 		})
-		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			pluginController := controllers.NewPluginController()
 			r.Get("list", pluginController.List)
 			r.Post("install", pluginController.Install)
@@ -63,7 +64,7 @@ func Web() {
 			r.Post("update", pluginController.Update)
 			r.Post("updateShow", pluginController.UpdateShow)
 		})
-		r.Prefix("cron").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("cron").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			cronController := controllers.NewCronController()
 			r.Get("list", cronController.List)
 			r.Get("script", cronController.Script)
@@ -73,7 +74,7 @@ func Web() {
 			r.Post("status", cronController.Status)
 			r.Get("log", cronController.Log)
 		})
-		r.Prefix("safe").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("safe").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			safeController := controllers.NewSafeController()
 			r.Get("firewallStatus", safeController.GetFirewallStatus)
 			r.Post("firewallStatus", safeController.SetFirewallStatus)
@@ -87,7 +88,7 @@ func Web() {
 			r.Get("pingStatus", safeController.GetPingStatus)
 			r.Post("pingStatus", safeController.SetPingStatus)
 		})
-		r.Prefix("monitor").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("monitor").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			monitorController := controllers.NewMonitorController()
 			r.Post("switch", monitorController.Switch)
 			r.Post("saveDays", monitorController.SaveDays)
@@ -95,20 +96,20 @@ func Web() {
 			r.Get("list", monitorController.List)
 			r.Get("switchAndDays", monitorController.SwitchAndDays)
 		})
-		r.Prefix("ssh").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("ssh").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			sshController := controllers.NewSshController()
 			r.Get("info", sshController.GetInfo)
 			r.Post("info", sshController.UpdateInfo)
 			r.Get("session", sshController.Session)
 		})
-		r.Prefix("setting").Middleware(middleware.Jwt()).Group(func(r route.Route) {
+		r.Prefix("setting").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			settingController := controllers.NewSettingController()
 			r.Get("list", settingController.List)
 			r.Post("save", settingController.Save)
 		})
 	})
 
-	facades.Route().Fallback(func(ctx http.Context) {
-		ctx.Response().String(404, "not found")
+	facades.Route().Fallback(func(ctx http.Context) http.Response {
+		return ctx.Response().String(404, "not found")
 	})
 }
