@@ -85,6 +85,10 @@ panel
 
 - [AnyCast.Ai](https://www.anycast.ai/)
 
+### 对象存储
+
+- [无畏云科技](https://www.sctes.com/)
+
 ### DevOps
 
 - [极狐GitLab](https://www.jihulab.com/)
