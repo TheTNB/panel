@@ -3,7 +3,7 @@ module panel
 go 1.18
 
 require (
-	github.com/bytedance/sonic v1.10.0
+	github.com/bytedance/sonic v1.10.1
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.4
@@ -11,7 +11,7 @@ require (
 	github.com/goravel/gin v1.1.5
 	github.com/gorilla/websocket v1.5.0
 	github.com/iancoleman/strcase v0.3.0
-	github.com/imroc/req/v3 v3.41.12
+	github.com/imroc/req/v3 v3.42.0
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cast v1.5.1
