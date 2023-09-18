@@ -30,4 +30,5 @@ archives:
       - storage/*
       - database/*
       - scripts/*
+      - resources/*
       - panel-example.conf
