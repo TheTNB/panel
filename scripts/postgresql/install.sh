@@ -29,7 +29,9 @@ postgresqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 if [[ "${1}" == "15" ]]; then
-    postgresqlVersion="15.3"
+    postgresqlVersion="15.4"
+elif [[ "${1}" == "16" ]]; then
+    postgresqlVersion="16.0"
 else
     echo -e $HR
     echo "错误：不支持的 PostgreSQL 版本！"

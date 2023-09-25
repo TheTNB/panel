@@ -14,6 +14,7 @@ import (
 	"panel/app/http/controllers/plugins/php82"
 	"panel/app/http/controllers/plugins/phpmyadmin"
 	"panel/app/http/controllers/plugins/postgresql15"
+	"panel/app/http/controllers/plugins/postgresql16"
 	"panel/app/http/controllers/plugins/pureftpd"
 	"panel/app/http/controllers/plugins/redis"
 	"panel/app/http/controllers/plugins/s3fs"
@@ -123,6 +124,33 @@ func Plugin() {
 		route.Post("addUser", postgresql15Controller.AddUser)
 		route.Post("deleteUser", postgresql15Controller.DeleteUser)
 		route.Post("userPassword", postgresql15Controller.SetUserPassword)
+	})
+	facades.Route().Prefix("api/plugins/postgresql16").Middleware(middleware.Jwt()).Group(func(route route.Router) {
+		postgresql16Controller := postgresql16.NewPostgresql16Controller()
+		route.Get("status", postgresql16Controller.Status)
+		route.Post("reload", postgresql16Controller.Reload)
+		route.Post("start", postgresql16Controller.Start)
+		route.Post("stop", postgresql16Controller.Stop)
+		route.Post("restart", postgresql16Controller.Restart)
+		route.Get("load", postgresql16Controller.Load)
+		route.Get("config", postgresql16Controller.GetConfig)
+		route.Post("config", postgresql16Controller.SaveConfig)
+		route.Get("userConfig", postgresql16Controller.GetUserConfig)
+		route.Post("userConfig", postgresql16Controller.SaveUserConfig)
+		route.Get("log", postgresql16Controller.Log)
+		route.Post("clearLog", postgresql16Controller.ClearLog)
+		route.Get("database", postgresql16Controller.DatabaseList)
+		route.Post("addDatabase", postgresql16Controller.AddDatabase)
+		route.Post("deleteDatabase", postgresql16Controller.DeleteDatabase)
+		route.Get("backup", postgresql16Controller.BackupList)
+		route.Post("createBackup", postgresql16Controller.CreateBackup)
+		route.Post("uploadBackup", postgresql16Controller.UploadBackup)
+		route.Post("deleteBackup", postgresql16Controller.DeleteBackup)
+		route.Post("restoreBackup", postgresql16Controller.RestoreBackup)
+		route.Get("user", postgresql16Controller.UserList)
+		route.Post("addUser", postgresql16Controller.AddUser)
+		route.Post("deleteUser", postgresql16Controller.DeleteUser)
+		route.Post("userPassword", postgresql16Controller.SetUserPassword)
 	})
 	facades.Route().Prefix("api/plugins/php74").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		php74Controller := php74.NewPhp74Controller()
