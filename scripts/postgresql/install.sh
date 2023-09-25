@@ -163,14 +163,18 @@ TimeoutSec=infinity
 WantedBy=multi-user.target
 EOF
 
+# 在 /etc/systemd/logind.conf 设置 RemoveIPC=no，不然会删除 /dev/shm 下的共享内存文件
+checkRemoveIPC=$(cat /etc/systemd/logind.conf | grep '^RemoveIPC=no.*$')
+if [ "${checkRemoveIPC}" == "" ]; then
+    echo "RemoveIPC=no" >> /etc/systemd/logind.conf
+    systemctl restart systemd-logind
+fi
+
 # 启动服务
 systemctl daemon-reload
 systemctl enable postgresql
 systemctl start postgresql
 
 panel writePlugin postgresql${1} ${postgresqlVersion}
-
-# 测试中发现不重启一下，会导致无法连接
-systemctl restart postgresql
 
 echo -e "${HR}\nPostgreSQL-${1} 安装完成\n${HR}"
