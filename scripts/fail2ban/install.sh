@@ -59,18 +59,6 @@ bantime = 86400
 action = %(action_mwl)s
 logpath = /var/log/secure
 # ssh-END
-
-# pure-ftpd-START
-[pure-ftpd]
-enabled = true
-filter = pure-ftpd
-port = 21
-maxretry = 5
-findtime = 300
-bantime = 86400
-action = %(action_mwl)s
-logpath = /var/log/messages
-# pure-ftpd-END
 EOF
 # 替换端口
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
@@ -78,15 +66,6 @@ if [ "${sshPort}" == "" ]; then
     sshPort="22"
 fi
 sed -i "s/port = 22/port = ${sshPort}/g" /etc/fail2ban/jail.local
-if [ -f "/www/server/pure-ftpd/etc/pure-ftpd.conf" ]; then
-    ftpPort=$(cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}')
-fi
-if [ "${ftpPort}" == "" ]; then
-    ftpPort="21"
-    sed -i "s/port = 21/port = ${ftpPort}/g" /etc/fail2ban/jail.local
-else
-    sed -i "s/port = 21/port = ${ftpPort}/g" /etc/fail2ban/jail.local
-fi
 
 # Debian 的特殊处理
 if [ "${OS}" == "debian" ]; then
