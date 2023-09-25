@@ -51,15 +51,11 @@ else
     exit 1
 fi
 
-postgresqlUserCheck=$(cat /etc/passwd | grep postgres)
-if [ "${postgresqlUserCheck}" == "" ]; then
-    groupadd postgres
-    useradd -g postgres postgres
-fi
+# 停止已有服务
+systemctl stop postgresql
 
 # 准备目录
-rm -rf ${postgresqlPath}
-mkdir -p ${postgresqlPath}
+rm -rf ${postgresqlPath}/src
 cd ${postgresqlPath}
 
 # 下载源码
@@ -74,21 +70,18 @@ cd src
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：PostgreSQL 编译初始化失败，请截图错误信息寻求帮助。"
-    rm -rf ${postgresqlPath}
     exit 1
 fi
 make -j${cpuCore}
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：PostgreSQL 编译失败，请截图错误信息寻求帮助。"
-    rm -rf ${postgresqlPath}
     exit 1
 fi
 make install
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：PostgreSQL 安装失败，请截图错误信息寻求帮助。"
-    rm -rf ${postgresqlPath}
     exit 1
 fi
 
@@ -96,81 +89,12 @@ cd ${postgresqlPath}
 rm -rf ${postgresqlPath}/src
 
 # 配置
-mkdir -p ${postgresqlPath}/data
-mkdir -p ${postgresqlPath}/logs
 chown -R postgres:postgres ${postgresqlPath}
 chmod -R 700 ${postgresqlPath}
 
-echo "export PATH=${postgresqlPath}/bin:\$PATH" >> /etc/profile
-source /etc/profile
-
-mkdir -p /home/postgres
-cd /home/postgres
-if [ -f /home/postgres/.bash_profile ]; then
-        echo "export PGHOME=${postgresqlPath}" >> /home/postgres/.bash_profile
-        echo "export PGDATA=${postgresqlPath}/data" >> /home/postgres/.bash_profile
-        echo "export PATH=${postgresqlPath}/bin:\$PATH " >> /home/postgres/.bash_profile
-        echo "MANPATH=$PGHOME/share/man:$MANPATH" >> /home/postgres/.bash_profile
-        echo "LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH" >> /home/postgres/.bash_profile
-        source /home/postgres/.bash_profile
-fi
-if [ -f /home/postgres/.profile ]; then
-        echo "export PGHOME=${postgresqlPath}" >> /home/postgres/.profile
-        echo "export PGDATA=${postgresqlPath}/data" >> /home/postgres/.profile
-        echo "export PATH=${postgresqlPath}/bin:\$PATH " >> /home/postgres/.profile
-        echo "MANPATH=$PGHOME/share/man:$MANPATH" >> /home/postgres/.profile
-        echo "LD_LIBRARY_PATH=$PGHOME/lib:$LD_LIBRARY_PATH" >> /home/postgres/.profile
-        source /home/postgres/.profile
-fi
-
-# 初始化
-su - postgres -c "${postgresqlPath}/bin/initdb -D ${postgresqlPath}/data"
-if [ "$?" != "0" ]; then
-    echo -e $HR
-    echo "错误：PostgreSQL 初始化失败，请截图错误信息寻求帮助。"
-    rm -rf ${postgresqlPath}
-    exit 1
-fi
-
-# 配置慢查询日志
-cat >> ${postgresqlPath}/data/postgresql.conf << EOF
-logging_collector = on
-log_destination = 'stderr'
-log_directory = '${postgresqlPath}/logs'
-log_filename = 'postgresql-%Y-%m-%d.log'
-log_statement = all
-log_min_duration_statement = 5000
-EOF
-
-# 写入服务
-cat > /etc/systemd/system/postgresql.service << EOF
-[Unit]
-Description=PostgreSQL database server
-Documentation=man:postgres(1)
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=notify
-User=postgres
-ExecStart=${postgresqlPath}/bin/postgres -D ${postgresqlPath}/data
-ExecReload=/bin/kill -HUP \$MAINPID
-KillMode=mixed
-KillSignal=SIGINT
-TimeoutSec=infinity
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# 启动服务
-systemctl daemon-reload
-systemctl enable postgresql
-systemctl start postgresql
-
 panel writePlugin postgresql${1} ${postgresqlVersion}
 
-# 测试中发现不重启一下，会导致无法连接
+systemctl daemon-reload
 systemctl restart postgresql
 
-echo -e "${HR}\nPostgreSQL-${1} 安装完成\n${HR}"
+echo -e "${HR}\nPostgreSQL-${1} 升级完成\n${HR}"
