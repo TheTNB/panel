@@ -171,4 +171,7 @@ systemctl start postgresql
 
 panel writePlugin postgresql${1} ${postgresqlVersion}
 
+# 测试中发现不重启一下，会导致无法连接
+systemctl restart postgresql
+
 echo -e "${HR}\nPostgreSQL-${1} 安装完成\n${HR}"
