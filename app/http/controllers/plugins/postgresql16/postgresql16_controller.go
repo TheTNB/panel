@@ -269,7 +269,7 @@ func (c *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 	var databaseList []database
 	for _, db := range databases {
 		parts := strings.Split(db, "|")
-		if len(parts) != 8 || len(strings.TrimSpace(parts[0])) == 0 {
+		if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 {
 			continue
 		}
 
@@ -499,7 +499,7 @@ func (c *Postgresql16Controller) UserList(ctx http.Context) http.Response {
 	var userList []user
 	for _, u := range users {
 		userInfo := strings.Split(u, "|")
-		if len(userInfo) != 3 {
+		if len(userInfo) != 2 {
 			continue
 		}
 
