@@ -8,6 +8,6 @@ func init() {
 	config := facades.Config()
 	config.Add("panel", map[string]any{
 		"name":    "耗子Linux面板",
-		"version": "v2.0.43",
+		"version": "v2.0.44",
 	})
 }
