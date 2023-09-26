@@ -326,6 +326,7 @@ func (c *Postgresql15Controller) AddDatabase(ctx http.Context) http.Response {
 
 	tools.Exec(`echo "CREATE DATABASE ` + database + `;" | su - postgres -c "psql"`)
 	tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
+	tools.Exec(`echo "ALTER DATABASE ` + database + ` OWNER TO ` + user + `;" | su - postgres -c "psql"`)
 	tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
 
 	userConfig := "host    " + database + "    " + user + "    127.0.0.1/32    scram-sha-256"
