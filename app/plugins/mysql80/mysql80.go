@@ -9,5 +9,5 @@ var (
 	Excludes    = []string{"mysql57"}
 	Install     = `bash /www/panel/scripts/mysql/install.sh 80`
 	Uninstall   = `bash /www/panel/scripts/mysql/uninstall.sh 80`
-	Update      = `echo "not support now"`
+	Update      = `bash /www/panel/scripts/mysql/update.sh 80`
 )
