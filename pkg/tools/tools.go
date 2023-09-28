@@ -144,10 +144,20 @@ func UpdatePanel(proxy bool) error {
 	} else {
 		Exec("wget -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
 	}
+
+	if !Exists("/www/panel/panel.zip") {
+		return errors.New("下载失败")
+	}
+
 	color.Greenln("下载完成")
 
 	color.Greenln("更新新版本...")
 	Exec("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel && bash scripts/update_panel.sh")
+
+	if !Exists("/www/panel/panel") {
+		return errors.New("更新失败，可能是下载过程中出现了问题")
+	}
+
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
@@ -160,6 +170,9 @@ func UpdatePanel(proxy bool) error {
 	color.Greenln("恢复完成")
 
 	Exec("panel writeSetting version " + panelInfo.Version)
+
+	Exec("rm -rf /tmp/panel.db.bak")
+	Exec("rm -rf /tmp/panel.conf.bak")
 
 	color.Greenln("重启面板...")
 	Exec("systemctl restart panel")
