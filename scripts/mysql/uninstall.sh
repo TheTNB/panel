@@ -33,7 +33,7 @@ rm -f /usr/lib64/libmysql*
 userdel -r mysql
 groupdel mysql
 
-sed -i '/export PATH=\/www\/server\/mysql/d' /etc/profile
+rm -f /etc/profile.d/mysql.sh
 source /etc/profile
 
 panel deletePlugin mysql${1}

@@ -29,9 +29,9 @@ mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 if [[ "${1}" == "80" ]]; then
-    mysqlVersion="8.0.33"
+    mysqlVersion="8.0.34"
 elif [[ "${1}" == "57" ]]; then
-    mysqlVersion="5.7.42"
+    mysqlVersion="5.7.43"
 else
     echo -e $HR
     echo "错误：不支持的 MySQL 版本！"
@@ -287,7 +287,7 @@ chmod 644 ${mysqlPath}/conf/my.cnf
 
 ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath} --datadir=${mysqlPath}/data
 
-echo "export PATH=${mysqlPath}/bin:\$PATH" >> /etc/profile
+echo "export PATH=${mysqlPath}/bin:\$PATH" >> /etc/profile.d/mysql.sh
 source /etc/profile
 
 # 检查 systemd 文件是否存在
