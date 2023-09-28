@@ -126,8 +126,15 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
+# 设置权限
+chown -R mysql:mysql ${mysqlPath}
+chmod -R 755 ${mysqlPath}
+chmod 644 ${mysqlPath}/conf/my.cnf
+
 # 启动服务
 systemctl daemon-reload
 systemctl enable mysqld
+
+panel writePlugin mysql${1} ${mysqlVersion}
 
 echo -e "${HR}\nMySQL-${1} 升级完成\n${HR}"
