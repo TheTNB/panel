@@ -66,8 +66,6 @@ if [ "${mysqlUserCheck}" == "" ]; then
 fi
 
 # 准备目录
-rm -rf ${mysqlPath}
-mkdir -p ${mysqlPath}
 cd ${mysqlPath}
 
 # 下载源码
@@ -98,7 +96,6 @@ cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译初始化失败，请截图错误信息寻求帮助。"
-    rm -rf ${mysqlPath}
     exit 1
 fi
 
@@ -110,7 +107,6 @@ fi
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译失败，请截图错误信息寻求帮助。"
-    rm -rf ${mysqlPath}
     exit 1
 fi
 
@@ -122,7 +118,6 @@ make install
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 安装失败，请截图错误信息寻求帮助。"
-    rm -rf ${mysqlPath}
     exit 1
 fi
 
