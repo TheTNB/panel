@@ -290,8 +290,8 @@ ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath
 echo "export PATH=${mysqlPath}/bin:\$PATH" >> /etc/profile
 source /etc/profile
 
-# ARM 环境下，没有 systemd 文件
-if [ "${ARCH}" == "aarch64" ]; then
+# 检查 systemd 文件是否存在
+if [ -f "${mysqlPath}/lib/systemd/system/mysqld.service" ]; then
     mkdir -p ${mysqlPath}/lib/systemd/system
     cat > ${mysqlPath}/lib/systemd/system/mysqld.service << EOF
 # Copyright (c) 2015, 2023, Oracle and/or its affiliates.
