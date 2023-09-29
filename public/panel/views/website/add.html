@@ -1,7 +1,7 @@
 <!--
 Name: 网站 - 添加
 Author: 耗子
-Date: 2023-06-24
+Date: 2023-069-29
 -->
 <script type="text/html" template lay-done="layui.data.sendParams(d.params)">
     <form class="layui-form" action="" lay-filter="add-website-form">
@@ -94,7 +94,7 @@ Date: 2023-06-24
 </script>
 <script>
   layui.data.sendParams = function (params) {
-    layui.use(['admin', 'form', 'laydate'], function () {
+    layui.use(['jquery', 'admin', 'layer', 'table', 'form'], function () {
       var $ = layui.$
         , admin = layui.admin
         , layer = layui.layer
@@ -131,13 +131,14 @@ Date: 2023-06-24
       // 提交
       form.on('submit(add-website-submit)', function (data) {
         data.field.db = data.field.db_type !== "false";
+        index = layer.msg('正在提交...', {icon: 16, time: 0, shade: 0.3});
         admin.req({
           url: '/api/panel/website/add'
           , type: 'post'
           , data: data.field
           , success: function (result) {
+            layer.close(index)
             if (result.code !== 0) {
-              console.log('耗子Linux面板：新网站添加失败，接口返回' + result)
               layer.msg('新网站添加失败！')
               return false
             }
