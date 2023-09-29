@@ -165,7 +165,7 @@ Date: 2023-06-22
                 </div>
                 <div class="layui-card-body layui-text layadmin-text">
                     <blockquote class="layui-elem-quote">
-                        <p style="color: red;">开发组祝大家2023端午快乐！永无Bug，永不宕机！</p>
+                        <p style="color: red;">开发组祝大家2023中秋国庆快乐！永无Bug，永不宕机！</p>
                     </blockquote>
                     <blockquote class="layui-elem-quote">
                         <p>欢迎您使用耗子Linux面板。如遇到问题/Bug，可通过 <a
@@ -206,7 +206,6 @@ Date: 2023-06-22
                 , admin = layui.admin
                 , element = layui.element
 
-            let device = layui.device()
             let cpu_info
             admin.req({
                 url: '/api/panel/info/nowMonitor'
@@ -310,6 +309,7 @@ Date: 2023-06-22
             index = layer.msg('正在获取版本信息...', {
                 icon: 16
                 , time: 0
+                , shade: 0.3
             })
             admin.req(
                 {
