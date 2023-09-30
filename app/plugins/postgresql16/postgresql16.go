@@ -2,7 +2,7 @@ package postgresql16
 
 var (
 	Name        = "PostgreSQL-16"
-	Description = "PostgreSQL 是开源的对象 - 关系数据库数据库管理系统，在类似 BSD 许可与 MIT 许可的 PostgreSQL 许可下发行。"
+	Description = "PostgreSQL 是世界上最先进的开源关系数据库，在类似 BSD 与 MIT 许可的 PostgreSQL 许可下发行。"
 	Slug        = "postgresql16"
 	Version     = "16.0"
 	Requires    = []string{}
