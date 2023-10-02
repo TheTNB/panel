@@ -19,5 +19,5 @@ func IsRHEL() bool {
 
 // IsArm 判断是否是 ARM 架构
 func IsArm() bool {
-	return runtime.GOARCH == "arm"
+	return runtime.GOARCH == "arm" || runtime.GOARCH == "arm64"
 }
