@@ -25,22 +25,15 @@ setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.2"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
-ipLocation=$(curl -s https://ip.ping0.cc/geo)
 
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
-    # EPEL 9 仓库中目前没有 GeoIP-devel 包，暂时使用 Remi 仓库
-    dnf install https://rpms.remirepo.net/enterprise/remi-release-9.rpm -y
-    if [[ ${ipLocation} =~ "中国" ]]; then
-        sed -e 's!^#mirrorlist=!mirrorlist=!g' -e 's!^mirrorlist=!#mirrorlist=!g' -e 's!^#baseurl=!baseurl=!g' -e 's!http://rpms.remirepo.net/enterprise!https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise!g' -i /etc/yum.repos.d/remi*
-    fi
-
     dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel GeoIP-devel bison yajl yajl-devel curl curl-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel bison yajl yajl-devel curl curl-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
     apt-get update
-    apt-get install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev libgeoip-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt-get install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子Linux面板不支持该系统"
@@ -133,7 +126,7 @@ cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_geoip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_geoip_module --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-std=gnu99" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-std=gnu99" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
 if [[ "${cpuCore}" -gt "1" ]]; then
     make -j2
 else
