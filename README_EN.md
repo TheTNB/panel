@@ -16,7 +16,7 @@ The HaoZi Linux Panel is a lightweight Linux server operation and maintenance ma
 
 Disclaimer: It is strictly prohibited to use the HaoZi Linux Panel to engage in any illegal activities. Please do not request any form of technical support from us for illegal sites. If illegal content is discovered during the technical support process, we will immediately stop technical support and retain relevant evidence.
 
-Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ channel: [pd.qq.com/s/fyol46wfy](https://pd.qq.com /s/fyol46wfy)
+Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ channel: [pd.qq.com/s/fyol46wfy](https://pd.qq.com/s/fyol46wfy)
 
 ## UI Screenshots
 
@@ -29,6 +29,8 @@ HaoZi Linux Panel only supports the latest version of mainstream systems under t
 Recommended to use `Debian` for low-configuration machines, as its resource usage is lower than that of the `RHEL` system. For other machines, recommended to use `RockyLinux` | `AlmaLinux`, which has a longer maintenance cycle and is more stable.
 
 For other systems not in the table below (OpenCloudOS 8, Anolis 8, CentOS Stream 8/9, Debian 11, etc.), you can try to install it yourself, but normal operation is not guaranteed, and free technical support is not provided (theoretically there will be no major question).
+
+CentOS Stream can be migrated to a supported system using the migration script: [CentOS 8/9 Migration Script](https://github.com/haozi-team/byecentos)
 
 | OS         | Version |
 |------------|---------|

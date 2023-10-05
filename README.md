@@ -26,15 +26,17 @@
 
 耗子Linux面板仅支持 `amd64` | `arm64` 架构下的主流系统的最新版本，不支持 `Ubuntu`，因为其发版太过频繁，难以维护。
 
-低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `RockyLinux` | `AlmaLinux`，维护周期更长也更稳定。
+低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `AlmaLinux` | `RockyLinux`，维护周期更长也更稳定。
 
 不在下表中的其他系统（OpenCloudOS 8、Anolis 8、CentOS Stream 8/9、Debian 11等），可自行尝试安装，但不保证能够正常运行，且不提供无偿技术支持（理论上不会有大问题）。
+
+CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移脚本](https://github.com/haozi-team/byecentos)
 
 | 系统         | 版本 |
 |------------|----|
 | RHEL       | 9  |
-| RockyLinux | 9  |
 | AlmaLinux  | 9  |
+| RockyLinux | 9  |
 | Debian     | 12 |
 
 随着系统版本的不断更新，我们亦可能会终止部分过于老旧的系统的支持，以保证面板的稳定性。

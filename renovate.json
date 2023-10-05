@@ -7,9 +7,6 @@
     "🤖 Dependencies"
   ],
   "commitMessagePrefix": "chore(deps): ",
-  "customEnvVariables": {
-    "GOPROXY": "https://goproxy.cn,direct"
-  },
   "postUpdateOptions": [
     "gomodTidy"
   ]
