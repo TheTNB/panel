@@ -46,56 +46,56 @@ mkdir -p ${openrestyPath}
 cd ${openrestyPath}
 
 # 下载源码
-wget -T 120 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
+wget -T 120 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
 tar -zxvf openresty-${openrestyVersion}.tar.gz
 rm -f openresty-${openrestyVersion}.tar.gz
 mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -O openssl.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
+wget -T 120 -t 3 -O openssl.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
 tar -zxvf openssl.tar.gz
 rm -f openssl.tar.gz
 mv openssl-1.1.1u openssl
 rm -f openssl.tar.gz
 
 # pcre
-wget -T 60 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
+wget -T 60 -t 3 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
 tar -zxvf pcre-8.45.tar.gz
 rm -f pcre-8.45.tar.gz
 mv pcre-8.45 pcre
 rm -f pcre-8.45.tar.gz
 
 # ngx_cache_purge
-wget -T 20 -O ngx_cache_purge.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
+wget -T 20 -t 3 -O ngx_cache_purge.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
 tar -zxvf ngx_cache_purge.tar.gz
 rm -f ngx_cache_purge.tar.gz
 mv ngx_cache_purge-2.3 ngx_cache_purge
 rm -f ngx_cache_purge.tar.gz
 
 # nginx-sticky-module
-wget -T 20 -O nginx-sticky-module.zip ${downloadUrl}/modules/nginx-sticky-module.zip
+wget -T 20 -t 3 -O nginx-sticky-module.zip ${downloadUrl}/modules/nginx-sticky-module.zip
 unzip -o nginx-sticky-module.zip
 rm -f nginx-sticky-module.zip
 
 # nginx-dav-ext-module
-wget -T 20 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz
+wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz
 tar -xvf nginx-dav-ext-module-3.0.0.tar.gz
 rm -f nginx-dav-ext-module-3.0.0.tar.gz
 mv nginx-dav-ext-module-3.0.0 nginx-dav-ext-module
 
 # waf
-wget -T 60 -O uthash.zip ${downloadUrl}/modules/uthash-2.3.0.zip
+wget -T 60 -t 3 -O uthash.zip ${downloadUrl}/modules/uthash-2.3.0.zip
 unzip -o uthash.zip
 mv uthash-2.3.0 uthash
 rm -f uthash.zip
 cd ../
-wget -T 20 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
+wget -T 20 -t 3 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
 unzip -o ngx_waf.zip
 mv ngx_waf-6.1.9 ngx_waf
 rm -f ngx_waf.zip
 cd ngx_waf/inc
-wget -T 60 -O libinjection.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
+wget -T 60 -t 3 -O libinjection.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
 unzip -o libinjection.zip
 mv libinjection-3.10.0 libinjection
 rm -f libinjection.zip
@@ -110,13 +110,13 @@ fi
 cd ${openrestyPath}/src
 
 # brotli
-wget -T 20 -O ngx_brotli.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
+wget -T 20 -t 3 -O ngx_brotli.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
 unzip -o ngx_brotli.zip
 mv ngx_brotli-1.0.0rc ngx_brotli
 rm -f ngx_brotli.zip
 cd ngx_brotli/deps
 rm -rf brotli
-wget -T 20 -O brotli.zip ${downloadUrl}/modules/brotli-1.0.9.zip
+wget -T 20 -t 3 -O brotli.zip ${downloadUrl}/modules/brotli-1.0.9.zip
 unzip -o brotli.zip
 mv brotli-1.0.9 brotli
 rm -f brotli.zip

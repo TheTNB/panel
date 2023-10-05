@@ -30,7 +30,7 @@ cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 cd ${redisPath}
 
 # 下载源码
-wget -T 120 -O ${redisPath}/redis-${redisVersion}.tar.gz ${downloadUrl}/redis-${redisVersion}.tar.gz
+wget -T 120 -t 3 -O ${redisPath}/redis-${redisVersion}.tar.gz ${downloadUrl}/redis-${redisVersion}.tar.gz
 tar -zxvf redis-${redisVersion}.tar.gz
 rm -f redis-${redisVersion}.tar.gz
 mv redis-${redisVersion}/* ./ && rm -rf redis-${redisVersion}

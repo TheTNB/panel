@@ -140,9 +140,9 @@ func UpdatePanel(proxy bool) error {
 
 	color.Greenln("正在下载...")
 	if proxy {
-		Exec("wget -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
+		Exec("wget -T 120 -t 3 -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
 	} else {
-		Exec("wget -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
+		Exec("wget -T 120 -t 3 -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
 	}
 
 	if !Exists("/www/panel/panel.zip") {

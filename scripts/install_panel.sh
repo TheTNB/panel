@@ -22,7 +22,7 @@ HR="+----------------------------------------------------"
 download_Url=""
 setup_Path="/www"
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
-ipLocation=$(curl -s https://ip.ping0.cc/geo)
+inChina=$(curl --retry 2 -m 10 -L https://www.cloudflare-cn.com/cdn-cgi/trace 2> /dev/null | grep -qx 'loc=CN' && echo "true" || echo "false")
 
 Prepare_system() {
     if [ $(whoami) != "root" ]; then
@@ -92,7 +92,7 @@ Prepare_system() {
     fi
 
     if [ "${OS}" == "centos" ]; then
-        if [[ ${ipLocation} =~ "中国" ]]; then
+        if ${inChina}; then
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
                 -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.aliyun.com/rockylinux|g' \
                 -i.bak \
@@ -107,7 +107,7 @@ Prepare_system() {
         dnf install dnf-plugins-core -y
         dnf install epel-release -y
         dnf config-manager --set-enabled epel
-        if [[ ${ipLocation} =~ "中国" ]]; then
+        if ${inChina}; then
             sed -i 's|^#baseurl=https://download.example/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
             sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
             dnf makecache -y
@@ -121,7 +121,7 @@ Prepare_system() {
         dnf makecache -y
         dnf install -y curl wget zip unzip tar git jq git-core dos2unix
     elif [ "${OS}" == "debian" ]; then
-        if [[ ${ipLocation} =~ "中国" ]]; then
+        if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
@@ -187,7 +187,7 @@ Init_Panel() {
         echo "错误：获取面板下载链接失败，请截图错误信息寻求帮助。"
         exit 1
     fi
-    wget -O ${setup_Path}/panel/panel.zip "${download_Url}${panelZip}"
+    wget -T 120 -t 3 -O ${setup_Path}/panel/panel.zip "${download_Url}${panelZip}"
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：下载面板失败，请截图错误信息寻求帮助。"

@@ -31,7 +31,7 @@ rm -rf ${phpmyadminPath}
 mkdir -p ${phpmyadminPath}
 cd ${phpmyadminPath}
 
-wget -O phpmyadmin.zip ${downloadUrl}/phpMyAdmin-${phpmyadminVersion}-all-languages.zip
+wget -T 60 -t 3 -O phpmyadmin.zip ${downloadUrl}/phpMyAdmin-${phpmyadminVersion}-all-languages.zip
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：phpMyAdmin 下载失败"

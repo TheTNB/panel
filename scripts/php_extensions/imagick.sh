@@ -48,7 +48,7 @@ Install() {
     cd /www/server/php/${phpVersion}/src/ext
     rm -rf imagick
     rm -rf imagick.tar.gz
-    wget -O imagick.tar.gz ${downloadUrl}/imagick-${imagickVersion}.tar.gz
+    wget -T 60 -t 3 -O imagick.tar.gz ${downloadUrl}/imagick-${imagickVersion}.tar.gz
     tar -zxvf imagick.tar.gz
     mv imagick-${imagickVersion} imagick
     cd imagick

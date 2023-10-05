@@ -69,13 +69,13 @@ fi
 cd ${mysqlPath}
 
 # 下载源码
-wget -T 120 -O ${mysqlPath}/mysql-${mysqlVersion}.tar.gz ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz
+wget -T 120 -t 3 -O ${mysqlPath}/mysql-${mysqlVersion}.tar.gz ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz
 tar -zxvf mysql-${mysqlVersion}.tar.gz
 rm -f mysql-${mysqlVersion}.tar.gz
 mv mysql-${mysqlVersion} src
 
 # openssl
-wget -T 120 -O ${mysqlPath}/openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
+wget -T 120 -t 3 -O ${mysqlPath}/openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
 tar -zxvf openssl-1.1.1u.tar.gz
 rm -f openssl-1.1.1u.tar.gz
 mv openssl-1.1.1u openssl

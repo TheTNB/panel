@@ -33,7 +33,7 @@ rm -rf ${pureftpdPath}
 mkdir -p ${pureftpdPath}
 cd ${pureftpdPath}
 
-wget -O ${pureftpdPath}/pure-ftpd-${pureftpdVersion}.tar.gz ${downloadUrl}/pure-ftpd-${pureftpdVersion}.tar.gz
+wget -T 60 -t 3 -O ${pureftpdPath}/pure-ftpd-${pureftpdVersion}.tar.gz ${downloadUrl}/pure-ftpd-${pureftpdVersion}.tar.gz
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：Pure-Ftpd-${pureftpdVersion}下载失败，请检查网络是否正常。"

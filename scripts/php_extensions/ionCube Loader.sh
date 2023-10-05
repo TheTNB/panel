@@ -33,7 +33,7 @@ Install() {
     fi
 
     mkdir /usr/local/ioncube
-    wget -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so
+    wget -T 60 -t 3 -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：ionCube 下载失败，请检查网络是否正常。"

@@ -59,7 +59,7 @@ rm -rf ${postgresqlPath}/src
 cd ${postgresqlPath}
 
 # 下载源码
-wget -T 120 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz
+wget -T 120 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz
 tar -zxvf postgresql-${postgresqlVersion}.tar.gz
 rm -f postgresql-${postgresqlVersion}.tar.gz
 mv postgresql-${postgresqlVersion} src
