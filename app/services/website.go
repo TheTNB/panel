@@ -243,6 +243,12 @@ server
 		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
 		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
 	}
+	if website.Db && website.DbType == "postgresql" {
+		tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
+		tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
+		tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+	}
 
 	return w, nil
 }
