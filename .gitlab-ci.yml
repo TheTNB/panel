@@ -49,4 +49,4 @@ build:
     name: "$OUTPUT_NAME"
     paths:
       - $OUTPUT_NAME
-    expire_in: 1 week
+    expire_in: 3 days
