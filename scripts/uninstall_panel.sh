@@ -49,6 +49,13 @@ Remove_Swap() {
         rm -f ${swapFile}
         sed -i '/swap/d' /etc/fstab
     fi
+
+    mount -a
+    if [ "$?" != "0" ]; then
+        echo -e $HR
+        echo "错误：检测到系统的 /etc/fstab 文件配置有误，请检查排除后重试，问题解决前勿重启系统。"
+        exit 1
+    fi
 }
 
 Remove_Panel() {
