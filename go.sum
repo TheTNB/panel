@@ -244,8 +244,8 @@ github.com/golang-jwt/jwt/v5 v5.0.0 h1:1n1XNM9hk7O9mnQoNBGolZvzebBQ7p93ULHRc28XJ
 github.com/golang-jwt/jwt/v5 v5.0.0/go.mod h1:pqrtFR0X4osieyHYxtmOUWsAWrfe1Q5UVIyoH402zdk=
 github.com/golang-migrate/migrate/v4 v4.16.2 h1:8coYbMKUyInrFk1lfGfRovTLAW7PhWp8qQDT2iKfuoA=
 github.com/golang-migrate/migrate/v4 v4.16.2/go.mod h1:pfcJX4nPHaVdc5nmdCikFBWtm+UBpiZjRNNsyBbp0/o=
-github.com/golang-module/carbon/v2 v2.2.6 h1:4nHkIx7A7d+aoRDAGLwxZEJWAAZpmH5Bm/pVUl58FXI=
-github.com/golang-module/carbon/v2 v2.2.6/go.mod h1:XDALX7KgqmHk95xyLeaqX9/LJGbfLATyruTziq68SZ8=
+github.com/golang-module/carbon/v2 v2.2.8 h1:a1VxHHKAR7fc1ho7sYXhS1s5S4x7+oqAf2EY5p8C46A=
+github.com/golang-module/carbon/v2 v2.2.8/go.mod h1:XDALX7KgqmHk95xyLeaqX9/LJGbfLATyruTziq68SZ8=
 github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 h1:au07oEsX2xN0ktxqI+Sida1w446QrXBRJ0nee3SNZlA=
 github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9/go.mod h1:8vg3r2VgvsThLBIFL93Qb5yWzgyZWhEmBwUJWevAkK0=
 github.com/golang-sql/sqlexp v0.1.0 h1:ZCD6MBpcuOVfGVqsEmY5/4FtYiKz6tSyUv9LPEDei6A=
@@ -354,8 +354,8 @@ github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c h1:obhFK91
 github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c/go.mod h1:YSWsLXlG16u5CWFaXNZHhEQD10+NwF3xfgDV816OwLE=
 github.com/goravel/file-rotatelogs/v2 v2.4.1 h1:ogkeIFcTHSBRUBpZYiyJbpul8hkVXxHPuDbOaP78O1M=
 github.com/goravel/file-rotatelogs/v2 v2.4.1/go.mod h1:euk9qr52WrzM8ICs1hecFcR4CZ/ZZOPdacHfvHgbOf0=
-github.com/goravel/framework v1.13.1 h1:3VM0ZEqbPtHN5llrtB1Mtw9Vr4VK/wPcupzNU7dreSs=
-github.com/goravel/framework v1.13.1/go.mod h1:CKsMPL8D72wKEZILHUo8Zzi6I9GDW424GpoLAMlB9b8=
+github.com/goravel/framework v1.13.2 h1:7BRNihQ/ZNeA384941yg8zRytXRXkkStksXNyyUEgQI=
+github.com/goravel/framework v1.13.2/go.mod h1:BOUTIwzhOMyKNXaxSYbVB74NkmbS2xv1W1fPRv9eDws=
 github.com/goravel/gin v1.1.5 h1:HWVBxSDHsfpq2lWvuagQVMJlCwznf6ifc71IYEo3sCE=
 github.com/goravel/gin v1.1.5/go.mod h1:FxnhnqcMJk/Sk6jA/xcXn6tHtFzayNXeFuw7GnLORMY=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
@@ -1049,8 +1049,8 @@ google.golang.org/grpc v1.34.0/go.mod h1:WotjhfgOW/POjDeRt8vscBtXq+2VjORFy659qA5
 google.golang.org/grpc v1.35.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/grpc v1.36.0/go.mod h1:qjiiYl8FncCW8feJPdyg3v6XW24KsRHe+dy9BAGRRjU=
 google.golang.org/grpc v1.45.0/go.mod h1:lN7owxKUQEqMfSyQikvvk5tf/6zMPsrK+ONuO11+0rQ=
-google.golang.org/grpc v1.58.0 h1:32JY8YpPMSR45K+c3o6b8VL73V+rR8k+DeMIr4vRH8o=
-google.golang.org/grpc v1.58.0/go.mod h1:tgX3ZQDlNJGU96V6yHh1T/JeoBQ2TXdr43YbYSsCJk0=
+google.golang.org/grpc v1.58.2 h1:SXUpjxeVF3FKrTYQI4f4KvbGD5u2xccdYdurwowix5I=
+google.golang.org/grpc v1.58.2/go.mod h1:tgX3ZQDlNJGU96V6yHh1T/JeoBQ2TXdr43YbYSsCJk0=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=
 google.golang.org/protobuf v0.0.0-20200221191635-4d8936d0db64/go.mod h1:kwYJMbMJ01Woi6D6+Kah6886xMZcty6N08ah7+eCXa0=
 google.golang.org/protobuf v0.0.0-20200228230310-ab0ca4ff8a60/go.mod h1:cfTl7dwQJ+fmap5saPgwCLgHXTUD7jkjRqWcaiX5VyM=
