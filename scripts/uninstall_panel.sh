@@ -62,6 +62,7 @@ Remove_Panel() {
     systemctl stop panel
     systemctl disable panel
     rm -f /etc/systemd/system/panel.service
+    rm -f /usr/bin/panel
     rm -rf ${setup_Path}
 }
 
