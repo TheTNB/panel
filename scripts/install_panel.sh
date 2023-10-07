@@ -24,7 +24,7 @@ setup_Path="/www"
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
 inChina=$(curl --retry 2 -m 10 -L https://www.cloudflare-cn.com/cdn-cgi/trace 2> /dev/null | grep -qx 'loc=CN' && echo "true" || echo "false")
 
-Prepare_system() {
+Prepare_System() {
     if [ $(whoami) != "root" ]; then
         echo -e $HR
         echo "错误：请使用root用户运行安装命令。"
@@ -290,12 +290,12 @@ fi
 echo -e $LOGO
 echo '安装面板依赖软件（如报错请检查 APT/Yum 源是否正常）'
 echo -e $HR
-sleep 3s
-Prepare_system
+sleep 2s
+Prepare_System
 Auto_Swap
 
 echo -e $LOGO
 echo '安装面板运行环境（视网络情况可能需要较长时间）'
 echo -e $HR
-sleep 3s
+sleep 2s
 Init_Panel

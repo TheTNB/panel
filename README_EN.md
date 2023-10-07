@@ -51,6 +51,18 @@ If you decide to continue, please log in to the server as `root` user and execut
 bash <(curl -sSL https://dl.cdn.haozi.net/panel/install_panel.sh)
 ```
 
+## Uninstall Panel
+
+Recommended to back up data and reinstall the system first, so that the system can be kept clean.
+
+If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
+
+```shell
+bash <(curl -sSL https://dl.cdn.haozi.net/panel/uninstall_panel.sh)
+```
+
+Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!
+
 ## Daily Maintenance
 
 Use `panel` command for daily maintenance:
