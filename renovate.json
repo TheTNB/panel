@@ -9,5 +9,14 @@
   "commitMessagePrefix": "chore(deps): ",
   "postUpdateOptions": [
     "gomodTidy"
+  ],
+  "packageRules": [
+    {
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackagePatterns": [
+        "*"
+      ]
+    }
   ]
 }
