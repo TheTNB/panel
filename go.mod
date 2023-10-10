@@ -3,7 +3,7 @@ module panel
 go 1.18
 
 require (
-	github.com/bytedance/sonic v1.10.1
+	github.com/bytedance/sonic v1.10.2
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-contrib/static v0.0.1
 	github.com/gookit/color v1.5.4
