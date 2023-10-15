@@ -63,6 +63,10 @@ Prepare_System() {
         useradd -s /sbin/nologin -g www www
     fi
 
+    if [ ! -d ${setup_Path} ]; then
+        mkdir ${setup_Path}
+    fi
+
     timedatectl set-timezone Asia/Shanghai
 
     [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
@@ -145,10 +149,6 @@ Auto_Swap() {
     swap=$(LC_ALL=C free | grep Swap | awk '{print $2}')
     if [ "${swap}" -gt 1 ]; then
         return
-    fi
-
-    if [ ! -d ${setup_Path} ]; then
-        mkdir ${setup_Path}
     fi
 
     # 设置swap
