@@ -12,7 +12,6 @@ builds:
       - arm64
     goamd64:
       - v2
-      - v3
     ldflags:
       - -s -w --extldflags "-static -fpic"
 archives:
@@ -23,7 +22,6 @@ archives:
     format: zip
     wrap_in_directory: false
     strip_parent_binary_folder: true
-    rlcp: true
     files:
       - LICENSE
       - public/*
