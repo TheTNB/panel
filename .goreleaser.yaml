@@ -5,6 +5,7 @@ builds:
     binary: panel
     env:
       - CGO_ENABLED=0
+      - GOPROXY=https://goproxy.cn,direct
     goos:
       - linux
     goarch:
