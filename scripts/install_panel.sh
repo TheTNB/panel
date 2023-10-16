@@ -98,11 +98,11 @@ Prepare_System() {
     if [ "${OS}" == "centos" ]; then
         if ${inChina}; then
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-                -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.aliyun.com/rockylinux|g' \
+                -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.cloud.tencent.com/rocky|g' \
                 -i.bak \
                 /etc/yum.repos.d/[Rr]ocky*.repo
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-                -e 's|^# baseurl=https://repo.almalinux.org|baseurl=https://mirrors.aliyun.com|g' \
+                -e 's|^# baseurl=https://repo.almalinux.org|baseurl=https://mirrors.cloud.tencent.com|g' \
                 -i.bak \
                 /etc/yum.repos.d/[Aa]lmalinux*.repo
 
