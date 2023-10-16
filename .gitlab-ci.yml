@@ -23,6 +23,7 @@ variables:
 stages:
   - prepare
   - build
+  - release
 
 golangci_lint:
   stage: prepare
