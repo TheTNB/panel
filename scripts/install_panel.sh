@@ -112,7 +112,7 @@ Prepare_System() {
         dnf install epel-release -y
         dnf config-manager --set-enabled epel
         if ${inChina}; then
-            sed -i 's|^#baseurl=https://download.example/pub|baseurl=https://mirrors.aliyun.com|' /etc/yum.repos.d/epel*
+            sed -i 's|^#baseurl=https://download.example/pub|baseurl=https://mirrors.cloud.tencent.com|' /etc/yum.repos.d/epel*
             sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
             dnf makecache -y
         fi
