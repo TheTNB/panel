@@ -295,6 +295,7 @@ if [ "$install" != 'y' ]; then
     exit
 fi
 
+clear
 echo -e $LOGO
 echo '安装面板依赖软件（如报错请检查 APT/Yum 源是否正常）'
 echo -e $HR
