@@ -19,7 +19,7 @@ limitations under the License.
 
 HR="+----------------------------------------------------"
 
-downloadUrl="https://dl.cdn.haozi.net/panel/php_extensions"
+downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/php_extensions"
 action="$1"
 phpVersion="$2"
 phpredisVersion="5.3.7"

@@ -20,7 +20,7 @@ limitations under the License.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://dl.cdn.haozi.net/panel/phpmyadmin"
+downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/phpmyadmin"
 setupPath="/www"
 phpmyadminPath="${setupPath}/server/phpmyadmin"
 phpmyadminVersion="5.2.1"

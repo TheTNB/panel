@@ -20,7 +20,7 @@ limitations under the License.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://dl.cdn.haozi.net/panel/openresty"
+downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.2"

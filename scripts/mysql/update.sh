@@ -21,7 +21,7 @@ HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 memTotal=$(LC_ALL=C free -m | grep Mem | awk '{print  $2}')
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://dl.cdn.haozi.net/panel/mysql"
+downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/mysql"
 setupPath="/www"
 mysqlPath="${setupPath}/server/mysql"
 mysqlVersion=""
