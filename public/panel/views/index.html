@@ -326,28 +326,15 @@ Date: 2023-06-22
                                 title: '最新版本: ' + result.data.version + ' ，是否更新？',
                                 btn: ['更新', '取消']
                             }, function () {
-                                let proxy = false
-                                layer.confirm('对于大陆服务器，建议使用代理进行更新', {
-                                    title: '是否使用代理更新？',
-                                    btn: ['是', '否']
-                                }, function () {
-                                    proxy = true
-                                    index = layer.msg('正在更新，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
-                                    admin.req({
-                                        url: '/api/panel/info/update'
-                                        , type: 'post'
-                                        , data: {proxy: proxy}
-                                    })
-                                }, function () {
-                                    proxy = false
-                                    index = layer.msg('正在更新，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
-                                    admin.req({
-                                        url: '/api/panel/info/update'
-                                        , type: 'post'
-                                        , data: {proxy: proxy}
-                                    })
+                                index = layer.msg('更新中（出现请求错误为正常情况），稍后请手动刷新...', {
+                                    icon: 16,
+                                    time: 0,
+                                    shade: 0.3
                                 })
-
+                                admin.req({
+                                    url: '/api/panel/info/update'
+                                    , type: 'post'
+                                })
                             })
                         } else {
                             layer.msg('当前已是最新版本！')
@@ -361,8 +348,7 @@ Date: 2023-06-22
             layer.confirm('真的要重启吗？', {
                 btn: ['是', '否']
             }, function () {
-                proxy = true
-                index = layer.msg('正在重启，稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
+                index = layer.msg('重启中（出现请求错误为正常情况），稍后请手动刷新...', {icon: 16, time: 0, shade: 0.3})
                 admin.req({
                     url: '/api/panel/info/restart'
                     , type: 'post'

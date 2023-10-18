@@ -86,12 +86,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		input := arg1
-		proxy := false
-		if input == "y" || input == "Y" || input == "yes" || input == "Yes" {
-			proxy = true
-		}
-		err = tools.UpdatePanel(cast.ToBool(proxy))
+		err = tools.UpdatePanel()
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil
@@ -496,7 +491,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	default:
 		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
 		color.Greenln("请使用以下命令：")
-		color.Greenln("panel update {proxy} 更新 / 修复面板到最新版本")
+		color.Greenln("panel update 更新 / 修复面板到最新版本")
 		color.Greenln("panel getInfo 重新初始化面板账号信息")
 		color.Greenln("panel getPort 获取面板访问端口")
 		color.Greenln("panel getEntrance 获取面板访问入口")

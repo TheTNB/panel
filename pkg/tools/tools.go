@@ -4,12 +4,11 @@ package tools
 import (
 	"errors"
 	"os"
-	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/imroc/req/v3"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -68,10 +67,16 @@ type PanelInfo struct {
 // GetLatestPanelVersion 获取最新版本
 func GetLatestPanelVersion() (PanelInfo, error) {
 	var info PanelInfo
+	var output string
+	isChina := IsChina()
 
-	cmd := exec.Command("/bin/bash", "-c", "curl \"https://api.github.com/repos/haozi-team/panel/releases/latest\"")
-	output, err := cmd.Output()
-	if err != nil {
+	if isChina {
+		output = Exec(`curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases"`)
+	} else {
+		output = Exec(`curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
+	}
+
+	if len(output) == 0 {
 		return info, errors.New("获取最新版本失败")
 	}
 
@@ -80,7 +85,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		return info, errors.New("创建临时文件失败")
 	}
 	defer os.Remove(file.Name())
-	_, err = file.Write(output)
+	_, err = file.Write([]byte(output))
 	if err != nil {
 		return info, errors.New("写入临时文件失败")
 	}
@@ -90,33 +95,40 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	}
 	fileName := file.Name()
 
-	name := exec.Command("/bin/bash", "-c", "jq -r '.name' "+fileName)
-	version := exec.Command("/bin/bash", "-c", "jq -r '.tag_name' "+fileName)
-	body := exec.Command("/bin/bash", "-c", "jq -r '.body' "+fileName)
-	date := exec.Command("/bin/bash", "-c", "jq -r '.published_at' "+fileName)
-	nameOutput, _ := name.Output()
-	versionOutput, _ := version.Output()
-	bodyOutput, _ := body.Output()
-	dateOutput, _ := date.Output()
-	info.Name = strings.TrimSpace(string(nameOutput))
-	info.Version = strings.TrimSpace(string(versionOutput))
-	info.Body = strings.TrimSpace(string(bodyOutput))
-	info.Date = strings.TrimSpace(string(dateOutput))
-	if IsArm() {
-		downloadUrl := exec.Command("/bin/bash", "-c", "jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' "+fileName)
-		downloadUrlOutput, _ := downloadUrl.Output()
-		info.DownloadUrl = strings.TrimSpace(string(downloadUrlOutput))
+	var name, version, body, date, downloadUrl string
+	if isChina {
+		name = Exec("jq -r '.[0].name' " + fileName)
+		version = Exec("jq -r '.[0].tag_name' " + fileName)
+		body = Exec("jq -r '.[0].description' " + fileName)
+		date = Exec("jq -r '.[0].created_at' " + fileName)
+		if IsArm() {
+			downloadUrl = Exec("jq -r '.[0].assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
+		} else {
+			downloadUrl = Exec("jq -r '.[0].assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
+		}
 	} else {
-		downloadUrl := exec.Command("/bin/bash", "-c", "jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' "+fileName)
-		downloadUrlOutput, _ := downloadUrl.Output()
-		info.DownloadUrl = strings.TrimSpace(string(downloadUrlOutput))
+		name = Exec("jq -r '.name' " + fileName)
+		version = Exec("jq -r '.tag_name' " + fileName)
+		body = Exec("jq -r '.body' " + fileName)
+		date = Exec("jq -r '.published_at' " + fileName)
+		if IsArm() {
+			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
+		} else {
+			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
+		}
 	}
+
+	info.Name = name
+	info.Version = version
+	info.Body = body
+	info.Date = date
+	info.DownloadUrl = downloadUrl
 
 	return info, nil
 }
 
 // UpdatePanel 更新面板
-func UpdatePanel(proxy bool) error {
+func UpdatePanel() error {
 	panelInfo, err := GetLatestPanelVersion()
 	if err != nil {
 		return err
@@ -124,7 +136,6 @@ func UpdatePanel(proxy bool) error {
 
 	color.Greenln("最新版本: " + panelInfo.Version)
 	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
-	color.Greenln("使用代理: " + strconv.FormatBool(proxy))
 
 	color.Greenln("备份面板配置...")
 	Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak")
@@ -139,11 +150,7 @@ func UpdatePanel(proxy bool) error {
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
-	if proxy {
-		Exec("wget -T 120 -t 3 -O /www/panel/panel.zip https://ghproxy.com/" + panelInfo.DownloadUrl)
-	} else {
-		Exec("wget -T 120 -t 3 -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
-	}
+	Exec("wget -T 120 -t 3 -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
 
 	if !Exists("/www/panel/panel.zip") {
 		return errors.New("下载失败")
@@ -179,4 +186,23 @@ func UpdatePanel(proxy bool) error {
 	color.Greenln("重启完成")
 
 	return nil
+}
+
+// IsChina 是否中国大陆
+func IsChina() bool {
+	client := req.C()
+	client.SetTimeout(5 * time.Second)
+	client.SetCommonRetryCount(2)
+	client.ImpersonateSafari()
+
+	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	if err != nil || !resp.IsSuccessState() {
+		return false
+	}
+
+	if strings.Contains(resp.String(), "loc=CN") {
+		return true
+	}
+
+	return false
 }

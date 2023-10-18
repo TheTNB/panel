@@ -19,7 +19,6 @@ limitations under the License.
 
 LOGO="+----------------------------------------------------\n| 耗子Linux面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
 HR="+----------------------------------------------------"
-download_Url=""
 setup_Path="/www"
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
 inChina=$(curl --retry 2 -m 10 -L https://www.cloudflare-cn.com/cdn-cgi/trace 2> /dev/null | grep -qx 'loc=CN' && echo "true" || echo "false")
@@ -181,9 +180,17 @@ Init_Panel() {
     rm -rf ${setup_Path}/panel/*
     # 下载面板zip包并解压
     if [ "${ARCH}" == "x86_64" ]; then
-        panelZip=$(curl "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
+        if ${inChina}; then
+            panelZip=$(curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
+        else
+            panelZip=$(curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
+        fi
     elif [ "${ARCH}" == "aarch64" ]; then
-        panelZip=$(curl "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
+        if ${inChina}; then
+            panelZip=$(curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
+        else
+            panelZip=$(curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
+        fi
     else
         echo -e $HR
         echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
@@ -194,7 +201,7 @@ Init_Panel() {
         echo "错误：获取面板下载链接失败，请截图错误信息寻求帮助。"
         exit 1
     fi
-    wget -T 120 -t 3 -O ${setup_Path}/panel/panel.zip "${download_Url}${panelZip}"
+    wget -T 120 -t 3 -O ${setup_Path}/panel/panel.zip "${panelZip}"
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：下载面板失败，请截图错误信息寻求帮助。"
@@ -286,12 +293,6 @@ read -p "面板将安装至 ${setup_Path} 目录，请输入 y 并回车以开�
 if [ "$install" != 'y' ]; then
     echo "输入不正确，已退出安装。"
     exit
-fi
-
-#代理设置
-read -p "是否使用GitHub代理安装(建议大陆机器使用)？(y/n)" proxy
-if [ "$proxy" == 'y' ]; then
-    download_Url="https://ghproxy.com/"
 fi
 
 echo -e $LOGO

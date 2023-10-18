@@ -179,8 +179,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
 	}
 
-	proxy := ctx.Request().InputBool("proxy")
-	err = tools.UpdatePanel(proxy)
+	err = tools.UpdatePanel()
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 更新面板失败 ", err.Error())
 		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
