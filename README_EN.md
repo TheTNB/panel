@@ -94,17 +94,9 @@ You can find or create an Issue in [Issue List](https://github.com/haozi-team/pa
 
 ## Sponsor
 
-### Server
-
-- [盾云](https://www.ddunyun.com/aff/PNYAXMKI)
-
 ### CDN
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
-
-- [又拍云](https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral)
-
-- [AnyCast.Ai](https://www.anycast.ai/)
 
 - [盾云CDN](http://cdn.ddunyun.com/)
 
