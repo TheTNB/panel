@@ -10,6 +10,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/gorilla/websocket"
+	"github.com/spf13/cast"
 
 	"panel/app/models"
 	"panel/app/services"
@@ -40,7 +41,7 @@ func (r *SshController) GetInfo(ctx http.Context) http.Response {
 
 	return Success(ctx, http.Json{
 		"host":     host,
-		"port":     port,
+		"port":     cast.ToInt(port),
 		"user":     user,
 		"password": password,
 	})
