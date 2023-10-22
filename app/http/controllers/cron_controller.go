@@ -74,7 +74,7 @@ func (c *CronController) Add(ctx http.Context) http.Response {
 			backupName = ctx.Request().Input("website")
 		}
 		backupPath := ctx.Request().Input("backup_path")
-		if len(backupName) == 0 {
+		if len(backupPath) == 0 {
 			backupPath = c.setting.Get(models.SettingKeyBackupPath) + "/" + backupType
 		}
 		backupSave := ctx.Request().InputInt("save", 10)

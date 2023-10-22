@@ -132,10 +132,24 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusBadRequest, "防火墙未启动")
 	}
 
-	port := ctx.Request().InputInt("port", 0)
-	protocol := ctx.Request().Input("protocol", "")
-	if port == 0 || protocol == "" {
+	port := ctx.Request().Input("port")
+	protocol := ctx.Request().Input("protocol")
+	if port == "" || protocol == "" || (protocol != "tcp" && protocol != "udp") {
 		return Error(ctx, http.StatusBadRequest, "参数错误")
+	}
+	// 端口有 2 种写法，一种是 80-443，一种是 80
+	if strings.Contains(port, "-") {
+		ports := strings.Split(port, "-")
+		startPort := cast.ToInt(ports[0])
+		endPort := cast.ToInt(ports[1])
+		if startPort < 1 || startPort > 65535 || endPort < 1 || endPort > 65535 || startPort > endPort {
+			return Error(ctx, http.StatusBadRequest, "参数错误")
+		}
+	} else {
+		port := cast.ToInt(port)
+		if port < 1 || port > 65535 {
+			return Error(ctx, http.StatusBadRequest, "参数错误")
+		}
 	}
 
 	if tools.IsRHEL() {
@@ -143,6 +157,10 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 		tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1")
 		tools.Exec("firewall-cmd --reload")
 	} else {
+		// ufw 需要替换 - 为 : 添加
+		if strings.Contains(port, "-") {
+			port = strings.ReplaceAll(port, "-", ":")
+		}
 		tools.Exec("ufw delete allow " + cast.ToString(port) + "/" + protocol)
 		tools.Exec("ufw allow " + cast.ToString(port) + "/" + protocol)
 		tools.Exec("ufw reload")

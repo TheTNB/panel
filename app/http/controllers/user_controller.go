@@ -61,12 +61,18 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 
 // Info 用户信息
 func (r *UserController) Info(ctx http.Context) http.Response {
-	user, ok := ctx.Value("user").(models.User)
-	if !ok {
-		return Error(ctx, http.StatusUnauthorized, "登录已过期")
+	var user models.User
+	err := facades.Auth().User(ctx, &user)
+	if err != nil {
+		facades.Log().With(map[string]any{
+			"error": err.Error(),
+		}).Error("[面板][UserController] 查询用户信息失败")
+		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
 	return Success(ctx, http.Json{
+		"id":       user.ID,
+		"role":     []string{"admin"},
 		"username": user.Username,
 		"email":    user.Email,
 	})
