@@ -123,24 +123,32 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 	}
 
 	type data struct {
-		Slug string `json:"slug"`
-		Name string `json:"name"`
+		Label string `json:"label"`
+		Value string `json:"value"`
 	}
 	var phpData []data
-	phpData = append(phpData, data{Slug: "0", Name: "不使用"})
+	var dbData []data
+	phpData = append(phpData, data{Value: "0", Label: "不使用"})
+	dbData = append(dbData, data{Value: "0", Label: "不使用"})
 	for _, p := range php {
 		match := regexp.MustCompile(`php(\d+)`).FindStringSubmatch(p.Slug)
 		if len(match) == 0 {
 			continue
 		}
 
-		phpData = append(phpData, data{Slug: strings.ReplaceAll(p.Slug, "php", ""), Name: c.plugin.GetBySlug(p.Slug).Name})
+		phpData = append(phpData, data{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: c.plugin.GetBySlug(p.Slug).Name})
+	}
+
+	if mysqlInstalled {
+		dbData = append(dbData, data{Value: "mysql", Label: "MySQL"})
+	}
+	if postgresqlInstalled {
+		dbData = append(dbData, data{Value: "postgresql", Label: "PostgreSQL"})
 	}
 
 	return Success(ctx, http.Json{
-		"php":        phpData,
-		"mysql":      mysqlInstalled,
-		"postgresql": postgresqlInstalled,
+		"php": phpData,
+		"db":  dbData,
 	})
 }
 

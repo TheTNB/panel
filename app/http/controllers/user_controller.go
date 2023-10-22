@@ -26,7 +26,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if errors != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, errors.All())
+		return Error(ctx, http.StatusUnprocessableEntity, errors.One())
 	}
 
 	var user models.User

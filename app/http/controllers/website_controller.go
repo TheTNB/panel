@@ -53,7 +53,8 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name",
-		"domain":      "required",
+		"domains":     "required|slice",
+		"ports":       "required|slice",
 		"php":         "required",
 		"db":          "bool",
 		"db_type":     "required_if:db,true",
@@ -70,7 +71,8 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 
 	var website services.PanelWebsite
 	website.Name = ctx.Request().Input("name")
-	website.Domain = ctx.Request().Input("domain")
+	website.Domains = ctx.Request().InputArray("domains")
+	website.Ports = ctx.Request().InputArray("ports")
 	website.Php = ctx.Request().InputInt("php")
 	website.Db = ctx.Request().InputBool("db")
 	website.DbType = ctx.Request().Input("db_type")
@@ -167,14 +169,13 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 		return check
 	}
 	validator, err := ctx.Request().Validate(map[string]string{
-		"id":                  "required",
-		"domains":             "required",
-		"ports":               "required",
+		"domains":             "required|slice",
+		"ports":               "required|slice",
 		"hsts":                "bool",
 		"ssl":                 "bool",
 		"http_redirect":       "bool",
 		"open_basedir":        "bool",
-		"waf":                 "required",
+		"waf":                 "bool",
 		"waf_cache":           "required",
 		"waf_mode":            "required",
 		"waf_cc_deny":         "required",
@@ -219,7 +220,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 
 	// 域名
 	domain := "server_name"
-	domains := strings.Split(ctx.Request().Input("domains"), "\n")
+	domains := ctx.Request().InputArray("domains")
 	if len(domains) == 0 {
 		return Error(ctx, http.StatusBadRequest, "域名不能为空")
 	}
@@ -238,7 +239,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 
 	// 端口
 	var port strings.Builder
-	ports := strings.Split(ctx.Request().Input("ports"), "\n")
+	ports := ctx.Request().InputArray("ports")
 	if len(ports) == 0 {
 		return Error(ctx, http.StatusBadRequest, "端口不能为空")
 	}
@@ -299,12 +300,16 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	}
 
 	// WAF
-	waf := ctx.Request().Input("waf")
+	waf := ctx.Request().InputBool("waf")
+	wafStr := "off"
+	if waf {
+		wafStr = "on"
+	}
 	wafMode := ctx.Request().Input("waf_mode", "DYNAMIC")
 	wafCcDeny := ctx.Request().Input("waf_cc_deny", "rate=1000r/m duration=60m")
 	wafCache := ctx.Request().Input("waf_cache", "capacity=50")
 	wafConfig := `# waf标记位开始
-    waf ` + waf + `;
+    waf ` + wafStr + `;
     waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
     waf_mode ` + wafMode + `;
     waf_cc_deny ` + wafCcDeny + `;
