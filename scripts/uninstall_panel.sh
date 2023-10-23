@@ -94,4 +94,4 @@ echo '感谢您的使用，欢迎您再次使用耗子Linux面板。'
 echo -e $HR
 
 rm -f uninstall_panel.sh
-rm -f uninstall_panel.sh_checksums.txt
+rm -f uninstall_panel.sh.checksum.txt

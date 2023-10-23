@@ -35,10 +35,20 @@ Install() {
 
     cd /www/server/php/${phpVersion}/src/ext
     rm -rf phpredis
-    rm -rf phpredis.tar.gz
-    wget -T 60 -t 3 -O phpredis.tar.gz ${downloadUrl}/phpredis-${phpredisVersion}.tar.gz
-    tar -zxvf phpredis.tar.gz
+    rm -rf phpredis-${phpredisVersion}.tar.gz
+    wget -T 60 -t 3 -O phpredis-${phpredisVersion}.tar.gz ${downloadUrl}/phpredis-${phpredisVersion}.tar.gz
+    wget -T 20 -t 3 -O phpredis-${phpredisVersion}.tar.gz.checksum.txt ${downloadUrl}/phpredis-${phpredisVersion}.tar.gz.checksum.txt
+
+    if ! sha256sum --status -c phpredis-${phpredisVersion}.tar.gz.checksum.txt; then
+        echo -e $HR
+        echo "错误：PHP-${phpVersion} redis 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+        exit 1
+    fi
+
+    tar -zxvf phpredis-${phpredisVersion}.tar.gz
     mv phpredis-${phpredisVersion} phpredis
+    rm -f phpredis-${phpredisVersion}.tar.gz
+    rm -f phpredis-${phpredisVersion}.tar.gz.checksum.txt
     cd phpredis
     /www/server/php/${phpVersion}/bin/phpize
     ./configure --with-php-config=/www/server/php/${phpVersion}/bin/php-config

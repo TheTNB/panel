@@ -31,18 +31,22 @@ rm -rf ${phpmyadminPath}
 mkdir -p ${phpmyadminPath}
 cd ${phpmyadminPath}
 
-wget -T 60 -t 3 -O phpmyadmin.zip ${downloadUrl}/phpMyAdmin-${phpmyadminVersion}-all-languages.zip
-if [ "$?" != "0" ]; then
+wget -T 60 -t 3 -O phpMyAdmin-${phpmyadminVersion}-all-languages.zip ${downloadUrl}/phpMyAdmin-${phpmyadminVersion}-all-languages.zip
+wget -T 20 -t 3 -O phpMyAdmin-${phpmyadminVersion}-all-languages.zip.checksum.txt ${downloadUrl}/phpMyAdmin-${phpmyadminVersion}-all-languages.zip.checksum.txt
+
+if ! sha256sum --status -c phpMyAdmin-${phpmyadminVersion}-all-languages.zip.checksum.txt; then
     echo -e $HR
-    echo "错误：phpMyAdmin 下载失败"
+    echo "错误：phpMyAdmin 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${phpmyadminPath}
     exit 1
 fi
-unzip -o phpmyadmin.zip
+
+unzip -o phpMyAdmin-${phpmyadminVersion}-all-languages.zip
 mv phpMyAdmin-${phpmyadminVersion}-all-languages phpmyadmin_${randomDir}
 chown -R www:www ${phpmyadminPath}
 chmod -R 755 ${phpmyadminPath}
-rm -rf phpmyadmin.zip
+rm -rf phpMyAdmin-${phpmyadminVersion}-all-languages.zip
+rm -rf phpMyAdmin-${phpmyadminVersion}-all-languages.zip.checksum.txt
 
 # 判断PHP版本
 phpVersion=""
@@ -67,7 +71,7 @@ if [ "${phpVersion}" == "" ]; then
 fi
 
 # 写入 phpMyAdmin 配置文件
-cat >/www/server/vhost/phpmyadmin.conf <<EOF
+cat > /www/server/vhost/phpmyadmin.conf << EOF
 # 配置文件中的标记位请勿随意修改，改错将导致面板无法识别！
 # 有自定义配置需求的，请将自定义的配置写在各标记位下方。
 server
@@ -117,10 +121,10 @@ chown -R www:www ${phpmyadminPath}
 
 # 放行端口
 if [ "${OS}" == "centos" ]; then
-    firewall-cmd --permanent --zone=public --add-port=888/tcp >/dev/null 2>&1
+    firewall-cmd --permanent --zone=public --add-port=888/tcp > /dev/null 2>&1
     firewall-cmd --reload
 elif [ "${OS}" == "debian" ]; then
-    ufw allow 888/tcp >/dev/null 2>&1
+    ufw allow 888/tcp > /dev/null 2>&1
     ufw reload
 fi
 

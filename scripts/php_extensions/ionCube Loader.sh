@@ -34,11 +34,16 @@ Install() {
 
     mkdir /usr/local/ioncube
     wget -T 60 -t 3 -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so
-    if [ "$?" != "0" ]; then
+    wget -T 20 -t 3 -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so.checksum.txt ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so.checksum.txt
+
+    if ! sha256sum --status -c /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so.checksum.txt; then
         echo -e $HR
-        echo "错误：ionCube 下载失败，请检查网络是否正常。"
+        echo "错误：PHP-${phpVersion} ionCube 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
         exit 1
     fi
+
+    rm -f /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so.checksum.txt
+
     sed -i -e "/;haozi/a\zend_extension=/usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so" /www/server/php/${phpVersion}/etc/php.ini
 
     # 重载PHP

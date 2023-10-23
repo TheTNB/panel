@@ -70,14 +70,32 @@ cd ${mysqlPath}
 
 # 下载源码
 wget -T 120 -t 3 -O ${mysqlPath}/mysql-${mysqlVersion}.tar.gz ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz
+wget -T 20 -t 3 -O ${mysqlPath}/mysql-${mysqlVersion}.tar.gz.checksum.txt ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c mysql-${mysqlVersion}.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：MySQL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    exit 1
+fi
+
 tar -zxvf mysql-${mysqlVersion}.tar.gz
 rm -f mysql-${mysqlVersion}.tar.gz
+rm -f mysql-${mysqlVersion}.tar.gz.checksum.txt
 mv mysql-${mysqlVersion} src
 
 # openssl
 wget -T 120 -t 3 -O ${mysqlPath}/openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
+wget -T 20 -t 3 -O ${mysqlPath}/openssl-1.1.1u.tar.gz..checksum.txt ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz..checksum.txt
+
+if ! sha256sum --status -c openssl-1.1.1u.tar.gz..checksum.txt; then
+    echo -e $HR
+    echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    exit 1
+fi
+
 tar -zxvf openssl-1.1.1u.tar.gz
 rm -f openssl-1.1.1u.tar.gz
+rm -f openssl-1.1.1u.tar.gz..checksum.txt
 mv openssl-1.1.1u openssl
 cd openssl
 ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1

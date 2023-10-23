@@ -70,21 +70,35 @@ else
     exit 1
 fi
 
-wget -T 120 -t 3 -O ${phpPath}/php-${phpVersion}.tar.gz ${downloadUrl}/php-${phpVersionCode}.tar.gz
-if [ "$?" != "0" ]; then
+wget -T 120 -t 3 -O ${phpPath}/php-${phpVersionCode}.tar.gz ${downloadUrl}/php-${phpVersionCode}.tar.gz
+wget -T 20 -t 3 -O ${phpPath}/php-${phpVersionCode}.tar.gz.checksum.txt ${downloadUrl}/php-${phpVersionCode}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c php-${phpVersionCode}.tar.gz.checksum.txt; then
     echo -e $HR
-    echo "错误：PHP-${phpVersion}下载失败，请检查网络是否正常。"
+    echo "错误：PHP-${phpVersion}源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${phpPath}
     exit 1
 fi
 
-tar -xvf php-${phpVersion}.tar.gz
-rm -f php-${phpVersion}.tar.gz
+tar -xvf php-${phpVersionCode}.tar.gz
+rm -f php-${phpVersionCode}.tar.gz
+rm -f php-${phpVersionCode}.tar.gz.checksum.txt
 mv php-* src
 
 if [ "${phpVersion}" -le "80" ]; then
     wget -T 120 -t 3 -O ${phpPath}/openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
+    wget -T 20 -t 3 -O ${phpPath}/openssl-1.1.1u.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz.checksum.txt
+
+    if ! sha256sum --status -c openssl-1.1.1u.tar.gz.checksum.txt; then
+        echo -e $HR
+        echo "错误：PHP-${phpVersion} OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+        rm -rf ${phpPath}
+        exit 1
+    fi
+
     tar -zxvf openssl-1.1.1u.tar.gz
     rm -f openssl-1.1.1u.tar.gz
+    rm -f openssl-1.1.1u.tar.gz.checksum.txt
     mv openssl-1.1.1u openssl
     cd openssl
     ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1

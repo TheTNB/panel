@@ -182,39 +182,54 @@ Init_Panel() {
     if [ "${ARCH}" == "x86_64" ]; then
         if ${inChina}; then
             panelZip=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
+            panelZipName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .name')
         else
             panelZip=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
+            panelZipName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .name')
         fi
     elif [ "${ARCH}" == "aarch64" ]; then
         if ${inChina}; then
             panelZip=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
+            panelZipName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .name')
         else
             panelZip=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
+            panelZipName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .name')
         fi
     else
         echo -e $HR
         echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
         exit 1
     fi
-    if [ "$?" != "0" ] || [ "${panelZip}" == "" ]; then
+    if [ "$?" != "0" ] || [ "${panelZip}" == "" ] || [ "${panelZipName}" == "" ]; then
         echo -e $HR
         echo "错误：获取面板下载链接失败，请截图错误信息寻求帮助。"
         exit 1
     fi
-    wget -T 120 -t 3 -O ${setup_Path}/panel/panel.zip "${panelZip}"
-    if [ "$?" != "0" ]; then
+    wget -T 120 -t 3 -O ${setup_Path}/panel/${panelZipName} "${panelZip}"
+
+    # 下载 checksums 文件
+    if ${inChina}; then
+        checksumsFile=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .direct_asset_url')
+        checksumsFileName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .name')
+    else
+        checksumsFile=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("checksums")) | .browser_download_url')
+        checksumsFileName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("checksums")) | .name')
+    fi
+    wget -T 20 -t 3 -O ${setup_Path}/panel/${checksumsFileName} "${checksumsFile}"
+    cd ${setup_Path}/panel
+    if ! sha256sum --status -c ${checksumsFileName}; then
         echo -e $HR
-        echo "错误：下载面板失败，请截图错误信息寻求帮助。"
+        echo "错误：面板压缩包 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
         exit 1
     fi
-    cd ${setup_Path}/panel
-    unzip -o panel.zip
+    unzip -o ${panelZipName}
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：解压面板失败，请截图错误信息寻求帮助。"
         exit 1
     fi
-    rm -rf panel.zip
+    rm -rf ${panelZipName}
+    rm -rf ${checksumsFileName}
     cp panel-example.conf panel.conf
     ${setup_Path}/panel/panel --env="panel.conf" artisan key:generate
     ${setup_Path}/panel/panel --env="panel.conf" artisan jwt:secret
@@ -284,7 +299,7 @@ EOF
     panel init
     panel getInfo
     rm -f install_panel.sh
-    rm -f install_panel.sh_checksums.txt
+    rm -f install_panel.sh.checksum.txt
 }
 
 clear

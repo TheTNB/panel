@@ -34,14 +34,18 @@ mkdir -p ${pureftpdPath}
 cd ${pureftpdPath}
 
 wget -T 60 -t 3 -O ${pureftpdPath}/pure-ftpd-${pureftpdVersion}.tar.gz ${downloadUrl}/pure-ftpd-${pureftpdVersion}.tar.gz
-if [ "$?" != "0" ]; then
+wget -T 20 -t 3 -O ${pureftpdPath}/pure-ftpd-${pureftpdVersion}.tar.gz.checksum.txt ${downloadUrl}/pure-ftpd-${pureftpdVersion}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c pure-ftpd-${pureftpdVersion}.tar.gz.checksum.txt; then
     echo -e $HR
-    echo "错误：Pure-Ftpd-${pureftpdVersion}下载失败，请检查网络是否正常。"
+    echo "错误：Pure-Ftpd-${pureftpdVersion}源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${pureftpdPath}
     exit 1
 fi
 
 tar -xvf pure-ftpd-${pureftpdVersion}.tar.gz
 rm -f pure-ftpd-${pureftpdVersion}.tar.gz
+rm -f pure-ftpd-${pureftpdVersion}.tar.gz.checksum.txt
 mv pure-ftpd-${pureftpdVersion} src
 cd src
 

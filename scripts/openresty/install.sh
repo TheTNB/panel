@@ -47,58 +47,148 @@ cd ${openrestyPath}
 
 # 下载源码
 wget -T 120 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
+wget -T 20 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz.checksum.txt ${downloadUrl}/openresty-${openrestyVersion}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c openresty-${openrestyVersion}.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：OpenResty 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
 tar -zxvf openresty-${openrestyVersion}.tar.gz
 rm -f openresty-${openrestyVersion}.tar.gz
+rm -f openresty-${openrestyVersion}.tar.gz.checksum.txt
 mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -t 3 -O openssl.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
-tar -zxvf openssl.tar.gz
-rm -f openssl.tar.gz
+wget -T 120 -t 3 -O openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
+wget -T 20 -t 3 -O openssl-1.1.1u.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz.checksum.txt
+
+if ! sha256sum --status -c openssl-1.1.1u.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+tar -zxvf openssl-1.1.1u.tar.gz
+rm -f openssl-1.1.1u.tar.gz
+rm -f openssl-1.1.1u.tar.gz.checksum.txt
 mv openssl-1.1.1u openssl
-rm -f openssl.tar.gz
 
 # pcre
 wget -T 60 -t 3 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
+wget -T 20 -t 3 -O pcre-8.45.tar.gz.checksum.txt ${downloadUrl}/pcre/pcre-8.45.tar.gz.checksum.txt
+
+if ! sha256sum --status -c pcre-8.45.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：pcre 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
 tar -zxvf pcre-8.45.tar.gz
 rm -f pcre-8.45.tar.gz
+rm -f pcre-8.45.tar.gz.checksum.txt
 mv pcre-8.45 pcre
-rm -f pcre-8.45.tar.gz
 
 # ngx_cache_purge
-wget -T 20 -t 3 -O ngx_cache_purge.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
-tar -zxvf ngx_cache_purge.tar.gz
-rm -f ngx_cache_purge.tar.gz
+wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
+wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz.checksum.txt ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz.checksum.txt
+
+if ! sha256sum --status -c ngx_cache_purge-2.3.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：ngx_cache_purge 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+tar -zxvf ngx_cache_purge-2.3.tar.gz
+rm -f ngx_cache_purge-2.3.tar.gz
+rm -f ngx_cache_purge-2.3.tar.gz.checksum.txt
 mv ngx_cache_purge-2.3 ngx_cache_purge
-rm -f ngx_cache_purge.tar.gz
 
 # nginx-sticky-module
 wget -T 20 -t 3 -O nginx-sticky-module.zip ${downloadUrl}/modules/nginx-sticky-module.zip
+wget -T 20 -t 3 -O nginx-sticky-module.zip.checksum.txt ${downloadUrl}/modules/nginx-sticky-module.zip.checksum.txt
+
+if ! sha256sum --status -c nginx-sticky-module.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：nginx-sticky-module 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
 unzip -o nginx-sticky-module.zip
 rm -f nginx-sticky-module.zip
+rm -f nginx-sticky-module.zip.checksum.txt
 
 # nginx-dav-ext-module
 wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz
+wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt
+
+if ! sha256sum --status -c nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：nginx-dav-ext-module 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
 tar -xvf nginx-dav-ext-module-3.0.0.tar.gz
 rm -f nginx-dav-ext-module-3.0.0.tar.gz
+rm -f nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt
 mv nginx-dav-ext-module-3.0.0 nginx-dav-ext-module
 
 # waf
-wget -T 60 -t 3 -O uthash.zip ${downloadUrl}/modules/uthash-2.3.0.zip
-unzip -o uthash.zip
+wget -T 60 -t 3 -O uthash-2.3.0.zip ${downloadUrl}/modules/uthash-2.3.0.zip
+wget -T 20 -t 3 -O uthash-2.3.0.zip.checksum.txt ${downloadUrl}/modules/uthash-2.3.0.zip.checksum.txt
+
+if ! sha256sum --status -c uthash-2.3.0.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：uthash 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+unzip -o uthash-2.3.0.zip
 mv uthash-2.3.0 uthash
-rm -f uthash.zip
+rm -f uthash-2.3.0.zip
+rm -f uthash-2.3.0.zip.checksum.txt
 cd ../
-wget -T 20 -t 3 -O ngx_waf.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
-unzip -o ngx_waf.zip
+
+wget -T 20 -t 3 -O ngx_waf-6.1.9.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
+wget -T 20 -t 3 -O ngx_waf-6.1.9.zip.checksum.txt ${downloadUrl}/modules/ngx_waf-6.1.9.zip.checksum.txt
+
+if ! sha256sum --status -c ngx_waf-6.1.9.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：ngx_waf 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+unzip -o ngx_waf-6.1.9.zip
 mv ngx_waf-6.1.9 ngx_waf
-rm -f ngx_waf.zip
+rm -f ngx_waf-6.1.9.zip
+rm -f ngx_waf-6.1.9.zip.checksum.txt
+
 cd ngx_waf/inc
-wget -T 60 -t 3 -O libinjection.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
-unzip -o libinjection.zip
+wget -T 60 -t 3 -O libinjection-3.10.0.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
+wget -T 20 -t 3 -O libinjection-3.10.0.zip.checksum.txt ${downloadUrl}/modules/libinjection-3.10.0.zip.checksum.txt
+
+if ! sha256sum --status -c libinjection-3.10.0.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：libinjection 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+unzip -o libinjection-3.10.0.zip
 mv libinjection-3.10.0 libinjection
-rm -f libinjection.zip
+rm -f libinjection-3.10.0.zip
+rm -f libinjection-3.10.0.zip.checksum.txt
+
 cd ../
 make -j$(nproc)
 if [ "$?" != "0" ]; then
@@ -110,17 +200,37 @@ fi
 cd ${openrestyPath}/src
 
 # brotli
-wget -T 20 -t 3 -O ngx_brotli.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
-unzip -o ngx_brotli.zip
+wget -T 20 -t 3 -O ngx_brotli-1.0.0rc.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
+wget -T 20 -t 3 -O ngx_brotli-1.0.0rc.zip.checksum.txt ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip.checksum.txt
+
+if ! sha256sum --status -c ngx_brotli-1.0.0rc.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：ngx_brotli 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+unzip -o ngx_brotli-1.0.0rc.zip
 mv ngx_brotli-1.0.0rc ngx_brotli
-rm -f ngx_brotli.zip
+rm -f ngx_brotli-1.0.0rc.zip
+rm -f ngx_brotli-1.0.0rc.zip.checksum.txt
 cd ngx_brotli/deps
 rm -rf brotli
-wget -T 20 -t 3 -O brotli.zip ${downloadUrl}/modules/brotli-1.0.9.zip
-unzip -o brotli.zip
+
+wget -T 20 -t 3 -O brotli-1.0.9.zip ${downloadUrl}/modules/brotli-1.0.9.zip
+wget -T 20 -t 3 -O brotli-1.0.9.zip.checksum.txt ${downloadUrl}/modules/brotli-1.0.9.zip.checksum.txt
+
+if ! sha256sum --status -c brotli-1.0.9.zip.checksum.txt; then
+    echo -e $HR
+    echo "错误：brotli 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+unzip -o brotli-1.0.9.zip
 mv brotli-1.0.9 brotli
-rm -f brotli.zip
-cd ${openrestyPath}/src
+rm -f brotli-1.0.9.zip
+rm -f brotli-1.0.9.zip.checksum.txt
 
 cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH

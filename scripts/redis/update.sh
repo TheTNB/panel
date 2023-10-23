@@ -31,8 +31,18 @@ cd ${redisPath}
 
 # 下载源码
 wget -T 120 -t 3 -O ${redisPath}/redis-${redisVersion}.tar.gz ${downloadUrl}/redis-${redisVersion}.tar.gz
+wget -T 20 -t 3 -O ${redisPath}/redis-${redisVersion}.tar.gz.checksum.txt ${downloadUrl}/redis-${redisVersion}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c redis-${redisVersion}.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：Redis源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${redisPath}
+    exit 1
+fi
+
 tar -zxvf redis-${redisVersion}.tar.gz
 rm -f redis-${redisVersion}.tar.gz
+rm -f redis-${redisVersion}.tar.gz.checksum.txt
 mv redis-${redisVersion}/* ./ && rm -rf redis-${redisVersion}
 mkdir -p ${redisPath}/bin
 
@@ -40,14 +50,12 @@ make BUILD_TLS=yes USE_SYSTEMD=yes -j${cpuCore}
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：Redis编译失败，请截图错误信息寻求帮助。"
-    rm -rf ${redisPath}
     exit 1
 fi
 make PREFIX=${redisPath} install
 if [ ! -f "${redisPath}/bin/redis-server" ]; then
     echo -e $HR
     echo "错误：Redis安装失败，请截图错误信息寻求帮助。"
-    rm -rf ${redisPath}
     exit 1
 fi
 

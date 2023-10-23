@@ -47,9 +47,19 @@ Install() {
 
     cd /www/server/php/${phpVersion}/src/ext
     rm -rf imagick
-    rm -rf imagick.tar.gz
-    wget -T 60 -t 3 -O imagick.tar.gz ${downloadUrl}/imagick-${imagickVersion}.tar.gz
-    tar -zxvf imagick.tar.gz
+    rm -rf imagick-${imagickVersion}.tar.gz
+    wget -T 60 -t 3 -O imagick-${imagickVersion}.tar.gz ${downloadUrl}/imagick-${imagickVersion}.tar.gz
+    wget -T 20 -t 3 -O imagick-${imagickVersion}.tar.gz.checksum.txt ${downloadUrl}/imagick-${imagickVersion}.tar.gz.checksum.txt
+
+    if ! sha256sum --status -c imagick-${imagickVersion}.tar.gz.checksum.txt; then
+        echo -e $HR
+        echo "错误：PHP-${phpVersion} imagick 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+        exit 1
+    fi
+
+    tar -zxvf imagick-${imagickVersion}.tar.gz
+    rm -f imagick-${imagickVersion}.tar.gz
+    rm -f imagick-${imagickVersion}.tar.gz.checksum.txt
     mv imagick-${imagickVersion} imagick
     cd imagick
     /www/server/php/${phpVersion}/bin/phpize

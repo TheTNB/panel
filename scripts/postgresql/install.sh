@@ -64,8 +64,18 @@ cd ${postgresqlPath}
 
 # 下载源码
 wget -T 120 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz
+wget -T 20 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz.checksum.txt ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz.checksum.txt
+
+if ! sha256sum --status -c postgresql-${postgresqlVersion}.tar.gz.checksum.txt; then
+    echo -e $HR
+    echo "错误：PostgreSQL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${postgresqlPath}
+    exit 1
+fi
+
 tar -zxvf postgresql-${postgresqlVersion}.tar.gz
 rm -f postgresql-${postgresqlVersion}.tar.gz
+rm -f postgresql-${postgresqlVersion}.tar.gz.checksum.txt
 mv postgresql-${postgresqlVersion} src
 
 # 编译
