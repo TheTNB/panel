@@ -43,6 +43,7 @@ unit_test:
     - wget -O /etc/apt/sources.list https://mirrors.ustc.edu.cn/repogen/conf/debian-http-4-bookworm
     - apt-get update
     - apt-get install -y curl jq
+    - cp panel-example.conf .env
     - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 build:
