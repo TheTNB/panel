@@ -17,9 +17,9 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 'stable'
-      - name: Fetch Latest Frontend
+      - name: Fetch Frontend
         run: |
-          apt install -y curl jq unzip zip
+          sudo apt-get install -y curl jq unzip zip
           curl -s https://api.github.com/repos/haozi-team/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"dist\")) | .browser_download_url" | xargs curl -L -o frontend.zip
           rm -rf public
           unzip frontend.zip
