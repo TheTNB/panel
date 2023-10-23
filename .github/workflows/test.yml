@@ -14,5 +14,8 @@ jobs:
           go-version: 'stable'
       - name: Install dependencies
         run: sudo apt-get install -y curl jq
+      - name: Set up environment
+        run: |
+          cp panel-example.conf .env
       - name: Run tests
         run: go test ./...
