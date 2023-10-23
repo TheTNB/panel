@@ -216,6 +216,14 @@ Init_Panel() {
         checksumsFileName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("checksums")) | .name')
     fi
     wget -T 20 -t 3 -O ${setup_Path}/panel/${checksumsFileName} "${checksumsFile}"
+
+    # 处理 checksums 文件
+    if [ "${ARCH}" == "x86_64" ]; then
+        sed -i '/linux_arm64/d' ${setup_Path}/panel/${checksumsFileName}
+    elif [ "${ARCH}" == "aarch64" ]; then
+        sed -i '/linux_amd64/d' ${setup_Path}/panel/${checksumsFileName}
+    fi
+
     cd ${setup_Path}/panel
     if ! sha256sum --status -c ${checksumsFileName}; then
         echo -e $HR
