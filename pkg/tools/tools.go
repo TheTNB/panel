@@ -97,9 +97,9 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	isChina := IsChina()
 
 	if isChina {
-		output = Exec(`curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest"`)
+		output = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest"`)
 	} else {
-		output = Exec(`curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
+		output = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
 	}
 
 	if len(output) == 0 {
@@ -160,9 +160,9 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	isChina := IsChina()
 
 	if isChina {
-		output = Exec(`curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/"` + version + `"`)
+		output = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/"` + version + `"`)
 	} else {
-		output = Exec(`curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
+		output = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
 	}
 
 	if len(output) == 0 {
