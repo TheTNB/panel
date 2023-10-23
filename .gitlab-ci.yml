@@ -1,4 +1,4 @@
-image: golang:alpine
+image: golang:bookworm
 
 # 在每个任务执行前运行
 before_script:
@@ -54,6 +54,7 @@ build:
 
 fetch:
   stage: build
+  image: alpine:latest
   before_script:
     - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
     - apk add --no-cache curl jq unzip zip
