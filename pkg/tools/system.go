@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -54,6 +55,8 @@ func Exec(shell string) string {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if support.Env == support.EnvTest {
+			fmt.Println(string(output))
+			fmt.Println(err.Error())
 			panic(err)
 		} else {
 			facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
@@ -71,6 +74,7 @@ func ExecAsync(shell string) {
 	err := cmd.Start()
 	if err != nil {
 		if support.Env == support.EnvTest {
+			fmt.Println(err.Error())
 			panic(err)
 		} else {
 			facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
@@ -81,6 +85,7 @@ func ExecAsync(shell string) {
 		err := cmd.Wait()
 		if err != nil {
 			if support.Env == support.EnvTest {
+				fmt.Println(err.Error())
 				panic(err)
 			} else {
 				facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
