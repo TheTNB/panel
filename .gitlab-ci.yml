@@ -52,8 +52,19 @@ build:
       - $OUTPUT_NAME
     expire_in: 3 days
 
+fetch:
+  stage: build
+  script:
+    - apt install -y curl jq unzip zip
+    - curl -s https://api.github.com/repos/haozi-team/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"admin\")) | .browser_download_url" | xargs curl -L -o frontend.zip
+    - rm -rf public
+    - unzip frontend.zip
+    - mv dist public
+
 release:
   stage: release
+  dependencies:
+    - build
   image:
     name: goreleaser/goreleaser
     entrypoint: ['']

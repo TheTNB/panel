@@ -17,6 +17,13 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 'stable'
+      - name: Fetch Latest Frontend
+        run: |
+          apt install -y curl jq unzip zip
+          curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("arm64")) | .direct_asset_url' | xargs curl -L -o frontend.zip
+          rm -rf public
+          unzip frontend.zip
+          mv dist public
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
