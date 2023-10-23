@@ -28,14 +28,22 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	var result = make(map[string]string)
-	for _, setting := range settings {
-		if setting.Key == models.SettingKeyMysqlRootPassword {
-			continue
-		}
-
-		result[setting.Key] = setting.Value
+	type data struct {
+		Name        string `json:"name"`
+		Username    string `json:"username"`
+		Password    string `json:"password"`
+		Email       string `json:"email"`
+		Port        string `json:"port"`
+		Entrance    string `json:"entrance"`
+		WebsitePath string `json:"website_path"`
+		BackupPath  string `json:"backup_path"`
 	}
+
+	var result data
+	result.Name = r.setting.Get(models.SettingKeyName)
+	result.Entrance = r.setting.Get(models.SettingKeyEntrance)
+	result.WebsitePath = r.setting.Get(models.SettingKeyWebsitePath)
+	result.BackupPath = r.setting.Get(models.SettingKeyBackupPath)
 
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
@@ -43,10 +51,10 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		facades.Log().Error("[面板][SettingController] 获取用户失败 ", err)
 		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
-	result["username"] = user.Username
-	result["email"] = user.Email
+	result.Username = user.Username
+	result.Email = user.Email
 
-	result["port"] = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	result.Port = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 
 	return Success(ctx, result)
 }

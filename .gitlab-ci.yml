@@ -1,4 +1,4 @@
-image: golang:bookworm
+image: golang:alpine
 
 # 在每个任务执行前运行
 before_script:
@@ -52,11 +52,29 @@ build:
       - $OUTPUT_NAME
     expire_in: 3 days
 
+fetch:
+  stage: build
+  before_script:
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+    - apk add --no-cache curl jq unzip zip
+  script:
+    - curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
+    - rm -rf public
+    - unzip frontend.zip
+    - mv dist public
+  artifacts:
+    name: "frontend"
+    paths:
+      - public
+    expire_in: 3 days
+
 release:
   stage: release
+  dependencies:
+    - build
   image:
     name: goreleaser/goreleaser
-    entrypoint: ['']
+    entrypoint: [ '' ]
   only:
     - tags
   variables:

@@ -23,7 +23,7 @@ func NewMonitorController() *MonitorController {
 
 // Switch 监控开关
 func (r *MonitorController) Switch(ctx http.Context) http.Response {
-	value := ctx.Request().InputBool("switch")
+	value := ctx.Request().InputBool("monitor")
 	err := r.setting.Set(models.SettingKeyMonitor, cast.ToString(value))
 	if err != nil {
 		facades.Log().Error("[面板][MonitorController] 更新监控开关失败 ", err)

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/goravel/framework/facades"
@@ -21,32 +22,34 @@ type Website interface {
 	Add(website PanelWebsite) (models.Website, error)
 	Delete(id int) error
 	GetConfig(id int) (WebsiteSetting, error)
+	GetConfigByName(name string) (WebsiteSetting, error)
 }
 
 type PanelWebsite struct {
-	Name       string `json:"name"`
-	Status     bool   `json:"status"`
-	Domain     string `json:"domain"`
-	Path       string `json:"path"`
-	Php        int    `json:"php"`
-	Ssl        bool   `json:"ssl"`
-	Remark     string `json:"remark"`
-	Db         bool   `json:"db"`
-	DbType     string `json:"db_type"`
-	DbName     string `json:"db_name"`
-	DbUser     string `json:"db_user"`
-	DbPassword string `json:"db_password"`
+	Name       string   `json:"name"`
+	Status     bool     `json:"status"`
+	Domains    []string `json:"domains"`
+	Ports      []string `json:"ports"`
+	Path       string   `json:"path"`
+	Php        int      `json:"php"`
+	Ssl        bool     `json:"ssl"`
+	Remark     string   `json:"remark"`
+	Db         bool     `json:"db"`
+	DbType     string   `json:"db_type"`
+	DbName     string   `json:"db_name"`
+	DbUser     string   `json:"db_user"`
+	DbPassword string   `json:"db_password"`
 }
 
 // WebsiteSetting 网站设置
 type WebsiteSetting struct {
 	Name              string   `json:"name"`
-	Ports             []string `json:"ports"`
 	Domains           []string `json:"domains"`
+	Ports             []string `json:"ports"`
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
-	Php               int      `json:"php"`
+	Php               string   `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
 	Ssl               bool     `json:"ssl"`
 	SslCertificate    string   `json:"ssl_certificate"`
@@ -107,7 +110,6 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 
 	website.Ssl = false
 	website.Status = true
-	website.Domain = strings.TrimSpace(website.Domain)
 
 	w := models.Website{
 		Name:   website.Name,
@@ -138,32 +140,28 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 `
 	tools.Write(website.Path+"/index.html", index, 0644)
 
-	domainArr := strings.Split(website.Domain, "\n")
 	portList := ""
-	portArr := make(map[string]bool)
 	domainList := ""
-	for key, value := range domainArr {
-		temp := strings.Split(value, ":")
-		domainList += " " + temp[0]
+	portUsed := make(map[string]bool)
+	domainUsed := make(map[string]bool)
 
-		if len(temp) < 2 {
-			if _, ok := portArr["80"]; !ok {
-				if key == len(domainArr)-1 {
-					portList += "    listen 80;"
-				} else {
-					portList += "    listen 80;\n"
-				}
-				portArr["80"] = true
+	for i, port := range website.Ports {
+		if _, ok := portUsed[port]; !ok {
+			if i == len(website.Ports)-1 {
+				portList += "    listen " + port + ";"
+			} else {
+				portList += "    listen " + port + ";\n"
 			}
-		} else {
-			if _, ok := portArr[temp[1]]; !ok {
-				if key == len(domainArr)-1 {
-					portList += "    listen " + temp[1] + ";"
-				} else {
-					portList += "    listen " + temp[1] + ";\n"
-				}
-				portArr[temp[1]] = true
-			}
+			portUsed[port] = true
+		}
+	}
+	if len(website.Ports) == 0 {
+		portList += "    listen 80;\n"
+	}
+	for _, domain := range website.Domains {
+		if _, ok := domainUsed[domain]; !ok {
+			domainList += " " + domain
+			domainUsed[domain] = true
 		}
 	}
 
@@ -288,7 +286,7 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
-	setting.Php = website.Php
+	setting.Php = strconv.Itoa(website.Php)
 	setting.Raw = config
 
 	ports := tools.Cut(config, "# port标记位开始", "# port标记位结束")
@@ -369,4 +367,14 @@ func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
 	setting.Log = tools.Escape(tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`))
 
 	return setting, nil
+}
+
+// GetConfigByName 根据网站名称获取网站配置
+func (r *WebsiteImpl) GetConfigByName(name string) (WebsiteSetting, error) {
+	var website models.Website
+	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
+		return WebsiteSetting{}, err
+	}
+
+	return r.GetConfig(int(website.ID))
 }
