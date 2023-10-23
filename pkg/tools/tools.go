@@ -151,11 +151,14 @@ func GenerateVersions(start, end string) ([]string, error) {
 }
 
 type PanelInfo struct {
-	Name        string `json:"name"`
-	Version     string `json:"version"`
-	DownloadUrl string `json:"download_url"`
-	Body        string `json:"body"`
-	Date        string `json:"date"`
+	Name         string `json:"name"`
+	Version      string `json:"version"`
+	DownloadName string `json:"download_name"`
+	DownloadUrl  string `json:"download_url"`
+	Body         string `json:"body"`
+	Date         string `json:"date"`
+	Checksums    string `json:"checksums"`
+	ChecksumsUrl string `json:"checksums_url"`
 }
 
 // GetLatestPanelVersion 获取最新版本
@@ -189,15 +192,19 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	}
 	fileName := file.Name()
 
-	var name, version, body, date, downloadUrl string
+	var name, version, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
 		name = Exec("jq -r '.name' " + fileName)
 		version = Exec("jq -r '.tag_name' " + fileName)
 		body = Exec("jq -r '.description' " + fileName)
 		date = Exec("jq -r '.created_at' " + fileName)
+		checksums = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
+		checksumsUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName)
 		if IsArm() {
+			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
 		} else {
+			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
 		}
 	} else {
@@ -205,9 +212,13 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		version = Exec("jq -r '.tag_name' " + fileName)
 		body = Exec("jq -r '.body' " + fileName)
 		date = Exec("jq -r '.published_at' " + fileName)
+		checksums = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
+		checksumsUrl = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName)
 		if IsArm() {
+			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
 		} else {
+			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
 		}
 	}
@@ -216,7 +227,10 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	info.Version = version
 	info.Body = body
 	info.Date = date
+	info.DownloadName = downloadName
 	info.DownloadUrl = downloadUrl
+	info.Checksums = checksums
+	info.ChecksumsUrl = checksumsUrl
 
 	return info, nil
 }
@@ -252,15 +266,19 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	}
 	fileName := file.Name()
 
-	var name, version2, body, date, downloadUrl string
+	var name, version2, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
 		name = Exec("jq -r '.name' " + fileName)
 		version2 = Exec("jq -r '.tag_name' " + fileName)
 		body = Exec("jq -r '.description' " + fileName)
 		date = Exec("jq -r '.created_at' " + fileName)
+		checksums = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
+		checksumsUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName)
 		if IsArm() {
+			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
 		} else {
+			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
 		}
 	} else {
@@ -268,9 +286,13 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 		version2 = Exec("jq -r '.tag_name' " + fileName)
 		body = Exec("jq -r '.body' " + fileName)
 		date = Exec("jq -r '.published_at' " + fileName)
+		checksums = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
+		checksumsUrl = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName)
 		if IsArm() {
+			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
 		} else {
+			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
 			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
 		}
 	}
@@ -279,7 +301,10 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	info.Version = version2
 	info.Body = body
 	info.Date = date
+	info.DownloadName = downloadName
 	info.DownloadUrl = downloadUrl
+	info.Checksums = checksums
+	info.ChecksumsUrl = checksumsUrl
 
 	return info, nil
 }
@@ -302,21 +327,25 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
-	Exec("wget -T 120 -t 3 -O /www/panel/panel.zip " + panelInfo.DownloadUrl)
-
-	if !Exists("/www/panel/panel.zip") {
+	Exec("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl)
+	Exec("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl)
+	if !Exists("/www/panel/"+panelInfo.DownloadName) || !Exists("/www/panel/"+panelInfo.Checksums) {
 		return errors.New("下载失败")
 	}
-
 	color.Greenln("下载完成")
 
-	color.Greenln("更新新版本...")
-	Exec("cd /www/panel && unzip -o panel.zip && rm -rf panel.zip && chmod 700 panel && bash scripts/update_panel.sh")
+	color.Greenln("校验下载文件...")
+	check := Exec("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
+	if check != panelInfo.DownloadName+": OK" {
+		return errors.New("下载文件校验失败")
+	}
+	color.Greenln("文件校验完成")
 
+	color.Greenln("更新新版本...")
+	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName + " && chmod 700 panel && bash scripts/update_panel.sh")
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
-
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")

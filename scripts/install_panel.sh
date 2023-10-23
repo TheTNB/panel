@@ -217,15 +217,8 @@ Init_Panel() {
     fi
     wget -T 20 -t 3 -O ${setup_Path}/panel/${checksumsFileName} "${checksumsFile}"
 
-    # 处理 checksums 文件
-    if [ "${ARCH}" == "x86_64" ]; then
-        sed -i '/linux_arm64/d' ${setup_Path}/panel/${checksumsFileName}
-    elif [ "${ARCH}" == "aarch64" ]; then
-        sed -i '/linux_amd64/d' ${setup_Path}/panel/${checksumsFileName}
-    fi
-
     cd ${setup_Path}/panel
-    if ! sha256sum --status -c ${checksumsFileName}; then
+    if ! sha256sum --status -c ${checksumsFileName} --ignore-missing; then
         echo -e $HR
         echo "错误：面板压缩包 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
         exit 1
