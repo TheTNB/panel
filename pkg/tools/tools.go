@@ -3,7 +3,9 @@ package tools
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -80,6 +82,72 @@ func VersionCompare(ver1, ver2, operator string) bool {
 		}
 	}
 	return operator == "==" || operator == ">=" || operator == "<="
+}
+
+// GenerateVersions 获取版本列表
+func GenerateVersions(start, end string) ([]string, error) {
+	var versions []string
+	start = strings.TrimPrefix(start, "v")
+	end = strings.TrimPrefix(end, "v")
+	startParts := strings.Split(start, ".")
+	endParts := strings.Split(end, ".")
+
+	if len(startParts) != 3 || len(endParts) != 3 {
+		return nil, fmt.Errorf("版本格式错误")
+	}
+
+	startMajor, err := strconv.Atoi(startParts[0])
+	if err != nil {
+		return nil, fmt.Errorf("无效的起始主版本号: %v", err)
+	}
+	startMinor, err := strconv.Atoi(startParts[1])
+	if err != nil {
+		return nil, fmt.Errorf("无效的起始次版本号: %v", err)
+	}
+	startPatch, err := strconv.Atoi(startParts[2])
+	if err != nil {
+		return nil, fmt.Errorf("无效的起始修订号: %v", err)
+	}
+	endMajor, err := strconv.Atoi(endParts[0])
+	if err != nil {
+		return nil, fmt.Errorf("无效的结束主版本号: %v", err)
+	}
+	endMinor, err := strconv.Atoi(endParts[1])
+	if err != nil {
+		return nil, fmt.Errorf("无效的结束次版本号: %v", err)
+	}
+	endPatch, err := strconv.Atoi(endParts[2])
+	if err != nil {
+		return nil, fmt.Errorf("无效的结束修订号: %v", err)
+	}
+
+	for major := startMajor; major <= endMajor; major++ {
+		for minor := 0; minor <= 99; minor++ {
+			for patch := 0; patch <= 99; patch++ {
+				if major == startMajor && minor < startMinor {
+					continue
+				}
+				if major == startMajor && minor == startMinor && patch <= startPatch {
+					continue
+				}
+
+				if major == endMajor && minor > endMinor {
+					return versions, nil
+				}
+				if major == endMajor && minor == endMinor && patch > endPatch {
+					return versions, nil
+				}
+
+				versions = append(versions, fmt.Sprintf("%d.%d.%d", major, minor, patch))
+			}
+		}
+	}
+
+	if len(versions) == 0 {
+		return []string{}, nil
+	}
+
+	return versions, nil
 }
 
 type PanelInfo struct {
@@ -217,13 +285,8 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 }
 
 // UpdatePanel 更新面板
-func UpdatePanel() error {
-	panelInfo, err := GetLatestPanelVersion()
-	if err != nil {
-		return err
-	}
-
-	color.Greenln("最新版本: " + panelInfo.Version)
+func UpdatePanel(panelInfo PanelInfo) error {
+	color.Greenln("目标版本: " + panelInfo.Version)
 	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
 
 	color.Greenln("备份面板配置...")
@@ -270,11 +333,13 @@ func UpdatePanel() error {
 	Exec("rm -rf /tmp/panel.db.bak")
 	Exec("rm -rf /tmp/panel.conf.bak")
 
-	color.Greenln("重启面板...")
-	Exec("systemctl restart panel")
-	color.Greenln("重启完成")
-
 	return nil
+}
+
+func RestartPanel() {
+	color.Greenln("重启面板...")
+	ExecAsync("sleep 2 && systemctl restart panel")
+	color.Greenln("重启完成")
 }
 
 // IsChina 是否中国大陆

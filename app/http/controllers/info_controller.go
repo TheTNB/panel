@@ -160,7 +160,7 @@ func (c *InfoController) CheckUpdate(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
-	if version == remote.Version {
+	if tools.VersionCompare(version, remote.Version, ">=") {
 		return Success(ctx, http.Json{
 			"update":  false,
 			"version": remote.Version,
@@ -187,12 +187,23 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
 	}
 
-	err = tools.UpdatePanel()
+	panel, err := tools.GetLatestPanelVersion()
 	if err != nil {
-		facades.Log().Error("[面板][InfoController] 更新面板失败 ", err.Error())
+		facades.Log().With(map[string]any{
+			"error": err.Error(),
+		}).Error("[面板][InfoController] 获取最新版本失败")
+		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
+	}
+
+	err = tools.UpdatePanel(panel)
+	if err != nil {
+		facades.Log().With(map[string]any{
+			"error": err.Error(),
+		}).Error("[面板][InfoController] 更新面板失败")
 		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
 	}
 
+	tools.RestartPanel()
 	return Success(ctx, nil)
 }
 
@@ -204,6 +215,6 @@ func (c *InfoController) Restart(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")
 	}
 
-	tools.Exec("systemctl restart panel")
+	tools.RestartPanel()
 	return Success(ctx, nil)
 }

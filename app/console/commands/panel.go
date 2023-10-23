@@ -86,13 +86,20 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		err = tools.UpdatePanel()
+		panel, err := tools.GetLatestPanelVersion()
+		if err != nil {
+			color.Redln("获取最新版本失败")
+			return err
+		}
+
+		err = tools.UpdatePanel(panel)
 		if err != nil {
 			color.Redln("更新失败: " + err.Error())
 			return nil
 		}
 
 		color.Greenln("更新成功")
+		tools.RestartPanel()
 
 	case "getInfo":
 		var user models.User
