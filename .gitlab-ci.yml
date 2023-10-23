@@ -62,6 +62,11 @@ fetch:
     - rm -rf public
     - unzip frontend.zip
     - mv dist public
+  artifacts:
+    name: "frontend"
+    paths:
+      - public
+    expire_in: 3 days
 
 release:
   stage: release
@@ -69,7 +74,7 @@ release:
     - build
   image:
     name: goreleaser/goreleaser
-    entrypoint: ['']
+    entrypoint: [ '' ]
   only:
     - tags
   variables:
