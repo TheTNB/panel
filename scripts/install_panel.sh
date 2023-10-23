@@ -181,15 +181,15 @@ Init_Panel() {
     # 下载面板zip包并解压
     if [ "${ARCH}" == "x86_64" ]; then
         if ${inChina}; then
-            panelZip=$(curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
+            panelZip=$(curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
         else
-            panelZip=$(curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
+            panelZip=$(curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
         fi
     elif [ "${ARCH}" == "aarch64" ]; then
         if ${inChina}; then
-            panelZip=$(curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
+            panelZip=$(curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases" | jq -r '.[0].assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
         else
-            panelZip=$(curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
+            panelZip=$(curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
         fi
     else
         echo -e $HR

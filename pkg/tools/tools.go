@@ -56,6 +56,32 @@ func GetMonitoringInfo() MonitoringInfo {
 	return res
 }
 
+// VersionCompare 版本比较
+func VersionCompare(ver1, ver2, operator string) bool {
+	v1 := strings.TrimPrefix(ver1, "v")
+	v2 := strings.TrimPrefix(ver2, "v")
+
+	v1s := strings.Split(v1, ".")
+	v2s := strings.Split(v2, ".")
+
+	for len(v1s) < len(v2s) {
+		v1s = append(v1s, "0")
+	}
+
+	for len(v2s) < len(v1s) {
+		v2s = append(v2s, "0")
+	}
+
+	for i := 0; i < len(v1s); i++ {
+		if v1s[i] > v2s[i] {
+			return operator == ">" || operator == ">=" || operator == "!="
+		} else if v1s[i] < v2s[i] {
+			return operator == "<" || operator == "<=" || operator == "!="
+		}
+	}
+	return operator == "==" || operator == ">=" || operator == "<="
+}
+
 type PanelInfo struct {
 	Name        string `json:"name"`
 	Version     string `json:"version"`
@@ -71,9 +97,9 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	isChina := IsChina()
 
 	if isChina {
-		output = Exec(`curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases"`)
+		output = Exec(`curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest"`)
 	} else {
-		output = Exec(`curl -s "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
+		output = Exec(`curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
 	}
 
 	if len(output) == 0 {
@@ -97,14 +123,14 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 
 	var name, version, body, date, downloadUrl string
 	if isChina {
-		name = Exec("jq -r '.[0].name' " + fileName)
-		version = Exec("jq -r '.[0].tag_name' " + fileName)
-		body = Exec("jq -r '.[0].description' " + fileName)
-		date = Exec("jq -r '.[0].created_at' " + fileName)
+		name = Exec("jq -r '.name' " + fileName)
+		version = Exec("jq -r '.tag_name' " + fileName)
+		body = Exec("jq -r '.description' " + fileName)
+		date = Exec("jq -r '.created_at' " + fileName)
 		if IsArm() {
-			downloadUrl = Exec("jq -r '.[0].assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
+			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
 		} else {
-			downloadUrl = Exec("jq -r '.[0].assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
+			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
 		}
 	} else {
 		name = Exec("jq -r '.name' " + fileName)
@@ -120,6 +146,69 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 
 	info.Name = name
 	info.Version = version
+	info.Body = body
+	info.Date = date
+	info.DownloadUrl = downloadUrl
+
+	return info, nil
+}
+
+// GetPanelVersion 获取指定面板版本
+func GetPanelVersion(version string) (PanelInfo, error) {
+	var info PanelInfo
+	var output string
+	isChina := IsChina()
+
+	if isChina {
+		output = Exec(`curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/"` + version + `"`)
+	} else {
+		output = Exec(`curl -L -s "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
+	}
+
+	if len(output) == 0 {
+		return info, errors.New("获取面板版本失败")
+	}
+
+	file, err := os.CreateTemp("", "panel")
+	if err != nil {
+		return info, errors.New("创建临时文件失败")
+	}
+	defer os.Remove(file.Name())
+	_, err = file.Write([]byte(output))
+	if err != nil {
+		return info, errors.New("写入临时文件失败")
+	}
+	err = file.Close()
+	if err != nil {
+		return info, errors.New("关闭临时文件失败")
+	}
+	fileName := file.Name()
+
+	var name, version2, body, date, downloadUrl string
+	if isChina {
+		name = Exec("jq -r '.name' " + fileName)
+		version2 = Exec("jq -r '.tag_name' " + fileName)
+		body = Exec("jq -r '.description' " + fileName)
+		date = Exec("jq -r '.created_at' " + fileName)
+		if IsArm() {
+			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
+		} else {
+			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
+		}
+	} else {
+		name = Exec("jq -r '.name' " + fileName)
+		version2 = Exec("jq -r '.tag_name' " + fileName)
+		body = Exec("jq -r '.body' " + fileName)
+		date = Exec("jq -r '.published_at' " + fileName)
+		if IsArm() {
+			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
+		} else {
+			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
+		}
+	}
+
+	info.Name = name
+	info.Version = version2
 	info.Body = body
 	info.Date = date
 	info.DownloadUrl = downloadUrl

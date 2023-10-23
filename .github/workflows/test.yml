@@ -13,6 +13,6 @@ jobs:
         with:
           go-version: 'stable'
       - name: Install dependencies
-        run: go mod tidy
+        run: sudo apt-get install -y curl jq
       - name: Run tests
         run: go test ./...

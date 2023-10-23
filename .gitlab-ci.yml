@@ -38,6 +38,7 @@ unit_test:
   extends: .go_cache
   allow_failure: true
   script:
+    - apt-get install -y curl jq
     - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 build:
@@ -59,7 +60,7 @@ fetch:
     - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
     - apk add --no-cache curl jq unzip zip
   script:
-    - curl -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
+    - curl -L -s "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
     - rm -rf public
     - unzip frontend.zip
     - mv dist public

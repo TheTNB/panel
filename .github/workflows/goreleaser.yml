@@ -20,7 +20,7 @@ jobs:
       - name: Fetch Frontend
         run: |
           sudo apt-get install -y curl jq unzip zip
-          curl -s https://api.github.com/repos/haozi-team/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"dist\")) | .browser_download_url" | xargs curl -L -o frontend.zip
+          curl -L -s https://api.github.com/repos/haozi-team/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"dist\")) | .browser_download_url" | xargs curl -L -o frontend.zip
           rm -rf public
           unzip frontend.zip
           mv dist public
