@@ -17,5 +17,6 @@ jobs:
       - name: Set up environment
         run: |
           cp panel-example.conf .env
+          go run . artisan key:generate
       - name: Run tests
         run: go test ./...
