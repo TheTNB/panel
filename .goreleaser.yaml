@@ -29,7 +29,6 @@ archives:
       - storage/*
       - database/*
       - scripts/*
-      - resources/*
       - panel-example.conf
 
 gitlab_urls:
