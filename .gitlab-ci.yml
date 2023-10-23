@@ -38,6 +38,10 @@ unit_test:
   extends: .go_cache
   allow_failure: true
   script:
+    - rm -rf /etc/apt/sources.list
+    - rm -rf /etc/apt/sources.list.d/*
+    - wget -O /etc/apt/sources.list https://mirrors.ustc.edu.cn/repogen/conf/debian-http-4-bookworm
+    - apt-get update
     - apt-get install -y curl jq
     - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 

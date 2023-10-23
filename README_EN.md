@@ -48,7 +48,7 @@ Before installing the panel, you need to understand the basic knowledge of the L
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
 ```shell
-bash <(curl -sSL https://jihulab.com/haozi-team/download/-/raw/main/panel/install_panel.sh)
+HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh_checksums.txt && sha256sum -c install_panel.sh_checksums.txt && bash install_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
 ```
 
 ## Uninstall Panel
@@ -58,7 +58,7 @@ Recommended to back up data and reinstall the system first, so that the system c
 If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
 
 ```shell
-bash <(curl -sSL https://jihulab.com/haozi-team/download/-/raw/main/panel/uninstall_panel.sh)
+HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh_checksums.txt && sha256sum -c uninstall_panel.sh_checksums.txt && bash uninstall_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
 ```
 
 Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!

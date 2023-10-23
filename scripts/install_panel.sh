@@ -283,6 +283,8 @@ EOF
     echo -e $HR
     panel init
     panel getInfo
+    rm -f install_panel.sh
+    rm -f install_panel.sh_checksums.txt
 }
 
 clear

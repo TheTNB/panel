@@ -52,7 +52,7 @@ CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移�
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
 ```shell
-bash <(curl -sSL https://jihulab.com/haozi-team/download/-/raw/main/panel/install_panel.sh)
+HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh_checksums.txt && sha256sum -c install_panel.sh_checksums.txt && bash install_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
 ```
 
 ## 卸载面板
@@ -62,7 +62,7 @@ bash <(curl -sSL https://jihulab.com/haozi-team/download/-/raw/main/panel/instal
 如果你无法重装系统，请以`root`用户登录服务器，执行以下命令卸载面板：
 
 ```shell
-bash <(curl -sSL https://jihulab.com/haozi-team/download/-/raw/main/panel/uninstall_panel.sh)
+HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh_checksums.txt && sha256sum -c uninstall_panel.sh_checksums.txt && bash uninstall_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
 ```
 
 卸载面板前请务必备份好所有数据，提前卸载面板全部插件。卸载后数据将**无法恢复**！
