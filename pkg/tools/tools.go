@@ -339,6 +339,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	if check != panelInfo.DownloadName+": OK" {
 		return errors.New("下载文件校验失败")
 	}
+	Remove("/www/panel/" + panelInfo.Checksums)
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
