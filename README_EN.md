@@ -12,7 +12,7 @@
 [<a href="README.md">简体中文</a>] | [English]
 </p>
 
-The HaoZi Linux Panel is a lightweight Linux server operation and maintenance management panel developed using Golang for our own business needs. It is open source under the Apache 2.0 protocol.
+The HaoZi Linux Panel is a lightweight Linux server operation and maintenance management panel developed using Golang for our own business needs. It is open source under the GNU Affero General Public License v3.0 protocol.
 
 Disclaimer: It is strictly prohibited to use the HaoZi Linux Panel to engage in any illegal activities. Please do not request any form of technical support from us for illegal sites. If illegal content is discovered during the technical support process, we will immediately stop technical support and retain relevant evidence.
 

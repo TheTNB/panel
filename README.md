@@ -12,7 +12,7 @@
 [简体中文] | [<a href="README_EN.md">English</a>]
 </p>
 
-耗子 Linux 面板是针对我们自身业务需要使用 Golang 开发的轻量 Linux 服务器运维管理面板，以 Apache 2.0 协议开源。
+耗子 Linux 面板是针对我们自身业务需要使用 Golang 开发的轻量 Linux 服务器运维管理面板，以 GNU Affero General Public License v3.0 开源。
 
 免责声明：严禁使用耗子 Linux 面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
 
