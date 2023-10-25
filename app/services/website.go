@@ -128,15 +128,56 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 	index := `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>耗子Linux面板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>耗子Linux面板</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5em;
+        }
+        p {
+            color: #555;
+            line-height: 1.8;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 2em 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>耗子Linux面板</h1>
-<p>这是耗子Linux面板的网站默认页面！</p>
-<p>当您看到此页面，说明您的网站已创建成功。</p>
+    <div class="container">
+        <h1>耗子Linux面板</h1>
+        <p>这是耗子Linux面板的网站默认页面！</p>
+        <p>当您看到此页面，说明您的网站已创建成功。</p>
+    </div>
 </body>
 </html>
+
 `
 	tools.Write(website.Path+"/index.html", index, 0644)
 

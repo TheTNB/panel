@@ -15,10 +15,10 @@ func Api() {
 		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
 			r.Get("name", infoController.Name)
-			r.Middleware(middleware.Jwt()).Get("menu", infoController.Menu)
 			r.Middleware(middleware.Jwt()).Get("homePlugins", infoController.HomePlugins)
 			r.Middleware(middleware.Jwt()).Get("nowMonitor", infoController.NowMonitor)
 			r.Middleware(middleware.Jwt()).Get("systemInfo", infoController.SystemInfo)
+			r.Middleware(middleware.Jwt()).Get("countInfo", infoController.CountInfo)
 			r.Middleware(middleware.Jwt()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
 			r.Middleware(middleware.Jwt()).Get("checkUpdate", infoController.CheckUpdate)
 			r.Middleware(middleware.Jwt()).Post("update", infoController.Update)
@@ -109,6 +109,14 @@ func Api() {
 	})
 
 	facades.Route().Fallback(func(ctx http.Context) http.Response {
-		return ctx.Response().String(404, "not found")
+		return ctx.Response().String(404, `<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>openresty</center>
+</body>
+</html>
+
+`)
 	})
 }

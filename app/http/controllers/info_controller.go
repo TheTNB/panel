@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"fmt"
 	"regexp"
 	"strings"
@@ -21,12 +22,14 @@ type MenuItem struct {
 }
 
 type InfoController struct {
-	plugin services.Plugin
+	plugin  services.Plugin
+	setting services.Setting
 }
 
 func NewInfoController() *InfoController {
 	return &InfoController{
-		plugin: services.NewPluginImpl(),
+		plugin:  services.NewPluginImpl(),
+		setting: services.NewSettingImpl(),
 	}
 }
 
@@ -41,21 +44,6 @@ func (c *InfoController) Name(ctx http.Context) http.Response {
 
 	return Success(ctx, http.Json{
 		"name": setting.Value,
-	})
-}
-
-// Menu 获取面板菜单
-func (c *InfoController) Menu(ctx http.Context) http.Response {
-	return Success(ctx, []MenuItem{
-		{Name: "home", Title: "主页", Icon: "layui-icon-home", Jump: "/"},
-		{Name: "website", Title: "网站管理", Icon: "layui-icon-website", Jump: "website/list"},
-		{Name: "monitor", Title: "资源监控", Icon: "layui-icon-chart-screen", Jump: "monitor"},
-		{Name: "safe", Title: "系统安全", Icon: "layui-icon-auz", Jump: "safe"},
-		/*{Name: "file", Title: "文件管理", Icon: "layui-icon-file", Jump: "file"},*/
-		{Name: "cron", Title: "计划任务", Icon: "layui-icon-date", Jump: "cron"},
-		{Name: "ssh", Title: "SSH", Icon: "layui-icon-layer", Jump: "ssh"},
-		{Name: "plugin", Title: "插件中心", Icon: "layui-icon-app", Jump: "plugin"},
-		{Name: "setting", Title: "面板设置", Icon: "layui-icon-set", Jump: "setting"},
 	})
 }
 
@@ -97,6 +85,100 @@ func (c *InfoController) SystemInfo(ctx http.Context) http.Response {
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
 		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
 		"panel_version": facades.Config().GetString("panel.version"),
+	})
+}
+
+// CountInfo 获取面板统计信息
+func (c *InfoController) CountInfo(ctx http.Context) http.Response {
+	var websiteCount int64
+	err := facades.Orm().Query().Model(models.Website{}).Count(&websiteCount)
+	if err != nil {
+		websiteCount = -1
+	}
+
+	var mysql models.Plugin
+	mysqlInstalled := true
+	err = facades.Orm().Query().Where("slug like ?", "mysql%").FirstOrFail(&mysql)
+	if err != nil {
+		mysqlInstalled = false
+	}
+	var postgresql models.Plugin
+	postgresqlInstalled := true
+	err = facades.Orm().Query().Where("slug like ?", "postgresql%").FirstOrFail(&postgresql)
+	if err != nil {
+		postgresqlInstalled = false
+	}
+	var databaseCount int64
+	if mysqlInstalled {
+		status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+		if status == "active" {
+			rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
+			type database struct {
+				Name string `json:"name"`
+			}
+
+			db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+			if err != nil {
+				facades.Log().With(map[string]any{
+					"error": err.Error(),
+				}).Error("[面板][InfoController] 获取数据库列表失败")
+				databaseCount = -1
+			} else {
+				defer db.Close()
+				rows, err := db.Query("SHOW DATABASES")
+				if err != nil {
+					facades.Log().With(map[string]any{
+						"error": err.Error(),
+					}).Error("[面板][InfoController] 获取数据库列表失败")
+					databaseCount = -1
+				}
+				defer rows.Close()
+
+				var databases []database
+				for rows.Next() {
+					var d database
+					err := rows.Scan(&d.Name)
+					if err != nil {
+						continue
+					}
+
+					databases = append(databases, d)
+				}
+				databaseCount = int64(len(databases))
+			}
+		}
+	}
+	if postgresqlInstalled {
+		status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+		if status == "active" {
+			raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+			databases := strings.Split(raw, "\n")
+			databases = databases[3 : len(databases)-1]
+			databaseCount = int64(len(databases))
+		}
+	}
+
+	var ftpCount int64
+	var ftpPlugin = c.plugin.GetInstalledBySlug("pureftpd")
+	if ftpPlugin.ID != 0 {
+		listRaw := tools.Exec("pure-pw list")
+		if len(listRaw) != 0 {
+			listArr := strings.Split(listRaw, "\n")
+			ftpCount = int64(len(listArr))
+		}
+	}
+
+	var cronCount int64
+	err = facades.Orm().Query().Model(models.Cron{}).Count(&cronCount)
+	if err != nil {
+		cronCount = -1
+	}
+
+	return Success(ctx, http.Json{
+		"website":  websiteCount,
+		"database": databaseCount,
+		"ftp":      ftpCount,
+		"cron":     cronCount,
 	})
 }
 
