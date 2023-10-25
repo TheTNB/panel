@@ -118,21 +118,21 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 			}
 
 			db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
-			defer db.Close()
 			if err != nil {
 				facades.Log().With(map[string]any{
 					"error": err.Error(),
 				}).Error("[面板][InfoController] 获取数据库列表失败")
 				databaseCount = -1
 			} else {
+				defer db.Close()
 				rows, err := db.Query("SHOW DATABASES")
-				defer rows.Close()
 				if err != nil {
 					facades.Log().With(map[string]any{
 						"error": err.Error(),
 					}).Error("[面板][InfoController] 获取数据库列表失败")
 					databaseCount = -1
 				} else {
+					defer rows.Close()
 					var databases []database
 					for rows.Next() {
 						var d database
