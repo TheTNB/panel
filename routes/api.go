@@ -21,6 +21,7 @@ func Api() {
 			r.Middleware(middleware.Jwt()).Get("countInfo", infoController.CountInfo)
 			r.Middleware(middleware.Jwt()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
 			r.Middleware(middleware.Jwt()).Get("checkUpdate", infoController.CheckUpdate)
+			r.Middleware(middleware.Jwt()).Get("updateInfo", infoController.UpdateInfo)
 			r.Middleware(middleware.Jwt()).Post("update", infoController.Update)
 			r.Middleware(middleware.Jwt()).Post("restart", infoController.Restart)
 		})

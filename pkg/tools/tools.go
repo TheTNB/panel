@@ -241,6 +241,10 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	var output string
 	isChina := IsChina()
 
+	if !strings.HasPrefix(version, "v") {
+		version = "v" + version
+	}
+
 	if isChina {
 		output = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/` + version + `"`)
 	} else {

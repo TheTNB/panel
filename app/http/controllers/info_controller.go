@@ -118,33 +118,33 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 			}
 
 			db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+			defer db.Close()
 			if err != nil {
 				facades.Log().With(map[string]any{
 					"error": err.Error(),
 				}).Error("[面板][InfoController] 获取数据库列表失败")
 				databaseCount = -1
 			} else {
-				defer db.Close()
 				rows, err := db.Query("SHOW DATABASES")
+				defer rows.Close()
 				if err != nil {
 					facades.Log().With(map[string]any{
 						"error": err.Error(),
 					}).Error("[面板][InfoController] 获取数据库列表失败")
 					databaseCount = -1
-				}
-				defer rows.Close()
+				} else {
+					var databases []database
+					for rows.Next() {
+						var d database
+						err := rows.Scan(&d.Name)
+						if err != nil {
+							continue
+						}
 
-				var databases []database
-				for rows.Next() {
-					var d database
-					err := rows.Scan(&d.Name)
-					if err != nil {
-						continue
+						databases = append(databases, d)
 					}
-
-					databases = append(databases, d)
+					databaseCount = int64(len(databases))
 				}
-				databaseCount = int64(len(databases))
 			}
 		}
 	}
@@ -244,21 +244,43 @@ func (c *InfoController) CheckUpdate(ctx http.Context) http.Response {
 
 	if tools.VersionCompare(version, remote.Version, ">=") {
 		return Success(ctx, http.Json{
-			"update":  false,
-			"version": remote.Version,
-			"name":    remote.Name,
-			"body":    remote.Body,
-			"date":    remote.Date,
+			"update": false,
 		})
 	}
 
 	return Success(ctx, http.Json{
-		"update":  true,
-		"version": remote.Version,
-		"name":    remote.Name,
-		"body":    remote.Body,
-		"date":    remote.Date,
+		"update": true,
 	})
+}
+
+// UpdateInfo 获取更新信息
+func (c *InfoController) UpdateInfo(ctx http.Context) http.Response {
+	version := facades.Config().GetString("panel.version")
+	current, err := tools.GetLatestPanelVersion()
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
+	}
+
+	if tools.VersionCompare(version, current.Version, ">=") {
+		return Error(ctx, http.StatusInternalServerError, "当前版本已是最新版本")
+	}
+
+	versions, err := tools.GenerateVersions(version, current.Version)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "获取更新信息失败")
+	}
+
+	var versionInfo []tools.PanelInfo
+	for _, v := range versions {
+		info, err := tools.GetPanelVersion(v)
+		if err != nil {
+			continue
+		}
+
+		versionInfo = append(versionInfo, info)
+	}
+
+	return Success(ctx, versionInfo)
 }
 
 // Update 更新面板
