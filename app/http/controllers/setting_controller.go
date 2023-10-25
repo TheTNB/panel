@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"regexp"
+
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"panel/pkg/tools"
@@ -69,6 +71,10 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	username := ctx.Request().Input("username")
 	email := ctx.Request().Input("email")
 	password := ctx.Request().Input("password")
+
+	if regexp.MustCompile(`^/[^/]*[^/]$`).MatchString(entrance) == false {
+		return Error(ctx, http.StatusUnprocessableEntity, "入口格式错误")
+	}
 
 	err := r.setting.Set(models.SettingKeyName, name)
 	if err != nil {

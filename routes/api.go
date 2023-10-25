@@ -10,7 +10,7 @@ import (
 )
 
 func Api() {
-	facades.Route().StaticFile("favicon.ico", "/www/panel/public/favicon.ico")
+	facades.Route().StaticFile("favicon.ico", "public/favicon.ico")
 	facades.Route().Prefix("api/panel").Group(func(r route.Router) {
 		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
@@ -110,7 +110,7 @@ func Api() {
 	})
 
 	facades.Route().Fallback(func(ctx http.Context) http.Response {
-		return ctx.Response().String(404, `<html>
+		return ctx.Response().Data(http.StatusNotFound, "text/html; charset=utf-8", []byte(`<html>
 <head><title>404 Not Found</title></head>
 <body>
 <center><h1>404 Not Found</h1></center>
@@ -118,6 +118,6 @@ func Api() {
 </body>
 </html>
 
-`)
+`))
 	})
 }
