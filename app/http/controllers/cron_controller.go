@@ -27,8 +27,8 @@ func NewCronController() *CronController {
 
 // List 获取计划任务列表
 func (c *CronController) List(ctx http.Context) http.Response {
-	limit := ctx.Request().QueryInt("limit")
-	page := ctx.Request().QueryInt("page")
+	limit := ctx.Request().QueryInt("limit", 10)
+	page := ctx.Request().QueryInt("page", 1)
 
 	var crons []models.Cron
 	var total int64

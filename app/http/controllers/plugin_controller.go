@@ -51,7 +51,7 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 		Show             bool     `json:"show"`
 	}
 
-	var p []plugin
+	var pluginArr []plugin
 	for _, item := range plugins {
 		installed, installedVersion, show := false, "", false
 		if _, ok := installedPluginsMap[item.Slug]; ok {
@@ -59,7 +59,7 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 			installedVersion = installedPluginsMap[item.Slug].Version
 			show = installedPluginsMap[item.Slug].Show
 		}
-		p = append(p, plugin{
+		pluginArr = append(pluginArr, plugin{
 			Name:             item.Name,
 			Description:      item.Description,
 			Slug:             item.Slug,
@@ -72,7 +72,25 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	return Success(ctx, p)
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(pluginArr) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []plugin{},
+		})
+	}
+	if endIndex > len(pluginArr) {
+		endIndex = len(pluginArr)
+	}
+	pagedPlugins := pluginArr[startIndex:endIndex]
+
+	return Success(ctx, http.Json{
+		"total": len(pluginArr),
+		"items": pagedPlugins,
+	})
 }
 
 // Install 安装插件
