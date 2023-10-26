@@ -154,7 +154,14 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 			raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
 			databases := strings.Split(raw, "\n")
 			databases = databases[3 : len(databases)-1]
-			databaseCount = int64(len(databases))
+			for _, db := range databases {
+				parts := strings.Split(db, "|")
+				if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 {
+					continue
+				}
+
+				databaseCount++
+			}
 		}
 	}
 
