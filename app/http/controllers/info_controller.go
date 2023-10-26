@@ -140,6 +140,9 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 						if err != nil {
 							continue
 						}
+						if d.Name == "information_schema" || d.Name == "performance_schema" || d.Name == "mysql" || d.Name == "sys" {
+							continue
+						}
 
 						databases = append(databases, d)
 					}
@@ -156,7 +159,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 			databases = databases[3 : len(databases)-1]
 			for _, db := range databases {
 				parts := strings.Split(db, "|")
-				if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 {
+				if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 || strings.TrimSpace(parts[0]) == "template0" || strings.TrimSpace(parts[0]) == "template1" || strings.TrimSpace(parts[0]) == "postgres" {
 					continue
 				}
 
