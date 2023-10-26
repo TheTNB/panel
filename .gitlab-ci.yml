@@ -80,6 +80,7 @@ release:
   stage: release
   dependencies:
     - build
+    - fetch
   image:
     name: goreleaser/goreleaser
     entrypoint: [ '' ]
