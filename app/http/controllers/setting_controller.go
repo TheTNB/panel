@@ -72,7 +72,7 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	email := ctx.Request().Input("email")
 	password := ctx.Request().Input("password")
 
-	if regexp.MustCompile(`^/[^/]*[^/]$`).MatchString(entrance) == false {
+	if !regexp.MustCompile(`^/[^/]*[^/]$`).MatchString(entrance) {
 		return Error(ctx, http.StatusUnprocessableEntity, "入口格式错误")
 	}
 
