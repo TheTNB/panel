@@ -30,8 +30,8 @@ func NewWebsiteController() *WebsiteController {
 
 // List 网站列表
 func (c *WebsiteController) List(ctx http.Context) http.Response {
-	limit := ctx.Request().QueryInt("limit")
-	page := ctx.Request().QueryInt("page")
+	limit := ctx.Request().QueryInt("limit", 10)
+	page := ctx.Request().QueryInt("page", 1)
 
 	total, websites, err := c.website.List(page, limit)
 	if err != nil {

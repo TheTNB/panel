@@ -187,7 +187,7 @@ func (c *Mysql80Controller) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
 
-	data := make(map[int]map[string]string)
+	var data []map[string]string
 	expressions := []struct {
 		regex string
 		name  string
@@ -212,16 +212,18 @@ func (c *Mysql80Controller) Load(ctx http.Context) http.Response {
 		{`Table_locks_waited\s+\|\s+(\d+)\s+\|`, "锁表次数"},
 	}
 
-	for i, expression := range expressions {
+	for _, expression := range expressions {
 		re := regexp.MustCompile(expression.regex)
 		matches := re.FindStringSubmatch(raw)
 		if len(matches) > 1 {
-			data[i] = make(map[string]string)
-			data[i] = map[string]string{"name": expression.name, "value": matches[1]}
+			d := make(map[string]string)
+			d = map[string]string{"name": expression.name, "value": matches[1]}
 
 			if expression.name == "发送" || expression.name == "接收" {
-				data[i]["value"] = tools.FormatBytes(cast.ToFloat64(matches[1]))
+				d["value"] = tools.FormatBytes(cast.ToFloat64(matches[1]))
 			}
+
+			data = append(data, d)
 		}
 	}
 
@@ -527,7 +529,7 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"name": "required|min_len:1|max_len:255",
+		"backup": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
 		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
@@ -537,7 +539,7 @@ func (c *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-	fileName := ctx.Request().Input("name")
+	fileName := ctx.Request().Input("backup")
 	tools.Remove(backupPath + "/" + fileName)
 
 	return controllers.Success(ctx, "删除备份成功")
@@ -551,7 +553,7 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"name":     "required|min_len:1|max_len:255",
+		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
@@ -561,7 +563,7 @@ func (c *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
 	}
 
-	err = c.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("name"))
+	err = c.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
 		facades.Log().Error("[MYSQL80] 还原失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
