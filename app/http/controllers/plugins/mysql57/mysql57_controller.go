@@ -152,7 +152,7 @@ func (c *Mysql57Controller) SaveConfig(ctx http.Context) http.Response {
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/mysql/conf/my.cnf", config, 0644) {
@@ -171,7 +171,7 @@ func (c *Mysql57Controller) Load(ctx http.Context) http.Response {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
 	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
@@ -181,7 +181,7 @@ func (c *Mysql57Controller) Load(ctx http.Context) http.Response {
 
 	raw := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if strings.Contains(raw, "Access denied for user") {
-		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码错误")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码错误")
 	}
 	if !strings.Contains(raw, "Uptime") {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
@@ -290,7 +290,7 @@ func (c *Mysql57Controller) GetRootPassword(ctx http.Context) http.Response {
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
 	return controllers.Success(ctx, rootPassword)
@@ -313,7 +313,7 @@ func (c *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
 
 	rootPassword := ctx.Request().Input(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "MySQL root密码不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码不能为空")
 	}
 
 	oldRootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -407,10 +407,10 @@ func (c *Mysql57Controller) AddDatabase(ctx http.Context) http.Response {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -437,10 +437,10 @@ func (c *Mysql57Controller) DeleteDatabase(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -463,7 +463,25 @@ func (c *Mysql57Controller) BackupList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
-	return controllers.Success(ctx, backupList)
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(backupList) {
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []services.BackupFile{},
+		})
+	}
+	if endIndex > len(backupList) {
+		endIndex = len(backupList)
+	}
+	pagedBackupList := backupList[startIndex:endIndex]
+
+	return controllers.Success(ctx, http.Json{
+		"total": len(backupList),
+		"items": pagedBackupList,
+	})
 }
 
 // UploadBackup 上传备份
@@ -475,7 +493,7 @@ func (c *Mysql57Controller) UploadBackup(ctx http.Context) http.Response {
 
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
@@ -486,7 +504,7 @@ func (c *Mysql57Controller) UploadBackup(ctx http.Context) http.Response {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	return controllers.Success(ctx, "上传文件成功")
@@ -503,10 +521,10 @@ func (c *Mysql57Controller) CreateBackup(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	database := ctx.Request().Input("database")
@@ -527,17 +545,17 @@ func (c *Mysql57Controller) DeleteBackup(ctx http.Context) http.Response {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"backup": "required|min_len:1|max_len:255",
+		"name": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/mysql"
-	fileName := ctx.Request().Input("backup")
+	fileName := ctx.Request().Input("name")
 	tools.Remove(backupPath + "/" + fileName)
 
 	return controllers.Success(ctx, "删除备份成功")
@@ -555,10 +573,10 @@ func (c *Mysql57Controller) RestoreBackup(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	err = c.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
@@ -669,10 +687,10 @@ func (c *Mysql57Controller) AddUser(ctx http.Context) http.Response {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -697,10 +715,10 @@ func (c *Mysql57Controller) DeleteUser(ctx http.Context) http.Response {
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -722,10 +740,10 @@ func (c *Mysql57Controller) SetUserPassword(ctx http.Context) http.Response {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -749,10 +767,10 @@ func (c *Mysql57Controller) SetUserPrivileges(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)

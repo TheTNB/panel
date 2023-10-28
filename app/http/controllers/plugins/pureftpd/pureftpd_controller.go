@@ -184,10 +184,10 @@ func (c *PureFtpdController) Add(ctx http.Context) http.Response {
 		"path":     "required",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -198,7 +198,7 @@ func (c *PureFtpdController) Add(ctx http.Context) http.Response {
 		path = "/" + path
 	}
 	if !tools.Exists(path) {
-		return controllers.Error(ctx, http.StatusBadRequest, "目录不存在")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "目录不存在")
 	}
 
 	tools.Chmod(path, 0755)
@@ -220,10 +220,10 @@ func (c *PureFtpdController) Delete(ctx http.Context) http.Response {
 		"username": "required",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -246,10 +246,10 @@ func (c *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 		"password": "required|min_len:6",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	username := ctx.Request().Input("username")
@@ -287,10 +287,10 @@ func (c *PureFtpdController) SetPort(ctx http.Context) http.Response {
 		"port": "required",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	port := ctx.Request().Input("port")

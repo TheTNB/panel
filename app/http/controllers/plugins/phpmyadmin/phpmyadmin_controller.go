@@ -26,7 +26,7 @@ func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
 
 	files, err := os.ReadDir("/www/server/phpmyadmin")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到 phpMyAdmin 目录")
 	}
 
 	var phpmyadmin string
@@ -36,13 +36,13 @@ func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
 		}
 	}
 	if len(phpmyadmin) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 目录")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到 phpMyAdmin 目录")
 	}
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	match := regexp.MustCompile(`listen\s+(\d+);`).FindStringSubmatch(conf)
 	if len(match) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "找不到 phpMyAdmin 端口")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到 phpMyAdmin 端口")
 	}
 
 	return controllers.Success(ctx, http.Json{
@@ -59,7 +59,7 @@ func (c *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 
 	port := ctx.Request().Input("port")
 	if len(port) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "端口不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "端口不能为空")
 	}
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")

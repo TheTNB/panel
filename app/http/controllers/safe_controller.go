@@ -129,13 +129,13 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 // AddFirewallRule 添加防火墙规则
 func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 	if !r.firewallStatus() {
-		return Error(ctx, http.StatusBadRequest, "防火墙未启动")
+		return Error(ctx, http.StatusUnprocessableEntity, "防火墙未启动")
 	}
 
 	port := ctx.Request().Input("port")
 	protocol := ctx.Request().Input("protocol")
 	if port == "" || protocol == "" || (protocol != "tcp" && protocol != "udp") {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 	// 端口有 2 种写法，一种是 80-443，一种是 80
 	if strings.Contains(port, "-") {
@@ -143,12 +143,12 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 		startPort := cast.ToInt(ports[0])
 		endPort := cast.ToInt(ports[1])
 		if startPort < 1 || startPort > 65535 || endPort < 1 || endPort > 65535 || startPort > endPort {
-			return Error(ctx, http.StatusBadRequest, "参数错误")
+			return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 		}
 	} else {
 		port := cast.ToInt(port)
 		if port < 1 || port > 65535 {
-			return Error(ctx, http.StatusBadRequest, "参数错误")
+			return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 		}
 	}
 
@@ -172,13 +172,13 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 // DeleteFirewallRule 删除防火墙规则
 func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 	if !r.firewallStatus() {
-		return Error(ctx, http.StatusBadRequest, "防火墙未启动")
+		return Error(ctx, http.StatusUnprocessableEntity, "防火墙未启动")
 	}
 
 	port := ctx.Request().InputInt("port", 0)
 	protocol := ctx.Request().Input("protocol", "")
 	if port == 0 || protocol == "" {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	if tools.IsRHEL() {
@@ -265,7 +265,7 @@ func (r *SafeController) GetSshPort(ctx http.Context) http.Response {
 func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 	port := ctx.Request().InputInt("port", 0)
 	if port == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	oldPort := tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")

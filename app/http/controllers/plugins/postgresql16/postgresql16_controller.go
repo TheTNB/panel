@@ -170,7 +170,7 @@ func (c *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/postgresql/data/postgresql.conf", config, 0644) {
@@ -189,7 +189,7 @@ func (c *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response 
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644) {
@@ -314,10 +314,10 @@ func (c *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	database := ctx.Request().Input("database")
@@ -346,10 +346,10 @@ func (c *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response 
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	database := ctx.Request().Input("database")
@@ -383,7 +383,7 @@ func (c *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
 
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
@@ -394,7 +394,7 @@ func (c *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	return controllers.Success(ctx, nil)
@@ -411,10 +411,10 @@ func (c *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	database := ctx.Request().Input("database")
@@ -438,10 +438,10 @@ func (c *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
 		"name": "required|min_len:1|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
@@ -463,10 +463,10 @@ func (c *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	err = c.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("name"))
@@ -544,10 +544,10 @@ func (c *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	user := ctx.Request().Input("user")
@@ -573,10 +573,10 @@ func (c *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	user := ctx.Request().Input("user")
@@ -598,10 +598,10 @@ func (c *Postgresql16Controller) SetUserPassword(ctx http.Context) http.Response
 		"password": "required|min_len:8|max_len:255",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	user := ctx.Request().Input("user")

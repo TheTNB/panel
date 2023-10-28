@@ -145,7 +145,7 @@ func (c *RedisController) SaveConfig(ctx http.Context) http.Response {
 
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "配置不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if !tools.Write("/www/server/redis/redis.conf", config, 0644) {

@@ -345,10 +345,10 @@ func (c *SupervisorController) AddProcess(ctx http.Context) http.Response {
 		"num":     "required",
 	})
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, err.Error())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	name := ctx.Request().Input("name")

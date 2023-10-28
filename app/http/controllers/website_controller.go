@@ -63,10 +63,10 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 		"db_password": "required_if:db,true",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	var website services.PanelWebsite
@@ -150,7 +150,7 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	config, err := c.website.GetConfig(id)
@@ -188,19 +188,19 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 		"ssl_certificate_key": "required_if:ssl,true",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	var website models.Website
 	if facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&website) != nil {
-		return Error(ctx, http.StatusBadRequest, "网站不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "网站不存在")
 	}
 
 	if !website.Status {
-		return Error(ctx, http.StatusBadRequest, "网站已停用，请先启用")
+		return Error(ctx, http.StatusUnprocessableEntity, "网站已停用，请先启用")
 	}
 
 	// 原文
@@ -214,7 +214,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	// 目录
 	path := ctx.Request().Input("path")
 	if !tools.Exists(path) {
-		return Error(ctx, http.StatusBadRequest, "网站目录不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "网站目录不存在")
 	}
 	website.Path = path
 
@@ -222,7 +222,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	domain := "server_name"
 	domains := ctx.Request().InputArray("domains")
 	if len(domains) == 0 {
-		return Error(ctx, http.StatusBadRequest, "域名不能为空")
+		return Error(ctx, http.StatusUnprocessableEntity, "域名不能为空")
 	}
 	for _, v := range domains {
 		if v == "" {
@@ -233,7 +233,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	domain += ";"
 	domainConfigOld := tools.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
 	if len(strings.TrimSpace(domainConfigOld)) == 0 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中缺少server_name标记位")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中缺少server_name标记位")
 	}
 	raw = strings.Replace(raw, domainConfigOld, "\n    "+domain+"\n    ", -1)
 
@@ -241,11 +241,11 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	var port strings.Builder
 	ports := ctx.Request().InputArray("ports")
 	if len(ports) == 0 {
-		return Error(ctx, http.StatusBadRequest, "端口不能为空")
+		return Error(ctx, http.StatusUnprocessableEntity, "端口不能为空")
 	}
 	for i, v := range ports {
 		if _, err := strconv.Atoi(v); err != nil && v != "443 ssl http2" {
-			return Error(ctx, http.StatusBadRequest, "端口格式错误")
+			return Error(ctx, http.StatusUnprocessableEntity, "端口格式错误")
 		}
 		if v == "443" && ctx.Request().InputBool("ssl") {
 			v = "443 ssl http2"
@@ -258,18 +258,18 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	}
 	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
 	if len(strings.TrimSpace(portConfigOld)) == 0 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中缺少port标记位")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中缺少port标记位")
 	}
 	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
 
 	// 运行目录
 	root := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
 	if len(strings.TrimSpace(root)) == 0 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中缺少root标记位")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中缺少root标记位")
 	}
 	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(root)
 	if len(match) != 2 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中root标记位格式错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中root标记位格式错误")
 	}
 	rootNew := strings.Replace(root, match[1], ctx.Request().Input("root"), -1)
 	raw = strings.Replace(raw, root, rootNew, -1)
@@ -277,11 +277,11 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	// 默认文件
 	index := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
 	if len(strings.TrimSpace(index)) == 0 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中缺少index标记位")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中缺少index标记位")
 	}
 	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(index)
 	if len(match) != 2 {
-		return Error(ctx, http.StatusBadRequest, "配置文件中index标记位格式错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "配置文件中index标记位格式错误")
 	}
 	indexNew := strings.Replace(index, match[1], ctx.Request().Input("index"), -1)
 	raw = strings.Replace(raw, index, indexNew, -1)
@@ -396,7 +396,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}
@@ -415,7 +415,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}
@@ -450,7 +450,7 @@ func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}
@@ -473,7 +473,7 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
@@ -484,7 +484,7 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "上传文件失败")
+		return Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	return Success(ctx, "上传文件成功")
@@ -494,11 +494,11 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 	fileName := ctx.Request().Input("name")
 	if len(fileName) == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}
@@ -521,7 +521,7 @@ func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	fileName := ctx.Request().Input("name")
 	if len(fileName) == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
@@ -544,7 +544,7 @@ func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}
@@ -634,7 +634,7 @@ func (c *WebsiteController) Status(ctx http.Context) http.Response {
 	}
 	id := ctx.Request().InputInt("id")
 	if id == 0 {
-		return Error(ctx, http.StatusBadRequest, "参数错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	website := models.Website{}

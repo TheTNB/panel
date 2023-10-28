@@ -143,12 +143,12 @@ func (c *Fail2banController) List(ctx http.Context) http.Response {
 	limit := ctx.Request().QueryInt("limit", 10)
 	raw := tools.Read("/etc/fail2ban/jail.local")
 	if len(raw) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "Fail2ban 规则为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
 	}
 
 	jailList := regexp.MustCompile(`\[(.*?)]`).FindAllStringSubmatch(raw, -1)
 	if len(jailList) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "Fail2ban 规则为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
 	}
 
 	var jails []Jail

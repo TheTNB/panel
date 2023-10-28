@@ -54,15 +54,15 @@ func (c *CronController) Add(ctx http.Context) http.Response {
 		"backup_type": "required_if:type,backup|in:website,mysql,postgresql",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	// 单独验证时间格式
 	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(ctx.Request().Input("time")) {
-		return Error(ctx, http.StatusBadRequest, "时间格式错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "时间格式错误")
 	}
 
 	shell := ctx.Request().Input("script")
@@ -151,7 +151,7 @@ func (c *CronController) Script(ctx http.Context) http.Response {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	return Success(ctx, tools.Read(cron.Shell))
@@ -165,25 +165,25 @@ func (c *CronController) Update(ctx http.Context) http.Response {
 		"script": "required",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	// 单独验证时间格式
 	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(ctx.Request().Input("time")) {
-		return Error(ctx, http.StatusBadRequest, "时间格式错误")
+		return Error(ctx, http.StatusUnprocessableEntity, "时间格式错误")
 	}
 
 	var cron models.Cron
 	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	if !cron.Status {
-		return Error(ctx, http.StatusBadRequest, "计划任务已禁用")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务已禁用")
 	}
 
 	cron.Time = ctx.Request().Input("time")
@@ -213,7 +213,7 @@ func (c *CronController) Delete(ctx http.Context) http.Response {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	c.cron.DeleteFromSystem(cron)
@@ -234,16 +234,16 @@ func (c *CronController) Status(ctx http.Context) http.Response {
 		"status": "bool",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	var cron models.Cron
 	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	cron.Status = ctx.Request().InputBool("status")
@@ -266,11 +266,11 @@ func (c *CronController) Log(ctx http.Context) http.Response {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, "计划任务不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	if !tools.Exists(cron.Log) {
-		return Error(ctx, http.StatusBadRequest, "日志文件不存在")
+		return Error(ctx, http.StatusUnprocessableEntity, "日志文件不存在")
 	}
 
 	return Success(ctx, tools.Read(cron.Log))

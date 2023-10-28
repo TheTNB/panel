@@ -43,7 +43,7 @@ func (c *S3fsController) List(ctx http.Context) http.Response {
 	var s3fsList []s3fs
 	err := sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusBadRequest, "获取 S3fs 挂载失败")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 S3fs 挂载失败")
 	}
 
 	startIndex := (page - 1) * limit

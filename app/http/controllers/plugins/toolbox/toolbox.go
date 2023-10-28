@@ -29,7 +29,7 @@ func (c *ToolBoxController) GetDNS(ctx http.Context) http.Response {
 	raw := tools.Read("/etc/resolv.conf")
 	match := regexp.MustCompile(`nameserver\s+(\S+)`).FindAllStringSubmatch(raw, -1)
 	if len(match) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "找不到 DNS 信息")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到 DNS 信息")
 	}
 
 	var dns []string
@@ -51,7 +51,7 @@ func (c *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 	dns2 := ctx.Request().Input("dns2")
 
 	if len(dns1) == 0 || len(dns2) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "DNS 信息不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "DNS 信息不能为空")
 	}
 
 	var dns string
@@ -112,7 +112,7 @@ func (c *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 	if size > 1 {
 		free := tools.Exec("df -k /www | awk '{print $4}' | tail -n 1")
 		if cast.ToInt64(free)*1024 < int64(size)*1024*1024 {
-			return controllers.Error(ctx, http.StatusBadRequest, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
 		}
 
 		if strings.Contains(tools.Exec("df -T /www | awk '{print $2}' | tail -n 1"), "btrfs") {
@@ -139,7 +139,7 @@ func (c *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 	raw := tools.Exec("LC_ALL=C timedatectl | grep zone")
 	match := regexp.MustCompile(`zone:\s+(\S+)`).FindStringSubmatch(raw)
 	if len(match) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "找不到时区信息")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到时区信息")
 	}
 
 	zonesRaw := tools.Exec("LC_ALL=C timedatectl list-timezones")
@@ -160,7 +160,7 @@ func (c *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 
 	timezone := ctx.Request().Input("timezone")
 	if len(timezone) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "时区不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "时区不能为空")
 	}
 
 	tools.Exec("timedatectl set-timezone " + timezone)
@@ -187,7 +187,7 @@ func (c *ToolBoxController) SetHosts(ctx http.Context) http.Response {
 
 	hosts := ctx.Request().Input("hosts")
 	if len(hosts) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "hosts 信息不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "hosts 信息不能为空")
 	}
 
 	tools.Write("/etc/hosts", hosts, 0644)
@@ -204,10 +204,10 @@ func (c *ToolBoxController) SetRootPassword(ctx http.Context) http.Response {
 
 	password := ctx.Request().Input("password")
 	if len(password) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "密码不能为空")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "密码不能为空")
 	}
 	if !regexp.MustCompile(`^[a-zA-Z0-9·~!@#$%^&*()_+-=\[\]{};:'",./<>?]{6,20}$`).MatchString(password) {
-		return controllers.Error(ctx, http.StatusBadRequest, "密码必须为 6-20 位字母、数字或特殊字符")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "密码必须为 6-20 位字母、数字或特殊字符")
 	}
 
 	password = strings.ReplaceAll(password, `'`, `\'`)

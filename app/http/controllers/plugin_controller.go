@@ -105,7 +105,7 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	}
 
 	if installedPlugin.ID != 0 {
-		return Error(ctx, http.StatusBadRequest, "插件已安装")
+		return Error(ctx, http.StatusUnprocessableEntity, "插件已安装")
 	}
 
 	var lock sync.RWMutex
@@ -161,7 +161,7 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	}
 
 	if installedPlugin.ID == 0 {
-		return Error(ctx, http.StatusBadRequest, "插件未安装")
+		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
 	var lock sync.RWMutex
@@ -217,7 +217,7 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	}
 
 	if installedPlugin.ID == 0 {
-		return Error(ctx, http.StatusBadRequest, "插件未安装")
+		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
 	var lock sync.RWMutex
@@ -272,7 +272,7 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 	if plugin.ID == 0 {
-		return Error(ctx, http.StatusBadRequest, "插件未安装")
+		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
 	plugin.Show = show

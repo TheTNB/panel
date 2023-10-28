@@ -56,10 +56,10 @@ func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
 		"password": "required",
 	})
 	if err != nil {
-		return Error(ctx, http.StatusBadRequest, err.Error())
+		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if validator.Fails() {
-		return Error(ctx, http.StatusBadRequest, validator.Errors().One())
+		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
 	host := ctx.Request().Input("host")

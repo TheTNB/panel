@@ -250,14 +250,14 @@ func (c *Php82Controller) InstallExtension(ctx http.Context) http.Response {
 
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "参数错误")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	extensions := c.GetExtensions()
 	for _, item := range extensions {
 		if item.Slug == slug {
 			if item.Installed {
-				return controllers.Error(ctx, http.StatusBadRequest, "扩展已安装")
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, "扩展已安装")
 			}
 
 			var task models.Task
@@ -276,7 +276,7 @@ func (c *Php82Controller) InstallExtension(ctx http.Context) http.Response {
 		}
 	}
 
-	return controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
+	return controllers.Error(ctx, http.StatusUnprocessableEntity, "扩展不存在")
 }
 
 func (c *Php82Controller) UninstallExtension(ctx http.Context) http.Response {
@@ -287,14 +287,14 @@ func (c *Php82Controller) UninstallExtension(ctx http.Context) http.Response {
 
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
-		return controllers.Error(ctx, http.StatusBadRequest, "参数错误")
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	extensions := c.GetExtensions()
 	for _, item := range extensions {
 		if item.Slug == slug {
 			if !item.Installed {
-				return controllers.Error(ctx, http.StatusBadRequest, "扩展未安装")
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, "扩展未安装")
 			}
 
 			var task models.Task
@@ -313,7 +313,7 @@ func (c *Php82Controller) UninstallExtension(ctx http.Context) http.Response {
 		}
 	}
 
-	return controllers.Error(ctx, http.StatusBadRequest, "扩展不存在")
+	return controllers.Error(ctx, http.StatusUnprocessableEntity, "扩展不存在")
 }
 
 func (c *Php82Controller) GetExtensions() []Extension {
