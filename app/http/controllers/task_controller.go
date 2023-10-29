@@ -62,7 +62,7 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
 	}
 
-	log := tools.Read(task.Log)
+	log := tools.Exec("tail -n 1000 " + task.Log)
 
 	return Success(ctx, log)
 }

@@ -273,5 +273,7 @@ func (c *CronController) Log(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "日志文件不存在")
 	}
 
-	return Success(ctx, tools.Read(cron.Log))
+	log := tools.Exec("tail -n 1000 " + cron.Log)
+
+	return Success(ctx, log)
 }
