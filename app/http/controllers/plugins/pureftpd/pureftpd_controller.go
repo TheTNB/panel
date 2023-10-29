@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
 	"panel/pkg/tools"
@@ -29,26 +30,6 @@ func (c *PureFtpdController) Status(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
-	}
-
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
-}
-
-// Reload 重载配置
-func (c *PureFtpdController) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
-	tools.Exec("systemctl reload pure-ftpd")
 	status := tools.Exec("systemctl status pure-ftpd | grep Active | grep -v grep | awk '{print $2}'")
 	if len(status) == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
@@ -273,7 +254,7 @@ func (c *PureFtpdController) GetPort(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
 	}
 
-	return controllers.Success(ctx, port)
+	return controllers.Success(ctx, cast.ToInt(port))
 }
 
 // SetPort 设置端口

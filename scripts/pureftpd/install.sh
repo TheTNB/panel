@@ -81,11 +81,12 @@ sed -i 's!LimitRecursion\s*10000 8!LimitRecursion 20000 8!' ${pureftpdPath}/etc/
 sed -i 's!# TLS!TLS!' ${pureftpdPath}/etc/pure-ftpd.conf
 sed -i "s!# CertFile\s*/etc/ssl/private/pure-ftpd.pem!CertFile ${pureftpdPath}/etc/pure-ftpd.pem!" ${pureftpdPath}/etc/pure-ftpd.conf
 sed -i 's!# Bind\s*127.0.0.1,21!Bind 0.0.0.0,21!' ${pureftpdPath}/etc/pure-ftpd.conf
+sed -i "s!# PIDFile\s*/var/run/pure-ftpd.pid!PIDFile ${pureftpdPath}/etc/pure-ftpd.pid!" ${pureftpdPath}/etc/pure-ftpd.conf
 touch ${pureftpdPath}/etc/pureftpd.passwd
 touch ${pureftpdPath}/etc/pureftpd.pdb
 
 openssl dhparam -out ${pureftpdPath}/etc/pure-ftpd-dhparams.pem 2048
-openssl req -x509 -nodes -days 3560 -newkey rsa:2048 -sha256 -keyout ${pureftpdPath}/etc/pure-ftpd.pem -out ${pureftpdPath}/etc/pure-ftpd.pem << EOF
+openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -sha256 -keyout ${pureftpdPath}/etc/pure-ftpd.pem -out ${pureftpdPath}/etc/pure-ftpd.pem << EOF
 CN
 Beijing
 Beijing
@@ -102,13 +103,13 @@ ln -sf ${pureftpdPath}/bin/pure-pw /usr/bin/pure-pw
 cat > /etc/systemd/system/pure-ftpd.service << EOF
 [Unit]
 Description=Pure-FTPd FTP server
-After=network.target
+After=syslog.target network.target
 
 [Service]
 Type=forking
-PIDFile=/var/run/pure-ftpd.pid
+PIDFile=${pureftpdPath}/etc/pure-ftpd.pid
 ExecStart=${pureftpdPath}/sbin/pure-ftpd ${pureftpdPath}/etc/pure-ftpd.conf
-ExecReload=/bin/kill -HUP \$MAINPID
+ExecStartPost=/bin/sleep 2
 ExecStop=/bin/kill -TERM \$MAINPID
 
 [Install]
