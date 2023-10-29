@@ -477,6 +477,9 @@ func (c *Mysql80Controller) BackupList(ctx http.Context) http.Response {
 		endIndex = len(backupList)
 	}
 	pagedBackupList := backupList[startIndex:endIndex]
+	if pagedBackupList == nil {
+		pagedBackupList = []services.BackupFile{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(backupList),

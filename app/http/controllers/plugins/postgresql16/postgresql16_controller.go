@@ -371,7 +371,28 @@ func (c *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
-	return controllers.Success(ctx, backupList)
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+	if startIndex > len(backupList) {
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []services.BackupFile{},
+		})
+	}
+	if endIndex > len(backupList) {
+		endIndex = len(backupList)
+	}
+	pagedBackupList := backupList[startIndex:endIndex]
+	if pagedBackupList == nil {
+		pagedBackupList = []services.BackupFile{}
+	}
+
+	return controllers.Success(ctx, http.Json{
+		"total": len(backupList),
+		"items": pagedBackupList,
+	})
 }
 
 // UploadBackup 上传备份
@@ -459,7 +480,7 @@ func (c *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 	}
 
 	validator, err := ctx.Request().Validate(map[string]string{
-		"name":     "required|min_len:1|max_len:255",
+		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
 	if err != nil {
@@ -469,7 +490,7 @@ func (c *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
 	}
 
-	err = c.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("name"))
+	err = c.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
 		facades.Log().Error("[PostgreSQL] 还原失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
