@@ -2,7 +2,6 @@ package toolbox
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
@@ -69,13 +68,14 @@ func (c *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 		return check
 	}
 
-	var total, size, used, free string
+	var total, used, free string
+	var size int64
 	if tools.Exists("/www/swap") {
 		s, _ := tools.FileSize("/www/swap")
-		size = strconv.Itoa(int(s / 1024 / 1024))
+		size = s / 1024 / 1024
 		total = tools.FormatBytes(float64(s))
 	} else {
-		size = "0.00 B"
+		size = 0
 		total = "0.00 B"
 	}
 
@@ -142,12 +142,25 @@ func (c *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到时区信息")
 	}
 
+	type zone struct {
+		Label string `json:"label"`
+		Value string `json:"value"`
+	}
+
 	zonesRaw := tools.Exec("LC_ALL=C timedatectl list-timezones")
 	zones := strings.Split(zonesRaw, "\n")
 
+	var zonesList []zone
+	for _, z := range zones {
+		zonesList = append(zonesList, zone{
+			Label: z,
+			Value: z,
+		})
+	}
+
 	return controllers.Success(ctx, http.Json{
-		"zone":  match[1],
-		"zones": zones,
+		"timezone":  match[1],
+		"timezones": zonesList,
 	})
 }
 

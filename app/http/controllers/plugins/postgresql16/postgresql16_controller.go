@@ -256,14 +256,21 @@ func (c *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL 已停止运行")
 	}
 
-	raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
-	databases := strings.Split(raw, "\n")
-	databases = databases[3 : len(databases)-1]
-
 	type database struct {
 		Name     string `json:"name"`
 		Owner    string `json:"owner"`
 		Encoding string `json:"encoding"`
+	}
+
+	raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+	databases := strings.Split(raw, "\n")
+	if len(databases) >= 4 {
+		databases = databases[3 : len(databases)-1]
+	} else {
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
 	}
 
 	var databaseList []database
