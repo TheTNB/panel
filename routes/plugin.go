@@ -246,7 +246,6 @@ func Plugin() {
 	facades.Route().Prefix("api/plugins/redis").Middleware(middleware.Jwt()).Group(func(route route.Router) {
 		redisController := redis.NewRedisController()
 		route.Get("status", redisController.Status)
-		route.Post("reload", redisController.Reload)
 		route.Post("start", redisController.Start)
 		route.Post("stop", redisController.Stop)
 		route.Post("restart", redisController.Restart)

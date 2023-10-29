@@ -40,26 +40,6 @@ func (c *RedisController) Status(ctx http.Context) http.Response {
 	}
 }
 
-// Reload 重载配置
-func (c *RedisController) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
-	tools.Exec("systemctl reload redis")
-	status := tools.Exec("systemctl status redis | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-	}
-
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
-}
-
 // Restart 重启服务
 func (c *RedisController) Restart(ctx http.Context) http.Response {
 	check := controllers.Check(ctx, "redis")
