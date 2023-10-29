@@ -58,6 +58,9 @@ func (c *S3fsController) List(ctx http.Context) http.Response {
 		endIndex = len(s3fsList)
 	}
 	pagedS3fsList := s3fsList[startIndex:endIndex]
+	if pagedS3fsList == nil {
+		pagedS3fsList = []s3fs{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(s3fsList),
