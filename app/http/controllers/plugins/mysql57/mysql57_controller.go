@@ -311,7 +311,7 @@ func (c *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
 	}
 
-	rootPassword := ctx.Request().Input(models.SettingKeyMysqlRootPassword)
+	rootPassword := ctx.Request().Input("password")
 	if len(rootPassword) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码不能为空")
 	}
