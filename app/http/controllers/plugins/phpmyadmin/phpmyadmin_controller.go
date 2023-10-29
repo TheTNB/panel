@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
 	"panel/pkg/tools"
@@ -46,8 +47,8 @@ func (c *PhpMyAdminController) Info(ctx http.Context) http.Response {
 	}
 
 	return controllers.Success(ctx, http.Json{
-		"phpmyadmin": phpmyadmin,
-		"port":       match[1],
+		"path": phpmyadmin,
+		"port": cast.ToInt(match[1]),
 	})
 }
 
