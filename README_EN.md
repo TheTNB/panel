@@ -19,7 +19,7 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ 
 
 ## Advantages
 
-1. **Extremely low usage:** Deploying the panel + LNMP environment under Debian 12, the memory usage is less than 400 MB, far ahead of other panels using containerization.
+1. **Extremely low usage:** Deploying the panel + LNMP environment under Debian 12, the memory usage is less than 500 MB, far ahead of other panels using containerization.
 2. **Efficient operation and maintenance:** The panel UI interface is simple and easy to operate, and you can quickly deploy various environments and adjust application settings without complicated configuration.
 3. **Offline operation:** The panel can run without relying on any external services. You can even stop the panel process after deployment is complete, and it will not affect the deployed services.
 4. **Tested by time:** We have been using it in production environment since 2022, and it has been running stably for 1 year without any accidents.
