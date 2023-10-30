@@ -29,7 +29,7 @@ systemctl disable fail2ban
 if [ "${OS}" == "centos" ]; then
     dnf remove -y fail2ban
 elif [ "${OS}" == "debian" ]; then
-    apt-get install -y fail2ban
+    apt-get purge -y fail2ban
 else
     echo -e $HR
     echo "错误：不支持的操作系统"
