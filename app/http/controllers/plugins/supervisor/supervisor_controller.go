@@ -210,6 +210,9 @@ func (c *SupervisorController) Processes(ctx http.Context) http.Response {
 		endIndex = len(processList)
 	}
 	pagedProcessList := processList[startIndex:endIndex]
+	if pagedProcessList == nil {
+		pagedProcessList = []process{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(processList),
