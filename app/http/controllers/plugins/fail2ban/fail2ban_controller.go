@@ -215,7 +215,7 @@ func (c *Fail2banController) Add(ctx http.Context) http.Response {
 		"bantime":      "required",
 		"website_name": "required_if:type,website",
 		"website_mode": "required_if:type,website",
-		"website_path": "required_if:type,website",
+		"website_path": "required_if:website_mode,path",
 	})
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -234,7 +234,7 @@ func (c *Fail2banController) Add(ctx http.Context) http.Response {
 	jailWebsitePath := ctx.Request().Input("website_path")
 
 	raw := tools.Read("/etc/fail2ban/jail.local")
-	if strings.Contains(raw, "["+jailName+"]") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailWebsiteMode == "path") {
+	if (strings.Contains(raw, "["+jailName+"]") && jailType == "service") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailType == "website" && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailType == "website" && jailWebsiteMode == "path") {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
 	}
 
