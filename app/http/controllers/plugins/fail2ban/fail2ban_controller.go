@@ -385,6 +385,9 @@ func (c *Fail2banController) BanList(ctx http.Context) http.Response {
 			})
 		}
 	}
+	if list == nil {
+		list = []map[string]string{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"currently_ban": currentlyBan,
