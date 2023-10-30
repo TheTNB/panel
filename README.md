@@ -6,17 +6,24 @@
   <a href="https://goreportcard.com/report/github.com/haozi-team/panel"><img src="https://goreportcard.com/badge/github.com/haozi-team/panel"></a>
   <a href="https://codecov.io/gh/haozi-team/panel"><img src="https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
   <a href="https://img.shields.io/github/license/haozi-team/panel"><img src="https://img.shields.io/github/license/haozi-team/panel"></a>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
 <p align="center">
 [简体中文] | [<a href="README_EN.md">English</a>]
 </p>
 
-耗子 Linux 面板是针对我们自身业务需要使用 Golang 开发的轻量 Linux 服务器运维管理面板，以 GNU Affero General Public License v3.0 开源。
-
-免责声明：严禁使用耗子 Linux 面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
+耗子 Linux 面板是使用 Golang + Vue 开发的轻量 Linux 服务器运维管理面板，以 GNU Affero General Public License v3.0 开源。
 
 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ频道：[pd.qq.com/s/fyol46wfy](https://pd.qq.com/s/fyol46wfy)
+
+## 优势
+
+1. 极低资源占用: 在 Debian 12 下部署面板 + LNMP 环境，内存占用不到 400 MB，遥遥领先于使用容器化的其他面板。
+2. 高效运维: 面板 UI 界面简洁，操作简单，无需繁琐的配置，即可快速部署各类环境、调整应用设置。
+3. 支持离线运行: 面板运行可不依赖任何外部服务，你甚至可以在部署完成后停止面板进程，不会对已部署服务造成任何影响。
+4. 久经考验: 我们生产环境自 2022 年即开始使用，已稳定运行 1 年无事故。
+5. 开源开放: 面板开源，你可以自由修改、审计面板源码，安全性有保障。
 
 ## UI 截图
 
@@ -125,3 +132,7 @@ panel
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date" />
   </picture>
 </a>
+
+## 免责声明
+
+严禁使用耗子 Linux 面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
