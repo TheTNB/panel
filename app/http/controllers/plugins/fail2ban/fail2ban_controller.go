@@ -213,6 +213,7 @@ func (c *Fail2banController) Add(ctx http.Context) http.Response {
 		"maxretry":     "required",
 		"findtime":     "required",
 		"bantime":      "required",
+		"website_name": "required_if:type,website",
 		"website_mode": "required_if:type,website",
 		"website_path": "required_if:type,website",
 	})
@@ -228,18 +229,19 @@ func (c *Fail2banController) Add(ctx http.Context) http.Response {
 	jailMaxRetry := ctx.Request().Input("maxretry")
 	jailFindTime := ctx.Request().Input("findtime")
 	jailBanTime := ctx.Request().Input("bantime")
+	jailWebsiteName := ctx.Request().Input("website_name")
 	jailWebsiteMode := ctx.Request().Input("website_mode")
 	jailWebsitePath := ctx.Request().Input("website_path")
 
 	raw := tools.Read("/etc/fail2ban/jail.local")
-	if strings.Contains(raw, "["+jailName+"]") || (strings.Contains(raw, "["+jailName+"]"+"-cc") && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailName+"]"+"-path") && jailWebsiteMode == "path") {
+	if strings.Contains(raw, "["+jailName+"]") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailWebsiteMode == "path") {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
 	}
 
 	switch jailType {
 	case "website":
 		var website models.Website
-		err := facades.Orm().Query().Where("name", jailName).FirstOrFail(&website)
+		err := facades.Orm().Query().Where("name", jailWebsiteName).FirstOrFail(&website)
 		if err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "网站不存在")
 		}
@@ -257,17 +259,17 @@ func (c *Fail2banController) Add(ctx http.Context) http.Response {
 		}
 
 		rule := `
-# ` + jailName + `-` + jailWebsiteMode + `-START
-[` + jailName + `-` + jailWebsiteMode + `]
+# ` + jailWebsiteName + `-` + jailWebsiteMode + `-START
+[` + jailWebsiteName + `-` + jailWebsiteMode + `]
 enabled = true
-filter = haozi-` + jailName + `-` + jailWebsiteMode + `
+filter = haozi-` + jailWebsiteName + `-` + jailWebsiteMode + `
 port = ` + ports + `
 maxretry = ` + jailMaxRetry + `
 findtime = ` + jailFindTime + `
 bantime = ` + jailBanTime + `
 action = %(action_mwl)s
 logpath = /www/wwwlogs/` + website.Name + `.log
-# ` + jailName + `-` + jailWebsiteMode + `-END
+# ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
 		tools.Write("/etc/fail2ban/jail.local", raw, 0644)
@@ -286,7 +288,7 @@ failregex = ^<HOST>\s-.*\s` + jailWebsitePath + `.*HTTP/.*$
 ignoreregex =
 `
 		}
-		tools.Write("/etc/fail2ban/filter.d/haozi-"+jailName+"-"+jailWebsiteMode+".conf", filter, 0644)
+		tools.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644)
 
 	case "service":
 		var logPath string
