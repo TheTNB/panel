@@ -190,6 +190,9 @@ func (c *Fail2banController) List(ctx http.Context) http.Response {
 		endIndex = len(jails)
 	}
 	pagedJails := jails[startIndex:endIndex]
+	if pagedJails == nil {
+		pagedJails = []Jail{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(jails),
@@ -363,7 +366,7 @@ func (c *Fail2banController) BanList(ctx http.Context) http.Response {
 		return check
 	}
 
-	name := ctx.Request().Query("name")
+	name := ctx.Request().Input("name")
 	if len(name) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
@@ -384,9 +387,9 @@ func (c *Fail2banController) BanList(ctx http.Context) http.Response {
 	}
 
 	return controllers.Success(ctx, http.Json{
-		"currentlyBan": currentlyBan,
-		"totalBan":     totalBan,
-		"bannedIpList": list,
+		"currently_ban": currentlyBan,
+		"total_ban":     totalBan,
+		"baned_list":    list,
 	})
 }
 
