@@ -36,7 +36,7 @@ func (r *TaskController) Status(ctx http.Context) http.Response {
 func (r *TaskController) List(ctx http.Context) http.Response {
 	var tasks []models.Task
 	var total int64
-	err := facades.Orm().Query().Paginate(ctx.Request().QueryInt("page", 1), ctx.Request().QueryInt("limit", 10), &tasks, &total)
+	err := facades.Orm().Query().Order("id desc").Paginate(ctx.Request().QueryInt("page", 1), ctx.Request().QueryInt("limit", 10), &tasks, &total)
 	if err != nil {
 		facades.Log().With(map[string]any{
 			"error": err.Error(),
