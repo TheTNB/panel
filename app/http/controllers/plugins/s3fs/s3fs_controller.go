@@ -3,9 +3,9 @@ package s3fs
 import (
 	"strings"
 
-	"github.com/bytedance/sonic"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
+	"github.com/goravel/framework/support/json"
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
@@ -41,7 +41,7 @@ func (c *S3fsController) List(ctx http.Context) http.Response {
 	limit := ctx.Request().QueryInt("limit", 10)
 
 	var s3fsList []s3fs
-	err := sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
+	err := json.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 S3fs 挂载失败")
 	}
@@ -109,7 +109,7 @@ func (c *S3fsController) Add(ctx http.Context) http.Response {
 	}
 
 	var s3fsList []s3fs
-	err = sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
+	err = json.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
@@ -141,11 +141,11 @@ func (c *S3fsController) Add(ctx http.Context) http.Response {
 		Bucket: bucket,
 		Url:    url,
 	})
-	json, err := sonic.MarshalString(s3fsList)
+	encoded, err := json.MarshalString(s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
 	}
-	err = c.setting.Set("s3fs", json)
+	err = c.setting.Set("s3fs", encoded)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "添加 S3fs 挂载失败")
 	}
@@ -166,7 +166,7 @@ func (c *S3fsController) Delete(ctx http.Context) http.Response {
 	}
 
 	var s3fsList []s3fs
-	err := sonic.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
+	err := json.UnmarshalString(c.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
@@ -197,11 +197,11 @@ func (c *S3fsController) Delete(ctx http.Context) http.Response {
 			newS3fsList = append(newS3fsList, s)
 		}
 	}
-	json, err := sonic.MarshalString(newS3fsList)
+	encoded, err := json.MarshalString(newS3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
 	}
-	err = c.setting.Set("s3fs", json)
+	err = c.setting.Set("s3fs", encoded)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "删除 S3fs 挂载失败")
 	}
