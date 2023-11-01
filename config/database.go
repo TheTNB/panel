@@ -14,7 +14,7 @@ func init() {
 		"connections": map[string]any{
 			"panel": map[string]any{
 				"driver":   "sqlite",
-				"database": "/www/panel/database/panel.db",
+				"database": "database/panel.db",
 				"prefix":   "",
 				"singular": false, // Table name is singular
 			},
