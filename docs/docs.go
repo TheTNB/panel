@@ -831,6 +831,10 @@ const docTemplate = `{
         "models.Cert": {
             "type": "object",
             "properties": {
+                "auto_renew": {
+                    "description": "自动续签",
+                    "type": "boolean"
+                },
                 "cert": {
                     "description": "证书内容",
                     "type": "string"
@@ -841,13 +845,6 @@ const docTemplate = `{
                 },
                 "created_at": {
                     "type": "string"
-                },
-                "cron": {
-                    "$ref": "#/definitions/models.Cron"
-                },
-                "cron_id": {
-                    "description": "关联的计划任务 ID",
-                    "type": "integer"
                 },
                 "dns": {
                     "$ref": "#/definitions/models.CertDNS"
@@ -958,38 +955,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Cron": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "log": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "shell": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "boolean"
-                },
-                "time": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
         "models.Website": {
             "type": "object",
             "properties": {
@@ -1025,6 +990,9 @@ const docTemplate = `{
         "requests.CertAdd": {
             "type": "object",
             "properties": {
+                "auto_renew": {
+                    "type": "boolean"
+                },
                 "dns_id": {
                     "type": "integer"
                 },

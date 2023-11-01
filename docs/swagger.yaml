@@ -41,6 +41,9 @@ definitions:
     type: object
   models.Cert:
     properties:
+      auto_renew:
+        description: 自动续签
+        type: boolean
       cert:
         description: 证书内容
         type: string
@@ -49,11 +52,6 @@ definitions:
         type: string
       created_at:
         type: string
-      cron:
-        $ref: '#/definitions/models.Cron'
-      cron_id:
-        description: 关联的计划任务 ID
-        type: integer
       dns:
         $ref: '#/definitions/models.CertDNS'
       dns_id:
@@ -128,27 +126,6 @@ definitions:
       updated_at:
         type: string
     type: object
-  models.Cron:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: integer
-      log:
-        type: string
-      name:
-        type: string
-      shell:
-        type: string
-      status:
-        type: boolean
-      time:
-        type: string
-      type:
-        type: string
-      updated_at:
-        type: string
-    type: object
   models.Website:
     properties:
       created_at:
@@ -172,6 +149,8 @@ definitions:
     type: object
   requests.CertAdd:
     properties:
+      auto_renew:
+        type: boolean
       dns_id:
         type: integer
       domains:

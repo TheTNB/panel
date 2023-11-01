@@ -7,11 +7,11 @@ import (
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/goravel/framework/facades"
-	"panel/pkg/tools"
 
 	requests "panel/app/http/requests/cert"
 	"panel/app/models"
 	"panel/pkg/acme"
+	"panel/pkg/tools"
 )
 
 type Cert interface {
@@ -127,11 +127,11 @@ func (s *CertImpl) CertAdd(request requests.CertAdd) error {
 	var cert models.Cert
 	cert.Type = request.Type
 	cert.Domains = request.Domains
+	cert.AutoRenew = request.AutoRenew
 	cert.UserID = request.UserID
 
 	if request.DNSID != nil {
 		cert.DNSID = request.DNSID
-		// TODO 生成计划任务
 	}
 
 	return facades.Orm().Query().Create(&cert)
@@ -143,10 +143,6 @@ func (s *CertImpl) CertDelete(ID uint) error {
 	err := facades.Orm().Query().Where("id = ?", ID).First(&cert)
 	if err != nil {
 		return err
-	}
-
-	if cert.CronID != nil {
-		// TODO 删除计划任务
 	}
 
 	_, err = facades.Orm().Query().Delete(&models.Cert{}, ID)

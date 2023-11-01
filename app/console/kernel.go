@@ -14,6 +14,7 @@ type Kernel struct {
 func (kernel *Kernel) Schedule() []schedule.Event {
 	return []schedule.Event{
 		facades.Schedule().Command("panel:monitoring").EveryMinute().SkipIfStillRunning(),
+		facades.Schedule().Command("panel:cert-renew").Daily().SkipIfStillRunning(),
 	}
 }
 
@@ -21,5 +22,6 @@ func (kernel *Kernel) Commands() []console.Command {
 	return []console.Command{
 		&commands.Panel{},
 		&commands.Monitoring{},
+		&commands.CertRenew{},
 	}
 }
