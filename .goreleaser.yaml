@@ -25,6 +25,7 @@ archives:
     strip_parent_binary_folder: true
     files:
       - LICENSE
+      - docs/*
       - public/*
       - storage/*
       - database/*

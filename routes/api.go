@@ -4,6 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+	httpswagger "github.com/swaggo/http-swagger"
 
 	"panel/app/http/controllers"
 	"panel/app/http/middleware"
@@ -107,6 +108,17 @@ func Api() {
 			r.Get("list", settingController.List)
 			r.Post("save", settingController.Save)
 		})
+	})
+
+	facades.Route().StaticFile("/swagger.json", "docs/swagger.json")
+	facades.Route().Get("/swagger", func(ctx http.Context) http.Response {
+		return ctx.Response().Redirect(http.StatusMovedPermanently, "/swagger/")
+	})
+	facades.Route().Get("/swagger/*any", func(ctx http.Context) http.Response {
+		handler := httpswagger.Handler(httpswagger.URL("/swagger.json"))
+		handler(ctx.Response().Writer(), ctx.Request().Origin())
+
+		return nil
 	})
 
 	facades.Route().Fallback(func(ctx http.Context) http.Response {

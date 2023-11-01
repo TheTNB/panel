@@ -9,11 +9,16 @@ import (
 	"panel/app/services"
 )
 
-func Success(ctx http.Context, data any) http.Response {
+func Success(ctx http.Context, data ...any) http.Response {
+	var d any
+	if len(data) > 0 {
+		d = data[0]
+	}
+
 	return ctx.Response().Success().Json(http.Json{
 		"code":    0,
 		"message": "success",
-		"data":    data,
+		"data":    d,
 	})
 }
 
