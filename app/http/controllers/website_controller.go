@@ -36,7 +36,7 @@ func (c *WebsiteController) List(ctx http.Context) http.Response {
 	total, websites, err := c.website.List(page, limit)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站列表失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{
@@ -83,7 +83,7 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 	newSite, err := c.website.Add(website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 添加网站失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, newSite)
@@ -131,12 +131,12 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 
 	if !tools.Write("/www/server/openresty/html/index.html", index, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if !tools.Write("/www/server/openresty/html/stop.html", stop, 0644) {
 		facades.Log().Error("[面板][WebsiteController] 保存默认配置失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -156,7 +156,7 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	config, err := c.website.GetConfig(id)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, config)
@@ -378,7 +378,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	err = facades.Orm().Query().Save(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644)
@@ -403,7 +403,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	tools.Remove("/www/wwwlogs/" + website.Name + ".log")
@@ -422,14 +422,14 @@ func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Where("id", id).Get(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	website.Remark = ctx.Request().Input("remark")
 	err = facades.Orm().Query().Save(&website)
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站备注失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -440,7 +440,7 @@ func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 	backupList, err := c.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站备份列表失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, backupList)
@@ -550,14 +550,14 @@ func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", id).Get(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	website.Status = true
 	website.Ssl = false
 	if err := facades.Orm().Query().Save(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	raw := fmt.Sprintf(`
@@ -640,13 +640,13 @@ func (c *WebsiteController) Status(ctx http.Context) http.Response {
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", id).Get(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 获取网站信息失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	website.Status = ctx.Request().InputBool("status")
 	if err := facades.Orm().Query().Save(&website); err != nil {
 		facades.Log().Error("[面板][WebsiteController] 保存网站配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")

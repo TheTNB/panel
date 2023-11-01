@@ -67,7 +67,7 @@ func Check(ctx http.Context, slug string) http.Response {
 	installedPlugins, err := services.NewPluginImpl().AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][插件] 获取已安装插件失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if installedPlugin.Version != plugin.Version || installedPlugin.Slug != plugin.Slug {

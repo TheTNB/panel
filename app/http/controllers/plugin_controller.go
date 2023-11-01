@@ -27,7 +27,7 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 	plugins := r.plugin.All()
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	var lock sync.RWMutex
@@ -101,7 +101,7 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if installedPlugin.ID != 0 {
@@ -142,7 +142,7 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	r.task.Process(task.ID)
@@ -157,7 +157,7 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if installedPlugin.ID == 0 {
@@ -198,7 +198,7 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	r.task.Process(task.ID)
@@ -213,7 +213,7 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
 		facades.Log().Error("[面板][PluginController] 获取已安装插件失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if installedPlugin.ID == 0 {
@@ -254,7 +254,7 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Error("[面板][PluginController] 创建任务失败: " + err.Error())
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	r.task.Process(task.ID)
@@ -269,7 +269,7 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 	var plugin models.Plugin
 	if err := facades.Orm().Query().Where("slug", slug).First(&plugin); err != nil {
 		facades.Log().Error("[面板][PluginController] 查询插件失败: " + err.Error())
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	if plugin.ID == 0 {
 		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
@@ -278,7 +278,7 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 	plugin.Show = show
 	if err := facades.Orm().Query().Save(&plugin); err != nil {
 		facades.Log().Error("[面板][PluginController] 更新插件失败: " + err.Error())
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, "操作成功")

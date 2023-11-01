@@ -35,7 +35,7 @@ func (c *CronController) List(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Paginate(page, limit, &crons, &total)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 查询计划任务列表失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{
@@ -121,7 +121,7 @@ panel cutoff ${name} ${save} 2>&1
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
 	if !tools.Write(shellDir+shellFile+".sh", shell, 0700) {
 		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	tools.Exec("dos2unix " + shellDir + shellFile + ".sh")
 
@@ -136,7 +136,7 @@ panel cutoff ${name} ${save} 2>&1
 	err = facades.Orm().Query().Create(&cron)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 创建计划任务失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	c.cron.AddToSystem(cron)
@@ -191,12 +191,12 @@ func (c *CronController) Update(ctx http.Context) http.Response {
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 更新计划任务失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if !tools.Write(cron.Shell, ctx.Request().Input("script"), 0644) {
 		facades.Log().Error("[面板][CronController] 更新计划任务脚本失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	tools.Exec("dos2unix " + cron.Shell)
 
@@ -222,7 +222,7 @@ func (c *CronController) Delete(ctx http.Context) http.Response {
 	_, err = facades.Orm().Query().Delete(&cron)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 删除计划任务失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -250,7 +250,7 @@ func (c *CronController) Status(ctx http.Context) http.Response {
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
 		facades.Log().Error("[面板][CronController] 更新计划任务状态失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	c.cron.DeleteFromSystem(cron)

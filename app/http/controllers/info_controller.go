@@ -39,7 +39,7 @@ func (c *InfoController) Name(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Where("key", "name").First(&setting)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 查询面板名称失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{
@@ -53,7 +53,7 @@ func (c *InfoController) HomePlugins(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Where("show", 1).Find(&plugins)
 	if err != nil {
 		facades.Log().Error("[面板][InfoController] 查询首页插件失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	type pluginsData struct {
@@ -199,7 +199,7 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 	var php []models.Plugin
 	err := facades.Orm().Query().Where("slug like ?", "php%").Find(&php)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	var mysql models.Plugin

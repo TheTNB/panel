@@ -27,7 +27,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Get(&settings)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 查询设置列表失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	type data struct {
@@ -51,7 +51,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 获取用户失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	result.Username = user.Username
 	result.Email = user.Email
@@ -79,7 +79,7 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	err := r.setting.Set(models.SettingKeyName, name)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	oldPort := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if oldPort != port {
@@ -91,7 +91,7 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	err = r.setting.Set(models.SettingKeyBackupPath, backupPath)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	if !tools.Exists(websitePath) {
 		tools.Mkdir(websitePath, 0755)
@@ -100,19 +100,19 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	err = r.setting.Set(models.SettingKeyWebsitePath, websitePath)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	err = r.setting.Set(models.SettingKeyEntrance, entrance)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 获取用户失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if len(username) > 0 {
@@ -125,14 +125,14 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
 			facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-			return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+			return ErrorSystem(ctx)
 		}
 		user.Password = hash
 	}
 
 	if err = facades.Orm().Query().Save(&user); err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)

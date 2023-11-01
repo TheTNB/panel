@@ -69,22 +69,22 @@ func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
 	err = r.setting.Set(models.SettingKeySshHost, host)
 	if err != nil {
 		facades.Log().Error("[面板][SSH] 更新配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	err = r.setting.Set(models.SettingKeySshPort, port)
 	if err != nil {
 		facades.Log().Error("[面板][SSH] 更新配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	err = r.setting.Set(models.SettingKeySshUser, user)
 	if err != nil {
 		facades.Log().Error("[面板][SSH] 更新配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	err = r.setting.Set(models.SettingKeySshPassword, password)
 	if err != nil {
 		facades.Log().Error("[面板][SSH] 更新配置失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -104,7 +104,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	ws, err := upGrader.Upgrade(ctx.Response().Writer(), ctx.Request().Origin(), nil)
 	if err != nil {
 		facades.Log().Error("[面板][SSH] 建立连接失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	defer ws.Close()
 
@@ -117,7 +117,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	defer client.Close()
 
@@ -125,7 +125,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 	defer turn.Close()
 

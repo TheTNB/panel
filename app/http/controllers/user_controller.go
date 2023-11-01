@@ -80,7 +80,7 @@ func (r *UserController) Info(ctx http.Context) http.Response {
 		facades.Log().With(map[string]any{
 			"error": err.Error(),
 		}).Error("[面板][UserController] 查询用户信息失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{

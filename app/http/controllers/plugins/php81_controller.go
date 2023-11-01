@@ -260,7 +260,7 @@ func (r *Php81Controller) InstallExtension(ctx http.Context) http.Response {
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + r.version + "] 创建安装拓展任务失败：" + err.Error())
-				return controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
+				return controllers.ErrorSystem(ctx)
 			}
 
 			r.task.Process(task.ID)
@@ -297,7 +297,7 @@ func (r *Php81Controller) UninstallExtension(ctx http.Context) http.Response {
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Error("[PHP-" + r.version + "] 创建卸载拓展任务失败：" + err.Error())
-				return controllers.Error(ctx, http.StatusInternalServerError, "系统内部错误")
+				return controllers.ErrorSystem(ctx)
 			}
 
 			r.task.Process(task.ID)

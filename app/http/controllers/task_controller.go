@@ -41,7 +41,7 @@ func (r *TaskController) List(ctx http.Context) http.Response {
 		facades.Log().With(map[string]any{
 			"error": err.Error(),
 		}).Error("[面板][TaskController] 查询任务列表失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{
@@ -59,7 +59,7 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
 		}).Error("[面板][TaskController] 查询任务失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	log := tools.Exec("tail -n 1000 " + task.Log)
@@ -76,7 +76,7 @@ func (r *TaskController) Delete(ctx http.Context) http.Response {
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
 		}).Error("[面板][TaskController] 删除任务失败")
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)

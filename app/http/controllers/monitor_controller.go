@@ -27,7 +27,7 @@ func (r *MonitorController) Switch(ctx http.Context) http.Response {
 	err := r.setting.Set(models.SettingKeyMonitor, cast.ToString(value))
 	if err != nil {
 		facades.Log().Error("[面板][MonitorController] 更新监控开关失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -39,7 +39,7 @@ func (r *MonitorController) SaveDays(ctx http.Context) http.Response {
 	err := r.setting.Set(models.SettingKeyMonitorDays, days)
 	if err != nil {
 		facades.Log().Error("[面板][MonitorController] 更新监控天数失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -61,7 +61,7 @@ func (r *MonitorController) Clear(ctx http.Context) http.Response {
 	_, err := facades.Orm().Query().Where("1 = 1").Delete(&models.Monitor{})
 	if err != nil {
 		facades.Log().Error("[面板][MonitorController] 清空监控数据失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, nil)
@@ -78,7 +78,7 @@ func (r *MonitorController) List(ctx http.Context) http.Response {
 	err := facades.Orm().Query().Where("created_at >= ?", startTime.ToDateTimeString()).Where("created_at <= ?", endTime.ToDateTimeString()).Get(&monitors)
 	if err != nil {
 		facades.Log().Error("[面板][MonitorController] 查询监控数据失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		return ErrorSystem(ctx)
 	}
 
 	if len(monitors) == 0 {
