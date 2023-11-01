@@ -24,6 +24,13 @@ func Error(ctx http.Context, code int, message any) http.Response {
 	})
 }
 
+func SystemError(ctx http.Context) http.Response {
+	return ctx.Response().Json(http.StatusOK, http.Json{
+		"code":    http.StatusInternalServerError,
+		"message": "系统内部错误",
+	})
+}
+
 // Check 检查插件是否可用
 func Check(ctx http.Context, slug string) http.Response {
 	plugin := services.NewPluginImpl().GetBySlug(slug)
