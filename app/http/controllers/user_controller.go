@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/http/requests"
+	"panel/app/http/requests/user"
 	"panel/app/models"
 )
 
@@ -18,22 +18,31 @@ func NewUserController() *UserController {
 	}
 }
 
-// Login 用户登录
+// Login
+// @Summary 用户登录
+// @Description 通过用户名和密码获取访问令牌
+// @Tags 用户
+// @Accept json
+// @Produce json
+// @Param data body requests.Login true "登录信息"
+// @Success 200 {object} SuccessResponse
+// @Failure 403 {object} ErrorResponse "用户名或密码错误"
+// @Failure 500 {object} ErrorResponse "系统内部错误
+// @Router /panel/user/login [post]
 func (r *UserController) Login(ctx http.Context) http.Response {
-	var loginRequest requests.LoginRequest
-	errors, err := ctx.Request().ValidateRequest(&loginRequest)
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if errors != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, errors.One())
+	var loginRequest requests.Login
+	sanitize := Sanitize(ctx, &loginRequest)
+	if sanitize != nil {
+		return sanitize
 	}
 
 	var user models.User
-	err = facades.Orm().Query().Where("username", loginRequest.Username).First(&user)
+	err := facades.Orm().Query().Where("username", loginRequest.Username).First(&user)
 	if err != nil {
-		facades.Log().Error("[面板][UserController] 查询用户失败 ", err)
-		return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "用户").Error("查询用户失败")
+		return ErrorSystem(ctx)
 	}
 
 	if user.ID == 0 || !facades.Hash().Check(loginRequest.Password, user.Password) {
@@ -43,15 +52,19 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	if facades.Hash().NeedsRehash(user.Password) {
 		user.Password, err = facades.Hash().Make(loginRequest.Password)
 		if err != nil {
-			facades.Log().Error("[面板][UserController] 更新密码失败 ", err)
-			return Error(ctx, http.StatusInternalServerError, "系统内部错误")
+			facades.Log().Request(ctx.Request()).With(map[string]any{
+				"error": err.Error(),
+			}).Tags("面板", "用户").Error("更新密码失败")
+			return ErrorSystem(ctx)
 		}
 	}
 
 	token, loginErr := facades.Auth().LoginUsingID(ctx, user.ID)
 	if loginErr != nil {
-		facades.Log().Error("[面板][UserController] 登录失败 ", loginErr)
-		return Error(ctx, http.StatusInternalServerError, loginErr.Error())
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "用户").Error("登录失败")
+		return ErrorSystem(ctx)
 	}
 
 	return Success(ctx, http.Json{

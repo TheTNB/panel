@@ -11,7 +11,6 @@ import (
 )
 
 func Api() {
-	facades.Route().StaticFile("favicon.ico", "public/favicon.ico")
 	facades.Route().Prefix("api/panel").Group(func(r route.Router) {
 		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
@@ -56,6 +55,25 @@ func Api() {
 			r.Post("deleteBackup/{id}", websiteController.DeleteBackup)
 			r.Post("resetConfig/{id}", websiteController.ResetConfig)
 			r.Post("status/{id}", websiteController.Status)
+		})
+		r.Prefix("cert").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+			certController := controllers.NewCertController()
+			r.Get("caProviders", certController.CAProviders)
+			r.Get("dnsProviders", certController.DNSProviders)
+			r.Get("algorithms", certController.Algorithms)
+			r.Get("users", certController.UserList)
+			r.Post("users", certController.UserAdd)
+			r.Delete("users/{id}", certController.UserDelete)
+			r.Get("dns", certController.DNSList)
+			r.Post("dns", certController.DNSAdd)
+			r.Delete("dns/{id}", certController.DNSDelete)
+			r.Get("certs", certController.CertList)
+			r.Post("certs", certController.CertAdd)
+			r.Delete("certs/{id}", certController.CertDelete)
+			// r.Get("certs/{id}", certController.CertInfo)
+			r.Post("obtain", certController.Obtain)
+			r.Post("renew", certController.Renew)
+			r.Post("manualDNS", certController.ManualDNS)
 		})
 		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			pluginController := controllers.NewPluginController()
@@ -110,6 +128,10 @@ func Api() {
 		})
 	})
 
+	// 静态文件
+	facades.Route().StaticFile("favicon.ico", "public/favicon.ico")
+
+	// 文档
 	facades.Route().StaticFile("/swagger.json", "docs/swagger.json")
 	facades.Route().Get("/swagger", func(ctx http.Context) http.Response {
 		return ctx.Response().Redirect(http.StatusMovedPermanently, "/swagger/")
@@ -121,6 +143,7 @@ func Api() {
 		return nil
 	})
 
+	// 404
 	facades.Route().Fallback(func(ctx http.Context) http.Response {
 		return ctx.Response().Data(http.StatusNotFound, "text/html; charset=utf-8", []byte(`<html>
 <head><title>404 Not Found</title></head>

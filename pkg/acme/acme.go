@@ -2,10 +2,10 @@ package acme
 
 import (
 	"crypto"
+	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/lego"
@@ -19,6 +19,8 @@ const (
 	CABuypass    = "https://api.buypass.com/acme/directory"
 	CASSLcom     = "https://acme.ssl.com/sslcom-dv-rsa"
 )
+
+type KeyType = certcrypto.KeyType
 
 const (
 	KeyEC256   = certcrypto.EC256
@@ -50,14 +52,32 @@ func (u *User) GetPrivateKey() crypto.PrivateKey {
 	return u.Key
 }
 
-func GetPrivateKey(priKey crypto.PrivateKey) []byte {
-	rsaKey := priKey.(*rsa.PrivateKey)
-	marshal := x509.MarshalPKCS1PrivateKey(rsaKey)
-	block := &pem.Block{
-		Type:  "privateKey",
-		Bytes: marshal,
+func GetPrivateKey(priKey crypto.PrivateKey, keyType KeyType) ([]byte, error) {
+	var marshal []byte
+	var block *pem.Block
+	var err error
+
+	switch keyType {
+	case KeyEC256, KeyEC384:
+		key := priKey.(*ecdsa.PrivateKey)
+		marshal, err = x509.MarshalECPrivateKey(key)
+		if err != nil {
+			return nil, err
+		}
+		block = &pem.Block{
+			Type:  "PRIVATE KEY",
+			Bytes: marshal,
+		}
+	case KeyRSA2048, KeyRSA3072, KeyRSA4096:
+		key := priKey.(*rsa.PrivateKey)
+		marshal = x509.MarshalPKCS1PrivateKey(key)
+		block = &pem.Block{
+			Type:  "privateKey",
+			Bytes: marshal,
+		}
 	}
-	return pem.EncodeToMemory(block)
+
+	return pem.EncodeToMemory(block), nil
 }
 
 func NewRegisterClient(email string, CA string, keyType certcrypto.KeyType) (*Client, error) {
@@ -125,12 +145,7 @@ func NewRegisterWithExternalAccountBindingClient(email, kid, hmac, CA string, ke
 }
 
 func NewPrivateKeyClient(email string, privateKey string, CA string, keyType certcrypto.KeyType) (*Client, error) {
-	block, _ := pem.Decode([]byte(privateKey))
-	if block == nil {
-		return nil, errors.New("无法解析私钥")
-	}
-
-	key, err := certcrypto.ParsePEMPrivateKey(block.Bytes)
+	key, err := certcrypto.ParsePEMPrivateKey([]byte(privateKey))
 	if err != nil {
 		return nil, err
 	}

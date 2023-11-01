@@ -3,6 +3,7 @@ package rules
 import (
 	"github.com/goravel/framework/contracts/validation"
 	"github.com/goravel/framework/facades"
+	"github.com/spf13/cast"
 )
 
 type NotExists struct {
@@ -21,8 +22,8 @@ func (receiver *NotExists) Passes(_ validation.Data, val any, options ...any) bo
 	// 第二个参数，字段名称，如 id
 	fieldName := options[1].(string)
 	// 用户请求过来的数据
-	requestValue, ok := val.(string)
-	if !ok {
+	requestValue, err := cast.ToStringE(val)
+	if err != nil {
 		return false
 	}
 
@@ -40,7 +41,7 @@ func (receiver *NotExists) Passes(_ validation.Data, val any, options ...any) bo
 			query = query.OrWhere(options[i].(string), requestValue)
 		}
 	}
-	err := query.Count(&count)
+	err = query.Count(&count)
 	if err != nil {
 		return false
 	}

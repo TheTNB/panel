@@ -5,7 +5,6 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/models"
-	"panel/app/plugins/certbot"
 	"panel/app/plugins/fail2ban"
 	"panel/app/plugins/mysql57"
 	"panel/app/plugins/mysql80"
@@ -196,17 +195,6 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     redis.Install,
 		Uninstall:   redis.Uninstall,
 		Update:      redis.Update,
-	})
-	p = append(p, PanelPlugin{
-		Name:        certbot.Name,
-		Description: certbot.Description,
-		Slug:        certbot.Slug,
-		Version:     certbot.Version,
-		Requires:    certbot.Requires,
-		Excludes:    certbot.Excludes,
-		Install:     certbot.Install,
-		Uninstall:   certbot.Uninstall,
-		Update:      certbot.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        s3fs.Name,

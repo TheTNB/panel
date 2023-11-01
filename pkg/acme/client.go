@@ -24,18 +24,18 @@ type Client struct {
 type DnsType string
 
 const (
-	DnsPod     DnsType = "DnsPod"
-	AliYun     DnsType = "AliYun"
-	CloudFlare DnsType = "CloudFlare"
+	DnsPod     DnsType = "dnspod"
+	AliYun     DnsType = "aliyun"
+	CloudFlare DnsType = "cloudflare"
 )
 
 type DNSParam struct {
 	ID        string `json:"id"`
 	Token     string `json:"token"`
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
+	AccessKey string `json:"access_key"`
+	SecretKey string `json:"secret_key"`
 	Email     string `json:"email"`
-	APIkey    string `json:"APIkey"`
+	APIkey    string `json:"api_key"`
 }
 
 // UseDns 使用 DNS 接口验证
