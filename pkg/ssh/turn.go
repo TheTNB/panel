@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/gorilla/websocket"
+	"github.com/fasthttp/websocket"
 	"golang.org/x/crypto/ssh"
 )
 

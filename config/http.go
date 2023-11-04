@@ -1,21 +1,23 @@
 package config
 
 import (
+	fiberfacades "github.com/goravel/fiber/facades"
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	ginfacades "github.com/goravel/gin/facades"
 )
 
 func init() {
 	config := facades.Config()
 	config.Add("http", map[string]any{
 		// HTTP Driver
-		"default": "gin",
+		"default": "fiber",
 		// HTTP Drivers
 		"drivers": map[string]any{
-			"gin": map[string]any{
+			"fiber": map[string]any{
+				// prefork mode, see https://docs.gofiber.io/api/fiber/#config
+				"prefork": false,
 				"route": func() (route.Route, error) {
-					return ginfacades.Route("gin"), nil
+					return fiberfacades.Route("fiber"), nil
 				},
 			},
 		},

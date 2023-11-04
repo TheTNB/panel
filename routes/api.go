@@ -1,13 +1,12 @@
 package routes
 
 import (
-	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	httpswagger "github.com/swaggo/http-swagger"
-
 	"panel/app/http/controllers"
 	"panel/app/http/middleware"
+	"panel/app/models"
+	"panel/app/services"
 )
 
 func Api() {
@@ -128,31 +127,20 @@ func Api() {
 		})
 	})
 
-	// 静态文件
-	facades.Route().StaticFile("favicon.ico", "public/favicon.ico")
-
 	// 文档
-	facades.Route().StaticFile("/swagger.json", "docs/swagger.json")
-	facades.Route().Get("/swagger", func(ctx http.Context) http.Response {
-		return ctx.Response().Redirect(http.StatusMovedPermanently, "/swagger/")
-	})
-	facades.Route().Get("/swagger/*any", func(ctx http.Context) http.Response {
-		handler := httpswagger.Handler(httpswagger.URL("/swagger.json"))
-		handler(ctx.Response().Writer(), ctx.Request().Origin())
+	swaggerController := controllers.NewSwaggerController()
+	facades.Route().Get("swagger", swaggerController.Index)
+	facades.Route().Get("swagger/{any}", swaggerController.Index)
 
-		return nil
-	})
+	// 静态文件
+	entrance := services.NewSettingImpl().Get(models.SettingKeyEntrance) + "/"
+	assetController := controllers.NewAssetController()
+	facades.Route().Get("favicon.png", assetController.Favicon)
+	facades.Route().Get("robots.txt", assetController.Robots)
+	facades.Route().Get(entrance+"assets/{any}", assetController.Index)
+	facades.Route().Get(entrance+"loading/{any}", assetController.Index)
+	facades.Route().Get(entrance+"{any}", assetController.Index)
 
 	// 404
-	facades.Route().Fallback(func(ctx http.Context) http.Response {
-		return ctx.Response().Data(http.StatusNotFound, "text/html; charset=utf-8", []byte(`<html>
-<head><title>404 Not Found</title></head>
-<body>
-<center><h1>404 Not Found</h1></center>
-<hr><center>openresty</center>
-</body>
-</html>
-
-`))
-	})
+	facades.Route().Fallback(assetController.NotFound)
 }
