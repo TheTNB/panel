@@ -18,5 +18,6 @@ jobs:
         run: |
           cp panel-example.conf .env
           go run . artisan key:generate
+          go run . artisan migrate
       - name: Run tests
         run: go test ./...

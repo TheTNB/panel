@@ -45,6 +45,7 @@ unit_test:
     - apt-get install -y curl jq
     - cp panel-example.conf .env
     - go run . artisan key:generate
+    - go run . artisan migrate
     - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 build:
