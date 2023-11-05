@@ -1,6 +1,6 @@
 module panel
 
-go 1.18
+go 1.20
 
 require (
 	github.com/fasthttp/websocket v1.5.6
@@ -8,7 +8,7 @@ require (
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
 	github.com/goravel/fiber v1.1.10
-	github.com/goravel/framework v1.13.3-0.20231105044008-e0020c289cb5
+	github.com/goravel/framework v1.13.1-0.20231104153423-7bfd9573b12d
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mojocn/base64Captcha v1.3.5
