@@ -8,7 +8,7 @@ require (
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
 	github.com/goravel/fiber v1.1.10
-	github.com/goravel/framework v1.13.1-0.20231105145249-62c723ac8fd1
+	github.com/goravel/framework v1.13.1-0.20231105170024-1042844af36a
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mojocn/base64Captcha v1.3.5

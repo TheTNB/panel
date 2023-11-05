@@ -101,6 +101,7 @@ func (s *CertImpl) UserDelete(ID uint) error {
 func (s *CertImpl) DNSAdd(request requests.DNSAdd) error {
 	var dns models.CertDNS
 	dns.Type = request.Type
+	dns.Name = request.Name
 	dns.Data = request.Data
 
 	return facades.Orm().Query().Create(&dns)
@@ -132,6 +133,9 @@ func (s *CertImpl) CertAdd(request requests.CertAdd) error {
 
 	if request.DNSID != nil {
 		cert.DNSID = request.DNSID
+	}
+	if request.WebsiteID != nil {
+		cert.WebsiteID = request.WebsiteID
 	}
 
 	return facades.Orm().Query().Create(&cert)

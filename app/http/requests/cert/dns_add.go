@@ -8,6 +8,7 @@ import (
 
 type DNSAdd struct {
 	Type string        `form:"type" json:"type"`
+	Name string        `form:"name" json:"name"`
 	Data acme.DNSParam `form:"data" json:"data"`
 }
 
@@ -18,6 +19,7 @@ func (r *DNSAdd) Authorize(ctx http.Context) error {
 func (r *DNSAdd) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"type":            "required|in:dnspod,aliyun,cloudflare",
+		"name":            "required",
 		"data":            "required",
 		"data.id":         "required_if:type,dnspod",
 		"data.token":      "required_if:type,dnspod",
@@ -32,6 +34,7 @@ func (r *DNSAdd) Messages(ctx http.Context) map[string]string {
 	return map[string]string{
 		"type.required":            "类型不能为空",
 		"type.in":                  "类型必须为 dnspod, aliyun, cloudflare 中的一个",
+		"name.required":            "备注名称不能为空",
 		"data.required":            "数据不能为空",
 		"data.id.required_if":      "ID 不能为空",
 		"data.token.required_if":   "Token 不能为空",
