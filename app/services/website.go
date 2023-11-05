@@ -295,8 +295,12 @@ server
 // Delete 删除网站
 func (r *WebsiteImpl) Delete(id int) error {
 	var website models.Website
-	if err := facades.Orm().Query().Where("id", id).FirstOrFail(&website); err != nil {
+	if err := facades.Orm().Query().With("Cert").Where("id", id).FirstOrFail(&website); err != nil {
 		return err
+	}
+
+	if website.Cert != nil {
+		return errors.New("网站" + website.Name + "已绑定SSL证书，请先删除证书")
 	}
 
 	if _, err := facades.Orm().Query().Delete(&website); err != nil {

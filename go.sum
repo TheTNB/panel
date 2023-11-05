@@ -385,8 +385,6 @@ github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c h1:obhFK91
 github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c/go.mod h1:YSWsLXlG16u5CWFaXNZHhEQD10+NwF3xfgDV816OwLE=
 github.com/goravel/file-rotatelogs/v2 v2.4.1 h1:ogkeIFcTHSBRUBpZYiyJbpul8hkVXxHPuDbOaP78O1M=
 github.com/goravel/file-rotatelogs/v2 v2.4.1/go.mod h1:euk9qr52WrzM8ICs1hecFcR4CZ/ZZOPdacHfvHgbOf0=
-github.com/goravel/framework v1.13.1-0.20231104153423-7bfd9573b12d h1:20bsAUUZWGcB8LvCP3nbO+fxGPuwYITiUJGnyx2xUgQ=
-github.com/goravel/framework v1.13.1-0.20231104153423-7bfd9573b12d/go.mod h1:5jKFbJzfqhaQTP3HCgbyrpnrCyoJjxN5JWSXO96H0iQ=
 github.com/goravel/framework v1.13.1-0.20231105145249-62c723ac8fd1 h1:Bi86UTQtrQIo74ler6NbbXTy0dOGGZaNwtRcBOuZom8=
 github.com/goravel/framework v1.13.1-0.20231105145249-62c723ac8fd1/go.mod h1:5jKFbJzfqhaQTP3HCgbyrpnrCyoJjxN5JWSXO96H0iQ=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=

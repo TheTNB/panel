@@ -14,4 +14,6 @@ type Website struct {
 	Remark    string          `gorm:"default:''" json:"remark"`
 	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
 	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
+
+	Cert *Cert `gorm:"foreignKey:WebsiteID" json:"cert"`
 }
