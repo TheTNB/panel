@@ -7,8 +7,9 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
+	github.com/gookit/validate v1.5.1
 	github.com/goravel/fiber v1.1.10
-	github.com/goravel/framework v1.13.1-0.20231105170024-1042844af36a
+	github.com/goravel/framework v1.13.1-0.20231105184928-f95059f0588e
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mojocn/base64Captcha v1.3.5
@@ -101,7 +102,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/gookit/filter v1.2.0 // indirect
 	github.com/gookit/goutil v0.6.14 // indirect
-	github.com/gookit/validate v1.5.1 // indirect
 	github.com/goravel/file-rotatelogs v0.0.0-20211215053220-2ab31dd9575c // indirect
 	github.com/goravel/file-rotatelogs/v2 v2.4.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
