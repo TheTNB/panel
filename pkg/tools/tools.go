@@ -347,7 +347,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
-	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName + " && chmod 700 panel && bash scripts/update_panel.sh")
+	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName + " && bash scripts/update_panel.sh")
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
@@ -361,6 +361,10 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	}
 	Exec("/www/panel/panel --env=panel.conf artisan migrate")
 	color.Greenln("恢复完成")
+
+	color.Greenln("设置面板文件权限...")
+	Exec("chmod -R 700 /www/panel")
+	color.Greenln("设置完成")
 
 	Exec("panel writeSetting version " + panelInfo.Version)
 
