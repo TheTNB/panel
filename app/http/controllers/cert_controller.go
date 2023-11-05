@@ -37,23 +37,23 @@ func (r *CertController) CAProviders(ctx http.Context) http.Response {
 	return Success(ctx, []map[string]string{
 		{
 			"name": "Let's Encrypt",
-			"ca":   acme.CALetEncrypt,
+			"ca":   "letsencrypt",
 		},
 		{
 			"name": "ZeroSSL",
-			"ca":   acme.CAZeroSSL,
+			"ca":   "zerossl",
 		},
 		{
 			"name": "SSL.com",
-			"ca":   acme.CASSLcom,
+			"ca":   "sslcom",
 		},
 		{
 			"name": "Google",
-			"ca":   acme.CAGoogle,
+			"ca":   "google",
 		},
 		{
 			"name": "Buypass",
-			"ca":   acme.CABuypass,
+			"ca":   "buypass",
 		},
 	})
 }

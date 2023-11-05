@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+
 	"panel/app/http/controllers"
 	"panel/app/http/middleware"
 	"panel/app/models"
@@ -140,7 +141,4 @@ func Api() {
 	facades.Route().Get(entrance+"assets/{any}", assetController.Index)
 	facades.Route().Get(entrance+"loading/{any}", assetController.Index)
 	facades.Route().Get(entrance+"{any}", assetController.Index)
-
-	// 404
-	facades.Route().Fallback(assetController.NotFound)
 }
