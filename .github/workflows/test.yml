@@ -17,6 +17,7 @@ jobs:
       - name: Set up environment
         run: |
           cp panel-example.conf .env
+          echo "DB_FILE=database/panel.db" >> .env
           go run . artisan key:generate
           go run . artisan migrate
       - name: Run tests
