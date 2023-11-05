@@ -9,7 +9,6 @@ const (
 	SettingKeyMonitorDays       = "monitor_days"
 	SettingKeyBackupPath        = "backup_path"
 	SettingKeyWebsitePath       = "website_path"
-	SettingKeyEntrance          = "entrance"
 	SettingKeyMysqlRootPassword = "mysql_root_password"
 	SettingKeySshHost           = "ssh_host"
 	SettingKeySshPort           = "ssh_port"

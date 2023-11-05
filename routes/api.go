@@ -6,8 +6,6 @@ import (
 
 	"panel/app/http/controllers"
 	"panel/app/http/middleware"
-	"panel/app/models"
-	"panel/app/services"
 )
 
 func Api() {
@@ -134,11 +132,14 @@ func Api() {
 	facades.Route().Get("swagger/{any}", swaggerController.Index)
 
 	// 静态文件
-	entrance := services.NewSettingImpl().Get(models.SettingKeyEntrance) + "/"
+	entrance := facades.Config().GetString("http.entrance")
+	if entrance == "/" {
+		entrance = ""
+	}
 	assetController := controllers.NewAssetController()
 	facades.Route().Get("favicon.png", assetController.Favicon)
 	facades.Route().Get("robots.txt", assetController.Robots)
-	facades.Route().Get(entrance+"assets/{any}", assetController.Index)
-	facades.Route().Get(entrance+"loading/{any}", assetController.Index)
-	facades.Route().Get(entrance+"{any}", assetController.Index)
+	facades.Route().Get(entrance+"/assets/{any}", assetController.Index)
+	facades.Route().Get(entrance+"/loading/{any}", assetController.Index)
+	facades.Route().Get(entrance+"/{any}", assetController.Index)
 }

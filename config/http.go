@@ -27,6 +27,8 @@ func init() {
 		"host": config.Env("APP_HOST", "0.0.0.0"),
 		// HTTP Port
 		"port": config.Env("APP_PORT", "8888"),
+		// HTTP Entrance
+		"entrance": config.Env("APP_ENTRANCE", "/"),
 		// HTTPS Configuration
 		"tls": map[string]any{
 			// HTTPS Host

@@ -19,4 +19,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
 HR="+----------------------------------------------------"
-OldVersion=$(panel getSetting version)
+oldVersion=$(panel getSetting version)
+oldVersion=${oldVersion#v}
+panelPath="/www/panel"
+
+# 大于
+function version_gt() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+# 小于
+function version_lt() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+# 大于等于
+function version_ge() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+# 小于等于
+function version_le() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+
+if [ -z "$oldVersion" ]; then
+    echo "错误：无法获取面板版本"
+    echo "Error: can't get panel version"
+    exit 1
+fi
+
+echo $HR
+
+if version_lt "$oldVersion" "2.1.8"; then
+    echo "更新面板到 v2.1.8 ..."
+    echo "Update panel to v2.1.8 ..."
+    oldEntrance=$(panel getSetting entrance)
+    echo "APP_ENTRANCE=$oldEntrance" >> $panelPath/panel.conf
+    panel deleteSetting entrance
+fi
+
+echo $HR
+echo "更新结束"
+echo "Update finished"

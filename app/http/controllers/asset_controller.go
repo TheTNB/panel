@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
-	"panel/app/models"
+	"github.com/goravel/framework/facades"
+
 	"panel/app/services"
 	"panel/pkg/tools"
 )
@@ -21,7 +22,7 @@ func NewAssetController() *AssetController {
 }
 
 func (r *AssetController) Index(ctx http.Context) http.Response {
-	entrance := r.setting.Get(models.SettingKeyEntrance)
+	entrance := facades.Config().GetString("http.entrance")
 	path := strings.TrimPrefix(ctx.Request().Path(), entrance)
 
 	// 自动纠正 URL 格式

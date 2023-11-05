@@ -5,10 +5,10 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	"panel/pkg/tools"
 
 	"panel/app/models"
 	"panel/app/services"
+	"panel/pkg/tools"
 )
 
 type SettingController struct {
@@ -43,7 +43,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 
 	var result data
 	result.Name = r.setting.Get(models.SettingKeyName)
-	result.Entrance = r.setting.Get(models.SettingKeyEntrance)
+	result.Entrance = facades.Config().GetString("http.entrance")
 	result.WebsitePath = r.setting.Get(models.SettingKeyWebsitePath)
 	result.BackupPath = r.setting.Get(models.SettingKeyBackupPath)
 
@@ -85,6 +85,11 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 	if oldPort != port {
 		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
 	}
+	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	if oldEntrance != entrance {
+		tools.Exec("sed -i 's/APP_ENTRANCE=" + oldEntrance + "/APP_ENTRANCE=" + entrance + "/g' /www/panel/panel.conf")
+	}
+
 	if !tools.Exists(backupPath) {
 		tools.Mkdir(backupPath, 0644)
 	}
@@ -98,11 +103,6 @@ func (r *SettingController) Save(ctx http.Context) http.Response {
 		tools.Chown(websitePath, "www", "www")
 	}
 	err = r.setting.Set(models.SettingKeyWebsitePath, websitePath)
-	if err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
-		return ErrorSystem(ctx)
-	}
-	err = r.setting.Set(models.SettingKeyEntrance, entrance)
 	if err != nil {
 		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
 		return ErrorSystem(ctx)

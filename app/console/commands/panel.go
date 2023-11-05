@@ -56,7 +56,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyEntrance, Value: "/"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
+		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")
@@ -130,21 +130,18 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
 		color.Greenln("面板端口: " + port)
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyEntrance, "/"))
+		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
 		port := tools.Exec("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":
-		color.Greenln("面板入口: " + services.NewSettingImpl().Get(models.SettingKeyEntrance, "/"))
+		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
-		err := services.NewSettingImpl().Set(models.SettingKeyEntrance, "/")
-		if err != nil {
-			color.Redln("删除面板入口失败")
-			return nil
-		}
+		oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+		tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf")
 
 		color.Greenln("删除面板入口成功")
 
