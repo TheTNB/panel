@@ -85,12 +85,12 @@ func init() {
 			&testing.ServiceProvider{},
 			&providers.AppServiceProvider{},
 			&providers.AuthServiceProvider{},
+			&providers.DatabaseServiceProvider{},
 			&providers.RouteServiceProvider{},
 			&providers.ConsoleServiceProvider{},
 			&providers.QueueServiceProvider{},
 			&providers.EventServiceProvider{},
 			&providers.ValidationServiceProvider{},
-			&providers.DatabaseServiceProvider{},
 			&fiber.ServiceProvider{},
 		},
 	})
