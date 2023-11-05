@@ -125,15 +125,15 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
-	var updateProfileRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &updateProfileRequest)
+	var paginateRequest commonrequests.Paginate
+	sanitize := Sanitize(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	var users []models.CertUser
 	var total int64
-	err := facades.Orm().Query().Paginate(updateProfileRequest.Page, updateProfileRequest.Limit, &users, &total)
+	err := facades.Orm().Query().Paginate(paginateRequest.Page, paginateRequest.Limit, &users, &total)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -215,15 +215,15 @@ func (r *CertController) UserDelete(ctx http.Context) http.Response {
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
-	var updateProfileRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &updateProfileRequest)
+	var paginateRequest commonrequests.Paginate
+	sanitize := Sanitize(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	var dns []models.CertDNS
 	var total int64
-	err := facades.Orm().Query().Paginate(updateProfileRequest.Page, updateProfileRequest.Limit, &dns, &total)
+	err := facades.Orm().Query().Paginate(paginateRequest.Page, paginateRequest.Limit, &dns, &total)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -305,15 +305,15 @@ func (r *CertController) DNSDelete(ctx http.Context) http.Response {
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
-	var updateProfileRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &updateProfileRequest)
+	var paginateRequest commonrequests.Paginate
+	sanitize := Sanitize(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	var certs []models.Cert
 	var total int64
-	err := facades.Orm().Query().Paginate(updateProfileRequest.Page, updateProfileRequest.Limit, &certs, &total)
+	err := facades.Orm().Query().Paginate(paginateRequest.Page, paginateRequest.Limit, &certs, &total)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),

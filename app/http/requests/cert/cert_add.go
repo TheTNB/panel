@@ -44,10 +44,5 @@ func (r *CertAdd) Attributes(ctx http.Context) map[string]string {
 }
 
 func (r *CertAdd) PrepareForValidation(ctx http.Context, data validation.Data) error {
-	err := data.Set("user_id", uint(ctx.Request().InputInt("user_id")))
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

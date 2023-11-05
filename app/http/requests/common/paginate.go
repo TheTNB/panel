@@ -37,8 +37,5 @@ func (r *Paginate) Attributes(ctx http.Context) map[string]string {
 }
 
 func (r *Paginate) PrepareForValidation(ctx http.Context, data validation.Data) error {
-	_ = data.Set("page", ctx.Request().QueryInt("page"))
-	_ = data.Set("limit", ctx.Request().QueryInt("limit"))
-
 	return nil
 }
