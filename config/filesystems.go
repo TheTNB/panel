@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/support/path"
 )
 
 func init() {
@@ -26,6 +27,11 @@ func init() {
 				"driver": "local",
 				"root":   "/",
 				"url":    "http://localhost/",
+			},
+			"public": map[string]any{
+				"driver": "local",
+				"root":   path.Storage("app/public"),
+				"url":    config.Env("APP_URL", "").(string) + "/storage",
 			},
 		},
 	})

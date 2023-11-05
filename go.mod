@@ -8,7 +8,7 @@ require (
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
 	github.com/goravel/fiber v1.1.10
-	github.com/goravel/framework v1.13.1-0.20231103030757-81cd82744019
+	github.com/goravel/framework v1.13.3-0.20231105044008-e0020c289cb5
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mojocn/base64Captcha v1.3.5
@@ -211,7 +211,7 @@ require (
 	gorm.io/driver/mysql v1.5.2 // indirect
 	gorm.io/driver/postgres v1.5.2 // indirect
 	gorm.io/driver/sqlserver v1.5.2 // indirect
-	gorm.io/gorm v1.25.5 // indirect
+	gorm.io/gorm v1.25.4 // indirect
 	gorm.io/plugin/dbresolver v1.4.7 // indirect
 	modernc.org/libc v1.22.5 // indirect
 	modernc.org/mathutil v1.5.0 // indirect
