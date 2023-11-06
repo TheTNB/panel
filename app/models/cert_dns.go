@@ -14,7 +14,7 @@ type CertDNS struct {
 	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
 	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
 
-	Certs []*Cert `gorm:"foreignKey:DNSID" json:"certs"`
+	Certs []*Cert `gorm:"foreignKey:DNSID" json:"-"`
 }
 
 func (CertDNS) TableName() string {
