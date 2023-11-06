@@ -94,6 +94,9 @@ definitions:
         $ref: '#/definitions/acme.DNSParam'
       id:
         type: integer
+      name:
+        description: 备注名称
+        type: string
       type:
         description: DNS 提供商 (dnspod, aliyun, cloudflare)
         type: string
@@ -128,6 +131,8 @@ definitions:
     type: object
   models.Website:
     properties:
+      cert:
+        $ref: '#/definitions/models.Cert'
       created_at:
         type: string
       id:
@@ -147,7 +152,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  requests.CertAdd:
+  requests.CertStore:
     properties:
       auto_renew:
         type: boolean
@@ -161,11 +166,45 @@ definitions:
         type: string
       user_id:
         type: integer
+      website_id:
+        type: integer
     type: object
-  requests.DNSAdd:
+  requests.CertUpdate:
+    properties:
+      auto_renew:
+        type: boolean
+      dns_id:
+        type: integer
+      domains:
+        items:
+          type: string
+        type: array
+      id:
+        type: integer
+      type:
+        type: string
+      user_id:
+        type: integer
+      website_id:
+        type: integer
+    type: object
+  requests.DNSStore:
     properties:
       data:
         $ref: '#/definitions/acme.DNSParam'
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  requests.DNSUpdate:
+    properties:
+      data:
+        $ref: '#/definitions/acme.DNSParam'
+      id:
+        type: integer
+      name:
+        type: string
       type:
         type: string
     type: object
@@ -186,7 +225,7 @@ definitions:
       id:
         type: integer
     type: object
-  requests.UserAdd:
+  requests.UserStore:
     properties:
       ca:
         type: string
@@ -194,6 +233,21 @@ definitions:
         type: string
       hmac_encoded:
         type: string
+      key_type:
+        type: string
+      kid:
+        type: string
+    type: object
+  requests.UserUpdate:
+    properties:
+      ca:
+        type: string
+      email:
+        type: string
+      hmac_encoded:
+        type: string
+      id:
+        type: integer
       key_type:
         type: string
       kid:
@@ -301,7 +355,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.CertAdd'
+          $ref: '#/definitions/requests.CertStore'
       produces:
       - application/json
       responses:
@@ -353,6 +407,75 @@ paths:
       summary: 删除证书
       tags:
       - 证书
+    get:
+      description: 获取面板证书管理的证书
+      parameters:
+      - description: 证书 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Cert'
+              type: object
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 获取证书
+      tags:
+      - 证书
+    put:
+      consumes:
+      - application/json
+      description: 更新面板证书管理的证书
+      parameters:
+      - description: 证书 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 证书信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CertUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 更新证书
+      tags:
+      - 证书
   /panel/cert/dns:
     get:
       description: 获取面板证书管理的 DNS 接口列表
@@ -391,7 +514,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.DNSAdd'
+          $ref: '#/definitions/requests.DNSStore'
       produces:
       - application/json
       responses:
@@ -441,6 +564,75 @@ paths:
       security:
       - BearerToken: []
       summary: 删除 DNS 接口
+      tags:
+      - 证书
+    get:
+      description: 获取面板证书管理的 DNS 接口
+      parameters:
+      - description: DNS 接口 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CertDNS'
+              type: object
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 获取 DNS 接口
+      tags:
+      - 证书
+    put:
+      consumes:
+      - application/json
+      description: 更新面板证书管理的 DNS 接口
+      parameters:
+      - description: DNS 接口 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: DNS 接口信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DNSUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 更新 DNS 接口
       tags:
       - 证书
   /panel/cert/dnsProviders:
@@ -603,7 +795,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.UserAdd'
+          $ref: '#/definitions/requests.UserStore'
       produces:
       - application/json
       responses:
@@ -655,6 +847,75 @@ paths:
       summary: 删除 ACME 用户
       tags:
       - 证书
+    get:
+      description: 获取面板证书管理的 ACME 用户
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CertUser'
+              type: object
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 获取 ACME 用户
+      tags:
+      - 证书
+    put:
+      consumes:
+      - application/json
+      description: 更新面板证书管理的 ACME 用户
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 用户信息
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UserUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 更新 ACME 用户
+      tags:
+      - 证书
   /panel/user/login:
     post:
       consumes:
@@ -685,6 +946,17 @@ paths:
       summary: 用户登录
       tags:
       - 用户
+  /swagger:
+    get:
+      description: Swagger UI
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Swagger UI
+      tags:
+      - Swagger
 securityDefinitions:
   BearerToken:
     in: header

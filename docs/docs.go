@@ -152,7 +152,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.CertAdd"
+                            "$ref": "#/definitions/requests.CertStore"
                         }
                     }
                 ],
@@ -179,6 +179,118 @@ const docTemplate = `{
             }
         },
         "/panel/cert/certs/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取面板证书管理的证书",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "获取证书",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "证书 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.Cert"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新面板证书管理的证书",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "更新证书",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "证书 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "证书信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CertUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -299,7 +411,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.DNSAdd"
+                            "$ref": "#/definitions/requests.DNSStore"
                         }
                     }
                 ],
@@ -326,6 +438,118 @@ const docTemplate = `{
             }
         },
         "/panel/cert/dns/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取面板证书管理的 DNS 接口",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "获取 DNS 接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "DNS 接口 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.CertDNS"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新面板证书管理的 DNS 接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "更新 DNS 接口",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "DNS 接口 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "DNS 接口信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.DNSUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -645,7 +869,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UserAdd"
+                            "$ref": "#/definitions/requests.UserStore"
                         }
                     }
                 ],
@@ -672,6 +896,118 @@ const docTemplate = `{
             }
         },
         "/panel/cert/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取面板证书管理的 ACME 用户",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "获取 ACME 用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.CertUser"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新面板证书管理的 ACME 用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书"
+                ],
+                "summary": "更新 ACME 用户",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "用户信息",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UserUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
@@ -762,6 +1098,23 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.ErrorResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/swagger": {
+            "get": {
+                "description": "Swagger UI",
+                "tags": [
+                    "Swagger"
+                ],
+                "summary": "Swagger UI",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -907,6 +1260,10 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "name": {
+                    "description": "备注名称",
+                    "type": "string"
+                },
                 "type": {
                     "description": "DNS 提供商 (dnspod, aliyun, cloudflare)",
                     "type": "string"
@@ -958,6 +1315,9 @@ const docTemplate = `{
         "models.Website": {
             "type": "object",
             "properties": {
+                "cert": {
+                    "$ref": "#/definitions/models.Cert"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -987,7 +1347,7 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.CertAdd": {
+        "requests.CertStore": {
             "type": "object",
             "properties": {
                 "auto_renew": {
@@ -1007,14 +1367,66 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "website_id": {
+                    "type": "integer"
                 }
             }
         },
-        "requests.DNSAdd": {
+        "requests.CertUpdate": {
+            "type": "object",
+            "properties": {
+                "auto_renew": {
+                    "type": "boolean"
+                },
+                "dns_id": {
+                    "type": "integer"
+                },
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "website_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "requests.DNSStore": {
             "type": "object",
             "properties": {
                 "data": {
                     "$ref": "#/definitions/acme.DNSParam"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.DNSUpdate": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/acme.DNSParam"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "type": {
                     "type": "string"
@@ -1048,7 +1460,7 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.UserAdd": {
+        "requests.UserStore": {
             "type": "object",
             "properties": {
                 "ca": {
@@ -1059,6 +1471,29 @@ const docTemplate = `{
                 },
                 "hmac_encoded": {
                     "type": "string"
+                },
+                "key_type": {
+                    "type": "string"
+                },
+                "kid": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UserUpdate": {
+            "type": "object",
+            "properties": {
+                "ca": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hmac_encoded": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "key_type": {
                     "type": "string"

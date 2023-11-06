@@ -15,13 +15,18 @@ import (
 )
 
 type Cert interface {
-	GetByID(ID uint) (models.Cert, error)
-	UserAdd(request requests.UserAdd) error
-	UserDelete(ID uint) error
-	DNSAdd(request requests.DNSAdd) error
-	DNSDelete(ID uint) error
-	CertAdd(request requests.CertAdd) error
-	CertDelete(ID uint) error
+	UserStore(request requests.UserStore) error
+	UserUpdate(request requests.UserUpdate) error
+	UserShow(ID uint) (models.CertUser, error)
+	UserDestroy(ID uint) error
+	DNSStore(request requests.DNSStore) error
+	DNSUpdate(request requests.DNSUpdate) error
+	DNSShow(ID uint) (models.CertDNS, error)
+	DNSDestroy(ID uint) error
+	CertStore(request requests.CertStore) error
+	CertUpdate(request requests.CertUpdate) error
+	CertShow(ID uint) (models.Cert, error)
+	CertDestroy(ID uint) error
 	ObtainAuto(ID uint) (certificate.Resource, error)
 	ObtainManual(ID uint) (certificate.Resource, error)
 	ManualDNS(ID uint) (map[string]acme.Resolve, error)
@@ -35,15 +40,8 @@ func NewCertImpl() *CertImpl {
 	return &CertImpl{}
 }
 
-// GetByID 根据 ID 获取证书
-func (s *CertImpl) GetByID(ID uint) (models.Cert, error) {
-	var cert models.Cert
-	err := facades.Orm().Query().With("User").With("DNS").With("Website").Where("id = ?", ID).First(&cert)
-	return cert, err
-}
-
-// UserAdd 添加用户
-func (s *CertImpl) UserAdd(request requests.UserAdd) error {
+// UserStore 添加用户
+func (s *CertImpl) UserStore(request requests.UserStore) error {
 	var user models.CertUser
 	user.CA = request.CA
 	user.Email = request.Email
@@ -81,8 +79,59 @@ func (s *CertImpl) UserAdd(request requests.UserAdd) error {
 	return facades.Orm().Query().Create(&user)
 }
 
-// UserDelete 删除用户
-func (s *CertImpl) UserDelete(ID uint) error {
+// UserUpdate 更新用户
+func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
+	var user models.CertUser
+	err := facades.Orm().Query().Where("id = ?", request.ID).First(&user)
+	if err != nil {
+		return err
+	}
+
+	user.CA = request.CA
+	user.Email = request.Email
+	user.Kid = &request.Kid
+	user.HmacEncoded = &request.HmacEncoded
+	user.KeyType = request.KeyType
+
+	var client *acme.Client
+	switch user.CA {
+	case "letsencrypt":
+		client, err = acme.NewRegisterClient(user.Email, acme.CALetEncrypt, certcrypto.KeyType(user.KeyType))
+	case "buypass":
+		client, err = acme.NewRegisterClient(user.Email, acme.CABuypass, certcrypto.KeyType(user.KeyType))
+	case "zerossl":
+		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAZeroSSL, certcrypto.KeyType(user.KeyType))
+	case "sslcom":
+		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CASSLcom, certcrypto.KeyType(user.KeyType))
+	case "google":
+		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAGoogle, certcrypto.KeyType(user.KeyType))
+	default:
+		return errors.New("CA 提供商不支持")
+	}
+
+	if err != nil {
+		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
+	}
+
+	privateKey, err := acme.GetPrivateKey(client.User.GetPrivateKey(), acme.KeyType(user.KeyType))
+	if err != nil {
+		return errors.New("获取私钥失败")
+	}
+	user.PrivateKey = string(privateKey)
+
+	return facades.Orm().Query().Save(&user)
+}
+
+// UserShow 根据 ID 获取用户
+func (s *CertImpl) UserShow(ID uint) (models.CertUser, error) {
+	var user models.CertUser
+	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&user)
+
+	return user, err
+}
+
+// UserDestroy 删除用户
+func (s *CertImpl) UserDestroy(ID uint) error {
 	var user models.CertUser
 	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&user)
 	if err != nil {
@@ -97,8 +146,8 @@ func (s *CertImpl) UserDelete(ID uint) error {
 	return err
 }
 
-// DNSAdd 添加 DNS
-func (s *CertImpl) DNSAdd(request requests.DNSAdd) error {
+// DNSStore 添加 DNS
+func (s *CertImpl) DNSStore(request requests.DNSStore) error {
 	var dns models.CertDNS
 	dns.Type = request.Type
 	dns.Name = request.Name
@@ -107,8 +156,31 @@ func (s *CertImpl) DNSAdd(request requests.DNSAdd) error {
 	return facades.Orm().Query().Create(&dns)
 }
 
-// DNSDelete 删除 DNS
-func (s *CertImpl) DNSDelete(ID uint) error {
+// DNSUpdate 更新 DNS
+func (s *CertImpl) DNSUpdate(request requests.DNSUpdate) error {
+	var dns models.CertDNS
+	err := facades.Orm().Query().Where("id = ?", request.ID).First(&dns)
+	if err != nil {
+		return err
+	}
+
+	dns.Type = request.Type
+	dns.Name = request.Name
+	dns.Data = request.Data
+
+	return facades.Orm().Query().Save(&dns)
+}
+
+// DNSShow 根据 ID 获取 DNS
+func (s *CertImpl) DNSShow(ID uint) (models.CertDNS, error) {
+	var dns models.CertDNS
+	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&dns)
+
+	return dns, err
+}
+
+// DNSDestroy 删除 DNS
+func (s *CertImpl) DNSDestroy(ID uint) error {
 	var dns models.CertDNS
 	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&dns)
 	if err != nil {
@@ -123,8 +195,8 @@ func (s *CertImpl) DNSDelete(ID uint) error {
 	return err
 }
 
-// CertAdd 添加证书
-func (s *CertImpl) CertAdd(request requests.CertAdd) error {
+// CertStore 添加证书
+func (s *CertImpl) CertStore(request requests.CertStore) error {
 	var cert models.Cert
 	cert.Type = request.Type
 	cert.Domains = request.Domains
@@ -141,8 +213,39 @@ func (s *CertImpl) CertAdd(request requests.CertAdd) error {
 	return facades.Orm().Query().Create(&cert)
 }
 
-// CertDelete 删除证书
-func (s *CertImpl) CertDelete(ID uint) error {
+// CertUpdate 更新证书
+func (s *CertImpl) CertUpdate(request requests.CertUpdate) error {
+	var cert models.Cert
+	err := facades.Orm().Query().Where("id = ?", request.ID).First(&cert)
+	if err != nil {
+		return err
+	}
+
+	cert.Type = request.Type
+	cert.Domains = request.Domains
+	cert.AutoRenew = request.AutoRenew
+	cert.UserID = request.UserID
+
+	if request.DNSID != nil {
+		cert.DNSID = request.DNSID
+	}
+	if request.WebsiteID != nil {
+		cert.WebsiteID = request.WebsiteID
+	}
+
+	return facades.Orm().Query().Save(&cert)
+}
+
+// CertShow 根据 ID 获取证书
+func (s *CertImpl) CertShow(ID uint) (models.Cert, error) {
+	var cert models.Cert
+	err := facades.Orm().Query().With("User").With("DNS").With("Website").Where("id = ?", ID).First(&cert)
+
+	return cert, err
+}
+
+// CertDestroy 删除证书
+func (s *CertImpl) CertDestroy(ID uint) error {
 	var cert models.Cert
 	err := facades.Orm().Query().Where("id = ?", ID).First(&cert)
 	if err != nil {

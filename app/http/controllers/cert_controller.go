@@ -3,8 +3,8 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	requests "panel/app/http/requests/cert"
 
+	requests "panel/app/http/requests/cert"
 	commonrequests "panel/app/http/requests/common"
 	responses "panel/app/http/responses/cert"
 	"panel/app/models"
@@ -147,26 +147,26 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 	})
 }
 
-// UserAdd
+// UserStore
 // @Summary 添加 ACME 用户
 // @Description 添加 ACME 用户到面板证书管理
 // @Tags 证书
 // @Accept json
 // @Produce json
 // @Security BearerToken
-// @Param data body requests.UserAdd true "用户信息"
+// @Param data body requests.UserStore true "用户信息"
 // @Success 200 {object} SuccessResponse
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/users [post]
-func (r *CertController) UserAdd(ctx http.Context) http.Response {
-	var addRequest requests.UserAdd
-	sanitize := Sanitize(ctx, &addRequest)
+func (r *CertController) UserStore(ctx http.Context) http.Response {
+	var storeRequest requests.UserStore
+	sanitize := Sanitize(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	err := r.cert.UserAdd(addRequest)
+	err := r.cert.UserStore(storeRequest)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -177,7 +177,69 @@ func (r *CertController) UserAdd(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
-// UserDelete
+// UserUpdate
+// @Summary 更新 ACME 用户
+// @Description 更新面板证书管理的 ACME 用户
+// @Tags 证书
+// @Accept json
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "用户 ID"
+// @Param data body requests.UserUpdate true "用户信息"
+// @Success 200 {object} SuccessResponse
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/users/{id} [put]
+func (r *CertController) UserUpdate(ctx http.Context) http.Response {
+	var updateRequest requests.UserUpdate
+	sanitize := Sanitize(ctx, &updateRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	err := r.cert.UserUpdate(updateRequest)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"userID": updateRequest.ID,
+			"error":  err.Error(),
+		}).Error("更新ACME用户失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, nil)
+}
+
+// UserShow
+// @Summary 获取 ACME 用户
+// @Description 获取面板证书管理的 ACME 用户
+// @Tags 证书
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "用户 ID"
+// @Success 200 {object} SuccessResponse{data=models.CertUser}
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/users/{id} [get]
+func (r *CertController) UserShow(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.UserShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	user, err := r.cert.UserShow(showAndDestroyRequest.ID)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"userID": showAndDestroyRequest.ID,
+			"error":  err.Error(),
+		}).Error("获取ACME用户失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, user)
+}
+
+// UserDestroy
 // @Summary 删除 ACME 用户
 // @Description 删除面板证书管理的 ACME 用户
 // @Tags 证书
@@ -189,13 +251,17 @@ func (r *CertController) UserAdd(ctx http.Context) http.Response {
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/users/{id} [delete]
-func (r *CertController) UserDelete(ctx http.Context) http.Response {
-	userID := ctx.Request().InputInt("id")
+func (r *CertController) UserDestroy(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.UserShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
 
-	err := r.cert.UserDelete(uint(userID))
+	err := r.cert.UserDestroy(showAndDestroyRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
-			"userID": userID,
+			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Error("删除ACME用户失败")
 		return ErrorSystem(ctx)
@@ -237,26 +303,26 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 	})
 }
 
-// DNSAdd
+// DNSStore
 // @Summary 添加 DNS 接口
 // @Description 添加 DNS 接口到面板证书管理
 // @Tags 证书
 // @Accept json
 // @Produce json
 // @Security BearerToken
-// @Param data body requests.DNSAdd true "DNS 接口信息"
+// @Param data body requests.DNSStore true "DNS 接口信息"
 // @Success 200 {object} SuccessResponse
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/dns [post]
-func (r *CertController) DNSAdd(ctx http.Context) http.Response {
-	var addRequest requests.DNSAdd
-	sanitize := Sanitize(ctx, &addRequest)
+func (r *CertController) DNSStore(ctx http.Context) http.Response {
+	var storeRequest requests.DNSStore
+	sanitize := Sanitize(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	err := r.cert.DNSAdd(addRequest)
+	err := r.cert.DNSStore(storeRequest)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -267,7 +333,69 @@ func (r *CertController) DNSAdd(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
-// DNSDelete
+// DNSShow
+// @Summary 获取 DNS 接口
+// @Description 获取面板证书管理的 DNS 接口
+// @Tags 证书
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "DNS 接口 ID"
+// @Success 200 {object} SuccessResponse{data=models.CertDNS}
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/dns/{id} [get]
+func (r *CertController) DNSShow(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.DNSShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	dns, err := r.cert.DNSShow(showAndDestroyRequest.ID)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"dnsID": showAndDestroyRequest.ID,
+			"error": err.Error(),
+		}).Error("获取DNS接口失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, dns)
+}
+
+// DNSUpdate
+// @Summary 更新 DNS 接口
+// @Description 更新面板证书管理的 DNS 接口
+// @Tags 证书
+// @Accept json
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "DNS 接口 ID"
+// @Param data body requests.DNSUpdate true "DNS 接口信息"
+// @Success 200 {object} SuccessResponse
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/dns/{id} [put]
+func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
+	var updateRequest requests.DNSUpdate
+	sanitize := Sanitize(ctx, &updateRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	err := r.cert.DNSUpdate(updateRequest)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"dnsID": updateRequest.ID,
+			"error": err.Error(),
+		}).Error("更新DNS接口失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, nil)
+}
+
+// DNSDestroy
 // @Summary 删除 DNS 接口
 // @Description 删除面板证书管理的 DNS 接口
 // @Tags 证书
@@ -279,13 +407,17 @@ func (r *CertController) DNSAdd(ctx http.Context) http.Response {
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/dns/{id} [delete]
-func (r *CertController) DNSDelete(ctx http.Context) http.Response {
-	dnsID := ctx.Request().InputInt("id")
+func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.DNSShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
 
-	err := r.cert.DNSDelete(uint(dnsID))
+	err := r.cert.DNSDestroy(showAndDestroyRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
-			"dnsID": dnsID,
+			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
 		}).Error("删除DNS接口失败")
 		return ErrorSystem(ctx)
@@ -327,26 +459,26 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 	})
 }
 
-// CertAdd
+// CertStore
 // @Summary 添加证书
 // @Description 添加证书到面板证书管理
 // @Tags 证书
 // @Accept json
 // @Produce json
 // @Security BearerToken
-// @Param data body requests.CertAdd true "证书信息"
+// @Param data body requests.CertStore true "证书信息"
 // @Success 200 {object} SuccessResponse
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/certs [post]
-func (r *CertController) CertAdd(ctx http.Context) http.Response {
-	var addRequest requests.CertAdd
-	sanitize := Sanitize(ctx, &addRequest)
+func (r *CertController) CertStore(ctx http.Context) http.Response {
+	var storeRequest requests.CertStore
+	sanitize := Sanitize(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	err := r.cert.CertAdd(addRequest)
+	err := r.cert.CertStore(storeRequest)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -357,7 +489,69 @@ func (r *CertController) CertAdd(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
-// CertDelete
+// CertUpdate
+// @Summary 更新证书
+// @Description 更新面板证书管理的证书
+// @Tags 证书
+// @Accept json
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "证书 ID"
+// @Param data body requests.CertUpdate true "证书信息"
+// @Success 200 {object} SuccessResponse
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/certs/{id} [put]
+func (r *CertController) CertUpdate(ctx http.Context) http.Response {
+	var updateRequest requests.CertUpdate
+	sanitize := Sanitize(ctx, &updateRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	err := r.cert.CertUpdate(updateRequest)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"certID": updateRequest.ID,
+			"error":  err.Error(),
+		}).Error("更新证书失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, nil)
+}
+
+// CertShow
+// @Summary 获取证书
+// @Description 获取面板证书管理的证书
+// @Tags 证书
+// @Produce json
+// @Security BearerToken
+// @Param id path int true "证书 ID"
+// @Success 200 {object} SuccessResponse{data=models.Cert}
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/cert/certs/{id} [get]
+func (r *CertController) CertShow(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.CertShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	cert, err := r.cert.CertShow(showAndDestroyRequest.ID)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"certID": showAndDestroyRequest.ID,
+			"error":  err.Error(),
+		}).Error("获取证书失败")
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, cert)
+}
+
+// CertDestroy
 // @Summary 删除证书
 // @Description 删除面板证书管理的证书
 // @Tags 证书
@@ -369,13 +563,17 @@ func (r *CertController) CertAdd(ctx http.Context) http.Response {
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
 // @Router /panel/cert/certs/{id} [delete]
-func (r *CertController) CertDelete(ctx http.Context) http.Response {
-	certID := ctx.Request().InputInt("id")
+func (r *CertController) CertDestroy(ctx http.Context) http.Response {
+	var showAndDestroyRequest requests.CertShowAndDestroy
+	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	if sanitize != nil {
+		return sanitize
+	}
 
-	err := r.cert.CertDelete(uint(certID))
+	err := r.cert.CertDestroy(showAndDestroyRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
-			"certID": certID,
+			"certID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Error("删除证书失败")
 		return ErrorSystem(ctx)
@@ -403,7 +601,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	cert, err := r.cert.GetByID(obtainRequest.ID)
+	cert, err := r.cert.CertShow(obtainRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"certID": obtainRequest.ID,

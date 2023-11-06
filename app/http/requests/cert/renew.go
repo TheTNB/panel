@@ -20,10 +20,7 @@ func (r *Renew) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *Renew) Messages(ctx http.Context) map[string]string {
-	return map[string]string{
-		"id.required": "证书 ID 不能为空",
-		"id.exists":   "证书 ID 不存在",
-	}
+	return map[string]string{}
 }
 
 func (r *Renew) Attributes(ctx http.Context) map[string]string {
