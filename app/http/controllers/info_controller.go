@@ -119,7 +119,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 
 			db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 			if err != nil {
-				facades.Log().With(map[string]any{
+				facades.Log().Request(ctx.Request()).With(map[string]any{
 					"error": err.Error(),
 				}).Error("[面板][InfoController] 获取数据库列表失败")
 				databaseCount = -1
@@ -127,7 +127,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 				defer db.Close()
 				rows, err := db.Query("SHOW DATABASES")
 				if err != nil {
-					facades.Log().With(map[string]any{
+					facades.Log().Request(ctx.Request()).With(map[string]any{
 						"error": err.Error(),
 					}).Error("[面板][InfoController] 获取数据库列表失败")
 					databaseCount = -1
@@ -305,7 +305,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 
 	panel, err := tools.GetLatestPanelVersion()
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
 		}).Error("[面板][InfoController] 获取最新版本失败")
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
@@ -313,7 +313,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 
 	err = tools.UpdatePanel(panel)
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
 		}).Error("[面板][InfoController] 更新面板失败")
 		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())

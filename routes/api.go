@@ -127,7 +127,7 @@ func Api() {
 		r.Prefix("setting").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			settingController := controllers.NewSettingController()
 			r.Get("list", settingController.List)
-			r.Post("save", settingController.Save)
+			r.Post("update", settingController.Update)
 		})
 	})
 

@@ -376,7 +376,12 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 func RestartPanel() {
 	color.Greenln("重启面板...")
-	ExecAsync("sleep 2 && systemctl restart panel")
+	err := ExecAsync("sleep 2 && systemctl restart panel")
+	if err != nil {
+		color.Redln("重启失败")
+		return
+	}
+
 	color.Greenln("重启完成")
 }
 

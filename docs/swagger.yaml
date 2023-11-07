@@ -188,6 +188,25 @@ definitions:
       id:
         type: integer
     type: object
+  requests.Update:
+    properties:
+      backup_path:
+        type: string
+      email:
+        type: string
+      entrance:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      username:
+        type: string
+      website_path:
+        type: string
+    type: object
   requests.UserStore:
     properties:
       ca:
@@ -234,6 +253,38 @@ definitions:
       total:
         type: integer
     type: object
+  responses.Info:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      role:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+  responses.Settings:
+    properties:
+      backup_path:
+        type: string
+      email:
+        type: string
+      entrance:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: string
+      username:
+        type: string
+      website_path:
+        type: string
+    type: object
 info:
   contact:
     email: i@haozi.net
@@ -260,7 +311,7 @@ paths:
       - BearerToken: []
       summary: 获取算法列表
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/caProviders:
     get:
       description: 获取面板证书管理支持的 CA 提供商
@@ -279,7 +330,7 @@ paths:
       - BearerToken: []
       summary: 获取 CA 提供商
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/certs:
     get:
       description: 获取面板证书管理的证书列表
@@ -307,7 +358,7 @@ paths:
       - BearerToken: []
       summary: 获取证书列表
       tags:
-      - 证书
+      - 证书管理
     post:
       consumes:
       - application/json
@@ -338,7 +389,7 @@ paths:
       - BearerToken: []
       summary: 添加证书
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/certs/{id}:
     delete:
       consumes:
@@ -369,7 +420,7 @@ paths:
       - BearerToken: []
       summary: 删除证书
       tags:
-      - 证书
+      - 证书管理
     get:
       description: 获取面板证书管理的证书
       parameters:
@@ -402,7 +453,7 @@ paths:
       - BearerToken: []
       summary: 获取证书
       tags:
-      - 证书
+      - 证书管理
     put:
       consumes:
       - application/json
@@ -438,7 +489,7 @@ paths:
       - BearerToken: []
       summary: 更新证书
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/dns:
     get:
       description: 获取面板证书管理的 DNS 接口列表
@@ -466,7 +517,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 接口列表
       tags:
-      - 证书
+      - 证书管理
     post:
       consumes:
       - application/json
@@ -497,7 +548,7 @@ paths:
       - BearerToken: []
       summary: 添加 DNS 接口
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/dns/{id}:
     delete:
       consumes:
@@ -528,7 +579,7 @@ paths:
       - BearerToken: []
       summary: 删除 DNS 接口
       tags:
-      - 证书
+      - 证书管理
     get:
       description: 获取面板证书管理的 DNS 接口
       parameters:
@@ -561,7 +612,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 接口
       tags:
-      - 证书
+      - 证书管理
     put:
       consumes:
       - application/json
@@ -597,7 +648,7 @@ paths:
       - BearerToken: []
       summary: 更新 DNS 接口
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/dnsProviders:
     get:
       description: 获取面板证书管理支持的 DNS 提供商
@@ -616,7 +667,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 提供商
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/manualDNS:
     post:
       consumes:
@@ -655,7 +706,7 @@ paths:
       - BearerToken: []
       summary: 获取手动 DNS 记录
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/obtain:
     post:
       consumes:
@@ -687,7 +738,7 @@ paths:
       - BearerToken: []
       summary: 签发证书
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/renew:
     post:
       consumes:
@@ -719,7 +770,7 @@ paths:
       - BearerToken: []
       summary: 续签证书
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/users:
     get:
       description: 获取面板证书管理的 ACME 用户列表
@@ -747,7 +798,7 @@ paths:
       - BearerToken: []
       summary: 获取用户列表
       tags:
-      - 证书
+      - 证书管理
     post:
       consumes:
       - application/json
@@ -778,7 +829,7 @@ paths:
       - BearerToken: []
       summary: 添加 ACME 用户
       tags:
-      - 证书
+      - 证书管理
   /panel/cert/users/{id}:
     delete:
       consumes:
@@ -809,7 +860,7 @@ paths:
       - BearerToken: []
       summary: 删除 ACME 用户
       tags:
-      - 证书
+      - 证书管理
     get:
       description: 获取面板证书管理的 ACME 用户
       parameters:
@@ -842,7 +893,7 @@ paths:
       - BearerToken: []
       summary: 获取 ACME 用户
       tags:
-      - 证书
+      - 证书管理
     put:
       consumes:
       - application/json
@@ -878,7 +929,95 @@ paths:
       - BearerToken: []
       summary: 更新 ACME 用户
       tags:
-      - 证书
+      - 证书管理
+  /panel/setting/list:
+    get:
+      description: 获取面板设置列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/responses.Settings'
+              type: object
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 设置列表
+      tags:
+      - 面板设置
+  /panel/setting/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新面板设置
+      parameters:
+      - description: 更新设置
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Update'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 更新设置
+      tags:
+      - 面板设置
+  /panel/user/info:
+    get:
+      description: 获取当前登录用户信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/responses.Info'
+              type: object
+        "401":
+          description: 登录已过期
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+        "500":
+          description: 系统内部错误
+          schema:
+            $ref: '#/definitions/controllers.ErrorResponse'
+      security:
+      - BearerToken: []
+      summary: 用户信息
+      tags:
+      - 用户鉴权
   /panel/user/login:
     post:
       consumes:
@@ -906,9 +1045,9 @@ paths:
           description: 系统内部错误
           schema:
             $ref: '#/definitions/controllers.ErrorResponse'
-      summary: 用户登录
+      summary: 登录
       tags:
-      - 用户
+      - 用户鉴权
   /swagger:
     get:
       description: Swagger UI

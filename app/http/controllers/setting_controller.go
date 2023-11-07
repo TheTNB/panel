@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"regexp"
-
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/spf13/cast"
 
+	requests "panel/app/http/requests/setting"
+	responses "panel/app/http/responses/setting"
 	"panel/app/models"
 	"panel/app/services"
 	"panel/pkg/tools"
@@ -21,7 +22,16 @@ func NewSettingController() *SettingController {
 	}
 }
 
-// List 获取设置列表
+// List
+// @Summary 设置列表
+// @Description 获取面板设置列表
+// @Tags 面板设置
+// @Produce json
+// @Security BearerToken
+// @Success 200 {object} SuccessResponse{data=responses.Settings}
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/setting/list [get]
 func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
 	err := facades.Orm().Query().Get(&settings)
@@ -30,18 +40,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	type data struct {
-		Name        string `json:"name"`
-		Username    string `json:"username"`
-		Password    string `json:"password"`
-		Email       string `json:"email"`
-		Port        string `json:"port"`
-		Entrance    string `json:"entrance"`
-		WebsitePath string `json:"website_path"`
-		BackupPath  string `json:"backup_path"`
-	}
-
-	var result data
+	var result responses.Settings
 	result.Name = r.setting.Get(models.SettingKeyName)
 	result.Entrance = facades.Config().GetString("http.entrance")
 	result.WebsitePath = r.setting.Get(models.SettingKeyWebsitePath)
@@ -61,78 +60,89 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	return Success(ctx, result)
 }
 
-// Save 保存设置
-func (r *SettingController) Save(ctx http.Context) http.Response {
-	name := ctx.Request().Input("name")
-	port := ctx.Request().Input("port")
-	backupPath := ctx.Request().Input("backup_path")
-	websitePath := ctx.Request().Input("website_path")
-	entrance := ctx.Request().Input("entrance")
-	username := ctx.Request().Input("username")
-	email := ctx.Request().Input("email")
-	password := ctx.Request().Input("password")
-
-	if !regexp.MustCompile(`^/[^/]*[^/]$`).MatchString(entrance) || entrance == "/api" {
-		return Error(ctx, http.StatusUnprocessableEntity, "入口格式错误")
+// Update
+// @Summary 更新设置
+// @Description 更新面板设置
+// @Tags 面板设置
+// @Accept json
+// @Produce json
+// @Security BearerToken
+// @Param data body requests.Update true "更新设置"
+// @Success 200 {object} SuccessResponse
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/setting/update [post]
+func (r *SettingController) Update(ctx http.Context) http.Response {
+	var updateRequest requests.Update
+	sanitize := Sanitize(ctx, &updateRequest)
+	if sanitize != nil {
+		return sanitize
 	}
 
-	err := r.setting.Set(models.SettingKeyName, name)
+	err := r.setting.Set(models.SettingKeyName, updateRequest.Name)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "面板设置").Error("保存面板名称失败")
 		return ErrorSystem(ctx)
 	}
-	oldPort := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
-	if oldPort != port {
-		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
-	}
-	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
-	if oldEntrance != entrance {
-		tools.Exec("sed -i 's/APP_ENTRANCE=" + oldEntrance + "/APP_ENTRANCE=" + entrance + "/g' /www/panel/panel.conf")
-	}
 
-	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+	if !tools.Exists(updateRequest.BackupPath) {
+		tools.Mkdir(updateRequest.BackupPath, 0644)
 	}
-	err = r.setting.Set(models.SettingKeyBackupPath, backupPath)
+	err = r.setting.Set(models.SettingKeyBackupPath, updateRequest.BackupPath)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "面板设置").Error("保存备份目录失败")
 		return ErrorSystem(ctx)
 	}
-	if !tools.Exists(websitePath) {
-		tools.Mkdir(websitePath, 0755)
-		tools.Chown(websitePath, "www", "www")
+	if !tools.Exists(updateRequest.WebsitePath) {
+		tools.Mkdir(updateRequest.WebsitePath, 0755)
+		tools.Chown(updateRequest.WebsitePath, "www", "www")
 	}
-	err = r.setting.Set(models.SettingKeyWebsitePath, websitePath)
+	err = r.setting.Set(models.SettingKeyWebsitePath, updateRequest.WebsitePath)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "面板设置").Error("保存建站目录失败")
 		return ErrorSystem(ctx)
 	}
 
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 获取用户失败 ", err)
 		return ErrorSystem(ctx)
 	}
-
-	if len(username) > 0 {
-		user.Username = username
-	}
-	if len(email) > 0 {
-		user.Email = email
-	}
-	if len(password) > 0 {
-		hash, err := facades.Hash().Make(password)
+	user.Username = updateRequest.UserName
+	user.Email = updateRequest.Email
+	if len(updateRequest.Password) > 0 {
+		hash, err := facades.Hash().Make(updateRequest.Password)
 		if err != nil {
-			facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
 			return ErrorSystem(ctx)
 		}
 		user.Password = hash
 	}
-
 	if err = facades.Orm().Query().Save(&user); err != nil {
-		facades.Log().Error("[面板][SettingController] 保存设置失败 ", err)
+		facades.Log().Request(ctx.Request()).With(map[string]any{
+			"error": err.Error(),
+		}).Tags("面板", "面板设置").Error("保存用户信息失败")
 		return ErrorSystem(ctx)
+	}
+
+	oldPort := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	port := cast.ToString(updateRequest.Port)
+	if oldPort != port {
+		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+	}
+	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	entrance := cast.ToString(updateRequest.Entrance)
+	if oldEntrance != entrance {
+		tools.Exec("sed -i 's/APP_ENTRANCE=" + oldEntrance + "/APP_ENTRANCE=" + entrance + "/g' /www/panel/panel.conf")
+	}
+
+	if oldPort != port || oldEntrance != entrance {
+		tools.RestartPanel()
 	}
 
 	return Success(ctx, nil)

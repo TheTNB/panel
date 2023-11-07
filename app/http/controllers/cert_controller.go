@@ -27,7 +27,7 @@ func NewCertController() *CertController {
 // CAProviders
 // @Summary 获取 CA 提供商
 // @Description 获取面板证书管理支持的 CA 提供商
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse
@@ -61,7 +61,7 @@ func (r *CertController) CAProviders(ctx http.Context) http.Response {
 // DNSProviders
 // @Summary 获取 DNS 提供商
 // @Description 获取面板证书管理支持的 DNS 提供商
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse
@@ -87,7 +87,7 @@ func (r *CertController) DNSProviders(ctx http.Context) http.Response {
 // Algorithms
 // @Summary 获取算法列表
 // @Description 获取面板证书管理支持的算法列表
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse
@@ -117,7 +117,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 // UserList
 // @Summary 获取用户列表
 // @Description 获取面板证书管理的 ACME 用户列表
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse{data=responses.CertList}
@@ -150,7 +150,7 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 // UserStore
 // @Summary 添加 ACME 用户
 // @Description 添加 ACME 用户到面板证书管理
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -180,7 +180,7 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 // UserUpdate
 // @Summary 更新 ACME 用户
 // @Description 更新面板证书管理的 ACME 用户
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -212,7 +212,7 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 // UserShow
 // @Summary 获取 ACME 用户
 // @Description 获取面板证书管理的 ACME 用户
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Param id path int true "用户 ID"
@@ -242,7 +242,7 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 // UserDestroy
 // @Summary 删除 ACME 用户
 // @Description 删除面板证书管理的 ACME 用户
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -273,7 +273,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 // DNSList
 // @Summary 获取 DNS 接口列表
 // @Description 获取面板证书管理的 DNS 接口列表
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse{data=responses.DNSList}
@@ -306,7 +306,7 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 // DNSStore
 // @Summary 添加 DNS 接口
 // @Description 添加 DNS 接口到面板证书管理
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -336,7 +336,7 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 // DNSShow
 // @Summary 获取 DNS 接口
 // @Description 获取面板证书管理的 DNS 接口
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Param id path int true "DNS 接口 ID"
@@ -366,7 +366,7 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 // DNSUpdate
 // @Summary 更新 DNS 接口
 // @Description 更新面板证书管理的 DNS 接口
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -398,7 +398,7 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 // DNSDestroy
 // @Summary 删除 DNS 接口
 // @Description 删除面板证书管理的 DNS 接口
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -429,7 +429,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 // CertList
 // @Summary 获取证书列表
 // @Description 获取面板证书管理的证书列表
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Success 200 {object} SuccessResponse{data=responses.CertList}
@@ -462,7 +462,7 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 // CertStore
 // @Summary 添加证书
 // @Description 添加证书到面板证书管理
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -492,7 +492,7 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 // CertUpdate
 // @Summary 更新证书
 // @Description 更新面板证书管理的证书
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -524,7 +524,7 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 // CertShow
 // @Summary 获取证书
 // @Description 获取面板证书管理的证书
-// @Tags 证书
+// @Tags 证书管理
 // @Produce json
 // @Security BearerToken
 // @Param id path int true "证书 ID"
@@ -554,7 +554,7 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 // CertDestroy
 // @Summary 删除证书
 // @Description 删除面板证书管理的证书
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -585,7 +585,7 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 // Obtain
 // @Summary 签发证书
 // @Description 签发面板证书管理的证书
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -628,7 +628,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 // Renew
 // @Summary 续签证书
 // @Description 续签面板证书管理的证书
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken
@@ -658,7 +658,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 // ManualDNS
 // @Summary 获取手动 DNS 记录
 // @Description 获取签发证书所需的 DNS 记录
-// @Tags 证书
+// @Tags 证书管理
 // @Accept json
 // @Produce json
 // @Security BearerToken

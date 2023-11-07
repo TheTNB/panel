@@ -30,7 +30,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取算法列表",
                 "responses": {
@@ -61,7 +61,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取 CA 提供商",
                 "responses": {
@@ -92,7 +92,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取证书列表",
                 "responses": {
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "添加证书",
                 "parameters": [
@@ -190,7 +190,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取证书",
                 "parameters": [
@@ -249,7 +249,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "更新证书",
                 "parameters": [
@@ -305,7 +305,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "删除证书",
                 "parameters": [
@@ -351,7 +351,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取 DNS 接口列表",
                 "responses": {
@@ -401,7 +401,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "添加 DNS 接口",
                 "parameters": [
@@ -449,7 +449,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取 DNS 接口",
                 "parameters": [
@@ -508,7 +508,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "更新 DNS 接口",
                 "parameters": [
@@ -564,7 +564,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "删除 DNS 接口",
                 "parameters": [
@@ -610,7 +610,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取 DNS 提供商",
                 "responses": {
@@ -644,7 +644,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取手动 DNS 记录",
                 "parameters": [
@@ -710,7 +710,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "签发证书",
                 "parameters": [
@@ -761,7 +761,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "续签证书",
                 "parameters": [
@@ -809,7 +809,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取用户列表",
                 "responses": {
@@ -859,7 +859,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "添加 ACME 用户",
                 "parameters": [
@@ -907,7 +907,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "获取 ACME 用户",
                 "parameters": [
@@ -966,7 +966,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "更新 ACME 用户",
                 "parameters": [
@@ -1022,7 +1022,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书"
+                    "证书管理"
                 ],
                 "summary": "删除 ACME 用户",
                 "parameters": [
@@ -1056,6 +1056,155 @@ const docTemplate = `{
                 }
             }
         },
+        "/panel/setting/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取面板设置列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "面板设置"
+                ],
+                "summary": "设置列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/responses.Settings"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/setting/update": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新面板设置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "面板设置"
+                ],
+                "summary": "更新设置",
+                "parameters": [
+                    {
+                        "description": "更新设置",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Update"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/user/info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取当前登录用户信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户鉴权"
+                ],
+                "summary": "用户信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/responses.Info"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "登录已过期",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "系统内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/panel/user/login": {
             "post": {
                 "description": "通过用户名和密码获取访问令牌",
@@ -1066,9 +1215,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "用户"
+                    "用户鉴权"
                 ],
-                "summary": "用户登录",
+                "summary": "登录",
                 "parameters": [
                     {
                         "description": "登录信息",
@@ -1404,6 +1553,35 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.Update": {
+            "type": "object",
+            "properties": {
+                "backup_path": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "entrance": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "website_path": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.UserStore": {
             "type": "object",
             "properties": {
@@ -1472,6 +1650,55 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "responses.Info": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.Settings": {
+            "type": "object",
+            "properties": {
+                "backup_path": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "entrance": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "website_path": {
+                    "type": "string"
                 }
             }
         }

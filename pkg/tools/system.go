@@ -14,13 +14,21 @@ import (
 // Write 写入文件
 func Write(path string, data string, permission os.FileMode) bool {
 	if err := os.MkdirAll(filepath.Dir(path), permission); err != nil {
-		facades.Log().Errorf("[面板][Helpers] 创建目录失败: %s", err.Error())
+		facades.Log().With(map[string]any{
+			"path":       filepath.Dir(path),
+			"permission": permission,
+			"error":      err.Error(),
+		}).Tags("面板", "工具函数").Error("创建目录失败")
 		return false
 	}
 
 	err := os.WriteFile(path, []byte(data), permission)
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 写入文件 %s 失败: %s", path, err.Error())
+		facades.Log().With(map[string]any{
+			"path":       path,
+			"permission": permission,
+			"error":      err.Error(),
+		}).Tags("面板", "工具函数").Error("写入文件失败")
 		return false
 	}
 
@@ -31,17 +39,23 @@ func Write(path string, data string, permission os.FileMode) bool {
 func Read(path string) string {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 读取文件 %s 失败: %s", path, err.Error())
+		facades.Log().With(map[string]any{
+			"path":  path,
+			"error": err.Error(),
+		}).Tags("面板", "工具函数").Error("读取文件失败")
 		return ""
 	}
 
 	return string(data)
 }
 
-// Remove 删除文件
+// Remove 删除文件/目录
 func Remove(path string) bool {
-	if err := os.Remove(path); err != nil {
-		facades.Log().Errorf("[面板][Helpers] 删除文件 %s 失败: %s", path, err.Error())
+	if err := os.RemoveAll(path); err != nil {
+		facades.Log().With(map[string]any{
+			"path":  path,
+			"error": err.Error(),
+		}).Tags("面板", "工具函数").Error("删除文件/目录失败")
 		return false
 	}
 
@@ -59,7 +73,10 @@ func Exec(shell string) string {
 			fmt.Println(err.Error())
 			panic(err)
 		} else {
-			facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
+			facades.Log().With(map[string]any{
+				"shell": shell,
+				"error": err.Error(),
+			}).Tags("面板", "工具函数").Error("执行命令失败")
 		}
 		return ""
 	}
@@ -68,17 +85,11 @@ func Exec(shell string) string {
 }
 
 // ExecAsync 异步执行 shell 命令
-func ExecAsync(shell string) {
+func ExecAsync(shell string) error {
 	cmd := exec.Command("bash", "-c", shell)
-
 	err := cmd.Start()
 	if err != nil {
-		if support.Env == support.EnvTest {
-			fmt.Println(err.Error())
-			panic(err)
-		} else {
-			facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
-		}
+		return err
 	}
 
 	go func() {
@@ -88,39 +99,56 @@ func ExecAsync(shell string) {
 				fmt.Println(err.Error())
 				panic(err)
 			} else {
-				facades.Log().Errorf("[面板][Helpers] 执行命令 %s 失败: %s", shell, err.Error())
+				facades.Log().With(map[string]any{
+					"shell": shell,
+					"error": err.Error(),
+				}).Tags("面板", "工具函数").Error("异步执行命令失败")
 			}
 		}
 	}()
+
+	return nil
 }
 
 // Mkdir 创建目录
 func Mkdir(path string, permission os.FileMode) bool {
 	if err := os.MkdirAll(path, permission); err != nil {
-		facades.Log().Errorf("[面板][Helpers] 创建目录 %s 失败: %s", path, err.Error())
+		facades.Log().With(map[string]any{
+			"path":       path,
+			"permission": permission,
+			"error":      err.Error(),
+		}).Tags("面板", "工具函数").Error("创建目录失败")
 		return false
 	}
 
 	return true
 }
 
-// Chmod 修改文件权限
+// Chmod 修改文件/目录权限
 func Chmod(path string, permission os.FileMode) bool {
 	if err := os.Chmod(path, permission); err != nil {
-		facades.Log().Errorf("[面板][Helpers] 修改文件 %s 权限失败: %s", path, err.Error())
+		facades.Log().With(map[string]any{
+			"path":       path,
+			"permission": permission,
+		}).Tags("面板", "工具函数").Error("修改文件/目录权限失败")
 		return false
 	}
 
 	return true
 }
 
-// Chown 修改路径所有者
+// Chown 修改文件/目录所有者
 func Chown(path, user, group string) bool {
 	cmd := exec.Command("chown", "-R", user+":"+group, path)
 
 	err := cmd.Run()
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 修改路径 %s 所有者失败: %s", path, err.Error())
+		facades.Log().With(map[string]any{
+			"path":  path,
+			"user":  user,
+			"group": group,
+			"error": err.Error(),
+		}).Tags("面板", "工具函数").Error("修改文件/目录所有者失败")
 		return false
 	}
 
@@ -143,20 +171,19 @@ func Empty(path string) bool {
 	return len(files) == 0
 }
 
-// Mv 移动路径
+// Mv 移动文件/目录
 func Mv(src, dst string) (bool, error) {
 	cmd := exec.Command("mv", src, dst)
 
 	err := cmd.Run()
 	if err != nil {
-		facades.Log().Errorf("[面板][Helpers] 移动 %s 到 %s 失败: %s", src, dst, err.Error())
 		return false, err
 	}
 
 	return true, nil
 }
 
-// Cp 复制路径
+// Cp 复制文件/目录
 func Cp(src, dst string) (bool, error) {
 	cmd := exec.Command("cp", "-r", src, dst)
 

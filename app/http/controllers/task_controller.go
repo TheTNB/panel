@@ -38,7 +38,7 @@ func (r *TaskController) List(ctx http.Context) http.Response {
 	var total int64
 	err := facades.Orm().Query().Order("id desc").Paginate(ctx.Request().QueryInt("page", 1), ctx.Request().QueryInt("limit", 10), &tasks, &total)
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
 		}).Error("[面板][TaskController] 查询任务列表失败")
 		return ErrorSystem(ctx)
@@ -55,7 +55,7 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("id", ctx.Request().QueryInt("id")).FirstOrFail(&task)
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
 		}).Error("[面板][TaskController] 查询任务失败")

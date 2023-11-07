@@ -55,7 +55,8 @@ func (s *SystemHelperTestSuite) TestExecAsync() {
 	command := "echo 'test' > /tmp/testfile"
 	defer os.Remove("/tmp/testfile")
 
-	ExecAsync(command)
+	err := ExecAsync(command)
+	s.Nil(err)
 
 	time.Sleep(time.Second)
 

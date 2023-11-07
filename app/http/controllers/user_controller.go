@@ -5,6 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/http/requests/user"
+	responses "panel/app/http/responses/user"
 	"panel/app/models"
 )
 
@@ -19,9 +20,9 @@ func NewUserController() *UserController {
 }
 
 // Login
-// @Summary 用户登录
+// @Summary 登录
 // @Description 通过用户名和密码获取访问令牌
-// @Tags 用户
+// @Tags 用户鉴权
 // @Accept json
 // @Produce json
 // @Param data body requests.Login true "登录信息"
@@ -72,21 +73,30 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	})
 }
 
-// Info 用户信息
+// Info
+// @Summary 用户信息
+// @Description 获取当前登录用户信息
+// @Tags 用户鉴权
+// @Produce json
+// @Security BearerToken
+// @Success 200 {object} SuccessResponse{data=responses.Info}
+// @Failure 401 {object} ErrorResponse "登录已过期"
+// @Failure 500 {object} ErrorResponse "系统内部错误"
+// @Router /panel/user/info [get]
 func (r *UserController) Info(ctx http.Context) http.Response {
 	var user models.User
 	err := facades.Auth().User(ctx, &user)
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Error("[面板][UserController] 查询用户信息失败")
+		}).Tags("面板", "用户").Error("获取用户信息失败")
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
-		"id":       user.ID,
-		"role":     []string{"admin"},
-		"username": user.Username,
-		"email":    user.Email,
+	return Success(ctx, responses.Info{
+		ID:       user.ID,
+		Role:     []string{"admin"},
+		Username: user.Username,
+		Email:    user.Email,
 	})
 }
