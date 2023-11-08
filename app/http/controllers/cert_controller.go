@@ -171,7 +171,7 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Error("添加ACME用户失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -203,7 +203,7 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 			"userID": updateRequest.ID,
 			"error":  err.Error(),
 		}).Error("更新ACME用户失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -264,7 +264,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Error("删除ACME用户失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -420,7 +420,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
 		}).Error("删除DNS接口失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
