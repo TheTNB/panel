@@ -1,3 +1,7 @@
+<p align="right">
+[简体中文] | [<a href="README_EN.md">English</a>]
+</p>
+
 <h1 align="center">耗子 Linux 面板</h1>
 
 <p align="center">
@@ -7,10 +11,6 @@
   <a href="https://codecov.io/gh/haozi-team/panel"><img src="https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
   <a href="https://img.shields.io/github/license/haozi-team/panel"><img src="https://img.shields.io/github/license/haozi-team/panel"></a>
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
-</p>
-
-<p align="center">
-[简体中文] | [<a href="README_EN.md">English</a>]
 </p>
 
 耗子 Linux 面板是使用 Golang + Vue 开发的轻量 Linux 服务器运维管理面板，以 GNU Affero General Public License v3.0 开源。
@@ -50,7 +50,8 @@ CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移�
 
 ## 安装面板
 
-安装面板前，你需要了解LNMP环境的基本知识，以及如何处理常见的LNMP环境问题，不建议0基础的用户安装和使用耗子Linux面板（[推荐: 宝塔 - 简单好用服务器运维面板](https://www.bt.cn/?invite_code=M190eXRpZWE=)）。
+> **Warning**
+> 安装面板前，你需要了解LNMP环境的基本知识，以及如何处理常见的LNMP环境问题，不建议0基础的用户安装和使用耗子Linux面板。
 
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
@@ -106,10 +107,6 @@ panel
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 
 - [盾云CDN](http://cdn.ddunyun.com/)
-
-### 对象存储
-
-- [又拍云](https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral)
 
 ### DevOps
 

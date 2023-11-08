@@ -1,3 +1,7 @@
+<p align="right">
+[<a href="README.md">简体中文</a>] | [English]
+</p>
+
 <h1 align="center">HaoZi Linux Panel</h1>
 
 <p align="center">
@@ -7,10 +11,6 @@
   <a href="https://codecov.io/gh/haozi-team/panel"><img src="https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
   <a href="https://img.shields.io/github/license/haozi-team/panel"><img src="https://img.shields.io/github/license/haozi-team/panel"></a>
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
-</p>
-
-<p align="center">
-[<a href="README.md">简体中文</a>] | [English]
 </p>
 
 The HaoZi Linux Panel is a lightweight Linux server operation and maintenance management panel developed using Golang and Vue. It is open source under the GNU Affero General Public License v3.0 protocol.
@@ -50,7 +50,8 @@ As system versions are constantly updated, we may also terminate support for som
 
 ## Install Panel
 
-Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. It is not recommended for users with zero basic knowledge to install and use HaoZi Linux Panel ([Recommended: aaPanel - easy-to-use server operation and maintenance panel](https://aapanel.com)).
+> **Warning**
+> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. It is not recommended for users with zero basic knowledge to install and use HaoZi Linux Panel.
 
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
@@ -106,10 +107,6 @@ You can find or create an Issue in [Issue List](https://github.com/haozi-team/pa
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 
 - [盾云CDN](http://cdn.ddunyun.com/)
-
-### Object Storage
-
-- [又拍云](https://www.upyun.com/?utm_source=lianmeng&utm_medium=referral)
 
 ### DevOps
 
