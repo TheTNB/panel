@@ -132,13 +132,13 @@ func (s *CertImpl) UserShow(ID uint) (models.CertUser, error) {
 
 // UserDestroy 删除用户
 func (s *CertImpl) UserDestroy(ID uint) error {
-	var user models.CertUser
-	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&user)
+	var cert models.Cert
+	err := facades.Orm().Query().Where("user_id = ?", ID).First(&cert)
 	if err != nil {
 		return err
 	}
 
-	if user.Certs != nil {
+	if cert.ID != 0 {
 		return errors.New("该用户下存在证书，无法删除")
 	}
 
@@ -181,13 +181,13 @@ func (s *CertImpl) DNSShow(ID uint) (models.CertDNS, error) {
 
 // DNSDestroy 删除 DNS
 func (s *CertImpl) DNSDestroy(ID uint) error {
-	var dns models.CertDNS
-	err := facades.Orm().Query().With("Certs").Where("id = ?", ID).First(&dns)
+	var cert models.Cert
+	err := facades.Orm().Query().Where("dns_id = ?", ID).First(&cert)
 	if err != nil {
 		return err
 	}
 
-	if dns.Certs != nil {
+	if cert.ID != 0 {
 		return errors.New("该 DNS 接口下存在证书，无法删除")
 	}
 
