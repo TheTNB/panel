@@ -1348,6 +1348,9 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "dns": {
+                    "$ref": "#/definitions/models.CertDNS"
+                },
                 "dns_id": {
                     "description": "关联的 DNS ID",
                     "type": "integer"
@@ -1372,9 +1375,15 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string"
                 },
+                "user": {
+                    "$ref": "#/definitions/models.CertUser"
+                },
                 "user_id": {
                     "description": "关联的 ACME 用户 ID",
                     "type": "integer"
+                },
+                "website": {
+                    "$ref": "#/definitions/models.Website"
                 },
                 "website_id": {
                     "description": "关联的网站 ID",
@@ -1434,6 +1443,41 @@ const docTemplate = `{
                 },
                 "private_key": {
                     "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Website": {
+            "type": "object",
+            "properties": {
+                "cert": {
+                    "$ref": "#/definitions/models.Cert"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "php": {
+                    "type": "integer"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "ssl": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "boolean"
                 },
                 "updated_at": {
                     "type": "string"

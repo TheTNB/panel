@@ -410,7 +410,7 @@ func (s *CertImpl) ManualDNS(ID uint) (map[string]acme.Resolve, error) {
 // Renew 续签证书
 func (s *CertImpl) Renew(ID uint) (certificate.Resource, error) {
 	var cert models.Cert
-	err := facades.Orm().Query().With("User").With("DNS").Where("id = ?", ID).First(&cert)
+	err := facades.Orm().Query().With("Website").With("User").With("DNS").Where("id = ?", ID).First(&cert)
 	if err != nil {
 		return certificate.Resource{}, err
 	}

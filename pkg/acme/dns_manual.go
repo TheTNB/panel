@@ -1,9 +1,9 @@
 package acme
 
 type Resolve struct {
-	Key   string
-	Value string
-	Err   string
+	Key   string `json:"key"`
+	Value string `json:"value"`
+	Err   string `json:"err"`
 }
 
 type manualDnsProvider struct {

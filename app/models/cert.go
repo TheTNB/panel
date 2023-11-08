@@ -18,7 +18,7 @@ type Cert struct {
 	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
 	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
 
-	Website *Website  `gorm:"foreignKey:WebsiteID" json:"-"`
-	User    *CertUser `gorm:"foreignKey:UserID" json:"-"`
-	DNS     *CertDNS  `gorm:"foreignKey:DNSID" json:"-"`
+	Website *Website  `gorm:"foreignKey:WebsiteID" json:"website"`
+	User    *CertUser `gorm:"foreignKey:UserID" json:"user"`
+	DNS     *CertDNS  `gorm:"foreignKey:DNSID" json:"dns"`
 }

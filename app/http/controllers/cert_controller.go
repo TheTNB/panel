@@ -445,7 +445,7 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 
 	var certs []models.Cert
 	var total int64
-	err := facades.Orm().Query().Paginate(paginateRequest.Page, paginateRequest.Limit, &certs, &total)
+	err := facades.Orm().Query().With("Website").With("User").With("DNS").Paginate(paginateRequest.Page, paginateRequest.Limit, &certs, &total)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
@@ -619,7 +619,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Error("签发证书失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -649,7 +649,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Error("续签证书失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -679,7 +679,7 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Error("获取手动DNS记录失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, resolves)

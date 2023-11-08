@@ -7,7 +7,7 @@ import (
 
 type Update struct {
 	Name        string `form:"name" json:"name"`
-	Port        uint   `form:"port" json:"port" filter:"int"`
+	Port        uint   `form:"port" json:"port" filter:"uint"`
 	BackupPath  string `form:"backup_path" json:"backup_path"`
 	WebsitePath string `form:"website_path" json:"website_path"`
 	Entrance    string `form:"entrance" json:"entrance"`
