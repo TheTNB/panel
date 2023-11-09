@@ -351,7 +351,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
-	Exec("bash /www/panel/scripts/update_panel.sh")
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
@@ -367,6 +366,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	Exec("chmod -R 700 /www/panel")
 	color.Greenln("设置完成")
 
+	Exec("bash /www/panel/scripts/update_panel.sh")
 	Exec("panel writeSetting version " + panelInfo.Version)
 
 	Exec("rm -rf /tmp/panel.db.bak")
