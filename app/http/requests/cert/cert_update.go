@@ -11,7 +11,7 @@ type CertUpdate struct {
 	Type      string   `form:"type" json:"type"`
 	Domains   []string `form:"domains" json:"domains"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
-	UserID    uint     `form:"user_id" json:"user_id" filter:"uint"`
+	UserID    uint     `form:"user_id" json:"user_id"`
 	DNSID     *uint    `form:"dns_id" json:"dns_id"`
 	WebsiteID *uint    `form:"website_id" json:"website_id"`
 }
@@ -24,7 +24,7 @@ func (r *CertUpdate) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"id":         "required|uint|min:1|exists:certs,id",
 		"type":       "required|in:P256,P384,2048,4096",
-		"domains":    "required|array",
+		"domains":    "required|slice",
 		"auto_renew": "required|bool",
 		"user_id":    "required|uint|exists:cert_users,id",
 		"dns_id":     "uint",
@@ -42,6 +42,13 @@ func (r *CertUpdate) Attributes(ctx http.Context) map[string]string {
 
 func (r *CertUpdate) PrepareForValidation(ctx http.Context, data validation.Data) error {
 	// TODO 由于验证器 filter 标签的问题，暂时这里这样处理
+	userID, exist := data.Get("user_id")
+	if exist {
+		err := data.Set("user_id", cast.ToUint(userID))
+		if err != nil {
+			return err
+		}
+	}
 	dnsID, exist := data.Get("dns_id")
 	if exist {
 		err := data.Set("dns_id", cast.ToUint(dnsID))

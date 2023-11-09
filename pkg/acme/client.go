@@ -30,12 +30,12 @@ const (
 )
 
 type DNSParam struct {
-	ID        string `json:"id"`
-	Token     string `json:"token"`
-	AccessKey string `json:"access_key"`
-	SecretKey string `json:"secret_key"`
-	Email     string `json:"email"`
-	APIkey    string `json:"api_key"`
+	ID        string `form:"id" json:"id"`
+	Token     string `form:"token" json:"token"`
+	AccessKey string `form:"access_key" json:"access_key"`
+	SecretKey string `form:"secret_key" json:"secret_key"`
+	Email     string `form:"email" json:"email"`
+	APIkey    string `form:"api_key" json:"api_key"`
 }
 
 // UseDns 使用 DNS 接口验证
