@@ -3,8 +3,10 @@ package user
 import (
 	"testing"
 
+	"github.com/goravel/framework/facades"
 	"github.com/stretchr/testify/suite"
 
+	"panel/app/models"
 	"panel/app/services"
 	"panel/tests"
 )
@@ -29,4 +31,18 @@ func (s *UserTestSuite) TestCreate() {
 	user, err := s.user.Create("haozi", "123456")
 	s.Nil(err)
 	s.Equal("haozi", user.Username)
+	_, err = facades.Orm().Query().Where("username", "haozi").Delete(&models.User{})
+	s.Nil(err)
+}
+
+func (s *UserTestSuite) TestUpdate() {
+	user, err := s.user.Create("haozi", "123456")
+	s.Nil(err)
+	s.Equal("haozi", user.Username)
+	user.Username = "haozi2"
+	user, err = s.user.Update(user)
+	s.Nil(err)
+	s.Equal("haozi2", user.Username)
+	_, err = facades.Orm().Query().Where("username", "haozi").Delete(&models.User{})
+	s.Nil(err)
 }

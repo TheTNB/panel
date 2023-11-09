@@ -35,4 +35,13 @@ func (s *SettingTestSuite) TestGet() {
 func (s *SettingTestSuite) TestSet() {
 	err := s.setting.Set("test", "test")
 	s.Nil(err)
+	err = s.setting.Delete("test")
+	s.Nil(err)
+}
+
+func (s *SettingTestSuite) TestDelete() {
+	err := s.setting.Set("test", "test")
+	s.Nil(err)
+	err = s.setting.Delete("test")
+	s.Nil(err)
 }
