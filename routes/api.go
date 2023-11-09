@@ -147,4 +147,6 @@ func Api() {
 	facades.Route().Get(entrance+"/assets/{any}", assetController.Index)
 	facades.Route().Get(entrance+"/loading/{any}", assetController.Index)
 	facades.Route().Get(entrance+"/{any}", assetController.Index)
+	facades.Route().Get(entrance+"/", assetController.Index)
+	facades.Route().Fallback(assetController.NotFound)
 }

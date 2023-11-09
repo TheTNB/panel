@@ -20,8 +20,8 @@ func (receiver *RouteServiceProvider) Boot(app foundation.Application) {
 
 	receiver.configureRateLimiting()
 
-	routes.Api()
 	routes.Plugin()
+	routes.Api()
 }
 
 func (receiver *RouteServiceProvider) configureRateLimiting() {

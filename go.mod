@@ -9,7 +9,7 @@ require (
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.1
 	github.com/goravel/fiber v1.1.11-0.20231108081345-36e967f101d0
-	github.com/goravel/framework v1.13.1-0.20231108041300-502c6154220a
+	github.com/goravel/framework v1.13.1-0.20231109083801-f2c86a7c0796
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mojocn/base64Captcha v1.3.5

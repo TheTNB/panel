@@ -23,11 +23,23 @@ func NewAssetController() *AssetController {
 
 func (r *AssetController) Index(ctx http.Context) http.Response {
 	entrance := facades.Config().GetString("http.entrance")
-	path := strings.TrimPrefix(ctx.Request().Path(), entrance)
+	if entrance == "/" {
+		entrance = ""
+	}
 
 	// 自动纠正 URL 格式
 	if ctx.Request().Path() == entrance && ctx.Request().Path() != "/" {
 		return ctx.Response().Redirect(http.StatusMovedPermanently, ctx.Request().Path()+"/")
+	}
+	// 拒绝访问非入口文件
+	if !strings.HasPrefix(ctx.Request().Path(), entrance) {
+		return ctx.Response().Status(http.StatusNotFound).String(http.StatusText(http.StatusNotFound))
+	}
+
+	path := strings.TrimPrefix(ctx.Request().Path(), entrance)
+	// 设置默认首页
+	if path == "/" || path == "" {
+		path = "/index.html"
 	}
 
 	if !tools.Exists("public" + path) {
@@ -52,7 +64,7 @@ func (r *AssetController) Index(ctx http.Context) http.Response {
 }
 
 func (r *AssetController) Favicon(ctx http.Context) http.Response {
-	return ctx.Response().File("public/favicon.ico")
+	return ctx.Response().File("public/favicon.png")
 }
 
 func (r *AssetController) Robots(ctx http.Context) http.Response {
