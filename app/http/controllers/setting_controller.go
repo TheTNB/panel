@@ -138,7 +138,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 	entrance := cast.ToString(updateRequest.Entrance)
 	if oldEntrance != entrance {
-		tools.Exec("sed -i 's/APP_ENTRANCE=" + oldEntrance + "/APP_ENTRANCE=" + entrance + "/g' /www/panel/panel.conf")
+		tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf")
 	}
 
 	if oldPort != port || oldEntrance != entrance {
