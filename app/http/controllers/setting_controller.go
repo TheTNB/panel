@@ -134,6 +134,15 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	port := cast.ToString(updateRequest.Port)
 	if oldPort != port {
 		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+		if tools.IsRHEL() {
+			tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/tcp --permanent 2>&1")
+			tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/tcp --permanent 2>&1")
+			tools.Exec("firewall-cmd --reload")
+		} else {
+			tools.Exec("ufw delete allow " + cast.ToString(port) + "/tcp")
+			tools.Exec("ufw allow " + cast.ToString(port) + "/tcp")
+			tools.Exec("ufw reload")
+		}
 	}
 	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 	entrance := cast.ToString(updateRequest.Entrance)
