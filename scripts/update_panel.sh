@@ -37,6 +37,13 @@ if [ -z "$oldVersion" ]; then
     echo "Error: can't get panel version"
     exit 1
 fi
+# 判断版本号是否合法
+versionPattern="^[0-9]+\.[0-9]+\.[0-9]+$"
+if [[ ! $oldVersion =~ $versionPattern ]]; then
+    echo "错误：面板版本号不合法"
+    echo "Error: panel version is illegal"
+    exit 1
+fi
 
 echo $HR
 

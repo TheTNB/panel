@@ -347,10 +347,11 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
-	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName + " && bash scripts/update_panel.sh")
+	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName)
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
+	Exec("bash /www/panel/scripts/update_panel.sh")
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
