@@ -36,7 +36,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
 	err := facades.Orm().Query().Get(&settings)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 查询设置列表失败 ", err)
+		facades.Log().Info("[面板][SettingController] 查询设置列表失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -49,7 +49,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
-		facades.Log().Error("[面板][SettingController] 获取用户失败 ", err)
+		facades.Log().Info("[面板][SettingController] 获取用户失败 ", err)
 		return ErrorSystem(ctx)
 	}
 	result.Username = user.Username
@@ -83,7 +83,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Error("保存面板名称失败")
+		}).Tags("面板", "面板设置").Info("保存面板名称失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -94,7 +94,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Error("保存备份目录失败")
+		}).Tags("面板", "面板设置").Info("保存备份目录失败")
 		return ErrorSystem(ctx)
 	}
 	if !tools.Exists(updateRequest.WebsitePath) {
@@ -105,7 +105,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Error("保存建站目录失败")
+		}).Tags("面板", "面板设置").Info("保存建站目录失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -126,7 +126,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	if err = facades.Orm().Query().Save(&user); err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Error("保存用户信息失败")
+		}).Tags("面板", "面板设置").Info("保存用户信息失败")
 		return ErrorSystem(ctx)
 	}
 

@@ -149,7 +149,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
 	}
 
-	if !tools.Write("/www/server/openresty/conf/nginx.conf", config, 0644) {
+	if err := tools.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "保存OpenResty配置失败")
 	}
 
@@ -192,7 +192,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccessState() {
-		facades.Log().Error("[OpenResty] 获取OpenResty负载失败: " + err.Error())
+		facades.Log().Info("[OpenResty] 获取OpenResty负载失败: " + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
 	}
 

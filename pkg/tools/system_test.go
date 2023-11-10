@@ -21,7 +21,7 @@ func (s *SystemHelperTestSuite) TestWrite() {
 	filePath := "/tmp/testfile"
 	defer os.Remove(filePath)
 
-	s.True(Write(filePath, "test data", 0644))
+	s.Nil(Write(filePath, "test data", 0644))
 	s.FileExists(filePath)
 
 	content, _ := os.ReadFile(filePath)

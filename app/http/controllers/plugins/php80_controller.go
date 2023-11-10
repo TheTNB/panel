@@ -158,7 +158,7 @@ func (r *Php80Controller) Load(ctx http.Context) http.Response {
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + r.version)
 	if err != nil || !resp.IsSuccessState() {
-		facades.Log().Error("获取PHP-" + r.version + "运行状态失败")
+		facades.Log().Info("获取PHP-" + r.version + "运行状态失败")
 		return controllers.Error(ctx, http.StatusInternalServerError, "[PHP-"+r.version+"] 获取运行状态失败")
 	}
 
@@ -259,7 +259,7 @@ func (r *Php80Controller) InstallExtension(ctx http.Context) http.Response {
 			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' install ` + r.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
-				facades.Log().Error("[PHP-" + r.version + "] 创建安装拓展任务失败：" + err.Error())
+				facades.Log().Info("[PHP-" + r.version + "] 创建安装拓展任务失败：" + err.Error())
 				return controllers.ErrorSystem(ctx)
 			}
 
@@ -296,7 +296,7 @@ func (r *Php80Controller) UninstallExtension(ctx http.Context) http.Response {
 			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' uninstall ` + r.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
-				facades.Log().Error("[PHP-" + r.version + "] 创建卸载拓展任务失败：" + err.Error())
+				facades.Log().Info("[PHP-" + r.version + "] 创建卸载拓展任务失败：" + err.Error())
 				return controllers.ErrorSystem(ctx)
 			}
 

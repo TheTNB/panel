@@ -34,7 +34,7 @@ func (c *CronController) List(ctx http.Context) http.Response {
 	var total int64
 	err := facades.Orm().Query().Paginate(page, limit, &crons, &total)
 	if err != nil {
-		facades.Log().Error("[面板][CronController] 查询计划任务列表失败 ", err)
+		facades.Log().Info("[面板][CronController] 查询计划任务列表失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -111,16 +111,16 @@ panel cutoff ${name} ${save} 2>&1
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
 	if !tools.Exists(shellDir) {
-		facades.Log().Error("[面板][CronController] 计划任务目录不存在")
+		facades.Log().Info("[面板][CronController] 计划任务目录不存在")
 		return Error(ctx, http.StatusInternalServerError, "计划任务目录不存在")
 	}
 	if !tools.Exists(shellLogDir) {
-		facades.Log().Error("[面板][CronController] 计划任务日志目录不存在")
+		facades.Log().Info("[面板][CronController] 计划任务日志目录不存在")
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if !tools.Write(shellDir+shellFile+".sh", shell, 0700) {
-		facades.Log().Error("[面板][CronController] 创建计划任务脚本失败 ", err)
+	if err = tools.Write(shellDir+shellFile+".sh", shell, 0700); err != nil {
+		facades.Log().Info("[面板][CronController] 创建计划任务脚本失败 ", err)
 		return ErrorSystem(ctx)
 	}
 	tools.Exec("dos2unix " + shellDir + shellFile + ".sh")
@@ -135,7 +135,7 @@ panel cutoff ${name} ${save} 2>&1
 
 	err = facades.Orm().Query().Create(&cron)
 	if err != nil {
-		facades.Log().Error("[面板][CronController] 创建计划任务失败 ", err)
+		facades.Log().Info("[面板][CronController] 创建计划任务失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -190,12 +190,12 @@ func (c *CronController) Update(ctx http.Context) http.Response {
 	cron.Name = ctx.Request().Input("name")
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
-		facades.Log().Error("[面板][CronController] 更新计划任务失败 ", err)
+		facades.Log().Info("[面板][CronController] 更新计划任务失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
-	if !tools.Write(cron.Shell, ctx.Request().Input("script"), 0644) {
-		facades.Log().Error("[面板][CronController] 更新计划任务脚本失败 ", err)
+	if err = tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
+		facades.Log().Info("[面板][CronController] 更新计划任务脚本失败 ", err)
 		return ErrorSystem(ctx)
 	}
 	tools.Exec("dos2unix " + cron.Shell)
@@ -221,7 +221,7 @@ func (c *CronController) Delete(ctx http.Context) http.Response {
 
 	_, err = facades.Orm().Query().Delete(&cron)
 	if err != nil {
-		facades.Log().Error("[面板][CronController] 删除计划任务失败 ", err)
+		facades.Log().Info("[面板][CronController] 删除计划任务失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -249,7 +249,7 @@ func (c *CronController) Status(ctx http.Context) http.Response {
 	cron.Status = ctx.Request().InputBool("status")
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
-		facades.Log().Error("[面板][CronController] 更新计划任务状态失败 ", err)
+		facades.Log().Info("[面板][CronController] 更新计划任务状态失败 ", err)
 		return ErrorSystem(ctx)
 	}
 

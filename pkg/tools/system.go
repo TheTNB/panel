@@ -12,27 +12,17 @@ import (
 )
 
 // Write 写入文件
-func Write(path string, data string, permission os.FileMode) bool {
+func Write(path string, data string, permission os.FileMode) error {
 	if err := os.MkdirAll(filepath.Dir(path), permission); err != nil {
-		facades.Log().With(map[string]any{
-			"path":       filepath.Dir(path),
-			"permission": permission,
-			"error":      err.Error(),
-		}).Tags("面板", "工具函数").Error("创建目录失败")
-		return false
+		return err
 	}
 
 	err := os.WriteFile(path, []byte(data), permission)
 	if err != nil {
-		facades.Log().With(map[string]any{
-			"path":       path,
-			"permission": permission,
-			"error":      err.Error(),
-		}).Tags("面板", "工具函数").Error("写入文件失败")
-		return false
+		return err
 	}
 
-	return true
+	return nil
 }
 
 // Read 读取文件
@@ -42,7 +32,7 @@ func Read(path string) string {
 		facades.Log().With(map[string]any{
 			"path":  path,
 			"error": err.Error(),
-		}).Tags("面板", "工具函数").Error("读取文件失败")
+		}).Tags("面板", "工具函数").Info("读取文件失败")
 		return ""
 	}
 
@@ -55,7 +45,7 @@ func Remove(path string) bool {
 		facades.Log().With(map[string]any{
 			"path":  path,
 			"error": err.Error(),
-		}).Tags("面板", "工具函数").Error("删除文件/目录失败")
+		}).Tags("面板", "工具函数").Info("删除文件/目录失败")
 		return false
 	}
 
@@ -76,7 +66,7 @@ func Exec(shell string) string {
 			facades.Log().With(map[string]any{
 				"shell": shell,
 				"error": err.Error(),
-			}).Tags("面板", "工具函数").Error("执行命令失败")
+			}).Tags("面板", "工具函数").Info("执行命令失败")
 		}
 		return ""
 	}
@@ -102,7 +92,7 @@ func ExecAsync(shell string) error {
 				facades.Log().With(map[string]any{
 					"shell": shell,
 					"error": err.Error(),
-				}).Tags("面板", "工具函数").Error("异步执行命令失败")
+				}).Tags("面板", "工具函数").Info("异步执行命令失败")
 			}
 		}
 	}()
@@ -117,7 +107,7 @@ func Mkdir(path string, permission os.FileMode) bool {
 			"path":       path,
 			"permission": permission,
 			"error":      err.Error(),
-		}).Tags("面板", "工具函数").Error("创建目录失败")
+		}).Tags("面板", "工具函数").Info("创建目录失败")
 		return false
 	}
 
@@ -130,7 +120,7 @@ func Chmod(path string, permission os.FileMode) bool {
 		facades.Log().With(map[string]any{
 			"path":       path,
 			"permission": permission,
-		}).Tags("面板", "工具函数").Error("修改文件/目录权限失败")
+		}).Tags("面板", "工具函数").Info("修改文件/目录权限失败")
 		return false
 	}
 
@@ -148,7 +138,7 @@ func Chown(path, user, group string) bool {
 			"user":  user,
 			"group": group,
 			"error": err.Error(),
-		}).Tags("面板", "工具函数").Error("修改文件/目录所有者失败")
+		}).Tags("面板", "工具函数").Info("修改文件/目录所有者失败")
 		return false
 	}
 

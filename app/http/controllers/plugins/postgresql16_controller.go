@@ -168,7 +168,7 @@ func (r *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if !tools.Write("/www/server/postgresql/data/postgresql.conf", config, 0644) {
+	if err := tools.Write("/www/server/postgresql/data/postgresql.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
@@ -187,7 +187,7 @@ func (r *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response 
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if !tools.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644) {
+	if err := tools.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
@@ -369,7 +369,7 @@ func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
 
 	backupList, err := r.backup.PostgresqlList()
 	if err != nil {
-		facades.Log().Error("[PostgreSQL] 获取备份列表失败：" + err.Error())
+		facades.Log().Info("[PostgreSQL] 获取备份列表失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
@@ -443,7 +443,7 @@ func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	err = r.backup.PostgresqlBackup(database)
 	if err != nil {
-		facades.Log().Error("[PostgreSQL] 创建备份失败：" + err.Error())
+		facades.Log().Info("[PostgreSQL] 创建备份失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
 	}
 
@@ -494,7 +494,7 @@ func (r *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 
 	err = r.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
-		facades.Log().Error("[PostgreSQL] 还原失败：" + err.Error())
+		facades.Log().Info("[PostgreSQL] 还原失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 	}
 

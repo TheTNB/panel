@@ -40,7 +40,7 @@ func (r *TaskController) List(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Error("[面板][TaskController] 查询任务列表失败")
+		}).Info("[面板][TaskController] 查询任务列表失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -58,7 +58,7 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
-		}).Error("[面板][TaskController] 查询任务失败")
+		}).Info("[面板][TaskController] 查询任务失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -75,7 +75,7 @@ func (r *TaskController) Delete(ctx http.Context) http.Response {
 		facades.Log().With(map[string]any{
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
-		}).Error("[面板][TaskController] 删除任务失败")
+		}).Info("[面板][TaskController] 删除任务失败")
 		return ErrorSystem(ctx)
 	}
 

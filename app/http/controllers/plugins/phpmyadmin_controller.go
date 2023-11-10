@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
@@ -65,7 +66,13 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+port+";")
-	tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644)
+	err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
+			"error": err.Error(),
+		}).Info("修改 phpMyAdmin 端口失败")
+		return controllers.ErrorSystem(ctx)
+	}
 
 	if tools.IsRHEL() {
 		tools.Exec("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent")

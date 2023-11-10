@@ -120,6 +120,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 // @Tags 证书管理
 // @Produce json
 // @Security BearerToken
+// @Param data body commonrequests.Paginate true "分页信息"
 // @Success 200 {object} SuccessResponse{data=responses.CertList}
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
@@ -137,11 +138,11 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("获取ACME用户列表失败")
+		}).Info("获取ACME用户列表失败")
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, &responses.UserList{
+	return Success(ctx, responses.UserList{
 		Total: total,
 		Items: users,
 	})
@@ -170,7 +171,7 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("添加ACME用户失败")
+		}).Info("添加ACME用户失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -202,7 +203,7 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"userID": updateRequest.ID,
 			"error":  err.Error(),
-		}).Error("更新ACME用户失败")
+		}).Info("更新ACME用户失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -232,7 +233,7 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
-		}).Error("获取ACME用户失败")
+		}).Info("获取ACME用户失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -263,7 +264,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
-		}).Error("删除ACME用户失败")
+		}).Info("删除ACME用户失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -276,6 +277,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 // @Tags 证书管理
 // @Produce json
 // @Security BearerToken
+// @Param data body commonrequests.Paginate true "分页信息"
 // @Success 200 {object} SuccessResponse{data=responses.DNSList}
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
@@ -293,11 +295,11 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("获取DNS接口列表失败")
+		}).Info("获取DNS接口列表失败")
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, &responses.DNSList{
+	return Success(ctx, responses.DNSList{
 		Total: total,
 		Items: dns,
 	})
@@ -326,7 +328,7 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("添加DNS接口失败")
+		}).Info("添加DNS接口失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -356,7 +358,7 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
-		}).Error("获取DNS接口失败")
+		}).Info("获取DNS接口失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -388,7 +390,7 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"dnsID": updateRequest.ID,
 			"error": err.Error(),
-		}).Error("更新DNS接口失败")
+		}).Info("更新DNS接口失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -419,7 +421,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
-		}).Error("删除DNS接口失败")
+		}).Info("删除DNS接口失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -432,6 +434,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 // @Tags 证书管理
 // @Produce json
 // @Security BearerToken
+// @Param data body commonrequests.Paginate true "分页信息"
 // @Success 200 {object} SuccessResponse{data=responses.CertList}
 // @Failure 401 {object} ErrorResponse "登录已过期"
 // @Failure 500 {object} ErrorResponse "系统内部错误"
@@ -449,11 +452,11 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("获取证书列表失败")
+		}).Info("获取证书列表失败")
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, &responses.CertList{
+	return Success(ctx, responses.CertList{
 		Total: total,
 		Items: certs,
 	})
@@ -482,7 +485,7 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("添加证书失败")
+		}).Info("添加证书失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -514,7 +517,7 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"certID": updateRequest.ID,
 			"error":  err.Error(),
-		}).Error("更新证书失败")
+		}).Info("更新证书失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -544,7 +547,7 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"certID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
-		}).Error("获取证书失败")
+		}).Info("获取证书失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -575,7 +578,7 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"certID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
-		}).Error("删除证书失败")
+		}).Info("删除证书失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -606,7 +609,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"certID": obtainRequest.ID,
 			"error":  err.Error(),
-		}).Error("获取证书失败")
+		}).Info("获取证书失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -618,7 +621,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("签发证书失败")
+		}).Info("签发证书失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -648,7 +651,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("续签证书失败")
+		}).Info("续签证书失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -678,7 +681,7 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
-		}).Error("获取手动DNS记录失败")
+		}).Info("获取手动DNS记录失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

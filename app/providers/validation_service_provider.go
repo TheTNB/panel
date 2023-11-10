@@ -17,7 +17,7 @@ func (receiver *ValidationServiceProvider) Register(app foundation.Application) 
 
 func (receiver *ValidationServiceProvider) Boot(app foundation.Application) {
 	if err := facades.Validation().AddRules(receiver.rules()); err != nil {
-		facades.Log().Errorf("add rules error: %+v", err)
+		facades.Log().Infof("add rules error: %+v", err)
 	}
 }
 

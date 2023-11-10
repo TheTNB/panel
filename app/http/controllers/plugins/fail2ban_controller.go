@@ -236,7 +236,7 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 		if err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "网站不存在")
 		}
-		config, err := r.website.GetConfig(int(website.ID))
+		config, err := r.website.GetConfig(website.ID)
 		if err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取网站配置失败")
 		}

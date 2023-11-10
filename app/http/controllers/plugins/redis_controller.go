@@ -123,7 +123,7 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if !tools.Write("/www/server/redis/redis.conf", config, 0644) {
+	if err := tools.Write("/www/server/redis/redis.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 

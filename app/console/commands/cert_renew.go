@@ -66,7 +66,7 @@ func (receiver *CertRenew) Handle(ctx console.Context) error {
 			facades.Log().Tags("面板", "证书管理").With(map[string]any{
 				"cert_id": cert.ID,
 				"error":   err.Error(),
-			}).Errorf("证书续签失败")
+			}).Infof("证书续签失败")
 		}
 	}
 

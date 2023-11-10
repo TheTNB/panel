@@ -42,7 +42,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Error("查询用户失败")
+		}).Tags("面板", "用户").Info("查询用户失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -55,7 +55,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 		if err != nil {
 			facades.Log().Request(ctx.Request()).With(map[string]any{
 				"error": err.Error(),
-			}).Tags("面板", "用户").Error("更新密码失败")
+			}).Tags("面板", "用户").Info("更新密码失败")
 			return ErrorSystem(ctx)
 		}
 	}
@@ -64,7 +64,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	if loginErr != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Error("登录失败")
+		}).Tags("面板", "用户").Info("登录失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -89,7 +89,7 @@ func (r *UserController) Info(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Error("获取用户信息失败")
+		}).Tags("面板", "用户").Info("获取用户信息失败")
 		return ErrorSystem(ctx)
 	}
 

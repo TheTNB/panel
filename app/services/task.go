@@ -24,7 +24,7 @@ func (r *TaskImpl) Process(taskID uint) {
 			{Type: "uint", Value: taskID},
 		}).Dispatch()
 		if err != nil {
-			facades.Log().Error("[面板][TaskService] 运行任务失败: " + err.Error())
+			facades.Log().Info("[面板][TaskService] 运行任务失败: " + err.Error())
 			return
 		}
 	}()

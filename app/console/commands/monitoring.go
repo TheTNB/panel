@@ -49,7 +49,7 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		Info: info,
 	})
 	if err != nil {
-		facades.Log().Errorf("[面板] 系统监控保存失败: %s", err.Error())
+		facades.Log().Infof("[面板] 系统监控保存失败: %s", err.Error())
 		color.Redf("[面板] 系统监控保存失败: %s", err.Error())
 		return nil
 	}
@@ -69,7 +69,7 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 	}
 	_, err = facades.Orm().Query().Where("created_at < ?", carbon.Now().SubDays(days).ToDateTimeString()).Delete(&models.Monitor{})
 	if err != nil {
-		facades.Log().Errorf("[面板] 系统监控删除过期数据失败: %s", err.Error())
+		facades.Log().Infof("[面板] 系统监控删除过期数据失败: %s", err.Error())
 		return nil
 	}
 

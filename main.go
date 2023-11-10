@@ -41,7 +41,7 @@ func main() {
 	// 启动 HTTP 服务
 	go func() {
 		if err := facades.Route().Run(); err != nil {
-			facades.Log().Errorf("Route run error: %v", err)
+			facades.Log().Infof("Route run error: %v", err)
 		}
 	}()
 

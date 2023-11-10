@@ -22,7 +22,7 @@ func (receiver *ProcessTask) Signature() string {
 func (receiver *ProcessTask) Handle(args ...any) error {
 	taskID, ok := args[0].(uint)
 	if !ok {
-		facades.Log().Error("[面板][ProcessTask] 任务ID参数错误")
+		facades.Log().Info("[面板][ProcessTask] 任务ID参数错误")
 		return nil
 	}
 
@@ -35,13 +35,13 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 
 	var task models.Task
 	if err := facades.Orm().Query().Where("id = ?", taskID).Get(&task); err != nil {
-		facades.Log().Errorf("[面板][ProcessTask] 获取任务%d失败: %s", taskID, err.Error())
+		facades.Log().Infof("[面板][ProcessTask] 获取任务%d失败: %s", taskID, err.Error())
 		return nil
 	}
 
 	task.Status = models.TaskStatusRunning
 	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Errorf("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+		facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
 		return nil
 	}
 
@@ -51,16 +51,16 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 	if err != nil {
 		task.Status = models.TaskStatusFailed
 		if err := facades.Orm().Query().Save(&task); err != nil {
-			facades.Log().Errorf("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+			facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
 			return nil
 		}
-		facades.Log().Errorf("[面板][ProcessTask] 任务%d执行失败: %s", taskID, err.Error())
+		facades.Log().Infof("[面板][ProcessTask] 任务%d执行失败: %s", taskID, err.Error())
 		return nil
 	}
 
 	task.Status = models.TaskStatusSuccess
 	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Errorf("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+		facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
 		return nil
 	}
 
@@ -72,7 +72,7 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 func haveRunningTask() bool {
 	var task models.Task
 	if err := facades.Orm().Query().Where("status = ?", models.TaskStatusRunning).Get(&task); err != nil {
-		facades.Log().Error("[面板][ProcessTask] 获取任务失败: " + err.Error())
+		facades.Log().Info("[面板][ProcessTask] 获取任务失败: " + err.Error())
 		return true
 	}
 

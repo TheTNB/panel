@@ -38,7 +38,7 @@ func (c *InfoController) Name(ctx http.Context) http.Response {
 	var setting models.Setting
 	err := facades.Orm().Query().Where("key", "name").First(&setting)
 	if err != nil {
-		facades.Log().Error("[面板][InfoController] 查询面板名称失败 ", err)
+		facades.Log().Info("[面板][InfoController] 查询面板名称失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -52,7 +52,7 @@ func (c *InfoController) HomePlugins(ctx http.Context) http.Response {
 	var plugins []models.Plugin
 	err := facades.Orm().Query().Where("show", 1).Find(&plugins)
 	if err != nil {
-		facades.Log().Error("[面板][InfoController] 查询首页插件失败 ", err)
+		facades.Log().Info("[面板][InfoController] 查询首页插件失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
@@ -121,7 +121,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 			if err != nil {
 				facades.Log().Request(ctx.Request()).With(map[string]any{
 					"error": err.Error(),
-				}).Error("[面板][InfoController] 获取数据库列表失败")
+				}).Info("[面板][InfoController] 获取数据库列表失败")
 				databaseCount = -1
 			} else {
 				defer db.Close()
@@ -129,7 +129,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 				if err != nil {
 					facades.Log().Request(ctx.Request()).With(map[string]any{
 						"error": err.Error(),
-					}).Error("[面板][InfoController] 获取数据库列表失败")
+					}).Info("[面板][InfoController] 获取数据库列表失败")
 					databaseCount = -1
 				} else {
 					defer rows.Close()
@@ -307,7 +307,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Error("[面板][InfoController] 获取最新版本失败")
+		}).Info("[面板][InfoController] 获取最新版本失败")
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
@@ -315,7 +315,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		facades.Log().Request(ctx.Request()).With(map[string]any{
 			"error": err.Error(),
-		}).Error("[面板][InfoController] 更新面板失败")
+		}).Info("[面板][InfoController] 更新面板失败")
 		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
 	}
 

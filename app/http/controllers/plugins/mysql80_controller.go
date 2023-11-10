@@ -155,7 +155,7 @@ func (r *Mysql80Controller) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if !tools.Write("/www/server/mysql/conf/my.cnf", config, 0644) {
+	if err := tools.Write("/www/server/mysql/conf/my.cnf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 	}
 
@@ -345,14 +345,14 @@ func (r *Mysql80Controller) DatabaseList(ctx http.Context) http.Response {
 
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		facades.Log().Error("[MySQL80] 连接数据库失败" + err.Error())
+		facades.Log().Info("[MySQL80] 连接数据库失败" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SHOW DATABASES")
 	if err != nil {
-		facades.Log().Error("[MySQL80] 获取数据库列表失败" + err.Error())
+		facades.Log().Info("[MySQL80] 获取数据库列表失败" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 	defer rows.Close()
@@ -369,7 +369,7 @@ func (r *Mysql80Controller) DatabaseList(ctx http.Context) http.Response {
 	}
 
 	if err := rows.Err(); err != nil {
-		facades.Log().Error("[MySQL80] 获取数据库列表失败" + err.Error())
+		facades.Log().Info("[MySQL80] 获取数据库列表失败" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 
@@ -459,7 +459,7 @@ func (r *Mysql80Controller) BackupList(ctx http.Context) http.Response {
 
 	backupList, err := r.backup.MysqlList()
 	if err != nil {
-		facades.Log().Error("[MySQL80] 获取备份列表失败：" + err.Error())
+		facades.Log().Info("[MySQL80] 获取备份列表失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
@@ -533,7 +533,7 @@ func (r *Mysql80Controller) CreateBackup(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	err = r.backup.MysqlBackup(database)
 	if err != nil {
-		facades.Log().Error("[MYSQL80] 创建备份失败：" + err.Error())
+		facades.Log().Info("[MYSQL80] 创建备份失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
 	}
 
@@ -584,7 +584,7 @@ func (r *Mysql80Controller) RestoreBackup(ctx http.Context) http.Response {
 
 	err = r.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
-		facades.Log().Error("[MYSQL80] 还原失败：" + err.Error())
+		facades.Log().Info("[MYSQL80] 还原失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 	}
 
@@ -607,14 +607,14 @@ func (r *Mysql80Controller) UserList(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		facades.Log().Error("[MYSQL80] 连接数据库失败：" + err.Error())
+		facades.Log().Info("[MYSQL80] 连接数据库失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT user, host FROM mysql.user")
 	if err != nil {
-		facades.Log().Error("[MYSQL80] 查询数据库失败：" + err.Error())
+		facades.Log().Info("[MYSQL80] 查询数据库失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "查询数据库失败")
 	}
 	defer rows.Close()

@@ -12,6 +12,7 @@ import (
 
 	"github.com/goravel/framework/facades"
 	"golang.org/x/exp/slices"
+	requests "panel/app/http/requests/website"
 
 	"panel/app/models"
 	"panel/pkg/tools"
@@ -20,8 +21,9 @@ import (
 type Website interface {
 	List(page int, limit int) (int64, []models.Website, error)
 	Add(website PanelWebsite) (models.Website, error)
-	Delete(id int) error
-	GetConfig(id int) (WebsiteSetting, error)
+	SaveConfig(config requests.SaveConfig) error
+	Delete(id uint) error
+	GetConfig(id uint) (WebsiteSetting, error)
 	GetConfigByName(name string) (WebsiteSetting, error)
 }
 
@@ -292,8 +294,208 @@ server
 	return w, nil
 }
 
+// SaveConfig 保存网站配置
+func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
+	var website models.Website
+	if err := facades.Orm().Query().Where("id", config.ID).First(&website); err != nil {
+		return err
+	}
+
+	if !website.Status {
+		return errors.New("网站已停用，请先启用")
+	}
+
+	// 原文
+	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	if strings.TrimSpace(raw) != strings.TrimSpace(config.Raw) {
+		err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644)
+		if err != nil {
+			return err
+		}
+		tools.Exec("systemctl reload openresty")
+		return nil
+	}
+
+	// 目录
+	path := config.Path
+	if !tools.Exists(path) {
+		return errors.New("网站目录不存在")
+	}
+	website.Path = path
+
+	// 域名
+	domain := "server_name"
+	domains := config.Domains
+	for _, v := range domains {
+		if v == "" {
+			continue
+		}
+		domain += " " + v
+	}
+	domain += ";"
+	domainConfigOld := tools.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
+	if len(strings.TrimSpace(domainConfigOld)) == 0 {
+		return errors.New("配置文件中缺少server_name标记位")
+	}
+	raw = strings.Replace(raw, domainConfigOld, "\n    "+domain+"\n    ", -1)
+
+	// 端口
+	var port strings.Builder
+	ports := config.Ports
+	for i, v := range ports {
+		if _, err := strconv.Atoi(v); err != nil && v != "443 ssl http2" {
+			return errors.New("端口格式错误")
+		}
+		if v == "443" && config.Ssl {
+			v = "443 ssl http2"
+		}
+		if i != len(ports)-1 {
+			port.WriteString("    listen " + v + ";\n")
+		} else {
+			port.WriteString("    listen " + v + ";")
+		}
+	}
+	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
+	if len(strings.TrimSpace(portConfigOld)) == 0 {
+		return errors.New("配置文件中缺少port标记位")
+	}
+	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
+
+	// 运行目录
+	root := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
+	if len(strings.TrimSpace(root)) == 0 {
+		return errors.New("配置文件中缺少root标记位")
+	}
+	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(root)
+	if len(match) != 2 {
+		return errors.New("配置文件中root标记位格式错误")
+	}
+	rootNew := strings.Replace(root, match[1], config.Root, -1)
+	raw = strings.Replace(raw, root, rootNew, -1)
+
+	// 默认文件
+	index := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
+	if len(strings.TrimSpace(index)) == 0 {
+		return errors.New("配置文件中缺少index标记位")
+	}
+	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(index)
+	if len(match) != 2 {
+		return errors.New("配置文件中index标记位格式错误")
+	}
+	indexNew := strings.Replace(index, match[1], config.Index, -1)
+	raw = strings.Replace(raw, index, indexNew, -1)
+
+	// 防跨站
+	root = config.Root
+	if !strings.HasSuffix(root, "/") {
+		root += "/"
+	}
+	if config.OpenBasedir {
+		if err := tools.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644); err != nil {
+			return err
+		}
+	} else {
+		if tools.Exists(root + ".user.ini") {
+			tools.Remove(root + ".user.ini")
+		}
+	}
+
+	// WAF
+	waf := config.Waf
+	wafStr := "off"
+	if waf {
+		wafStr = "on"
+	}
+	wafMode := config.WafMode
+	wafCcDeny := config.WafCcDeny
+	wafCache := config.WafCache
+	wafConfig := `# waf标记位开始
+    waf ` + wafStr + `;
+    waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
+    waf_mode ` + wafMode + `;
+    waf_cc_deny ` + wafCcDeny + `;
+    waf_cache ` + wafCache + `;
+    `
+	wafConfigOld := tools.Cut(raw, "# waf标记位开始", "# waf标记位结束")
+	if len(strings.TrimSpace(wafConfigOld)) != 0 {
+		raw = strings.Replace(raw, wafConfigOld, "", -1)
+	}
+	raw = strings.Replace(raw, "# waf标记位开始", wafConfig, -1)
+
+	// SSL
+	ssl := config.Ssl
+	website.Ssl = ssl
+	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
+		return err
+	}
+	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
+		return err
+	}
+	if ssl {
+		sslConfig := `# ssl标记位开始
+    ssl_certificate /www/server/vhost/ssl/` + website.Name + `.pem;
+    ssl_certificate_key /www/server/vhost/ssl/` + website.Name + `.key;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    `
+		if config.HttpRedirect {
+			sslConfig += `# http重定向标记位开始
+    if ($server_port !~ 443){
+        return 301 https://$host$request_uri;
+    }
+    error_page 497  https://$host$request_uri;
+    # http重定向标记位结束
+    `
+		}
+		if config.Hsts {
+			sslConfig += `# hsts标记位开始
+    add_header Strict-Transport-Security "max-age=63072000" always;
+    # hsts标记位结束
+    `
+		}
+		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		if len(strings.TrimSpace(sslConfigOld)) != 0 {
+			raw = strings.Replace(raw, sslConfigOld, "", -1)
+		}
+		raw = strings.Replace(raw, "# ssl标记位开始", sslConfig, -1)
+	} else {
+		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		if len(strings.TrimSpace(sslConfigOld)) != 0 {
+			raw = strings.Replace(raw, sslConfigOld, "\n    ", -1)
+		}
+	}
+
+	if website.Php != config.Php {
+		website.Php = config.Php
+		phpConfigOld := tools.Cut(raw, "# php标记位开始", "# php标记位结束")
+		phpConfig := `
+    include enable-php-` + strconv.Itoa(website.Php) + `.conf;
+    `
+		if len(strings.TrimSpace(phpConfigOld)) != 0 {
+			raw = strings.Replace(raw, phpConfigOld, phpConfig, -1)
+		}
+	}
+
+	if err := facades.Orm().Query().Save(&website); err != nil {
+		return err
+	}
+
+	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+		return err
+	}
+	if err := tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
+		return err
+	}
+	tools.Exec("systemctl reload openresty")
+	return nil
+}
+
 // Delete 删除网站
-func (r *WebsiteImpl) Delete(id int) error {
+func (r *WebsiteImpl) Delete(id uint) error {
 	var website models.Website
 	if err := facades.Orm().Query().With("Cert").Where("id", id).FirstOrFail(&website); err != nil {
 		return err
@@ -319,7 +521,7 @@ func (r *WebsiteImpl) Delete(id int) error {
 }
 
 // GetConfig 获取网站配置
-func (r *WebsiteImpl) GetConfig(id int) (WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
 		return WebsiteSetting{}, err
@@ -421,5 +623,5 @@ func (r *WebsiteImpl) GetConfigByName(name string) (WebsiteSetting, error) {
 		return WebsiteSetting{}, err
 	}
 
-	return r.GetConfig(int(website.ID))
+	return r.GetConfig(website.ID)
 }
