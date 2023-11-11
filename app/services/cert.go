@@ -310,8 +310,12 @@ func (s *CertImpl) ObtainAuto(ID uint) (certificate.Resource, error) {
 	}
 
 	if cert.Website != nil {
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644)
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644)
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
 		tools.Exec("systemctl reload openresty")
 	}
 
@@ -364,8 +368,12 @@ func (s *CertImpl) ObtainManual(ID uint) (certificate.Resource, error) {
 	}
 
 	if cert.Website != nil {
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644)
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644)
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
 		tools.Exec("systemctl reload openresty")
 	}
 
@@ -465,8 +473,12 @@ func (s *CertImpl) Renew(ID uint) (certificate.Resource, error) {
 	}
 
 	if cert.Website != nil {
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644)
-		tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644)
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
+			return certificate.Resource{}, err
+		}
 		tools.Exec("systemctl reload openresty")
 	}
 

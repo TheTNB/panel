@@ -113,7 +113,7 @@ func (s *SystemHelperTestSuite) TestMv() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.True(Mv(filePath, "/tmp/testfile2"))
+	s.Nil(Mv(filePath, "/tmp/testfile2"))
 	s.False(Exists(filePath))
 }
 
@@ -124,7 +124,7 @@ func (s *SystemHelperTestSuite) TestCp() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.True(Cp(filePath, "/tmp/testfile2"))
+	s.Nil(Cp(filePath, "/tmp/testfile2"))
 	s.True(Exists(filePath))
 }
 

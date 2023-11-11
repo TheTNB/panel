@@ -145,7 +145,9 @@ func (r *Php81Controller) SaveConfig(ctx http.Context) http.Response {
 	}
 
 	config := ctx.Request().Input("config")
-	tools.Write("/www/server/php/"+r.version+"/etc/php.ini", config, 0644)
+	if err := tools.Write("/www/server/php/"+r.version+"/etc/php.ini", config, 0644); err != nil {
+		return nil
+	}
 	return r.Reload(ctx)
 }
 

@@ -462,6 +462,8 @@ info:
     email: i@haozi.net
     name: 耗子科技
   description: 耗子 Linux 面板的 API 信息
+  license:
+    name: GNU Affero General Public License v3
   title: 耗子 Linux 面板 API
   version: "2"
 paths:
@@ -475,10 +477,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取算法列表
@@ -494,10 +492,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取 CA 提供商
@@ -507,7 +501,7 @@ paths:
     get:
       description: 获取面板证书管理的证书列表
       parameters:
-      - description: 分页信息
+      - description: request
         in: body
         name: data
         required: true
@@ -525,14 +519,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.CertList'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取证书列表
@@ -543,7 +529,7 @@ paths:
       - application/json
       description: 添加证书到面板证书管理
       parameters:
-      - description: 证书信息
+      - description: request
         in: body
         name: data
         required: true
@@ -556,14 +542,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 添加证书
@@ -587,14 +565,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 删除证书
@@ -620,14 +590,6 @@ paths:
                 data:
                   $ref: '#/definitions/models.Cert'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取证书
@@ -643,7 +605,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: 证书信息
+      - description: request
         in: body
         name: data
         required: true
@@ -656,14 +618,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 更新证书
@@ -673,7 +627,7 @@ paths:
     get:
       description: 获取面板证书管理的 DNS 接口列表
       parameters:
-      - description: 分页信息
+      - description: request
         in: body
         name: data
         required: true
@@ -691,14 +645,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.DNSList'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取 DNS 接口列表
@@ -709,7 +655,7 @@ paths:
       - application/json
       description: 添加 DNS 接口到面板证书管理
       parameters:
-      - description: DNS 接口信息
+      - description: request
         in: body
         name: data
         required: true
@@ -722,14 +668,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 添加 DNS 接口
@@ -753,14 +691,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 删除 DNS 接口
@@ -786,14 +716,6 @@ paths:
                 data:
                   $ref: '#/definitions/models.CertDNS'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取 DNS 接口
@@ -809,7 +731,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: DNS 接口信息
+      - description: request
         in: body
         name: data
         required: true
@@ -822,14 +744,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 更新 DNS 接口
@@ -845,10 +759,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取 DNS 提供商
@@ -860,7 +770,7 @@ paths:
       - application/json
       description: 获取签发证书所需的 DNS 记录
       parameters:
-      - description: 证书信息
+      - description: request
         in: body
         name: data
         required: true
@@ -880,14 +790,6 @@ paths:
                     $ref: '#/definitions/acme.Resolve'
                   type: object
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取手动 DNS 记录
@@ -899,7 +801,7 @@ paths:
       - application/json
       description: 签发面板证书管理的证书
       parameters:
-      - description: 证书信息
+      - description: request
         in: body
         name: data
         required: true
@@ -912,14 +814,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 签发证书
@@ -931,7 +825,7 @@ paths:
       - application/json
       description: 续签面板证书管理的证书
       parameters:
-      - description: 证书信息
+      - description: request
         in: body
         name: data
         required: true
@@ -944,14 +838,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 续签证书
@@ -961,7 +847,7 @@ paths:
     get:
       description: 获取面板证书管理的 ACME 用户列表
       parameters:
-      - description: 分页信息
+      - description: request
         in: body
         name: data
         required: true
@@ -979,14 +865,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.CertList'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取用户列表
@@ -997,7 +875,7 @@ paths:
       - application/json
       description: 添加 ACME 用户到面板证书管理
       parameters:
-      - description: 用户信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1010,14 +888,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 添加 ACME 用户
@@ -1041,14 +911,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 删除 ACME 用户
@@ -1074,14 +936,6 @@ paths:
                 data:
                   $ref: '#/definitions/models.CertUser'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取 ACME 用户
@@ -1097,7 +951,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: 用户信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1110,14 +964,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 更新 ACME 用户
@@ -1138,14 +984,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.Settings'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 设置列表
@@ -1157,7 +995,7 @@ paths:
       - application/json
       description: 更新面板设置
       parameters:
-      - description: 更新设置
+      - description: request
         in: body
         name: data
         required: true
@@ -1170,14 +1008,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 更新设置
@@ -1198,14 +1028,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.Info'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 用户信息
@@ -1217,7 +1039,7 @@ paths:
       - application/json
       description: 通过用户名和密码获取访问令牌
       parameters:
-      - description: 登录信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1245,7 +1067,7 @@ paths:
     get:
       description: 获取网站管理的网站列表
       parameters:
-      - description: 分页信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1263,18 +1085,6 @@ paths:
                 data:
                   $ref: '#/definitions/responses.List'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "403":
-          description: 插件需更新
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取网站列表
@@ -1285,7 +1095,7 @@ paths:
       - application/json
       description: 添加网站到网站管理
       parameters:
-      - description: 网站信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1298,18 +1108,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "403":
-          description: 插件需更新
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 添加网站
@@ -1333,18 +1131,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "403":
-          description: 插件需更新
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 删除网站
@@ -1367,14 +1153,6 @@ paths:
                     $ref: '#/definitions/services.BackupFile'
                   type: array
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取备份列表
@@ -1403,14 +1181,6 @@ paths:
                 data:
                   $ref: '#/definitions/services.PanelWebsite'
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取配置
@@ -1426,7 +1196,7 @@ paths:
         name: id
         required: true
         type: integer
-      - description: 网站配置
+      - description: request
         in: body
         name: data
         required: true
@@ -1439,14 +1209,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 保存配置
@@ -1458,7 +1220,7 @@ paths:
       - application/json
       description: 创建网站的备份
       parameters:
-      - description: 网站 ID
+      - description: request
         in: body
         name: data
         required: true
@@ -1471,14 +1233,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 创建备份
@@ -1501,14 +1255,6 @@ paths:
                     type: string
                   type: object
               type: object
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "403":
-          description: 插件需更新
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 获取默认配置
@@ -1519,7 +1265,7 @@ paths:
       - application/json
       description: 保存默认首页和停止页配置
       parameters:
-      - description: 页面信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1534,18 +1280,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "403":
-          description: 插件需更新
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 保存默认配置
@@ -1557,7 +1291,7 @@ paths:
       - application/json
       description: 删除网站的备份
       parameters:
-      - description: 备份信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1570,18 +1304,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "422":
-          description: 参数错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 删除备份
@@ -1605,14 +1327,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 清空日志
@@ -1624,7 +1338,7 @@ paths:
       - application/json
       description: 重置网站的配置
       parameters:
-      - description: 网站 ID
+      - description: request
         in: body
         name: data
         required: true
@@ -1637,18 +1351,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "422":
-          description: 参数错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 重置配置
@@ -1660,7 +1362,7 @@ paths:
       - application/json
       description: 还原网站的备份
       parameters:
-      - description: 备份信息
+      - description: request
         in: body
         name: data
         required: true
@@ -1673,18 +1375,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "422":
-          description: 参数错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 还原备份
@@ -1708,18 +1398,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "422":
-          description: 参数错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 状态
@@ -1743,14 +1421,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 更新备注
@@ -1774,18 +1444,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/controllers.SuccessResponse'
-        "401":
-          description: 登录已过期
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "422":
-          description: 上传文件失败
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
-        "500":
-          description: 系统内部错误
-          schema:
-            $ref: '#/definitions/controllers.ErrorResponse'
       security:
       - BearerToken: []
       summary: 上传备份

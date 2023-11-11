@@ -162,27 +162,17 @@ func Empty(path string) bool {
 }
 
 // Mv 移动文件/目录
-func Mv(src, dst string) (bool, error) {
+func Mv(src, dst string) error {
 	cmd := exec.Command("mv", src, dst)
 
-	err := cmd.Run()
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return cmd.Run()
 }
 
 // Cp 复制文件/目录
-func Cp(src, dst string) (bool, error) {
+func Cp(src, dst string) error {
 	cmd := exec.Command("cp", "-r", src, dst)
 
-	err := cmd.Run()
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return cmd.Run()
 }
 
 // Size 获取路径大小
@@ -197,19 +187,11 @@ func Size(path string) (int64, error) {
 		return nil
 	})
 
-	if err != nil {
-		return 0, err
-	}
-
-	return size, nil
+	return size, err
 }
 
 // FileSize 获取文件大小
 func FileSize(path string) (int64, error) {
 	info, err := os.Stat(path)
-	if err != nil {
-		return 0, err
-	}
-
-	return info.Size(), nil
+	return info.Size(), err
 }

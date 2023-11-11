@@ -25,14 +25,14 @@ func NewCertController() *CertController {
 }
 
 // CAProviders
-// @Summary 获取 CA 提供商
-// @Description 获取面板证书管理支持的 CA 提供商
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Router /panel/cert/caProviders [get]
+//
+//	@Summary		获取 CA 提供商
+//	@Description	获取面板证书管理支持的 CA 提供商
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/caProviders [get]
 func (r *CertController) CAProviders(ctx http.Context) http.Response {
 	return Success(ctx, []map[string]string{
 		{
@@ -59,14 +59,14 @@ func (r *CertController) CAProviders(ctx http.Context) http.Response {
 }
 
 // DNSProviders
-// @Summary 获取 DNS 提供商
-// @Description 获取面板证书管理支持的 DNS 提供商
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Router /panel/cert/dnsProviders [get]
+//
+//	@Summary		获取 DNS 提供商
+//	@Description	获取面板证书管理支持的 DNS 提供商
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/dnsProviders [get]
 func (r *CertController) DNSProviders(ctx http.Context) http.Response {
 	return Success(ctx, []map[string]any{
 		{
@@ -85,14 +85,14 @@ func (r *CertController) DNSProviders(ctx http.Context) http.Response {
 }
 
 // Algorithms
-// @Summary 获取算法列表
-// @Description 获取面板证书管理支持的算法列表
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Router /panel/cert/algorithms [get]
+//
+//	@Summary		获取算法列表
+//	@Description	获取面板证书管理支持的算法列表
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/algorithms [get]
 func (r *CertController) Algorithms(ctx http.Context) http.Response {
 	return Success(ctx, []map[string]any{
 		{
@@ -115,16 +115,15 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 }
 
 // UserList
-// @Summary 获取用户列表
-// @Description 获取面板证书管理的 ACME 用户列表
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param data body commonrequests.Paginate true "分页信息"
-// @Success 200 {object} SuccessResponse{data=responses.CertList}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/users [get]
+//
+//	@Summary		获取用户列表
+//	@Description	获取面板证书管理的 ACME 用户列表
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=responses.CertList}
+//	@Router			/panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
@@ -149,17 +148,16 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 }
 
 // UserStore
-// @Summary 添加 ACME 用户
-// @Description 添加 ACME 用户到面板证书管理
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.UserStore true "用户信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/users [post]
+//
+//	@Summary		添加 ACME 用户
+//	@Description	添加 ACME 用户到面板证书管理
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.UserStore	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/users [post]
 func (r *CertController) UserStore(ctx http.Context) http.Response {
 	var storeRequest requests.UserStore
 	sanitize := Sanitize(ctx, &storeRequest)
@@ -179,18 +177,17 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 }
 
 // UserUpdate
-// @Summary 更新 ACME 用户
-// @Description 更新面板证书管理的 ACME 用户
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "用户 ID"
-// @Param data body requests.UserUpdate true "用户信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/users/{id} [put]
+//
+//	@Summary		更新 ACME 用户
+//	@Description	更新面板证书管理的 ACME 用户
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id		path		int					true	"用户 ID"
+//	@Param			data	body		requests.UserUpdate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/users/{id} [put]
 func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.UserUpdate
 	sanitize := Sanitize(ctx, &updateRequest)
@@ -211,16 +208,15 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 }
 
 // UserShow
-// @Summary 获取 ACME 用户
-// @Description 获取面板证书管理的 ACME 用户
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "用户 ID"
-// @Success 200 {object} SuccessResponse{data=models.CertUser}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/users/{id} [get]
+//
+//	@Summary		获取 ACME 用户
+//	@Description	获取面板证书管理的 ACME 用户
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"用户 ID"
+//	@Success		200	{object}	SuccessResponse{data=models.CertUser}
+//	@Router			/panel/cert/users/{id} [get]
 func (r *CertController) UserShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -241,17 +237,16 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 }
 
 // UserDestroy
-// @Summary 删除 ACME 用户
-// @Description 删除面板证书管理的 ACME 用户
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "用户 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/users/{id} [delete]
+//
+//	@Summary		删除 ACME 用户
+//	@Description	删除面板证书管理的 ACME 用户
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"用户 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/users/{id} [delete]
 func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -272,16 +267,15 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 }
 
 // DNSList
-// @Summary 获取 DNS 接口列表
-// @Description 获取面板证书管理的 DNS 接口列表
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param data body commonrequests.Paginate true "分页信息"
-// @Success 200 {object} SuccessResponse{data=responses.DNSList}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/dns [get]
+//
+//	@Summary		获取 DNS 接口列表
+//	@Description	获取面板证书管理的 DNS 接口列表
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=responses.DNSList}
+//	@Router			/panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
@@ -306,17 +300,16 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 }
 
 // DNSStore
-// @Summary 添加 DNS 接口
-// @Description 添加 DNS 接口到面板证书管理
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.DNSStore true "DNS 接口信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/dns [post]
+//
+//	@Summary		添加 DNS 接口
+//	@Description	添加 DNS 接口到面板证书管理
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.DNSStore	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/dns [post]
 func (r *CertController) DNSStore(ctx http.Context) http.Response {
 	var storeRequest requests.DNSStore
 	sanitize := Sanitize(ctx, &storeRequest)
@@ -336,16 +329,15 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 }
 
 // DNSShow
-// @Summary 获取 DNS 接口
-// @Description 获取面板证书管理的 DNS 接口
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "DNS 接口 ID"
-// @Success 200 {object} SuccessResponse{data=models.CertDNS}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/dns/{id} [get]
+//
+//	@Summary		获取 DNS 接口
+//	@Description	获取面板证书管理的 DNS 接口
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"DNS 接口 ID"
+//	@Success		200	{object}	SuccessResponse{data=models.CertDNS}
+//	@Router			/panel/cert/dns/{id} [get]
 func (r *CertController) DNSShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -366,18 +358,17 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 }
 
 // DNSUpdate
-// @Summary 更新 DNS 接口
-// @Description 更新面板证书管理的 DNS 接口
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "DNS 接口 ID"
-// @Param data body requests.DNSUpdate true "DNS 接口信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/dns/{id} [put]
+//
+//	@Summary		更新 DNS 接口
+//	@Description	更新面板证书管理的 DNS 接口
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id		path		int					true	"DNS 接口 ID"
+//	@Param			data	body		requests.DNSUpdate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/dns/{id} [put]
 func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.DNSUpdate
 	sanitize := Sanitize(ctx, &updateRequest)
@@ -398,17 +389,16 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 }
 
 // DNSDestroy
-// @Summary 删除 DNS 接口
-// @Description 删除面板证书管理的 DNS 接口
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "DNS 接口 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/dns/{id} [delete]
+//
+//	@Summary		删除 DNS 接口
+//	@Description	删除面板证书管理的 DNS 接口
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"DNS 接口 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/dns/{id} [delete]
 func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -429,16 +419,15 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 }
 
 // CertList
-// @Summary 获取证书列表
-// @Description 获取面板证书管理的证书列表
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param data body commonrequests.Paginate true "分页信息"
-// @Success 200 {object} SuccessResponse{data=responses.CertList}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/certs [get]
+//
+//	@Summary		获取证书列表
+//	@Description	获取面板证书管理的证书列表
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=responses.CertList}
+//	@Router			/panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
@@ -463,17 +452,16 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 }
 
 // CertStore
-// @Summary 添加证书
-// @Description 添加证书到面板证书管理
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.CertStore true "证书信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/certs [post]
+//
+//	@Summary		添加证书
+//	@Description	添加证书到面板证书管理
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.CertStore	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/certs [post]
 func (r *CertController) CertStore(ctx http.Context) http.Response {
 	var storeRequest requests.CertStore
 	sanitize := Sanitize(ctx, &storeRequest)
@@ -493,18 +481,17 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 }
 
 // CertUpdate
-// @Summary 更新证书
-// @Description 更新面板证书管理的证书
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "证书 ID"
-// @Param data body requests.CertUpdate true "证书信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/certs/{id} [put]
+//
+//	@Summary		更新证书
+//	@Description	更新面板证书管理的证书
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id		path		int					true	"证书 ID"
+//	@Param			data	body		requests.CertUpdate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/certs/{id} [put]
 func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.CertUpdate
 	sanitize := Sanitize(ctx, &updateRequest)
@@ -525,16 +512,15 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 }
 
 // CertShow
-// @Summary 获取证书
-// @Description 获取面板证书管理的证书
-// @Tags 证书管理
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "证书 ID"
-// @Success 200 {object} SuccessResponse{data=models.Cert}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/certs/{id} [get]
+//
+//	@Summary		获取证书
+//	@Description	获取面板证书管理的证书
+//	@Tags			证书管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"证书 ID"
+//	@Success		200	{object}	SuccessResponse{data=models.Cert}
+//	@Router			/panel/cert/certs/{id} [get]
 func (r *CertController) CertShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -555,17 +541,16 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 }
 
 // CertDestroy
-// @Summary 删除证书
-// @Description 删除面板证书管理的证书
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "证书 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/certs/{id} [delete]
+//
+//	@Summary		删除证书
+//	@Description	删除面板证书管理的证书
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"证书 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/cert/certs/{id} [delete]
 func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
 	sanitize := Sanitize(ctx, &showAndDestroyRequest)
@@ -586,17 +571,16 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 }
 
 // Obtain
-// @Summary 签发证书
-// @Description 签发面板证书管理的证书
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.Obtain true "证书信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/obtain [post]
+//
+//	@Summary		签发证书
+//	@Description	签发面板证书管理的证书
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.Obtain	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/obtain [post]
 func (r *CertController) Obtain(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
 	sanitize := Sanitize(ctx, &obtainRequest)
@@ -629,17 +613,16 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 }
 
 // Renew
-// @Summary 续签证书
-// @Description 续签面板证书管理的证书
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.Renew true "证书信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/renew [post]
+//
+//	@Summary		续签证书
+//	@Description	续签面板证书管理的证书
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.Renew	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/renew [post]
 func (r *CertController) Renew(ctx http.Context) http.Response {
 	var renewRequest requests.Renew
 	sanitize := Sanitize(ctx, &renewRequest)
@@ -659,17 +642,16 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 }
 
 // ManualDNS
-// @Summary 获取手动 DNS 记录
-// @Description 获取签发证书所需的 DNS 记录
-// @Tags 证书管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.Obtain true "证书信息"
-// @Success 200 {object} SuccessResponse{data=map[string]acme.Resolve}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/cert/manualDNS [post]
+//
+//	@Summary		获取手动 DNS 记录
+//	@Description	获取签发证书所需的 DNS 记录
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.Obtain	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=map[string]acme.Resolve}
+//	@Router			/panel/cert/manualDNS [post]
 func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
 	sanitize := Sanitize(ctx, &obtainRequest)

@@ -66,8 +66,7 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 
 	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+port+";")
-	err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644)
-	if err != nil {
+	if err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
 			"error": err.Error(),
 		}).Info("修改 phpMyAdmin 端口失败")

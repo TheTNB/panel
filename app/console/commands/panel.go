@@ -265,7 +265,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
-			if _, err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
 				color.Redln("|-移动失败: " + err.Error())
 				return nil
 			}
@@ -291,7 +291,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
-			if _, err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
 				color.Redln("|-移动失败: " + err.Error())
 				return nil
 			}

@@ -57,7 +57,10 @@ func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 	dns += "nameserver " + dns1 + "\n"
 	dns += "nameserver " + dns2 + "\n"
 
-	tools.Write("/etc/resolv.conf", dns, 0644)
+	if err := tools.Write("/etc/resolv.conf", dns, 0644); err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "写入 DNS 信息失败")
+	}
+
 	return controllers.Success(ctx, nil)
 }
 
@@ -203,7 +206,9 @@ func (r *ToolBoxController) SetHosts(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "hosts 信息不能为空")
 	}
 
-	tools.Write("/etc/hosts", hosts, 0644)
+	if err := tools.Write("/etc/hosts", hosts, 0644); err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "写入 hosts 信息失败")
+	}
 
 	return controllers.Success(ctx, nil)
 }

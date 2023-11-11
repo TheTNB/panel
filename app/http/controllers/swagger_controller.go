@@ -33,12 +33,13 @@ func NewSwaggerController() *SwaggerController {
 }
 
 // Index
-// @Summary Swagger UI
-// @Description Swagger UI
-// @Tags Swagger
-// @Success 200
-// @Failure 500
-// @Router /swagger [get]
+//
+//	@Summary		Swagger UI
+//	@Description	Swagger UI
+//	@Tags			Swagger
+//	@Success		200
+//	@Failure		500
+//	@Router			/swagger [get]
 func (r *SwaggerController) Index(ctx http.Context) http.Response {
 	config := Config{
 		URL:          "swagger.json",

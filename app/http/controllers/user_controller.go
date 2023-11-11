@@ -20,16 +20,17 @@ func NewUserController() *UserController {
 }
 
 // Login
-// @Summary 登录
-// @Description 通过用户名和密码获取访问令牌
-// @Tags 用户鉴权
-// @Accept json
-// @Produce json
-// @Param data body requests.Login true "登录信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 403 {object} ErrorResponse "用户名或密码错误"
-// @Failure 500 {object} ErrorResponse "系统内部错误
-// @Router /panel/user/login [post]
+//
+//	@Summary		登录
+//	@Description	通过用户名和密码获取访问令牌
+//	@Tags			用户鉴权
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		requests.Login	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Failure		403		{object}	ErrorResponse	"用户名或密码错误"
+//	@Failure		500		{object}	ErrorResponse	"系统内部错误
+//	@Router			/panel/user/login [post]
 func (r *UserController) Login(ctx http.Context) http.Response {
 	var loginRequest requests.Login
 	sanitize := Sanitize(ctx, &loginRequest)
@@ -74,15 +75,14 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 }
 
 // Info
-// @Summary 用户信息
-// @Description 获取当前登录用户信息
-// @Tags 用户鉴权
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse{data=responses.Info}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/user/info [get]
+//
+//	@Summary		用户信息
+//	@Description	获取当前登录用户信息
+//	@Tags			用户鉴权
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse{data=responses.Info}
+//	@Router			/panel/user/info [get]
 func (r *UserController) Info(ctx http.Context) http.Response {
 	var user models.User
 	err := facades.Auth().User(ctx, &user)

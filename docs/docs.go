@@ -13,6 +13,9 @@ const docTemplate = `{
             "name": "耗子科技",
             "email": "i@haozi.net"
         },
+        "license": {
+            "name": "GNU Affero General Public License v3"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -39,12 +42,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -70,12 +67,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -97,7 +88,7 @@ const docTemplate = `{
                 "summary": "获取证书列表",
                 "parameters": [
                     {
-                        "description": "分页信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -124,18 +115,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -158,7 +137,7 @@ const docTemplate = `{
                 "summary": "添加证书",
                 "parameters": [
                     {
-                        "description": "证书信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -172,18 +151,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -231,18 +198,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -272,7 +227,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "证书信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -286,18 +241,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -334,18 +277,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -367,7 +298,7 @@ const docTemplate = `{
                 "summary": "获取 DNS 接口列表",
                 "parameters": [
                     {
-                        "description": "分页信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -394,18 +325,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -428,7 +347,7 @@ const docTemplate = `{
                 "summary": "添加 DNS 接口",
                 "parameters": [
                     {
-                        "description": "DNS 接口信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -442,18 +361,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -501,18 +408,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -542,7 +437,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "DNS 接口信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -556,18 +451,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -604,18 +487,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -641,12 +512,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -671,7 +536,7 @@ const docTemplate = `{
                 "summary": "获取手动 DNS 记录",
                 "parameters": [
                     {
-                        "description": "证书信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -701,18 +566,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -737,7 +590,7 @@ const docTemplate = `{
                 "summary": "签发证书",
                 "parameters": [
                     {
-                        "description": "证书信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -751,18 +604,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -788,7 +629,7 @@ const docTemplate = `{
                 "summary": "续签证书",
                 "parameters": [
                     {
-                        "description": "证书信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -802,18 +643,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -836,7 +665,7 @@ const docTemplate = `{
                 "summary": "获取用户列表",
                 "parameters": [
                     {
-                        "description": "分页信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -863,18 +692,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -897,7 +714,7 @@ const docTemplate = `{
                 "summary": "添加 ACME 用户",
                 "parameters": [
                     {
-                        "description": "用户信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -911,18 +728,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -970,18 +775,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -1011,7 +804,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "用户信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1025,18 +818,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1072,18 +853,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1122,18 +891,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -1158,7 +915,7 @@ const docTemplate = `{
                 "summary": "更新设置",
                 "parameters": [
                     {
-                        "description": "更新设置",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1172,18 +929,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1222,18 +967,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -1253,7 +986,7 @@ const docTemplate = `{
                 "summary": "登录",
                 "parameters": [
                     {
-                        "description": "登录信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1301,7 +1034,7 @@ const docTemplate = `{
                 "summary": "获取网站列表",
                 "parameters": [
                     {
-                        "description": "分页信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1328,24 +1061,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "插件需更新",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -1368,7 +1083,7 @@ const docTemplate = `{
                 "summary": "添加网站",
                 "parameters": [
                     {
-                        "description": "网站信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1382,24 +1097,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "插件需更新",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1440,18 +1137,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1502,18 +1187,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -1543,7 +1216,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "网站配置",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1557,18 +1230,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1594,7 +1255,7 @@ const docTemplate = `{
                 "summary": "创建备份",
                 "parameters": [
                     {
-                        "description": "网站 ID",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1608,18 +1269,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1661,18 +1310,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "插件需更新",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             },
@@ -1695,7 +1332,7 @@ const docTemplate = `{
                 "summary": "保存默认配置",
                 "parameters": [
                     {
-                        "description": "页面信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1712,24 +1349,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "插件需更新",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1755,7 +1374,7 @@ const docTemplate = `{
                 "summary": "删除备份",
                 "parameters": [
                     {
-                        "description": "备份信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1769,24 +1388,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1825,18 +1426,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -1861,7 +1450,7 @@ const docTemplate = `{
                 "summary": "重置配置",
                 "parameters": [
                     {
-                        "description": "网站 ID",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1875,24 +1464,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1918,7 +1489,7 @@ const docTemplate = `{
                 "summary": "还原备份",
                 "parameters": [
                     {
-                        "description": "备份信息",
+                        "description": "request",
                         "name": "data",
                         "in": "body",
                         "required": true,
@@ -1932,24 +1503,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -1988,24 +1541,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "参数错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -2042,18 +1577,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }
@@ -2092,24 +1615,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
                         }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "上传文件失败",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
                     }
                 }
             }
@@ -2146,24 +1651,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "登录已过期",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "插件需更新",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "系统内部错误",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.ErrorResponse"
                         }
                     }
                 }

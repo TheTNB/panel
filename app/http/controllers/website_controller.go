@@ -31,17 +31,15 @@ func NewWebsiteController() *WebsiteController {
 }
 
 // List
-// @Summary 获取网站列表
-// @Description 获取网站管理的网站列表
-// @Tags 网站管理
-// @Produce json
-// @Security BearerToken
-// @Param data body commonrequests.Paginate true "分页信息"
-// @Success 200 {object} SuccessResponse{data=responses.List}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 403 {object} ErrorResponse "插件需更新"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website [get]
+//
+//	@Summary		获取网站列表
+//	@Description	获取网站管理的网站列表
+//	@Tags			网站管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=responses.List}
+//	@Router			/panel/website [get]
 func (c *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
@@ -64,18 +62,16 @@ func (c *WebsiteController) List(ctx http.Context) http.Response {
 }
 
 // Add
-// @Summary 添加网站
-// @Description 添加网站到网站管理
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.Add true "网站信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 403 {object} ErrorResponse "插件需更新"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website [post]
+//
+//	@Summary		添加网站
+//	@Description	添加网站到网站管理
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.Add	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website [post]
 func (c *WebsiteController) Add(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -111,18 +107,16 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 }
 
 // Delete
-// @Summary 删除网站
-// @Description 删除网站管理的网站
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 403 {object} ErrorResponse "插件需更新"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/{id} [delete]
+//
+//	@Summary		删除网站
+//	@Description	删除网站管理的网站
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/website/{id} [delete]
 func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -148,15 +142,14 @@ func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 }
 
 // GetDefaultConfig
-// @Summary 获取默认配置
-// @Description 获取默认首页和停止页配置
-// @Tags 网站管理
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse{data=map[string]string}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 403 {object} ErrorResponse "插件需更新"
-// @Router /panel/website/defaultConfig [get]
+//
+//	@Summary		获取默认配置
+//	@Description	获取默认首页和停止页配置
+//	@Tags			网站管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse{data=map[string]string}
+//	@Router			/panel/website/defaultConfig [get]
 func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -172,18 +165,16 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 }
 
 // SaveDefaultConfig
-// @Summary 保存默认配置
-// @Description 保存默认首页和停止页配置
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body map[string]string true "页面信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 403 {object} ErrorResponse "插件需更新"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/defaultConfig [post]
+//
+//	@Summary		保存默认配置
+//	@Description	保存默认首页和停止页配置
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		map[string]string	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/defaultConfig [post]
 func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -210,17 +201,16 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 }
 
 // GetConfig
-// @Summary 获取配置
-// @Description 获取网站的配置
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Success 200 {object} SuccessResponse{data=services.PanelWebsite}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/config/{id} [get]
+//
+//	@Summary		获取配置
+//	@Description	获取网站的配置
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse{data=services.PanelWebsite}
+//	@Router			/panel/website/config/{id} [get]
 func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -246,18 +236,17 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 }
 
 // SaveConfig
-// @Summary 保存配置
-// @Description 保存网站的配置
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Param data body requests.SaveConfig true "网站配置"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/config/{id} [post]
+//
+//	@Summary		保存配置
+//	@Description	保存网站的配置
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id		path		int					true	"网站 ID"
+//	@Param			data	body		requests.SaveConfig	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/config/{id} [post]
 func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -282,17 +271,16 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 }
 
 // ClearLog
-// @Summary 清空日志
-// @Description 清空网站的日志
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/log/{id} [delete]
+//
+//	@Summary		清空日志
+//	@Description	清空网站的日志
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/website/log/{id} [delete]
 func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -316,17 +304,16 @@ func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 }
 
 // UpdateRemark
-// @Summary 更新备注
-// @Description 更新网站的备注
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/updateRemark/{id} [post]
+//
+//	@Summary		更新备注
+//	@Description	更新网站的备注
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/website/updateRemark/{id} [post]
 func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
@@ -353,15 +340,14 @@ func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 }
 
 // BackupList
-// @Summary 获取备份列表
-// @Description 获取网站的备份列表
-// @Tags 网站管理
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse{data=[]services.BackupFile}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/backupList [get]
+//
+//	@Summary		获取备份列表
+//	@Description	获取网站的备份列表
+//	@Tags			网站管理
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse{data=[]services.BackupFile}
+//	@Router			/panel/website/backupList [get]
 func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 	backupList, err := c.backup.WebsiteList()
 	if err != nil {
@@ -375,17 +361,16 @@ func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 }
 
 // CreateBackup
-// @Summary 创建备份
-// @Description 创建网站的备份
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.ID true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/createBackup [post]
+//
+//	@Summary		创建备份
+//	@Description	创建网站的备份
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/createBackup [post]
 func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
@@ -414,18 +399,16 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 }
 
 // UploadBackup
-// @Summary 上传备份
-// @Description 上传网站的备份
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param file formData file true "备份文件"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 422 {object} ErrorResponse "上传文件失败"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/uploadBackup [post]
+//
+//	@Summary		上传备份
+//	@Description	上传网站的备份
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			file	formData	file	true	"备份文件"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/uploadBackup [post]
 func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
@@ -450,18 +433,16 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 }
 
 // RestoreBackup
-// @Summary 还原备份
-// @Description 还原网站的备份
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.RestoreBackup true "备份信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 422 {object} ErrorResponse "参数错误"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/restoreBackup [post]
+//
+//	@Summary		还原备份
+//	@Description	还原网站的备份
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.RestoreBackup	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/restoreBackup [post]
 func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
 	sanitize := Sanitize(ctx, &restoreBackupRequest)
@@ -487,18 +468,16 @@ func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 }
 
 // DeleteBackup
-// @Summary 删除备份
-// @Description 删除网站的备份
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.DeleteBackup true "备份信息"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 422 {object} ErrorResponse "参数错误"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/deleteBackup [delete]
+//
+//	@Summary		删除备份
+//	@Description	删除网站的备份
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.DeleteBackup	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/deleteBackup [delete]
 func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	var deleteBackupRequest requests.DeleteBackup
 	sanitize := Sanitize(ctx, &deleteBackupRequest)
@@ -519,18 +498,16 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 }
 
 // ResetConfig
-// @Summary 重置配置
-// @Description 重置网站的配置
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.ID true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 422 {object} ErrorResponse "参数错误"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/resetConfig [post]
+//
+//	@Summary		重置配置
+//	@Description	重置网站的配置
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/website/resetConfig [post]
 func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -628,18 +605,16 @@ server
 }
 
 // Status
-// @Summary 状态
-// @Description 启用或停用网站
-// @Tags 网站管理
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param id path int true "网站 ID"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 422 {object} ErrorResponse "参数错误"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/website/status/{id} [post]
+//
+//	@Summary		状态
+//	@Description	启用或停用网站
+//	@Tags			网站管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/website/status/{id} [post]
 func (c *WebsiteController) Status(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {

@@ -181,7 +181,9 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 </html>
 
 `
-	tools.Write(website.Path+"/index.html", index, 0644)
+	if err := tools.Write(website.Path+"/index.html", index, 0644); err != nil {
+		return models.Website{}, err
+	}
 
 	portList := ""
 	domainList := ""
@@ -265,10 +267,18 @@ server
 }
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	tools.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644)
-	tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644)
-	tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644)
-	tools.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644)
+	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
+		return models.Website{}, err
+	}
+	if err := tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
+		return models.Website{}, err
+	}
+	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
+		return models.Website{}, err
+	}
+	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644); err != nil {
+		return models.Website{}, err
+	}
 
 	tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755)
 	tools.Chmod(website.Path, 0755)
@@ -308,8 +318,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	// 原文
 	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 	if strings.TrimSpace(raw) != strings.TrimSpace(config.Raw) {
-		err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644)
-		if err != nil {
+		if err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
 		}
 		tools.Exec("systemctl reload openresty")

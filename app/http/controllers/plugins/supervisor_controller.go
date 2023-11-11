@@ -152,10 +152,15 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 	}
 
 	config := ctx.Request().Input("config")
+	var err error
 	if tools.IsRHEL() {
-		tools.Write(`/etc/supervisord.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisord.conf`, config, 0644)
 	} else {
-		tools.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
+	}
+
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	return r.Restart(ctx)
@@ -321,11 +326,17 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 
 	process := ctx.Request().Input("process")
 	config := ctx.Request().Input("config")
+	var err error
 	if tools.IsRHEL() {
-		tools.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
 	} else {
-		tools.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
 	}
+
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
+
 	tools.Exec(`supervisorctl reread`)
 	tools.Exec(`supervisorctl update`)
 	tools.Exec(`supervisorctl start ` + process)
@@ -372,10 +383,15 @@ stdout_logfile=/var/log/supervisor/` + name + `.log
 stdout_logfile_maxbytes=2MB
 `
 	if tools.IsRHEL() {
-		tools.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
 	} else {
-		tools.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
+		err = tools.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
 	}
+
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
+
 	tools.Exec(`supervisorctl reread`)
 	tools.Exec(`supervisorctl update`)
 	tools.Exec(`supervisorctl start ` + name)

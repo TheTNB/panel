@@ -23,15 +23,14 @@ func NewSettingController() *SettingController {
 }
 
 // List
-// @Summary 设置列表
-// @Description 获取面板设置列表
-// @Tags 面板设置
-// @Produce json
-// @Security BearerToken
-// @Success 200 {object} SuccessResponse{data=responses.Settings}
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/setting/list [get]
+//
+//	@Summary		设置列表
+//	@Description	获取面板设置列表
+//	@Tags			面板设置
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse{data=responses.Settings}
+//	@Router			/panel/setting/list [get]
 func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
 	err := facades.Orm().Query().Get(&settings)
@@ -61,17 +60,16 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 }
 
 // Update
-// @Summary 更新设置
-// @Description 更新面板设置
-// @Tags 面板设置
-// @Accept json
-// @Produce json
-// @Security BearerToken
-// @Param data body requests.Update true "更新设置"
-// @Success 200 {object} SuccessResponse
-// @Failure 401 {object} ErrorResponse "登录已过期"
-// @Failure 500 {object} ErrorResponse "系统内部错误"
-// @Router /panel/setting/update [post]
+//
+//	@Summary		更新设置
+//	@Description	更新面板设置
+//	@Tags			面板设置
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.Update	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/setting/update [post]
 func (r *SettingController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
 	sanitize := Sanitize(ctx, &updateRequest)

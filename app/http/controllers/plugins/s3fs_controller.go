@@ -115,7 +115,9 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 	id := carbon.Now().TimestampMilli()
 	password := ak + ":" + sk
-	tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600)
+	if err = tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
+		return nil
+	}
 	tools.Exec(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
 	mountCheck := tools.Exec("mount -a 2>&1")
 	if len(mountCheck) != 0 {

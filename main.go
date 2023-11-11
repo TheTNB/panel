@@ -22,18 +22,21 @@ import (
 	"panel/bootstrap"
 )
 
-// @title           耗子 Linux 面板 API
-// @version         2
-// @description     耗子 Linux 面板的 API 信息
+//	@title			耗子 Linux 面板 API
+//	@version		2
+//	@description	耗子 Linux 面板的 API 信息
 
-// @contact.name   耗子科技
-// @contact.email  i@haozi.net
+//	@contact.name	耗子科技
+//	@contact.email	i@haozi.net
 
-// @securityDefinitions.apikey BearerToken
-// @in header
-// @name Authorization
+//	@license.name	GNU Affero General Public License v3
+//	@license		url   https://www.gnu.org/licenses/agpl-3.0.html
 
-// @BasePath  /api
+//	@securityDefinitions.apikey	BearerToken
+//	@in							header
+//	@name						Authorization
+
+// @BasePath	/api
 func main() {
 	// 启动框架
 	bootstrap.Boot()

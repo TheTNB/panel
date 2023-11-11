@@ -263,7 +263,9 @@ logpath = /www/wwwlogs/` + website.Name + `.log
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
-		tools.Write("/etc/fail2ban/jail.local", raw, 0644)
+		if err = tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+		}
 
 		var filter string
 		if jailWebsiteMode == "cc" {
@@ -279,7 +281,9 @@ failregex = ^<HOST>\s-.*\s` + jailWebsitePath + `.*HTTP/.*$
 ignoreregex =
 `
 		}
-		tools.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644)
+		if err = tools.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+		}
 
 	case "service":
 		var logPath string
@@ -323,7 +327,9 @@ logpath = ` + logPath + `
 # ` + jailName + `-END
 `
 		raw += rule
-		tools.Write("/etc/fail2ban/jail.local", raw, 0644)
+		if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+		}
 	}
 
 	tools.Exec("fail2ban-client reload")
@@ -346,7 +352,9 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 	rule := tools.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 	raw = strings.Replace(raw, "\n# "+jailName+"-START"+rule+"# "+jailName+"-END", "", -1)
 	raw = strings.TrimSpace(raw)
-	tools.Write("/etc/fail2ban/jail.local", raw, 0644)
+	if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+	}
 
 	tools.Exec("fail2ban-client reload")
 	return controllers.Success(ctx, nil)
@@ -427,7 +435,9 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
 	}
 
-	tools.Write("/etc/fail2ban/jail.local", raw, 0644)
+	if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+	}
 	tools.Exec("fail2ban-client reload")
 	return controllers.Success(ctx, nil)
 }
