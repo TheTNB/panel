@@ -123,7 +123,9 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 		} else {
 			tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size))
 			tools.Exec("mkswap -f /www/swap")
-			tools.Chmod("/www/swap", 0600)
+			if err := tools.Chmod("/www/swap", 0600); err != nil {
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
+			}
 		}
 		tools.Exec("swapon /www/swap")
 		tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab")

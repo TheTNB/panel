@@ -182,7 +182,9 @@ func (r *PureFtpdController) Add(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "目录不存在")
 	}
 
-	tools.Chmod(path, 0755)
+	if err = tools.Chmod(path, 0755); err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "修改目录权限失败")
+	}
 	tools.Chown(path, "www", "www")
 	tools.Exec(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
 	tools.Exec("pure-pw mkdb")

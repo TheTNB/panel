@@ -282,8 +282,12 @@ server
 		return models.Website{}, err
 	}
 
-	tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755)
-	tools.Chmod(website.Path, 0755)
+	if err := tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755); err != nil {
+		return models.Website{}, err
+	}
+	if err := tools.Chmod(website.Path, 0755); err != nil {
+		return models.Website{}, err
+	}
 	tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www")
 	tools.Chown(website.Path, "www", "www")
 

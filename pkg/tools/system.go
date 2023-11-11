@@ -106,16 +106,8 @@ func Mkdir(path string, permission os.FileMode) error {
 }
 
 // Chmod 修改文件/目录权限
-func Chmod(path string, permission os.FileMode) bool {
-	if err := os.Chmod(path, permission); err != nil {
-		facades.Log().With(map[string]any{
-			"path":       path,
-			"permission": permission,
-		}).Tags("面板", "工具函数").Info("修改文件/目录权限失败")
-		return false
-	}
-
-	return true
+func Chmod(path string, permission os.FileMode) error {
+	return os.Chmod(path, permission)
 }
 
 // Chown 修改文件/目录所有者

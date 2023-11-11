@@ -114,7 +114,9 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 
 	tools.Exec(`rm -rf '` + website.Path + `/*'`)
 	tools.Exec(`unzip -o '` + backupFile + `' -d '` + website.Path + `' 2>&1`)
-	tools.Chmod(website.Path, 0755)
+	if err := tools.Chmod(website.Path, 0755); err != nil {
+		return err
+	}
 	tools.Chown(website.Path, "www", "www")
 
 	return nil
