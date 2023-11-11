@@ -288,8 +288,12 @@ server
 	if err := tools.Chmod(website.Path, 0755); err != nil {
 		return models.Website{}, err
 	}
-	tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www")
-	tools.Chown(website.Path, "www", "www")
+	if err := tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www"); err != nil {
+		return models.Website{}, err
+	}
+	if err := tools.Chown(website.Path, "www", "www"); err != nil {
+		return models.Website{}, err
+	}
 
 	tools.Exec("systemctl reload openresty")
 

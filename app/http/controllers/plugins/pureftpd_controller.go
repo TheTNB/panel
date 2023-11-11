@@ -185,7 +185,9 @@ func (r *PureFtpdController) Add(ctx http.Context) http.Response {
 	if err = tools.Chmod(path, 0755); err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "修改目录权限失败")
 	}
-	tools.Chown(path, "www", "www")
+	if err = tools.Chown(path, "www", "www"); err != nil {
+		return nil
+	}
 	tools.Exec(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path)
 	tools.Exec("pure-pw mkdb")
 

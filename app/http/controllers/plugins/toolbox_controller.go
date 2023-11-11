@@ -74,9 +74,13 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 	var total, used, free string
 	var size int64
 	if tools.Exists("/www/swap") {
-		s, _ := tools.FileSize("/www/swap")
-		size = s / 1024 / 1024
-		total = tools.FormatBytes(float64(s))
+		file, err := tools.FileInfo("/www/swap")
+		if err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
+		}
+
+		size = file.Size() / 1024 / 1024
+		total = tools.FormatBytes(float64(file.Size()))
 	} else {
 		size = 0
 		total = "0.00 B"

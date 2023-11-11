@@ -93,7 +93,7 @@ func (s *SystemHelperTestSuite) TestChown() {
 	groups, err := currentUser.GroupIds()
 	s.Nil(err)
 
-	s.True(Chown(filePath, currentUser.Username, groups[0]))
+	s.Nil(Chown(filePath, currentUser.Username, groups[0]))
 }
 
 func (s *SystemHelperTestSuite) TestExists() {
@@ -134,8 +134,7 @@ func (s *SystemHelperTestSuite) TestSize() {
 	s.Error(err)
 }
 
-func (s *SystemHelperTestSuite) TestFileSize() {
-	size, err := FileSize("/tmp/123")
-	s.Equal(int64(0), size)
+func (s *SystemHelperTestSuite) TestFileInfo() {
+	_, err := FileInfo("/tmp/123")
 	s.Error(err)
 }

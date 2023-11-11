@@ -117,7 +117,9 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 	if err := tools.Chmod(website.Path, 0755); err != nil {
 		return err
 	}
-	tools.Chown(website.Path, "www", "www")
+	if err := tools.Chown(website.Path, "www", "www"); err != nil {
+		return err
+	}
 
 	return nil
 }

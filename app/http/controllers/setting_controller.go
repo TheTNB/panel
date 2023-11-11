@@ -101,7 +101,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		if err = tools.Mkdir(updateRequest.WebsitePath, 0755); err != nil {
 			return ErrorSystem(ctx)
 		}
-		tools.Chown(updateRequest.WebsitePath, "www", "www")
+		if err = tools.Chown(updateRequest.WebsitePath, "www", "www"); err != nil {
+			return ErrorSystem(ctx)
+		}
 	}
 	err = r.setting.Set(models.SettingKeyWebsitePath, updateRequest.WebsitePath)
 	if err != nil {
