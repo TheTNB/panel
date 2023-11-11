@@ -95,7 +95,9 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 	// 检查挂载目录是否存在且为空
 	if !tools.Exists(path) {
-		tools.Mkdir(path, 0755)
+		if err = tools.Mkdir(path, 0755); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录创建失败")
+		}
 	}
 	if !tools.Empty(path) {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录必须为空")

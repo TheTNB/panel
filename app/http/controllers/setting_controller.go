@@ -86,7 +86,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	}
 
 	if !tools.Exists(updateRequest.BackupPath) {
-		tools.Mkdir(updateRequest.BackupPath, 0644)
+		if err = tools.Mkdir(updateRequest.BackupPath, 0644); err != nil {
+			return ErrorSystem(ctx)
+		}
 	}
 	err = r.setting.Set(models.SettingKeyBackupPath, updateRequest.BackupPath)
 	if err != nil {
@@ -96,7 +98,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 	if !tools.Exists(updateRequest.WebsitePath) {
-		tools.Mkdir(updateRequest.WebsitePath, 0755)
+		if err = tools.Mkdir(updateRequest.WebsitePath, 0755); err != nil {
+			return ErrorSystem(ctx)
+		}
 		tools.Chown(updateRequest.WebsitePath, "www", "www")
 	}
 	err = r.setting.Set(models.SettingKeyWebsitePath, updateRequest.WebsitePath)

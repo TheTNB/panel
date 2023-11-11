@@ -68,7 +68,7 @@ func (s *SystemHelperTestSuite) TestMkdir() {
 	dirPath := "/tmp/testdir"
 	defer os.RemoveAll(dirPath)
 
-	s.True(Mkdir(dirPath, 0755))
+	s.Nil(Mkdir(dirPath, 0755))
 }
 
 func (s *SystemHelperTestSuite) TestChmod() {

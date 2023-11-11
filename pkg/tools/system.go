@@ -101,17 +101,8 @@ func ExecAsync(shell string) error {
 }
 
 // Mkdir 创建目录
-func Mkdir(path string, permission os.FileMode) bool {
-	if err := os.MkdirAll(path, permission); err != nil {
-		facades.Log().With(map[string]any{
-			"path":       path,
-			"permission": permission,
-			"error":      err.Error(),
-		}).Tags("面板", "工具函数").Info("创建目录失败")
-		return false
-	}
-
-	return true
+func Mkdir(path string, permission os.FileMode) error {
+	return os.MkdirAll(path, permission)
 }
 
 // Chmod 修改文件/目录权限

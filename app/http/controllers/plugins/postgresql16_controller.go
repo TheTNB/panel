@@ -411,7 +411,9 @@ func (r *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err = tools.Mkdir(backupPath, 0644); err != nil {
+			return nil
+		}
 	}
 
 	name := file.GetClientOriginalName()

@@ -49,7 +49,9 @@ func (s *BackupImpl) WebsiteList() ([]BackupFile, error) {
 
 	backupPath += "/website"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return []BackupFile{}, err
+		}
 	}
 
 	files, err := os.ReadDir(backupPath)
@@ -80,7 +82,9 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 
 	backupPath += "/website"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return err
+		}
 	}
 
 	backupFile := backupPath + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
@@ -98,7 +102,9 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 
 	backupPath += "/website"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return err
+		}
 	}
 
 	backupFile = backupPath + "/" + backupFile
@@ -123,7 +129,9 @@ func (s *BackupImpl) MysqlList() ([]BackupFile, error) {
 
 	backupPath += "/mysql"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return []BackupFile{}, err
+		}
 	}
 
 	files, err := os.ReadDir(backupPath)
@@ -151,7 +159,9 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 	rootPassword := s.setting.Get(models.SettingKeyMysqlRootPassword)
 	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return err
+		}
 	}
 	err := os.Setenv("MYSQL_PWD", rootPassword)
 	if err != nil {
@@ -225,7 +235,9 @@ func (s *BackupImpl) PostgresqlList() ([]BackupFile, error) {
 
 	backupPath += "/postgresql"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return []BackupFile{}, err
+		}
 	}
 
 	files, err := os.ReadDir(backupPath)
@@ -252,7 +264,9 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return err
+		}
 	}
 
 	tools.Exec(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile)

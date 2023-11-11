@@ -122,10 +122,12 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 		Remark: website.Remark,
 	}
 	if err := facades.Orm().Query().Create(&w); err != nil {
-		return w, err
+		return models.Website{}, err
 	}
 
-	tools.Mkdir(website.Path, 0755)
+	if err := tools.Mkdir(website.Path, 0755); err != nil {
+		return models.Website{}, err
+	}
 
 	index := `<!DOCTYPE html>
 <html lang="zh-CN">

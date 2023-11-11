@@ -417,7 +417,9 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err = tools.Mkdir(backupPath, 0644); err != nil {
+			return nil
+		}
 	}
 
 	name := file.GetClientOriginalName()
@@ -487,7 +489,9 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 
 	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
 	if !tools.Exists(backupPath) {
-		tools.Mkdir(backupPath, 0644)
+		if err := tools.Mkdir(backupPath, 0644); err != nil {
+			return nil
+		}
 	}
 
 	if !tools.Remove(backupPath + "/" + deleteBackupRequest.Name) {

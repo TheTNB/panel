@@ -228,7 +228,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln(hr)
 
 		if !tools.Exists(path) {
-			tools.Mkdir(path, 0644)
+			if err := tools.Mkdir(path, 0644); err != nil {
+				color.Redln("|-创建备份目录失败: " + err.Error())
+				return nil
+			}
 		}
 
 		switch backupType {
