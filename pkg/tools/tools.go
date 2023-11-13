@@ -440,7 +440,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
-	if err := Remove("/www/panel/" + panelInfo.Checksums); err != nil {
+	if err = Remove("/www/panel/" + panelInfo.Checksums); err != nil {
 		color.Redln("清理临时文件失败")
 		return err
 	}
