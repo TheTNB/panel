@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support"
 )
 
@@ -26,13 +25,10 @@ func Write(path string, data string, permission os.FileMode) error {
 }
 
 // Read 读取文件
+// TODO 重构带 error 返回
 func Read(path string) string {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		facades.Log().With(map[string]any{
-			"path":  path,
-			"error": err.Error(),
-		}).Tags("面板", "工具函数").Info("读取文件失败")
 		return ""
 	}
 
@@ -40,12 +36,9 @@ func Read(path string) string {
 }
 
 // Remove 删除文件/目录
+// TODO 重构带 error 返回
 func Remove(path string) bool {
 	if err := os.RemoveAll(path); err != nil {
-		facades.Log().With(map[string]any{
-			"path":  path,
-			"error": err.Error(),
-		}).Tags("面板", "工具函数").Info("删除文件/目录失败")
 		return false
 	}
 
@@ -53,25 +46,11 @@ func Remove(path string) bool {
 }
 
 // Exec 执行 shell 命令
-func Exec(shell string) string {
-	cmd := exec.Command("bash", "-c", shell)
+func Exec(shell string) (string, error) {
+	cmd := exec.Command("bash", "-c", "LC_ALL=C "+shell)
 
 	output, err := cmd.CombinedOutput()
-	if err != nil {
-		if support.Env == support.EnvTest {
-			fmt.Println(string(output))
-			fmt.Println(err.Error())
-			panic(err)
-		} else {
-			facades.Log().With(map[string]any{
-				"shell": shell,
-				"error": err.Error(),
-			}).Tags("面板", "工具函数").Info("执行命令失败")
-		}
-		return ""
-	}
-
-	return strings.TrimSpace(string(output))
+	return strings.TrimSpace(string(output)), err
 }
 
 // ExecAsync 异步执行 shell 命令
@@ -88,11 +67,6 @@ func ExecAsync(shell string) error {
 			if support.Env == support.EnvTest {
 				fmt.Println(err.Error())
 				panic(err)
-			} else {
-				facades.Log().With(map[string]any{
-					"shell": shell,
-					"error": err.Error(),
-				}).Tags("面板", "工具函数").Info("异步执行命令失败")
 			}
 		}
 	}()

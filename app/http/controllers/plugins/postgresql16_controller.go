@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
-	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
 	"panel/app/http/controllers"
@@ -32,16 +31,12 @@ func (r *Postgresql16Controller) Status(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
+	status, err := tools.ServiceStatus("postgresql")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, status)
 }
 
 // Reload 重载配置
@@ -51,17 +46,11 @@ func (r *Postgresql16Controller) Reload(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl reload postgresql")
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载PostgreSQL失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Restart 重启服务
@@ -71,17 +60,11 @@ func (r *Postgresql16Controller) Restart(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl restart postgresql")
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	if err := tools.ServiceRestart("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重启PostgreSQL失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Start 启动服务
@@ -91,17 +74,11 @@ func (r *Postgresql16Controller) Start(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl start postgresql")
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	if err := tools.ServiceStart("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "启动PostgreSQL失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Stop 停止服务
@@ -111,17 +88,11 @@ func (r *Postgresql16Controller) Stop(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl stop postgresql")
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	if err := tools.ServiceStop("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "停止PostgreSQL失败")
 	}
 
-	if status != "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // GetConfig 获取配置
@@ -201,17 +172,41 @@ func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if status != "active" {
-		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL 已停止运行")
+	status, err := tools.ServiceStatus("postgresql")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	}
+	if !status {
+		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL已停止运行")
+	}
+
+	time, err := tools.Exec(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL启动时间失败")
+	}
+	pid, err := tools.Exec(`echo "select pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL进程PID失败")
+	}
+	process, err := tools.Exec(`ps aux | grep postgres | grep -v grep | wc -l`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL进程数失败")
+	}
+	connections, err := tools.Exec(`echo "SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL连接数失败")
+	}
+	storage, err := tools.Exec(`echo "select pg_size_pretty(pg_database_size('postgres'));" | su - postgres -c "psql" | sed -n 3p`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL空间占用失败")
 	}
 
 	data := []LoadInfo{
-		{"启动时间", carbon.Parse(tools.Exec(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)).ToDateTimeString()},
-		{"进程 PID", tools.Exec(`echo "select pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
-		{"进程数", tools.Exec(`ps aux | grep postgres | grep -v grep | wc -l`)},
-		{"总连接数", tools.Exec(`echo "SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid();" | su - postgres -c "psql" | sed -n 3p`)},
-		{"空间占用", tools.Exec(`echo "select pg_size_pretty(pg_database_size('postgres'));" | su - postgres -c "psql" | sed -n 3p`)},
+		{"启动时间", carbon.Parse(time).ToDateTimeString()},
+		{"进程 PID", pid},
+		{"进程数", process},
+		{"总连接数", connections},
+		{"空间占用", storage},
 	}
 
 	return controllers.Success(ctx, data)
@@ -224,7 +219,11 @@ func (r *Postgresql16Controller) Log(ctx http.Context) http.Response {
 		return check
 	}
 
-	log := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
+	log, err := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, log)
+	}
+
 	return controllers.Success(ctx, log)
 }
 
@@ -235,7 +234,10 @@ func (r *Postgresql16Controller) ClearLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
+	if out, err := tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+
 	return controllers.Success(ctx, nil)
 }
 
@@ -246,9 +248,12 @@ func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-	if status != "active" {
-		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL 已停止运行")
+	status, err := tools.ServiceStatus("postgresql")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+	}
+	if !status {
+		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL已停止运行")
 	}
 
 	type database struct {
@@ -257,7 +262,10 @@ func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 		Encoding string `json:"encoding"`
 	}
 
-	raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+	raw, err := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, raw)
+	}
 	databases := strings.Split(raw, "\n")
 	if len(databases) >= 4 {
 		databases = databases[3 : len(databases)-1]
@@ -326,13 +334,23 @@ func (r *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	tools.Exec(`echo "CREATE DATABASE ` + database + `;" | su - postgres -c "psql"`)
-	tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
-	tools.Exec(`echo "ALTER DATABASE ` + database + ` OWNER TO ` + user + `;" | su - postgres -c "psql"`)
-	tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
+	if out, err := tools.Exec(`echo "CREATE DATABASE ` + database + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec(`echo "ALTER DATABASE ` + database + ` OWNER TO ` + user + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	userConfig := "host    " + database + "    " + user + "    127.0.0.1/32    scram-sha-256"
-	tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+	if out, err := tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	return r.Reload(ctx)
 }
@@ -355,7 +373,9 @@ func (r *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response 
 	}
 
 	database := ctx.Request().Input("database")
-	tools.Exec(`echo "DROP DATABASE ` + database + `;" | su - postgres -c "psql"`)
+	if out, err := tools.Exec(`echo "DROP DATABASE ` + database + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	return controllers.Success(ctx, nil)
 }
@@ -369,7 +389,6 @@ func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
 
 	backupList, err := r.backup.PostgresqlList()
 	if err != nil {
-		facades.Log().Info("[PostgreSQL] 获取备份列表失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
@@ -445,8 +464,7 @@ func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	err = r.backup.PostgresqlBackup(database)
 	if err != nil {
-		facades.Log().Info("[PostgreSQL] 创建备份失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -496,7 +514,6 @@ func (r *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 
 	err = r.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
-		facades.Log().Info("[PostgreSQL] 还原失败：" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 	}
 
@@ -515,7 +532,10 @@ func (r *Postgresql16Controller) UserList(ctx http.Context) http.Response {
 		Role string `json:"role"`
 	}
 
-	raw := tools.Exec(`echo "\du" | su - postgres -c "psql"`)
+	raw, err := tools.Exec(`echo "\du" | su - postgres -c "psql"`)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, raw)
+	}
 	users := strings.Split(raw, "\n")
 	if len(users) < 4 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "用户列表为空")
@@ -578,11 +598,17 @@ func (r *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
-	tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`)
+	if out, err := tools.Exec(`echo "CREATE USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + database + ` TO ` + user + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	userConfig := "host    " + database + "    " + user + "    127.0.0.1/32    scram-sha-256"
-	tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+	if out, err := tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	return r.Reload(ctx)
 }
@@ -605,8 +631,12 @@ func (r *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
 	}
 
 	user := ctx.Request().Input("user")
-	tools.Exec(`echo "DROP USER ` + user + `;" | su - postgres -c "psql"`)
-	tools.Exec(`sed -i '/` + user + `/d' /www/server/postgresql/data/pg_hba.conf`)
+	if out, err := tools.Exec(`echo "DROP USER ` + user + `;" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec(`sed -i '/` + user + `/d' /www/server/postgresql/data/pg_hba.conf`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	return r.Reload(ctx)
 }
@@ -631,7 +661,9 @@ func (r *Postgresql16Controller) SetUserPassword(ctx http.Context) http.Response
 
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	tools.Exec(`echo "ALTER USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`)
+	if out, err := tools.Exec(`echo "ALTER USER ` + user + ` WITH PASSWORD '` + password + `';" | su - postgres -c "psql"`); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	return controllers.Success(ctx, nil)
 }

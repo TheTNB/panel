@@ -40,14 +40,14 @@ func NewWebsiteController() *WebsiteController {
 //	@Param			data	body		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse{data=responses.List}
 //	@Router			/panel/website [get]
-func (c *WebsiteController) List(ctx http.Context) http.Response {
+func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	total, websites, err := c.website.List(paginateRequest.Page, paginateRequest.Limit)
+	total, websites, err := r.website.List(paginateRequest.Page, paginateRequest.Limit)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
@@ -72,7 +72,7 @@ func (c *WebsiteController) List(ctx http.Context) http.Response {
 //	@Param			data	body		requests.Add	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website [post]
-func (c *WebsiteController) Add(ctx http.Context) http.Response {
+func (r *WebsiteController) Add(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -83,11 +83,18 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 		return sanitize
 	}
 
+	if len(addRequest.Path) == 0 {
+		addRequest.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + addRequest.Name
+	}
+
 	website := services.PanelWebsite{
 		Name:       addRequest.Name,
+		Status:     true,
 		Domains:    addRequest.Domains,
 		Ports:      addRequest.Ports,
+		Path:       addRequest.Path,
 		Php:        addRequest.Php,
+		Ssl:        false,
 		Db:         addRequest.Db,
 		DbType:     addRequest.DbType,
 		DbName:     addRequest.DbName,
@@ -95,7 +102,7 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 		DbPassword: addRequest.DbPassword,
 	}
 
-	_, err := c.website.Add(website)
+	_, err := r.website.Add(website)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
@@ -117,7 +124,7 @@ func (c *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/website/{id} [delete]
-func (c *WebsiteController) Delete(ctx http.Context) http.Response {
+func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -129,7 +136,7 @@ func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	err := c.website.Delete(idRequest.ID)
+	err := r.website.Delete(idRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"id":    idRequest.ID,
@@ -150,7 +157,7 @@ func (c *WebsiteController) Delete(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Success		200	{object}	SuccessResponse{data=map[string]string}
 //	@Router			/panel/website/defaultConfig [get]
-func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
+func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -175,7 +182,7 @@ func (c *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 //	@Param			data	body		map[string]string	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/defaultConfig [post]
-func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
+func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -211,7 +218,7 @@ func (c *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse{data=services.PanelWebsite}
 //	@Router			/panel/website/config/{id} [get]
-func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
+func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -223,7 +230,7 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	config, err := c.website.GetConfig(idRequest.ID)
+	config, err := r.website.GetConfig(idRequest.ID)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"id":    idRequest.ID,
@@ -247,7 +254,7 @@ func (c *WebsiteController) GetConfig(ctx http.Context) http.Response {
 //	@Param			data	body		requests.SaveConfig	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/config/{id} [post]
-func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
+func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -259,7 +266,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	err := c.website.SaveConfig(saveConfigRequest)
+	err := r.website.SaveConfig(saveConfigRequest)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
@@ -281,7 +288,7 @@ func (c *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/website/log/{id} [delete]
-func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
+func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -314,7 +321,7 @@ func (c *WebsiteController) ClearLog(ctx http.Context) http.Response {
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/website/updateRemark/{id} [post]
-func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
+func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -348,8 +355,8 @@ func (c *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Success		200	{object}	SuccessResponse{data=[]services.BackupFile}
 //	@Router			/panel/website/backupList [get]
-func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
-	backupList, err := c.backup.WebsiteList()
+func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
+	backupList, err := r.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
@@ -371,7 +378,7 @@ func (c *WebsiteController) BackupList(ctx http.Context) http.Response {
 //	@Param			data	body		requests.ID	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/createBackup [post]
-func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
+func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -387,7 +394,7 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	if err := c.backup.WebSiteBackup(website); err != nil {
+	if err := r.backup.WebSiteBackup(website); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"id":    idRequest.ID,
 			"error": err.Error(),
@@ -409,13 +416,13 @@ func (c *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 //	@Param			file	formData	file	true	"备份文件"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/uploadBackup [post]
-func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
+func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
+		return Error(ctx, http.StatusInternalServerError, "上传文件失败")
 	}
 
-	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
+	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/website"
 	if !tools.Exists(backupPath) {
 		if err = tools.Mkdir(backupPath, 0644); err != nil {
 			return nil
@@ -445,7 +452,7 @@ func (c *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 //	@Param			data	body		requests.RestoreBackup	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/restoreBackup [post]
-func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
+func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
 	sanitize := Sanitize(ctx, &restoreBackupRequest)
 	if sanitize != nil {
@@ -457,7 +464,7 @@ func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	if err := c.backup.WebsiteRestore(website, restoreBackupRequest.Name); err != nil {
+	if err := r.backup.WebsiteRestore(website, restoreBackupRequest.Name); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"id":    restoreBackupRequest.ID,
 			"file":  restoreBackupRequest.Name,
@@ -480,14 +487,14 @@ func (c *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 //	@Param			data	body		requests.DeleteBackup	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/deleteBackup [delete]
-func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
+func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	var deleteBackupRequest requests.DeleteBackup
 	sanitize := Sanitize(ctx, &deleteBackupRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	backupPath := c.setting.Get(models.SettingKeyBackupPath) + "/website"
+	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/website"
 	if !tools.Exists(backupPath) {
 		if err := tools.Mkdir(backupPath, 0644); err != nil {
 			return nil
@@ -512,7 +519,7 @@ func (c *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 //	@Param			data	body		requests.ID	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/resetConfig [post]
-func (c *WebsiteController) ResetConfig(ctx http.Context) http.Response {
+func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -603,7 +610,9 @@ server
 	if err := tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
 		return nil
 	}
-	tools.Exec("systemctl reload openresty")
+	if exec, err := tools.Exec("systemctl reload openresty"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, exec)
+	}
 
 	return Success(ctx, nil)
 }
@@ -619,7 +628,7 @@ server
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/website/status/{id} [post]
-func (c *WebsiteController) Status(ctx http.Context) http.Response {
+func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
 		return check
@@ -672,7 +681,9 @@ func (c *WebsiteController) Status(ctx http.Context) http.Response {
 	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return ErrorSystem(ctx)
 	}
-	tools.Exec("systemctl reload openresty")
+	if exec, err := tools.Exec("systemctl reload openresty"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, exec)
+	}
 
 	return Success(ctx, nil)
 }

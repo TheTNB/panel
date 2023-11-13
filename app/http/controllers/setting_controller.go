@@ -35,7 +35,9 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
 	err := facades.Orm().Query().Get(&settings)
 	if err != nil {
-		facades.Log().Info("[面板][SettingController] 查询设置列表失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取面板设置列表失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -48,13 +50,21 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
-		facades.Log().Info("[面板][SettingController] 获取用户失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取用户信息失败")
 		return ErrorSystem(ctx)
 	}
 	result.Username = user.Username
 	result.Email = user.Email
 
-	result.Port = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	result.Port, err = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取面板端口失败")
+		return ErrorSystem(ctx)
+	}
 
 	return Success(ctx, result)
 }
@@ -79,9 +89,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 
 	err := r.setting.Set(models.SettingKeyName, updateRequest.Name)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Info("保存面板名称失败")
+		}).Info("保存面板名称失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -92,9 +102,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	}
 	err = r.setting.Set(models.SettingKeyBackupPath, updateRequest.BackupPath)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Info("保存备份目录失败")
+		}).Info("保存备份目录失败")
 		return ErrorSystem(ctx)
 	}
 	if !tools.Exists(updateRequest.WebsitePath) {
@@ -107,9 +117,9 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	}
 	err = r.setting.Set(models.SettingKeyWebsitePath, updateRequest.WebsitePath)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Info("保存建站目录失败")
+		}).Info("保存建站目录失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -128,30 +138,61 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		user.Password = hash
 	}
 	if err = facades.Orm().Query().Save(&user); err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "面板设置").Info("保存用户信息失败")
+		}).Info("保存用户信息失败")
 		return ErrorSystem(ctx)
 	}
 
-	oldPort := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	oldPort, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取面板端口失败")
+		return ErrorSystem(ctx)
+	}
+
 	port := cast.ToString(updateRequest.Port)
 	if oldPort != port {
-		tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf")
+		if out, err := tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf"); err != nil {
+			return Error(ctx, http.StatusInternalServerError, out)
+		}
 		if tools.IsRHEL() {
-			tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/tcp --permanent 2>&1")
-			tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/tcp --permanent 2>&1")
-			tools.Exec("firewall-cmd --reload")
+			if out, err := tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/tcp --permanent 2>&1"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
+			if out, err := tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/tcp --permanent 2>&1"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
+			if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
 		} else {
-			tools.Exec("ufw delete allow " + cast.ToString(port) + "/tcp")
-			tools.Exec("ufw allow " + cast.ToString(port) + "/tcp")
-			tools.Exec("ufw reload")
+			if out, err := tools.Exec("ufw delete allow " + cast.ToString(port) + "/tcp"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
+			if out, err := tools.Exec("ufw allow " + cast.ToString(port) + "/tcp"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
+			if out, err := tools.Exec("ufw reload"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, out)
+			}
 		}
 	}
-	oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+
+	oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取面板入口失败")
+		return ErrorSystem(ctx)
+	}
+
 	entrance := cast.ToString(updateRequest.Entrance)
 	if oldEntrance != entrance {
-		tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf")
+		if out, err := tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf"); err != nil {
+			return Error(ctx, http.StatusInternalServerError, out)
+		}
 	}
 
 	if oldPort != port || oldEntrance != entrance {

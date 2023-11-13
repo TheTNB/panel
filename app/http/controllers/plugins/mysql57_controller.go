@@ -4,10 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/goravel/framework/contracts/http"
-	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
@@ -35,16 +33,12 @@ func (r *Mysql57Controller) Status(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
+	status, err := tools.ServiceStatus("mysqld")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, status)
 }
 
 // Reload 重载配置
@@ -54,17 +48,11 @@ func (r *Mysql57Controller) Reload(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl reload mysqld")
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
+	if err := tools.ServiceReload("mysqld"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Restart 重启服务
@@ -74,17 +62,11 @@ func (r *Mysql57Controller) Restart(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl restart mysqld")
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
+	if err := tools.ServiceRestart("mysqld"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重启MySQL服务失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Start 启动服务
@@ -94,17 +76,11 @@ func (r *Mysql57Controller) Start(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl start mysqld")
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
+	if err := tools.ServiceStart("mysqld"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "启动MySQL服务失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // Stop 停止服务
@@ -114,17 +90,11 @@ func (r *Mysql57Controller) Stop(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl stop mysqld")
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
+	if err := tools.ServiceStop("mysqld"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "停止MySQL服务失败")
 	}
 
-	if status != "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 // GetConfig 获取配置
@@ -174,16 +144,16 @@ func (r *Mysql57Controller) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if status != "active" {
-		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 已停止运行")
+	status, err := tools.ServiceStatus("mysqld")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
+	}
+	if !status {
+		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
 	}
 
-	raw := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
-	if strings.Contains(raw, "Access denied for user") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码错误")
-	}
-	if !strings.Contains(raw, "Uptime") {
+	raw, err := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
 
@@ -244,7 +214,11 @@ func (r *Mysql57Controller) ErrorLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log"))
+	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, log)
+	}
+
 	return controllers.Success(ctx, log)
 }
 
@@ -255,8 +229,11 @@ func (r *Mysql57Controller) ClearErrorLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("echo '' > /www/server/mysql/mysql-error.log")
-	return controllers.Success(ctx, "清空错误日志成功")
+	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-error.log"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // SlowLog 获取慢查询日志
@@ -266,7 +243,11 @@ func (r *Mysql57Controller) SlowLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	log := tools.Escape(tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log"))
+	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, log)
+	}
+
 	return controllers.Success(ctx, log)
 }
 
@@ -277,8 +258,10 @@ func (r *Mysql57Controller) ClearSlowLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("echo '' > /www/server/mysql/mysql-slow.log")
-	return controllers.Success(ctx, "清空慢查询日志成功")
+	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-slow.log"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	return controllers.Success(ctx, nil)
 }
 
 // GetRootPassword 获取root密码
@@ -303,11 +286,11 @@ func (r *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
+	status, err := tools.ServiceStatus("mysqld")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}
-	if status != "active" {
+	if !status {
 		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
 	}
 
@@ -318,17 +301,25 @@ func (r *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
 
 	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
-		tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\"")
-		tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\"")
+		if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\""); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
+		}
+		if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
+		}
 		err := r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
 		if err != nil {
-			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\"")
-			tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+			if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\""); err != nil {
+				return nil
+			}
+			if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+				return nil
+			}
 			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 		}
 	}
 
-	return controllers.Success(ctx, "设置root密码成功")
+	return controllers.Success(ctx, nil)
 }
 
 // DatabaseList 获取数据库列表
@@ -345,15 +336,13 @@ func (r *Mysql57Controller) DatabaseList(ctx http.Context) http.Response {
 
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		facades.Log().Info("[MySQL57] 连接数据库失败" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SHOW DATABASES")
 	if err != nil {
-		facades.Log().Info("[MySQL57] 获取数据库列表失败" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer rows.Close()
 
@@ -369,7 +358,6 @@ func (r *Mysql57Controller) DatabaseList(ctx http.Context) http.Response {
 	}
 
 	if err := rows.Err(); err != nil {
-		facades.Log().Info("[MySQL57] 获取数据库列表失败" + err.Error())
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 
@@ -418,12 +406,20 @@ func (r *Mysql57Controller) AddDatabase(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "添加数据库成功")
+	return controllers.Success(ctx, nil)
 }
 
 // DeleteDatabase 删除数据库
@@ -445,9 +441,11 @@ func (r *Mysql57Controller) DeleteDatabase(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "删除数据库成功")
+	return controllers.Success(ctx, nil)
 }
 
 // BackupList 获取备份列表
@@ -459,8 +457,7 @@ func (r *Mysql57Controller) BackupList(ctx http.Context) http.Response {
 
 	backupList, err := r.backup.MysqlList()
 	if err != nil {
-		facades.Log().Info("[MySQL57] 获取备份列表失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
@@ -512,7 +509,7 @@ func (r *Mysql57Controller) UploadBackup(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
-	return controllers.Success(ctx, "上传文件成功")
+	return controllers.Success(ctx, nil)
 }
 
 // CreateBackup 创建备份
@@ -535,11 +532,10 @@ func (r *Mysql57Controller) CreateBackup(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	err = r.backup.MysqlBackup(database)
 	if err != nil {
-		facades.Log().Info("[MYSQL57] 创建备份失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "创建备份失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, "备份成功")
+	return controllers.Success(ctx, nil)
 }
 
 // DeleteBackup 删除备份
@@ -563,7 +559,7 @@ func (r *Mysql57Controller) DeleteBackup(ctx http.Context) http.Response {
 	fileName := ctx.Request().Input("name")
 	tools.Remove(backupPath + "/" + fileName)
 
-	return controllers.Success(ctx, "删除备份成功")
+	return controllers.Success(ctx, nil)
 }
 
 // RestoreBackup 还原备份
@@ -586,11 +582,10 @@ func (r *Mysql57Controller) RestoreBackup(ctx http.Context) http.Response {
 
 	err = r.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
 	if err != nil {
-		facades.Log().Info("[MYSQL57] 还原失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, "还原成功")
+	return controllers.Success(ctx, nil)
 }
 
 // UserList 用户列表
@@ -609,15 +604,13 @@ func (r *Mysql57Controller) UserList(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		facades.Log().Info("[MYSQL57] 连接数据库失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "连接数据库失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT user, host FROM mysql.user")
 	if err != nil {
-		facades.Log().Info("[MYSQL57] 查询数据库失败：" + err.Error())
-		return controllers.Error(ctx, http.StatusInternalServerError, "查询数据库失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer rows.Close()
 
@@ -702,11 +695,17 @@ func (r *Mysql57Controller) AddUser(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "添加成功")
+	return controllers.Success(ctx, nil)
 }
 
 // DeleteUser 删除用户
@@ -728,9 +727,11 @@ func (r *Mysql57Controller) DeleteUser(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "删除成功")
+	return controllers.Success(ctx, nil)
 }
 
 // SetUserPassword 设置用户密码
@@ -754,10 +755,14 @@ func (r *Mysql57Controller) SetUserPassword(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "修改成功")
+	return controllers.Success(ctx, nil)
 }
 
 // SetUserPrivileges 设置用户权限
@@ -781,9 +786,15 @@ func (r *Mysql57Controller) SetUserPrivileges(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\"")
-	tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\"")
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	return controllers.Success(ctx, "修改成功")
+	return controllers.Success(ctx, nil)
 }

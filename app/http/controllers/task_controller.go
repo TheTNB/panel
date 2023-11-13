@@ -38,9 +38,9 @@ func (r *TaskController) List(ctx http.Context) http.Response {
 	var total int64
 	err := facades.Orm().Query().Order("id desc").Paginate(ctx.Request().QueryInt("page", 1), ctx.Request().QueryInt("limit", 10), &tasks, &total)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "任务中心").With(map[string]any{
 			"error": err.Error(),
-		}).Info("[面板][TaskController] 查询任务列表失败")
+		}).Info("查询任务列表失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -55,14 +55,17 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("id", ctx.Request().QueryInt("id")).FirstOrFail(&task)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "任务中心").With(map[string]any{
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
-		}).Info("[面板][TaskController] 查询任务失败")
+		}).Info("查询任务失败")
 		return ErrorSystem(ctx)
 	}
 
-	log := tools.Exec("tail -n 1000 " + task.Log)
+	log, err := tools.Exec("tail -n 1000 " + task.Log)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, log)
+	}
 
 	return Success(ctx, log)
 }
@@ -72,10 +75,10 @@ func (r *TaskController) Delete(ctx http.Context) http.Response {
 	var task models.Task
 	_, err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).Delete(&task)
 	if err != nil {
-		facades.Log().With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "任务中心").With(map[string]any{
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
-		}).Info("[面板][TaskController] 删除任务失败")
+		}).Info("删除任务失败")
 		return ErrorSystem(ctx)
 	}
 

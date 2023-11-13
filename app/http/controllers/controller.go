@@ -35,7 +35,7 @@ func Success(ctx http.Context, data any) http.Response {
 func Error(ctx http.Context, code int, message string) http.Response {
 	return ctx.Response().Json(http.StatusOK, &ErrorResponse{
 		Code:    code,
-		Message: message,
+		Message: "错误: " + message,
 	})
 }
 

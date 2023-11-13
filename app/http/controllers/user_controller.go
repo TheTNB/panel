@@ -41,9 +41,9 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	var user models.User
 	err := facades.Orm().Query().Where("username", loginRequest.Username).First(&user)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Info("查询用户失败")
+		}).Info("查询用户失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -54,18 +54,18 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 	if facades.Hash().NeedsRehash(user.Password) {
 		user.Password, err = facades.Hash().Make(loginRequest.Password)
 		if err != nil {
-			facades.Log().Request(ctx.Request()).With(map[string]any{
+			facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 				"error": err.Error(),
-			}).Tags("面板", "用户").Info("更新密码失败")
+			}).Info("更新密码失败")
 			return ErrorSystem(ctx)
 		}
 	}
 
 	token, loginErr := facades.Auth().LoginUsingID(ctx, user.ID)
 	if loginErr != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Info("登录失败")
+		}).Info("登录失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -87,9 +87,9 @@ func (r *UserController) Info(ctx http.Context) http.Response {
 	var user models.User
 	err := facades.Auth().User(ctx, &user)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
-		}).Tags("面板", "用户").Info("获取用户信息失败")
+		}).Info("获取用户信息失败")
 		return ErrorSystem(ctx)
 	}
 

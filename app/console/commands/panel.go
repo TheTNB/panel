@@ -125,7 +125,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		port := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		if err != nil {
+			color.Redln("获取面板端口失败")
+			return nil
+		}
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
@@ -133,15 +137,27 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
-		port := tools.Exec("cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}'")
+		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		if err != nil {
+			color.Redln("获取面板端口失败")
+			return nil
+		}
+
 		color.Greenln("面板端口: " + port)
 
 	case "getEntrance":
 		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
-		oldEntrance := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
-		tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf")
+		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+		if err != nil {
+			color.Redln("获取面板入口失败")
+			return nil
+		}
+		if _, err = tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf"); err != nil {
+			color.Redln("删除面板入口失败")
+			return nil
+		}
 
 		color.Greenln("删除面板入口成功")
 
@@ -245,7 +261,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			}
 
 			backupFile := path + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
-			tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`)
+			if _, err := tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
+				color.Redln("|-备份失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-备份成功")
 
 		case "mysql":
@@ -261,10 +280,16 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Greenln("|-目标MySQL数据库: " + name)
 			color.Greenln("|-开始导出")
-			tools.Exec(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`)
+			if _, err = tools.Exec(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`); err != nil {
+				color.Redln("|-导出失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-导出成功")
 			color.Greenln("|-开始压缩")
-			tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
+			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
+				color.Redln("|-压缩失败: " + err.Error())
+				return nil
+			}
 			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
@@ -278,7 +303,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		case "postgresql":
 			backupFile := name + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-			check := tools.Exec(`su - postgres -c "psql -l" 2>&1`)
+			check, err := tools.Exec(`su - postgres -c "psql -l" 2>&1`)
+			if err != nil {
+				color.Redln("|-获取数据库失败: " + err.Error())
+				color.Greenln(hr)
+				return nil
+			}
 			if strings.Contains(check, name) {
 				color.Redln("|-数据库不存在")
 				color.Greenln(hr)
@@ -287,10 +317,16 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Greenln("|-目标PostgreSQL数据库: " + name)
 			color.Greenln("|-开始导出")
-			tools.Exec(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`)
+			if _, err = tools.Exec(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`); err != nil {
+				color.Redln("|-导出失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-导出成功")
 			color.Greenln("|-开始压缩")
-			tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile)
+			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
+				color.Redln("|-压缩失败: " + err.Error())
+				return nil
+			}
 			tools.Remove("/tmp/" + backupFile)
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
@@ -360,8 +396,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		backupPath := "/www/wwwlogs/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".log.zip"
-		tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log")
-		tools.Exec(`echo "" > ` + logPath)
+		if _, err := tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log"); err != nil {
+			color.Redln("|-备份失败: " + err.Error())
+			return nil
+		}
+		if _, err := tools.Exec(`echo "" > ` + logPath); err != nil {
+			color.Redln("|-清空失败: " + err.Error())
+			return nil
+		}
 		color.Greenln("|-切割成功")
 
 		color.Greenln(hr)

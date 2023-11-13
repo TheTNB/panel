@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/facades"
-	"golang.org/x/exp/slices"
 	requests "panel/app/http/requests/website"
 
 	"panel/app/models"
@@ -95,24 +94,6 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 
 // Add 添加网站
 func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
-	// 禁止部分保留名称
-	nameSlices := []string{"phpmyadmin", "mysql", "panel", "ssh"}
-	if slices.Contains(nameSlices, website.Name) {
-		return models.Website{}, errors.New("网站名称" + website.Name + "为保留名称，请更换")
-	}
-
-	// path为空时，设置默认值
-	if len(website.Path) == 0 {
-		website.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + website.Name
-	}
-	// path不为/开头时，返回错误
-	if website.Path[0] != '/' {
-		return models.Website{}, errors.New("网站路径" + website.Path + "必须以/开头")
-	}
-
-	website.Ssl = false
-	website.Status = true
-
 	w := models.Website{
 		Name:   website.Name,
 		Status: website.Status,
@@ -295,20 +276,38 @@ server
 		return models.Website{}, err
 	}
 
-	tools.Exec("systemctl reload openresty")
+	if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+		return models.Website{}, err
+	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
-		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
-		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
-		tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
+		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`); err != nil {
+			return models.Website{}, err
+		}
 	}
 	if website.Db && website.DbType == "postgresql" {
-		tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
-		tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
-		tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
-		tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		if _, err := tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`); err != nil {
+			return models.Website{}, err
+		}
+		if _, err := tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`); err != nil {
+			return models.Website{}, err
+		}
 	}
 
 	return w, nil
@@ -331,7 +330,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		if err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
 		}
-		tools.Exec("systemctl reload openresty")
+		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+			return err
+		}
+
 		return nil
 	}
 
@@ -509,8 +511,9 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	if err := tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
 		return err
 	}
-	tools.Exec("systemctl reload openresty")
-	return nil
+
+	_, err := tools.Exec("systemctl reload openresty")
+	return err
 }
 
 // Delete 删除网站
@@ -534,9 +537,8 @@ func (r *WebsiteImpl) Delete(id uint) error {
 	tools.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
 	tools.Remove(website.Path)
 
-	tools.Exec("systemctl reload openresty")
-
-	return nil
+	_, err := tools.Exec("systemctl reload openresty")
+	return err
 }
 
 // GetConfig 获取网站配置
@@ -630,9 +632,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 	}
 
 	setting.Rewrite = tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	setting.Log = tools.Escape(tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`))
+	log, err := tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
+	setting.Log = log
 
-	return setting, nil
+	return setting, err
 }
 
 // GetConfigByName 根据网站名称获取网站配置

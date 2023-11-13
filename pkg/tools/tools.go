@@ -165,15 +165,16 @@ type PanelInfo struct {
 func GetLatestPanelVersion() (PanelInfo, error) {
 	var info PanelInfo
 	var output string
+	var err error
 	isChina := IsChina()
 
 	if isChina {
-		output = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest"`)
+		output, err = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest"`)
 	} else {
-		output = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
+		output, err = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
 	}
 
-	if len(output) == 0 {
+	if len(output) == 0 || err != nil {
 		return info, errors.New("获取最新版本失败")
 	}
 
@@ -194,32 +195,72 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 
 	var name, version, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
-		name = Exec("jq -r '.name' " + fileName)
-		version = Exec("jq -r '.tag_name' " + fileName)
-		body = Exec("jq -r '.description' " + fileName)
-		date = Exec("jq -r '.created_at' " + fileName)
-		checksums = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
-		checksumsUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName)
+		if name, err = Exec("jq -r '.name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if version, err = Exec("jq -r '.tag_name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if body, err = Exec("jq -r '.description' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if date, err = Exec("jq -r '.created_at' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if checksums, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if checksumsUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
 		if IsArm() {
-			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
 		} else {
-			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
 		}
 	} else {
-		name = Exec("jq -r '.name' " + fileName)
-		version = Exec("jq -r '.tag_name' " + fileName)
-		body = Exec("jq -r '.body' " + fileName)
-		date = Exec("jq -r '.published_at' " + fileName)
-		checksums = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
-		checksumsUrl = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName)
+		if name, err = Exec("jq -r '.name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if version, err = Exec("jq -r '.tag_name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if body, err = Exec("jq -r '.body' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if date, err = Exec("jq -r '.published_at' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if checksums, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
+		if checksumsUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
+			return info, errors.New("获取最新版本失败")
+		}
 		if IsArm() {
-			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
 		} else {
-			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName); err != nil {
+				return info, errors.New("获取最新版本失败")
+			}
 		}
 	}
 
@@ -239,6 +280,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 func GetPanelVersion(version string) (PanelInfo, error) {
 	var info PanelInfo
 	var output string
+	var err error
 	isChina := IsChina()
 
 	if !strings.HasPrefix(version, "v") {
@@ -246,12 +288,12 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	}
 
 	if isChina {
-		output = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/` + version + `"`)
+		output, err = Exec(`curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/` + version + `"`)
 	} else {
-		output = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
+		output, err = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
 	}
 
-	if len(output) == 0 {
+	if len(output) == 0 || err != nil {
 		return info, errors.New("获取面板版本失败")
 	}
 
@@ -272,32 +314,72 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 
 	var name, version2, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
-		name = Exec("jq -r '.name' " + fileName)
-		version2 = Exec("jq -r '.tag_name' " + fileName)
-		body = Exec("jq -r '.description' " + fileName)
-		date = Exec("jq -r '.created_at' " + fileName)
-		checksums = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
-		checksumsUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName)
+		if name, err = Exec("jq -r '.name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if version2, err = Exec("jq -r '.tag_name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if body, err = Exec("jq -r '.description' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if date, err = Exec("jq -r '.created_at' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if checksums, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if checksumsUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
 		if IsArm() {
-			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
 		} else {
-			downloadName = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
 		}
 	} else {
-		name = Exec("jq -r '.name' " + fileName)
-		version2 = Exec("jq -r '.tag_name' " + fileName)
-		body = Exec("jq -r '.body' " + fileName)
-		date = Exec("jq -r '.published_at' " + fileName)
-		checksums = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName)
-		checksumsUrl = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName)
+		if name, err = Exec("jq -r '.name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if version2, err = Exec("jq -r '.tag_name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if body, err = Exec("jq -r '.body' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if date, err = Exec("jq -r '.published_at' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if checksums, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
+		if checksumsUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
+			return info, errors.New("获取面板版本失败")
+		}
 		if IsArm() {
-			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
 		} else {
-			downloadName = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName)
-			downloadUrl = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName)
+			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
+			if downloadUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName); err != nil {
+				return info, errors.New("获取面板版本失败")
+			}
 		}
 	}
 
@@ -319,58 +401,100 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
 
 	color.Greenln("备份面板配置...")
-	Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak")
-	Exec("cp -f /www/panel/panel.conf /tmp/panel.conf.bak")
+	if _, err := Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak"); err != nil {
+		color.Redln("备份面板数据库失败")
+		return err
+	}
+	if _, err := Exec("cp -f /www/panel/panel.conf /tmp/panel.conf.bak"); err != nil {
+		color.Redln("备份面板配置失败")
+		return err
+	}
 	if !Exists("/tmp/panel.db.bak") || !Exists("/tmp/panel.conf.bak") {
 		return errors.New("备份面板配置失败")
 	}
 	color.Greenln("备份完成")
 
 	color.Greenln("清理旧版本...")
-	Exec("rm -rf /www/panel/*")
+	if _, err := Exec("rm -rf /www/panel/*"); err != nil {
+		color.Redln("清理旧版本失败")
+		return err
+	}
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
-	Exec("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl)
-	Exec("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl)
+	if _, err := Exec("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl); err != nil {
+		color.Redln("下载失败")
+		return err
+	}
+	if _, err := Exec("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl); err != nil {
+		color.Redln("下载失败")
+		return err
+	}
 	if !Exists("/www/panel/"+panelInfo.DownloadName) || !Exists("/www/panel/"+panelInfo.Checksums) {
 		return errors.New("下载失败")
 	}
 	color.Greenln("下载完成")
 
 	color.Greenln("校验下载文件...")
-	check := Exec("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
-	if check != panelInfo.DownloadName+": OK" {
+	check, err := Exec("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
+	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
 	Remove("/www/panel/" + panelInfo.Checksums)
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
-	Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName)
+	if _, err = Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName); err != nil {
+		color.Redln("更新失败")
+		return err
+	}
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板配置...")
-	Exec("cp -f /tmp/panel.db.bak /www/panel/database/panel.db")
-	Exec("cp -f /tmp/panel.conf.bak /www/panel/panel.conf")
+	if _, err = Exec("cp -f /tmp/panel.db.bak /www/panel/database/panel.db"); err != nil {
+		color.Redln("恢复面板数据库失败")
+		return err
+	}
+	if _, err = Exec("cp -f /tmp/panel.conf.bak /www/panel/panel.conf"); err != nil {
+		color.Redln("恢复面板配置失败")
+		return err
+	}
 	if !Exists("/www/panel/database/panel.db") || !Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板配置失败")
 	}
-	Exec("/www/panel/panel --env=panel.conf artisan migrate")
+	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
+		color.Redln("运行面板数据库迁移失败")
+		return err
+	}
 	color.Greenln("恢复完成")
 
 	color.Greenln("设置面板文件权限...")
-	Exec("chmod -R 700 /www/panel")
+	if _, err = Exec("chmod -R 700 /www/panel"); err != nil {
+		color.Redln("设置面板文件权限失败")
+		return err
+	}
 	color.Greenln("设置完成")
 
-	Exec("bash /www/panel/scripts/update_panel.sh")
-	Exec("panel writeSetting version " + panelInfo.Version)
+	if _, err = Exec("bash /www/panel/scripts/update_panel.sh"); err != nil {
+		color.Redln("执行面板升级后脚本失败")
+		return err
+	}
+	if _, err = Exec("panel writeSetting version " + panelInfo.Version); err != nil {
+		color.Redln("写入面板版本号失败")
+		return err
+	}
 
-	Exec("rm -rf /tmp/panel.db.bak")
-	Exec("rm -rf /tmp/panel.conf.bak")
+	if _, err = Exec("rm -rf /tmp/panel.db.bak"); err != nil {
+		color.Redln("清理临时文件失败")
+		return err
+	}
+	if _, err = Exec("rm -rf /tmp/panel.conf.bak"); err != nil {
+		color.Redln("清理临时文件失败")
+		return err
+	}
 
 	return nil
 }

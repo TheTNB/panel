@@ -34,25 +34,20 @@ func NewInfoController() *InfoController {
 }
 
 // Name 获取面板名称
-func (c *InfoController) Name(ctx http.Context) http.Response {
-	var setting models.Setting
-	err := facades.Orm().Query().Where("key", "name").First(&setting)
-	if err != nil {
-		facades.Log().Info("[面板][InfoController] 查询面板名称失败 ", err)
-		return ErrorSystem(ctx)
-	}
-
+func (r *InfoController) Name(ctx http.Context) http.Response {
 	return Success(ctx, http.Json{
-		"name": setting.Value,
+		"name": r.setting.Get(models.SettingKeyName),
 	})
 }
 
 // HomePlugins 获取首页插件
-func (c *InfoController) HomePlugins(ctx http.Context) http.Response {
+func (r *InfoController) HomePlugins(ctx http.Context) http.Response {
 	var plugins []models.Plugin
 	err := facades.Orm().Query().Where("show", 1).Find(&plugins)
 	if err != nil {
-		facades.Log().Info("[面板][InfoController] 查询首页插件失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取首页插件失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -73,12 +68,12 @@ func (c *InfoController) HomePlugins(ctx http.Context) http.Response {
 }
 
 // NowMonitor 获取当前监控信息
-func (c *InfoController) NowMonitor(ctx http.Context) http.Response {
+func (r *InfoController) NowMonitor(ctx http.Context) http.Response {
 	return Success(ctx, tools.GetMonitoringInfo())
 }
 
 // SystemInfo 获取系统信息
-func (c *InfoController) SystemInfo(ctx http.Context) http.Response {
+func (r *InfoController) SystemInfo(ctx http.Context) http.Response {
 	monitorInfo := tools.GetMonitoringInfo()
 
 	return Success(ctx, http.Json{
@@ -89,7 +84,7 @@ func (c *InfoController) SystemInfo(ctx http.Context) http.Response {
 }
 
 // CountInfo 获取面板统计信息
-func (c *InfoController) CountInfo(ctx http.Context) http.Response {
+func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 	var websiteCount int64
 	err := facades.Orm().Query().Model(models.Website{}).Count(&websiteCount)
 	if err != nil {
@@ -110,26 +105,26 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 	}
 	var databaseCount int64
 	if mysqlInstalled {
-		status := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-		if status == "active" {
-			rootPassword := c.setting.Get(models.SettingKeyMysqlRootPassword)
+		status, err := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
+		if status == "active" && err == nil {
+			rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 			type database struct {
 				Name string `json:"name"`
 			}
 
 			db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 			if err != nil {
-				facades.Log().Request(ctx.Request()).With(map[string]any{
+				facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
 					"error": err.Error(),
-				}).Info("[面板][InfoController] 获取数据库列表失败")
+				}).Info("获取数据库列表失败")
 				databaseCount = -1
 			} else {
 				defer db.Close()
 				rows, err := db.Query("SHOW DATABASES")
 				if err != nil {
-					facades.Log().Request(ctx.Request()).With(map[string]any{
+					facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
 						"error": err.Error(),
-					}).Info("[面板][InfoController] 获取数据库列表失败")
+					}).Info("获取数据库列表失败")
 					databaseCount = -1
 				} else {
 					defer rows.Close()
@@ -152,29 +147,31 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 		}
 	}
 	if postgresqlInstalled {
-		status := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-		if status == "active" {
-			raw := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
-			databases := strings.Split(raw, "\n")
-			if len(databases) >= 4 {
-				databases = databases[3 : len(databases)-1]
-				for _, db := range databases {
-					parts := strings.Split(db, "|")
-					if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 || strings.TrimSpace(parts[0]) == "template0" || strings.TrimSpace(parts[0]) == "template1" || strings.TrimSpace(parts[0]) == "postgres" {
-						continue
-					}
+		status, err := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
+		if status == "active" && err == nil {
+			raw, err := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+			if err == nil {
+				databases := strings.Split(raw, "\n")
+				if len(databases) >= 4 {
+					databases = databases[3 : len(databases)-1]
+					for _, db := range databases {
+						parts := strings.Split(db, "|")
+						if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 || strings.TrimSpace(parts[0]) == "template0" || strings.TrimSpace(parts[0]) == "template1" || strings.TrimSpace(parts[0]) == "postgres" {
+							continue
+						}
 
-					databaseCount++
+						databaseCount++
+					}
 				}
 			}
 		}
 	}
 
 	var ftpCount int64
-	var ftpPlugin = c.plugin.GetInstalledBySlug("pureftpd")
+	var ftpPlugin = r.plugin.GetInstalledBySlug("pureftpd")
 	if ftpPlugin.ID != 0 {
-		listRaw := tools.Exec("pure-pw list")
-		if len(listRaw) != 0 {
+		listRaw, err := tools.Exec("pure-pw list")
+		if len(listRaw) != 0 && err == nil {
 			listArr := strings.Split(listRaw, "\n")
 			ftpCount = int64(len(listArr))
 		}
@@ -195,7 +192,7 @@ func (c *InfoController) CountInfo(ctx http.Context) http.Response {
 }
 
 // InstalledDbAndPhp 获取已安装的数据库和 PHP 版本
-func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
+func (r *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 	var php []models.Plugin
 	err := facades.Orm().Query().Where("slug like ?", "php%").Find(&php)
 	if err != nil {
@@ -230,7 +227,7 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 			continue
 		}
 
-		phpData = append(phpData, data{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: c.plugin.GetBySlug(p.Slug).Name})
+		phpData = append(phpData, data{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: r.plugin.GetBySlug(p.Slug).Name})
 	}
 
 	if mysqlInstalled {
@@ -247,7 +244,7 @@ func (c *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 }
 
 // CheckUpdate 检查面板更新
-func (c *InfoController) CheckUpdate(ctx http.Context) http.Response {
+func (r *InfoController) CheckUpdate(ctx http.Context) http.Response {
 	version := facades.Config().GetString("panel.version")
 	remote, err := tools.GetLatestPanelVersion()
 	if err != nil {
@@ -266,7 +263,7 @@ func (c *InfoController) CheckUpdate(ctx http.Context) http.Response {
 }
 
 // UpdateInfo 获取更新信息
-func (c *InfoController) UpdateInfo(ctx http.Context) http.Response {
+func (r *InfoController) UpdateInfo(ctx http.Context) http.Response {
 	version := facades.Config().GetString("panel.version")
 	current, err := tools.GetLatestPanelVersion()
 	if err != nil {
@@ -296,7 +293,7 @@ func (c *InfoController) UpdateInfo(ctx http.Context) http.Response {
 }
 
 // Update 更新面板
-func (c *InfoController) Update(ctx http.Context) http.Response {
+func (r *InfoController) Update(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 	if err == nil {
@@ -305,18 +302,18 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 
 	panel, err := tools.GetLatestPanelVersion()
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
 			"error": err.Error(),
-		}).Info("[面板][InfoController] 获取最新版本失败")
+		}).Info("获取最新版本失败")
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
 	err = tools.UpdatePanel(panel)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).With(map[string]any{
+		facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
 			"error": err.Error(),
-		}).Info("[面板][InfoController] 更新面板失败")
-		return Error(ctx, http.StatusInternalServerError, "更新失败: "+err.Error())
+		}).Info("更新面板失败")
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	tools.RestartPanel()
@@ -324,7 +321,7 @@ func (c *InfoController) Update(ctx http.Context) http.Response {
 }
 
 // Restart 重启面板
-func (c *InfoController) Restart(ctx http.Context) http.Response {
+func (r *InfoController) Restart(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 	if err == nil {

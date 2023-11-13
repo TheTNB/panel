@@ -67,25 +67,17 @@ func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
 	port := ctx.Request().Input("port")
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	err = r.setting.Set(models.SettingKeySshHost, host)
-	if err != nil {
-		facades.Log().Info("[面板][SSH] 更新配置失败 ", err)
-		return ErrorSystem(ctx)
+	if err = r.setting.Set(models.SettingKeySshHost, host); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	err = r.setting.Set(models.SettingKeySshPort, port)
-	if err != nil {
-		facades.Log().Info("[面板][SSH] 更新配置失败 ", err)
-		return ErrorSystem(ctx)
+	if err = r.setting.Set(models.SettingKeySshPort, port); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	err = r.setting.Set(models.SettingKeySshUser, user)
-	if err != nil {
-		facades.Log().Info("[面板][SSH] 更新配置失败 ", err)
-		return ErrorSystem(ctx)
+	if err = r.setting.Set(models.SettingKeySshUser, user); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	err = r.setting.Set(models.SettingKeySshPassword, password)
-	if err != nil {
-		facades.Log().Info("[面板][SSH] 更新配置失败 ", err)
-		return ErrorSystem(ctx)
+	if err = r.setting.Set(models.SettingKeySshPassword, password); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -142,21 +134,24 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 			defer wg.Done()
 			err := turn.LoopRead(logBuff, ctx2)
 			if err != nil {
-				facades.Log().Info("[面板][SSH] 读取数据失败 ", err.Error())
+				facades.Log().Request(ctx.Request()).Tags("面板", "SSH").With(map[string]any{
+					"error": err.Error(),
+				}).Info("SSH 会话错误")
 			}
 		}()
 		go func() {
 			defer wg.Done()
 			err := turn.SessionWait()
 			if err != nil {
-				facades.Log().Info("[面板][SSH] 会话失败 ", err.Error())
+				facades.Log().Request(ctx.Request()).Tags("面板", "SSH").With(map[string]any{
+					"error": err.Error(),
+				}).Info("SSH 会话错误")
 			}
 			cancel()
 		}()
 		wg.Wait()
 	})
 	if err != nil {
-		facades.Log().Info("[面板][SSH] 建立连接失败 ", err)
 		return ErrorSystem(ctx)
 	}
 

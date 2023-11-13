@@ -26,7 +26,7 @@ func NewCronController() *CronController {
 }
 
 // List 获取计划任务列表
-func (c *CronController) List(ctx http.Context) http.Response {
+func (r *CronController) List(ctx http.Context) http.Response {
 	limit := ctx.Request().QueryInt("limit", 10)
 	page := ctx.Request().QueryInt("page", 1)
 
@@ -34,7 +34,9 @@ func (c *CronController) List(ctx http.Context) http.Response {
 	var total int64
 	err := facades.Orm().Query().Paginate(page, limit, &crons, &total)
 	if err != nil {
-		facades.Log().Info("[面板][CronController] 查询计划任务列表失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
+			"error": err.Error(),
+		}).Info("查询计划任务列表失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -45,7 +47,7 @@ func (c *CronController) List(ctx http.Context) http.Response {
 }
 
 // Add 添加计划任务
-func (c *CronController) Add(ctx http.Context) http.Response {
+func (r *CronController) Add(ctx http.Context) http.Response {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":        "required|min_len:1|max_len:255",
 		"time":        "required",
@@ -75,7 +77,7 @@ func (c *CronController) Add(ctx http.Context) http.Response {
 		}
 		backupPath := ctx.Request().Input("backup_path")
 		if len(backupPath) == 0 {
-			backupPath = c.setting.Get(models.SettingKeyBackupPath) + "/" + backupType
+			backupPath = r.setting.Get(models.SettingKeyBackupPath) + "/" + backupType
 		}
 		backupSave := ctx.Request().InputInt("save", 10)
 		shell = `#!/bin/bash
@@ -111,19 +113,18 @@ panel cutoff ${name} ${save} 2>&1
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
 	if !tools.Exists(shellDir) {
-		facades.Log().Info("[面板][CronController] 计划任务目录不存在")
 		return Error(ctx, http.StatusInternalServerError, "计划任务目录不存在")
 	}
 	if !tools.Exists(shellLogDir) {
-		facades.Log().Info("[面板][CronController] 计划任务日志目录不存在")
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
 	if err = tools.Write(shellDir+shellFile+".sh", shell, 0700); err != nil {
-		facades.Log().Info("[面板][CronController] 创建计划任务脚本失败 ", err)
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	tools.Exec("dos2unix " + shellDir + shellFile + ".sh")
+	if out, err := tools.Exec("dos2unix " + shellDir + shellFile + ".sh"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, out)
+	}
 
 	var cron models.Cron
 	cron.Name = ctx.Request().Input("name")
@@ -135,11 +136,15 @@ panel cutoff ${name} ${save} 2>&1
 
 	err = facades.Orm().Query().Create(&cron)
 	if err != nil {
-		facades.Log().Info("[面板][CronController] 创建计划任务失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
+			"error": err.Error(),
+		}).Info("保存计划任务失败")
 		return ErrorSystem(ctx)
 	}
 
-	c.cron.AddToSystem(cron)
+	if err := r.cron.AddToSystem(cron); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	return Success(ctx, http.Json{
 		"id": cron.ID,
@@ -147,7 +152,7 @@ panel cutoff ${name} ${save} 2>&1
 }
 
 // Script 获取脚本内容
-func (c *CronController) Script(ctx http.Context) http.Response {
+func (r *CronController) Script(ctx http.Context) http.Response {
 	var cron models.Cron
 	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
 	if err != nil {
@@ -158,7 +163,7 @@ func (c *CronController) Script(ctx http.Context) http.Response {
 }
 
 // Update 更新计划任务
-func (c *CronController) Update(ctx http.Context) http.Response {
+func (r *CronController) Update(ctx http.Context) http.Response {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":   "required|min_len:1|max_len:255",
 		"time":   "required",
@@ -190,38 +195,47 @@ func (c *CronController) Update(ctx http.Context) http.Response {
 	cron.Name = ctx.Request().Input("name")
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
-		facades.Log().Info("[面板][CronController] 更新计划任务失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
+			"error": err.Error(),
+		}).Info("更新计划任务失败")
 		return ErrorSystem(ctx)
 	}
 
 	if err = tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
-		facades.Log().Info("[面板][CronController] 更新计划任务脚本失败 ", err)
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	tools.Exec("dos2unix " + cron.Shell)
+	if out, err := tools.Exec("dos2unix " + cron.Shell); err != nil {
+		return Error(ctx, http.StatusInternalServerError, out)
+	}
 
-	c.cron.DeleteFromSystem(cron)
+	if err := r.cron.DeleteFromSystem(cron); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	if cron.Status {
-		c.cron.AddToSystem(cron)
+		if err := r.cron.AddToSystem(cron); err != nil {
+			return Error(ctx, http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	return Success(ctx, nil)
 }
 
 // Delete 删除计划任务
-func (c *CronController) Delete(ctx http.Context) http.Response {
+func (r *CronController) Delete(ctx http.Context) http.Response {
 	var cron models.Cron
-	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron); err != nil {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
-	c.cron.DeleteFromSystem(cron)
+	if err := r.cron.DeleteFromSystem(cron); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	tools.Remove(cron.Shell)
 
-	_, err = facades.Orm().Query().Delete(&cron)
-	if err != nil {
-		facades.Log().Info("[面板][CronController] 删除计划任务失败 ", err)
+	if _, err := facades.Orm().Query().Delete(&cron); err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
+			"error": err.Error(),
+		}).Info("删除计划任务失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -229,7 +243,7 @@ func (c *CronController) Delete(ctx http.Context) http.Response {
 }
 
 // Status 更新计划任务状态
-func (c *CronController) Status(ctx http.Context) http.Response {
+func (r *CronController) Status(ctx http.Context) http.Response {
 	validator, err := ctx.Request().Validate(map[string]string{
 		"status": "bool",
 	})
@@ -249,23 +263,28 @@ func (c *CronController) Status(ctx http.Context) http.Response {
 	cron.Status = ctx.Request().InputBool("status")
 	err = facades.Orm().Query().Save(&cron)
 	if err != nil {
-		facades.Log().Info("[面板][CronController] 更新计划任务状态失败 ", err)
+		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
+			"error": err.Error(),
+		}).Info("更新计划任务状态失败")
 		return ErrorSystem(ctx)
 	}
 
-	c.cron.DeleteFromSystem(cron)
+	if err := r.cron.DeleteFromSystem(cron); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	if cron.Status {
-		c.cron.AddToSystem(cron)
+		if err := r.cron.AddToSystem(cron); err != nil {
+			return Error(ctx, http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	return Success(ctx, nil)
 }
 
 // Log 获取计划任务日志
-func (c *CronController) Log(ctx http.Context) http.Response {
+func (r *CronController) Log(ctx http.Context) http.Response {
 	var cron models.Cron
-	err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron); err != nil {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
@@ -273,7 +292,10 @@ func (c *CronController) Log(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "日志文件不存在")
 	}
 
-	log := tools.Exec("tail -n 1000 " + cron.Log)
+	log, err := tools.Exec("tail -n 1000 " + cron.Log)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	return Success(ctx, log)
 }

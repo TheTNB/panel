@@ -316,7 +316,9 @@ func (s *CertImpl) ObtainAuto(ID uint) (certificate.Resource, error) {
 		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
 			return certificate.Resource{}, err
 		}
-		tools.Exec("systemctl reload openresty")
+		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+			return certificate.Resource{}, err
+		}
 	}
 
 	return ssl, nil
@@ -374,7 +376,9 @@ func (s *CertImpl) ObtainManual(ID uint) (certificate.Resource, error) {
 		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
 			return certificate.Resource{}, err
 		}
-		tools.Exec("systemctl reload openresty")
+		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+			return certificate.Resource{}, err
+		}
 	}
 
 	return ssl, nil
@@ -479,7 +483,9 @@ func (s *CertImpl) Renew(ID uint) (certificate.Resource, error) {
 		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
 			return certificate.Resource{}, err
 		}
-		tools.Exec("systemctl reload openresty")
+		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+			return certificate.Resource{}, err
+		}
 	}
 
 	return ssl, nil

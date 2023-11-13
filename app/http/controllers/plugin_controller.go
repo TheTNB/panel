@@ -100,7 +100,9 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		facades.Log().Info("[面板][PluginController] 获取已安装插件失败")
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+		}).Info("检查插件安装状态失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -141,7 +143,10 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	task.Shell = plugin.Install + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Info("[面板][PluginController] 创建任务失败: " + err.Error())
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+			"err":  err.Error(),
+		}).Info("创建任务失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -156,7 +161,9 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		facades.Log().Info("[面板][PluginController] 获取已安装插件失败")
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+		}).Info("检查插件安装状态失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -197,7 +204,10 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	task.Shell = plugin.Uninstall + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Info("[面板][PluginController] 创建任务失败: " + err.Error())
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+			"err":  err.Error(),
+		}).Info("创建任务失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -212,7 +222,9 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	installedPlugin := r.plugin.GetInstalledBySlug(slug)
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		facades.Log().Info("[面板][PluginController] 获取已安装插件失败")
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+		}).Info("检查插件安装状态失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -253,7 +265,10 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	task.Shell = plugin.Update + " >> /tmp/" + plugin.Slug + ".log 2>&1"
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Info("[面板][PluginController] 创建任务失败: " + err.Error())
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+			"err":  err.Error(),
+		}).Info("创建任务失败")
 		return ErrorSystem(ctx)
 	}
 
@@ -268,7 +283,10 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 
 	var plugin models.Plugin
 	if err := facades.Orm().Query().Where("slug", slug).First(&plugin); err != nil {
-		facades.Log().Info("[面板][PluginController] 查询插件失败: " + err.Error())
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+			"err":  err.Error(),
+		}).Info("获取插件失败")
 		return ErrorSystem(ctx)
 	}
 	if plugin.ID == 0 {
@@ -277,7 +295,10 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 
 	plugin.Show = show
 	if err := facades.Orm().Query().Save(&plugin); err != nil {
-		facades.Log().Info("[面板][PluginController] 更新插件失败: " + err.Error())
+		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
+			"slug": slug,
+			"err":  err.Error(),
+		}).Info("更新插件失败")
 		return ErrorSystem(ctx)
 	}
 

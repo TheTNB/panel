@@ -28,7 +28,7 @@ func (r *ToolBoxController) GetDNS(ctx http.Context) http.Response {
 	raw := tools.Read("/etc/resolv.conf")
 	match := regexp.MustCompile(`nameserver\s+(\S+)`).FindAllStringSubmatch(raw, -1)
 	if len(match) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到 DNS 信息")
+		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 DNS 信息")
 	}
 
 	var dns []string
@@ -58,7 +58,7 @@ func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 	dns += "nameserver " + dns2 + "\n"
 
 	if err := tools.Write("/etc/resolv.conf", dns, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "写入 DNS 信息失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "写入 DNS 信息失败")
 	}
 
 	return controllers.Success(ctx, nil)
@@ -86,7 +86,11 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 		total = "0.00 B"
 	}
 
-	raw := tools.Exec("LC_ALL=C free | grep Swap")
+	raw, err := tools.Exec("free | grep Swap")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
+	}
+
 	match := regexp.MustCompile(`Swap:\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) > 0 {
 		used = tools.FormatBytes(cast.ToFloat64(match[2]) * 1024)
@@ -111,28 +115,48 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 	size := ctx.Request().InputInt("size")
 
 	if tools.Exists("/www/swap") {
-		tools.Exec("swapoff /www/swap")
-		tools.Exec("rm -f /www/swap")
-		tools.Exec("sed -i '/www\\/swap/d' /etc/fstab")
+		if out, err := tools.Exec("swapoff /www/swap"); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+		}
+		if out, err := tools.Exec("rm -f /www/swap"); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+		}
+		if out, err := tools.Exec("sed -i '/www\\/swap/d' /etc/fstab"); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+		}
 	}
 
 	if size > 1 {
-		free := tools.Exec("df -k /www | awk '{print $4}' | tail -n 1")
+		free, err := tools.Exec("df -k /www | awk '{print $4}' | tail -n 1")
+		if err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取磁盘空间失败")
+		}
 		if cast.ToInt64(free)*1024 < int64(size)*1024*1024 {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
 		}
 
-		if strings.Contains(tools.Exec("df -T /www | awk '{print $2}' | tail -n 1"), "btrfs") {
-			tools.Exec("btrfs filesystem mkswapfile --size " + cast.ToString(size) + "M --uuid clear /www/swap")
+		btrfsCheck, _ := tools.Exec("df -T /www | awk '{print $2}' | tail -n 1")
+		if strings.Contains(btrfsCheck, "btrfs") {
+			if out, err := tools.Exec("btrfs filesystem mkswapfile --size " + cast.ToString(size) + "M --uuid clear /www/swap"); err != nil {
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+			}
 		} else {
-			tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size))
-			tools.Exec("mkswap -f /www/swap")
+			if out, err := tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size)); err != nil {
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+			}
+			if out, err := tools.Exec("mkswap -f /www/swap"); err != nil {
+				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+			}
 			if err := tools.Chmod("/www/swap", 0600); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
 			}
 		}
-		tools.Exec("swapon /www/swap")
-		tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab")
+		if out, err := tools.Exec("swapon /www/swap"); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+		}
+		if out, err := tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab"); err != nil {
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+		}
 	}
 
 	return controllers.Success(ctx, nil)
@@ -145,7 +169,11 @@ func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 		return check
 	}
 
-	raw := tools.Exec("LC_ALL=C timedatectl | grep zone")
+	raw, err := tools.Exec("timedatectl | grep zone")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取时区信息失败")
+	}
+
 	match := regexp.MustCompile(`zone:\s+(\S+)`).FindStringSubmatch(raw)
 	if len(match) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "找不到时区信息")
@@ -156,7 +184,10 @@ func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 		Value string `json:"value"`
 	}
 
-	zonesRaw := tools.Exec("LC_ALL=C timedatectl list-timezones")
+	zonesRaw, err := tools.Exec("timedatectl list-timezones")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取时区列表失败")
+	}
 	zones := strings.Split(zonesRaw, "\n")
 
 	var zonesList []zone

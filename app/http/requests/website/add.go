@@ -9,6 +9,7 @@ type Add struct {
 	Name       string   `form:"name" json:"name"`
 	Domains    []string `form:"domains" json:"domains"`
 	Ports      []string `form:"ports" json:"ports"`
+	Path       string   `form:"path" json:"path"`
 	Php        int      `form:"php" json:"php"`
 	Db         bool     `form:"db" json:"db"`
 	DbType     string   `form:"db_type" json:"db_type"`
@@ -23,9 +24,10 @@ func (r *Add) Authorize(ctx http.Context) error {
 
 func (r *Add) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name",
+		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name|not_in:phpmyadmin,mysql,panel,ssh",
 		"domains":     "required|slice",
 		"ports":       "required|slice",
+		"path":        "regex:^/[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*$",
 		"php":         "required",
 		"db":          "bool",
 		"db_type":     "required_if:db,true|in:mysql,postgresql",

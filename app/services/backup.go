@@ -88,7 +88,9 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 	}
 
 	backupFile := backupPath + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
-	tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`)
+	if _, err := tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -112,8 +114,12 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 		return errors.New("备份文件不存在")
 	}
 
-	tools.Exec(`rm -rf '` + website.Path + `/*'`)
-	tools.Exec(`unzip -o '` + backupFile + `' -d '` + website.Path + `' 2>&1`)
+	if _, err := tools.Exec(`rm -rf '` + website.Path + `/*'`); err != nil {
+		return err
+	}
+	if _, err := tools.Exec(`unzip -o '` + backupFile + `' -d '` + website.Path + `' 2>&1`); err != nil {
+		return err
+	}
 	if err := tools.Chmod(website.Path, 0755); err != nil {
 		return err
 	}
@@ -172,12 +178,15 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 		return err
 	}
 
-	tools.Exec("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile)
-	tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
+	if _, err := tools.Exec("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile); err != nil {
+		return err
+	}
+	if _, err := tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
+		return err
+	}
 	tools.Remove(backupPath + "/" + backupFile)
-	_ = os.Unsetenv("MYSQL_PWD")
 
-	return nil
+	return os.Unsetenv("MYSQL_PWD")
 }
 
 // MysqlRestore MySQL恢复
@@ -197,26 +206,38 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 
 	switch ext {
 	case ".zip":
-		tools.Exec("unzip -o " + backupFile + " -d " + backupPath)
+		if _, err := tools.Exec("unzip -o " + backupFile + " -d " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".gz":
 		if strings.HasSuffix(backupFile, ".tar.gz") {
 			// 解压.tar.gz文件
-			tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath)
+			if _, err := tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath); err != nil {
+				return err
+			}
 			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
 		} else {
 			// 解压.gz文件
-			tools.Exec("gzip -d " + backupFile)
+			if _, err := tools.Exec("gzip -d " + backupFile); err != nil {
+				return err
+			}
 			backupFile = strings.TrimSuffix(backupFile, ext)
 		}
 	case ".bz2":
-		tools.Exec("bzip2 -d " + backupFile)
+		if _, err := tools.Exec("bzip2 -d " + backupFile); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".tar":
-		tools.Exec("tar -xvf " + backupFile + " -C " + backupPath)
+		if _, err := tools.Exec("tar -xvf " + backupFile + " -C " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".rar":
-		tools.Exec("unrar x " + backupFile + " " + backupPath)
+		if _, err := tools.Exec("unrar x " + backupFile + " " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	}
 
@@ -224,10 +245,11 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return errors.New("自动解压失败，请手动解压")
 	}
 
-	tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + backupFile)
-	_ = os.Unsetenv("MYSQL_PWD")
+	if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + backupFile); err != nil {
+		return err
+	}
 
-	return nil
+	return os.Unsetenv("MYSQL_PWD")
 }
 
 // PostgresqlList PostgreSQL备份列表
@@ -273,10 +295,14 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 		}
 	}
 
-	tools.Exec(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile)
-	tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile)
-	tools.Remove(backupPath + "/" + backupFile)
+	if _, err := tools.Exec(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile); err != nil {
+		return err
+	}
+	if _, err := tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
+		return err
+	}
 
+	tools.Remove(backupPath + "/" + backupFile)
 	return nil
 }
 
@@ -291,26 +317,38 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 
 	switch ext {
 	case ".zip":
-		tools.Exec("unzip -o " + backupFile + " -d " + backupPath)
+		if _, err := tools.Exec("unzip -o " + backupFile + " -d " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".gz":
 		if strings.HasSuffix(backupFile, ".tar.gz") {
 			// 解压.tar.gz文件
-			tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath)
+			if _, err := tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath); err != nil {
+				return err
+			}
 			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
 		} else {
 			// 解压.gz文件
-			tools.Exec("gzip -d " + backupFile)
+			if _, err := tools.Exec("gzip -d " + backupFile); err != nil {
+				return err
+			}
 			backupFile = strings.TrimSuffix(backupFile, ext)
 		}
 	case ".bz2":
-		tools.Exec("bzip2 -d " + backupFile)
+		if _, err := tools.Exec("bzip2 -d " + backupFile); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".tar":
-		tools.Exec("tar -xvf " + backupFile + " -C " + backupPath)
+		if _, err := tools.Exec("tar -xvf " + backupFile + " -C " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	case ".rar":
-		tools.Exec("unrar x " + backupFile + " " + backupPath)
+		if _, err := tools.Exec("unrar x " + backupFile + " " + backupPath); err != nil {
+			return err
+		}
 		backupFile = strings.TrimSuffix(backupFile, ext)
 	}
 
@@ -318,7 +356,9 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 		return errors.New("自动解压失败，请手动解压")
 	}
 
-	tools.Exec(`su - postgres -c "psql ` + database + `" < ` + backupFile)
+	if _, err := tools.Exec(`su - postgres -c "psql ` + database + `" < ` + backupFile); err != nil {
+		return err
+	}
 
 	return nil
 }

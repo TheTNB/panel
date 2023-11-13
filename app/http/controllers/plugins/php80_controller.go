@@ -36,16 +36,12 @@ func (r *Php80Controller) Status(ctx http.Context) http.Response {
 		return check
 	}
 
-	status := tools.Exec("systemctl status php-fpm-" + r.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	if len(status) == 0 {
+	status, err := tools.ServiceStatus("php-fpm-" + r.version)
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, status)
 }
 
 func (r *Php80Controller) Reload(ctx http.Context) http.Response {
@@ -54,18 +50,11 @@ func (r *Php80Controller) Reload(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl reload php-fpm-" + r.version)
-	out := tools.Exec("systemctl status php-fpm-" + r.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
+	if err := tools.ServiceReload("php-fpm-" + r.version); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载PHP-"+r.version+"失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) Start(ctx http.Context) http.Response {
@@ -74,18 +63,11 @@ func (r *Php80Controller) Start(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl start php-fpm-" + r.version)
-	out := tools.Exec("systemctl status php-fpm-" + r.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
+	if err := tools.ServiceStart("php-fpm-" + r.version); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "启动PHP-"+r.version+"失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) Stop(ctx http.Context) http.Response {
@@ -94,18 +76,11 @@ func (r *Php80Controller) Stop(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl stop php-fpm-" + r.version)
-	out := tools.Exec("systemctl status php-fpm-" + r.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
+	if err := tools.ServiceStop("php-fpm-" + r.version); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "停止PHP-"+r.version+"失败")
 	}
 
-	if status != "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) Restart(ctx http.Context) http.Response {
@@ -114,18 +89,11 @@ func (r *Php80Controller) Restart(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("systemctl restart php-fpm-" + r.version)
-	out := tools.Exec("systemctl status php-fpm-" + r.version + " | grep Active | grep -v grep | awk '{print $2}'")
-	status := strings.TrimSpace(out)
-	if len(status) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
+	if err := tools.ServiceRestart("php-fpm-" + r.version); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重启PHP-"+r.version+"失败")
 	}
 
-	if status == "active" {
-		return controllers.Success(ctx, true)
-	} else {
-		return controllers.Success(ctx, false)
-	}
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) GetConfig(ctx http.Context) http.Response {
@@ -193,7 +161,11 @@ func (r *Php80Controller) ErrorLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/php-fpm.log"))
+	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/php-fpm.log")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, log)
+	}
+
 	return controllers.Success(ctx, log)
 }
 
@@ -203,7 +175,11 @@ func (r *Php80Controller) SlowLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	log := tools.Escape(tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/slow.log"))
+	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/slow.log")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, log)
+	}
+
 	return controllers.Success(ctx, log)
 }
 
@@ -213,8 +189,11 @@ func (r *Php80Controller) ClearErrorLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/php-fpm.log")
-	return controllers.Success(ctx, true)
+	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/php-fpm.log"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) ClearSlowLog(ctx http.Context) http.Response {
@@ -223,8 +202,10 @@ func (r *Php80Controller) ClearSlowLog(ctx http.Context) http.Response {
 		return check
 	}
 
-	tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/slow.log")
-	return controllers.Success(ctx, true)
+	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/slow.log"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	}
+	return controllers.Success(ctx, nil)
 }
 
 func (r *Php80Controller) GetExtensionList(ctx http.Context) http.Response {
@@ -350,9 +331,12 @@ func (r *Php80Controller) GetExtensions() []PHPExtension {
 		Installed:   false,
 	})
 
-	raw := tools.Exec("/www/server/php/" + r.version + "/bin/php -m")
-	rawExtensionList := strings.Split(raw, "\n")
+	raw, err := tools.Exec("/www/server/php/" + r.version + "/bin/php -m")
+	if err != nil {
+		return extensions
+	}
 
+	rawExtensionList := strings.Split(raw, "\n")
 	for _, item := range rawExtensionList {
 		if !strings.Contains(item, "[") && item != "" {
 			for i := range extensions {

@@ -48,7 +48,9 @@ func (s *SystemHelperTestSuite) TestRemove() {
 }
 
 func (s *SystemHelperTestSuite) TestExec() {
-	s.Equal("test", Exec("echo 'test'"))
+	output, err := Exec("echo 'test'")
+	s.Equal("test", output)
+	s.Nil(err)
 }
 
 func (s *SystemHelperTestSuite) TestExecAsync() {
