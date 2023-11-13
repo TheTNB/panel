@@ -25,7 +25,10 @@ func (r *ToolBoxController) GetDNS(ctx http.Context) http.Response {
 		return check
 	}
 
-	raw := tools.Read("/etc/resolv.conf")
+	raw, err := tools.Read("/etc/resolv.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	match := regexp.MustCompile(`nameserver\s+(\S+)`).FindAllStringSubmatch(raw, -1)
 	if len(match) == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 DNS 信息")
@@ -228,7 +231,12 @@ func (r *ToolBoxController) GetHosts(ctx http.Context) http.Response {
 		return check
 	}
 
-	return controllers.Success(ctx, tools.Read("/etc/hosts"))
+	hosts, err := tools.Read("/etc/hosts")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
+
+	return controllers.Success(ctx, hosts)
 }
 
 // SetHosts 设置 hosts 信息

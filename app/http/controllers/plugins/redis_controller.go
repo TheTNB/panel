@@ -81,8 +81,8 @@ func (r *RedisController) GetConfig(ctx http.Context) http.Response {
 	}
 
 	// 获取配置
-	config := tools.Read("/www/server/redis/redis.conf")
-	if len(config) == 0 {
+	config, err := tools.Read("/www/server/redis/redis.conf")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
 	}
 

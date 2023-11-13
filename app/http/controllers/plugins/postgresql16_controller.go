@@ -103,8 +103,8 @@ func (r *Postgresql16Controller) GetConfig(ctx http.Context) http.Response {
 	}
 
 	// 获取配置
-	config := tools.Read("/www/server/postgresql/data/postgresql.conf")
-	if len(config) == 0 {
+	config, err := tools.Read("/www/server/postgresql/data/postgresql.conf")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 	}
 
@@ -119,8 +119,8 @@ func (r *Postgresql16Controller) GetUserConfig(ctx http.Context) http.Response {
 	}
 
 	// 获取配置
-	config := tools.Read("/www/server/postgresql/data/pg_hba.conf")
-	if len(config) == 0 {
+	config, err := tools.Read("/www/server/postgresql/data/pg_hba.conf")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 	}
 

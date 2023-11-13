@@ -162,8 +162,14 @@ func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	if check != nil {
 		return check
 	}
-	index := tools.Read("/www/server/openresty/html/index.html")
-	stop := tools.Read("/www/server/openresty/html/stop.html")
+	index, err := tools.Read("/www/server/openresty/html/index.html")
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	stop, err := tools.Read("/www/server/openresty/html/stop.html")
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	return Success(ctx, http.Json{
 		"index": index,
@@ -642,17 +648,18 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", idRequest.ID).Get(&website); err != nil {
-		facades.Log().Info("[面板][WebsiteController] 获取网站信息失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
 	website.Status = ctx.Request().InputBool("status")
 	if err := facades.Orm().Query().Save(&website); err != nil {
-		facades.Log().Info("[面板][WebsiteController] 保存网站配置失败 ", err)
 		return ErrorSystem(ctx)
 	}
 
-	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	raw, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	// 运行目录
 	rootConfig := tools.Cut(raw, "# root标记位开始\n", "# root标记位结束")

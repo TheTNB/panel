@@ -108,9 +108,9 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
-	raw := tools.Read("/etc/fail2ban/jail.local")
-	if len(raw) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
+	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	jailList := regexp.MustCompile(`\[(.*?)]`).FindAllStringSubmatch(raw, -1)
@@ -200,7 +200,10 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 	jailWebsiteMode := ctx.Request().Input("website_mode")
 	jailWebsitePath := ctx.Request().Input("website_path")
 
-	raw := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
 	if (strings.Contains(raw, "["+jailName+"]") && jailType == "service") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailType == "website" && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailType == "website" && jailWebsiteMode == "path") {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
 	}
@@ -324,7 +327,10 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 	}
 
 	jailName := ctx.Request().Input("name")
-	raw := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
 	if !strings.Contains(raw, "["+jailName+"]") {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则不存在")
 	}
@@ -421,7 +427,10 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
-	raw := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
 	// 正则替换
 	reg := regexp.MustCompile(`ignoreip\s*=\s*.*\n`)
 	if reg.MatchString(raw) {
@@ -447,7 +456,10 @@ func (r *Fail2banController) GetWhiteList(ctx http.Context) http.Response {
 		return check
 	}
 
-	raw := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+	}
 	reg := regexp.MustCompile(`ignoreip\s*=\s*(.*)\n`)
 	if reg.MatchString(raw) {
 		ignoreIp := reg.FindStringSubmatch(raw)[1]

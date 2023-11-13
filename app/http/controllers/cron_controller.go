@@ -159,7 +159,12 @@ func (r *CronController) Script(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
-	return Success(ctx, tools.Read(cron.Shell))
+	shell, err := tools.Read(cron.Shell)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, shell)
 }
 
 // Update 更新计划任务

@@ -342,7 +342,10 @@ func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
 			return Success(ctx, false)
 		}
 	} else {
-		config := tools.Read("/etc/ufw/before.rules")
+		config, err := tools.Read("/etc/ufw/before.rules")
+		if err != nil {
+			return Error(ctx, http.StatusInternalServerError, err.Error())
+		}
 		if strings.Contains(config, "-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT") {
 			return Success(ctx, true)
 		} else {

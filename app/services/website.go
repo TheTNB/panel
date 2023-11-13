@@ -325,7 +325,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	}
 
 	// 原文
-	raw := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	raw, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	if err != nil {
+		return err
+	}
 	if strings.TrimSpace(raw) != strings.TrimSpace(config.Raw) {
 		if err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
@@ -512,7 +515,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 
-	_, err := tools.Exec("systemctl reload openresty")
+	_, err = tools.Exec("systemctl reload openresty")
 	return err
 }
 
@@ -548,7 +551,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		return WebsiteSetting{}, err
 	}
 
-	config := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	config, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	if err != nil {
+		return WebsiteSetting{}, err
+	}
 
 	var setting WebsiteSetting
 	setting.Name = website.Name
@@ -582,7 +588,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 	}
 
 	if tools.Exists(setting.Root + "/.user.ini") {
-		userIni := tools.Read(setting.Path + "/.user.ini")
+		userIni, err := tools.Read(setting.Path + "/.user.ini")
+		if err != nil {
+			return WebsiteSetting{}, err
+		}
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {
@@ -592,15 +601,20 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
-	setting.SslCertificate = tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
-	setting.SslCertificateKey = tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
+	cert, err := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+	if err == nil {
+		setting.SslCertificate = cert
+	}
+	key, err := tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
+	if err == nil {
+		setting.SslCertificateKey = key
+	}
 	if setting.Ssl {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
 
-		certData := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
-		block, _ := pem.Decode([]byte(certData))
+		block, _ := pem.Decode([]byte(cert))
 		if block != nil {
 			cert, err := x509.ParseCertificate(block.Bytes)
 			if err == nil {
@@ -631,7 +645,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	setting.Rewrite = tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	rewrite, err := tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	if err == nil {
+		setting.Rewrite = rewrite
+	}
 	log, err := tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
 	setting.Log = log
 

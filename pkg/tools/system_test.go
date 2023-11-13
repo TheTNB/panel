@@ -35,7 +35,9 @@ func (s *SystemHelperTestSuite) TestRead() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.Equal("test data", Read(filePath))
+	data, err := Read(filePath)
+	s.Nil(err)
+	s.Equal("test data", data)
 }
 
 func (s *SystemHelperTestSuite) TestRemove() {

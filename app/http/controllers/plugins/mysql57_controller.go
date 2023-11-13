@@ -104,9 +104,8 @@ func (r *Mysql57Controller) GetConfig(ctx http.Context) http.Response {
 		return check
 	}
 
-	// 获取配置
-	config := tools.Read("/www/server/mysql/conf/my.cnf")
-	if len(config) == 0 {
+	config, err := tools.Read("/www/server/mysql/conf/my.cnf")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 	}
 

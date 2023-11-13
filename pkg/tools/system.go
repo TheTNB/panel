@@ -25,14 +25,9 @@ func Write(path string, data string, permission os.FileMode) error {
 }
 
 // Read 读取文件
-// TODO 重构带 error 返回
-func Read(path string) string {
+func Read(path string) (string, error) {
 	data, err := os.ReadFile(path)
-	if err != nil {
-		return ""
-	}
-
-	return string(data)
+	return string(data), err
 }
 
 // Remove 删除文件/目录

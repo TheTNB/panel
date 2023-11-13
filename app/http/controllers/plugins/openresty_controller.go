@@ -100,8 +100,8 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 		return check
 	}
 
-	config := tools.Read("/www/server/openresty/conf/nginx.conf")
-	if len(config) == 0 {
+	config, err := tools.Read("/www/server/openresty/conf/nginx.conf")
+	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty配置失败")
 	}
 

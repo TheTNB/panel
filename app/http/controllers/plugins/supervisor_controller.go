@@ -135,10 +135,15 @@ func (r *SupervisorController) Config(ctx http.Context) http.Response {
 	}
 
 	var config string
+	var err error
 	if tools.IsRHEL() {
-		config = tools.Read(`/etc/supervisord.conf`)
+		config, err = tools.Read(`/etc/supervisord.conf`)
 	} else {
-		config = tools.Read(`/etc/supervisor/supervisord.conf`)
+		config, err = tools.Read(`/etc/supervisor/supervisord.conf`)
+	}
+
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, config)
@@ -342,10 +347,15 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 
 	process := ctx.Request().Query("process")
 	var config string
+	var err error
 	if tools.IsRHEL() {
-		config = tools.Read(`/etc/supervisord.d/` + process + `.conf`)
+		config, err = tools.Read(`/etc/supervisord.d/` + process + `.conf`)
 	} else {
-		config = tools.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
+		config, err = tools.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
+	}
+
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, config)

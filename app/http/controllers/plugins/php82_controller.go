@@ -102,7 +102,11 @@ func (r *Php82Controller) GetConfig(ctx http.Context) http.Response {
 		return check
 	}
 
-	config := tools.Read("/www/server/php/" + r.version + "/etc/php.ini")
+	config, err := tools.Read("/www/server/php/" + r.version + "/etc/php.ini")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"配置失败")
+	}
+
 	return controllers.Success(ctx, config)
 }
 

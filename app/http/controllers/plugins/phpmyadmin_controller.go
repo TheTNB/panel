@@ -41,7 +41,10 @@ func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 phpMyAdmin 目录")
 	}
 
-	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	conf, err := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	match := regexp.MustCompile(`listen\s+(\d+);`).FindStringSubmatch(conf)
 	if len(match) == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 phpMyAdmin 端口")
@@ -64,7 +67,10 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "端口不能为空")
 	}
 
-	conf := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	conf, err := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+port+";")
 	if err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
@@ -89,8 +95,7 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		}
 	}
 
-	err := tools.ServiceReload("openresty")
-	if err != nil {
+	if err := tools.ServiceReload("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
 	}
 
