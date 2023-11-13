@@ -235,7 +235,9 @@ func (r *CronController) Delete(ctx http.Context) http.Response {
 	if err := r.cron.DeleteFromSystem(cron); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	tools.Remove(cron.Shell)
+	if err := tools.Remove(cron.Shell); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	if _, err := facades.Orm().Query().Delete(&cron); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{

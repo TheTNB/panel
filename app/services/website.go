@@ -420,7 +420,9 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		}
 	} else {
 		if tools.Exists(root + ".user.ini") {
-			tools.Remove(root + ".user.ini")
+			if err := tools.Remove(root + ".user.ini"); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -534,11 +536,21 @@ func (r *WebsiteImpl) Delete(id uint) error {
 		return err
 	}
 
-	tools.Remove("/www/server/vhost/" + website.Name + ".conf")
-	tools.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	tools.Remove("/www/server/vhost/ssl/" + website.Name + ".pem")
-	tools.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
-	tools.Remove(website.Path)
+	if err := tools.Remove("/www/server/vhost/" + website.Name + ".conf"); err != nil {
+		return err
+	}
+	if err := tools.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf"); err != nil {
+		return err
+	}
+	if err := tools.Remove("/www/server/vhost/ssl/" + website.Name + ".pem"); err != nil {
+		return err
+	}
+	if err := tools.Remove("/www/server/vhost/ssl/" + website.Name + ".key"); err != nil {
+		return err
+	}
+	if err := tools.Remove(website.Path); err != nil {
+		return err
+	}
 
 	_, err := tools.Exec("systemctl reload openresty")
 	return err

@@ -290,7 +290,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 				color.Redln("|-压缩失败: " + err.Error())
 				return nil
 			}
-			tools.Remove("/tmp/" + backupFile)
+			if err := tools.Remove("/tmp/" + backupFile); err != nil {
+				color.Redln("|-删除失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
 			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
@@ -327,7 +330,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 				color.Redln("|-压缩失败: " + err.Error())
 				return nil
 			}
-			tools.Remove("/tmp/" + backupFile)
+			if err := tools.Remove("/tmp/" + backupFile); err != nil {
+				color.Redln("|-删除失败: " + err.Error())
+				return nil
+			}
 			color.Greenln("|-压缩成功")
 			color.Greenln("|-开始移动")
 			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
@@ -360,7 +366,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join(path, filteredFiles[i].Name())
 			color.Yellowln("|-清理备份: " + fileToDelete)
-			tools.Remove(fileToDelete)
+			if err := tools.Remove(fileToDelete); err != nil {
+				color.Redln("|-清理失败: " + err.Error())
+				return nil
+			}
 		}
 		color.Greenln("|-清理完成")
 		color.Greenln(hr)
@@ -428,7 +437,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join("/www/wwwlogs", filteredFiles[i].Name())
 			color.Yellowln("|-清理日志: " + fileToDelete)
-			tools.Remove(fileToDelete)
+			if err := tools.Remove(fileToDelete); err != nil {
+				color.Redln("|-清理失败: " + err.Error())
+				return nil
+			}
 		}
 		color.Greenln("|-清理完成")
 		color.Greenln(hr)

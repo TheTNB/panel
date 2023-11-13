@@ -46,7 +46,7 @@ func (s *SystemHelperTestSuite) TestRemove() {
 	err := os.WriteFile(filePath, []byte("test data"), 0644)
 	s.Nil(err)
 
-	s.True(Remove(filePath))
+	s.Nil(Remove(filePath))
 }
 
 func (s *SystemHelperTestSuite) TestExec() {

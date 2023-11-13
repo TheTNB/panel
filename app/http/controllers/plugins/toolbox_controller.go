@@ -219,7 +219,9 @@ func (r *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "时区不能为空")
 	}
 
-	tools.Exec("timedatectl set-timezone " + timezone)
+	if out, err := tools.Exec("timedatectl set-timezone " + timezone); err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+	}
 
 	return controllers.Success(ctx, nil)
 }
@@ -274,7 +276,9 @@ func (r *ToolBoxController) SetRootPassword(ctx http.Context) http.Response {
 	}
 
 	password = strings.ReplaceAll(password, `'`, `\'`)
-	tools.Exec(`yes '` + password + `' | passwd root`)
+	if out, err := tools.Exec(`yes '` + password + `' | passwd root`); err != nil {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
+	}
 
 	return controllers.Success(ctx, nil)
 }

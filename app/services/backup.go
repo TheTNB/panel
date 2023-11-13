@@ -184,7 +184,9 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 	if _, err := tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
 		return err
 	}
-	tools.Remove(backupPath + "/" + backupFile)
+	if err := tools.Remove(backupPath + "/" + backupFile); err != nil {
+		return err
+	}
 
 	return os.Unsetenv("MYSQL_PWD")
 }
@@ -302,8 +304,7 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 		return err
 	}
 
-	tools.Remove(backupPath + "/" + backupFile)
-	return nil
+	return tools.Remove(backupPath + "/" + backupFile)
 }
 
 // PostgresqlRestore PostgreSQL恢复

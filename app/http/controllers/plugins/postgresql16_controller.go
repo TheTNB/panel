@@ -489,7 +489,9 @@ func (r *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	fileName := ctx.Request().Input("name")
-	tools.Remove(backupPath + "/" + fileName)
+	if err := tools.Remove(backupPath + "/" + fileName); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	return controllers.Success(ctx, nil)
 }

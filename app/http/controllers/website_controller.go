@@ -312,7 +312,10 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	tools.Remove("/www/wwwlogs/" + website.Name + ".log")
+	if err := tools.Remove("/www/wwwlogs/" + website.Name + ".log"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
@@ -507,8 +510,8 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 		}
 	}
 
-	if !tools.Remove(backupPath + "/" + deleteBackupRequest.Name) {
-		return Error(ctx, http.StatusInternalServerError, "删除备份失败")
+	if err := tools.Remove(backupPath + "/" + deleteBackupRequest.Name); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)

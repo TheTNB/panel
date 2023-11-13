@@ -192,7 +192,9 @@ func (r *S3fsController) Delete(ctx http.Context) http.Response {
 	if mountCheck, err := tools.Exec("mount -a 2>&1"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+mountCheck)
 	}
-	tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID))
+	if err := tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID)); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	var newS3fsList []S3fsMount
 	for _, s := range s3fsList {

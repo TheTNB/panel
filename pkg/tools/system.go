@@ -31,13 +31,8 @@ func Read(path string) (string, error) {
 }
 
 // Remove 删除文件/目录
-// TODO 重构带 error 返回
-func Remove(path string) bool {
-	if err := os.RemoveAll(path); err != nil {
-		return false
-	}
-
-	return true
+func Remove(path string) error {
+	return os.RemoveAll(path)
 }
 
 // Exec 执行 shell 命令

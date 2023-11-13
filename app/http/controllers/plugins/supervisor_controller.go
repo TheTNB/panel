@@ -471,17 +471,23 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	var err error
 	if tools.IsRHEL() {
 		logPath, err = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
-		tools.Remove(`/etc/supervisord.d/` + process + `.conf`)
+		if err := tools.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		}
 	} else {
 		logPath, err = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
-		tools.Remove(`/etc/supervisor/conf.d/` + process + `.conf`)
+		if err := tools.Remove(`/etc/supervisor/conf.d/` + process + `.conf`); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		}
 	}
 
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
 	}
 
-	tools.Remove(logPath)
+	if err := tools.Remove(logPath); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 	if out, err := tools.Exec(`supervisorctl reread`); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}

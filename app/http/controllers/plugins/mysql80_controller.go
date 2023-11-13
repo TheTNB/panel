@@ -556,7 +556,9 @@ func (r *Mysql80Controller) DeleteBackup(ctx http.Context) http.Response {
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	fileName := ctx.Request().Input("name")
-	tools.Remove(backupPath + "/" + fileName)
+	if err := tools.Remove(backupPath + "/" + fileName); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
 
 	return controllers.Success(ctx, nil)
 }
