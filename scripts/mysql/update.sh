@@ -30,9 +30,9 @@ mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 if [[ "${1}" == "80" ]]; then
-    mysqlVersion="8.0.34"
+    mysqlVersion="8.0.35"
 elif [[ "${1}" == "57" ]]; then
-    mysqlVersion="5.7.43"
+    mysqlVersion="5.7.44"
 else
     echo -e $HR
     echo "错误：不支持的 MySQL 版本！"

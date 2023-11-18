@@ -29,9 +29,9 @@ postgresqlVersion=""
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 if [[ "${1}" == "15" ]]; then
-    postgresqlVersion="15.4"
+    postgresqlVersion="15.5"
 elif [[ "${1}" == "16" ]]; then
-    postgresqlVersion="16.0"
+    postgresqlVersion="16.1"
 else
     echo -e $HR
     echo "错误：不支持的 PostgreSQL 版本！"

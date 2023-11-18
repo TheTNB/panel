@@ -24,7 +24,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
-openrestyVersion="1.21.4.2"
+openrestyVersion="1.21.4.3"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 # 安装依赖
