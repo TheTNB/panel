@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/facades"
+	"github.com/spf13/cast"
 	requests "panel/app/http/requests/website"
 
 	"panel/app/models"
@@ -30,7 +31,7 @@ type PanelWebsite struct {
 	Name       string   `json:"name"`
 	Status     bool     `json:"status"`
 	Domains    []string `json:"domains"`
-	Ports      []string `json:"ports"`
+	Ports      []uint   `json:"ports"`
 	Path       string   `json:"path"`
 	Php        int      `json:"php"`
 	Ssl        bool     `json:"ssl"`
@@ -46,7 +47,7 @@ type PanelWebsite struct {
 type WebsiteSetting struct {
 	Name              string   `json:"name"`
 	Domains           []string `json:"domains"`
-	Ports             []string `json:"ports"`
+	Ports             []uint   `json:"ports"`
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
@@ -170,21 +171,18 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 
 	portList := ""
 	domainList := ""
-	portUsed := make(map[string]bool)
+	portUsed := make(map[uint]bool)
 	domainUsed := make(map[string]bool)
 
 	for i, port := range website.Ports {
 		if _, ok := portUsed[port]; !ok {
 			if i == len(website.Ports)-1 {
-				portList += "    listen " + port + ";"
+				portList += "    listen " + cast.ToString(port) + ";"
 			} else {
-				portList += "    listen " + port + ";\n"
+				portList += "    listen " + cast.ToString(port) + ";\n"
 			}
 			portUsed[port] = true
 		}
-	}
-	if len(website.Ports) == 0 {
-		portList += "    listen 80;\n"
 	}
 	for _, domain := range website.Domains {
 		if _, ok := domainUsed[domain]; !ok {
@@ -367,16 +365,14 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	var port strings.Builder
 	ports := config.Ports
 	for i, v := range ports {
-		if _, err := strconv.Atoi(v); err != nil && v != "443 ssl http2" {
-			return errors.New("端口格式错误")
-		}
-		if v == "443" && config.Ssl {
-			v = "443 ssl http2"
+		vStr := cast.ToString(v)
+		if v == 443 && config.Ssl {
+			vStr = "443 ssl http2"
 		}
 		if i != len(ports)-1 {
-			port.WriteString("    listen " + v + ";\n")
+			port.WriteString("    listen " + vStr + ";\n")
 		} else {
-			port.WriteString("    listen " + v + ";")
+			port.WriteString("    listen " + vStr + ";")
 		}
 	}
 	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
@@ -581,7 +577,9 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		if len(match) < 2 {
 			continue
 		}
-		setting.Ports = append(setting.Ports, match[1])
+
+		port := strings.Fields(match[1])[0]
+		setting.Ports = append(setting.Ports, cast.ToUint(port))
 	}
 	serverName := tools.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
 	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)

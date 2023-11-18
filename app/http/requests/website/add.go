@@ -8,7 +8,7 @@ import (
 type Add struct {
 	Name       string   `form:"name" json:"name"`
 	Domains    []string `form:"domains" json:"domains"`
-	Ports      []string `form:"ports" json:"ports"`
+	Ports      []uint   `form:"ports" json:"ports"`
 	Path       string   `form:"path" json:"path"`
 	Php        int      `form:"php" json:"php"`
 	Db         bool     `form:"db" json:"db"`

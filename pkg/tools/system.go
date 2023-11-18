@@ -1,6 +1,8 @@
 package tools
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -39,8 +41,16 @@ func Remove(path string) error {
 func Exec(shell string) (string, error) {
 	cmd := exec.Command("bash", "-c", "LC_ALL=C "+shell)
 
-	output, err := cmd.CombinedOutput()
-	return strings.TrimSpace(string(output)), err
+	var stdoutBuf, stderrBuf bytes.Buffer
+	cmd.Stdout = &stdoutBuf
+	cmd.Stderr = &stderrBuf
+
+	err := cmd.Run()
+	if err != nil {
+		return "", errors.New(strings.TrimSpace(stderrBuf.String()))
+	}
+
+	return strings.TrimSpace(stdoutBuf.String()), err
 }
 
 // ExecAsync 异步执行 shell 命令

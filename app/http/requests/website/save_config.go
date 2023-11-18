@@ -8,7 +8,7 @@ import (
 type SaveConfig struct {
 	ID                uint     `form:"id" json:"id" filter:"uint"`
 	Domains           []string `form:"domains" json:"domains"`
-	Ports             []string `form:"ports" json:"ports"`
+	Ports             []uint   `form:"ports" json:"ports"`
 	Hsts              bool     `form:"hsts" json:"hsts"`
 	Ssl               bool     `form:"ssl" json:"ssl"`
 	HttpRedirect      bool     `form:"http_redirect" json:"http_redirect"`
@@ -50,8 +50,8 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"raw":                 "required|string",
 		"rewrite":             "string",
 		"php":                 "int",
-		"ssl_certificate":     "required_if:ssl,true|bool",
-		"ssl_certificate_key": "required_if:ssl,true|bool",
+		"ssl_certificate":     "required_if:ssl,true",
+		"ssl_certificate_key": "required_if:ssl,true",
 	}
 }
 

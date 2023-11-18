@@ -274,10 +274,7 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 
 	err := r.website.SaveConfig(saveConfigRequest)
 	if err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
-			"error": err.Error(),
-		}).Info("保存网站配置失败")
-		return Error(ctx, http.StatusInternalServerError, "保存网站配置失败: "+err.Error())
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)

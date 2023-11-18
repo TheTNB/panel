@@ -221,11 +221,8 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 		}
 		var ports string
 		for _, port := range config.Ports {
-			if len(strings.Split(port, " ")) > 1 {
-				ports += strings.Split(port, " ")[0] + ","
-			} else {
-				ports += port + ","
-			}
+			fields := strings.Fields(cast.ToString(port))
+			ports += fields[0] + ","
 		}
 
 		rule := `
