@@ -22,7 +22,7 @@ type SaveConfig struct {
 	Root              string   `form:"root" json:"root"`
 	Raw               string   `form:"raw" json:"raw"`
 	Rewrite           string   `form:"rewrite" json:"rewrite"`
-	Php               int      `form:"php" json:"php" filter:"uint"`
+	Php               int      `form:"php" json:"php" filter:"int"`
 	SslCertificate    string   `form:"ssl_certificate" json:"ssl_certificate"`
 	SslCertificateKey string   `form:"ssl_certificate_key" json:"ssl_certificate_key"`
 }
@@ -36,11 +36,11 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"id":                  "required|exists:websites,id",
 		"domains":             "required|slice",
 		"ports":               "required|slice",
-		"hsts":                "required|bool",
-		"ssl":                 "required|bool",
-		"http_redirect":       "required|bool",
-		"open_basedir":        "required|bool",
-		"waf":                 "required|bool",
+		"hsts":                "bool",
+		"ssl":                 "bool",
+		"http_redirect":       "bool",
+		"open_basedir":        "bool",
+		"waf":                 "bool",
 		"waf_cache":           "required|string",
 		"waf_mode":            "required|string",
 		"waf_cc_deny":         "required|string",
@@ -49,9 +49,9 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"root":                "required|string",
 		"raw":                 "required|string",
 		"rewrite":             "string",
-		"php":                 "required|uint",
-		"ssl_certificate":     "required_if:ssl,true",
-		"ssl_certificate_key": "required_if:ssl,true",
+		"php":                 "int",
+		"ssl_certificate":     "required_if:ssl,true|bool",
+		"ssl_certificate_key": "required_if:ssl,true|bool",
 	}
 }
 

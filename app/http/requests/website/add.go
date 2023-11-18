@@ -30,7 +30,7 @@ func (r *Add) Rules(ctx http.Context) map[string]string {
 		"path":        "regex:^/[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*$",
 		"php":         "required",
 		"db":          "bool",
-		"db_type":     "required_if:db,true|in:mysql,postgresql",
+		"db_type":     "required_if:db,true|in:0,mysql,postgresql",
 		"db_name":     "required_if:db,true|regex:^[a-zA-Z0-9_-]+$",
 		"db_user":     "required_if:db,true|regex:^[a-zA-Z0-9_-]+$",
 		"db_password": "required_if:db,true|min_len:8",

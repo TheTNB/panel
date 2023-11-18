@@ -169,6 +169,8 @@ definitions:
         type: array
       name:
         type: string
+      path:
+        type: string
       php:
         type: integer
       ports:
@@ -237,11 +239,6 @@ definitions:
       name:
         type: string
     type: object
-  requests.ID:
-    properties:
-      id:
-        type: integer
-    type: object
   requests.Login:
     properties:
       password:
@@ -258,13 +255,6 @@ definitions:
     properties:
       id:
         type: integer
-    type: object
-  requests.RestoreBackup:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
     type: object
   requests.SaveConfig:
     properties:
@@ -1063,79 +1053,6 @@ paths:
       summary: 登录
       tags:
       - 用户鉴权
-  /panel/website:
-    get:
-      description: 获取网站管理的网站列表
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.List'
-              type: object
-      security:
-      - BearerToken: []
-      summary: 获取网站列表
-      tags:
-      - 网站管理
-    post:
-      consumes:
-      - application/json
-      description: 添加网站到网站管理
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Add'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 添加网站
-      tags:
-      - 网站管理
-  /panel/website/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: 删除网站管理的网站
-      parameters:
-      - description: 网站 ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 删除网站
-      tags:
-      - 网站管理
   /panel/website/backupList:
     get:
       description: 获取网站的备份列表
@@ -1156,86 +1073,6 @@ paths:
       security:
       - BearerToken: []
       summary: 获取备份列表
-      tags:
-      - 网站管理
-  /panel/website/config/{id}:
-    get:
-      consumes:
-      - application/json
-      description: 获取网站的配置
-      parameters:
-      - description: 网站 ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/services.PanelWebsite'
-              type: object
-      security:
-      - BearerToken: []
-      summary: 获取配置
-      tags:
-      - 网站管理
-    post:
-      consumes:
-      - application/json
-      description: 保存网站的配置
-      parameters:
-      - description: 网站 ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.SaveConfig'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 保存配置
-      tags:
-      - 网站管理
-  /panel/website/createBackup:
-    post:
-      consumes:
-      - application/json
-      description: 创建网站的备份
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.ID'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 创建备份
       tags:
       - 网站管理
   /panel/website/defaultConfig:
@@ -1309,7 +1146,182 @@ paths:
       summary: 删除备份
       tags:
       - 网站管理
-  /panel/website/log/{id}:
+  /panel/website/uploadBackup:
+    post:
+      consumes:
+      - application/json
+      description: 上传网站的备份
+      parameters:
+      - description: 备份文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 上传备份
+      tags:
+      - 网站管理
+  /panel/websites:
+    get:
+      description: 获取网站管理的网站列表
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/commonrequests.Paginate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/responses.List'
+              type: object
+      security:
+      - BearerToken: []
+      summary: 获取网站列表
+      tags:
+      - 网站管理
+    post:
+      consumes:
+      - application/json
+      description: 添加网站到网站管理
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Add'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 添加网站
+      tags:
+      - 网站管理
+  /panel/websites/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除网站管理的网站
+      parameters:
+      - description: 网站 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除网站
+      tags:
+      - 网站管理
+  /panel/websites/{id}/config:
+    get:
+      consumes:
+      - application/json
+      description: 获取网站的配置
+      parameters:
+      - description: 网站 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/services.PanelWebsite'
+              type: object
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 网站管理
+    post:
+      consumes:
+      - application/json
+      description: 保存网站的配置
+      parameters:
+      - description: 网站 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SaveConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 保存配置
+      tags:
+      - 网站管理
+  /panel/websites/{id}/createBackup:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站的备份
+      parameters:
+      - description: 网站 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 创建备份
+      tags:
+      - 网站管理
+  /panel/websites/{id}/log:
     delete:
       consumes:
       - application/json
@@ -1332,18 +1344,17 @@ paths:
       summary: 清空日志
       tags:
       - 网站管理
-  /panel/website/resetConfig:
+  /panel/websites/{id}/resetConfig:
     post:
       consumes:
       - application/json
       description: 重置网站的配置
       parameters:
-      - description: request
-        in: body
-        name: data
+      - description: 网站 ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/requests.ID'
+        type: integer
       produces:
       - application/json
       responses:
@@ -1356,18 +1367,17 @@ paths:
       summary: 重置配置
       tags:
       - 网站管理
-  /panel/website/restoreBackup:
+  /panel/websites/{id}/restoreBackup:
     post:
       consumes:
       - application/json
       description: 还原网站的备份
       parameters:
-      - description: request
-        in: body
-        name: data
+      - description: 网站 ID
+        in: path
+        name: id
         required: true
-        schema:
-          $ref: '#/definitions/requests.RestoreBackup'
+        type: integer
       produces:
       - application/json
       responses:
@@ -1380,7 +1390,7 @@ paths:
       summary: 还原备份
       tags:
       - 网站管理
-  /panel/website/status/{id}:
+  /panel/websites/{id}/status:
     post:
       consumes:
       - application/json
@@ -1403,7 +1413,7 @@ paths:
       summary: 状态
       tags:
       - 网站管理
-  /panel/website/updateRemark/{id}:
+  /panel/websites/{id}/updateRemark:
     post:
       consumes:
       - application/json
@@ -1424,29 +1434,6 @@ paths:
       security:
       - BearerToken: []
       summary: 更新备注
-      tags:
-      - 网站管理
-  /panel/website/uploadBackup:
-    post:
-      consumes:
-      - application/json
-      description: 上传网站的备份
-      parameters:
-      - description: 备份文件
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 上传备份
       tags:
       - 网站管理
   /swagger:

@@ -50,7 +50,7 @@ type WebsiteSetting struct {
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
-	Php               string   `json:"php"`
+	Php               int      `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
 	Ssl               bool     `json:"ssl"`
 	SslCertificate    string   `json:"ssl_certificate"`
@@ -572,7 +572,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
-	setting.Php = strconv.Itoa(website.Php)
+	setting.Php = website.Php
 	setting.Raw = config
 
 	ports := tools.Cut(config, "# port标记位开始", "# port标记位结束")

@@ -1017,91 +1017,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/panel/website": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取网站管理的网站列表",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "获取网站列表",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.List"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "添加网站到网站管理",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "添加网站",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Add"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/panel/website/backupList": {
             "get": {
                 "security": [
@@ -1137,138 +1052,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/config/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取网站的配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "获取配置",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/services.PanelWebsite"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "保存网站的配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "保存配置",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.SaveConfig"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/createBackup": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "创建网站的备份",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "创建备份",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.ID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -1393,195 +1176,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/panel/website/log/{id}": {
-            "delete": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "清空网站的日志",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "清空日志",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/resetConfig": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "重置网站的配置",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "重置配置",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.ID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/restoreBackup": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "还原网站的备份",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "还原备份",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.RestoreBackup"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/status/{id}": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启用或停用网站",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "状态",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/panel/website/updateRemark/{id}": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "更新网站的备注",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "网站管理"
-                ],
-                "summary": "更新备注",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/panel/website/uploadBackup": {
             "post": {
                 "security": [
@@ -1619,7 +1213,92 @@ const docTemplate = `{
                 }
             }
         },
-        "/panel/website/{id}": {
+        "/panel/websites": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取网站管理的网站列表",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "获取网站列表",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/commonrequests.Paginate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/responses.List"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "添加网站到网站管理",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "添加网站",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Add"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}": {
             "delete": {
                 "security": [
                     {
@@ -1637,6 +1316,321 @@ const docTemplate = `{
                     "网站管理"
                 ],
                 "summary": "删除网站",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/config": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取网站的配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "获取配置",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/services.PanelWebsite"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "保存网站的配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "保存配置",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SaveConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/createBackup": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "创建网站的备份",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "创建备份",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/log": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "清空网站的日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "清空日志",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/resetConfig": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "重置网站的配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "重置配置",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/restoreBackup": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "还原网站的备份",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "还原备份",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/status": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启用或停用网站",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "状态",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "网站 ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/websites/{id}/updateRemark": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新网站的备注",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "网站管理"
+                ],
+                "summary": "更新备注",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1927,6 +1921,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "path": {
+                    "type": "string"
+                },
                 "php": {
                     "type": "integer"
                 },
@@ -2032,14 +2029,6 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.ID": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
         "requests.Login": {
             "type": "object",
             "properties": {
@@ -2064,17 +2053,6 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
-                }
-            }
-        },
-        "requests.RestoreBackup": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },

@@ -39,7 +39,7 @@ func NewWebsiteController() *WebsiteController {
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse{data=responses.List}
-//	@Router			/panel/website [get]
+//	@Router			/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := Sanitize(ctx, &paginateRequest)
@@ -71,7 +71,7 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			data	body		requests.Add	true	"request"
 //	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website [post]
+//	@Router			/panel/websites [post]
 func (r *WebsiteController) Add(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -123,7 +123,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/website/{id} [delete]
+//	@Router			/panel/websites/{id} [delete]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -223,7 +223,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse{data=services.PanelWebsite}
-//	@Router			/panel/website/config/{id} [get]
+//	@Router			/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -259,7 +259,7 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 //	@Param			id		path		int					true	"网站 ID"
 //	@Param			data	body		requests.SaveConfig	true	"request"
 //	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/config/{id} [post]
+//	@Router			/panel/websites/{id}/config [post]
 func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -293,7 +293,7 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/website/log/{id} [delete]
+//	@Router			/panel/websites/{id}/log [delete]
 func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -329,7 +329,7 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/website/updateRemark/{id} [post]
+//	@Router			/panel/websites/{id}/updateRemark [post]
 func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
@@ -384,9 +384,9 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.ID	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/createBackup [post]
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/websites/{id}/createBackup [post]
 func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
@@ -458,9 +458,9 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.RestoreBackup	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/restoreBackup [post]
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/websites/{id}/restoreBackup [post]
 func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
 	sanitize := Sanitize(ctx, &restoreBackupRequest)
@@ -525,9 +525,9 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.ID	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/resetConfig [post]
+//	@Param			id	path		int	true	"网站 ID"
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/websites/{id}/resetConfig [post]
 func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
@@ -636,7 +636,7 @@ server
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
 //	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/website/status/{id} [post]
+//	@Router			/panel/websites/{id}/status [post]
 func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	check := Check(ctx, "openresty")
 	if check != nil {
