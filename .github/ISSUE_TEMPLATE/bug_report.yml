@@ -132,12 +132,3 @@ body:
         Anything that can give us more insight into the problem you're having.
     validations:
       required: false
-  - type: textarea
-    id: yellows
-    attributes:
-      label: 来点色图 (Porn Pictures)
-      description: |
-        如果你不提供色图而你的 Issue 中又有其他不符合标准的地方，那么你的 Issue 可能会被直接关闭。
-        If you don't provide some porn pictures and there are other non-conformities in your issue, then your issue may be closed directly.
-    validations:
-      required: false
