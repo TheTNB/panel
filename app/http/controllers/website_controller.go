@@ -73,10 +73,6 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/websites [post]
 func (r *WebsiteController) Add(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
 	var addRequest requests.Add
 	sanitize := Sanitize(ctx, &addRequest)
 	if sanitize != nil {
@@ -125,11 +121,6 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/websites/{id} [delete]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -158,10 +149,6 @@ func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse{data=map[string]string}
 //	@Router			/panel/website/defaultConfig [get]
 func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
 	index, err := tools.Read("/www/server/openresty/html/index.html")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
@@ -189,10 +176,6 @@ func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/website/defaultConfig [post]
 func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
@@ -225,11 +208,6 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse{data=services.PanelWebsite}
 //	@Router			/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -261,11 +239,6 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/websites/{id}/config [post]
 func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var saveConfigRequest requests.SaveConfig
 	sanitize := Sanitize(ctx, &saveConfigRequest)
 	if sanitize != nil {
@@ -292,11 +265,6 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/websites/{id}/log [delete]
 func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -526,11 +494,6 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/websites/{id}/resetConfig [post]
 func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {
@@ -635,11 +598,6 @@ server
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/websites/{id}/status [post]
 func (r *WebsiteController) Status(ctx http.Context) http.Response {
-	check := Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	var idRequest requests.ID
 	sanitize := Sanitize(ctx, &idRequest)
 	if sanitize != nil {

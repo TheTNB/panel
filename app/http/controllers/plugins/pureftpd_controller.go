@@ -25,11 +25,6 @@ func NewPureFtpdController() *PureFtpdController {
 
 // Status 获取运行状态
 func (r *PureFtpdController) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("pure-ftpd")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd状态失败")
@@ -40,11 +35,6 @@ func (r *PureFtpdController) Status(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (r *PureFtpdController) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	err := tools.ServiceRestart("pure-ftpd")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启PureFtpd失败")
@@ -55,11 +45,6 @@ func (r *PureFtpdController) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (r *PureFtpdController) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	err := tools.ServiceStart("pure-ftpd")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动PureFtpd失败")
@@ -70,11 +55,6 @@ func (r *PureFtpdController) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (r *PureFtpdController) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	err := tools.ServiceStop("pure-ftpd")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止PureFtpd失败")
@@ -85,11 +65,6 @@ func (r *PureFtpdController) Stop(ctx http.Context) http.Response {
 
 // List 获取用户列表
 func (r *PureFtpdController) List(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	listRaw, err := tools.Exec("pure-pw list")
 	if err != nil {
 		return controllers.Success(ctx, http.Json{
@@ -135,11 +110,6 @@ func (r *PureFtpdController) List(ctx http.Context) http.Response {
 
 // Add 添加用户
 func (r *PureFtpdController) Add(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"username": "required",
 		"password": "required|min_len:6",
@@ -181,11 +151,6 @@ func (r *PureFtpdController) Add(ctx http.Context) http.Response {
 
 // Delete 删除用户
 func (r *PureFtpdController) Delete(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"username": "required",
 	})
@@ -210,11 +175,6 @@ func (r *PureFtpdController) Delete(ctx http.Context) http.Response {
 
 // ChangePassword 修改密码
 func (r *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"username": "required",
 		"password": "required|min_len:6",
@@ -241,11 +201,6 @@ func (r *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 
 // GetPort 获取端口
 func (r *PureFtpdController) GetPort(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	port, err := tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
@@ -256,11 +211,6 @@ func (r *PureFtpdController) GetPort(ctx http.Context) http.Response {
 
 // SetPort 设置端口
 func (r *PureFtpdController) SetPort(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "pureftpd")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"port": "required",
 	})

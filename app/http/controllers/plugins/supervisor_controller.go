@@ -29,11 +29,6 @@ func NewSupervisorController() *SupervisorController {
 
 // Status 状态
 func (r *SupervisorController) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus(r.ServiceName)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Supervisor状态失败")
@@ -44,11 +39,6 @@ func (r *SupervisorController) Status(ctx http.Context) http.Response {
 
 // Start 启动
 func (r *SupervisorController) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart(r.ServiceName); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动Supervisor失败")
 	}
@@ -58,11 +48,6 @@ func (r *SupervisorController) Start(ctx http.Context) http.Response {
 
 // Stop 停止
 func (r *SupervisorController) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop(r.ServiceName); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止Supervisor失败")
 	}
@@ -72,11 +57,6 @@ func (r *SupervisorController) Stop(ctx http.Context) http.Response {
 
 // Restart 重启
 func (r *SupervisorController) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart(r.ServiceName); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启Supervisor失败")
 	}
@@ -86,11 +66,6 @@ func (r *SupervisorController) Restart(ctx http.Context) http.Response {
 
 // Reload 重载
 func (r *SupervisorController) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceReload(r.ServiceName); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载Supervisor失败")
 	}
@@ -100,11 +75,6 @@ func (r *SupervisorController) Reload(ctx http.Context) http.Response {
 
 // Log 日志
 func (r *SupervisorController) Log(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec(`tail -n 200 /var/log/supervisor/supervisord.log`)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -115,11 +85,6 @@ func (r *SupervisorController) Log(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (r *SupervisorController) ClearLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -129,11 +94,6 @@ func (r *SupervisorController) ClearLog(ctx http.Context) http.Response {
 
 // Config 获取配置
 func (r *SupervisorController) Config(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	var config string
 	var err error
 	if tools.IsRHEL() {
@@ -151,11 +111,6 @@ func (r *SupervisorController) Config(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	var err error
 	if tools.IsRHEL() {
@@ -173,11 +128,6 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 
 // Processes 进程列表
 func (r *SupervisorController) Processes(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
 
@@ -240,11 +190,6 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 
 // StartProcess 启动进程
 func (r *SupervisorController) StartProcess(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	if out, err := tools.Exec(`supervisorctl start ` + process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
@@ -255,11 +200,6 @@ func (r *SupervisorController) StartProcess(ctx http.Context) http.Response {
 
 // StopProcess 停止进程
 func (r *SupervisorController) StopProcess(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	if out, err := tools.Exec(`supervisorctl stop ` + process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
@@ -270,11 +210,6 @@ func (r *SupervisorController) StopProcess(ctx http.Context) http.Response {
 
 // RestartProcess 重启进程
 func (r *SupervisorController) RestartProcess(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	if out, err := tools.Exec(`supervisorctl restart ` + process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
@@ -285,11 +220,6 @@ func (r *SupervisorController) RestartProcess(ctx http.Context) http.Response {
 
 // ProcessLog 进程日志
 func (r *SupervisorController) ProcessLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	var logPath string
 	var err error
@@ -313,11 +243,6 @@ func (r *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 
 // ClearProcessLog 清空进程日志
 func (r *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	var logPath string
 	var err error
@@ -340,11 +265,6 @@ func (r *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 
 // ProcessConfig 获取进程配置
 func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Query("process")
 	var config string
 	var err error
@@ -363,11 +283,6 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 
 // SaveProcessConfig 保存进程配置
 func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	config := ctx.Request().Input("config")
 	var err error
@@ -396,11 +311,6 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 
 // AddProcess 添加进程
 func (r *SupervisorController) AddProcess(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name":    "required|alpha_dash",
 		"user":    "required|alpha_dash",
@@ -457,11 +367,6 @@ stdout_logfile_maxbytes=2MB
 
 // DeleteProcess 删除进程
 func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "supervisor")
-	if check != nil {
-		return check
-	}
-
 	process := ctx.Request().Input("process")
 	if out, err := tools.Exec(`supervisorctl stop ` + process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)

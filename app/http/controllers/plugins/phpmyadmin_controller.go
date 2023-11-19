@@ -21,11 +21,6 @@ func NewPhpMyAdminController() *PhpMyAdminController {
 }
 
 func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "phpmyadmin")
-	if check != nil {
-		return check
-	}
-
 	files, err := os.ReadDir("/www/server/phpmyadmin")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 phpMyAdmin 目录")
@@ -57,11 +52,6 @@ func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
 }
 
 func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "phpmyadmin")
-	if check != nil {
-		return check
-	}
-
 	port := ctx.Request().Input("port")
 	if len(port) == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "端口不能为空")

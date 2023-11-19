@@ -25,11 +25,6 @@ func NewS3fsController() *S3fsController {
 
 // List 所有 S3fs 挂载
 func (r *S3fsController) List(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "s3fs")
-	if check != nil {
-		return check
-	}
-
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
 
@@ -63,11 +58,6 @@ func (r *S3fsController) List(ctx http.Context) http.Response {
 
 // Add 添加 S3fs 挂载
 func (r *S3fsController) Add(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "s3fs")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"ak":     "required|regex:^[a-zA-Z0-9]*$",
 		"sk":     "required|regex:^[a-zA-Z0-9]*$",
@@ -153,11 +143,6 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 // Delete 删除 S3fs 挂载
 func (r *S3fsController) Delete(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "s3fs")
-	if check != nil {
-		return check
-	}
-
 	id := ctx.Request().Input("id")
 	if len(id) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不能为空")

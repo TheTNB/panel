@@ -1,12 +1,7 @@
 package controllers
 
 import (
-	"sync"
-
 	"github.com/goravel/framework/contracts/http"
-	"github.com/goravel/framework/facades"
-
-	"panel/app/services"
 )
 
 // SuccessResponse 通用成功响应
@@ -55,50 +50,6 @@ func Sanitize(ctx http.Context, request http.FormRequest) http.Response {
 	}
 	if errors != nil {
 		return Error(ctx, http.StatusUnprocessableEntity, errors.One())
-	}
-
-	return nil
-}
-
-// Check 检查插件是否可用
-func Check(ctx http.Context, slug string) http.Response {
-	plugin := services.NewPluginImpl().GetBySlug(slug)
-	installedPlugin := services.NewPluginImpl().GetInstalledBySlug(slug)
-	installedPlugins, err := services.NewPluginImpl().AllInstalled()
-	if err != nil {
-		facades.Log().Info("[面板][插件] 获取已安装插件失败")
-		return ErrorSystem(ctx)
-	}
-
-	if installedPlugin.Version != plugin.Version || installedPlugin.Slug != plugin.Slug {
-		return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要更新至 "+plugin.Version+" 版本")
-	}
-
-	var lock sync.RWMutex
-	pluginsMap := make(map[string]bool)
-
-	for _, p := range installedPlugins {
-		lock.Lock()
-		pluginsMap[p.Slug] = true
-		lock.Unlock()
-	}
-
-	for _, require := range plugin.Requires {
-		lock.RLock()
-		_, requireFound := pluginsMap[require]
-		lock.RUnlock()
-		if !requireFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-		}
-	}
-
-	for _, exclude := range plugin.Excludes {
-		lock.RLock()
-		_, excludeFound := pluginsMap[exclude]
-		lock.RUnlock()
-		if excludeFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-		}
 	}
 
 	return nil

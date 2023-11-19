@@ -28,11 +28,6 @@ func NewMysql57Controller() *Mysql57Controller {
 
 // Status 获取运行状态
 func (r *Mysql57Controller) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("mysqld")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -43,11 +38,6 @@ func (r *Mysql57Controller) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (r *Mysql57Controller) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceReload("mysqld"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
 	}
@@ -57,11 +47,6 @@ func (r *Mysql57Controller) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (r *Mysql57Controller) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart("mysqld"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启MySQL服务失败")
 	}
@@ -71,11 +56,6 @@ func (r *Mysql57Controller) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (r *Mysql57Controller) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart("mysqld"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动MySQL服务失败")
 	}
@@ -85,11 +65,6 @@ func (r *Mysql57Controller) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (r *Mysql57Controller) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop("mysqld"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止MySQL服务失败")
 	}
@@ -99,11 +74,6 @@ func (r *Mysql57Controller) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (r *Mysql57Controller) GetConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	config, err := tools.Read("/www/server/mysql/conf/my.cnf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
@@ -114,11 +84,6 @@ func (r *Mysql57Controller) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (r *Mysql57Controller) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -133,11 +98,6 @@ func (r *Mysql57Controller) SaveConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *Mysql57Controller) Load(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
@@ -208,11 +168,6 @@ func (r *Mysql57Controller) Load(ctx http.Context) http.Response {
 
 // ErrorLog 获取错误日志
 func (r *Mysql57Controller) ErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -223,11 +178,6 @@ func (r *Mysql57Controller) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (r *Mysql57Controller) ClearErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -237,11 +187,6 @@ func (r *Mysql57Controller) ClearErrorLog(ctx http.Context) http.Response {
 
 // SlowLog 获取慢查询日志
 func (r *Mysql57Controller) SlowLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -252,11 +197,6 @@ func (r *Mysql57Controller) SlowLog(ctx http.Context) http.Response {
 
 // ClearSlowLog 清空慢查询日志
 func (r *Mysql57Controller) ClearSlowLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-slow.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -265,11 +205,6 @@ func (r *Mysql57Controller) ClearSlowLog(ctx http.Context) http.Response {
 
 // GetRootPassword 获取root密码
 func (r *Mysql57Controller) GetRootPassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
@@ -280,11 +215,6 @@ func (r *Mysql57Controller) GetRootPassword(ctx http.Context) http.Response {
 
 // SetRootPassword 设置root密码
 func (r *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("mysqld")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
@@ -323,11 +253,6 @@ func (r *Mysql57Controller) SetRootPassword(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (r *Mysql57Controller) DatabaseList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	type database struct {
 		Name string `json:"name"`
@@ -383,11 +308,6 @@ func (r *Mysql57Controller) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (r *Mysql57Controller) AddDatabase(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
@@ -423,11 +343,6 @@ func (r *Mysql57Controller) AddDatabase(ctx http.Context) http.Response {
 
 // DeleteDatabase 删除数据库
 func (r *Mysql57Controller) DeleteDatabase(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
@@ -449,11 +364,6 @@ func (r *Mysql57Controller) DeleteDatabase(ctx http.Context) http.Response {
 
 // BackupList 获取备份列表
 func (r *Mysql57Controller) BackupList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	backupList, err := r.backup.MysqlList()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
@@ -485,11 +395,6 @@ func (r *Mysql57Controller) BackupList(ctx http.Context) http.Response {
 
 // UploadBackup 上传备份
 func (r *Mysql57Controller) UploadBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	file, err := ctx.Request().File("file")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
@@ -513,11 +418,6 @@ func (r *Mysql57Controller) UploadBackup(ctx http.Context) http.Response {
 
 // CreateBackup 创建备份
 func (r *Mysql57Controller) CreateBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
@@ -539,11 +439,6 @@ func (r *Mysql57Controller) CreateBackup(ctx http.Context) http.Response {
 
 // DeleteBackup 删除备份
 func (r *Mysql57Controller) DeleteBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name": "required|min_len:1|max_len:255",
 	})
@@ -565,11 +460,6 @@ func (r *Mysql57Controller) DeleteBackup(ctx http.Context) http.Response {
 
 // RestoreBackup 还原备份
 func (r *Mysql57Controller) RestoreBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
@@ -591,11 +481,6 @@ func (r *Mysql57Controller) RestoreBackup(ctx http.Context) http.Response {
 
 // UserList 用户列表
 func (r *Mysql57Controller) UserList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	type user struct {
 		User   string   `json:"user"`
 		Host   string   `json:"host"`
@@ -675,11 +560,6 @@ func (r *Mysql57Controller) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (r *Mysql57Controller) AddUser(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
@@ -711,11 +591,6 @@ func (r *Mysql57Controller) AddUser(ctx http.Context) http.Response {
 
 // DeleteUser 删除用户
 func (r *Mysql57Controller) DeleteUser(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 	})
@@ -737,11 +612,6 @@ func (r *Mysql57Controller) DeleteUser(ctx http.Context) http.Response {
 
 // SetUserPassword 设置用户密码
 func (r *Mysql57Controller) SetUserPassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
@@ -768,11 +638,6 @@ func (r *Mysql57Controller) SetUserPassword(ctx http.Context) http.Response {
 
 // SetUserPrivileges 设置用户权限
 func (r *Mysql57Controller) SetUserPrivileges(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "mysql57")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"database": "required|min_len:1|max_len:255",

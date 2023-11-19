@@ -31,11 +31,6 @@ func NewPhp74Controller() *Php74Controller {
 }
 
 func (r *Php74Controller) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("php-fpm-" + r.version)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"运行状态失败")
@@ -45,11 +40,6 @@ func (r *Php74Controller) Status(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceReload("php-fpm-" + r.version); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载PHP-"+r.version+"失败")
 	}
@@ -58,11 +48,6 @@ func (r *Php74Controller) Reload(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart("php-fpm-" + r.version); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动PHP-"+r.version+"失败")
 	}
@@ -71,11 +56,6 @@ func (r *Php74Controller) Start(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop("php-fpm-" + r.version); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止PHP-"+r.version+"失败")
 	}
@@ -84,11 +64,6 @@ func (r *Php74Controller) Stop(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart("php-fpm-" + r.version); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启PHP-"+r.version+"失败")
 	}
@@ -97,11 +72,6 @@ func (r *Php74Controller) Restart(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) GetConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	config, err := tools.Read("/www/server/php/" + r.version + "/etc/php.ini")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PHP-"+r.version+"配置失败")
@@ -111,11 +81,6 @@ func (r *Php74Controller) GetConfig(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if err := tools.Write("/www/server/php/"+r.version+"/etc/php.ini", config, 0644); err != nil {
 		return nil
@@ -124,11 +89,6 @@ func (r *Php74Controller) SaveConfig(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) Load(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + r.version)
 	if err != nil || !resp.IsSuccessState() {
@@ -160,11 +120,6 @@ func (r *Php74Controller) Load(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) ErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/php-fpm.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -174,11 +129,6 @@ func (r *Php74Controller) ErrorLog(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) SlowLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/slow.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -188,11 +138,6 @@ func (r *Php74Controller) SlowLog(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) ClearErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/php-fpm.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -201,11 +146,6 @@ func (r *Php74Controller) ClearErrorLog(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) ClearSlowLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/slow.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -213,21 +153,11 @@ func (r *Php74Controller) ClearSlowLog(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) GetExtensionList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	extensions := r.GetExtensions()
 	return controllers.Success(ctx, extensions)
 }
 
 func (r *Php74Controller) InstallExtension(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")
@@ -260,11 +190,6 @@ func (r *Php74Controller) InstallExtension(ctx http.Context) http.Response {
 }
 
 func (r *Php74Controller) UninstallExtension(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "php"+r.version)
-	if check != nil {
-		return check
-	}
-
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")

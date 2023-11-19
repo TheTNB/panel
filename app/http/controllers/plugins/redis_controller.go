@@ -18,11 +18,6 @@ func NewRedisController() *RedisController {
 
 // Status 获取运行状态
 func (r *RedisController) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("redis")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
@@ -33,11 +28,6 @@ func (r *RedisController) Status(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (r *RedisController) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart("redis"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
 	}
@@ -47,11 +37,6 @@ func (r *RedisController) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (r *RedisController) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart("redis"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动Redis失败")
 	}
@@ -61,11 +46,6 @@ func (r *RedisController) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (r *RedisController) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop("redis"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止Redis失败")
 	}
@@ -75,11 +55,6 @@ func (r *RedisController) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (r *RedisController) GetConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	// 获取配置
 	config, err := tools.Read("/www/server/redis/redis.conf")
 	if err != nil {
@@ -91,11 +66,6 @@ func (r *RedisController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -110,11 +80,6 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *RedisController) Load(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "redis")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("redis")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")

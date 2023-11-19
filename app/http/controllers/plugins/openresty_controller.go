@@ -24,11 +24,6 @@ func NewOpenrestyController() *OpenRestyController {
 
 // Status 获取运行状态
 func (r *OpenRestyController) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("openresty")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
@@ -39,11 +34,6 @@ func (r *OpenRestyController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (r *OpenRestyController) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceReload("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
 	}
@@ -53,11 +43,6 @@ func (r *OpenRestyController) Reload(ctx http.Context) http.Response {
 
 // Start 启动OpenResty
 func (r *OpenRestyController) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动OpenResty失败")
 	}
@@ -67,11 +52,6 @@ func (r *OpenRestyController) Start(ctx http.Context) http.Response {
 
 // Stop 停止OpenResty
 func (r *OpenRestyController) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止OpenResty失败")
 	}
@@ -81,11 +61,6 @@ func (r *OpenRestyController) Stop(ctx http.Context) http.Response {
 
 // Restart 重启OpenResty
 func (r *OpenRestyController) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启OpenResty失败")
 	}
@@ -95,11 +70,6 @@ func (r *OpenRestyController) Restart(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	config, err := tools.Read("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty配置失败")
@@ -110,11 +80,6 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
@@ -129,11 +94,6 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 
 // ErrorLog 获取错误日志
 func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if !tools.Exists("/www/wwwlogs/nginx_error.log") {
 		return controllers.Success(ctx, "")
 	}
@@ -148,11 +108,6 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/wwwlogs/nginx_error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -162,11 +117,6 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *OpenRestyController) Load(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "openresty")
-	if check != nil {
-		return check
-	}
-
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccessState() {

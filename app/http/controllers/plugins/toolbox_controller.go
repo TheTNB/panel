@@ -20,11 +20,6 @@ func NewToolBoxController() *ToolBoxController {
 
 // GetDNS 获取 DNS 信息
 func (r *ToolBoxController) GetDNS(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	raw, err := tools.Read("/etc/resolv.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
@@ -44,11 +39,6 @@ func (r *ToolBoxController) GetDNS(ctx http.Context) http.Response {
 
 // SetDNS 设置 DNS 信息
 func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	dns1 := ctx.Request().Input("dns1")
 	dns2 := ctx.Request().Input("dns2")
 
@@ -69,11 +59,6 @@ func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 
 // GetSWAP 获取 SWAP 信息
 func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	var total, used, free string
 	var size int64
 	if tools.Exists("/www/swap") {
@@ -110,11 +95,6 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 
 // SetSWAP 设置 SWAP 信息
 func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	size := ctx.Request().InputInt("size")
 
 	if tools.Exists("/www/swap") {
@@ -167,11 +147,6 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 
 // GetTimezone 获取时区
 func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	raw, err := tools.Exec("timedatectl | grep zone")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取时区信息失败")
@@ -209,11 +184,6 @@ func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 
 // SetTimezone 设置时区
 func (r *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	timezone := ctx.Request().Input("timezone")
 	if len(timezone) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "时区不能为空")
@@ -228,11 +198,6 @@ func (r *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 
 // GetHosts 获取 hosts 信息
 func (r *ToolBoxController) GetHosts(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	hosts, err := tools.Read("/etc/hosts")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -243,11 +208,6 @@ func (r *ToolBoxController) GetHosts(ctx http.Context) http.Response {
 
 // SetHosts 设置 hosts 信息
 func (r *ToolBoxController) SetHosts(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	hosts := ctx.Request().Input("hosts")
 	if len(hosts) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "hosts 信息不能为空")
@@ -262,11 +222,6 @@ func (r *ToolBoxController) SetHosts(ctx http.Context) http.Response {
 
 // SetRootPassword 设置 root 密码
 func (r *ToolBoxController) SetRootPassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "toolbox")
-	if check != nil {
-		return check
-	}
-
 	password := ctx.Request().Input("password")
 	if len(password) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "密码不能为空")

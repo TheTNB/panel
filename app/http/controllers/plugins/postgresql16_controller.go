@@ -26,11 +26,6 @@ func NewPostgresql16Controller() *Postgresql16Controller {
 
 // Status 获取运行状态
 func (r *Postgresql16Controller) Status(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("postgresql")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
@@ -41,11 +36,6 @@ func (r *Postgresql16Controller) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (r *Postgresql16Controller) Reload(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceReload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载PostgreSQL失败")
 	}
@@ -55,11 +45,6 @@ func (r *Postgresql16Controller) Reload(ctx http.Context) http.Response {
 
 // Restart 重启服务
 func (r *Postgresql16Controller) Restart(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceRestart("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启PostgreSQL失败")
 	}
@@ -69,11 +54,6 @@ func (r *Postgresql16Controller) Restart(ctx http.Context) http.Response {
 
 // Start 启动服务
 func (r *Postgresql16Controller) Start(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStart("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "启动PostgreSQL失败")
 	}
@@ -83,11 +63,6 @@ func (r *Postgresql16Controller) Start(ctx http.Context) http.Response {
 
 // Stop 停止服务
 func (r *Postgresql16Controller) Stop(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	if err := tools.ServiceStop("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "停止PostgreSQL失败")
 	}
@@ -97,11 +72,6 @@ func (r *Postgresql16Controller) Stop(ctx http.Context) http.Response {
 
 // GetConfig 获取配置
 func (r *Postgresql16Controller) GetConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	// 获取配置
 	config, err := tools.Read("/www/server/postgresql/data/postgresql.conf")
 	if err != nil {
@@ -113,11 +83,6 @@ func (r *Postgresql16Controller) GetConfig(ctx http.Context) http.Response {
 
 // GetUserConfig 获取用户配置
 func (r *Postgresql16Controller) GetUserConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	// 获取配置
 	config, err := tools.Read("/www/server/postgresql/data/pg_hba.conf")
 	if err != nil {
@@ -129,11 +94,6 @@ func (r *Postgresql16Controller) GetUserConfig(ctx http.Context) http.Response {
 
 // SaveConfig 保存配置
 func (r *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -148,11 +108,6 @@ func (r *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
 
 // SaveUserConfig 保存用户配置
 func (r *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -167,11 +122,6 @@ func (r *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response 
 
 // Load 获取负载
 func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("postgresql")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
@@ -214,11 +164,6 @@ func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
 
 // Log 获取日志
 func (r *Postgresql16Controller) Log(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	log, err := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -229,11 +174,6 @@ func (r *Postgresql16Controller) Log(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (r *Postgresql16Controller) ClearLog(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	if out, err := tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -243,11 +183,6 @@ func (r *Postgresql16Controller) ClearLog(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	status, err := tools.ServiceStatus("postgresql")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
@@ -313,11 +248,6 @@ func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (r *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
@@ -357,11 +287,6 @@ func (r *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
 
 // DeleteDatabase 删除数据库
 func (r *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
 	})
@@ -382,11 +307,6 @@ func (r *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response 
 
 // BackupList 获取备份列表
 func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	backupList, err := r.backup.PostgresqlList()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
@@ -418,11 +338,6 @@ func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
 
 // UploadBackup 上传备份
 func (r *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	file, err := ctx.Request().File("file")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
@@ -446,11 +361,6 @@ func (r *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
 
 // CreateBackup 创建备份
 func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	})
@@ -472,11 +382,6 @@ func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
 
 // DeleteBackup 删除备份
 func (r *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"name": "required|min_len:1|max_len:255",
 	})
@@ -498,11 +403,6 @@ func (r *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
 
 // RestoreBackup 还原备份
 func (r *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
@@ -524,11 +424,6 @@ func (r *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
 
 // UserList 用户列表
 func (r *Postgresql16Controller) UserList(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	type user struct {
 		User string `json:"user"`
 		Role string `json:"role"`
@@ -580,11 +475,6 @@ func (r *Postgresql16Controller) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (r *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
@@ -617,11 +507,6 @@ func (r *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
 
 // DeleteUser 删除用户
 func (r *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 	})
@@ -645,11 +530,6 @@ func (r *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
 
 // SetUserPassword 设置用户密码
 func (r *Postgresql16Controller) SetUserPassword(ctx http.Context) http.Response {
-	check := controllers.Check(ctx, "postgresql16")
-	if check != nil {
-		return check
-	}
-
 	validator, err := ctx.Request().Validate(map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
