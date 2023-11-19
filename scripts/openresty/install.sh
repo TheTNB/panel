@@ -386,13 +386,53 @@ cat > ${openrestyPath}/html/index.html << EOF
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>耗子Linux面板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>未找到网站 - 耗子Linux面板</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5em;
+        }
+        p {
+            color: #555;
+            line-height: 1.8;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 2em 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>耗子Linux面板</h1>
-<p>这是耗子Linux面板的OpenResty默认页面！</p>
-<p>当您看到此页面，说明该域名尚未与站点绑定。</p>
+    <div class="container">
+        <h1>耗子Linux面板</h1>
+        <p>这是耗子Linux面板的OpenResty默认页面！</p>
+        <p>当您看到此页面，说明无法在服务器上找到该域名对应的站点。</p>
+    </div>
 </body>
 </html>
 EOF
@@ -402,13 +442,53 @@ cat > ${openrestyPath}/html/stop.html << EOF
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<title>网站已停止 - 耗子Linux面板</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站已停止 - 耗子Linux面板</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5em;
+        }
+        p {
+            color: #555;
+            line-height: 1.8;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 2em 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
 <body>
-<h1>耗子Linux面板</h1>
-<p>该网站已被管理员停止访问！</p>
-<p>当您看到此页面，说明该网站已被管理员停止对外访问，请联系管理员了解详情。</p>
+    <div class="container">
+        <h1>耗子Linux面板</h1>
+        <p>该网站已被管理员停止访问！</p>
+        <p>当您看到此页面，说明该网站已被服务器管理员停止对外访问。</p>
+    </div>
 </body>
 </html>
 EOF
