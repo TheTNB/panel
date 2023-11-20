@@ -301,6 +301,7 @@ events {
 http {
     include mime.types;
     include proxy.conf;
+    include default.conf;
     default_type application/octet-stream;
 
     server_names_hash_bucket_size 512;
