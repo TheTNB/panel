@@ -27,7 +27,28 @@ redisPath="${setupPath}/server/redis"
 redisVersion="7.2.3"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
+# 读取信息
+redisConfig="${redisPath}/redis.conf"
+redisPort=$(cat ${redisConfig} | grep 'port ' | grep -v '#' | awk '{print $2}')
+redisPass=$(cat ${redisConfig} | grep 'requirepass ' | grep -v '#' | awk '{print $2}')
+redisHost=$(cat ${redisConfig} | grep 'bind ' | grep -v '#' | awk '{print $2}')
+redisDir=$(cat ${redisConfig} | grep 'dir ' | grep -v '#' | awk '{print $2}')
+
+# 备份
+if [ -z "${redisPass}" ]; then
+    redis-cli -p ${redisPort} << EOF
+SAVE
+EOF
+else
+    redis-cli -p ${redisPort} -a ${redisPass} << EOF
+SAVE
+EOF
+fi
+mv ${redisDir}/dump.rdb /tmp/dump.rdb.bak
+
 # 准备目录
+rm -rf ${redisPath}
+mkdir -p ${redisPath}
 cd ${redisPath}
 
 # 下载源码
@@ -56,7 +77,7 @@ fi
 make PREFIX=${redisPath} install
 if [ ! -f "${redisPath}/bin/redis-server" ]; then
     echo -e $HR
-    echo "错误：Redis安装失败，请截图错误信息寻求帮助。"
+    echo "错误：Redis升级失败，请截图错误信息寻求帮助。"
     exit 1
 fi
 
@@ -75,6 +96,25 @@ sed -i 's/daemonize.*/daemonize no/g' ${redisPath}/redis.conf
 
 if [ "${ARCH}" == "aarch64" ]; then
     echo "ignore-warnings ARM64-COW-BUG" >> ${redisPath}/redis.conf
+fi
+
+# 恢复配置
+if [ -n "${redisPass}" ]; then
+    sed -i "s!# requirepass .*!requirepass ${redisPass}!g" ${redisPath}/redis.conf
+fi
+if [ -n "${redisHost}" ]; then
+    sed -i "s!bind .*!bind ${redisHost}!g" ${redisPath}/redis.conf
+fi
+if [ -n "${redisPort}" ]; then
+    sed -i "s!port .*!port ${redisPort}!g" ${redisPath}/redis.conf
+fi
+if [ -n "${redisDir}" ]; then
+    sed -i "s!dir .*!dir ${redisDir}!g" ${redisPath}/redis.conf
+fi
+
+# 恢复数据
+if [ -f "/tmp/dump.rdb.bak" ]; then
+    mv /tmp/dump.rdb.bak ${redisDir}/dump.rdb
 fi
 
 chown -R redis:redis ${redisPath}
