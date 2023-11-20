@@ -1025,6 +1025,17 @@
                     "网站管理"
                 ],
                 "summary": "获取备份列表",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/commonrequests.Paginate"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1170,7 +1181,7 @@
             }
         },
         "/panel/website/uploadBackup": {
-            "post": {
+            "put": {
                 "security": [
                     {
                         "BearerToken": []
@@ -1923,7 +1934,7 @@
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 }
             }
@@ -2082,7 +2093,7 @@
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "raw": {
@@ -2327,7 +2338,7 @@
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "remark": {

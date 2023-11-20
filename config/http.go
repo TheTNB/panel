@@ -16,6 +16,8 @@ func init() {
 			"fiber": map[string]any{
 				// prefork mode, see https://docs.gofiber.io/api/fiber/#config
 				"prefork": false,
+				// Optional, default is 4MB
+				"body_limit": 4000,
 				"route": func() (route.Route, error) {
 					return fiberfacades.Route("fiber"), nil
 				},

@@ -1032,6 +1032,17 @@ const docTemplate = `{
                     "网站管理"
                 ],
                 "summary": "获取备份列表",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/commonrequests.Paginate"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1177,7 +1188,7 @@ const docTemplate = `{
             }
         },
         "/panel/website/uploadBackup": {
-            "post": {
+            "put": {
                 "security": [
                     {
                         "BearerToken": []
@@ -1930,7 +1941,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 }
             }
@@ -2089,7 +2100,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "raw": {
@@ -2334,7 +2345,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "remark": {

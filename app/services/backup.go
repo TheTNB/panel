@@ -114,7 +114,7 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 		return errors.New("备份文件不存在")
 	}
 
-	if _, err := tools.Exec(`rm -rf '` + website.Path + `/*'`); err != nil {
+	if err := tools.Remove(website.Path); err != nil {
 		return err
 	}
 	if err := tools.UnArchive(backupFile, website.Path); err != nil {

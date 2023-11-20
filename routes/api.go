@@ -40,8 +40,8 @@ func Api() {
 			r.Get("defaultConfig", websiteController.GetDefaultConfig)
 			r.Post("defaultConfig", websiteController.SaveDefaultConfig)
 			r.Get("backupList", websiteController.BackupList)
-			r.Post("uploadBackup", websiteController.UploadBackup)
-			r.Post("deleteBackup", websiteController.DeleteBackup)
+			r.Put("uploadBackup", websiteController.UploadBackup)
+			r.Delete("deleteBackup", websiteController.DeleteBackup)
 		})
 		r.Prefix("websites").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()

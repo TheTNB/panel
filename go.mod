@@ -8,7 +8,7 @@ require (
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.1
-	github.com/goravel/fiber v1.1.11-0.20231117182543-0e63ed108e45
+	github.com/goravel/fiber v1.1.11-0.20231120162926-818d5d2c1b6d
 	github.com/goravel/framework v1.13.1-0.20231117140817-50ecec9871ec
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1

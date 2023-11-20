@@ -327,9 +327,16 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Tags			网站管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200	{object}	SuccessResponse{data=[]services.BackupFile}
+//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse{data=[]services.BackupFile}
 //	@Router			/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
+	var paginateRequest commonrequests.Paginate
+	sanitize := Sanitize(ctx, &paginateRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
 	backupList, err := r.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
@@ -338,7 +345,26 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, backupList)
+	startIndex := (paginateRequest.Page - 1) * paginateRequest.Limit
+	endIndex := paginateRequest.Page * paginateRequest.Limit
+	if startIndex > len(backupList) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []services.BackupFile{},
+		})
+	}
+	if endIndex > len(backupList) {
+		endIndex = len(backupList)
+	}
+	pagedBackupList := backupList[startIndex:endIndex]
+	if pagedBackupList == nil {
+		pagedBackupList = []services.BackupFile{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(backupList),
+		"items": pagedBackupList,
+	})
 }
 
 // CreateBackup
@@ -389,7 +415,7 @@ func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 //	@Security		BearerToken
 //	@Param			file	formData	file	true	"备份文件"
 //	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/uploadBackup [post]
+//	@Router			/panel/website/uploadBackup [put]
 func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
