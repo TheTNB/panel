@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/support"
+	"github.com/goravel/framework/support/env"
 	"github.com/mholt/archiver/v3"
 )
 
@@ -42,7 +43,7 @@ func Remove(path string) error {
 // Exec 执行 shell 命令
 func Exec(shell string) (string, error) {
 	var cmd *exec.Cmd
-	if IsLinux() {
+	if env.IsLinux() {
 		cmd = exec.Command("bash", "-c", "LC_ALL=C "+shell)
 	} else {
 		cmd = exec.Command("cmd", "/C", "chcp 65001 >nul && "+shell)
@@ -63,7 +64,7 @@ func Exec(shell string) (string, error) {
 // ExecAsync 异步执行 shell 命令
 func ExecAsync(shell string) error {
 	var cmd *exec.Cmd
-	if IsLinux() {
+	if env.IsLinux() {
 		cmd = exec.Command("bash", "-c", "LC_ALL=C "+shell)
 	} else {
 		cmd = exec.Command("cmd", "/C", "chcp 65001 >nul && "+shell)
@@ -99,7 +100,7 @@ func Chmod(path string, permission os.FileMode) error {
 
 // Chown 修改文件或目录所有者
 func Chown(path, user, group string) error {
-	if IsWindows() {
+	if env.IsWindows() {
 		return errors.New("chown is not supported on Windows")
 	}
 

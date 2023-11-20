@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/goravel/framework/support/env"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,6 +26,7 @@ func (s *SystemHelperTestSuite) TestWrite() {
 
 	content, _ := Read(filePath.Name())
 	s.Equal("test data", content)
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -37,6 +39,7 @@ func (s *SystemHelperTestSuite) TestRead() {
 	data, err := Read(filePath.Name())
 	s.Nil(err)
 	s.Equal("test data", data)
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -58,7 +61,7 @@ func (s *SystemHelperTestSuite) TestExec() {
 
 func (s *SystemHelperTestSuite) TestExecAsync() {
 	command := "echo test > test.txt"
-	if IsWindows() {
+	if env.IsWindows() {
 		command = "echo test> test.txt"
 	}
 
@@ -71,7 +74,7 @@ func (s *SystemHelperTestSuite) TestExecAsync() {
 	s.Nil(err)
 
 	condition := "test\n"
-	if IsWindows() {
+	if env.IsWindows() {
 		condition = "test\r\n"
 	}
 	s.Equal(condition, content)
@@ -92,6 +95,7 @@ func (s *SystemHelperTestSuite) TestChmod() {
 	s.Nil(err)
 
 	s.Nil(Chmod(filePath.Name(), 0755))
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -107,11 +111,12 @@ func (s *SystemHelperTestSuite) TestChown() {
 	s.Nil(err)
 
 	err = Chown(filePath.Name(), currentUser.Username, groups[0])
-	if IsWindows() {
+	if env.IsWindows() {
 		s.NotNil(err)
 	} else {
 		s.Nil(err)
 	}
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -120,18 +125,19 @@ func (s *SystemHelperTestSuite) TestExists() {
 	defer Remove(filePath.Name())
 
 	s.True(Exists(filePath.Name()))
-	s.False(Exists("/tmp/123"))
+	s.False(Exists("123"))
 }
 
 func (s *SystemHelperTestSuite) TestEmpty() {
 	filePath, _ := TempFile("testfile")
 
 	s.True(Empty(filePath.Name()))
-	if IsWindows() {
+	if env.IsWindows() {
 		s.True(Empty("C:\\Windows\\System32\\drivers\\etc\\hosts"))
 	} else {
 		s.True(Empty("/etc/hosts"))
 	}
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -143,8 +149,8 @@ func (s *SystemHelperTestSuite) TestMv() {
 
 	newFilePath, _ := TempFile("testfile2")
 
-	filePath.Close()
-	newFilePath.Close()
+	s.Nil(newFilePath.Close())
+	s.Nil(filePath.Close())
 
 	s.Nil(Mv(filePath.Name(), newFilePath.Name()))
 	s.False(Exists(filePath.Name()))
@@ -172,6 +178,7 @@ func (s *SystemHelperTestSuite) TestSize() {
 	size, err := Size(filePath.Name())
 	s.Nil(err)
 	s.Equal(int64(len("test data")), size)
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -184,6 +191,7 @@ func (s *SystemHelperTestSuite) TestFileInfo() {
 	info, err := FileInfo(filePath.Name())
 	s.Nil(err)
 	s.Equal(filepath.Base(filePath.Name()), info.Name())
+	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
@@ -201,6 +209,7 @@ func (s *SystemHelperTestSuite) TestUnArchiveSuccessfullyUnarchivesFile() {
 	err = UnArchive(filepath.Join(dstDir, "test.zip"), dstDir)
 	s.Nil(err)
 	s.FileExists(filepath.Join(dstDir, filepath.Base(file.Name())))
+	s.Nil(file.Close())
 	s.Nil(Remove(file.Name()))
 	s.Nil(Remove(dstDir))
 }
@@ -224,6 +233,7 @@ func (s *SystemHelperTestSuite) TestArchiveSuccessfullyArchivesFiles() {
 	err = Archive([]string{srcFile.Name()}, filepath.Join(dstDir, "test.zip"))
 	s.Nil(err)
 	s.FileExists(filepath.Join(dstDir, "test.zip"))
+	s.Nil(srcFile.Close())
 	s.Nil(Remove(srcFile.Name()))
 	s.Nil(Remove(dstDir))
 }

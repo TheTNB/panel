@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/goravel/framework/support/env"
 	"github.com/imroc/req/v3"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -213,7 +214,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		if checksumsUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if IsArm() {
+		if env.IsArm() {
 			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
@@ -247,7 +248,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		if checksumsUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if IsArm() {
+		if env.IsArm() {
 			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
@@ -332,7 +333,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 		if checksumsUrl, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if IsArm() {
+		if env.IsArm() {
 			if downloadName, err = Exec("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
@@ -366,7 +367,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 		if checksumsUrl, err = Exec("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if IsArm() {
+		if env.IsArm() {
 			if downloadName, err = Exec("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}

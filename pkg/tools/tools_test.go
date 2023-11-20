@@ -3,6 +3,7 @@ package tools
 import (
 	"testing"
 
+	"github.com/goravel/framework/support/env"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -84,7 +85,7 @@ func (s *HelperTestSuite) TestGenerateVersions() {
 }
 
 func (s *HelperTestSuite) TestGetLatestPanelVersion() {
-	if IsWindows() {
+	if env.IsWindows() {
 		return
 	}
 	version, err := GetLatestPanelVersion()
@@ -93,7 +94,7 @@ func (s *HelperTestSuite) TestGetLatestPanelVersion() {
 }
 
 func (s *HelperTestSuite) TestGetPanelVersion() {
-	if IsWindows() {
+	if env.IsWindows() {
 		return
 	}
 	version, err := GetPanelVersion("v2.0.58")
