@@ -15,10 +15,16 @@ func TestOSHelperTestSuite(t *testing.T) {
 }
 
 func (s *OSHelperTestSuite) TestIsDebian() {
+	if IsWindows() {
+		return
+	}
 	s.True(IsDebian())
 }
 
 func (s *OSHelperTestSuite) TestIsRHEL() {
+	if IsWindows() {
+		return
+	}
 	s.False(IsRHEL())
 }
 

@@ -117,7 +117,7 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 	if _, err := tools.Exec(`rm -rf '` + website.Path + `/*'`); err != nil {
 		return err
 	}
-	if _, err := tools.Exec(`unzip -o '` + backupFile + `' -d '` + website.Path + `' 2>&1`); err != nil {
+	if err := tools.UnArchive(backupFile, website.Path); err != nil {
 		return err
 	}
 	if err := tools.Chmod(website.Path, 0755); err != nil {
@@ -195,59 +195,45 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	rootPassword := s.setting.Get(models.SettingKeyMysqlRootPassword)
-	ext := filepath.Ext(backupFile)
-	backupFile = backupPath + "/" + backupFile
-	if !tools.Exists(backupFile) {
+	backupFullPath := filepath.Join(backupPath, backupFile)
+	if !tools.Exists(backupFullPath) {
 		return errors.New("备份文件不存在")
 	}
 
-	err := os.Setenv("MYSQL_PWD", rootPassword)
-	if err != nil {
+	if err := os.Setenv("MYSQL_PWD", rootPassword); err != nil {
 		return err
 	}
 
-	switch ext {
-	case ".zip":
-		if _, err := tools.Exec("unzip -o " + backupFile + " -d " + backupPath); err != nil {
+	tempDir, err := tools.TempDir(backupFile)
+	if err != nil {
+		return err
+	}
+	defer tools.Remove(tempDir)
+
+	if !strings.HasSuffix(backupFile, ".sql") {
+		backupFile = "" // 置空，防止干扰后续判断
+		if err = tools.UnArchive(backupFullPath, tempDir); err != nil {
 			return err
 		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".gz":
-		if strings.HasSuffix(backupFile, ".tar.gz") {
-			// 解压.tar.gz文件
-			if _, err := tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath); err != nil {
-				return err
+		if files, err := os.ReadDir(tempDir); err == nil {
+			for _, file := range files {
+				if strings.HasSuffix(file.Name(), ".sql") {
+					backupFile = filepath.Base(file.Name())
+					break
+				}
 			}
-			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
-		} else {
-			// 解压.gz文件
-			if _, err := tools.Exec("gzip -d " + backupFile); err != nil {
-				return err
-			}
-			backupFile = strings.TrimSuffix(backupFile, ext)
 		}
-	case ".bz2":
-		if _, err := tools.Exec("bzip2 -d " + backupFile); err != nil {
+	} else {
+		if err = tools.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
 			return err
 		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".tar":
-		if _, err := tools.Exec("tar -xvf " + backupFile + " -C " + backupPath); err != nil {
-			return err
-		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".rar":
-		if _, err := tools.Exec("unrar x " + backupFile + " " + backupPath); err != nil {
-			return err
-		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
 	}
 
-	if !tools.Exists(backupFile) {
-		return errors.New("自动解压失败，请手动解压")
+	if len(backupFile) == 0 {
+		return errors.New("无法找到备份文件")
 	}
 
-	if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + backupFile); err != nil {
+	if _, err = tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
 		return err
 	}
 
@@ -310,54 +296,41 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 // PostgresqlRestore PostgreSQL恢复
 func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
-	ext := filepath.Ext(backupFile)
-	backupFile = backupPath + "/" + backupFile
-	if !tools.Exists(backupFile) {
+	backupFullPath := filepath.Join(backupPath, backupFile)
+	if !tools.Exists(backupFullPath) {
 		return errors.New("备份文件不存在")
 	}
 
-	switch ext {
-	case ".zip":
-		if _, err := tools.Exec("unzip -o " + backupFile + " -d " + backupPath); err != nil {
+	tempDir, err := tools.TempDir(backupFile)
+	if err != nil {
+		return err
+	}
+	defer tools.Remove(tempDir)
+
+	if !strings.HasSuffix(backupFile, ".sql") {
+		backupFile = "" // 置空，防止干扰后续判断
+		if err = tools.UnArchive(backupFullPath, tempDir); err != nil {
 			return err
 		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".gz":
-		if strings.HasSuffix(backupFile, ".tar.gz") {
-			// 解压.tar.gz文件
-			if _, err := tools.Exec("tar -zxvf " + backupFile + " -C " + backupPath); err != nil {
-				return err
+		if files, err := os.ReadDir(tempDir); err == nil {
+			for _, file := range files {
+				if strings.HasSuffix(file.Name(), ".sql") {
+					backupFile = filepath.Base(file.Name())
+					break
+				}
 			}
-			backupFile = strings.TrimSuffix(backupFile, ".tar.gz")
-		} else {
-			// 解压.gz文件
-			if _, err := tools.Exec("gzip -d " + backupFile); err != nil {
-				return err
-			}
-			backupFile = strings.TrimSuffix(backupFile, ext)
 		}
-	case ".bz2":
-		if _, err := tools.Exec("bzip2 -d " + backupFile); err != nil {
+	} else {
+		if err = tools.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
 			return err
 		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".tar":
-		if _, err := tools.Exec("tar -xvf " + backupFile + " -C " + backupPath); err != nil {
-			return err
-		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
-	case ".rar":
-		if _, err := tools.Exec("unrar x " + backupFile + " " + backupPath); err != nil {
-			return err
-		}
-		backupFile = strings.TrimSuffix(backupFile, ext)
 	}
 
-	if !tools.Exists(backupFile) {
-		return errors.New("自动解压失败，请手动解压")
+	if len(backupFile) == 0 {
+		return errors.New("无法找到备份文件")
 	}
 
-	if _, err := tools.Exec(`su - postgres -c "psql ` + database + `" < ` + backupFile); err != nil {
+	if _, err = tools.Exec(`su - postgres -c "psql ` + database + `" < ` + filepath.Join(tempDir, backupFile)); err != nil {
 		return err
 	}
 

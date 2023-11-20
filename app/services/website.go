@@ -611,14 +611,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
-	cert, err := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
-	if err == nil {
-		setting.SslCertificate = cert
-	}
-	key, err := tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
-	if err == nil {
-		setting.SslCertificateKey = key
-	}
+	cert, _ := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+	setting.SslCertificate = cert
+	key, _ := tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
+	setting.SslCertificateKey = key
 	if setting.Ssl {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
@@ -655,11 +651,9 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	rewrite, err := tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
-	if err == nil {
-		setting.Rewrite = rewrite
-	}
-	log, err := tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
+	rewrite, _ := tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	setting.Rewrite = rewrite
+	log, _ := tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
 	setting.Log = log
 
 	return setting, err

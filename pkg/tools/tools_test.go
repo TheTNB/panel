@@ -84,12 +84,18 @@ func (s *HelperTestSuite) TestGenerateVersions() {
 }
 
 func (s *HelperTestSuite) TestGetLatestPanelVersion() {
+	if IsWindows() {
+		return
+	}
 	version, err := GetLatestPanelVersion()
 	s.NotEmpty(version)
 	s.Nil(err)
 }
 
 func (s *HelperTestSuite) TestGetPanelVersion() {
+	if IsWindows() {
+		return
+	}
 	version, err := GetPanelVersion("v2.0.58")
 	s.NotEmpty(version)
 	s.Nil(err)

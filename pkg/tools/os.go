@@ -21,3 +21,13 @@ func IsRHEL() bool {
 func IsArm() bool {
 	return runtime.GOARCH == "arm" || runtime.GOARCH == "arm64"
 }
+
+// IsLinux 判断是否是 Linux 系统
+func IsLinux() bool {
+	return runtime.GOOS == "linux"
+}
+
+// IsWindows 判断是否是 Windows 系统
+func IsWindows() bool {
+	return runtime.GOOS == "windows"
+}
