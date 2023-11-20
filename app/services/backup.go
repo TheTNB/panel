@@ -208,7 +208,6 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 	if err != nil {
 		return err
 	}
-	defer tools.Remove(tempDir)
 
 	if !strings.HasSuffix(backupFile, ".sql") {
 		backupFile = "" // 置空，防止干扰后续判断
@@ -234,6 +233,10 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 	}
 
 	if _, err = tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
+		return err
+	}
+
+	if err = tools.Remove(tempDir); err != nil {
 		return err
 	}
 
@@ -305,7 +308,6 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 	if err != nil {
 		return err
 	}
-	defer tools.Remove(tempDir)
 
 	if !strings.HasSuffix(backupFile, ".sql") {
 		backupFile = "" // 置空，防止干扰后续判断
@@ -331,6 +333,10 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 	}
 
 	if _, err = tools.Exec(`su - postgres -c "psql ` + database + `" < ` + filepath.Join(tempDir, backupFile)); err != nil {
+		return err
+	}
+
+	if err = tools.Remove(tempDir); err != nil {
 		return err
 	}
 

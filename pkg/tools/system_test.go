@@ -19,18 +19,17 @@ func TestSystemHelperTestSuite(t *testing.T) {
 
 func (s *SystemHelperTestSuite) TestWrite() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	s.Nil(Write(filePath.Name(), "test data", 0644))
 	s.FileExists(filePath.Name())
 
 	content, _ := Read(filePath.Name())
 	s.Equal("test data", content)
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestRead() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
@@ -38,6 +37,7 @@ func (s *SystemHelperTestSuite) TestRead() {
 	data, err := Read(filePath.Name())
 	s.Nil(err)
 	s.Equal("test data", data)
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestRemove() {
@@ -80,24 +80,23 @@ func (s *SystemHelperTestSuite) TestExecAsync() {
 
 func (s *SystemHelperTestSuite) TestMkdir() {
 	dirPath, _ := TempDir("testdir")
-	defer Remove(dirPath)
 
 	s.Nil(Mkdir(dirPath, 0755))
+	s.Nil(Remove(dirPath))
 }
 
 func (s *SystemHelperTestSuite) TestChmod() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
 
 	s.Nil(Chmod(filePath.Name(), 0755))
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestChown() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
@@ -113,6 +112,7 @@ func (s *SystemHelperTestSuite) TestChown() {
 	} else {
 		s.Nil(err)
 	}
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestExists() {
@@ -125,7 +125,6 @@ func (s *SystemHelperTestSuite) TestExists() {
 
 func (s *SystemHelperTestSuite) TestEmpty() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	s.True(Empty(filePath.Name()))
 	if IsWindows() {
@@ -133,39 +132,39 @@ func (s *SystemHelperTestSuite) TestEmpty() {
 	} else {
 		s.True(Empty("/etc/hosts"))
 	}
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestMv() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
 
 	newFilePath, _ := TempFile("testfile2")
-	defer Remove(newFilePath.Name())
 
 	filePath.Close()
 	newFilePath.Close()
 
 	s.Nil(Mv(filePath.Name(), newFilePath.Name()))
 	s.False(Exists(filePath.Name()))
+	s.Nil(Remove(newFilePath.Name()))
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestCp() {
 	tempDir, _ := TempDir("testdir")
-	defer Remove(tempDir)
 
 	err := Write(filepath.Join(tempDir, "testfile"), "test data", 0644)
 	s.Nil(err)
 
 	s.Nil(Cp(filepath.Join(tempDir, "testfile"), filepath.Join(tempDir, "testfile2")))
 	s.True(Exists(filepath.Join(tempDir, "testfile2")))
+	s.Nil(Remove(tempDir))
 }
 
 func (s *SystemHelperTestSuite) TestSize() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
@@ -173,11 +172,11 @@ func (s *SystemHelperTestSuite) TestSize() {
 	size, err := Size(filePath.Name())
 	s.Nil(err)
 	s.Equal(int64(len("test data")), size)
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestFileInfo() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
@@ -185,13 +184,12 @@ func (s *SystemHelperTestSuite) TestFileInfo() {
 	info, err := FileInfo(filePath.Name())
 	s.Nil(err)
 	s.Equal(filepath.Base(filePath.Name()), info.Name())
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestUnArchiveSuccessfullyUnarchivesFile() {
 	file, _ := TempFile("test")
-	defer Remove(file.Name())
 	dstDir, _ := TempDir("archive")
-	defer Remove(dstDir)
 
 	err := Write(file.Name(), "test data", 0644)
 	s.Nil(err)
@@ -203,22 +201,22 @@ func (s *SystemHelperTestSuite) TestUnArchiveSuccessfullyUnarchivesFile() {
 	err = UnArchive(filepath.Join(dstDir, "test.zip"), dstDir)
 	s.Nil(err)
 	s.FileExists(filepath.Join(dstDir, filepath.Base(file.Name())))
+	s.Nil(Remove(file.Name()))
+	s.Nil(Remove(dstDir))
 }
 
 func (s *SystemHelperTestSuite) TestUnArchiveFailsForNonExistentFile() {
 	srcFile := "nonexistent.zip"
 	dstDir, _ := TempDir("unarchived")
-	defer Remove(dstDir)
 
 	err := UnArchive(srcFile, dstDir)
 	s.NotNil(err)
+	s.Nil(Remove(dstDir))
 }
 
 func (s *SystemHelperTestSuite) TestArchiveSuccessfullyArchivesFiles() {
 	srcFile, _ := TempFile("test")
-	defer Remove(srcFile.Name())
 	dstDir, _ := TempDir("archive")
-	defer Remove(dstDir)
 
 	err := Write(srcFile.Name(), "test data", 0644)
 	s.Nil(err)
@@ -226,13 +224,15 @@ func (s *SystemHelperTestSuite) TestArchiveSuccessfullyArchivesFiles() {
 	err = Archive([]string{srcFile.Name()}, filepath.Join(dstDir, "test.zip"))
 	s.Nil(err)
 	s.FileExists(filepath.Join(dstDir, "test.zip"))
+	s.Nil(Remove(srcFile.Name()))
+	s.Nil(Remove(dstDir))
 }
 
 func (s *SystemHelperTestSuite) TestArchiveFailsForNonExistentFiles() {
 	srcFile := "nonexistent"
 	dstDir, _ := TempDir("archive")
-	defer Remove(dstDir)
 
 	err := Archive([]string{srcFile}, filepath.Join(dstDir, "test.zip"))
 	s.NotNil(err)
+	s.Nil(Remove(dstDir))
 }
