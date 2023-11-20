@@ -494,8 +494,7 @@ cat > ${openrestyPath}/html/stop.html << EOF
 EOF
 
 # 处理文件权限
-chmod 755 ${openrestyPath}
-chmod 644 ${openrestyPath}/html
+chmod -R 755 ${openrestyPath}
 chmod -R 755 /www/wwwroot
 chown -R www:www /www/wwwroot
 chmod -R 644 /www/server/vhost
@@ -536,6 +535,19 @@ proxy_busy_buffers_size 128k;
 proxy_temp_file_write_size 128k;
 proxy_next_upstream error timeout invalid_header http_500 http_503 http_404;
 proxy_cache cache_one;
+EOF
+
+# 写入默认站点配置文件
+cat > ${openrestyPath}/conf/default.conf << EOF
+server
+{
+    listen 80 default_server;
+    listen 443 ssl default_server;
+    server_name _;
+    index index.html;
+    root /www/server/openresty/html;
+    ssl_reject_handshake on;
+}
 EOF
 
 # 建立日志目录
