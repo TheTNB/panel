@@ -122,10 +122,11 @@ func (s *SystemHelperTestSuite) TestChown() {
 
 func (s *SystemHelperTestSuite) TestExists() {
 	filePath, _ := TempFile("testfile")
-	defer Remove(filePath.Name())
 
 	s.True(Exists(filePath.Name()))
 	s.False(Exists("123"))
+	s.Nil(filePath.Close())
+	s.Nil(Remove(filePath.Name()))
 }
 
 func (s *SystemHelperTestSuite) TestEmpty() {
