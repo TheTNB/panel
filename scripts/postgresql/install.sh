@@ -26,7 +26,9 @@ downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/postgresql
 setupPath="/www"
 postgresqlPath="${setupPath}/server/postgresql"
 postgresqlVersion=""
-cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
 
 if [[ "${1}" == "15" ]]; then
     postgresqlVersion="15.5"
@@ -88,7 +90,7 @@ if [ "$?" != "0" ]; then
     rm -rf ${postgresqlPath}
     exit 1
 fi
-make -j${cpuCore}
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：PostgreSQL 编译失败，请截图错误信息寻求帮助。"

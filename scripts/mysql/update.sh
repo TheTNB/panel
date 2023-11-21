@@ -26,22 +26,20 @@ downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/mysql"
 setupPath="/www"
 mysqlPath="${setupPath}/server/mysql"
 mysqlVersion=""
-mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
+mysqlPassword=$(panel getSetting mysql_root_password)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
+
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
 
 if [[ "${1}" == "80" ]]; then
     mysqlVersion="8.0.35"
+    j=$(calculate_j2)
 elif [[ "${1}" == "57" ]]; then
     mysqlVersion="5.7.44"
 else
     echo -e $HR
     echo "错误：不支持的 MySQL 版本！"
-    exit 1
-fi
-
-if [[ "${memTotal}" -lt "4096" ]] && [[ "${1}" == "80" ]]; then
-    echo -e $HR
-    echo "错误：这点内存(${memTotal}M)还想装 MySQL 8.0？洗洗睡吧！"
     exit 1
 fi
 
@@ -60,11 +58,8 @@ else
     exit 1
 fi
 
-mysqlUserCheck=$(cat /etc/passwd | grep mysql)
-if [ "${mysqlUserCheck}" == "" ]; then
-    groupadd mysql
-    useradd -s /sbin/nologin -g mysql mysql
-fi
+# 停止已有服务
+systemctl stop mysqld
 
 # 准备目录
 cd ${mysqlPath}
@@ -100,7 +95,7 @@ rm -f openssl-1.1.1u.tar.gz.checksum.txt
 mv openssl-1.1.1u openssl
 cd openssl
 ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1
-make -j$(nproc)
+make "-j${j}"
 make install
 echo "/usr/local/openssl-1.1/lib" > /etc/ld.so.conf.d/openssl-1.1.conf
 ldconfig
@@ -118,19 +113,12 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-if [[ "${cpuCore}" -gt "1" ]]; then
-    make -j2
-else
-    make
-fi
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译失败，请截图错误信息寻求帮助。"
     exit 1
 fi
-
-# 停止已有服务
-systemctl stop mysqld
 
 # 安装
 make install
@@ -146,8 +134,13 @@ chmod -R 755 ${mysqlPath}
 chmod 644 ${mysqlPath}/conf/my.cnf
 
 # 启动服务
-systemctl daemon-reload
-systemctl enable mysqld
+systemctl start mysqld
+
+# 执行更新后的初始化
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DROP DATABASE test;"
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DELETE FROM mysql.user WHERE user='';"
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "FLUSH PRIVILEGES;"
+${mysqlPath}/bin/mysql_upgrade -uroot -p${mysqlPassword} --force
 
 panel writePlugin mysql${1} ${mysqlVersion}
 

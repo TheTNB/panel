@@ -25,6 +25,9 @@ setupPath="/www"
 pureftpdPath="${setupPath}/server/pure-ftpd"
 pureftpdVersion="1.0.50"
 
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
+
 # 准备安装目录
 cp ${pureftpdPath}/etc/pureftpd.passwd /tmp/pureftpd.passwd
 cp ${pureftpdPath}/etc/pureftpd.pdb /tmp/pureftpd.pdb
@@ -57,7 +60,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-make
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：Pure-Ftpd-${pureftpdVersion}编译失败，请截图错误信息寻求帮助。"

@@ -29,19 +29,17 @@ mysqlVersion=""
 mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
+
 if [[ "${1}" == "80" ]]; then
     mysqlVersion="8.0.35"
+    j=$(calculate_j2)
 elif [[ "${1}" == "57" ]]; then
     mysqlVersion="5.7.44"
 else
     echo -e $HR
     echo "错误：不支持的 MySQL 版本！"
-    exit 1
-fi
-
-if [[ "${memTotal}" -lt "4096" ]] && [[ "${1}" == "80" ]]; then
-    echo -e $HR
-    echo "错误：这点内存(${memTotal}M)还想装 MySQL 8.0？洗洗睡吧！"
     exit 1
 fi
 
@@ -125,11 +123,7 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-if [[ "${cpuCore}" -gt "1" ]]; then
-    make -j2
-else
-    make
-fi
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译失败，请截图错误信息寻求帮助。"
@@ -394,6 +388,9 @@ systemctl enable mysqld
 systemctl start mysqld
 
 ${mysqlPath}/bin/mysqladmin -u root password ${mysqlPassword}
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DROP DATABASE test;"
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DELETE FROM mysql.user WHERE user='';"
+${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "FLUSH PRIVILEGES;"
 
 panel writePlugin mysql${1} ${mysqlVersion}
 panel writeMysqlPassword ${mysqlPassword}

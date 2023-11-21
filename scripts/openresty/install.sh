@@ -27,6 +27,9 @@ openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.21.4.3"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
+
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
     dnf makecache -y
@@ -191,7 +194,7 @@ rm -f libinjection-3.10.0.zip
 rm -f libinjection-3.10.0.zip.checksum.txt
 
 cd ../
-make -j$(nproc)
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：OpenResty waf拓展初始化失败，请截图错误信息寻求帮助。"
@@ -238,11 +241,7 @@ export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
 
 ./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-ld-opt="-Wl,-E" --with-cc-opt="-std=gnu99" --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
-if [[ "${cpuCore}" -gt "1" ]]; then
-    make -j2
-else
-    make
-fi
+make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：OpenResty编译失败，请截图错误信息寻求帮助。"

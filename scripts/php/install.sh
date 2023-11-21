@@ -28,6 +28,9 @@ phpVersionCode=""
 phpPath="${setupPath}/server/php/${phpVersion}"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
+source ${setupPath}/panel/scripts/calculate_j.sh
+j=$(calculate_j)
+
 # 安装依赖
 if [ "${OS}" == "centos" ]; then
     dnf install dnf-plugins-core -y
@@ -103,7 +106,7 @@ if [ "${phpVersion}" -le "80" ]; then
     mv openssl-1.1.1u openssl
     cd openssl
     ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1
-    make -j$(nproc)
+    make "-j${j}"
     make install
     echo "/usr/local/openssl-1.1/lib" > /etc/ld.so.conf.d/openssl-1.1.conf
     ldconfig
@@ -123,11 +126,7 @@ else
 fi
 
 # 编译安装
-if [[ "${cpuCore}" -gt "1" ]]; then
-    make -j2
-else
-    make
-fi
+make "-j${j}"
 make install
 if [ ! -f "${phpPath}/bin/php" ]; then
     echo -e $HR
@@ -144,7 +143,7 @@ mkdir -p ${phpPath}/etc
 cd ${phpPath}/src/ext/zip
 ${phpPath}/bin/phpize
 ./configure --with-php-config=${phpPath}/bin/php-config
-make -j${cpuCore}
+make "-j${j}"
 make install
 if [ "$?" != "0" ]; then
     echo -e $HR
