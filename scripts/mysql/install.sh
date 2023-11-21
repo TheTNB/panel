@@ -26,7 +26,6 @@ downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/mysql"
 setupPath="/www"
 mysqlPath="${setupPath}/server/mysql"
 mysqlVersion=""
-mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 source ${setupPath}/panel/scripts/calculate_j.sh
@@ -103,7 +102,7 @@ rm -f openssl-1.1.1u.tar.gz
 rm -f openssl-1.1.1u.tar.gz.checksum.txt
 mv openssl-1.1.1u openssl
 cd openssl
-./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1
+./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1 no-tests
 make -j$(nproc)
 make install
 echo "/usr/local/openssl-1.1/lib" > /etc/ld.so.conf.d/openssl-1.1.conf
@@ -115,7 +114,8 @@ rm -rf openssl
 cd src
 mkdir build
 cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DWITH_EXTRA_CHARSETS=all -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} -DWITH_SSL=/usr/local/openssl-1.1 -DWITH_BOOST=../boost
+
+cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_DEBUG=0 -DWITH_UNIT_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} -DWITH_SSL=/usr/local/openssl-1.1 -DWITH_BOOST=../boost
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译初始化失败，请截图错误信息寻求帮助。"
@@ -174,7 +174,6 @@ open_files_limit = 65535
 early-plugin-load = ""
 
 log-bin = mysql-bin
-binlog_format = mixed
 server-id = 1
 slow_query_log = 1
 slow-query-log-file = ${mysqlPath}/mysql-slow.log
@@ -229,7 +228,7 @@ if [[ ${memTotal} -gt 1024 && ${memTotal} -lt 2048 ]]; then
     sed -i "s#^query_cache_size.*#query_cache_size = 16M#" ${mysqlPath}/conf/my.cnf
     sed -i "s#^tmp_table_size.*#tmp_table_size = 32M#" ${mysqlPath}/conf/my.cnf
     sed -i "s#^innodb_buffer_pool_size.*#innodb_buffer_pool_size = 128M#" ${mysqlPath}/conf/my.cnf
-    sed -i "s#^innodb_redo_log_capacity.*#innodb_redo_log_capacity = 64M" ${mysqlPath}/conf/my.cnf
+    sed -i "s#^innodb_redo_log_capacity.*#innodb_redo_log_capacity = 64M#" ${mysqlPath}/conf/my.cnf
     sed -i "s#^innodb_log_buffer_size.*#innodb_log_buffer_size = 16M#" ${mysqlPath}/conf/my.cnf
 elif [[ ${memTotal} -ge 2048 && ${memTotal} -lt 4096 ]]; then
     sed -i "s#^key_buffer_size.*#key_buffer_size = 64M#" ${mysqlPath}/conf/my.cnf
@@ -387,6 +386,7 @@ systemctl daemon-reload
 systemctl enable mysqld
 systemctl start mysqld
 
+mysqlPassword=$(cat /dev/urandom | head -n 16 | md5sum | head -c 16)
 ${mysqlPath}/bin/mysqladmin -u root password ${mysqlPassword}
 ${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DROP DATABASE test;"
 ${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DELETE FROM mysql.user WHERE user='';"

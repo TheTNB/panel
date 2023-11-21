@@ -105,7 +105,7 @@ if [ "${phpVersion}" -le "80" ]; then
     rm -f openssl-1.1.1u.tar.gz.checksum.txt
     mv openssl-1.1.1u openssl
     cd openssl
-    ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1
+    ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1 no-tests
     make "-j${j}"
     make install
     echo "/usr/local/openssl-1.1/lib" > /etc/ld.so.conf.d/openssl-1.1.conf
