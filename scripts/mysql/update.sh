@@ -137,10 +137,12 @@ chmod 644 ${mysqlPath}/conf/my.cnf
 systemctl start mysqld
 
 # 执行更新后的初始化
+if [[ "${1}" == "57" ]]; then
+    ${mysqlPath}/bin/mysql_upgrade -uroot -p${mysqlPassword}
+fi
 ${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DROP DATABASE test;"
 ${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "DELETE FROM mysql.user WHERE user='';"
 ${mysqlPath}/bin/mysql -uroot -p${mysqlPassword} -e "FLUSH PRIVILEGES;"
-${mysqlPath}/bin/mysql_upgrade -uroot -p${mysqlPassword} --force
 
 panel writePlugin mysql${1} ${mysqlVersion}
 
