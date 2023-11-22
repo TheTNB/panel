@@ -18,11 +18,11 @@ func TestSystemHelperTestSuite(t *testing.T) {
 	suite.Run(t, &SystemHelperTestSuite{})
 }
 
-func (s *SystemHelperTestSuite) TestWrite() {
+func (s *SystemHelperTestSuite) WriteCreatesFileWithCorrectContent() {
 	filePath, _ := TempFile("testfile")
 
-	s.Nil(Write(filePath.Name(), "test data", 0644))
-	s.FileExists(filePath.Name())
+	err := Write(filePath.Name(), "test data", 0644)
+	s.Nil(err)
 
 	content, _ := Read(filePath.Name())
 	s.Equal("test data", content)
@@ -30,27 +30,108 @@ func (s *SystemHelperTestSuite) TestWrite() {
 	s.Nil(Remove(filePath.Name()))
 }
 
-func (s *SystemHelperTestSuite) TestRead() {
+func (s *SystemHelperTestSuite) WriteCreatesDirectoriesIfNeeded() {
+	filePath, _ := TempFile("testdir/testfile")
+
+	err := Write(filePath.Name(), "test data", 0644)
+	s.Nil(err)
+
+	content, _ := Read(filePath.Name())
+	s.Equal("test data", content)
+	s.Nil(filePath.Close())
+	s.Nil(Remove(filePath.Name()))
+}
+
+func (s *SystemHelperTestSuite) WriteFailsIfDirectoryCannotBeCreated() {
+	filePath := "/nonexistent/testfile"
+
+	err := Write(filePath, "test data", 0644)
+	s.NotNil(err)
+}
+
+func (s *SystemHelperTestSuite) WriteFailsIfFileCannotBeWritten() {
+	filePath, _ := TempFile("testfile")
+	s.Nil(filePath.Close())
+	s.Nil(Chmod(filePath.Name(), 0400))
+
+	err := Write(filePath.Name(), "test data", 0644)
+	s.NotNil(err)
+
+	s.Nil(Chmod(filePath.Name(), 0644))
+	s.Nil(Remove(filePath.Name()))
+}
+
+func (s *SystemHelperTestSuite) WriteAppendSuccessfullyAppendsDataToFile() {
+	filePath, _ := TempFile("testfile")
+
+	err := Write(filePath.Name(), "initial data", 0644)
+	s.Nil(err)
+
+	err = WriteAppend(filePath.Name(), " appended data")
+	s.Nil(err)
+
+	content, _ := Read(filePath.Name())
+	s.Equal("initial data appended data", content)
+	s.Nil(filePath.Close())
+	s.Nil(Remove(filePath.Name()))
+}
+
+func (s *SystemHelperTestSuite) WriteAppendCreatesFileIfNotExists() {
+	filePath, _ := TempFile("testfile")
+	s.Nil(filePath.Close())
+	s.Nil(Remove(filePath.Name()))
+
+	err := WriteAppend(filePath.Name(), "test data")
+	s.Nil(err)
+
+	content, _ := Read(filePath.Name())
+	s.Equal("test data", content)
+	s.Nil(Remove(filePath.Name()))
+}
+
+func (s *SystemHelperTestSuite) WriteAppendReturnsErrorIfPathIsADirectory() {
+	dirPath, _ := TempDir("testdir")
+
+	err := WriteAppend(dirPath, "test data")
+	s.NotNil(err)
+
+	s.Nil(Remove(dirPath))
+}
+
+func (s *SystemHelperTestSuite) ReadSuccessfullyReadsFileContent() {
 	filePath, _ := TempFile("testfile")
 
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
 
-	data, err := Read(filePath.Name())
+	content, err := Read(filePath.Name())
 	s.Nil(err)
-	s.Equal("test data", data)
+	s.Equal("test data", content)
+
 	s.Nil(filePath.Close())
 	s.Nil(Remove(filePath.Name()))
 }
 
-func (s *SystemHelperTestSuite) TestRemove() {
-	file, _ := TempFile("testfile")
-	file.Close()
+func (s *SystemHelperTestSuite) ReadReturnsErrorForNonExistentFile() {
+	_, err := Read("/nonexistent/testfile")
+	s.NotNil(err)
+}
 
-	err := Write(file.Name(), "test data", 0644)
+func (s *SystemHelperTestSuite) RemoveSuccessfullyRemovesFile() {
+	filePath, _ := TempFile("testfile")
+
+	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
 
-	s.Nil(Remove(file.Name()))
+	err = Remove(filePath.Name())
+	s.Nil(err)
+
+	s.False(Exists(filePath.Name()))
+}
+
+func (s *SystemHelperTestSuite) RemoveReturnsErrorForNonExistentFile() {
+	err := Remove("/nonexistent/testfile")
+	s.NotNil(err)
 }
 
 func (s *SystemHelperTestSuite) TestExec() {

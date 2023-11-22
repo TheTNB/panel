@@ -151,7 +151,56 @@ definitions:
       updated_at:
         type: string
     type: object
-  requests.Add:
+  panel_app_http_requests_plugins_rsync.Add:
+    properties:
+      auth_user:
+        type: string
+      comment:
+        type: string
+      hosts_allow:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      secret:
+        type: string
+    type: object
+  panel_app_http_requests_plugins_rsync.Update:
+    properties:
+      auth_user:
+        type: string
+      comment:
+        type: string
+      hosts_allow:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      secret:
+        type: string
+    type: object
+  panel_app_http_requests_setting.Update:
+    properties:
+      backup_path:
+        type: string
+      email:
+        type: string
+      entrance:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      username:
+        type: string
+      website_path:
+        type: string
+    type: object
+  panel_app_http_requests_website.Add:
     properties:
       db:
         type: boolean
@@ -299,25 +348,6 @@ definitions:
       waf_cc_deny:
         type: string
       waf_mode:
-        type: string
-    type: object
-  requests.Update:
-    properties:
-      backup_path:
-        type: string
-      email:
-        type: string
-      entrance:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      port:
-        type: integer
-      username:
-        type: string
-      website_path:
         type: string
     type: object
   requests.UserStore:
@@ -990,7 +1020,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.Update'
+          $ref: '#/definitions/panel_app_http_requests_setting.Update'
       produces:
       - application/json
       responses:
@@ -1213,7 +1243,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.Add'
+          $ref: '#/definitions/panel_app_http_requests_website.Add'
       produces:
       - application/json
       responses:
@@ -1443,6 +1473,150 @@ paths:
       summary: 更新备注
       tags:
       - 网站管理
+  /plugins/rsync/modules:
+    delete:
+      description: 删除 Rsync 模块
+      parameters:
+      - description: 模块名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除模块
+      tags:
+      - 插件-Rsync
+    get:
+      description: 列出所有 Rsync 模块
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/commonrequests.Paginate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 列出模块
+      tags:
+      - 插件-Rsync
+    post:
+      description: 添加 Rsync 模块
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_plugins_rsync.Add'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 添加模块
+      tags:
+      - 插件-Rsync
+    put:
+      description: 更新 Rsync 模块
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_plugins_rsync.Update'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新模块
+      tags:
+      - 插件-Rsync
+  /plugins/rsync/restart:
+    post:
+      description: 重启 Rsync 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重启服务
+      tags:
+      - 插件-Rsync
+  /plugins/rsync/start:
+    post:
+      description: 启动 Rsync 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启动服务
+      tags:
+      - 插件-Rsync
+  /plugins/rsync/status:
+    get:
+      description: 获取 Rsync 服务状态
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 服务状态
+      tags:
+      - 插件-Rsync
+  /plugins/rsync/stop:
+    post:
+      description: 停止 Rsync 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 停止服务
+      tags:
+      - 插件-Rsync
   /swagger:
     get:
       description: Swagger UI

@@ -29,6 +29,22 @@ func Write(path string, data string, permission os.FileMode) error {
 	return nil
 }
 
+// WriteAppend 追加写入文件
+func WriteAppend(path string, data string) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Read 读取文件
 func Read(path string) (string, error) {
 	data, err := os.ReadFile(path)

@@ -282,6 +282,16 @@ func Plugin() {
 			route.Post("whiteList", fail2banController.SetWhiteList)
 			route.Get("whiteList", fail2banController.GetWhiteList)
 		})
+		r.Prefix("rsync").Group(func(route route.Router) {
+			rsyncController := plugins.NewRsyncController()
+			route.Get("status", rsyncController.Status)
+			route.Post("start", rsyncController.Start)
+			route.Post("stop", rsyncController.Stop)
+			route.Post("restart", rsyncController.Restart)
+			route.Get("modules", rsyncController.List)
+			route.Post("modules", rsyncController.Add)
+			route.Delete("modules", rsyncController.Delete)
+		})
 		r.Prefix("toolbox").Group(func(route route.Router) {
 			toolboxController := plugins.NewToolBoxController()
 			route.Get("dns", toolboxController.GetDNS)

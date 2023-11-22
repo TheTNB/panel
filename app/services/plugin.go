@@ -18,6 +18,7 @@ import (
 	"panel/app/plugins/postgresql16"
 	"panel/app/plugins/pureftpd"
 	"panel/app/plugins/redis"
+	"panel/app/plugins/rsync"
 	"panel/app/plugins/s3fs"
 	"panel/app/plugins/supervisor"
 	"panel/app/plugins/toolbox"
@@ -228,6 +229,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     fail2ban.Install,
 		Uninstall:   fail2ban.Uninstall,
 		Update:      fail2ban.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        rsync.Name,
+		Description: rsync.Description,
+		Slug:        rsync.Slug,
+		Version:     rsync.Version,
+		Requires:    rsync.Requires,
+		Excludes:    rsync.Excludes,
+		Install:     rsync.Install,
+		Uninstall:   rsync.Uninstall,
+		Update:      rsync.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        toolbox.Name,

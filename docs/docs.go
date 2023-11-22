@@ -920,7 +920,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.Update"
+                            "$ref": "#/definitions/panel_app_http_requests_setting.Update"
                         }
                     }
                 ],
@@ -1295,7 +1295,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.Add"
+                            "$ref": "#/definitions/panel_app_http_requests_website.Add"
                         }
                     }
                 ],
@@ -1661,6 +1661,242 @@ const docTemplate = `{
                 }
             }
         },
+        "/plugins/rsync/modules": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "列出所有 Rsync 模块",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "列出模块",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/commonrequests.Paginate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Rsync 模块",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "更新模块",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Update"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "添加 Rsync 模块",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "添加模块",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Add"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "删除 Rsync 模块",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "删除模块",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模块名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/rsync/restart": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "重启 Rsync 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "重启服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/rsync/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启动 Rsync 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "启动服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/rsync/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Rsync 服务状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "服务状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/rsync/stop": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "停止 Rsync 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "停止服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/swagger": {
             "get": {
                 "description": "Swagger UI",
@@ -1905,7 +2141,82 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.Add": {
+        "panel_app_http_requests_plugins_rsync.Add": {
+            "type": "object",
+            "properties": {
+                "auth_user": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "hosts_allow": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "panel_app_http_requests_plugins_rsync.Update": {
+            "type": "object",
+            "properties": {
+                "auth_user": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "hosts_allow": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "panel_app_http_requests_setting.Update": {
+            "type": "object",
+            "properties": {
+                "backup_path": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "entrance": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "website_path": {
+                    "type": "string"
+                }
+            }
+        },
+        "panel_app_http_requests_website.Add": {
             "type": "object",
             "properties": {
                 "db": {
@@ -2131,35 +2442,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "waf_mode": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.Update": {
-            "type": "object",
-            "properties": {
-                "backup_path": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "entrance": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "website_path": {
                     "type": "string"
                 }
             }
