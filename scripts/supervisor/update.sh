@@ -22,17 +22,13 @@ HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
 if [ "${OS}" == "centos" ]; then
-    dnf update -y fail2ban
+    dnf update -y supervisor
 elif [ "${OS}" == "debian" ]; then
-    apt-get install --only-upgrade -y fail2ban
+    apt-get install --only-upgrade -y supervisor
 else
     echo -e $HR
     echo "错误：不支持的操作系统"
     exit 1
 fi
 
-if [ "$?" != "0" ]; then
-    echo -e $HR
-    echo "错误：fail2ban安装失败，请截图错误信息寻求帮助。"
-    exit 1
-fi
+panel writePlugin supervisor 4.2.5

@@ -9,5 +9,5 @@ var (
 	Excludes    = []string{}
 	Install     = `bash /www/panel/scripts/supervisor/install.sh`
 	Uninstall   = `bash /www/panel/scripts/supervisor/uninstall.sh`
-	Update      = `bash /www/panel/scripts/supervisor/install.sh`
+	Update      = `bash /www/panel/scripts/supervisor/update.sh`
 )

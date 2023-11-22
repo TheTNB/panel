@@ -9,5 +9,5 @@ var (
 	Excludes    = []string{}
 	Install     = `bash /www/panel/scripts/s3fs/install.sh`
 	Uninstall   = `bash /www/panel/scripts/s3fs/uninstall.sh`
-	Update      = `bash /www/panel/scripts/s3fs/install.sh`
+	Update      = `bash /www/panel/scripts/s3fs/update.sh`
 )
