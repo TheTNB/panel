@@ -50,7 +50,7 @@ log file = /var/log/rsyncd.log
 EOF
 
 touch /etc/rsyncd.secrets
-chmod 600 /etc/rsyncd.conf
+chmod 644 /etc/rsyncd.conf
 chmod 600 /etc/rsyncd.secrets
 
 # 写入服务文件

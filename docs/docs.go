@@ -1661,6 +1661,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/plugins/rsync/config": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Rsync 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "获取配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Rsync 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "更新配置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/plugins/rsync/modules": {
             "get": {
                 "security": [
@@ -2451,6 +2510,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "waf_mode": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UpdateConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
                     "type": "string"
                 }
             }

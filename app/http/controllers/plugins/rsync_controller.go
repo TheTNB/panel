@@ -346,3 +346,49 @@ secrets file = /etc/rsyncd.secrets
 
 	return controllers.Success(ctx, nil)
 }
+
+// GetConfig
+//
+//	@Summary		获取配置
+//	@Description	获取 Rsync 配置
+//	@Tags			插件-Rsync
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	controllers.SuccessResponse
+//	@Router			/plugins/rsync/config [get]
+func (r *RsyncController) GetConfig(ctx http.Context) http.Response {
+	config, err := tools.Read("/etc/rsyncd.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return controllers.Success(ctx, config)
+}
+
+// UpdateConfig
+//
+//	@Summary		更新配置
+//	@Description	更新 Rsync 配置
+//	@Tags			插件-Rsync
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.UpdateConfig	true	"request"
+//	@Success		200		{object}	controllers.SuccessResponse
+//	@Router			/plugins/rsync/config [post]
+func (r *RsyncController) UpdateConfig(ctx http.Context) http.Response {
+	var updateRequest requests.UpdateConfig
+	sanitize := controllers.Sanitize(ctx, &updateRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	if err := tools.Write("/etc/rsyncd.conf", updateRequest.Config, 0644); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	if err := tools.ServiceRestart("rsyncd"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return controllers.Success(ctx, nil)
+}

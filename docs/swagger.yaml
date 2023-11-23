@@ -350,6 +350,11 @@ definitions:
       waf_mode:
         type: string
     type: object
+  requests.UpdateConfig:
+    properties:
+      config:
+        type: string
+    type: object
   requests.UserStore:
     properties:
       ca:
@@ -1473,6 +1478,42 @@ paths:
       summary: 更新备注
       tags:
       - 网站管理
+  /plugins/rsync/config:
+    get:
+      description: 获取 Rsync 配置
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 插件-Rsync
+    post:
+      description: 更新 Rsync 配置
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新配置
+      tags:
+      - 插件-Rsync
   /plugins/rsync/modules:
     get:
       description: 列出所有 Rsync 模块
