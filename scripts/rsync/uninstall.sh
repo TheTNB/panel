@@ -31,4 +31,8 @@ else
     exit 1
 fi
 
+# 删除配置
+rm -rf /etc/rsyncd.conf
+rm -rf /etc/rsyncd.secrets
+
 panel deletePlugin rsync
