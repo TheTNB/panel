@@ -134,13 +134,8 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 				modules = append(modules, *currentModule)
 			}
 			moduleName := line[1 : len(line)-1]
-			secret, err := tools.Exec("grep -E '^" + moduleName + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
-			if err != nil {
-				return controllers.Error(ctx, http.StatusInternalServerError, "获取模块"+moduleName+"的密钥失败")
-			}
 			currentModule = &RsyncModule{
-				Name:   moduleName,
-				Secret: secret,
+				Name: moduleName,
 			}
 		} else if currentModule != nil {
 			parts := strings.SplitN(line, "=", 2)
@@ -157,6 +152,10 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 					currentModule.ReadOnly = value == "yes" || value == "true"
 				case "auth users":
 					currentModule.AuthUser = value
+					currentModule.Secret, err = tools.Exec("grep -E '^" + currentModule.AuthUser + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
+					if err != nil {
+						return controllers.Error(ctx, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
+					}
 				case "hosts allow":
 					currentModule.HostsAllow = value
 				}
