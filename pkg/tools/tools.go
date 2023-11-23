@@ -401,6 +401,11 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("目标版本: " + panelInfo.Version)
 	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
 
+	color.Greenln("前置检查...")
+	if Exists("/tmp/panel.db.bak") || Exists("/tmp/panel.conf.bak") {
+		return errors.New("检测到/tmp存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
+	}
+
 	color.Greenln("备份面板配置...")
 	if _, err := Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak"); err != nil {
 		color.Redln("备份面板数据库失败")
