@@ -65,9 +65,11 @@ if [ "${phpVersion}" == "74" ]; then
 elif [ "${phpVersion}" == "80" ]; then
     phpVersionCode="8.0.30"
 elif [ "${phpVersion}" == "81" ]; then
-    phpVersionCode="8.1.25"
+    phpVersionCode="8.1.26"
 elif [ "${phpVersion}" == "82" ]; then
-    phpVersionCode="8.2.12"
+    phpVersionCode="8.2.13"
+elif [ "${phpVersion}" == "83" ]; then
+    phpVersionCode="8.3.0"
 else
     echo -e $HR
     echo "错误：PHP-${phpVersion}不支持，请检查版本号是否正确。"
@@ -119,8 +121,8 @@ fi
 
 # 配置
 cd src
-if [ "${phpVersion}" == "81" ] || [ "${phpVersion}" == "82" ]; then
-    ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp --with-avif
+if [ "${phpVersion}" == "81" ] || [ "${phpVersion}" == "82" ] || [ "${phpVersion}" == "83" ]; then
+    ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp --with-avif
 else
     ./configure --prefix=${phpPath} --with-config-file-path=${phpPath}/etc --enable-fpm --with-fpm-user=www --with-fpm-group=www --enable-mysqlnd --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-freetype --with-jpeg --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-intl --enable-pcntl --enable-ftp --enable-gd --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-soap --with-gettext --enable-fileinfo --enable-opcache --with-sodium --with-webp
 fi

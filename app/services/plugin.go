@@ -13,6 +13,7 @@ import (
 	"panel/app/plugins/php80"
 	"panel/app/plugins/php81"
 	"panel/app/plugins/php82"
+	"panel/app/plugins/php83"
 	"panel/app/plugins/phpmyadmin"
 	"panel/app/plugins/postgresql15"
 	"panel/app/plugins/postgresql16"
@@ -163,6 +164,17 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Install:     php82.Install,
 		Uninstall:   php82.Uninstall,
 		Update:      php82.Update,
+	})
+	p = append(p, PanelPlugin{
+		Name:        php83.Name,
+		Description: php83.Description,
+		Slug:        php83.Slug,
+		Version:     php83.Version,
+		Requires:    php83.Requires,
+		Excludes:    php83.Excludes,
+		Install:     php83.Install,
+		Uninstall:   php83.Uninstall,
+		Update:      php83.Update,
 	})
 	p = append(p, PanelPlugin{
 		Name:        phpmyadmin.Name,
