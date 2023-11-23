@@ -26,5 +26,7 @@ func (receiver *ValidationServiceProvider) rules() []validation.Rule {
 		&rules.Exists{},
 		&rules.NotExists{},
 		&rules.Captcha{},
+		&rules.PathExists{},
+		&rules.PathNotExists{},
 	}
 }

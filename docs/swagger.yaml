@@ -212,6 +212,15 @@ definitions:
           type: integer
         type: array
     type: object
+  requests.Archive:
+    properties:
+      file:
+        type: string
+      paths:
+        items:
+          type: string
+        type: array
+    type: object
   requests.CertStore:
     properties:
       auto_renew:
@@ -247,6 +256,13 @@ definitions:
         type: integer
       website_id:
         type: integer
+    type: object
+  requests.Copy:
+    properties:
+      new:
+        type: string
+      old:
+        type: string
     type: object
   requests.Create:
     properties:
@@ -288,6 +304,11 @@ definitions:
       name:
         type: string
     type: object
+  requests.Exist:
+    properties:
+      path:
+        type: string
+    type: object
   requests.Login:
     properties:
       password:
@@ -295,10 +316,33 @@ definitions:
       username:
         type: string
     type: object
+  requests.Move:
+    properties:
+      new:
+        type: string
+      old:
+        type: string
+    type: object
+  requests.NotExist:
+    properties:
+      path:
+        type: string
+    type: object
   requests.Obtain:
     properties:
       id:
         type: integer
+    type: object
+  requests.Permission:
+    properties:
+      group:
+        type: string
+      mode:
+        type: integer
+      owner:
+        type: string
+      path:
+        type: string
     type: object
   requests.Renew:
     properties:
@@ -348,6 +392,20 @@ definitions:
       waf_cc_deny:
         type: string
       waf_mode:
+        type: string
+    type: object
+  requests.Search:
+    properties:
+      keyword:
+        type: string
+      path:
+        type: string
+    type: object
+  requests.UnArchive:
+    properties:
+      file:
+        type: string
+      path:
         type: string
     type: object
   requests.UpdateConfig:
@@ -994,6 +1052,361 @@ paths:
       summary: 更新 ACME 用户
       tags:
       - 证书管理
+  /panel/file/archive:
+    post:
+      consumes:
+      - application/json
+      description: 压缩文件/目录到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Archive'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 压缩文件/目录
+      tags:
+      - 文件管理
+  /panel/file/content:
+    get:
+      consumes:
+      - application/json
+      description: 获取给定路径的文件内容
+      parameters:
+      - in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取文件内容
+      tags:
+      - 文件管理
+  /panel/file/copy:
+    post:
+      consumes:
+      - application/json
+      description: 复制文件/目录到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Copy'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 复制文件/目录
+      tags:
+      - 文件管理
+  /panel/file/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建文件/目录到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NotExist'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 创建文件/目录
+      tags:
+      - 文件管理
+  /panel/file/delete:
+    post:
+      consumes:
+      - application/json
+      description: 删除给定路径的文件/目录
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Exist'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除文件/目录
+      tags:
+      - 文件管理
+  /panel/file/download:
+    get:
+      consumes:
+      - application/json
+      description: 下载给定路径的文件
+      parameters:
+      - in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 下载文件
+      tags:
+      - 文件管理
+  /panel/file/info:
+    get:
+      consumes:
+      - application/json
+      description: 获取给定路径的文件/目录信息
+      parameters:
+      - in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取文件/目录信息
+      tags:
+      - 文件管理
+  /panel/file/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取给定路径的文件/目录列表
+      parameters:
+      - in: query
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      summary: 获取文件/目录列表
+      tags:
+      - 文件管理
+  /panel/file/move:
+    post:
+      consumes:
+      - application/json
+      description: 移动文件/目录到给定路径，等效于重命名
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Move'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 移动文件/目录
+      tags:
+      - 文件管理
+  /panel/file/permission:
+    post:
+      consumes:
+      - application/json
+      description: 修改给定路径的文件/目录权限
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Permission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 修改文件/目录权限
+      tags:
+      - 文件管理
+  /panel/file/remoteDownload:
+    post:
+      consumes:
+      - application/json
+      description: 下载远程文件到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NotExist'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 下载远程文件
+      tags:
+      - 文件管理
+  /panel/file/save:
+    post:
+      consumes:
+      - application/json
+      description: 保存给定路径的文件内容
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Exist'
+      - description: content
+        in: body
+        name: content
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 保存文件内容
+      tags:
+      - 文件管理
+  /panel/file/search:
+    post:
+      consumes:
+      - application/json
+      description: 通过关键词搜索给定路径的文件/目录
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Search'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      summary: 搜索文件/目录
+      tags:
+      - 文件管理
+  /panel/file/unArchive:
+    post:
+      consumes:
+      - application/json
+      description: 解压文件/目录到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UnArchive'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 解压文件/目录
+      tags:
+      - 文件管理
+  /panel/file/upload:
+    post:
+      consumes:
+      - application/json
+      description: 上传文件到给定路径
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NotExist'
+      - description: file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 上传文件
+      tags:
+      - 文件管理
   /panel/setting/list:
     get:
       description: 获取面板设置列表
