@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
@@ -133,7 +134,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 				modules = append(modules, *currentModule)
 			}
 			moduleName := line[1 : len(line)-1]
-			secret, err := tools.Exec("grep -E '^" + moduleName + ":.*$' /etc/rsyncd.secrets | awk '{print $2}'")
+			secret, err := tools.Exec("grep -E '^" + moduleName + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
 			if err != nil {
 				return controllers.Error(ctx, http.StatusInternalServerError, "获取模块"+moduleName+"的密钥失败")
 			}
@@ -189,40 +190,47 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 	})
 }
 
-// Add
+// Create
 //
 //	@Summary		添加模块
 //	@Description	添加 Rsync 模块
 //	@Tags			插件-Rsync
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.Add	true	"request"
+//	@Param			data	body		requests.Create	true	"request"
 //	@Success		200		{object}	controllers.SuccessResponse
 //	@Router			/plugins/rsync/modules [post]
-func (r *RsyncController) Add(ctx http.Context) http.Response {
-	var addRequest requests.Add
-	sanitize := controllers.Sanitize(ctx, &addRequest)
+func (r *RsyncController) Create(ctx http.Context) http.Response {
+	var createRequest requests.Create
+	sanitize := controllers.Sanitize(ctx, &createRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	conf := `
-# ` + addRequest.Name + `-START
-[` + addRequest.Name + `]
-path = ` + addRequest.Path + `
-comment = ` + addRequest.Comment + `
+	config, err := tools.Read("/etc/rsyncd.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if strings.Contains(config, "["+createRequest.Name+"]") {
+		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+createRequest.Name+" 已存在")
+	}
+
+	conf := `# ` + createRequest.Name + `-START
+[` + createRequest.Name + `]
+path = ` + createRequest.Path + `
+comment = ` + createRequest.Comment + `
 read only = no
-auth users = ` + addRequest.AuthUser + `
-hosts allow = ` + addRequest.HostsAllow + `
+auth users = ` + createRequest.AuthUser + `
+hosts allow = ` + createRequest.HostsAllow + `
 secrets file = /etc/rsyncd.secrets
-# ` + addRequest.Name + `-END
+# ` + createRequest.Name + `-END
 `
 
 	if err := tools.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err := tools.WriteAppend("/etc/rsyncd.secrets", addRequest.Name+":"+addRequest.Secret); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	if out, err := tools.Exec("echo '" + createRequest.AuthUser + ":" + createRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	if err := tools.ServiceRestart("rsyncd"); err != nil {
@@ -232,17 +240,17 @@ secrets file = /etc/rsyncd.secrets
 	return controllers.Success(ctx, nil)
 }
 
-// Delete
+// Destroy
 //
 //	@Summary		删除模块
 //	@Description	删除 Rsync 模块
 //	@Tags			插件-Rsync
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			name	query		string	true	"模块名称"
+//	@Param			name	path		string	true	"模块名称"
 //	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules [delete]
-func (r *RsyncController) Delete(ctx http.Context) http.Response {
+//	@Router			/plugins/rsync/modules/{name} [delete]
+func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	if len(name) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "name 不能为空")
@@ -259,11 +267,16 @@ func (r *RsyncController) Delete(ctx http.Context) http.Response {
 	module := tools.Cut(config, "# "+name+"-START", "# "+name+"-END")
 	config = strings.Replace(config, "\n# "+name+"-START"+module+"# "+name+"-END", "", -1)
 
+	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
+	if len(match) == 2 {
+		authUser := match[1]
+		if out, err := tools.Exec("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, out)
+		}
+	}
+
 	if err = tools.Write("/etc/rsyncd.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-	if out, err := tools.Exec("sed -i '/^" + name + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	if err = tools.ServiceRestart("rsyncd"); err != nil {
@@ -280,9 +293,10 @@ func (r *RsyncController) Delete(ctx http.Context) http.Response {
 //	@Tags			插件-Rsync
 //	@Produce		json
 //	@Security		BearerToken
+//	@Param			name	path		string			true	"模块名称"
 //	@Param			data	body		requests.Update	true	"request"
 //	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules [put]
+//	@Router			/plugins/rsync/modules/{name} [post]
 func (r *RsyncController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
 	sanitize := controllers.Sanitize(ctx, &updateRequest)
@@ -294,7 +308,6 @@ func (r *RsyncController) Update(ctx http.Context) http.Response {
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-
 	if !strings.Contains(config, "["+updateRequest.Name+"]") {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+updateRequest.Name+" 不存在")
 	}
@@ -307,20 +320,24 @@ read only = no
 auth users = ` + updateRequest.AuthUser + `
 hosts allow = ` + updateRequest.HostsAllow + `
 secrets file = /etc/rsyncd.secrets
-# ` + updateRequest.Name + `-END
-`
+# ` + updateRequest.Name + `-END`
 
 	module := tools.Cut(config, "# "+updateRequest.Name+"-START", "# "+updateRequest.Name+"-END")
 	config = strings.Replace(config, "# "+updateRequest.Name+"-START"+module+"# "+updateRequest.Name+"-END", newConf, -1)
 
+	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
+	if len(match) == 2 {
+		authUser := match[1]
+		if out, err := tools.Exec("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, out)
+		}
+	}
+
 	if err = tools.Write("/etc/rsyncd.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec("sed -i '/^" + updateRequest.Name + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+	if out, err := tools.Exec("echo '" + updateRequest.AuthUser + ":" + updateRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if err := tools.WriteAppend("/etc/rsyncd.secrets", updateRequest.Name+":"+updateRequest.Secret); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = tools.ServiceRestart("rsyncd"); err != nil {

@@ -450,8 +450,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "writeSite":
 		name := arg1
 		status := cast.ToBool(arg2)
-		path := ctx.Argument(3)
-		php := cast.ToInt(ctx.Argument(4))
+		path := arg3
+		php := cast.ToInt(arg4)
 		ssl := cast.ToBool(ctx.Argument(5))
 		if len(name) == 0 || len(path) == 0 {
 			color.Redln("参数错误")

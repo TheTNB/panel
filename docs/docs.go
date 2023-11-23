@@ -1295,7 +1295,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_website.Add"
+                            "$ref": "#/definitions/requests.Add"
                         }
                     }
                 ],
@@ -1696,40 +1696,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "更新 Rsync 模块",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Rsync"
-                ],
-                "summary": "更新模块",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Update"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -1751,7 +1717,50 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Add"
+                            "$ref": "#/definitions/requests.Create"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/rsync/modules/{name}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Rsync 模块",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Rsync"
+                ],
+                "summary": "更新模块",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "模块名称",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Update"
                         }
                     }
                 ],
@@ -1783,7 +1792,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "模块名称",
                         "name": "name",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -2141,29 +2150,6 @@ const docTemplate = `{
                 }
             }
         },
-        "panel_app_http_requests_plugins_rsync.Add": {
-            "type": "object",
-            "properties": {
-                "auth_user": {
-                    "type": "string"
-                },
-                "comment": {
-                    "type": "string"
-                },
-                "hosts_allow": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "secret": {
-                    "type": "string"
-                }
-            }
-        },
         "panel_app_http_requests_plugins_rsync.Update": {
             "type": "object",
             "properties": {
@@ -2216,7 +2202,7 @@ const docTemplate = `{
                 }
             }
         },
-        "panel_app_http_requests_website.Add": {
+        "requests.Add": {
             "type": "object",
             "properties": {
                 "db": {
@@ -2309,6 +2295,29 @@ const docTemplate = `{
                 },
                 "website_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "requests.Create": {
+            "type": "object",
+            "properties": {
+                "auth_user": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "hosts_allow": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "secret": {
+                    "type": "string"
                 }
             }
         },

@@ -151,21 +151,6 @@ definitions:
       updated_at:
         type: string
     type: object
-  panel_app_http_requests_plugins_rsync.Add:
-    properties:
-      auth_user:
-        type: string
-      comment:
-        type: string
-      hosts_allow:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      secret:
-        type: string
-    type: object
   panel_app_http_requests_plugins_rsync.Update:
     properties:
       auth_user:
@@ -200,7 +185,7 @@ definitions:
       website_path:
         type: string
     type: object
-  panel_app_http_requests_website.Add:
+  requests.Add:
     properties:
       db:
         type: boolean
@@ -262,6 +247,21 @@ definitions:
         type: integer
       website_id:
         type: integer
+    type: object
+  requests.Create:
+    properties:
+      auth_user:
+        type: string
+      comment:
+        type: string
+      hosts_allow:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      secret:
+        type: string
     type: object
   requests.DNSStore:
     properties:
@@ -1243,7 +1243,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_website.Add'
+          $ref: '#/definitions/requests.Add'
       produces:
       - application/json
       responses:
@@ -1474,26 +1474,6 @@ paths:
       tags:
       - 网站管理
   /plugins/rsync/modules:
-    delete:
-      description: 删除 Rsync 模块
-      parameters:
-      - description: 模块名称
-        in: query
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 删除模块
-      tags:
-      - 插件-Rsync
     get:
       description: 列出所有 Rsync 模块
       parameters:
@@ -1523,7 +1503,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_plugins_rsync.Add'
+          $ref: '#/definitions/requests.Create'
       produces:
       - application/json
       responses:
@@ -1536,9 +1516,35 @@ paths:
       summary: 添加模块
       tags:
       - 插件-Rsync
-    put:
+  /plugins/rsync/modules/{name}:
+    delete:
+      description: 删除 Rsync 模块
+      parameters:
+      - description: 模块名称
+        in: path
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除模块
+      tags:
+      - 插件-Rsync
+    post:
       description: 更新 Rsync 模块
       parameters:
+      - description: 模块名称
+        in: path
+        name: name
+        required: true
+        type: string
       - description: request
         in: body
         name: data

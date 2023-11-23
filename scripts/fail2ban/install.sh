@@ -75,9 +75,9 @@ if [ "${OS}" == "debian" ]; then
 fi
 
 # 启动 fail2ban
-systemctl unmask fail2ban
 systemctl daemon-reload
+systemctl unmask fail2ban
 systemctl enable fail2ban
-systemctl restart fail2ban
+systemctl start fail2ban
 
 panel writePlugin fail2ban 1.0.0

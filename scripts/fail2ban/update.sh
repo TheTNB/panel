@@ -36,3 +36,5 @@ if [ "$?" != "0" ]; then
     echo "错误：fail2ban安装失败，请截图错误信息寻求帮助。"
     exit 1
 fi
+
+systemctl restart fail2ban

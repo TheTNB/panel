@@ -289,8 +289,9 @@ func Plugin() {
 			route.Post("stop", rsyncController.Stop)
 			route.Post("restart", rsyncController.Restart)
 			route.Get("modules", rsyncController.List)
-			route.Post("modules", rsyncController.Add)
-			route.Delete("modules", rsyncController.Delete)
+			route.Post("modules", rsyncController.Create)
+			route.Post("modules/{name}", rsyncController.Update)
+			route.Delete("modules/{name}", rsyncController.Destroy)
 		})
 		r.Prefix("toolbox").Group(func(route route.Router) {
 			toolboxController := plugins.NewToolBoxController()

@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/validation"
 )
 
-type Add struct {
+type Create struct {
 	Name       string `form:"name" json:"name"`
 	Path       string `form:"path" json:"path"`
 	Comment    string `form:"comment" json:"comment"`
@@ -14,11 +14,11 @@ type Add struct {
 	HostsAllow string `form:"hosts_allow" json:"hosts_allow"`
 }
 
-func (r *Add) Authorize(ctx http.Context) error {
+func (r *Create) Authorize(ctx http.Context) error {
 	return nil
 }
 
-func (r *Add) Rules(ctx http.Context) map[string]string {
+func (r *Create) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9-_]+$",
 		"path":        "regex:^/[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*$",
@@ -29,14 +29,14 @@ func (r *Add) Rules(ctx http.Context) map[string]string {
 	}
 }
 
-func (r *Add) Messages(ctx http.Context) map[string]string {
+func (r *Create) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }
 
-func (r *Add) Attributes(ctx http.Context) map[string]string {
+func (r *Create) Attributes(ctx http.Context) map[string]string {
 	return map[string]string{}
 }
 
-func (r *Add) PrepareForValidation(ctx http.Context, data validation.Data) error {
+func (r *Create) PrepareForValidation(ctx http.Context, data validation.Data) error {
 	return nil
 }
