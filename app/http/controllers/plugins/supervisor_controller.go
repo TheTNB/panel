@@ -302,9 +302,7 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 	if out, err := tools.Exec(`supervisorctl update`); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec(`supervisorctl start ` + process); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
+	_, _ = tools.Exec(`supervisorctl restart ` + process)
 
 	return controllers.Success(ctx, nil)
 }
