@@ -62,9 +62,9 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	log, err := tools.Exec("tail -n 1000 " + task.Log)
+	log, err := tools.Exec("tail -n 1000 " + task.Log + " | tac")
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, log)
+		return Error(ctx, http.StatusInternalServerError, "日志已被清理")
 	}
 
 	return Success(ctx, log)

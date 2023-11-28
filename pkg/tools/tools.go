@@ -474,10 +474,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	if !Exists("/www/panel/database/panel.db") || !Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板配置失败")
 	}
-	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
-		color.Redln("运行面板数据库迁移失败")
-		return err
-	}
 	color.Greenln("恢复完成")
 
 	color.Greenln("设置面板文件权限...")
@@ -487,6 +483,10 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	}
 	color.Greenln("设置完成")
 
+	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
+		color.Redln("运行面板数据库迁移失败")
+		return err
+	}
 	if _, err = Exec("bash /www/panel/scripts/update_panel.sh"); err != nil {
 		color.Redln("执行面板升级后脚本失败")
 		return err
