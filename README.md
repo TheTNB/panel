@@ -56,7 +56,7 @@ CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移�
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
 ```shell
-HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh.checksum.txt && sha256sum -c install_panel.sh.checksum.txt && bash install_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
+HAOZI_DL_URL="https://git.haozi.net/opensource/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh.checksum.txt && sha256sum -c install_panel.sh.checksum.txt && bash install_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
 ```
 
 ## 卸载面板
@@ -66,7 +66,7 @@ HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -s
 如果你无法重装系统，请以`root`用户登录服务器，执行以下命令卸载面板：
 
 ```shell
-HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
+HAOZI_DL_URL="https://git.haozi.net/opensource/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
 ```
 
 卸载面板前请务必备份好所有数据，提前卸载面板全部插件。卸载后数据将**无法恢复**！
@@ -96,7 +96,7 @@ panel
 ### 创建 PR
 
 - 在开发过程中，如果遇到问题可以随时在 Issue 中详尽描述该问题，以进一步沟通，但在此之前请确保自己已通过 Google 等方式尽可能的尝试解决问题；
-- PR 须提交至我们的极狐 GitLab 仓库[https://jihulab.com/haozi-team/panel](https://jihulab.com/haozi-team/panel)，勿在 GitHub 上提交；
+- PR 须提交至我们的极狐 GitLab 仓库[https://git.haozi.net/opensource/panel](https://git.haozi.net/opensource/panel)，勿在 GitHub 上提交；
 - 当 PR 开发完毕后，请为其添加 `🚀 Review Ready` 标签，维护者将及时进行评审；
 - 我们非常欢迎您的贡献，将在下次发版时将您添加到首页贡献者中；❤️
 

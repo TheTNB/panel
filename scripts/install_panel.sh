@@ -182,16 +182,16 @@ Init_Panel() {
     # 下载面板zip包并解压
     if [ "${ARCH}" == "x86_64" ]; then
         if ${inChina}; then
-            panelZip=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
-            panelZipName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .name')
+            panelZip=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .direct_asset_url')
+            panelZipName=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("amd64v2")) | .name')
         else
             panelZip=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .browser_download_url')
             panelZipName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("amd64v2")) | .name')
         fi
     elif [ "${ARCH}" == "aarch64" ]; then
         if ${inChina}; then
-            panelZip=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
-            panelZipName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .name')
+            panelZip=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .direct_asset_url')
+            panelZipName=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("arm64")) | .name')
         else
             panelZip=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .browser_download_url')
             panelZipName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("arm64")) | .name')
@@ -210,8 +210,8 @@ Init_Panel() {
 
     # 下载 checksums 文件
     if ${inChina}; then
-        checksumsFile=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .direct_asset_url')
-        checksumsFileName=$(curl -sSL "https://jihulab.com/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .name')
+        checksumsFile=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .direct_asset_url')
+        checksumsFileName=$(curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel/releases/permalink/latest" | jq -r '.assets.links[] | select(.name | contains("checksums")) | .name')
     else
         checksumsFile=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("checksums")) | .browser_download_url')
         checksumsFileName=$(curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest" | jq -r '.assets[] | select(.name | contains("checksums")) | .name')

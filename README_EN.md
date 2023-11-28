@@ -56,7 +56,7 @@ As system versions are constantly updated, we may also terminate support for som
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
 ```shell
-HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh.checksum.txt && sha256sum -c install_panel.sh.checksum.txt && bash install_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
+HAOZI_DL_URL="https://git.haozi.net/opensource/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh.checksum.txt && sha256sum -c install_panel.sh.checksum.txt && bash install_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
 ```
 
 ## Uninstall Panel
@@ -66,7 +66,7 @@ Recommended to back up data and reinstall the system first, so that the system c
 If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
 
 ```shell
-HAOZI_DL_URL="https://jihulab.com/haozi-team/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
+HAOZI_DL_URL="https://git.haozi.net/opensource/download/-/raw/main/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
 ```
 
 Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!
@@ -96,7 +96,7 @@ You can find or create an Issue in [Issue List](https://github.com/haozi-team/pa
 ### Create PR
 
 - During the development process, if you encounter a problem, you can describe the problem in detail in the Issue at any time for further communication, but before doing so, please make sure that you have tried your best to solve the problem through Google and other methods;
-- PRs must be submitted to our JiHu GitLab repository [https://jihulab.com/haozi-team/panel](https://jihulab.com/haozi-team/panel). Do not submit on GitHub;
+- PRs must be submitted to our JiHu GitLab repository [https://git.haozi.net/opensource/panel](https://git.haozi.net/opensource/panel). Do not submit on GitHub;
 - When the PR is completed, please add the `🚀 Review Ready` tag to it, and the maintainer will review it in time;
 - We very much welcome your contributions and will add you to the homepage contributors in the next release; ❤️
 

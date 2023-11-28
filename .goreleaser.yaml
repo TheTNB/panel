@@ -33,8 +33,8 @@ archives:
       - panel-example.conf
 
 gitlab_urls:
-  api: https://jihulab.com/api/v4/
-  download: https://jihulab.com
+  api: https://git.haozi.net/api/v4/
+  download: https://git.haozi.net
 
   # set to true if you use a self-signed certificate
   skip_tls_verify: false

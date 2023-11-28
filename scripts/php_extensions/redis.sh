@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 HR="+----------------------------------------------------"
 
-downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/php_extensions"
+downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/php_extensions"
 action="$1"
 phpVersion="$2"
 phpredisVersion="5.3.7"

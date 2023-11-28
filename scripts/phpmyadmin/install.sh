@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://jihulab.com/haozi-team/download/-/raw/main/panel/phpmyadmin"
+downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/phpmyadmin"
 setupPath="/www"
 phpmyadminPath="${setupPath}/server/phpmyadmin"
 phpmyadminVersion="5.2.1"
