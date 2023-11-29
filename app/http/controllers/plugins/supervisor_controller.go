@@ -296,12 +296,8 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	if out, err := tools.Exec(`supervisorctl reread`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if out, err := tools.Exec(`supervisorctl update`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
+	_, _ = tools.Exec(`supervisorctl reread`)
+	_, _ = tools.Exec(`supervisorctl update`)
 	_, _ = tools.Exec(`supervisorctl restart ` + process)
 
 	return controllers.Success(ctx, nil)
@@ -350,15 +346,9 @@ stdout_logfile_maxbytes=2MB
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	if out, err := tools.Exec(`supervisorctl reread`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if out, err := tools.Exec(`supervisorctl update`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if out, err := tools.Exec(`supervisorctl start ` + name); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
+	_, _ = tools.Exec(`supervisorctl reread`)
+	_, _ = tools.Exec(`supervisorctl update`)
+	_, _ = tools.Exec(`supervisorctl start ` + name)
 
 	return controllers.Success(ctx, nil)
 }
@@ -391,12 +381,8 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	if err := tools.Remove(logPath); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec(`supervisorctl reread`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if out, err := tools.Exec(`supervisorctl update`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
+	_, _ = tools.Exec(`supervisorctl reread`)
+	_, _ = tools.Exec(`supervisorctl update`)
 
 	return controllers.Success(ctx, nil)
 }
