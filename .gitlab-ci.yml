@@ -68,7 +68,7 @@ fetch:
     - sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
     - apk add --no-cache curl jq unzip zip
   script:
-    - curl -sSL "https://git.haozi.net/api/v4/projects/haozi-team%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
+    - curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
     - rm -rf public
     - unzip frontend.zip
     - mv dist public
