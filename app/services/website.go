@@ -585,10 +585,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 	}
 
 	if tools.Exists(setting.Root + "/.user.ini") {
-		userIni, err := tools.Read(setting.Path + "/.user.ini")
-		if err != nil {
-			return WebsiteSetting{}, err
-		}
+		userIni, _ := tools.Read(setting.Root + "/.user.ini")
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {
