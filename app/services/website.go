@@ -280,32 +280,19 @@ server
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`); err != nil {
-			return models.Website{}, err
-		}
+		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
+		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
+		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
+		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
 	}
 	if website.Db && website.DbType == "postgresql" {
-		if _, err := tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`); err != nil {
-			return models.Website{}, err
-		}
-		if _, err := tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`); err != nil {
-			return models.Website{}, err
-		}
+		_, _ = tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
+		_, _ = tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
+		_, _ = tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		_, _ = tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		userConfig := "host    " + website.DbName + "    " + website.DbUser + "    127.0.0.1/32    scram-sha-256"
+		_, _ = tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+		_ = tools.ServiceReload("postgresql")
 	}
 
 	return w, nil
