@@ -82,6 +82,23 @@ rm -f openssl-1.1.1w.tar.gz
 rm -f openssl-1.1.1w.tar.gz.checksum.txt
 mv openssl-1.1.1w openssl
 
+# patch openssl
+cd openssl
+wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch ${downloadUrl}/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch
+wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
+
+if ! sha256sum --status -c openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt; then
+    echo -e $HR
+    echo "错误：OpenSSL 补丁文件 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    rm -rf ${openrestyPath}
+    exit 1
+fi
+
+patch -p1 < openssl-1.1.1f-sess_set_get_cb_yield.patch
+rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch
+rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
+cd ../
+
 # pcre
 wget -T 60 -t 3 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
 wget -T 20 -t 3 -O pcre-8.45.tar.gz.checksum.txt ${downloadUrl}/pcre/pcre-8.45.tar.gz.checksum.txt
