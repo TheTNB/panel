@@ -92,20 +92,20 @@ rm -f php-${phpVersionCode}.tar.gz.checksum.txt
 mv php-* src
 
 if [ "${phpVersion}" -le "80" ]; then
-    wget -T 120 -t 3 -O ${phpPath}/openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
-    wget -T 20 -t 3 -O ${phpPath}/openssl-1.1.1u.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz.checksum.txt
+    wget -T 120 -t 3 -O ${phpPath}/openssl-1.1.1w.tar.gz ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz
+    wget -T 20 -t 3 -O ${phpPath}/openssl-1.1.1w.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz.checksum.txt
 
-    if ! sha256sum --status -c openssl-1.1.1u.tar.gz.checksum.txt; then
+    if ! sha256sum --status -c openssl-1.1.1w.tar.gz.checksum.txt; then
         echo -e $HR
         echo "错误：PHP-${phpVersion} OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
         rm -rf ${phpPath}
         exit 1
     fi
 
-    tar -zxvf openssl-1.1.1u.tar.gz
-    rm -f openssl-1.1.1u.tar.gz
-    rm -f openssl-1.1.1u.tar.gz.checksum.txt
-    mv openssl-1.1.1u openssl
+    tar -zxvf openssl-1.1.1w.tar.gz
+    rm -f openssl-1.1.1w.tar.gz
+    rm -f openssl-1.1.1w.tar.gz.checksum.txt
+    mv openssl-1.1.1w openssl
     cd openssl
     ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1 no-tests
     make "-j${j}"

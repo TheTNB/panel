@@ -67,20 +67,20 @@ mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -t 3 -O openssl-1.1.1u.tar.gz ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz
-wget -T 20 -t 3 -O openssl-1.1.1u.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1u.tar.gz.checksum.txt
+wget -T 120 -t 3 -O openssl-1.1.1w.tar.gz ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz
+wget -T 20 -t 3 -O openssl-1.1.1w.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz.checksum.txt
 
-if ! sha256sum --status -c openssl-1.1.1u.tar.gz.checksum.txt; then
+if ! sha256sum --status -c openssl-1.1.1w.tar.gz.checksum.txt; then
     echo -e $HR
     echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-tar -zxvf openssl-1.1.1u.tar.gz
-rm -f openssl-1.1.1u.tar.gz
-rm -f openssl-1.1.1u.tar.gz.checksum.txt
-mv openssl-1.1.1u openssl
+tar -zxvf openssl-1.1.1w.tar.gz
+rm -f openssl-1.1.1w.tar.gz
+rm -f openssl-1.1.1w.tar.gz.checksum.txt
+mv openssl-1.1.1w openssl
 
 # pcre
 wget -T 60 -t 3 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
