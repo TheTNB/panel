@@ -43,7 +43,7 @@ gitlab_urls:
   # Only works with GitLab 13.5+
   #
   # Since: v1.3
-  use_package_registry: true
+  use_package_registry: false
 
   # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
   #
