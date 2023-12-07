@@ -248,6 +248,7 @@ Init_Panel() {
         firewall-cmd --permanent --zone=public --add-port=22/tcp > /dev/null 2>&1
         firewall-cmd --permanent --zone=public --add-port=80/tcp > /dev/null 2>&1
         firewall-cmd --permanent --zone=public --add-port=443/tcp > /dev/null 2>&1
+        firewall-cmd --permanent --zone=public --add-port=443/udp > /dev/null 2>&1
         firewall-cmd --permanent --zone=public --add-port=8888/tcp > /dev/null 2>&1
         firewall-cmd --permanent --zone=public --add-port=${sshPort}/tcp > /dev/null 2>&1
         firewall-cmd --reload
@@ -257,6 +258,7 @@ Init_Panel() {
         ufw allow 22/tcp
         ufw allow 80/tcp
         ufw allow 443/tcp
+        ufw allow 443/udp
         ufw allow 8888/tcp
         ufw allow ${sshPort}/tcp
         ufw reload

@@ -24,7 +24,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
-openrestyVersion="1.21.4.3"
+openrestyVersion="1.25.3.1rc1"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 source ${setupPath}/panel/scripts/calculate_j.sh
@@ -67,36 +67,36 @@ mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -t 3 -O openssl-1.1.1w.tar.gz ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz
-wget -T 20 -t 3 -O openssl-1.1.1w.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz.checksum.txt
+wget -T 120 -t 3 -O openssl-3.0.12.tar.gz ${downloadUrl}/openssl/openssl-3.0.12.tar.gz
+wget -T 20 -t 3 -O openssl-3.0.12.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12.tar.gz.checksum.txt
 
-if ! sha256sum --status -c openssl-1.1.1w.tar.gz.checksum.txt; then
+if ! sha256sum --status -c openssl-3.0.12.tar.gz.checksum.txt; then
     echo -e $HR
     echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-tar -zxvf openssl-1.1.1w.tar.gz
-rm -f openssl-1.1.1w.tar.gz
-rm -f openssl-1.1.1w.tar.gz.checksum.txt
-mv openssl-1.1.1w openssl
+tar -zxvf openssl-3.0.12.tar.gz
+rm -f openssl-3.0.12.tar.gz
+rm -f openssl-3.0.12.tar.gz.checksum.txt
+mv openssl-3.0.12 openssl
 
 # patch openssl
 cd openssl
-wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch ${downloadUrl}/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch
-wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
+wget -T 20 -t 3 -O openssl-3.0.12-sess_set_get_cb_yield.patch ${downloadUrl}/openssl/openssl-3.0.12-sess_set_get_cb_yield.patch
+wget -T 20 -t 3 -O openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
 
-if ! sha256sum --status -c openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt; then
+if ! sha256sum --status -c openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt; then
     echo -e $HR
     echo "错误：OpenSSL 补丁文件 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-patch -p1 < openssl-1.1.1f-sess_set_get_cb_yield.patch
-rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch
-rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
+patch -p1 < openssl-3.0.12-sess_set_get_cb_yield.patch
+rm -f openssl-3.0.12-sess_set_get_cb_yield.patch
+rm -f openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
 cd ../
 
 # pcre
@@ -221,43 +221,33 @@ fi
 cd ${openrestyPath}/src
 
 # brotli
-wget -T 20 -t 3 -O ngx_brotli-1.0.0rc.zip ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip
-wget -T 20 -t 3 -O ngx_brotli-1.0.0rc.zip.checksum.txt ${downloadUrl}/modules/ngx_brotli-1.0.0rc.zip.checksum.txt
+wget -T 20 -t 3 -O ngx_brotli-a71f931.zip ${downloadUrl}/modules/ngx_brotli-a71f931.zip
+wget -T 20 -t 3 -O ngx_brotli-a71f931.zip.checksum.txt ${downloadUrl}/modules/ngx_brotli-a71f931.zip.checksum.txt
 
-if ! sha256sum --status -c ngx_brotli-1.0.0rc.zip.checksum.txt; then
+if ! sha256sum --status -c ngx_brotli-a71f931.zip.checksum.txt; then
     echo -e $HR
     echo "错误：ngx_brotli 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-unzip -o ngx_brotli-1.0.0rc.zip
-mv ngx_brotli-1.0.0rc ngx_brotli
-rm -f ngx_brotli-1.0.0rc.zip
-rm -f ngx_brotli-1.0.0rc.zip.checksum.txt
-cd ngx_brotli/deps
-rm -rf brotli
-
-wget -T 20 -t 3 -O brotli-1.0.9.zip ${downloadUrl}/modules/brotli-1.0.9.zip
-wget -T 20 -t 3 -O brotli-1.0.9.zip.checksum.txt ${downloadUrl}/modules/brotli-1.0.9.zip.checksum.txt
-
-if ! sha256sum --status -c brotli-1.0.9.zip.checksum.txt; then
-    echo -e $HR
-    echo "错误：brotli 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
-    rm -rf ${openrestyPath}
-    exit 1
-fi
-
-unzip -o brotli-1.0.9.zip
-mv brotli-1.0.9 brotli
-rm -f brotli-1.0.9.zip
-rm -f brotli-1.0.9.zip.checksum.txt
+unzip -o ngx_brotli-a71f931.zip
+mv ngx_brotli-a71f931 ngx_brotli
+rm -f ngx_brotli-a71f931.zip
+rm -f ngx_brotli-a71f931.zip.checksum.txt
+cd ngx_brotli/deps/brotli
+mkdir out && cd out
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_INSTALL_PREFIX=./installed ..
+cmake --build . --config Release --target brotlienc
+cd ../../../../
 
 cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
+export CFLAGS="-march=native -mtune=native -Ofast -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections"
+export LDFLAGS="-Wl,-s -Wl,-Bsymbolic -Wl,--gc-sections"
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-pcre-jit --with-http_v2_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-E" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-pcre-jit --with-http_v2_module --with-http_v3_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-E" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
 make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
@@ -300,6 +290,7 @@ worker_processes auto;
 error_log /www/wwwlogs/openresty_error.log crit;
 pid /www/server/openresty/nginx.pid;
 worker_rlimit_nofile 51200;
+quic_bpf on;
 
 stream {
     log_format tcp_format '\$time_local|\$remote_addr|\$protocol|\$status|\$bytes_sent|\$bytes_received|\$session_time|\$upstream_addr|\$upstream_bytes_sent|\$upstream_bytes_received|\$upstream_connect_time';
@@ -335,6 +326,9 @@ http {
 
     keepalive_timeout 60;
 
+    http2 on;
+    http3 on;
+    quic_gso on;
     tcp_nodelay on;
 
     fastcgi_connect_timeout 300;

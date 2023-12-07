@@ -177,9 +177,11 @@ func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
 	for i, port := range website.Ports {
 		if _, ok := portUsed[port]; !ok {
 			if i == len(website.Ports)-1 {
-				portList += "    listen " + cast.ToString(port) + ";"
+				portList += "    listen " + cast.ToString(port) + ";\n"
+				portList += "    listen [::]:" + cast.ToString(port) + ";"
 			} else {
 				portList += "    listen " + cast.ToString(port) + ";\n"
+				portList += "    listen [::]:" + cast.ToString(port) + ";\n"
 			}
 			portUsed[port] = true
 		}
@@ -354,12 +356,22 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	for i, v := range ports {
 		vStr := cast.ToString(v)
 		if v == 443 && config.Ssl {
-			vStr = "443 ssl http2"
+			vStr = `    listen 443 ssl;
+	listen [::]:443 ssl;
+    listen 443 quic reuseport;
+	listen [::]:443 quic reuseport;`
+			port.WriteString(vStr)
+			if i != len(ports)-1 {
+				port.WriteString("\n")
+			}
+			continue
 		}
 		if i != len(ports)-1 {
 			port.WriteString("    listen " + vStr + ";\n")
+			port.WriteString("    listen [::]:" + vStr + ";\n")
 		} else {
-			port.WriteString("    listen " + vStr + ";")
+			port.WriteString("    listen " + vStr + ";\n")
+			port.WriteString("    listen [::]:" + vStr + ";")
 		}
 	}
 	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
@@ -446,10 +458,11 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     ssl_certificate_key /www/server/vhost/ssl/` + website.Name + `.key;
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:10m;
-    ssl_session_tickets off;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
+    ssl_early_data on;
+    add_header Alt-Svc 'h3=":443"; ma=86400';
     `
 		if config.HttpRedirect {
 			sslConfig += `# http重定向标记位开始
@@ -564,9 +577,18 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 		if len(match) < 2 {
 			continue
 		}
+		// 跳过 ipv6
+		if strings.Contains(match[1], "[::]") {
+			continue
+		}
 
-		port := strings.Fields(match[1])[0]
-		setting.Ports = append(setting.Ports, cast.ToUint(port))
+		// 处理 443 ssl 之类的情况
+		ports := strings.Fields(match[1])
+		if len(ports) == 1 {
+			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
+		} else if len(ports) > 1 && ports[1] == "ssl" {
+			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
+		}
 	}
 	serverName := tools.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
 	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)
