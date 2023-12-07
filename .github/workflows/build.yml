@@ -13,7 +13,7 @@ jobs:
       fail-fast: true
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           cache: true
           go-version: 'stable'
