@@ -552,8 +552,10 @@ EOF
 cat > ${openrestyPath}/conf/default.conf << EOF
 server
 {
-    listen 80 default_server;
-    listen 443 ssl default_server;
+    listen 80 default_server reuseport;
+    listen [::]:80 default_server reuseport;
+    listen 443 ssl default_server reuseport;
+    listen [::]:443 ssl default_server reuseport;
     server_name _;
     index index.html;
     root /www/server/openresty/html;
