@@ -37,7 +37,7 @@
 
 低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `AlmaLinux` | `RockyLinux`，维护周期更长也更稳定。
 
-不在下表中的其他系统（OpenCloudOS 8、Anolis 8、CentOS Stream 8/9、Debian 11等），可自行尝试安装，但不保证能够正常运行，且不提供无偿技术支持（理论上不会有大问题）。
+不在下表中的其他 RHEL 9.x 系统，可自行尝试安装，但不保证能够正常运行，且不提供无偿技术支持（理论上不会有大问题）。
 
 CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移脚本](https://github.com/haozi-team/byecentos)
 

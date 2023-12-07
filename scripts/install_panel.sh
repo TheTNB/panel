@@ -44,6 +44,13 @@ Prepare_System() {
         exit 1
     fi
 
+    kernelVersion=$(uname -r | awk -F '.' '{print $1}')
+    if [ "${kernelVersion}" != "5" ] && [ "${kernelVersion}" != "6" ]; then
+        echo -e $HR
+        echo "错误：该系统内核版本太低，不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
+        exit 1
+    fi
+
     is64bit=$(getconf LONG_BIT)
     if [ "${is64bit}" != '64' ]; then
         echo -e $HR
