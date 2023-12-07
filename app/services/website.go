@@ -358,8 +358,8 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		if v == 443 && config.Ssl {
 			vStr = `    listen 443 ssl;
 	listen [::]:443 ssl;
-    listen 443 quic reuseport;
-	listen [::]:443 quic reuseport;`
+    listen 443 quic;
+	listen [::]:443 quic;`
 			port.WriteString(vStr)
 			if i != len(ports)-1 {
 				port.WriteString("\n")
