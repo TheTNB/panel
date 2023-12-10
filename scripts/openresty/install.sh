@@ -363,6 +363,8 @@ http {
     server_tokens off;
     access_log off;
 
+    waf_http_status general=403 cc_deny=444;
+
     # 服务状态页
     server {
         listen 80;
@@ -500,6 +502,63 @@ cat > ${openrestyPath}/html/stop.html << EOF
         <h1>耗子Linux面板</h1>
         <p>该网站已被管理员停止访问！</p>
         <p>当您看到此页面，说明该网站已被服务器管理员停止对外访问。</p>
+    </div>
+</body>
+</html>
+EOF
+
+# 写入 WAF 拦截页（战未来，暂时无法生效）
+cat > ${openrestyPath}/html/block.html << EOF
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>请求被拦截 - 耗子Linux面板</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5em;
+        }
+        p {
+            color: #555;
+            line-height: 1.8;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 2em 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>耗子Linux面板</h1>
+        <p>本次请求判断为危险的攻击请求，已被拦截！</p>
+        <p>当您看到此页面，说明您的请求被WAF拦截，可能是由于您的请求中包含了危险的攻击内容，或者您的请求被误判为攻击请求。</p>
+        <p>如果您认为这是误判，请联系服务器管理员解决。</p>
     </div>
 </body>
 </html>
