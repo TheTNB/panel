@@ -462,7 +462,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
     ssl_early_data on;
-    add_header Alt-Svc 'h3=":443"; ma=86400';
+    add_header Alt-Svc 'h3=":$server_port"; ma=2592000';
     `
 		if config.HttpRedirect {
 			sslConfig += `# http重定向标记位开始
