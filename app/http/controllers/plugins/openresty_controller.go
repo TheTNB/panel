@@ -98,7 +98,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 		return controllers.Success(ctx, "")
 	}
 
-	out, err := tools.Exec("tail -n 100 /www/wwwlogs/nginx_error.log")
+	out, err := tools.Exec("tail -n 100 /www/wwwlogs/openresty_error.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -108,7 +108,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
-	if out, err := tools.Exec("echo '' > /www/wwwlogs/nginx_error.log"); err != nil {
+	if out, err := tools.Exec("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 

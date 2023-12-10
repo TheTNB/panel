@@ -287,10 +287,12 @@ cat > ${openrestyPath}/conf/nginx.conf << EOF
 # 该文件为OpenResty主配置文件，不建议随意修改！
 user www www;
 worker_processes auto;
+worker_cpu_affinity auto;
+worker_rlimit_nofile 65535;
+pcre_jit on;
+quic_bpf on;
 error_log /www/wwwlogs/openresty_error.log crit;
 pid /www/server/openresty/nginx.pid;
-worker_rlimit_nofile 51200;
-quic_bpf on;
 
 stream {
     log_format tcp_format '\$time_local|\$remote_addr|\$protocol|\$status|\$bytes_sent|\$bytes_received|\$session_time|\$upstream_addr|\$upstream_bytes_sent|\$upstream_bytes_received|\$upstream_connect_time';
@@ -301,7 +303,7 @@ stream {
 
 events {
     use epoll;
-    worker_connections 51200;
+    worker_connections 65535;
     multi_accept on;
 }
 
@@ -309,7 +311,9 @@ http {
     include mime.types;
     include proxy.conf;
     include default.conf;
+
     default_type application/octet-stream;
+    keepalive_timeout 60;
 
     server_names_hash_bucket_size 512;
     client_header_buffer_size 32k;
@@ -321,14 +325,11 @@ http {
     variables_hash_max_size 2048;
     variables_hash_bucket_size 128;
 
-    sendfile on;
-    tcp_nopush on;
-
-    keepalive_timeout 60;
-
     http2 on;
     http3 on;
     quic_gso on;
+    sendfile on;
+    tcp_nopush on;
     tcp_nodelay on;
 
     fastcgi_connect_timeout 300;
