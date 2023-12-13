@@ -46,6 +46,46 @@ definitions:
       message:
         type: string
     type: object
+  internal.BackupFile:
+    properties:
+      name:
+        type: string
+      size:
+        type: string
+    type: object
+  internal.PanelWebsite:
+    properties:
+      db:
+        type: boolean
+      db_name:
+        type: string
+      db_password:
+        type: string
+      db_type:
+        type: string
+      db_user:
+        type: string
+      domains:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      path:
+        type: string
+      php:
+        type: integer
+      ports:
+        items:
+          type: integer
+        type: array
+      remark:
+        type: string
+      ssl:
+        type: boolean
+      status:
+        type: boolean
+    type: object
   models.Cert:
     properties:
       auto_renew:
@@ -441,105 +481,6 @@ definitions:
       kid:
         type: string
     type: object
-  responses.CertList:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/models.Cert'
-        type: array
-      total:
-        type: integer
-    type: object
-  responses.DNSList:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/models.CertDNS'
-        type: array
-      total:
-        type: integer
-    type: object
-  responses.Info:
-    properties:
-      email:
-        type: string
-      id:
-        type: integer
-      role:
-        items:
-          type: string
-        type: array
-      username:
-        type: string
-    type: object
-  responses.List:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/models.Website'
-        type: array
-      total:
-        type: integer
-    type: object
-  responses.Settings:
-    properties:
-      backup_path:
-        type: string
-      email:
-        type: string
-      entrance:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      port:
-        type: string
-      username:
-        type: string
-      website_path:
-        type: string
-    type: object
-  services.BackupFile:
-    properties:
-      name:
-        type: string
-      size:
-        type: string
-    type: object
-  services.PanelWebsite:
-    properties:
-      db:
-        type: boolean
-      db_name:
-        type: string
-      db_password:
-        type: string
-      db_type:
-        type: string
-      db_user:
-        type: string
-      domains:
-        items:
-          type: string
-        type: array
-      name:
-        type: string
-      path:
-        type: string
-      php:
-        type: integer
-      ports:
-        items:
-          type: integer
-        type: array
-      remark:
-        type: string
-      ssl:
-        type: boolean
-      status:
-        type: boolean
-    type: object
 info:
   contact:
     email: i@haozi.net
@@ -596,12 +537,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.CertList'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 获取证书列表
@@ -722,12 +658,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.DNSList'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 获取 DNS 接口列表
@@ -942,12 +873,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.CertList'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 获取用户列表
@@ -1416,12 +1342,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.Settings'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 设置列表
@@ -1460,12 +1381,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.Info'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 用户信息
@@ -1522,7 +1438,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/services.BackupFile'
+                    $ref: '#/definitions/internal.BackupFile'
                   type: array
               type: object
       security:
@@ -1640,12 +1556,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/controllers.SuccessResponse'
-            - properties:
-                data:
-                  $ref: '#/definitions/responses.List'
-              type: object
+            $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
       summary: 获取网站列表
@@ -1718,7 +1629,7 @@ paths:
             - $ref: '#/definitions/controllers.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/services.PanelWebsite'
+                  $ref: '#/definitions/internal.PanelWebsite'
               type: object
       security:
       - BearerToken: []

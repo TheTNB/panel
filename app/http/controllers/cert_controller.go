@@ -6,7 +6,6 @@ import (
 
 	requests "panel/app/http/requests/cert"
 	commonrequests "panel/app/http/requests/common"
-	responses "panel/app/http/responses/cert"
 	"panel/app/internal"
 	"panel/app/internal/services"
 	"panel/app/models"
@@ -123,7 +122,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=responses.CertList}
+//	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
@@ -142,9 +141,9 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, responses.UserList{
-		Total: total,
-		Items: users,
+	return Success(ctx, http.Json{
+		"total": total,
+		"items": users,
 	})
 }
 
@@ -275,7 +274,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=responses.DNSList}
+//	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
@@ -294,9 +293,9 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, responses.DNSList{
-		Total: total,
-		Items: dns,
+	return Success(ctx, http.Json{
+		"total": total,
+		"items": dns,
 	})
 }
 
@@ -427,7 +426,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=responses.CertList}
+//	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
@@ -446,9 +445,9 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, responses.CertList{
-		Total: total,
-		Items: certs,
+	return Success(ctx, http.Json{
+		"total": total,
+		"items": certs,
 	})
 }
 

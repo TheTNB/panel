@@ -5,7 +5,6 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"panel/app/http/requests/user"
-	responses "panel/app/http/responses/user"
 	"panel/app/models"
 )
 
@@ -81,7 +80,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 //	@Tags			用户鉴权
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200	{object}	SuccessResponse{data=responses.Info}
+//	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/user/info [get]
 func (r *UserController) Info(ctx http.Context) http.Response {
 	var user models.User
@@ -93,10 +92,10 @@ func (r *UserController) Info(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, responses.Info{
-		ID:       user.ID,
-		Role:     []string{"admin"},
-		Username: user.Username,
-		Email:    user.Email,
+	return Success(ctx, http.Json{
+		"id":       user.ID,
+		"role":     []string{"admin"},
+		"username": user.Username,
+		"email":    user.Email,
 	})
 }

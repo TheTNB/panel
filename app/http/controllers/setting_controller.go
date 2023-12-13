@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cast"
 
 	requests "panel/app/http/requests/setting"
-	responses "panel/app/http/responses/setting"
 	"panel/app/internal"
 	"panel/app/internal/services"
 	"panel/app/models"
@@ -30,7 +29,7 @@ func NewSettingController() *SettingController {
 //	@Tags			面板设置
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200	{object}	SuccessResponse{data=responses.Settings}
+//	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/setting/list [get]
 func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
@@ -42,12 +41,6 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	var result responses.Settings
-	result.Name = r.setting.Get(models.SettingKeyName)
-	result.Entrance = facades.Config().GetString("http.entrance")
-	result.WebsitePath = r.setting.Get(models.SettingKeyWebsitePath)
-	result.BackupPath = r.setting.Get(models.SettingKeyBackupPath)
-
 	var user models.User
 	err = facades.Auth().User(ctx, &user)
 	if err != nil {
@@ -56,10 +49,8 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		}).Info("获取用户信息失败")
 		return ErrorSystem(ctx)
 	}
-	result.Username = user.Username
-	result.Email = user.Email
 
-	result.Port, err = tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -67,7 +58,16 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, result)
+	return Success(ctx, http.Json{
+		"name":         r.setting.Get(models.SettingKeyName),
+		"entrance":     facades.Config().GetString("http.entrance"),
+		"website_path": r.setting.Get(models.SettingKeyWebsitePath),
+		"backup_path":  r.setting.Get(models.SettingKeyBackupPath),
+		"user_name":    user.Username,
+		"password":     "",
+		"email":        user.Email,
+		"port":         port,
+	})
 }
 
 // Update

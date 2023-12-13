@@ -10,7 +10,6 @@ import (
 
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/website"
-	responses "panel/app/http/responses/website"
 	"panel/app/internal"
 	"panel/app/internal/services"
 	"panel/app/models"
@@ -39,7 +38,7 @@ func NewWebsiteController() *WebsiteController {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=responses.List}
+//	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
@@ -56,9 +55,9 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	return Success(ctx, responses.List{
-		Total: total,
-		Items: websites,
+	return Success(ctx, http.Json{
+		"total": total,
+		"items": websites,
 	})
 }
 
@@ -206,7 +205,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse{data=services.PanelWebsite}
+//	@Success		200	{object}	SuccessResponse{data=internal.PanelWebsite}
 //	@Router			/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
@@ -329,7 +328,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=[]services.BackupFile}
+//	@Success		200		{object}	SuccessResponse{data=[]internal.BackupFile}
 //	@Router			/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate

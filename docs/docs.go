@@ -101,19 +101,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.CertList"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -311,19 +299,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.DNSList"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -678,19 +654,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.CertList"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -1452,19 +1416,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.Settings"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -1528,19 +1480,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.Info"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -1632,7 +1572,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/services.BackupFile"
+                                                "$ref": "#/definitions/internal.BackupFile"
                                             }
                                         }
                                     }
@@ -1829,19 +1769,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.SuccessResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/responses.List"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }
@@ -1960,7 +1888,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/services.PanelWebsite"
+                                            "$ref": "#/definitions/internal.PanelWebsite"
                                         }
                                     }
                                 }
@@ -2630,6 +2558,67 @@ const docTemplate = `{
                 }
             }
         },
+        "internal.BackupFile": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal.PanelWebsite": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "boolean"
+                },
+                "db_name": {
+                    "type": "string"
+                },
+                "db_password": {
+                    "type": "string"
+                },
+                "db_type": {
+                    "type": "string"
+                },
+                "db_user": {
+                    "type": "string"
+                },
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "php": {
+                    "type": "integer"
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "ssl": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "boolean"
+                }
+            }
+        },
         "models.Cert": {
             "type": "object",
             "properties": {
@@ -3228,158 +3217,6 @@ const docTemplate = `{
                 },
                 "kid": {
                     "type": "string"
-                }
-            }
-        },
-        "responses.CertList": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Cert"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "responses.DNSList": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.CertDNS"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "responses.Info": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "role": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "responses.List": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Website"
-                    }
-                },
-                "total": {
-                    "type": "integer"
-                }
-            }
-        },
-        "responses.Settings": {
-            "type": "object",
-            "properties": {
-                "backup_path": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "entrance": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "website_path": {
-                    "type": "string"
-                }
-            }
-        },
-        "services.BackupFile": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "string"
-                }
-            }
-        },
-        "services.PanelWebsite": {
-            "type": "object",
-            "properties": {
-                "db": {
-                    "type": "boolean"
-                },
-                "db_name": {
-                    "type": "string"
-                },
-                "db_password": {
-                    "type": "string"
-                },
-                "db_type": {
-                    "type": "string"
-                },
-                "db_user": {
-                    "type": "string"
-                },
-                "domains": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "php": {
-                    "type": "integer"
-                },
-                "ports": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "remark": {
-                    "type": "string"
-                },
-                "ssl": {
-                    "type": "boolean"
-                },
-                "status": {
-                    "type": "boolean"
                 }
             }
         }

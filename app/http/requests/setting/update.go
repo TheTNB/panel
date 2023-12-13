@@ -28,7 +28,7 @@ func (r *Update) Rules(ctx http.Context) map[string]string {
 		"website_path": "required|string:2,255",
 		"entrance":     `required|regex:^/(\w+)?$|not_in:/api`,
 		"username":     "required|string:2,20",
-		"email":        "required|email",
+		"email":        "email",
 		"password":     "string:8,255",
 	}
 }
