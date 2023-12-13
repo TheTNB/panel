@@ -11,9 +11,9 @@ import (
 	"github.com/imroc/req/v3"
 
 	"panel/app/http/controllers"
-	"panel/app/internal"
-	"panel/app/internal/services"
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 

@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
-	"panel/app/internal"
-	"panel/app/internal/services"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 

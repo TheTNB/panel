@@ -6,9 +6,9 @@ import (
 
 	requests "panel/app/http/requests/cert"
 	commonrequests "panel/app/http/requests/common"
-	"panel/app/internal"
-	"panel/app/internal/services"
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/acme"
 )
 

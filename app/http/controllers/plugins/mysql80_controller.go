@@ -7,11 +7,11 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
-	"panel/app/internal"
-	"panel/app/internal/services"
 
 	"panel/app/http/controllers"
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 

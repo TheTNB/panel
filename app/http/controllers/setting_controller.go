@@ -6,9 +6,9 @@ import (
 	"github.com/spf13/cast"
 
 	requests "panel/app/http/requests/setting"
-	"panel/app/internal"
-	"panel/app/internal/services"
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 

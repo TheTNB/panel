@@ -9,8 +9,8 @@ import (
 	"panel/app/http/controllers"
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/plugins/rsync"
-	"panel/app/internal"
-	"panel/app/internal/services"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 

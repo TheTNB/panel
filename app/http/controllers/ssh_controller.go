@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/cast"
 	"github.com/valyala/fasthttp"
 
-	"panel/app/internal"
-	"panel/app/internal/services"
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/ssh"
 )
 

@@ -4,15 +4,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
-	"panel/app/internal/services"
 
+	"panel/internal"
+	"panel/internal/services"
 	"panel/tests"
 )
 
 type SettingTestSuite struct {
 	suite.Suite
 	tests.TestCase
-	setting services.Setting
+	setting internal.Setting
 }
 
 func TestSettingTestSuite(t *testing.T) {

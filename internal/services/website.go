@@ -13,14 +13,14 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 	requests "panel/app/http/requests/website"
-	"panel/app/internal"
+	internal2 "panel/internal"
 
 	"panel/app/models"
 	"panel/pkg/tools"
 )
 
 type WebsiteImpl struct {
-	setting internal.Setting
+	setting internal2.Setting
 }
 
 func NewWebsiteImpl() *WebsiteImpl {
@@ -41,7 +41,7 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 }
 
 // Add 添加网站
-func (r *WebsiteImpl) Add(website internal.PanelWebsite) (models.Website, error) {
+func (r *WebsiteImpl) Add(website internal2.PanelWebsite) (models.Website, error) {
 	w := models.Website{
 		Name:   website.Name,
 		Status: website.Status,
@@ -500,18 +500,18 @@ func (r *WebsiteImpl) Delete(id uint) error {
 }
 
 // GetConfig 获取网站配置
-func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfig(id uint) (internal2.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
-		return internal.WebsiteSetting{}, err
+		return internal2.WebsiteSetting{}, err
 	}
 
 	config, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
-		return internal.WebsiteSetting{}, err
+		return internal2.WebsiteSetting{}, err
 	}
 
-	var setting internal.WebsiteSetting
+	var setting internal2.WebsiteSetting
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
@@ -613,10 +613,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
 }
 
 // GetConfigByName 根据网站名称获取网站配置
-func (r *WebsiteImpl) GetConfigByName(name string) (internal.WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfigByName(name string) (internal2.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
-		return internal.WebsiteSetting{}, err
+		return internal2.WebsiteSetting{}, err
 	}
 
 	return r.GetConfig(website.ID)

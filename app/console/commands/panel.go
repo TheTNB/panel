@@ -13,9 +13,9 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
-	services2 "panel/app/internal/services"
 
 	"panel/app/models"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 
@@ -69,7 +69,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		user := services2.NewUserImpl()
+		user := services.NewUserImpl()
 		_, err = user.Create("admin", hash)
 		if err != nil {
 			color.Redln("创建管理员失败")
@@ -276,7 +276,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			color.Greenln("|-备份成功")
 
 		case "mysql":
-			rootPassword := services2.NewSettingImpl().Get(models.SettingKeyMysqlRootPassword)
+			rootPassword := services.NewSettingImpl().Get(models.SettingKeyMysqlRootPassword)
 			backupFile := name + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 
 			err := os.Setenv("MYSQL_PWD", rootPassword)

@@ -7,8 +7,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/internal"
-	"panel/app/internal/services"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/pkg/tools"
 )
 
