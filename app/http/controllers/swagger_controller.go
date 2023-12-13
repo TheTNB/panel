@@ -38,7 +38,7 @@ func NewSwaggerController() *SwaggerController {
 //	@Router			/swagger [get]
 func (r *SwaggerController) Index(ctx http.Context) http.Response {
 	err := swagger.New(swagger.Config{
-		Title: "RPA Swagger",
+		Title: "耗子面板 Swagger",
 	})(ctx.(*fiber.Context).Instance())
 	if err != nil {
 		return Error(ctx, http.StatusNotFound, err.Error())
