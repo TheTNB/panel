@@ -55,6 +55,14 @@ if version_lt "$oldVersion" "2.1.8"; then
     panel deleteSetting entrance
 fi
 
+if version_lt "$oldVersion" "2.1.30"; then
+    echo "更新面板到 v2.1.30 ..."
+    echo "Update panel to v2.1.30 ..."
+    sed -i '/APP_HOST/d' $panelPath/panel.conf
+    echo "APP_SSL=false" >> $panelPath/panel.conf
+    mv $panelPath/database/panel.db $panelPath/storage/panel.db
+fi
+
 echo $HR
 echo "更新结束"
 echo "Update finished"

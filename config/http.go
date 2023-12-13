@@ -26,7 +26,7 @@ func init() {
 		// HTTP URL
 		"url": "http://localhost",
 		// HTTP Host
-		"host": config.Env("APP_HOST", "0.0.0.0"),
+		"host": "",
 		// HTTP Port
 		"port": config.Env("APP_PORT", "8888"),
 		// HTTP Entrance
@@ -34,15 +34,15 @@ func init() {
 		// HTTPS Configuration
 		"tls": map[string]any{
 			// HTTPS Host
-			"host": config.Env("APP_HOST", "0.0.0.0"),
+			"host": "",
 			// HTTPS Port
 			"port": config.Env("APP_PORT", "8888"),
 			// SSL Certificate
 			"ssl": map[string]any{
 				// ca.pem
-				"cert": "",
+				"cert": "/www/panel/storage/cert.pem",
 				// ca.key
-				"key": "",
+				"key": "/www/panel/storage/key.pem",
 			},
 		},
 	})

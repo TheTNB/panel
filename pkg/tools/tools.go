@@ -402,21 +402,21 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
 
 	color.Greenln("前置检查...")
-	if Exists("/tmp/panel.db.bak") || Exists("/tmp/panel.conf.bak") {
+	if Exists("/tmp/panel-storage.zip") || Exists("/tmp/panel.conf.bak") {
 		return errors.New("检测到/tmp存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
-	color.Greenln("备份面板配置...")
-	if _, err := Exec("cp -f /www/panel/database/panel.db /tmp/panel.db.bak"); err != nil {
-		color.Redln("备份面板数据库失败")
+	color.Greenln("备份面板数据...")
+	if _, err := Exec("cd /www/panel/storage && zip -r /tmp/panel-storage.zip *"); err != nil {
+		color.Redln("备份面板数据失败")
 		return err
 	}
 	if _, err := Exec("cp -f /www/panel/panel.conf /tmp/panel.conf.bak"); err != nil {
 		color.Redln("备份面板配置失败")
 		return err
 	}
-	if !Exists("/tmp/panel.db.bak") || !Exists("/tmp/panel.conf.bak") {
-		return errors.New("备份面板配置失败")
+	if !Exists("/tmp/panel-storage.zip") || !Exists("/tmp/panel.conf.bak") {
+		return errors.New("备份面板数据失败")
 	}
 	color.Greenln("备份完成")
 
@@ -462,25 +462,22 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	}
 	color.Greenln("更新完成")
 
-	color.Greenln("恢复面板配置...")
-	if _, err = Exec("cp -f /tmp/panel.db.bak /www/panel/database/panel.db"); err != nil {
-		color.Redln("恢复面板数据库失败")
+	color.Greenln("恢复面板数据...")
+	if _, err = Exec("cp -f /tmp/panel-storage.zip /www/panel/storage/panel-storage.zip && cd /www/panel/storage && unzip -o panel-storage.zip && rm -rf panel-storage.zip"); err != nil {
+		color.Redln("恢复面板数据失败")
 		return err
 	}
 	if _, err = Exec("cp -f /tmp/panel.conf.bak /www/panel/panel.conf"); err != nil {
-		color.Redln("恢复面板配置失败")
+		color.Redln("恢复面板数据失败")
 		return err
 	}
-	if !Exists("/www/panel/database/panel.db") || !Exists("/www/panel/panel.conf") {
+	if !Exists("/www/panel/storage/panel.db") || !Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板配置失败")
 	}
 	color.Greenln("恢复完成")
 
 	color.Greenln("设置面板文件权限...")
-	if _, err = Exec("chmod -R 700 /www/panel"); err != nil {
-		color.Redln("设置面板文件权限失败")
-		return err
-	}
+	_, _ = Exec("chmod -R 700 /www/panel")
 	color.Greenln("设置完成")
 
 	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
@@ -496,14 +493,8 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		return err
 	}
 
-	if _, err = Exec("rm -rf /tmp/panel.db.bak"); err != nil {
-		color.Redln("清理临时文件失败")
-		return err
-	}
-	if _, err = Exec("rm -rf /tmp/panel.conf.bak"); err != nil {
-		color.Redln("清理临时文件失败")
-		return err
-	}
+	_, _ = Exec("rm -rf /tmp/panel-storage.zip")
+	_, _ = Exec("rm -rf /tmp/panel.conf.bak")
 
 	return nil
 }

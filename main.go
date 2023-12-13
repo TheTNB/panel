@@ -42,11 +42,19 @@ func main() {
 	bootstrap.Boot()
 
 	// 启动 HTTP 服务
-	go func() {
-		if err := facades.Route().Run(); err != nil {
-			facades.Log().Infof("Route run error: %v", err)
-		}
-	}()
+	if facades.Config().GetBool("panel.ssl") {
+		go func() {
+			if err := facades.Route().RunTLS(); err != nil {
+				facades.Log().Infof("Route run error: %v", err)
+			}
+		}()
+	} else {
+		go func() {
+			if err := facades.Route().Run(); err != nil {
+				facades.Log().Infof("Route run error: %v", err)
+			}
+		}()
+	}
 
 	// 启动计划任务
 	go facades.Schedule().Run()

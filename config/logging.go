@@ -26,13 +26,13 @@ func init() {
 			},
 			"single": map[string]any{
 				"driver": "single",
-				"path":   "storage/logs/goravel.log",
+				"path":   "storage/logs/panel.log",
 				"level":  "info",
 				"print":  true,
 			},
 			"daily": map[string]any{
 				"driver": "daily",
-				"path":   "storage/logs/goravel.log",
+				"path":   "storage/logs/panel.log",
 				"level":  "info",
 				"days":   7,
 				"print":  true,

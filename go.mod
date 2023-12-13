@@ -9,14 +9,14 @@ require (
 	github.com/gofiber/swagger v0.1.14
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.1
-	github.com/goravel/fiber v1.1.11-0.20231121035208-8c744e1a4b62
+	github.com/goravel/fiber v1.1.11-0.20231213120052-2507f00aa821
 	github.com/goravel/framework v1.13.1-0.20231121034700-e91df530a997
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/shirou/gopsutil v3.21.11+incompatible
-	github.com/spf13/cast v1.5.1
+	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/swag v1.16.2
 	github.com/valyala/fasthttp v1.51.0
