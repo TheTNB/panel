@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/goravel/framework/contracts/http"
 
@@ -47,19 +46,14 @@ func MustInstall() http.Middleware {
 			return
 		}
 
-		var lock sync.RWMutex
 		pluginsMap := make(map[string]bool)
 
 		for _, p := range installedPlugins {
-			lock.Lock()
 			pluginsMap[p.Slug] = true
-			lock.Unlock()
 		}
 
 		for _, require := range plugin.Requires {
-			lock.RLock()
 			_, requireFound := pluginsMap[require]
-			lock.RUnlock()
 			if !requireFound {
 				ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
 					"code":    http.StatusForbidden,
@@ -70,9 +64,7 @@ func MustInstall() http.Middleware {
 		}
 
 		for _, exclude := range plugin.Excludes {
-			lock.RLock()
 			_, excludeFound := pluginsMap[exclude]
-			lock.RUnlock()
 			if excludeFound {
 				ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
 					"code":    http.StatusForbidden,

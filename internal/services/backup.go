@@ -8,14 +8,14 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/support/carbon"
-	internal2 "panel/internal"
 
 	"panel/app/models"
+	"panel/internal"
 	"panel/pkg/tools"
 )
 
 type BackupImpl struct {
-	setting internal2.Setting
+	setting internal.Setting
 }
 
 func NewBackupImpl() *BackupImpl {
@@ -25,30 +25,30 @@ func NewBackupImpl() *BackupImpl {
 }
 
 // WebsiteList 网站备份列表
-func (s *BackupImpl) WebsiteList() ([]internal2.BackupFile, error) {
+func (s *BackupImpl) WebsiteList() ([]internal.BackupFile, error) {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath)
 	if len(backupPath) == 0 {
-		return []internal2.BackupFile{}, nil
+		return []internal.BackupFile{}, nil
 	}
 
 	backupPath += "/website"
 	if !tools.Exists(backupPath) {
 		if err := tools.Mkdir(backupPath, 0644); err != nil {
-			return []internal2.BackupFile{}, err
+			return []internal.BackupFile{}, err
 		}
 	}
 
 	files, err := os.ReadDir(backupPath)
 	if err != nil {
-		return []internal2.BackupFile{}, err
+		return []internal.BackupFile{}, err
 	}
-	var backupList []internal2.BackupFile
+	var backupList []internal.BackupFile
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {
 			continue
 		}
-		backupList = append(backupList, internal2.BackupFile{
+		backupList = append(backupList, internal.BackupFile{
 			Name: file.Name(),
 			Size: tools.FormatBytes(float64(info.Size())),
 		})
@@ -115,30 +115,30 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 }
 
 // MysqlList MySQL备份列表
-func (s *BackupImpl) MysqlList() ([]internal2.BackupFile, error) {
+func (s *BackupImpl) MysqlList() ([]internal.BackupFile, error) {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath)
 	if len(backupPath) == 0 {
-		return []internal2.BackupFile{}, nil
+		return []internal.BackupFile{}, nil
 	}
 
 	backupPath += "/mysql"
 	if !tools.Exists(backupPath) {
 		if err := tools.Mkdir(backupPath, 0644); err != nil {
-			return []internal2.BackupFile{}, err
+			return []internal.BackupFile{}, err
 		}
 	}
 
 	files, err := os.ReadDir(backupPath)
 	if err != nil {
-		return []internal2.BackupFile{}, err
+		return []internal.BackupFile{}, err
 	}
-	var backupList []internal2.BackupFile
+	var backupList []internal.BackupFile
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {
 			continue
 		}
-		backupList = append(backupList, internal2.BackupFile{
+		backupList = append(backupList, internal.BackupFile{
 			Name: file.Name(),
 			Size: tools.FormatBytes(float64(info.Size())),
 		})
@@ -228,30 +228,30 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 }
 
 // PostgresqlList PostgreSQL备份列表
-func (s *BackupImpl) PostgresqlList() ([]internal2.BackupFile, error) {
+func (s *BackupImpl) PostgresqlList() ([]internal.BackupFile, error) {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath)
 	if len(backupPath) == 0 {
-		return []internal2.BackupFile{}, nil
+		return []internal.BackupFile{}, nil
 	}
 
 	backupPath += "/postgresql"
 	if !tools.Exists(backupPath) {
 		if err := tools.Mkdir(backupPath, 0644); err != nil {
-			return []internal2.BackupFile{}, err
+			return []internal.BackupFile{}, err
 		}
 	}
 
 	files, err := os.ReadDir(backupPath)
 	if err != nil {
-		return []internal2.BackupFile{}, err
+		return []internal.BackupFile{}, err
 	}
-	var backupList []internal2.BackupFile
+	var backupList []internal.BackupFile
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {
 			continue
 		}
-		backupList = append(backupList, internal2.BackupFile{
+		backupList = append(backupList, internal.BackupFile{
 			Name: file.Name(),
 			Size: tools.FormatBytes(float64(info.Size())),
 		})

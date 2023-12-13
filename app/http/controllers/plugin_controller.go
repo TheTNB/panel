@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"sync"
-
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
@@ -31,13 +29,10 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	var lock sync.RWMutex
 	installedPluginsMap := make(map[string]models.Plugin)
 
 	for _, p := range installedPlugins {
-		lock.Lock()
 		installedPluginsMap[p.Slug] = p
-		lock.Unlock()
 	}
 
 	type plugin struct {
@@ -111,28 +106,21 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "插件已安装")
 	}
 
-	var lock sync.RWMutex
 	pluginsMap := make(map[string]bool)
 
 	for _, p := range installedPlugins {
-		lock.Lock()
 		pluginsMap[p.Slug] = true
-		lock.Unlock()
 	}
 
 	for _, require := range plugin.Requires {
-		lock.RLock()
 		_, requireFound := pluginsMap[require]
-		lock.RUnlock()
 		if !requireFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
 	for _, exclude := range plugin.Excludes {
-		lock.RLock()
 		_, excludeFound := pluginsMap[exclude]
-		lock.RUnlock()
 		if excludeFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
@@ -172,28 +160,21 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
-	var lock sync.RWMutex
 	pluginsMap := make(map[string]bool)
 
 	for _, p := range installedPlugins {
-		lock.Lock()
 		pluginsMap[p.Slug] = true
-		lock.Unlock()
 	}
 
 	for _, require := range plugin.Requires {
-		lock.RLock()
 		_, requireFound := pluginsMap[require]
-		lock.RUnlock()
 		if !requireFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
 	for _, exclude := range plugin.Excludes {
-		lock.RLock()
 		_, excludeFound := pluginsMap[exclude]
-		lock.RUnlock()
 		if excludeFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
@@ -233,28 +214,21 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
-	var lock sync.RWMutex
 	pluginsMap := make(map[string]bool)
 
 	for _, p := range installedPlugins {
-		lock.Lock()
 		pluginsMap[p.Slug] = true
-		lock.Unlock()
 	}
 
 	for _, require := range plugin.Requires {
-		lock.RLock()
 		_, requireFound := pluginsMap[require]
-		lock.RUnlock()
 		if !requireFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
 		}
 	}
 
 	for _, exclude := range plugin.Excludes {
-		lock.RLock()
 		_, excludeFound := pluginsMap[exclude]
-		lock.RUnlock()
 		if excludeFound {
 			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
 		}
