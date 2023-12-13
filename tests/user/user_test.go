@@ -5,16 +5,17 @@ import (
 
 	"github.com/goravel/framework/facades"
 	"github.com/stretchr/testify/suite"
-	"panel/app/internal/services"
 
 	"panel/app/models"
+	"panel/internal"
+	"panel/internal/services"
 	"panel/tests"
 )
 
 type UserTestSuite struct {
 	suite.Suite
 	tests.TestCase
-	user services.User
+	user internal.User
 }
 
 func TestUserTestSuite(t *testing.T) {
