@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/goravel/fiber"
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 
 	_ "panel/docs"
 )
@@ -37,6 +38,10 @@ func NewSwaggerController() *SwaggerController {
 //	@Failure		500
 //	@Router			/swagger [get]
 func (r *SwaggerController) Index(ctx http.Context) http.Response {
+	if !facades.Config().GetBool("app.debug") {
+		return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
+	}
+
 	err := swagger.New(swagger.Config{
 		Title: "耗子面板 Swagger",
 	})(ctx.(*fiber.Context).Instance())

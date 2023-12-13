@@ -34,7 +34,7 @@ func (r *AssetController) Index(ctx http.Context) http.Response {
 	}
 	// 拒绝访问非入口文件
 	if !strings.HasPrefix(ctx.Request().Path(), entrance) {
-		return ctx.Response().Status(http.StatusNotFound).String(http.StatusText(http.StatusNotFound))
+		return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	path := strings.TrimPrefix(ctx.Request().Path(), entrance)
@@ -44,21 +44,21 @@ func (r *AssetController) Index(ctx http.Context) http.Response {
 	}
 
 	if !tools.Exists("public" + path) {
-		return ctx.Response().Status(http.StatusNotFound).String(http.StatusText(http.StatusNotFound))
+		return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
 	file, err := os.Open("public" + path)
 	if err != nil {
-		return ctx.Response().Status(http.StatusInternalServerError).String(http.StatusText(http.StatusInternalServerError))
+		return Error(ctx, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
 	stat, err := file.Stat()
 	if err != nil {
-		return ctx.Response().Status(http.StatusInternalServerError).String(http.StatusText(http.StatusInternalServerError))
+		return Error(ctx, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 	}
 
 	if stat.IsDir() {
-		return ctx.Response().Status(http.StatusForbidden).String(http.StatusText(http.StatusForbidden))
+		return Error(ctx, http.StatusForbidden, http.StatusText(http.StatusForbidden))
 	}
 
 	return ctx.Response().Header("Cache-Control", "no-cache").File("public" + path)
@@ -73,5 +73,5 @@ func (r *AssetController) Robots(ctx http.Context) http.Response {
 }
 
 func (r *AssetController) NotFound(ctx http.Context) http.Response {
-	return ctx.Response().Status(http.StatusNotFound).String(http.StatusText(http.StatusNotFound))
+	return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 }
