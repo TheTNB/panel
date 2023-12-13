@@ -115,7 +115,6 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			color.Redln("生成密码失败")
 			return nil
 		}
-
 		user.Username = tools.RandomString(8)
 		user.Password = hash
 
@@ -130,11 +129,20 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			color.Redln("获取面板端口失败")
 			return nil
 		}
+		ip, err := tools.GetPublicIP()
+		if err != nil {
+			ip = "127.0.0.1"
+		}
+		protocol := "http"
+		if facades.Config().GetBool("panel.ssl") {
+			protocol = "https"
+		}
 
 		color.Greenln("用户名: " + user.Username)
 		color.Greenln("密码: " + password)
 		color.Greenln("面板端口: " + port)
 		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
+		color.Greenln("面板地址: " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)

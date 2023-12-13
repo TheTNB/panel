@@ -97,7 +97,13 @@ func (s *HelperTestSuite) TestGetPanelVersion() {
 	if env.IsWindows() {
 		return
 	}
-	version, err := GetPanelVersion("v2.0.58")
+	version, err := GetPanelVersion("v2.1.29")
 	s.NotEmpty(version)
 	s.Nil(err)
+}
+
+func (s *HelperTestSuite) TestGetPublicIP() {
+	ip, err := GetPublicIP()
+	s.Nil(err)
+	s.NotEmpty(ip)
 }

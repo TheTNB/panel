@@ -240,6 +240,10 @@ Init_Panel() {
     rm -rf ${panelZipName}
     rm -rf ${checksumsFileName}
     cp panel-example.conf panel.conf
+
+    # 设置面板
+    entrance=$(cat /dev/urandom | head -n 16 | md5sum | head -c 6)
+    sed -i "s!APP_ENTRANCE=.*!APP_ENTRANCE=${entrance}!g" panel.conf
     ${setup_Path}/panel/panel --env="panel.conf" artisan key:generate
     ${setup_Path}/panel/panel --env="panel.conf" artisan jwt:secret
     ${setup_Path}/panel/panel --env="panel.conf" artisan migrate

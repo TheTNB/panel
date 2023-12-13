@@ -528,3 +528,18 @@ func IsChina() bool {
 
 	return false
 }
+
+// GetPublicIP 获取公网IP
+func GetPublicIP() (string, error) {
+	client := req.C()
+	client.SetTimeout(5 * time.Second)
+	client.SetCommonRetryCount(2)
+	client.ImpersonateSafari()
+
+	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	if err != nil || !resp.IsSuccessState() {
+		return "", errors.New("获取公网IP失败")
+	}
+
+	return strings.TrimPrefix(strings.Split(resp.String(), "\n")[2], "ip="), nil
+}
