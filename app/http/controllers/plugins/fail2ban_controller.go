@@ -9,13 +9,14 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type Fail2banController struct {
-	website services.Website
+	website internal.Website
 }
 
 func NewFail2banController() *Fail2banController {

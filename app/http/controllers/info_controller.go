@@ -9,8 +9,9 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
@@ -22,8 +23,8 @@ type MenuItem struct {
 }
 
 type InfoController struct {
-	plugin  services.Plugin
-	setting services.Setting
+	plugin  internal.Plugin
+	setting internal.Setting
 }
 
 func NewInfoController() *InfoController {
@@ -60,7 +61,7 @@ func (r *InfoController) HomePlugins(ctx http.Context) http.Response {
 	for _, plugin := range plugins {
 		pluginsJson = append(pluginsJson, pluginsData{
 			Plugin: plugin,
-			Name:   services.NewPluginImpl().GetBySlug(plugin.Slug).Name,
+			Name:   r.plugin.GetBySlug(plugin.Slug).Name,
 		})
 	}
 

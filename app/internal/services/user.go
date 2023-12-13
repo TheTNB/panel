@@ -7,11 +7,6 @@ import (
 	"panel/app/models"
 )
 
-type User interface {
-	Create(name, password string) (models.User, error)
-	Update(user models.User) (models.User, error)
-}
-
 type UserImpl struct {
 }
 

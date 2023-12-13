@@ -4,6 +4,7 @@ package services
 import (
 	"github.com/goravel/framework/facades"
 
+	"panel/app/internal"
 	"panel/app/models"
 	"panel/app/plugins/fail2ban"
 	"panel/app/plugins/mysql57"
@@ -25,26 +26,6 @@ import (
 	"panel/app/plugins/toolbox"
 )
 
-// PanelPlugin 插件元数据结构
-type PanelPlugin struct {
-	Name        string
-	Description string
-	Slug        string
-	Version     string
-	Requires    []string
-	Excludes    []string
-	Install     string
-	Uninstall   string
-	Update      string
-}
-
-type Plugin interface {
-	AllInstalled() ([]models.Plugin, error)
-	All() []PanelPlugin
-	GetBySlug(slug string) PanelPlugin
-	GetInstalledBySlug(slug string) models.Plugin
-}
-
 type PluginImpl struct {
 }
 
@@ -63,10 +44,10 @@ func (r *PluginImpl) AllInstalled() ([]models.Plugin, error) {
 }
 
 // All 获取所有插件
-func (r *PluginImpl) All() []PanelPlugin {
-	var p []PanelPlugin
+func (r *PluginImpl) All() []internal.PanelPlugin {
+	var p []internal.PanelPlugin
 
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        openresty.Name,
 		Description: openresty.Description,
 		Slug:        openresty.Slug,
@@ -77,7 +58,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   openresty.Uninstall,
 		Update:      openresty.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        mysql57.Name,
 		Description: mysql57.Description,
 		Slug:        mysql57.Slug,
@@ -88,7 +69,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   mysql57.Uninstall,
 		Update:      mysql57.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        mysql80.Name,
 		Description: mysql80.Description,
 		Slug:        mysql80.Slug,
@@ -99,7 +80,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   mysql80.Uninstall,
 		Update:      mysql80.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        postgresql15.Name,
 		Description: postgresql15.Description,
 		Slug:        postgresql15.Slug,
@@ -110,7 +91,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   postgresql15.Uninstall,
 		Update:      postgresql15.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        postgresql16.Name,
 		Description: postgresql16.Description,
 		Slug:        postgresql16.Slug,
@@ -121,7 +102,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   postgresql16.Uninstall,
 		Update:      postgresql16.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        php74.Name,
 		Description: php74.Description,
 		Slug:        php74.Slug,
@@ -132,7 +113,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   php74.Uninstall,
 		Update:      php74.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        php80.Name,
 		Description: php80.Description,
 		Slug:        php80.Slug,
@@ -143,7 +124,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   php80.Uninstall,
 		Update:      php80.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        php81.Name,
 		Description: php81.Description,
 		Slug:        php81.Slug,
@@ -154,7 +135,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   php81.Uninstall,
 		Update:      php81.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        php82.Name,
 		Description: php82.Description,
 		Slug:        php82.Slug,
@@ -165,7 +146,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   php82.Uninstall,
 		Update:      php82.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        php83.Name,
 		Description: php83.Description,
 		Slug:        php83.Slug,
@@ -176,7 +157,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   php83.Uninstall,
 		Update:      php83.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        phpmyadmin.Name,
 		Description: phpmyadmin.Description,
 		Slug:        phpmyadmin.Slug,
@@ -187,7 +168,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   phpmyadmin.Uninstall,
 		Update:      phpmyadmin.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        pureftpd.Name,
 		Description: pureftpd.Description,
 		Slug:        pureftpd.Slug,
@@ -198,7 +179,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   pureftpd.Uninstall,
 		Update:      pureftpd.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        redis.Name,
 		Description: redis.Description,
 		Slug:        redis.Slug,
@@ -209,7 +190,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   redis.Uninstall,
 		Update:      redis.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        s3fs.Name,
 		Description: s3fs.Description,
 		Slug:        s3fs.Slug,
@@ -220,7 +201,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   s3fs.Uninstall,
 		Update:      s3fs.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        supervisor.Name,
 		Description: supervisor.Description,
 		Slug:        supervisor.Slug,
@@ -231,7 +212,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   supervisor.Uninstall,
 		Update:      supervisor.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        fail2ban.Name,
 		Description: fail2ban.Description,
 		Slug:        fail2ban.Slug,
@@ -242,7 +223,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   fail2ban.Uninstall,
 		Update:      fail2ban.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        rsync.Name,
 		Description: rsync.Description,
 		Slug:        rsync.Slug,
@@ -253,7 +234,7 @@ func (r *PluginImpl) All() []PanelPlugin {
 		Uninstall:   rsync.Uninstall,
 		Update:      rsync.Update,
 	})
-	p = append(p, PanelPlugin{
+	p = append(p, internal.PanelPlugin{
 		Name:        toolbox.Name,
 		Description: toolbox.Description,
 		Slug:        toolbox.Slug,
@@ -269,14 +250,14 @@ func (r *PluginImpl) All() []PanelPlugin {
 }
 
 // GetBySlug 根据slug获取插件
-func (r *PluginImpl) GetBySlug(slug string) PanelPlugin {
+func (r *PluginImpl) GetBySlug(slug string) internal.PanelPlugin {
 	for _, item := range r.All() {
 		if item.Slug == slug {
 			return item
 		}
 	}
 
-	return PanelPlugin{}
+	return internal.PanelPlugin{}
 }
 
 // GetInstalledBySlug 根据slug获取已安装的插件

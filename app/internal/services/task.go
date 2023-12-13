@@ -7,10 +7,6 @@ import (
 	"panel/app/jobs"
 )
 
-type Task interface {
-	Process(taskID uint)
-}
-
 type TaskImpl struct {
 }
 

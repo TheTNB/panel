@@ -7,13 +7,14 @@ import (
 
 	requests "panel/app/http/requests/setting"
 	responses "panel/app/http/responses/setting"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type SettingController struct {
-	setting services.Setting
+	setting internal.Setting
 }
 
 func NewSettingController() *SettingController {

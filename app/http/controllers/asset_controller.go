@@ -7,12 +7,13 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/services"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/pkg/tools"
 )
 
 type AssetController struct {
-	setting services.Setting
+	setting internal.Setting
 }
 
 func NewAssetController() *AssetController {

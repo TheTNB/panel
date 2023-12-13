@@ -9,14 +9,15 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type Mysql57Controller struct {
-	setting services.Setting
-	backup  services.Backup
+	setting internal.Setting
+	backup  internal.Backup
 }
 
 func NewMysql57Controller() *Mysql57Controller {
@@ -376,7 +377,7 @@ func (r *Mysql57Controller) BackupList(ctx http.Context) http.Response {
 	if startIndex > len(backupList) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []services.BackupFile{},
+			"items": []internal.BackupFile{},
 		})
 	}
 	if endIndex > len(backupList) {
@@ -384,7 +385,7 @@ func (r *Mysql57Controller) BackupList(ctx http.Context) http.Response {
 	}
 	pagedBackupList := backupList[startIndex:endIndex]
 	if pagedBackupList == nil {
-		pagedBackupList = []services.BackupFile{}
+		pagedBackupList = []internal.BackupFile{}
 	}
 
 	return controllers.Success(ctx, http.Json{

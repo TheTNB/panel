@@ -11,15 +11,16 @@ import (
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/website"
 	responses "panel/app/http/responses/website"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type WebsiteController struct {
-	website services.Website
-	setting services.Setting
-	backup  services.Backup
+	website internal.Website
+	setting internal.Setting
+	backup  internal.Backup
 }
 
 func NewWebsiteController() *WebsiteController {
@@ -83,7 +84,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 		addRequest.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + addRequest.Name
 	}
 
-	website := services.PanelWebsite{
+	website := internal.PanelWebsite{
 		Name:       addRequest.Name,
 		Status:     true,
 		Domains:    addRequest.Domains,
@@ -350,7 +351,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	if startIndex > len(backupList) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []services.BackupFile{},
+			"items": []internal.BackupFile{},
 		})
 	}
 	if endIndex > len(backupList) {
@@ -358,7 +359,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	}
 	pagedBackupList := backupList[startIndex:endIndex]
 	if pagedBackupList == nil {
-		pagedBackupList = []services.BackupFile{}
+		pagedBackupList = []internal.BackupFile{}
 	}
 
 	return Success(ctx, http.Json{

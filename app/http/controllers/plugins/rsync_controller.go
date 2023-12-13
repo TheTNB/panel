@@ -9,12 +9,13 @@ import (
 	"panel/app/http/controllers"
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/plugins/rsync"
-	"panel/app/services"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/pkg/tools"
 )
 
 type RsyncController struct {
-	setting services.Setting
+	setting internal.Setting
 }
 
 func NewRsyncController() *RsyncController {

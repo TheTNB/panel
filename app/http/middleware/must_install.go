@@ -5,8 +5,7 @@ import (
 	"sync"
 
 	"github.com/goravel/framework/contracts/http"
-
-	"panel/app/services"
+	"panel/app/internal/services"
 )
 
 // MustInstall 确保已安装插件

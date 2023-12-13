@@ -13,14 +13,15 @@ import (
 	"github.com/spf13/cast"
 	"github.com/valyala/fasthttp"
 
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/ssh"
 )
 
 type SshController struct {
 	AuthMethod ssh.AuthMethod
-	setting    services.Setting
+	setting    internal.Setting
 }
 
 func NewSshController() *SshController {

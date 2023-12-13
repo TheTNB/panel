@@ -11,14 +11,15 @@ import (
 	"github.com/imroc/req/v3"
 
 	"panel/app/http/controllers"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/tools"
 )
 
 type Php74Controller struct {
-	setting services.Setting
-	task    services.Task
+	setting internal.Setting
+	task    internal.Task
 	version string
 }
 

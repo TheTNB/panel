@@ -9,12 +9,13 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
-	"panel/app/services"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/pkg/tools"
 )
 
 type S3fsController struct {
-	setting services.Setting
+	setting internal.Setting
 }
 
 func NewS3fsController() *S3fsController {

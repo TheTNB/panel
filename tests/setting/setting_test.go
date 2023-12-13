@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"panel/app/internal/services"
 
-	"panel/app/services"
 	"panel/tests"
 )
 

@@ -7,14 +7,15 @@ import (
 	requests "panel/app/http/requests/cert"
 	commonrequests "panel/app/http/requests/common"
 	responses "panel/app/http/responses/cert"
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 	"panel/pkg/acme"
 )
 
 type CertController struct {
-	cron services.Cron
-	cert services.Cert
+	cron internal.Cron
+	cert internal.Cert
 }
 
 func NewCertController() *CertController {

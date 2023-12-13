@@ -13,67 +13,14 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 	requests "panel/app/http/requests/website"
+	"panel/app/internal"
 
 	"panel/app/models"
 	"panel/pkg/tools"
 )
 
-type Website interface {
-	List(page int, limit int) (int64, []models.Website, error)
-	Add(website PanelWebsite) (models.Website, error)
-	SaveConfig(config requests.SaveConfig) error
-	Delete(id uint) error
-	GetConfig(id uint) (WebsiteSetting, error)
-	GetConfigByName(name string) (WebsiteSetting, error)
-}
-
-type PanelWebsite struct {
-	Name       string   `json:"name"`
-	Status     bool     `json:"status"`
-	Domains    []string `json:"domains"`
-	Ports      []uint   `json:"ports"`
-	Path       string   `json:"path"`
-	Php        int      `json:"php"`
-	Ssl        bool     `json:"ssl"`
-	Remark     string   `json:"remark"`
-	Db         bool     `json:"db"`
-	DbType     string   `json:"db_type"`
-	DbName     string   `json:"db_name"`
-	DbUser     string   `json:"db_user"`
-	DbPassword string   `json:"db_password"`
-}
-
-// WebsiteSetting 网站设置
-type WebsiteSetting struct {
-	Name              string   `json:"name"`
-	Domains           []string `json:"domains"`
-	Ports             []uint   `json:"ports"`
-	Root              string   `json:"root"`
-	Path              string   `json:"path"`
-	Index             string   `json:"index"`
-	Php               int      `json:"php"`
-	OpenBasedir       bool     `json:"open_basedir"`
-	Ssl               bool     `json:"ssl"`
-	SslCertificate    string   `json:"ssl_certificate"`
-	SslCertificateKey string   `json:"ssl_certificate_key"`
-	SslNotBefore      string   `json:"ssl_not_before"`
-	SslNotAfter       string   `json:"ssl_not_after"`
-	SSlDNSNames       []string `json:"ssl_dns_names"`
-	SslIssuer         string   `json:"ssl_issuer"`
-	SslOCSPServer     []string `json:"ssl_ocsp_server"`
-	HttpRedirect      bool     `json:"http_redirect"`
-	Hsts              bool     `json:"hsts"`
-	Waf               bool     `json:"waf"`
-	WafMode           string   `json:"waf_mode"`
-	WafCcDeny         string   `json:"waf_cc_deny"`
-	WafCache          string   `json:"waf_cache"`
-	Rewrite           string   `json:"rewrite"`
-	Raw               string   `json:"raw"`
-	Log               string   `json:"log"`
-}
-
 type WebsiteImpl struct {
-	setting Setting
+	setting internal.Setting
 }
 
 func NewWebsiteImpl() *WebsiteImpl {
@@ -94,7 +41,7 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 }
 
 // Add 添加网站
-func (r *WebsiteImpl) Add(website PanelWebsite) (models.Website, error) {
+func (r *WebsiteImpl) Add(website internal.PanelWebsite) (models.Website, error) {
 	w := models.Website{
 		Name:   website.Name,
 		Status: website.Status,
@@ -553,18 +500,18 @@ func (r *WebsiteImpl) Delete(id uint) error {
 }
 
 // GetConfig 获取网站配置
-func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
-		return WebsiteSetting{}, err
+		return internal.WebsiteSetting{}, err
 	}
 
 	config, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
-		return WebsiteSetting{}, err
+		return internal.WebsiteSetting{}, err
 	}
 
-	var setting WebsiteSetting
+	var setting internal.WebsiteSetting
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
@@ -666,10 +613,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (WebsiteSetting, error) {
 }
 
 // GetConfigByName 根据网站名称获取网站配置
-func (r *WebsiteImpl) GetConfigByName(name string) (WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfigByName(name string) (internal.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
-		return WebsiteSetting{}, err
+		return internal.WebsiteSetting{}, err
 	}
 
 	return r.GetConfig(website.ID)

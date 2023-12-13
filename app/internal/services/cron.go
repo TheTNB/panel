@@ -7,11 +7,6 @@ import (
 	"panel/pkg/tools"
 )
 
-type Cron interface {
-	AddToSystem(cron models.Cron) error
-	DeleteFromSystem(cron models.Cron) error
-}
-
 type CronImpl struct {
 }
 

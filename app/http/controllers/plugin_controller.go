@@ -6,13 +6,14 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
+	"panel/app/internal"
+	"panel/app/internal/services"
 	"panel/app/models"
-	"panel/app/services"
 )
 
 type PluginController struct {
-	plugin services.Plugin
-	task   services.Task
+	plugin internal.Plugin
+	task   internal.Task
 }
 
 func NewPluginController() *PluginController {
