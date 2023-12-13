@@ -62,7 +62,7 @@ func (c *Client) UseDns(dnsType DnsType, param DNSParam) error {
 	if dnsType == CloudFlare {
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
-		cloudflareConfig.AuthKey = param.APIkey
+		cloudflareConfig.AuthToken = param.APIkey
 		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
 		if err != nil {
 			return err
