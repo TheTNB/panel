@@ -21,9 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 # 计算 j 值（通用）
 calculate_j() {
     export LC_ALL=C
-    total_mem=$(free -m | awk '/^Mem:/{print $2}')
-    total_swap=$(free -m | awk '/^Swap:/{print $2}')
-    total=$((total_mem + total_swap))
+    total=$(free -m | awk '/^Mem:/{print $2}')
     j_value=$((total / 1024))
     cpu_cores=$(nproc)
 
@@ -41,9 +39,7 @@ calculate_j() {
 # 计算 j 值（2倍内存）
 calculate_j2() {
     export LC_ALL=C
-    total_mem=$(free -m | awk '/^Mem:/{print $2}')
-    total_swap=$(free -m | awk '/^Swap:/{print $2}')
-    total=$((total_mem + total_swap))
+    total=$(free -m | awk '/^Mem:/{print $2}')
     j_value=$((total / 2024))
     cpu_cores=$(nproc)
 
