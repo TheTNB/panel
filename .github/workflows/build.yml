@@ -26,7 +26,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: go build -ldflags '-s -w --extldflags "-static -fpic"' -o panel-${{ matrix.goarch }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: panel-${{ matrix.goarch }}
           path: panel-${{ matrix.goarch }}
