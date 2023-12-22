@@ -28,7 +28,7 @@ func (r *Update) Rules(ctx http.Context) map[string]string {
 		"backup_path":  "required|string:2,255",
 		"website_path": "required|string:2,255",
 		"entrance":     `required|regex:^/(\w+)?$|not_in:/api`,
-		"ssl":          "required|bool",
+		"ssl":          "bool",
 		"username":     "required|string:2,20",
 		"email":        "required|email",
 		"password":     "string:8,255",
