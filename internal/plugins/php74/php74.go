@@ -2,7 +2,7 @@ package php74
 
 var (
 	Name        = "PHP-7.4"
-	Description = "PHP 是世界上最好的语言！"
+	Description = "PHP 是世界上最好的语言！（已停止维护，不建议使用！预计 2024 年 12 月移除）"
 	Slug        = "php74"
 	Version     = "7.4.33"
 	Requires    = []string{}

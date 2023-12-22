@@ -2,7 +2,7 @@ package mysql57
 
 var (
 	Name        = "MySQL-5.7"
-	Description = "MySQL 是最流行的关系型数据库管理系统之一，Oracle 旗下产品。"
+	Description = "MySQL 是最流行的关系型数据库管理系统之一，Oracle 旗下产品。（已停止维护，不建议使用！预计 2025 年 12 月移除）"
 	Slug        = "mysql57"
 	Version     = "5.7.44"
 	Requires    = []string{}
