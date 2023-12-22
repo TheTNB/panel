@@ -10,7 +10,7 @@ require (
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.1
 	github.com/goravel/fiber v1.1.11-0.20231222082732-ab5faaaee0d2
-	github.com/goravel/framework v1.13.1-0.20231221015045-5ed4c21c6875
+	github.com/goravel/framework v1.13.1-0.20231222074402-8955968c9670
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1
 	github.com/mholt/archiver/v3 v3.5.1

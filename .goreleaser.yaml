@@ -14,7 +14,7 @@ builds:
     goamd64:
       - v2
     ldflags:
-      - -s -w --extldflags "-static -fpic"
+      - -s -w --extldflags "-static"
 archives:
   -
     id: panel-archive

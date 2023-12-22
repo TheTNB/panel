@@ -54,7 +54,7 @@ build:
   extends: .go_cache
   script:
     - go mod download
-    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static -fpic"' -o $OUTPUT_NAME
+    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static"' -o $OUTPUT_NAME
   artifacts:
     name: "$OUTPUT_NAME"
     paths:
