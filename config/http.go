@@ -40,9 +40,9 @@ func init() {
 			// SSL Certificate
 			"ssl": map[string]any{
 				// ca.pem
-				"cert": "/www/panel/storage/cert.pem",
+				"cert": config.Env("APP_SSL_CERT", "/www/panel/storage/ssl.crt"),
 				// ca.key
-				"key": "/www/panel/storage/key.pem",
+				"key": config.Env("APP_SSL_KEY", "/www/panel/storage/ssl.key"),
 			},
 		},
 	})

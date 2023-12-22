@@ -117,6 +117,9 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 		user.Username = tools.RandomString(8)
 		user.Password = hash
+		if user.Email == "" {
+			user.Email = tools.RandomString(8) + "@example.com"
+		}
 
 		err = facades.Orm().Query().Save(&user)
 		if err != nil {

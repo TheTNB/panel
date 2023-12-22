@@ -61,6 +61,7 @@ if version_lt "$oldVersion" "2.1.30"; then
     sed -i '/APP_HOST/d' $panelPath/panel.conf
     echo "APP_SSL=false" >> $panelPath/panel.conf
     mv $panelPath/database/panel.db $panelPath/storage/panel.db
+    openssl req -x509 -nodes -days 36500 -newkey ec:<(openssl ecparam -name secp384r1) -keyout $panelPath/storage/ssl.key -out $panelPath/storage/ssl.crt -subj "/C=CN/ST=Tianjin/L=Tianjin/O=HaoZi Technology Co., Ltd./OU=HaoZi Panel/CN=Panel"
 fi
 
 echo $HR

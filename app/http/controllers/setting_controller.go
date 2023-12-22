@@ -61,6 +61,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	return Success(ctx, http.Json{
 		"name":         r.setting.Get(models.SettingKeyName),
 		"entrance":     facades.Config().GetString("http.entrance"),
+		"ssl":          facades.Config().GetBool("panel.ssl"),
 		"website_path": r.setting.Get(models.SettingKeyWebsitePath),
 		"backup_path":  r.setting.Get(models.SettingKeyBackupPath),
 		"user_name":    user.Username,
@@ -192,6 +193,16 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	entrance := cast.ToString(updateRequest.Entrance)
 	if oldEntrance != entrance {
 		if out, err := tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf"); err != nil {
+			return Error(ctx, http.StatusInternalServerError, out)
+		}
+	}
+
+	if updateRequest.SSL {
+		if out, err := tools.Exec("sed -i 's/APP_SSL=false/APP_SSL=true/g' /www/panel/panel.conf"); err != nil {
+			return Error(ctx, http.StatusInternalServerError, out)
+		}
+	} else {
+		if out, err := tools.Exec("sed -i 's/APP_SSL=true/APP_SSL=false/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}

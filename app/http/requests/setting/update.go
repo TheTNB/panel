@@ -11,6 +11,7 @@ type Update struct {
 	BackupPath  string `form:"backup_path" json:"backup_path"`
 	WebsitePath string `form:"website_path" json:"website_path"`
 	Entrance    string `form:"entrance" json:"entrance"`
+	SSL         bool   `form:"ssl" json:"ssl"`
 	UserName    string `form:"username" json:"username"`
 	Email       string `form:"email" json:"email"`
 	Password    string `form:"password" json:"password"`
@@ -27,8 +28,9 @@ func (r *Update) Rules(ctx http.Context) map[string]string {
 		"backup_path":  "required|string:2,255",
 		"website_path": "required|string:2,255",
 		"entrance":     `required|regex:^/(\w+)?$|not_in:/api`,
+		"ssl":          "required|bool",
 		"username":     "required|string:2,20",
-		"email":        "email",
+		"email":        "required|email",
 		"password":     "string:8,255",
 	}
 }
