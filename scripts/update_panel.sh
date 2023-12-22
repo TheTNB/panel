@@ -33,16 +33,31 @@ function version_ge() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -rV | head
 function version_le() { test "$(echo -e "$1\n$2" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
 
 if [ -z "$oldVersion" ]; then
-    echo "错误：无法获取面板版本"
-    echo "Error: can't get panel version"
-    exit 1
+    if [ -f "$panelPath/database/panel.db" ]; then
+        echo "DB_FILE=$panelPath/database/panel.db" >> $panelPath/panel.conf
+        oldVersion=$(panel getSetting version)
+        oldVersion=${oldVersion#v}
+        sed -i '/DB_FILE/d' $panelPath/panel.conf
+    else
+        echo "错误：无法获取面板版本"
+        echo "Error: can't get panel version"
+        exit 1
+    fi
 fi
+
 # 判断版本号是否合法
 versionPattern="^[0-9]+\.[0-9]+\.[0-9]+$"
 if [[ ! $oldVersion =~ $versionPattern ]]; then
-    echo "错误：面板版本号不合法"
-    echo "Error: panel version is illegal"
-    exit 1
+    if [ -f "$panelPath/database/panel.db" ]; then
+        echo "DB_FILE=$panelPath/database/panel.db" >> $panelPath/panel.conf
+        oldVersion=$(panel getSetting version)
+        oldVersion=${oldVersion#v}
+        sed -i '/DB_FILE/d' $panelPath/panel.conf
+    else
+        echo "错误：面板版本号不合法"
+        echo "Error: panel version is illegal"
+        exit 1
+    fi
 fi
 
 echo $HR
