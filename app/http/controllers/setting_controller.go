@@ -207,7 +207,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}
 	}
 
-	if oldPort != port || oldEntrance != entrance {
+	if oldPort != port || oldEntrance != entrance || updateRequest.SSL != facades.Config().GetBool("panel.ssl") {
 		tools.RestartPanel()
 	}
 
