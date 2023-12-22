@@ -9,7 +9,7 @@ require (
 	github.com/gofiber/swagger v0.1.14
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.1
-	github.com/goravel/fiber v1.1.11-0.20231222082047-4dbfa2598536
+	github.com/goravel/fiber v1.1.11-0.20231222082732-ab5faaaee0d2
 	github.com/goravel/framework v1.13.1-0.20231214150751-ea46f55b93db
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imroc/req/v3 v3.42.1

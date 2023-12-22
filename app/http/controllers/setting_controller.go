@@ -64,7 +64,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		"ssl":          facades.Config().GetBool("panel.ssl"),
 		"website_path": r.setting.Get(models.SettingKeyWebsitePath),
 		"backup_path":  r.setting.Get(models.SettingKeyBackupPath),
-		"user_name":    user.Username,
+		"username":     user.Username,
 		"password":     "",
 		"email":        user.Email,
 		"port":         port,
