@@ -60,7 +60,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 		}
 	}
 
-	token, loginErr := facades.Auth().LoginUsingID(ctx, user.ID)
+	token, loginErr := facades.Auth(ctx).LoginUsingID(user.ID)
 	if loginErr != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
@@ -84,7 +84,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 //	@Router			/panel/user/info [get]
 func (r *UserController) Info(ctx http.Context) http.Response {
 	var user models.User
-	err := facades.Auth().User(ctx, &user)
+	err := facades.Auth(ctx).User(&user)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),

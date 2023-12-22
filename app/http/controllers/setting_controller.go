@@ -42,7 +42,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	}
 
 	var user models.User
-	err = facades.Auth().User(ctx, &user)
+	err = facades.Auth(ctx).User(&user)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -126,7 +126,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	}
 
 	var user models.User
-	err = facades.Auth().User(ctx, &user)
+	err = facades.Auth(ctx).User(&user)
 	if err != nil {
 		return ErrorSystem(ctx)
 	}

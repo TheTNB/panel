@@ -21,9 +21,9 @@ func Jwt() http.Middleware {
 		}
 
 		// JWT 鉴权
-		if _, err := facades.Auth().Parse(ctx, token); err != nil {
+		if _, err := facades.Auth(ctx).Parse(token); err != nil {
 			if errors.Is(err, auth.ErrorTokenExpired) {
-				token, err = facades.Auth().Refresh(ctx)
+				token, err = facades.Auth(ctx).Refresh()
 				if err != nil {
 					// 到达刷新时间上限
 					ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
