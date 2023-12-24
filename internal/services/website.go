@@ -165,7 +165,7 @@ server
     # php标记位结束
 
     # waf标记位开始
-    waf on;
+    waf off;
     waf_rule_path /www/server/openresty/ngx_waf/assets/rules/;
     waf_mode DYNAMIC;
     waf_cc_deny rate=1000r/m duration=60m;
