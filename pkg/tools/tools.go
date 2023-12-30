@@ -473,6 +473,10 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		color.Redln("恢复面板配置失败")
 		return err
 	}
+	if _, err = Exec("cp -f /www/panel/scripts/panel.sh /usr/bin/panel"); err != nil {
+		color.Redln("恢复面板脚本失败")
+		return err
+	}
 	if !Exists("/www/panel/storage/panel.db") || !Exists("/www/panel/panel.conf") {
 		color.Redln("恢复面板数据失败")
 		return errors.New("恢复面板数据失败")
@@ -481,6 +485,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 	color.Greenln("设置面板文件权限...")
 	_, _ = Exec("chmod -R 700 /www/panel")
+	_, _ = Exec("chmod -R 700 /usr/bin/panel")
 	color.Greenln("设置完成")
 
 	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {

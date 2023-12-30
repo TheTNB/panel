@@ -85,7 +85,7 @@ func (r *CronController) Add(ctx http.Context) http.Response {
 		shell = `#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
-# 耗子Linux面板 - 数据备份脚本
+# 耗子 Linux 面板 - 数据备份脚本
 
 type=` + backupType + `
 path=` + backupPath + `
@@ -102,7 +102,7 @@ panel backup ${type} ${name} ${path} ${save} 2>&1
 		shell = `#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
-# 耗子Linux面板 - 日志切割脚本
+# 耗子 Linux 面板 - 日志切割脚本
 
 name=` + website + `
 save=` + cast.ToString(save) + `

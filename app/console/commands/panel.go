@@ -56,7 +56,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子Linux面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
+		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子 Linux 面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
 			color.Redln("初始化失败")

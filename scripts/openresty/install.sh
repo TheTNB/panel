@@ -40,7 +40,7 @@ elif [ "${OS}" == "debian" ]; then
     apt-get install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
-    echo "错误：耗子Linux面板不支持该系统"
+    echo "错误：耗子 Linux 面板不支持该系统"
     exit 1
 fi
 
@@ -402,7 +402,7 @@ cat > ${openrestyPath}/html/index.html << EOF
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>未找到网站 - 耗子Linux面板</title>
+    <title>未找到网站 - 耗子 Linux 面板</title>
     <style>
         body {
             background-color: #f9f9f9;
@@ -443,8 +443,8 @@ cat > ${openrestyPath}/html/index.html << EOF
 </head>
 <body>
     <div class="container">
-        <h1>耗子Linux面板</h1>
-        <p>这是耗子Linux面板的OpenResty默认页面！</p>
+        <h1>耗子 Linux 面板</h1>
+        <p>这是耗子 Linux 面板的 OpenResty 默认页面！</p>
         <p>当您看到此页面，说明无法在服务器上找到该域名对应的站点。</p>
     </div>
 </body>
@@ -458,7 +458,7 @@ cat > ${openrestyPath}/html/stop.html << EOF
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网站已停止 - 耗子Linux面板</title>
+    <title>网站已停止 - 耗子 Linux 面板</title>
     <style>
         body {
             background-color: #f9f9f9;
@@ -499,7 +499,7 @@ cat > ${openrestyPath}/html/stop.html << EOF
 </head>
 <body>
     <div class="container">
-        <h1>耗子Linux面板</h1>
+        <h1>耗子 Linux 面板</h1>
         <p>该网站已被管理员停止访问！</p>
         <p>当您看到此页面，说明该网站已被服务器管理员停止对外访问。</p>
     </div>
@@ -514,7 +514,7 @@ cat > ${openrestyPath}/html/block.html << EOF
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>请求被拦截 - 耗子Linux面板</title>
+    <title>请求被拦截 - 耗子 Linux 面板</title>
     <style>
         body {
             background-color: #f9f9f9;
@@ -555,7 +555,7 @@ cat > ${openrestyPath}/html/block.html << EOF
 </head>
 <body>
     <div class="container">
-        <h1>耗子Linux面板</h1>
+        <h1>耗子 Linux 面板</h1>
         <p>本次请求判断为危险的攻击请求，已被拦截！</p>
         <p>当您看到此页面，说明您的请求被WAF拦截，可能是由于您的请求中包含了危险的攻击内容，或者您的请求被误判为攻击请求。</p>
         <p>如果您认为这是误判，请联系服务器管理员解决。</p>

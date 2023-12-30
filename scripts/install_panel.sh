@@ -18,7 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
-LOGO="+----------------------------------------------------\n| 耗子Linux面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
+LOGO="+----------------------------------------------------\n| 耗子 Linux 面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
 HR="+----------------------------------------------------"
 setup_Path="/www"
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
@@ -27,7 +27,7 @@ inChina=$(curl --retry 2 -m 10 -L https://www.cloudflare-cn.com/cdn-cgi/trace 2>
 Prepare_System() {
     if [ $(whoami) != "root" ]; then
         echo -e $HR
-        echo "错误：请使用root用户运行安装命令。"
+        echo "错误：请使用 root 用户运行安装命令。"
         exit 1
     fi
 
@@ -35,33 +35,33 @@ Prepare_System() {
     OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
     if [ "${OS}" == "unknown" ]; then
         echo -e $HR
-        echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
+        echo "错误：该系统不支持安装耗子 Linux 面板，请更换 Debian 12.x / RHEL 9.x 安装。"
         exit 1
     fi
     if [ "${ARCH}" != "x86_64" ] && [ "${ARCH}" != "aarch64" ]; then
         echo -e $HR
-        echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
+        echo "错误：该系统架构不支持安装耗子 Linux 面板，请更换 x86_64 / aarch64 架构安装。"
         exit 1
     fi
 
     kernelVersion=$(uname -r | awk -F '.' '{print $1}')
     if [ "${kernelVersion}" != "5" ] && [ "${kernelVersion}" != "6" ]; then
         echo -e $HR
-        echo "错误：该系统内核版本太低，不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
+        echo "错误：该系统内核版本太低，不支持安装耗子 Linux 面板，请更换 Debian 12 / RHEL 9.x 安装。"
         exit 1
     fi
 
     is64bit=$(getconf LONG_BIT)
     if [ "${is64bit}" != '64' ]; then
         echo -e $HR
-        echo "错误：32位系统不支持安装耗子Linux面板，请更换64位系统安装。"
+        echo "错误：32 位系统不支持安装耗子 Linux 面板，请更换 64 位系统安装。"
         exit 1
     fi
 
     isInstalled=$(systemctl status panel 2>&1 | grep "Active")
     if [ "${isInstalled}" != "" ]; then
         echo -e $HR
-        echo "错误：耗子Linux面板已安装，请勿重复安装。"
+        echo "错误：耗子 Linux 面板已安装，请勿重复安装。"
         exit 1
     fi
 
@@ -140,7 +140,7 @@ Prepare_System() {
         apt-get install -y curl wget zip unzip tar git jq git dos2unix rsyslog
     else
         echo -e $HR
-        echo "错误：该系统不支持安装耗子Linux面板，请更换Debian12/RHEL9安装。"
+        echo "错误：该系统不支持安装耗子 Linux 面板，请更换 Debian 12.x / RHEL 9.x 安装。"
         exit 1
     fi
 
@@ -205,7 +205,7 @@ Init_Panel() {
         fi
     else
         echo -e $HR
-        echo "错误：该系统架构不支持安装耗子Linux面板，请更换x86_64/aarch64架构安装。"
+        echo "错误：该系统架构不支持安装耗子 Linux 面板，请更换 x86_64 / aarch64 架构安装。"
         exit 1
     fi
     if [ "$?" != "0" ] || [ "${panelZip}" == "" ] || [ "${panelZipName}" == "" ]; then
@@ -248,7 +248,7 @@ Init_Panel() {
     ${setup_Path}/panel/panel --env="panel.conf" artisan jwt:secret
     ${setup_Path}/panel/panel --env="panel.conf" artisan migrate
     chmod -R 700 ${setup_Path}/panel
-    cp scripts/panel.sh /usr/bin/panel
+    cp -f scripts/panel.sh /usr/bin/panel
     chmod -R 700 /usr/bin/panel
     # 防火墙放行
     if [ "${OS}" == "centos" ]; then

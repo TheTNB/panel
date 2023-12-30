@@ -50,7 +50,7 @@ elif [ "${OS}" == "debian" ]; then
     apt-get install build-essential make gettext zlib1g-dev libreadline-dev libicu-dev libxml2-dev libxslt-dev libssl-dev libsystemd-dev -y
 else
     echo -e $HR
-    echo "错误：耗子Linux面板不支持该系统"
+    echo "错误：耗子 Linux 面板不支持该系统"
     exit 1
 fi
 
