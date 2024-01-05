@@ -14,12 +14,6 @@ before_script:
     paths:
       - .go/pkg/mod/
 
-# 全局变量
-variables:
-  OUTPUT_NAME: "panel"
-  GO111MODULE: "on"
-  GOPROXY: "https://goproxy.cn,direct"
-
 stages:
   - prepare
   - build
@@ -54,11 +48,11 @@ build:
   extends: .go_cache
   script:
     - go mod download
-    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static"' -o $OUTPUT_NAME
+    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static"' -o panel
   artifacts:
-    name: "$OUTPUT_NAME"
+    name: "panel"
     paths:
-      - $OUTPUT_NAME
+      - panel
     expire_in: 3 days
 
 fetch:
