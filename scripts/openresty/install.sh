@@ -642,6 +642,7 @@ ExecStartPre=/www/server/openresty/sbin/nginx -t -c /www/server/openresty/conf/n
 ExecStart=/www/server/openresty/sbin/nginx -c /www/server/openresty/conf/nginx.conf
 ExecReload=/www/server/openresty/sbin/nginx -s reload
 ExecStop=/www/server/openresty/sbin/nginx -s quit
+LimitNOFILE=500000
 
 [Install]
 WantedBy=multi-user.target

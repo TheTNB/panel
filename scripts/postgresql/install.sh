@@ -171,6 +171,7 @@ ExecReload=/bin/kill -HUP \$MAINPID
 KillMode=mixed
 KillSignal=SIGINT
 TimeoutSec=infinity
+LimitNOFILE=500000
 
 [Install]
 WantedBy=multi-user.target

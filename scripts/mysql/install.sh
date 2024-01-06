@@ -306,38 +306,10 @@ ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath
 echo "export PATH=${mysqlPath}/bin:\$PATH" >> /etc/profile.d/mysql.sh
 source /etc/profile
 
-# 检查 systemd 文件是否存在
-if [ -f "${mysqlPath}/lib/systemd/system/mysqld.service" ]; then
-    mkdir -p ${mysqlPath}/lib/systemd/system
-    cat > ${mysqlPath}/lib/systemd/system/mysqld.service << EOF
-# Copyright (c) 2015, 2023, Oracle and/or its affiliates.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License, version 2.0,
-# as published by the Free Software Foundation.
-#
-# This program is also distributed with certain software (including
-# but not limited to OpenSSL) that is licensed under separate terms,
-# as designated in a particular file or component or in included license
-# documentation.  The authors of MySQL hereby grant you an additional
-# permission to link the program and your derivative works with the
-# separately licensed software that they have included with MySQL.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License, version 2.0, for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-#
-# systemd service file for MySQL forking server
-#
-
+# 写入 systemd 配置
+cat > /etc/systemd/system/mysqld.service << EOF
 [Unit]
 Description=MySQL Server
-Documentation=man:mysqld(8)
 Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
 After=network.target
 After=syslog.target
@@ -359,17 +331,14 @@ TimeoutSec=0
 # Execute pre and post scripts as root
 PermissionsStartOnly=true
 
-# Needed to create system tables
-ExecStartPre=/www/server/mysql/bin/mysqld_pre_systemd
-
 # Start main service
-ExecStart=/www/server/mysql/bin/mysqld --daemonize --pid-file=/www/server/mysql/mysqld.pid $MYSQLD_OPTS
+ExecStart=/www/server/mysql/bin/mysqld --daemonize --pid-file=/www/server/mysql/mysqld.pid \$MYSQLD_OPTS
 
 # Use this to switch malloc implementation
 EnvironmentFile=-/etc/sysconfig/mysql
 
 # Sets open_files_limit
-LimitNOFILE = 5000
+LimitNOFILE = 500000
 
 Restart=on-failure
 
@@ -377,10 +346,6 @@ RestartPreventExitStatus=1
 
 PrivateTmp=false
 EOF
-fi
-
-cp ${mysqlPath}/lib/systemd/system/mysqld.service /etc/systemd/system/mysqld.service
-sed -i '/ExecStartPre/d' /etc/systemd/system/mysqld.service
 
 systemctl daemon-reload
 systemctl enable mysqld
