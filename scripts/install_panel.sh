@@ -247,6 +247,7 @@ Init_Panel() {
     ${setup_Path}/panel/panel --env="panel.conf" artisan key:generate
     ${setup_Path}/panel/panel --env="panel.conf" artisan jwt:secret
     ${setup_Path}/panel/panel --env="panel.conf" artisan migrate
+    openssl req -x509 -nodes -days 36500 -newkey ec:<(openssl ecparam -name secp384r1) -keyout ${setup_Path}/panel/storage/ssl.key -out ${setup_Path}/panel/storage/ssl.crt -subj "/C=CN/ST=Tianjin/L=Tianjin/O=HaoZi Technology Co., Ltd./OU=HaoZi Panel/CN=Panel"
     chmod -R 700 ${setup_Path}/panel
     cp -f scripts/panel.sh /usr/bin/panel
     chmod -R 700 /usr/bin/panel
