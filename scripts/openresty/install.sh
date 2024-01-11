@@ -24,7 +24,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/openresty"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
-openrestyVersion="1.25.3.1rc1"
+openrestyVersion="1.25.3.1"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 source ${setupPath}/panel/scripts/calculate_j.sh
@@ -34,10 +34,10 @@ j=$(calculate_j)
 if [ "${OS}" == "centos" ]; then
     dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel bison yajl yajl-devel curl curl-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
+    dnf install cmake tar unzip gd gd-devel git-core flex perl oniguruma oniguruma-devel libsodium-devel libxml2-devel libxslt-devel bison yajl yajl-devel curl curl-devel ncurses-devel libevent-devel readline-devel libuuid-devel brotli-devel icu libicu libicu-devel openssl openssl-devel -y
 elif [ "${OS}" == "debian" ]; then
     apt-get update
-    apt-get install build-essential tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
+    apt-get install build-essential cmake tar unzip libgd3 libgd-dev git flex perl libonig-dev libsodium-dev libxml2-dev libxslt1-dev bison libyajl-dev curl libcurl4-openssl-dev libncurses5-dev libevent-dev libreadline-dev uuid-dev libbrotli-dev icu-devtools libicu-dev openssl libssl-dev -y
 else
     echo -e $HR
     echo "错误：耗子 Linux 面板不支持该系统"
@@ -99,21 +99,21 @@ rm -f openssl-3.0.12-sess_set_get_cb_yield.patch
 rm -f openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
 cd ../
 
-# pcre
-wget -T 60 -t 3 -O pcre-8.45.tar.gz ${downloadUrl}/pcre/pcre-8.45.tar.gz
-wget -T 20 -t 3 -O pcre-8.45.tar.gz.checksum.txt ${downloadUrl}/pcre/pcre-8.45.tar.gz.checksum.txt
+# pcre2
+wget -T 60 -t 3 -O pcre2-10.42.tar.gz ${downloadUrl}/pcre/pcre2-10.42.tar.gz
+wget -T 20 -t 3 -O pcre2-10.42.tar.gz.checksum.txt ${downloadUrl}/pcre/pcre2-10.42.tar.gz.checksum.txt
 
-if ! sha256sum --status -c pcre-8.45.tar.gz.checksum.txt; then
+if ! sha256sum --status -c pcre2-10.42.tar.gz.checksum.txt; then
     echo -e $HR
-    echo "错误：pcre 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    echo "错误：pcre2 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-tar -zxvf pcre-8.45.tar.gz
-rm -f pcre-8.45.tar.gz
-rm -f pcre-8.45.tar.gz.checksum.txt
-mv pcre-8.45 pcre
+tar -zxvf pcre2-10.42.tar.gz
+rm -f pcre2-10.42.tar.gz
+rm -f pcre2-10.42.tar.gz.checksum.txt
+mv pcre2-10.42 pcre2
 
 # ngx_cache_purge
 wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
@@ -239,15 +239,15 @@ cd ngx_brotli/deps/brotli
 mkdir out && cd out
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS="-Ofast -march=native -mtune=native -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_CXX_FLAGS="-Ofast -march=native -mtune=native -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_INSTALL_PREFIX=./installed ..
 cmake --build . --config Release --target brotlienc
-cd ../../../../
 
 cd ${openrestyPath}/src
 export LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH
 export LIB_UTHASH=${openrestyPath}/src/uthash
-export CFLAGS="-march=native -mtune=native -Ofast -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections"
-export LDFLAGS="-Wl,-s -Wl,-Bsymbolic -Wl,--gc-sections"
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre --with-pcre-jit --with-http_v2_module --with-http_v3_module --with-http_slice_module --with-threads --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-E" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
+# 临时 patch，去除 --without-pcre2
+sed -i '/# disable pcre2 by default/,/push @ngx_opts, '\''--without-pcre2'\'';/d' configure
+
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre2 --with-pcre-jit --with-http_v2_module --with-http_v3_module --with-http_slice_module --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-s -Wl,-Bsymbolic -Wl,--gc-sections" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -march=native -mtune=native -Ofast -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-file-aio --with-threads --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
 make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
@@ -328,6 +328,9 @@ http {
     http2 on;
     http3 on;
     quic_gso on;
+    aio threads;
+    aio_write on;
+    directio 512k;
     sendfile on;
     tcp_nopush on;
     tcp_nodelay on;
