@@ -44,6 +44,12 @@ Prepare_System() {
         exit 1
     fi
 
+    if [ "${ARCH}" == "x86_64" ]; then
+        if [ "$(cat /proc/cpuinfo | grep -c ssse3)" -lt "1" ]; then
+            abort "错误：至少需运行在支持 x86-64-v2 的 CPU 上，请开启对应 CPU 指令集的支持"
+        fi
+    fi
+
     kernelVersion=$(uname -r | awk -F '.' '{print $1}')
     if [ "${kernelVersion}" != "5" ] && [ "${kernelVersion}" != "6" ]; then
         echo -e $HR
