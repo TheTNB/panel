@@ -13,12 +13,14 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
+	"panel/internal"
 
 	"panel/app/models"
 	"panel/internal/services"
 	"panel/pkg/tools"
 )
 
+// Panel 面板命令行
 type Panel struct {
 }
 
@@ -92,12 +94,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return err
 		}
 
-		err = tools.UpdatePanel(panel)
-		if err != nil {
+		internal.Status = internal.StatusUpgrade
+		if err = tools.UpdatePanel(panel); err != nil {
+			internal.Status = internal.StatusFailed
 			color.Redln("更新失败: " + err.Error())
 			return nil
 		}
 
+		internal.Status = internal.StatusNormal
 		color.Greenln("更新成功")
 		tools.RestartPanel()
 

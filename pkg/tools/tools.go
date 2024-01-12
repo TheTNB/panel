@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gookit/color"
+	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/support/env"
 	"github.com/imroc/req/v3"
 	"github.com/shirou/gopsutil/cpu"
@@ -403,11 +404,16 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 	color.Greenln("前置检查...")
 	if Exists("/tmp/panel-storage.zip") || Exists("/tmp/panel.conf.bak") {
-		color.Redln("检测到/tmp存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
-		return errors.New("检测到/tmp存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
+		color.Redln("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
 	color.Greenln("备份面板数据...")
+	// 备份面板
+	if err := Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
+		color.Redln("备份面板失败")
+		return err
+	}
 	if _, err := Exec("cd /www/panel/storage && zip -r /tmp/panel-storage.zip *"); err != nil {
 		color.Redln("备份面板数据失败")
 		return err

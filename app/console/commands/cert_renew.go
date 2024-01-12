@@ -10,9 +10,11 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	"panel/app/models"
+	"panel/internal"
 	"panel/internal/services"
 )
 
+// CertRenew 证书续签
 type CertRenew struct {
 }
 
@@ -35,6 +37,10 @@ func (receiver *CertRenew) Extend() command.Extend {
 
 // Handle Execute the console command.
 func (receiver *CertRenew) Handle(ctx console.Context) error {
+	if internal.Status != internal.StatusNormal {
+		return nil
+	}
+
 	var certs []models.Cert
 	err := facades.Orm().Query().With("Website").With("User").With("DNS").Find(&certs)
 	if err != nil {

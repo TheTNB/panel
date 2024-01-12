@@ -11,10 +11,12 @@ import (
 	"github.com/spf13/cast"
 
 	"panel/app/models"
+	"panel/internal"
 	"panel/internal/services"
 	"panel/pkg/tools"
 )
 
+// Monitoring 系统监控
 type Monitoring struct {
 }
 
@@ -37,6 +39,10 @@ func (receiver *Monitoring) Extend() command.Extend {
 
 // Handle Execute the console command.
 func (receiver *Monitoring) Handle(ctx console.Context) error {
+	if internal.Status != internal.StatusNormal {
+		return nil
+	}
+
 	var setting models.Setting
 	monitor := services.NewSettingImpl().Get(models.SettingKeyMonitor)
 	if !cast.ToBool(monitor) {

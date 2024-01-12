@@ -309,14 +309,16 @@ func (r *InfoController) Update(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
-	err = tools.UpdatePanel(panel)
-	if err != nil {
+	internal.Status = internal.StatusUpgrade
+	if err = tools.UpdatePanel(panel); err != nil {
+		internal.Status = internal.StatusFailed
 		facades.Log().Request(ctx.Request()).Tags("面板", "基础信息").With(map[string]any{
 			"error": err.Error(),
 		}).Info("更新面板失败")
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	internal.Status = internal.StatusNormal
 	tools.RestartPanel()
 	return Success(ctx, nil)
 }
