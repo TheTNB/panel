@@ -43,8 +43,8 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		return nil
 	}
 
-	var setting models.Setting
-	monitor := services.NewSettingImpl().Get(models.SettingKeyMonitor)
+	setting := services.NewSettingImpl()
+	monitor := setting.Get(models.SettingKeyMonitor)
 	if !cast.ToBool(monitor) {
 		return nil
 	}
@@ -62,6 +62,9 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 		cpu.Flags = nil
 	}
 
+	if internal.Status != internal.StatusNormal {
+		return nil
+	}
 	err := facades.Orm().Query().Create(&models.Monitor{
 		Info: info,
 	})
@@ -72,20 +75,16 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 	}
 
 	// 删除过期数据
-	err = facades.Orm().Query().Where("key", "monitor_days").First(&setting)
+	monitorDays := setting.Get(models.SettingKeyMonitorDays)
+	days, err := strconv.Atoi(monitorDays)
 	if err != nil {
-		return nil
-	}
-	if setting.Value == "0" || len(setting.Value) == 0 {
 		return nil
 	}
 
-	days, err := strconv.Atoi(setting.Value)
-	if err != nil {
+	if days <= 0 || internal.Status != internal.StatusNormal {
 		return nil
 	}
-	_, err = facades.Orm().Query().Where("created_at < ?", carbon.Now().SubDays(days).ToDateTimeString()).Delete(&models.Monitor{})
-	if err != nil {
+	if _, err = facades.Orm().Query().Where("created_at < ?", carbon.Now().SubDays(days).ToDateTimeString()).Delete(&models.Monitor{}); err != nil {
 		facades.Log().Infof("[面板] 系统监控删除过期数据失败: %s", err.Error())
 		return nil
 	}
