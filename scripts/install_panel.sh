@@ -110,6 +110,15 @@ Prepare_System() {
         echo fs.file-max = 6553560 >> /etc/sysctl.conf
     fi
 
+    # 自动开启 BBR
+    isBBRSupported=$(sysctl net.ipv4.tcp_available_congestion_control | grep -c bbr)
+    if [ "${isBBRSupported}" != "0" ]; then
+        qdisc=$(sysctl net.core.default_qdisc | awk '{print $3}')
+        echo "net.core.default_qdisc=${qdisc}" >> /etc/sysctl.conf
+        echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+        sysctl -p
+    fi
+
     if [ "${OS}" == "centos" ]; then
         if ${inChina}; then
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
