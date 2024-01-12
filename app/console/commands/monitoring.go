@@ -51,6 +51,17 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 
 	info := tools.GetMonitoringInfo()
 
+	// 去除部分数据以减少数据库存储
+	info.Disk = nil
+	for _, cpu := range info.Cpus {
+		cpu.VendorID = ""
+		cpu.Family = ""
+		cpu.Model = ""
+		cpu.PhysicalID = ""
+		cpu.ModelName = ""
+		cpu.Flags = nil
+	}
+
 	err := facades.Orm().Query().Create(&models.Monitor{
 		Info: info,
 	})
