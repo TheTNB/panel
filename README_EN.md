@@ -5,12 +5,12 @@
 <h1 align="center">HaoZi Linux Panel</h1>
 
 <p align="center">
-  <a href="https://github.com/haozi-team/panel/releases"><img src="https://img.shields.io/github/release/haozi-team/panel.svg"></a>
-  <a href="https://github.com/haozi-team/panel/actions"><img src="https://github.com/haozi-team/panel/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://goreportcard.com/report/github.com/haozi-team/panel"><img src="https://goreportcard.com/badge/github.com/haozi-team/panel"></a>
-  <a href="https://codecov.io/gh/haozi-team/panel"><img src="https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
-  <a href="https://img.shields.io/github/license/haozi-team/panel"><img src="https://img.shields.io/github/license/haozi-team/panel"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
+  <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
+  <a href="https://github.com/TheTNB/panel/actions"><img src="https://github.com/TheTNB/panel/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://goreportcard.com/report/github.com/TheTNB/panel"><img src="https://goreportcard.com/badge/github.com/TheTNB/panel"></a>
+  <a href="https://codecov.io/gh/TheTNB/panel"><img src="https://codecov.io/gh/TheTNB/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
+  <a href="https://img.shields.io/github/license/TheTNB/panel"><img src="https://img.shields.io/github/license/TheTNB/panel"></a>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
 The HaoZi Linux Panel is a lightweight Linux server operation and maintenance management panel developed using Golang and Vue. It is open source under the GNU Affero General Public License v3.0 protocol.
@@ -39,7 +39,7 @@ Recommended to use `Debian` for low-configuration machines, as its resource usag
 
 For other RHEL 9.x systems not in the table, you can try to install it yourself, but normal operation is not guaranteed, and free technical support is not provided (theoretically there will be no major question).
 
-CentOS Stream can be migrated to a supported system using the migration script: [CentOS 8/9 Migration Script](https://github.com/haozi-team/byecentos)
+CentOS Stream can be migrated to a supported system using the migration script: [CentOS 8/9 Migration Script](https://github.com/TheTNB/byecentos)
 
 | OS         | Version |
 |------------|---------|
@@ -81,7 +81,7 @@ Use `panel` command for daily maintenance:
 panel
 ```
 
-See more usage methods and tips in [Wiki](https://github.com/haozi-team/panel/wiki).
+See more usage methods and tips in [Wiki](https://github.com/TheTNB/panel/wiki).
 
 ## Feedback
 
@@ -93,7 +93,7 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 
 ### Find/Create Issue
 
-You can find or create an Issue in [Issue List](https://github.com/haozi-team/panel/issues), leave a message to express your willingness to deal with the Issue, and get confirmation from the maintainer. Start processing.
+You can find or create an Issue in [Issue List](https://github.com/TheTNB/panel/issues), leave a message to express your willingness to deal with the Issue, and get confirmation from the maintainer. Start processing.
 
 ### Create PR
 
@@ -124,11 +124,11 @@ This project owes its existence to all those who have contributed. To contribute
 
 ## Star History
 
-<a href="https://star-history.com/#haozi-team/panel&Date">
+<a href="https://star-history.com/#TheTNB/panel&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
   </picture>
 </a>
 

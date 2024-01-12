@@ -5,12 +5,12 @@
 <h1 align="center">耗子 Linux 面板</h1>
 
 <p align="center">
-  <a href="https://github.com/haozi-team/panel/releases"><img src="https://img.shields.io/github/release/haozi-team/panel.svg"></a>
-  <a href="https://github.com/haozi-team/panel/actions"><img src="https://github.com/haozi-team/panel/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://goreportcard.com/report/github.com/haozi-team/panel"><img src="https://goreportcard.com/badge/github.com/haozi-team/panel"></a>
-  <a href="https://codecov.io/gh/haozi-team/panel"><img src="https://codecov.io/gh/haozi-team/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
-  <a href="https://img.shields.io/github/license/haozi-team/panel"><img src="https://img.shields.io/github/license/haozi-team/panel"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fhaozi-team%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
+  <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
+  <a href="https://github.com/TheTNB/panel/actions"><img src="https://github.com/TheTNB/panel/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://goreportcard.com/report/github.com/TheTNB/panel"><img src="https://goreportcard.com/badge/github.com/TheTNB/panel"></a>
+  <a href="https://codecov.io/gh/TheTNB/panel"><img src="https://codecov.io/gh/TheTNB/panel/branch/main/graph/badge.svg?token=XFT5NGNSRG"></a>
+  <a href="https://img.shields.io/github/license/TheTNB/panel"><img src="https://img.shields.io/github/license/TheTNB/panel"></a>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
 耗子 Linux 面板是使用 Golang + Vue 开发的轻量 Linux 服务器运维管理面板，以 GNU Affero General Public License v3.0 开源。
@@ -39,7 +39,7 @@
 
 不在下表中的其他 RHEL 9.x 系统，可自行尝试安装，但不保证能够正常运行，且不提供无偿技术支持（理论上不会有大问题）。
 
-CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移脚本](https://github.com/haozi-team/byecentos)
+CentOS Stream 可使用迁移脚本迁移至支持的系统: [CentOS 8/9 迁移脚本](https://github.com/TheTNB/byecentos)
 
 | 系统         | 版本 |
 |------------|----|
@@ -81,7 +81,7 @@ HAOZI_DL_URL="https://git.haozi.net/opensource/download/-/raw/main/panel"; curl 
 panel
 ```
 
-在 [Wiki](https://github.com/haozi-team/panel/wiki) 中查看更多使用方法和技巧。
+在 [Wiki](https://github.com/TheTNB/panel/wiki) 中查看更多使用方法和技巧。
 
 ## 问题反馈
 
@@ -93,7 +93,7 @@ panel
 
 ### 寻找/创建 Issue
 
-您可以在 [Issue 列表](https://github.com/haozi-team/panel/issues) 中寻找或创建一个 Issue，留言表达想要处理该 Issue 的意愿，得到维护者的确认后，即可开始处理。
+您可以在 [Issue 列表](https://github.com/TheTNB/panel/issues) 中寻找或创建一个 Issue，留言表达想要处理该 Issue 的意愿，得到维护者的确认后，即可开始处理。
 
 ### 创建 PR
 
@@ -124,11 +124,11 @@ panel
 
 ## Star 历史
 
-<a href="https://star-history.com/#haozi-team/panel&Date">
+<a href="https://star-history.com/#TheTNB/panel&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=haozi-team/panel&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
   </picture>
 </a>
 

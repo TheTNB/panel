@@ -173,7 +173,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 	if isChina {
 		output, err = Exec(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel/releases/permalink/latest"`)
 	} else {
-		output, err = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/latest"`)
+		output, err = Exec(`curl -sSL "https://api.github.com/repos/TheTNB/panel/releases/latest"`)
 	}
 
 	if len(output) == 0 || err != nil {
@@ -292,7 +292,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	if isChina {
 		output, err = Exec(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel/releases/` + version + `"`)
 	} else {
-		output, err = Exec(`curl -sSL "https://api.github.com/repos/haozi-team/panel/releases/tags/` + version + `"`)
+		output, err = Exec(`curl -sSL "https://api.github.com/repos/TheTNB/panel/releases/tags/` + version + `"`)
 	}
 
 	if len(output) == 0 || err != nil {

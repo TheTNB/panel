@@ -89,15 +89,7 @@ touch ${pureftpdPath}/etc/pureftpd.passwd
 touch ${pureftpdPath}/etc/pureftpd.pdb
 
 openssl dhparam -out ${pureftpdPath}/etc/pure-ftpd-dhparams.pem 2048
-openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -sha256 -keyout ${pureftpdPath}/etc/pure-ftpd.pem -out ${pureftpdPath}/etc/pure-ftpd.pem << EOF
-CN
-Beijing
-Beijing
-HaoZi Technology Co., Ltd
-HaoZi Panel
-github.com/haozi-team/panel
-panel@haozi.net
-EOF
+openssl req -x509 -nodes -days 36500 -newkey rsa:2048 -sha256 -keyout ${pureftpdPath}/etc/pure-ftpd.pem -out ${pureftpdPath}/etc/pure-ftpd.pem -subj "/C=CN/ST=Tianjin/L=Tianjin/O=HaoZi Technology Co., Ltd./OU=HaoZi Panel/CN=Panel"
 chmod 600 ${pureftpdPath}/etc/*.pem
 
 # 添加系统服务
