@@ -154,7 +154,7 @@ func Api() {
 
 	// 文档
 	swaggerController := controllers.NewSwaggerController()
-	facades.Route().Get("swagger/*", swaggerController.Index)
+	facades.Route().Get("swagger/*any", swaggerController.Index)
 
 	// 静态文件
 	entrance := facades.Config().GetString("http.entrance")

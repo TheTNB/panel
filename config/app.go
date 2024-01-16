@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/goravel/fiber"
 	"github.com/goravel/framework/auth"
 	"github.com/goravel/framework/cache"
 	"github.com/goravel/framework/console"
@@ -21,6 +20,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/testing"
 	"github.com/goravel/framework/validation"
+	"github.com/goravel/gin"
 
 	"panel/app/providers"
 )
@@ -91,7 +91,7 @@ func init() {
 			&providers.EventServiceProvider{},
 			&providers.ValidationServiceProvider{},
 			&providers.DatabaseServiceProvider{},
-			&fiber.ServiceProvider{},
+			&gin.ServiceProvider{},
 		},
 	})
 }

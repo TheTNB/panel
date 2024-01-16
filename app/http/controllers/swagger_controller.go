@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"github.com/gofiber/swagger"
-	"github.com/goravel/fiber"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/swaggo/http-swagger/v2"
 
 	_ "panel/docs"
 )
@@ -13,20 +12,8 @@ type SwaggerController struct {
 	// Dependent services
 }
 
-// Config stores fiberSwagger configuration variables.
-type Config struct {
-	URL                  string
-	InstanceName         string
-	DocExpansion         string
-	DomID                string
-	DeepLinking          bool
-	PersistAuthorization bool
-}
-
 func NewSwaggerController() *SwaggerController {
-	return &SwaggerController{
-		// Inject services
-	}
+	return &SwaggerController{}
 }
 
 // Index
@@ -42,12 +29,8 @@ func (r *SwaggerController) Index(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 
-	err := swagger.New(swagger.Config{
-		Title: "耗子面板 Swagger",
-	})(ctx.(*fiber.Context).Instance())
-	if err != nil {
-		return Error(ctx, http.StatusNotFound, err.Error())
-	}
+	handler := httpSwagger.Handler()
+	handler(ctx.Response().Writer(), ctx.Request().Origin())
 
 	return nil
 }
