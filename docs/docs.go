@@ -88,13 +88,14 @@ const docTemplate = `{
                 "summary": "获取证书列表",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -286,13 +287,14 @@ const docTemplate = `{
                 "summary": "获取 DNS 接口列表",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -641,13 +643,14 @@ const docTemplate = `{
                 "summary": "获取用户列表",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1549,13 +1552,14 @@ const docTemplate = `{
                 "summary": "获取备份列表",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1756,13 +1760,14 @@ const docTemplate = `{
                 "summary": "获取网站列表",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2240,13 +2245,14 @@ const docTemplate = `{
                 "summary": "列出模块",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/commonrequests.Paginate"
-                        }
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2521,17 +2527,6 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
-                }
-            }
-        },
-        "commonrequests.Paginate": {
-            "type": "object",
-            "properties": {
-                "limit": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
                 }
             }
         },
@@ -2816,6 +2811,9 @@ const docTemplate = `{
                 },
                 "port": {
                     "type": "integer"
+                },
+                "ssl": {
+                    "type": "boolean"
                 },
                 "username": {
                     "type": "string"

@@ -327,7 +327,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Tags			网站管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse{data=[]internal.BackupFile}
 //	@Router			/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {

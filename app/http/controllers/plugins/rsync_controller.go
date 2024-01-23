@@ -104,7 +104,7 @@ func (r *RsyncController) Stop(ctx http.Context) http.Response {
 //	@Tags			插件-Rsync
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	controllers.SuccessResponse
 //	@Router			/plugins/rsync/modules [get]
 func (r *RsyncController) List(ctx http.Context) http.Response {

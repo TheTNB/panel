@@ -24,13 +24,6 @@ definitions:
       value:
         type: string
     type: object
-  commonrequests.Paginate:
-    properties:
-      limit:
-        type: integer
-      page:
-        type: integer
-    type: object
   controllers.ErrorResponse:
     properties:
       code:
@@ -220,6 +213,8 @@ definitions:
         type: string
       port:
         type: integer
+      ssl:
+        type: boolean
       username:
         type: string
       website_path:
@@ -525,12 +520,12 @@ paths:
     get:
       description: 获取面板证书管理的证书列表
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -646,12 +641,12 @@ paths:
     get:
       description: 获取面板证书管理的 DNS 接口列表
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -861,12 +856,12 @@ paths:
     get:
       description: 获取面板证书管理的 ACME 用户列表
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1421,12 +1416,12 @@ paths:
     get:
       description: 获取网站的备份列表
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1544,12 +1539,12 @@ paths:
     get:
       description: 获取网站管理的网站列表
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
@@ -1842,12 +1837,12 @@ paths:
     get:
       description: 列出所有 Rsync 模块
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/commonrequests.Paginate'
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:

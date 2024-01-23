@@ -121,7 +121,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 //	@Tags			证书管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
@@ -273,7 +273,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 //	@Tags			证书管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
@@ -425,7 +425,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 //	@Tags			证书管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
