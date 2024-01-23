@@ -19,6 +19,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
 HR="+----------------------------------------------------"
+OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
+if [ "${OS}" == "unknown" ]; then
+    echo -e $HR
+    echo "错误：该系统不支持安装耗子 Linux 面板，请更换 Debian 12.x / RHEL 9.x 安装。"
+    exit 1
+fi
+
 oldVersion=$(panel getSetting version)
 oldVersion=${oldVersion#v}
 panelPath="/www/panel"
@@ -77,6 +84,21 @@ if version_lt "$oldVersion" "2.1.30"; then
     echo "APP_SSL=false" >> $panelPath/panel.conf
     mv $panelPath/database/panel.db $panelPath/storage/panel.db
     openssl req -x509 -nodes -days 36500 -newkey ec:<(openssl ecparam -name secp384r1) -keyout $panelPath/storage/ssl.key -out $panelPath/storage/ssl.crt -subj "/C=CN/ST=Tianjin/L=Tianjin/O=HaoZi Technology Co., Ltd./OU=HaoZi Panel/CN=Panel"
+fi
+
+if version_lt "$oldVersion" "2.1.39"; then
+    echo "更新面板到 v2.1.39 ..."
+    echo "Update panel to v2.1.39 ..."
+    if [ "${OS}" == "centos" ]; then
+        yum makecache
+        yum install -y podman
+    else
+        apt-get update -y
+        apt-get install -y podman
+    fi
+
+    systemctl enable podman
+    systemctl start podman
 fi
 
 echo $HR

@@ -37,7 +37,7 @@ func NewWebsiteController() *WebsiteController {
 //	@Tags			网站管理
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		commonrequests.Paginate	true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {

@@ -147,20 +147,23 @@ Prepare_System() {
         dnf config-manager --set-enabled crb
         /usr/bin/crb enable
         dnf makecache -y
-        dnf install -y curl wget zip unzip tar git jq git-core dos2unix
+        dnf install -y curl wget zip unzip tar git jq git-core dos2unix podman
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
         fi
         apt-get update -y
-        apt-get install -y curl wget zip unzip tar git jq git dos2unix rsyslog
-    else
+        apt-get install -y curl wget zip unzip tar git jq git dos2unix podman rsyslog
+    fi
+    if [ "$?" != "0" ]; then
         echo -e $HR
-        echo "错误：该系统不支持安装耗子 Linux 面板，请更换 Debian 12.x / RHEL 9.x 安装。"
+        echo "错误：安装面板依赖软件失败，请截图错误信息寻求帮助。"
         exit 1
     fi
 
+    systemctl enable podman
+    systemctl start podman
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：安装面板依赖软件失败，请截图错误信息寻求帮助。"
