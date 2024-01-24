@@ -12,11 +12,14 @@
   ],
   "packageRules": [
     {
-      "groupName": "all dependencies",
-      "groupSlug": "all",
-      "matchPackagePatterns": [
-        "*"
-      ]
+      "description": "Automerge non-major updates",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchCurrentVersion": "!/^0/",
+      "automerge": true
     }
+  ],
+  "ignoreDeps": [
+    "github.com/goravel/framework",
+    "github.com/goravel/gin"
   ]
 }
