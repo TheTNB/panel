@@ -7,7 +7,7 @@ require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
-	github.com/gookit/validate v1.5.1
+	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.13.1-0.20240123013628-f0f824503a8c
 	github.com/goravel/gin v1.1.6-0.20240116040838-cf1f7d78b1f5
 	github.com/gorilla/websocket v1.5.1
@@ -101,8 +101,8 @@ require (
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
-	github.com/gookit/filter v1.2.0 // indirect
-	github.com/gookit/goutil v0.6.14 // indirect
+	github.com/gookit/filter v1.2.1 // indirect
+	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/goravel/file-rotatelogs/v2 v2.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
