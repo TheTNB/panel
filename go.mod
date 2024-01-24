@@ -3,7 +3,7 @@ module panel
 go 1.21
 
 require (
-	github.com/docker/docker v25.0.0+incompatible
+	github.com/docker/docker v25.0.1+incompatible
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-acme/lego/v4 v4.14.2
 	github.com/gookit/color v1.5.4
