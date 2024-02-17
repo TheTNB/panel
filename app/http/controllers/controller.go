@@ -6,21 +6,18 @@ import (
 
 // SuccessResponse 通用成功响应
 type SuccessResponse struct {
-	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data    any    `json:"data"`
 }
 
 // ErrorResponse 通用错误响应
 type ErrorResponse struct {
-	Code    int    `json:"code"`
 	Message string `json:"message"`
 }
 
 // Success 响应成功
 func Success(ctx http.Context, data any) http.Response {
 	return ctx.Response().Success().Json(&SuccessResponse{
-		Code:    0,
 		Message: "success",
 		Data:    data,
 	})
@@ -28,16 +25,14 @@ func Success(ctx http.Context, data any) http.Response {
 
 // Error 响应错误
 func Error(ctx http.Context, code int, message string) http.Response {
-	return ctx.Response().Json(http.StatusOK, &ErrorResponse{
-		Code:    code,
+	return ctx.Response().Json(code, &ErrorResponse{
 		Message: "错误: " + message,
 	})
 }
 
 // ErrorSystem 响应系统错误
 func ErrorSystem(ctx http.Context) http.Response {
-	return ctx.Response().Json(http.StatusOK, &ErrorResponse{
-		Code:    http.StatusInternalServerError,
+	return ctx.Response().Json(http.StatusInternalServerError, &ErrorResponse{
 		Message: "系统内部错误",
 	})
 }

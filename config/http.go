@@ -15,7 +15,8 @@ func init() {
 		"drivers": map[string]any{
 			"gin": map[string]any{
 				// Optional, default is 4096 KB
-				"body_limit": 1024 * 1024 * 4,
+				"body_limit":   1024 * 1024 * 4,
+				"header_limit": 20480,
 				"route": func() (route.Route, error) {
 					return ginfacades.Route("gin"), nil
 				},
