@@ -55,6 +55,20 @@ func init() {
 		// More: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 		"timezone": carbon.PRC,
 
+		// Application Locale Configuration
+		//
+		// The application locale determines the default locale that will be used
+		// by the translation service provider.You are free to set this value
+		// to any of the locales which will be supported by the application.
+		"locale": "zh_CN",
+
+		// Application Fallback Locale
+		//
+		// The fallback locale determines the locale to use when the current one
+		// is not available.You may change the value to correspond to any of
+		// the language folders that are provided through your application.
+		"fallback_locale": "zh_CN",
+
 		// Encryption Key
 		//
 		// 32 character string, otherwise these encrypted strings
