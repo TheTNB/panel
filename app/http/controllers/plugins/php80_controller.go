@@ -121,20 +121,12 @@ func (r *Php80Controller) Load(ctx http.Context) http.Response {
 }
 
 func (r *Php80Controller) ErrorLog(ctx http.Context) http.Response {
-	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/php-fpm.log")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
-	}
-
+	log, _ := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/php-fpm.log")
 	return controllers.Success(ctx, log)
 }
 
 func (r *Php80Controller) SlowLog(ctx http.Context) http.Response {
-	log, err := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/slow.log")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
-	}
-
+	log, _ := tools.Exec("tail -n 100 /www/server/php/" + r.version + "/var/log/slow.log")
 	return controllers.Success(ctx, log)
 }
 
