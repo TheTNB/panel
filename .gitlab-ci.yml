@@ -1,4 +1,4 @@
-image: golang:1.22-bookworm
+image: golang:bookworm
 
 # 在每个任务执行前运行
 before_script:
