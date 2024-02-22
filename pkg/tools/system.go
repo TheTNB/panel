@@ -144,14 +144,11 @@ func Mv(src, dst string) error {
 	err := os.Rename(src, dst)
 	if err != nil {
 		// 如果在不同的文件系统中移动文件，os.Rename 可能会失败
-		// 在这种情况下，可以先复制然后删除原文件
-		if os.IsExist(err) {
-			err = Cp(src, dst)
-			if err != nil {
-				return err
-			}
-			err = os.RemoveAll(src)
+		err = Cp(src, dst)
+		if err != nil {
+			return err
 		}
+		err = os.RemoveAll(src)
 	}
 	return err
 }
