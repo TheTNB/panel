@@ -150,6 +150,7 @@ func Mv(src, dst string) error {
 		}
 		err = os.RemoveAll(src)
 	}
+
 	return err
 }
 
