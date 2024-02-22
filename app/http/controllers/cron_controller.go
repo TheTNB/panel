@@ -73,7 +73,7 @@ func (r *CronController) Add(ctx http.Context) http.Response {
 	cronType := ctx.Request().Input("type")
 	if cronType == "backup" {
 		backupType := ctx.Request().Input("backup_type")
-		backupName := ctx.Request().Input("backup_database")
+		backupName := ctx.Request().Input("database")
 		if backupType == "website" {
 			backupName = ctx.Request().Input("website")
 		}
