@@ -166,7 +166,7 @@ func (r *Php80Controller) InstallExtension(ctx http.Context) http.Response {
 			var task models.Task
 			task.Name = "安装PHP-" + r.version + "扩展-" + item.Name
 			task.Status = models.TaskStatusWaiting
-			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' install ` + r.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
+			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' install ` + r.version + ` >> '/tmp/` + item.Slug + `.log' 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Info("[PHP-" + r.version + "] 创建安装拓展任务失败：" + err.Error())
@@ -198,7 +198,7 @@ func (r *Php80Controller) UninstallExtension(ctx http.Context) http.Response {
 			var task models.Task
 			task.Name = "卸载PHP-" + r.version + "扩展-" + item.Name
 			task.Status = models.TaskStatusWaiting
-			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' uninstall ` + r.version + ` >> /tmp/` + item.Slug + `.log 2>&1`
+			task.Shell = `bash '/www/panel/scripts/php_extensions/` + item.Slug + `.sh' uninstall ` + r.version + ` >> '/tmp/` + item.Slug + `.log' 2>&1`
 			task.Log = "/tmp/" + item.Slug + ".log"
 			if err := facades.Orm().Query().Create(&task); err != nil {
 				facades.Log().Info("[PHP-" + r.version + "] 创建卸载拓展任务失败：" + err.Error())

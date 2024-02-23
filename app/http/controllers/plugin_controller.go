@@ -129,7 +129,7 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	var task models.Task
 	task.Name = "安装插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
-	task.Shell = plugin.Install + " >> /tmp/" + plugin.Slug + ".log 2>&1"
+	task.Shell = plugin.Install + ` >> '/tmp/` + plugin.Slug + `.log' 2>&1`
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 	if err := facades.Orm().Query().Create(&task); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
