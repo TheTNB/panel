@@ -103,8 +103,9 @@ func (c *Client) UseHTTP(path string) error {
 // ObtainSSL 签发 SSL 证书
 func (c *Client) ObtainSSL(domains []string) (certificate.Resource, error) {
 	request := certificate.ObtainRequest{
-		Domains: domains,
-		Bundle:  true,
+		Domains:    domains,
+		Bundle:     true,
+		MustStaple: false,
 	}
 
 	certificates, err := c.Client.Certificate.Obtain(request)
@@ -124,7 +125,7 @@ func (c *Client) RenewSSL(certUrl string) (certificate.Resource, error) {
 
 	certificates, err = c.Client.Certificate.RenewWithOptions(*certificates, &certificate.RenewOptions{
 		Bundle:     true,
-		MustStaple: true,
+		MustStaple: false,
 	})
 	if err != nil {
 		return certificate.Resource{}, err

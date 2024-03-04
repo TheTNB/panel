@@ -17,11 +17,11 @@ type Container struct {
 	client *client.Client
 }
 
-func NewContainer(sock string) *Container {
-	if sock == "" {
-		sock = "/run/podman/podman.sock"
+func NewContainer(sock ...string) *Container {
+	if len(sock) == 0 {
+		sock[0] = "/run/podman/podman.sock"
 	}
-	cli, _ := client.NewClientWithOpts(client.WithHost("unix://"+sock), client.WithAPIVersionNegotiation())
+	cli, _ := client.NewClientWithOpts(client.WithHost("unix://"+sock[0]), client.WithAPIVersionNegotiation())
 	return &Container{
 		client: cli,
 	}
