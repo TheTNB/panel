@@ -10,7 +10,7 @@ type Add struct {
 	Domains    []string `form:"domains" json:"domains"`
 	Ports      []uint   `form:"ports" json:"ports"`
 	Path       string   `form:"path" json:"path"`
-	Php        int      `form:"php" json:"php"`
+	Php        string   `form:"php" json:"php"`
 	Db         bool     `form:"db" json:"db"`
 	DbType     string   `form:"db_type" json:"db_type"`
 	DbName     string   `form:"db_name" json:"db_name"`

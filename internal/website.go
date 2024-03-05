@@ -20,7 +20,7 @@ type PanelWebsite struct {
 	Domains    []string `json:"domains"`
 	Ports      []uint   `json:"ports"`
 	Path       string   `json:"path"`
-	Php        int      `json:"php"`
+	Php        string   `json:"php"`
 	Ssl        bool     `json:"ssl"`
 	Remark     string   `json:"remark"`
 	Db         bool     `json:"db"`
@@ -38,7 +38,7 @@ type WebsiteSetting struct {
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
-	Php               int      `json:"php"`
+	Php               string   `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
 	Ssl               bool     `json:"ssl"`
 	SslCertificate    string   `json:"ssl_certificate"`

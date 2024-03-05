@@ -46,7 +46,7 @@ func (r *WebsiteImpl) Add(website internal.PanelWebsite) (models.Website, error)
 		Name:   website.Name,
 		Status: website.Status,
 		Path:   website.Path,
-		Php:    website.Php,
+		Php:    cast.ToInt(website.Php),
 		Ssl:    website.Ssl,
 		Remark: website.Remark,
 	}
@@ -161,7 +161,7 @@ server
     # ssl标记位结束
 
     # php标记位开始
-    include enable-php-%d.conf;
+    include enable-php-%s.conf;
     # php标记位结束
 
     # waf标记位开始
@@ -514,7 +514,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
-	setting.Php = website.Php
+	setting.Php = strconv.Itoa(website.Php)
 	setting.Raw = config
 
 	ports := tools.Cut(config, "# port标记位开始", "# port标记位结束")
