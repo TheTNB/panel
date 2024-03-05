@@ -225,7 +225,7 @@ func (r *Php80Controller) GetExtensions() []PHPExtension {
 	extensions = append(extensions, PHPExtension{
 		Name:        "PhpRedis",
 		Slug:        "redis",
-		Description: "PhpRedis 是一个用C语言编写的PHP模块，用来连接并操作 Redis 数据库上的数据。",
+		Description: "PhpRedis 是一个用 C 语言编写的 PHP 模块，用来连接并操作 Redis 数据库上的数据。",
 		Installed:   false,
 	})
 	extensions = append(extensions, PHPExtension{
@@ -249,7 +249,7 @@ func (r *Php80Controller) GetExtensions() []PHPExtension {
 	extensions = append(extensions, PHPExtension{
 		Name:        "ionCube",
 		Slug:        "ionCube Loader",
-		Description: "ionCube 是一个专业级的PHP加密解密工具。",
+		Description: "ionCube 是一个专业级的 PHP 加密解密工具。",
 		Installed:   false,
 	})
 
