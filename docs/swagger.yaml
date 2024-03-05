@@ -26,15 +26,11 @@ definitions:
     type: object
   controllers.ErrorResponse:
     properties:
-      code:
-        type: integer
       message:
         type: string
     type: object
   controllers.SuccessResponse:
     properties:
-      code:
-        type: integer
       data: {}
       message:
         type: string
@@ -67,7 +63,7 @@ definitions:
       path:
         type: string
       php:
-        type: integer
+        type: string
       ports:
         items:
           type: integer
@@ -241,7 +237,7 @@ definitions:
       path:
         type: string
       php:
-        type: integer
+        type: string
       ports:
         items:
           type: integer

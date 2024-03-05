@@ -13,8 +13,7 @@ func Jwt() http.Middleware {
 	return func(ctx http.Context) {
 		token := ctx.Request().Header("Authorization", ctx.Request().Header("Sec-WebSocket-Protocol"))
 		if len(token) == 0 {
-			ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-				"code":    401,
+			ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
 				"message": "未登录",
 			})
 			return
@@ -26,8 +25,7 @@ func Jwt() http.Middleware {
 				token, err = facades.Auth(ctx).Refresh()
 				if err != nil {
 					// 到达刷新时间上限
-					ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-						"code":    401,
+					ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
 						"message": "登录已过期",
 					})
 					return
@@ -35,8 +33,7 @@ func Jwt() http.Middleware {
 
 				token = "Bearer " + token
 			} else {
-				ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-					"code":    401,
+				ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
 					"message": "登录已过期",
 				})
 				return

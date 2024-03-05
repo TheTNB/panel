@@ -2533,9 +2533,6 @@ const docTemplate = `{
         "controllers.ErrorResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer"
-                },
                 "message": {
                     "type": "string"
                 }
@@ -2544,9 +2541,6 @@ const docTemplate = `{
         "controllers.SuccessResponse": {
             "type": "object",
             "properties": {
-                "code": {
-                    "type": "integer"
-                },
                 "data": {},
                 "message": {
                     "type": "string"
@@ -2595,7 +2589,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "php": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "ports": {
                     "type": "array",
@@ -2854,7 +2848,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "php": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "ports": {
                     "type": "array",

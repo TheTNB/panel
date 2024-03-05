@@ -11,26 +11,22 @@ func Status() http.Middleware {
 	return func(ctx http.Context) {
 		switch internal.Status {
 		case internal.StatusUpgrade:
-			ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-				"code":    503,
+			ctx.Request().AbortWithStatusJson(http.StatusServiceUnavailable, http.Json{
 				"message": "面板升级中，请稍后",
 			})
 			return
 		case internal.StatusMaintain:
-			ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-				"code":    503,
+			ctx.Request().AbortWithStatusJson(http.StatusServiceUnavailable, http.Json{
 				"message": "面板正在运行维护，请稍后",
 			})
 			return
 		case internal.StatusClosed:
-			ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-				"code":    403,
+			ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
 				"message": "面板已关闭",
 			})
 			return
 		case internal.StatusFailed:
-			ctx.Request().AbortWithStatusJson(http.StatusOK, http.Json{
-				"code":    500,
+			ctx.Request().AbortWithStatusJson(http.StatusInternalServerError, http.Json{
 				"message": "面板运行出错，请检查排除或联系支持",
 			})
 			return
