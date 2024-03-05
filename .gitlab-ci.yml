@@ -78,7 +78,7 @@ release:
     - build
     - fetch
   image:
-    name: goreleaser/goreleaser
+    name: goreleaser/goreleaser:nightly
     entrypoint: [ '' ]
   only:
     - tags
