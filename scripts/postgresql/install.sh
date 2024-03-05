@@ -31,9 +31,9 @@ source ${setupPath}/panel/scripts/calculate_j.sh
 j=$(calculate_j)
 
 if [[ "${1}" == "15" ]]; then
-    postgresqlVersion="15.5"
+    postgresqlVersion="15.6"
 elif [[ "${1}" == "16" ]]; then
-    postgresqlVersion="16.1"
+    postgresqlVersion="16.2"
 else
     echo -e $HR
     echo "错误：不支持的 PostgreSQL 版本！"

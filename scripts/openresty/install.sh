@@ -25,7 +25,6 @@ downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/openrest
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.25.3.1"
-cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 source ${setupPath}/panel/scripts/calculate_j.sh
 j=$(calculate_j)

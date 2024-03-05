@@ -33,7 +33,7 @@ source ${setupPath}/panel/scripts/calculate_j.sh
 j=$(calculate_j)
 
 if [[ "${1}" == "80" ]]; then
-    mysqlVersion="8.0.35"
+    mysqlVersion="8.0.36"
     j=$(calculate_j2)
 elif [[ "${1}" == "57" ]]; then
     mysqlVersion="5.7.44"
