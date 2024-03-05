@@ -327,7 +327,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 				color.Greenln(hr)
 				return nil
 			}
-			if strings.Contains(check, name) {
+			if !strings.Contains(check, name) {
 				color.Redln("|-数据库不存在")
 				color.Greenln(hr)
 				return nil
