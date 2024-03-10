@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/docker/docker v25.0.4+incompatible
 	github.com/gertd/go-pluralize v0.2.1
-	github.com/go-acme/lego/v4 v4.15.0
+	github.com/go-acme/lego/v4 v4.16.0
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.13.1-0.20240215091018-1a9f352e523c
@@ -67,7 +67,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/glebarez/sqlite v1.10.0 // indirect
-	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
