@@ -211,8 +211,8 @@ github.com/glebarez/go-sqlite v1.22.0 h1:uAcMJhaA6r3LHMTFgP0SifzgXg46yJkgxqyuyec
 github.com/glebarez/go-sqlite v1.22.0/go.mod h1:PlBIdHe0+aUEFn+r2/uthrWq4FxbzugL0L8Li6yQJbc=
 github.com/glebarez/sqlite v1.10.0 h1:u4gt8y7OND/cCei/NMHmfbLxF6xP2wgKcT/BJf2pYkc=
 github.com/glebarez/sqlite v1.10.0/go.mod h1:IJ+lfSOmiekhQsFTJRx/lHtGYmCdtAiTaf5wI9u5uHA=
-github.com/go-acme/lego/v4 v4.16.0 h1:dxLGC3B/xxfkDhT1YkNmgNtbevq+vQ6aqK6c5Fh+WxM=
-github.com/go-acme/lego/v4 v4.16.0/go.mod h1:AVvwdPned/IWpD/ihHhMsKnveF7HHYAz/CmtXi7OZoE=
+github.com/go-acme/lego/v4 v4.16.1 h1:JxZ93s4KG0jL27rZ30UsIgxap6VGzKuREsSkkyzeoCQ=
+github.com/go-acme/lego/v4 v4.16.1/go.mod h1:AVvwdPned/IWpD/ihHhMsKnveF7HHYAz/CmtXi7OZoE=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=

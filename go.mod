@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/docker/docker v25.0.4+incompatible
 	github.com/gertd/go-pluralize v0.2.1
-	github.com/go-acme/lego/v4 v4.16.0
+	github.com/go-acme/lego/v4 v4.16.1
 	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.13.1-0.20240215091018-1a9f352e523c
