@@ -12,7 +12,7 @@ require (
 	github.com/goravel/gin v1.1.6-0.20240215075927-ab614bfae9f3
 	github.com/gorilla/websocket v1.5.1
 	github.com/iancoleman/strcase v0.3.0
-	github.com/imroc/req/v3 v3.43.0
+	github.com/imroc/req/v3 v3.43.1
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/shirou/gopsutil v3.21.11+incompatible
