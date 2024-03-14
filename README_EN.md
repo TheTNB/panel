@@ -85,7 +85,7 @@ See more usage methods and tips in [Wiki](https://github.com/TheTNB/panel/wiki).
 
 ## Feedback
 
-For usage issues, you can ask questions in the [WePublish Community Forum](https://wepublish.cn/forums) or seek AI help in the QQ group `@坤坤`. You can also seek paid support in the group.
+For usage issues, you can ask questions in the [HaoZi Community Forum](https://forum.haozi.net) or seek AI help in the QQ group `@坤坤`. You can also seek paid support in the group.
 
 For issues with the panel itself, you can submit feedback on the `Issues` page of GitHub. Please note [the wisdom of asking questions](http://www.catb.org/~esr/faqs/smart-questions.html).
 
@@ -104,6 +104,10 @@ You can find or create an Issue in [Issue List](https://github.com/TheTNB/panel/
 
 ## Sponsor
 
+### Funding
+
+- [微晓朵](https://www.weixiaoduo.com/)
+
 ### CDN
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
@@ -111,7 +115,6 @@ You can find or create an Issue in [Issue List](https://github.com/TheTNB/panel/
 
 ### DevOps
 
-- [JiHu GitLab](https://www.jihulab.com/)
 - [JetBrains](https://www.jetbrains.com/)
 
 **Accept cloud resources and financial sponsorship, you can contact us through QQ group**

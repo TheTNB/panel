@@ -85,7 +85,7 @@ panel
 
 ## 问题反馈
 
-使用类问题，可在 [WePublish 社区论坛](https://wepublish.cn/forums) 提问或QQ群`@坤坤`寻求 AI 帮助，亦可在群里寻求付费支持。
+使用类问题，可在 [鼠片社区](https://forum.haozi.net) 提问或QQ群`@坤坤`寻求 AI 帮助，亦可在群里寻求付费支持。
 
 面板自身问题，可在 GitHub 的`Issues`页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
 
@@ -104,6 +104,10 @@ panel
 
 ## 赞助商
 
+### 资金
+
+- [微晓朵](https://www.weixiaoduo.com/)
+
 ### CDN
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
@@ -111,7 +115,6 @@ panel
 
 ### DevOps
 
-- [极狐 GitLab](https://www.jihulab.com/)
 - [JetBrains](https://www.jetbrains.com/)
 
 **接受云资源和资金赞助，可通过QQ群咨询联系**
