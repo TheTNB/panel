@@ -129,7 +129,7 @@ func Api() {
 			r.Post("archive", fileController.Archive)
 			r.Post("unArchive", fileController.UnArchive)
 			r.Post("search", fileController.Search)
-			r.Post("list", fileController.List)
+			r.Get("list", fileController.List)
 		})
 		r.Prefix("monitor").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			monitorController := controllers.NewMonitorController()

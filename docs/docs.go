@@ -1258,7 +1258,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.Exist"
+                            "$ref": "#/definitions/requests.Save"
                         }
                     },
                     {
@@ -1374,18 +1374,16 @@ const docTemplate = `{
                 "summary": "上传文件",
                 "parameters": [
                     {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.NotExist"
-                        }
-                    },
-                    {
                         "type": "file",
                         "description": "file",
                         "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "path",
+                        "name": "path",
                         "in": "formData",
                         "required": true
                     }
@@ -3068,6 +3066,17 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "requests.Save": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
                 }
             }
         },

@@ -32,5 +32,5 @@ func (receiver *PathExists) Passes(_ validation.Data, val any, options ...any) b
 
 // Message Get the validation error message.
 func (receiver *PathExists) Message() string {
-	return "路径 %v 不存在"
+	return "路径不存在"
 }

@@ -15,7 +15,7 @@ func (r *NotExist) Authorize(ctx http.Context) error {
 
 func (r *NotExist) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"path": "regex:^/[a-zA-Z0-9_-]+(\\/[a-zA-Z0-9_-]+)*$|path_not_exists",
+		"path": "regex:^/[a-zA-Z0-9_.@#$%-]+(\\/[a-zA-Z0-9_.@#$%-]+)*$|path_not_exists",
 	}
 }
 

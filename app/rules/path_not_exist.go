@@ -11,7 +11,7 @@ type PathNotExists struct {
 
 // Signature The name of the rule.
 func (receiver *PathNotExists) Signature() string {
-	return "path_exists"
+	return "path_not_exists"
 }
 
 // Passes Determine if the validation rule passes.
@@ -32,5 +32,5 @@ func (receiver *PathNotExists) Passes(_ validation.Data, val any, options ...any
 
 // Message Get the validation error message.
 func (receiver *PathNotExists) Message() string {
-	return "路径 %v 已存在"
+	return "路径已存在"
 }

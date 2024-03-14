@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/support/carbon"
 
 	requests "panel/app/http/requests/file"
 	"panel/pkg/tools"
@@ -47,13 +50,7 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 		}
 	}
 
-	if err := tools.Chmod(request.Path, 0755); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-	if err := tools.Chown(request.Path, "www", "www"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
+	r.setPermission(request.Path, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -75,6 +72,17 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 		return sanitize
 	}
 
+	fileInfo, err := tools.FileInfo(request.Path)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if fileInfo.IsDir() {
+		return Error(ctx, http.StatusInternalServerError, "目标路径不是文件")
+	}
+	if fileInfo.Size() > 10*1024*1024 {
+		return Error(ctx, http.StatusInternalServerError, "文件大小超过 10M")
+	}
+
 	content, err := tools.Read(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
@@ -91,27 +99,26 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.Exist	true	"request"
+//	@Param			data	body		requests.Save	true	"request"
 //	@Param			content	body		string			true	"content"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/file/save [post]
 func (r *FileController) Save(ctx http.Context) http.Response {
-	var request requests.Exist
+	var request requests.Save
 	sanitize := Sanitize(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	content := ctx.Request().Input("content")
-
 	fileInfo, err := tools.FileInfo(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err = tools.Write(request.Path, content, fileInfo.Mode()); err != nil {
+	if err = tools.Write(request.Path, request.Content, fileInfo.Mode()); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	r.setPermission(request.Path, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -148,35 +155,37 @@ func (r *FileController) Delete(ctx http.Context) http.Response {
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
-//	@Param			data	body		requests.NotExist	true	"request"
-//	@Param			file	formData	file				true	"file"
+//	@Param			file	formData	file	true	"file"
+//	@Param			path	formData	string	true	"path"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/file/upload [post]
 func (r *FileController) Upload(ctx http.Context) http.Response {
-	var request requests.NotExist
+	var request requests.Upload
 	sanitize := Sanitize(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	pathInfo, err := tools.FileInfo(request.Path)
+	src, err := request.File.Open()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if !pathInfo.IsDir() {
-		return Error(ctx, http.StatusInternalServerError, "目标路径不是目录")
+	defer src.Close()
+
+	if tools.Exists(request.Path) && !ctx.Request().InputBool("force") {
+		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
-	file, err := ctx.Request().File("file")
-	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, "上传文件失败")
-	}
-
-	_, err = file.Store(request.Path)
+	data, err := io.ReadAll(src)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	if err = tools.Write(request.Path, string(data), 0755); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	r.setPermission(request.Path, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -199,13 +208,14 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 	}
 
 	if tools.Exists(request.New) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusInternalServerError, "目标路径已存在，是否覆盖？")
+		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
 	if err := tools.Mv(request.Old, request.New); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	r.setPermission(request.New, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -228,13 +238,14 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 	}
 
 	if tools.Exists(request.New) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusInternalServerError, "目标路径已存在，是否覆盖？")
+		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
 	if err := tools.Cp(request.Old, request.New); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	r.setPermission(request.New, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -250,7 +261,7 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/file/download [get]
 func (r *FileController) Download(ctx http.Context) http.Response {
-	var request requests.NotExist
+	var request requests.Exist
 	sanitize := Sanitize(ctx, &request)
 	if sanitize != nil {
 		return sanitize
@@ -312,7 +323,14 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, fileInfo)
+	return Success(ctx, http.Json{
+		"name":     fileInfo.Name(),
+		"size":     tools.FormatBytes(float64(fileInfo.Size())),
+		"mode_str": fileInfo.Mode().String(),
+		"mode":     fmt.Sprintf("%04o", fileInfo.Mode().Perm()),
+		"dir":      fileInfo.IsDir(),
+		"modify":   carbon.FromStdTime(fileInfo.ModTime()).ToDateTimeString(),
+	})
 }
 
 // Permission
@@ -334,6 +352,9 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 	}
 
 	if err := tools.Chmod(request.Path, os.FileMode(request.Mode)); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if err := tools.Chown(request.Path, request.Owner, request.Group); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -362,6 +383,7 @@ func (r *FileController) Archive(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	r.setPermission(request.File, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -387,6 +409,7 @@ func (r *FileController) UnArchive(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	r.setPermission(request.Path, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 
@@ -441,17 +464,29 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	paths := make(map[string]os.FileInfo)
-	err := filepath.Walk(request.Path, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		paths[path] = info
-		return nil
-	})
+	fileInfoList, err := os.ReadDir(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	var paths []any
+	for _, fileInfo := range fileInfoList {
+		info, _ := fileInfo.Info()
+		paths = append(paths, map[string]any{
+			"name":     info.Name(),
+			"size":     tools.FormatBytes(float64(info.Size())),
+			"mode_str": info.Mode().String(),
+			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
+			"dir":      info.IsDir(),
+			"modify":   carbon.FromStdTime(info.ModTime()).ToDateTimeString(),
+		})
+	}
+
 	return Success(ctx, paths)
+}
+
+// setPermission
+func (r *FileController) setPermission(path string, mode uint, owner, group string) {
+	_ = tools.Chmod(path, os.FileMode(mode))
+	_ = tools.Chown(path, owner, group)
 }

@@ -380,6 +380,13 @@ definitions:
       id:
         type: integer
     type: object
+  requests.Save:
+    properties:
+      content:
+        type: string
+      path:
+        type: string
+    type: object
   requests.SaveConfig:
     properties:
       domains:
@@ -1230,7 +1237,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.Exist'
+          $ref: '#/definitions/requests.Save'
       - description: content
         in: body
         name: content
@@ -1301,17 +1308,16 @@ paths:
       - application/json
       description: 上传文件到给定路径
       parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.NotExist'
       - description: file
         in: formData
         name: file
         required: true
         type: file
+      - description: path
+        in: formData
+        name: path
+        required: true
+        type: string
       produces:
       - application/json
       responses:
