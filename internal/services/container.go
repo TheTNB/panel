@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"io"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -17,12 +18,12 @@ type Container struct {
 	client *client.Client
 }
 
-func NewContainer(sock ...string) *Container {
+func NewContainer(sock ...string) Container {
 	if len(sock) == 0 {
 		sock[0] = "/run/podman/podman.sock"
 	}
 	cli, _ := client.NewClientWithOpts(client.WithHost("unix://"+sock[0]), client.WithAPIVersionNegotiation())
-	return &Container{
+	return Container{
 		client: cli,
 	}
 }
@@ -81,6 +82,11 @@ func (r *Container) ContainerStop(id string) error {
 	return r.client.ContainerStop(context.Background(), id, container.StopOptions{})
 }
 
+// ContainerRestart 重启容器
+func (r *Container) ContainerRestart(id string) error {
+	return r.client.ContainerRestart(context.Background(), id, container.StopOptions{})
+}
+
 // ContainerPause 暂停容器
 func (r *Container) ContainerPause(id string) error {
 	return r.client.ContainerPause(context.Background(), id)
@@ -111,8 +117,8 @@ func (r *Container) ContainerStats(id string) (types.ContainerStats, error) {
 	return r.client.ContainerStats(context.Background(), id, false)
 }
 
-// ContainerExists 判断容器是否存在
-func (r *Container) ContainerExists(name string) (bool, error) {
+// ContainerExist 判断容器是否存在
+func (r *Container) ContainerExist(name string) (bool, error) {
 	var options container.ListOptions
 	options.Filters = filters.NewArgs(filters.Arg("name", name))
 	containers, err := r.client.ContainerList(context.Background(), options)
@@ -155,11 +161,6 @@ func (r *Container) ContainerPrune() error {
 	return err
 }
 
-// ContainerRestart 重启容器
-func (r *Container) ContainerRestart(id string) error {
-	return r.client.ContainerRestart(context.Background(), id, container.StopOptions{})
-}
-
 // NetworkList 列出网络
 func (r *Container) NetworkList() ([]types.NetworkResource, error) {
 	return r.client.NetworkList(context.Background(), types.NetworkListOptions{})
@@ -172,6 +173,11 @@ func (r *Container) NetworkCreate(name string) error {
 	})
 
 	return err
+}
+
+// NetworkRemove 删除网络
+func (r *Container) NetworkRemove(id string) error {
+	return r.client.NetworkRemove(context.Background(), id)
 }
 
 // NetworkExist 判断网络是否存在
@@ -205,11 +211,6 @@ func (r *Container) NetworkDisconnect(id string, containerID string) error {
 func (r *Container) NetworkPrune() error {
 	_, err := r.client.NetworksPrune(context.Background(), filters.NewArgs())
 	return err
-}
-
-// NetworkRemove 删除网络
-func (r *Container) NetworkRemove(id string) error {
-	return r.client.NetworkRemove(context.Background(), id)
 }
 
 // ImageList 列出镜像
@@ -258,6 +259,12 @@ func (r *Container) ImageInspect(id string) (types.ImageInspect, error) {
 	return img, err
 }
 
+// VolumeList 列出存储卷
+func (r *Container) VolumeList() ([]*volume.Volume, error) {
+	volumes, err := r.client.VolumeList(context.Background(), volume.ListOptions{})
+	return volumes.Volumes, err
+}
+
 // VolumeCreate 创建存储卷
 func (r *Container) VolumeCreate(name string, options, labels map[string]string) (volume.Volume, error) {
 	return r.client.VolumeCreate(context.Background(), volume.CreateOptions{
@@ -266,12 +273,6 @@ func (r *Container) VolumeCreate(name string, options, labels map[string]string)
 		DriverOpts: options,
 		Labels:     labels,
 	})
-}
-
-// VolumeList 列出存储卷
-func (r *Container) VolumeList() ([]*volume.Volume, error) {
-	volumes, err := r.client.VolumeList(context.Background(), volume.ListOptions{})
-	return volumes.Volumes, err
 }
 
 // VolumeExist 判断存储卷是否存在
@@ -300,4 +301,16 @@ func (r *Container) VolumeRemove(id string) error {
 func (r *Container) VolumePrune() error {
 	_, err := r.client.VolumesPrune(context.Background(), filters.NewArgs())
 	return err
+}
+
+// SliceToMap 将切片转换为 map
+func (r *Container) SliceToMap(slice []string) map[string]string {
+	m := make(map[string]string)
+	for _, s := range slice {
+		if strings.Contains(s, "=") {
+			sps := strings.SplitN(s, "=", 2)
+			m[sps[0]] = sps[1]
+		}
+	}
+	return m
 }
