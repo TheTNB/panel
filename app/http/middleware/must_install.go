@@ -36,9 +36,9 @@ func MustInstall() http.Middleware {
 			return
 		}
 
-		if installedPlugin.Version != plugin.Version || installedPlugin.Slug != plugin.Slug {
+		if installedPlugin.Slug != plugin.Slug {
 			ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-				"message": "插件 " + slug + " 需要更新至 " + plugin.Version + " 版本",
+				"message": "插件 " + slug + " 未安装",
 			})
 			return
 		}
