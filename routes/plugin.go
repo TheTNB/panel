@@ -139,7 +139,7 @@ func Plugin() {
 			route.Post("users/password", postgresql16Controller.SetUserPassword)
 		})
 		r.Prefix("php74").Group(func(route route.Router) {
-			php74Controller := plugins.NewPhp74Controller()
+			php74Controller := plugins.NewPHPController(74)
 			route.Get("status", php74Controller.Status)
 			route.Post("reload", php74Controller.Reload)
 			route.Post("start", php74Controller.Start)
@@ -157,7 +157,7 @@ func Plugin() {
 			route.Delete("extensions", php74Controller.UninstallExtension)
 		})
 		r.Prefix("php80").Group(func(route route.Router) {
-			php80Controller := plugins.NewPhp80Controller()
+			php80Controller := plugins.NewPHPController(80)
 			route.Get("status", php80Controller.Status)
 			route.Post("reload", php80Controller.Reload)
 			route.Post("start", php80Controller.Start)
@@ -175,7 +175,7 @@ func Plugin() {
 			route.Delete("extensions", php80Controller.UninstallExtension)
 		})
 		r.Prefix("php81").Group(func(route route.Router) {
-			php81Controller := plugins.NewPhp81Controller()
+			php81Controller := plugins.NewPHPController(81)
 			route.Get("status", php81Controller.Status)
 			route.Post("reload", php81Controller.Reload)
 			route.Post("start", php81Controller.Start)
@@ -193,7 +193,7 @@ func Plugin() {
 			route.Delete("extensions", php81Controller.UninstallExtension)
 		})
 		r.Prefix("php82").Group(func(route route.Router) {
-			php82Controller := plugins.NewPhp82Controller()
+			php82Controller := plugins.NewPHPController(82)
 			route.Get("status", php82Controller.Status)
 			route.Post("reload", php82Controller.Reload)
 			route.Post("start", php82Controller.Start)
@@ -211,7 +211,7 @@ func Plugin() {
 			route.Delete("extensions", php82Controller.UninstallExtension)
 		})
 		r.Prefix("php83").Group(func(route route.Router) {
-			php83Controller := plugins.NewPhp83Controller()
+			php83Controller := plugins.NewPHPController(83)
 			route.Get("status", php83Controller.Status)
 			route.Post("reload", php83Controller.Reload)
 			route.Post("start", php83Controller.Start)
