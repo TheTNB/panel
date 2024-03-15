@@ -76,6 +76,24 @@ func (r *PHPController) SaveConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
+func (r *PHPController) GetFPMConfig(ctx http.Context) http.Response {
+	config, err := r.service.GetFPMConfig()
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return controllers.Success(ctx, config)
+}
+
+func (r *PHPController) SaveFPMConfig(ctx http.Context) http.Response {
+	config := ctx.Request().Input("config")
+	if err := r.service.SaveFPMConfig(config); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return controllers.Success(ctx, nil)
+}
+
 func (r *PHPController) Load(ctx http.Context) http.Response {
 	load, err := r.service.Load()
 	if err != nil {
