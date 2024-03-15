@@ -280,7 +280,7 @@ func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
 		})
 		extensions = append(extensions, internal.PHPExtension{
 			Name:        "Swow",
-			Slug:        "swow",
+			Slug:        "Swow",
 			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
 			Installed:   false,
 		})
