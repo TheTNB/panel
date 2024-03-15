@@ -253,31 +253,35 @@ func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
 			Description: "Gettext 是一个用于处理多语言的库。",
 			Installed:   false,
 		},
-		/*{
+		{
 			Name:        "igbinary",
 			Slug:        "igbinary",
 			Description: "Igbinary 是一个用于序列化和反序列化数据的库。",
 			Installed:   false,
 		},
-		{
-			Name:        "swoole",
-			Slug:        "swoole",
-			Description: "Swoole 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
-			Installed:   false,
-		},
-		{
-			Name:        "swow",
-			Slug:        "swow",
-			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
-			Installed:   false,
-		},*/
 	}
 
+	// ionCube 只支持 PHP 8.3 以下版本
 	if cast.ToUint(r.version) < 83 {
 		extensions = append(extensions, internal.PHPExtension{
 			Name:        "ionCube",
 			Slug:        "ionCube Loader",
 			Description: "ionCube 是一个专业级的 PHP 加密解密工具。",
+			Installed:   false,
+		})
+	}
+	// Swoole 和 Swow 不支持 PHP 8.0 以下版本
+	if cast.ToUint(r.version) >= 80 {
+		extensions = append(extensions, internal.PHPExtension{
+			Name:        "Swoole",
+			Slug:        "swoole",
+			Description: "Swoole 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
+			Installed:   false,
+		})
+		extensions = append(extensions, internal.PHPExtension{
+			Name:        "Swow",
+			Slug:        "swow",
+			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
 			Installed:   false,
 		})
 	}
