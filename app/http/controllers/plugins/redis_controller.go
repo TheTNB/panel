@@ -105,19 +105,19 @@ func (r *RedisController) Load(ctx http.Context) http.Response {
 	}
 
 	data := []types.NV{
-		{"TCP 端口", dataRaw["tcp_port"]},
-		{"已运行天数", dataRaw["uptime_in_days"]},
-		{"连接的客户端数", dataRaw["connected_clients"]},
-		{"已分配的内存总量", dataRaw["used_memory_human"]},
-		{"占用内存总量", dataRaw["used_memory_rss_human"]},
-		{"占用内存峰值", dataRaw["used_memory_peak_human"]},
-		{"内存碎片比率", dataRaw["mem_fragmentation_ratio"]},
-		{"运行以来连接过的客户端的总数", dataRaw["total_connections_received"]},
-		{"运行以来执行过的命令的总数", dataRaw["total_commands_processed"]},
-		{"每秒执行的命令数", dataRaw["instantaneous_ops_per_sec"]},
-		{"查找数据库键成功次数", dataRaw["keyspace_hits"]},
-		{"查找数据库键失败次数", dataRaw["keyspace_misses"]},
-		{"最近一次 fork() 操作耗费的毫秒数", dataRaw["latest_fork_usec"]},
+		{Name: "TCP 端口", Value: dataRaw["tcp_port"]},
+		{Name: "已运行天数", Value: dataRaw["uptime_in_days"]},
+		{Name: "连接的客户端数", Value: dataRaw["connected_clients"]},
+		{Name: "已分配的内存总量", Value: dataRaw["used_memory_human"]},
+		{Name: "占用内存总量", Value: dataRaw["used_memory_rss_human"]},
+		{Name: "占用内存峰值", Value: dataRaw["used_memory_peak_human"]},
+		{Name: "内存碎片比率", Value: dataRaw["mem_fragmentation_ratio"]},
+		{Name: "运行以来连接过的客户端的总数", Value: dataRaw["total_connections_received"]},
+		{Name: "运行以来执行过的命令的总数", Value: dataRaw["total_commands_processed"]},
+		{Name: "每秒执行的命令数", Value: dataRaw["instantaneous_ops_per_sec"]},
+		{Name: "查找数据库键成功次数", Value: dataRaw["keyspace_hits"]},
+		{Name: "查找数据库键失败次数", Value: dataRaw["keyspace_misses"]},
+		{Name: "最近一次 fork() 操作耗费的毫秒数", Value: dataRaw["latest_fork_usec"]},
 	}
 
 	return controllers.Success(ctx, data)
