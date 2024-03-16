@@ -154,11 +154,11 @@ func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
 	}
 
 	data := []types.NV{
-		{"启动时间", carbon.Parse(time).ToDateTimeString()},
-		{"进程 PID", pid},
-		{"进程数", process},
-		{"总连接数", connections},
-		{"空间占用", storage},
+		{Name: "启动时间", Value: carbon.Parse(time).ToDateTimeString()},
+		{Name: "进程 PID", Value: pid},
+		{Name: "进程数", Value: process},
+		{Name: "总连接数", Value: connections},
+		{Name: "空间占用", Value: storage},
 	}
 
 	return controllers.Success(ctx, data)
