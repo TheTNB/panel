@@ -278,7 +278,13 @@ func (r *Container) ImagePull(config requests.ImagePull) error {
 		options.RegistryAuth = authStr
 	}
 
-	_, err := r.client.ImagePull(context.Background(), config.Name, options)
+	out, err := r.client.ImagePull(context.Background(), config.Name, options)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(io.Discard, out)
 	return err
 }
 
