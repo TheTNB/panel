@@ -4156,7 +4156,7 @@ const docTemplate = `{
                 "env": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "image": {
@@ -4165,7 +4165,7 @@ const docTemplate = `{
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "memory": {
@@ -4183,7 +4183,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requests.ContainerPort"
+                        "$ref": "#/definitions/types.ContainerPort"
                     }
                 },
                 "privileged": {
@@ -4201,31 +4201,8 @@ const docTemplate = `{
                 "volumes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requests.ContainerVolume"
+                        "$ref": "#/definitions/types.ContainerVolume"
                     }
-                }
-            }
-        },
-        "requests.ContainerPort": {
-            "type": "object",
-            "properties": {
-                "end": {
-                    "type": "integer"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "host_end": {
-                    "type": "integer"
-                },
-                "host_start": {
-                    "type": "integer"
-                },
-                "protocol": {
-                    "type": "string"
-                },
-                "start": {
-                    "type": "integer"
                 }
             }
         },
@@ -4236,20 +4213,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.ContainerVolume": {
-            "type": "object",
-            "properties": {
-                "container": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "mode": {
                     "type": "string"
                 }
             }
@@ -4374,23 +4337,6 @@ const docTemplate = `{
                 }
             }
         },
-        "requests.Network": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "gateway": {
-                    "type": "string"
-                },
-                "ip_range": {
-                    "type": "string"
-                },
-                "subnet": {
-                    "type": "string"
-                }
-            }
-        },
         "requests.NetworkConnectDisConnect": {
             "type": "object",
             "properties": {
@@ -4409,15 +4355,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "ipv4": {
-                    "$ref": "#/definitions/requests.Network"
+                    "$ref": "#/definitions/types.ContainerNetwork"
                 },
                 "ipv6": {
-                    "$ref": "#/definitions/requests.Network"
+                    "$ref": "#/definitions/types.ContainerNetwork"
                 },
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "name": {
@@ -4426,7 +4372,7 @@ const docTemplate = `{
                 "options": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 }
             }
@@ -4633,7 +4579,7 @@ const docTemplate = `{
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "name": {
@@ -4642,8 +4588,73 @@ const docTemplate = `{
                 "options": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
+                }
+            }
+        },
+        "types.ContainerNetwork": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "gateway": {
+                    "type": "string"
+                },
+                "ip_range": {
+                    "type": "string"
+                },
+                "subnet": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ContainerPort": {
+            "type": "object",
+            "properties": {
+                "container_end": {
+                    "type": "integer"
+                },
+                "container_start": {
+                    "type": "integer"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "host_end": {
+                    "type": "integer"
+                },
+                "host_start": {
+                    "type": "integer"
+                },
+                "protocol": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ContainerVolume": {
+            "type": "object",
+            "properties": {
+                "container": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.KV": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

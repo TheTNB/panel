@@ -1,5 +1,7 @@
 package internal
 
+import "panel/types"
+
 type PHPExtension struct {
 	Name        string `json:"name"`
 	Slug        string `json:"slug"`
@@ -17,7 +19,7 @@ type PHP interface {
 	SaveConfig(config string) error
 	GetFPMConfig() (string, error)
 	SaveFPMConfig(config string) error
-	Load() ([]NV, error)
+	Load() ([]types.NV, error)
 	GetErrorLog() (string, error)
 	GetSlowLog() (string, error)
 	ClearErrorLog() error

@@ -148,8 +148,8 @@ func Api() {
 				r.Get("exist", containerController.ImageExist)
 				r.Post("pull", containerController.ImagePull)
 				r.Post("remove", containerController.ImageRemove)
-				r.Post("prune", containerController.ImagePrune)
 				r.Get("inspect", containerController.ImageInspect)
+				r.Post("prune", containerController.ImagePrune)
 			})
 
 			r.Prefix("volume").Group(func(r route.Router) {

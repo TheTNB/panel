@@ -311,13 +311,13 @@ definitions:
         type: array
       env:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
       image:
         type: string
       labels:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
       memory:
         type: integer
@@ -329,7 +329,7 @@ definitions:
         type: boolean
       ports:
         items:
-          $ref: '#/definitions/requests.ContainerPort'
+          $ref: '#/definitions/types.ContainerPort'
         type: array
       privileged:
         type: boolean
@@ -341,38 +341,14 @@ definitions:
         type: boolean
       volumes:
         items:
-          $ref: '#/definitions/requests.ContainerVolume'
+          $ref: '#/definitions/types.ContainerVolume'
         type: array
-    type: object
-  requests.ContainerPort:
-    properties:
-      end:
-        type: integer
-      host:
-        type: string
-      host_end:
-        type: integer
-      host_start:
-        type: integer
-      protocol:
-        type: string
-      start:
-        type: integer
     type: object
   requests.ContainerRename:
     properties:
       id:
         type: string
       name:
-        type: string
-    type: object
-  requests.ContainerVolume:
-    properties:
-      container:
-        type: string
-      host:
-        type: string
-      mode:
         type: string
     type: object
   requests.Copy:
@@ -452,17 +428,6 @@ definitions:
       old:
         type: string
     type: object
-  requests.Network:
-    properties:
-      enabled:
-        type: boolean
-      gateway:
-        type: string
-      ip_range:
-        type: string
-      subnet:
-        type: string
-    type: object
   requests.NetworkConnectDisConnect:
     properties:
       container:
@@ -475,18 +440,18 @@ definitions:
       driver:
         type: string
       ipv4:
-        $ref: '#/definitions/requests.Network'
+        $ref: '#/definitions/types.ContainerNetwork'
       ipv6:
-        $ref: '#/definitions/requests.Network'
+        $ref: '#/definitions/types.ContainerNetwork'
       labels:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
       name:
         type: string
       options:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
     type: object
   requests.NotExist:
@@ -620,14 +585,56 @@ definitions:
         type: string
       labels:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
       name:
         type: string
       options:
         items:
-          type: string
+          $ref: '#/definitions/types.KV'
         type: array
+    type: object
+  types.ContainerNetwork:
+    properties:
+      enabled:
+        type: boolean
+      gateway:
+        type: string
+      ip_range:
+        type: string
+      subnet:
+        type: string
+    type: object
+  types.ContainerPort:
+    properties:
+      container_end:
+        type: integer
+      container_start:
+        type: integer
+      host:
+        type: string
+      host_end:
+        type: integer
+      host_start:
+        type: integer
+      protocol:
+        type: string
+    type: object
+  types.ContainerVolume:
+    properties:
+      container:
+        type: string
+      host:
+        type: string
+      mode:
+        type: string
+    type: object
+  types.KV:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
     type: object
 info:
   contact:

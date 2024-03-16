@@ -3,13 +3,15 @@ package requests
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
+
+	"panel/types"
 )
 
 type VolumeCreate struct {
-	Name    string   `form:"name" json:"name"`
-	Driver  string   `form:"driver" json:"driver"`
-	Labels  []string `form:"labels" json:"labels"`
-	Options []string `form:"options" json:"options"`
+	Name    string     `form:"name" json:"name"`
+	Driver  string     `form:"driver" json:"driver"`
+	Labels  []types.KV `form:"labels" json:"labels"`
+	Options []types.KV `form:"options" json:"options"`
 }
 
 func (r *VolumeCreate) Authorize(ctx http.Context) error {

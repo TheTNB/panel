@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/go-connections/nat"
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/support/carbon"
 
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/container"
@@ -65,9 +66,30 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 		paged = []types.Container{}
 	}
 
+	// 过滤需要的字段
+	var items []any
+	for _, item := range paged {
+		var name string
+		if len(item.Names) > 0 {
+			name = item.Names[0]
+		}
+		items = append(items, map[string]any{
+			"id":       item.ID,
+			"name":     strings.TrimLeft(name, "/"),
+			"image":    item.Image,
+			"image_id": item.ImageID,
+			"command":  item.Command,
+			"created":  carbon.FromTimestamp(item.Created).ToDateTimeString(),
+			"ports":    item.Ports,
+			"labels":   item.Labels,
+			"state":    item.State,
+			"status":   item.Status,
+		})
+	}
+
 	return Success(ctx, http.Json{
 		"total": len(containers),
-		"items": paged,
+		"items": items,
 	})
 }
 
@@ -158,18 +180,18 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	hostConf.Binds = []string{}
 
 	volumes := make(map[string]struct{})
-	for _, volume := range request.Volumes {
-		volumes[volume.Container] = struct{}{}
-		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.Host, volume.Container, volume.Mode))
+	for _, v := range request.Volumes {
+		volumes[v.Container] = struct{}{}
+		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", v.Host, v.Container, v.Mode))
 	}
 
 	id, err := r.container.ContainerCreate(request.Name,
 		container.Config{
 			Image:        request.Image,
-			Env:          request.Env,
+			Env:          r.container.KVToSlice(request.Env),
 			Entrypoint:   request.Entrypoint,
 			Cmd:          request.Command,
-			Labels:       r.container.SliceToMap(request.Labels),
+			Labels:       r.container.KVToMap(request.Labels),
 			ExposedPorts: exposed,
 			OpenStdin:    request.OpenStdin,
 			Tty:          request.Tty,

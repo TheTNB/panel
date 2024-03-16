@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"io"
-	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -17,6 +16,7 @@ import (
 	"github.com/goravel/framework/support/json"
 
 	requests "panel/app/http/requests/container"
+	paneltypes "panel/types"
 )
 
 type Container struct {
@@ -192,8 +192,8 @@ func (r *Container) NetworkCreate(config requests.NetworkCreate) (string, error)
 	options := types.NetworkCreate{
 		EnableIPv6: config.Ipv6.Enabled,
 		Driver:     config.Driver,
-		Options:    r.SliceToMap(config.Options),
-		Labels:     r.SliceToMap(config.Labels),
+		Options:    r.KVToMap(config.Options),
+		Labels:     r.KVToMap(config.Labels),
 	}
 	if len(ipamConfigs) > 0 {
 		options.IPAM = &network.IPAM{
@@ -320,8 +320,8 @@ func (r *Container) VolumeCreate(config requests.VolumeCreate) (volume.Volume, e
 	return r.client.VolumeCreate(context.Background(), volume.CreateOptions{
 		Name:       config.Name,
 		Driver:     config.Driver,
-		DriverOpts: r.SliceToMap(config.Options),
-		Labels:     r.SliceToMap(config.Labels),
+		DriverOpts: r.KVToMap(config.Options),
+		Labels:     r.KVToMap(config.Labels),
 	})
 }
 
@@ -353,15 +353,22 @@ func (r *Container) VolumePrune() error {
 	return err
 }
 
-// SliceToMap 将切片转换为 map
-func (r *Container) SliceToMap(slice []string) map[string]string {
+// KVToMap 将 key-value 切片转换为 map
+func (r *Container) KVToMap(kvs []paneltypes.KV) map[string]string {
 	m := make(map[string]string)
-	for _, s := range slice {
-		if strings.Contains(s, "=") {
-			sps := strings.SplitN(s, "=", 2)
-			m[sps[0]] = sps[1]
-		}
+	for _, item := range kvs {
+		m[item.Key] = item.Value
 	}
 
 	return m
+}
+
+// KVToSlice 将 key-value 切片转换为 key=value 切片
+func (r *Container) KVToSlice(kvs []paneltypes.KV) []string {
+	var s []string
+	for _, item := range kvs {
+		s = append(s, item.Key+"="+item.Value)
+	}
+
+	return s
 }

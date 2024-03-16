@@ -3,15 +3,17 @@ package requests
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
+
+	"panel/types"
 )
 
 type NetworkCreate struct {
-	Name    string   `form:"name" json:"name"`
-	Driver  string   `form:"driver" json:"driver"`
-	Ipv4    Network  `form:"ipv4" json:"ipv4"`
-	Ipv6    Network  `form:"ipv6" json:"ipv6"`
-	Labels  []string `form:"labels" json:"labels"`
-	Options []string `form:"options" json:"options"`
+	Name    string                 `form:"name" json:"name"`
+	Driver  string                 `form:"driver" json:"driver"`
+	Ipv4    types.ContainerNetwork `form:"ipv4" json:"ipv4"`
+	Ipv6    types.ContainerNetwork `form:"ipv6" json:"ipv6"`
+	Labels  []types.KV             `form:"labels" json:"labels"`
+	Options []types.KV             `form:"options" json:"options"`
 }
 
 func (r *NetworkCreate) Authorize(ctx http.Context) error {

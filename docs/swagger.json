@@ -4149,7 +4149,7 @@
                 "env": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "image": {
@@ -4158,7 +4158,7 @@
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "memory": {
@@ -4176,7 +4176,7 @@
                 "ports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requests.ContainerPort"
+                        "$ref": "#/definitions/types.ContainerPort"
                     }
                 },
                 "privileged": {
@@ -4194,31 +4194,8 @@
                 "volumes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/requests.ContainerVolume"
+                        "$ref": "#/definitions/types.ContainerVolume"
                     }
-                }
-            }
-        },
-        "requests.ContainerPort": {
-            "type": "object",
-            "properties": {
-                "end": {
-                    "type": "integer"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "host_end": {
-                    "type": "integer"
-                },
-                "host_start": {
-                    "type": "integer"
-                },
-                "protocol": {
-                    "type": "string"
-                },
-                "start": {
-                    "type": "integer"
                 }
             }
         },
@@ -4229,20 +4206,6 @@
                     "type": "string"
                 },
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.ContainerVolume": {
-            "type": "object",
-            "properties": {
-                "container": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "mode": {
                     "type": "string"
                 }
             }
@@ -4367,23 +4330,6 @@
                 }
             }
         },
-        "requests.Network": {
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                },
-                "gateway": {
-                    "type": "string"
-                },
-                "ip_range": {
-                    "type": "string"
-                },
-                "subnet": {
-                    "type": "string"
-                }
-            }
-        },
         "requests.NetworkConnectDisConnect": {
             "type": "object",
             "properties": {
@@ -4402,15 +4348,15 @@
                     "type": "string"
                 },
                 "ipv4": {
-                    "$ref": "#/definitions/requests.Network"
+                    "$ref": "#/definitions/types.ContainerNetwork"
                 },
                 "ipv6": {
-                    "$ref": "#/definitions/requests.Network"
+                    "$ref": "#/definitions/types.ContainerNetwork"
                 },
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "name": {
@@ -4419,7 +4365,7 @@
                 "options": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 }
             }
@@ -4626,7 +4572,7 @@
                 "labels": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
                 },
                 "name": {
@@ -4635,8 +4581,73 @@
                 "options": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/types.KV"
                     }
+                }
+            }
+        },
+        "types.ContainerNetwork": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "gateway": {
+                    "type": "string"
+                },
+                "ip_range": {
+                    "type": "string"
+                },
+                "subnet": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ContainerPort": {
+            "type": "object",
+            "properties": {
+                "container_end": {
+                    "type": "integer"
+                },
+                "container_start": {
+                    "type": "integer"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "host_end": {
+                    "type": "integer"
+                },
+                "host_start": {
+                    "type": "integer"
+                },
+                "protocol": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ContainerVolume": {
+            "type": "object",
+            "properties": {
+                "container": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "mode": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.KV": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         }

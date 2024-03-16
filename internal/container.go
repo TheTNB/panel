@@ -8,6 +8,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 
 	requests "panel/app/http/requests/container"
+	paneltypes "panel/types"
 )
 
 type Container interface {
@@ -48,5 +49,6 @@ type Container interface {
 	VolumeInspect(id string) (volume.Volume, error)
 	VolumeRemove(id string) error
 	VolumePrune() error
-	SliceToMap(slice []string) map[string]string
+	KVToMap(kvs []paneltypes.KV) map[string]string
+	KVToSlice(kvs []paneltypes.KV) []string
 }

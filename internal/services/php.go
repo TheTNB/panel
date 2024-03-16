@@ -15,6 +15,7 @@ import (
 	"panel/app/models"
 	"panel/internal"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type PHPImpl struct {
@@ -71,7 +72,7 @@ func (r *PHPImpl) SaveFPMConfig(config string) error {
 	return r.Reload()
 }
 
-func (r *PHPImpl) Load() ([]internal.NV, error) {
+func (r *PHPImpl) Load() ([]types.NV, error) {
 	client := req.C().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + r.version)
 	if err != nil || !resp.IsSuccessState() {
@@ -82,7 +83,7 @@ func (r *PHPImpl) Load() ([]internal.NV, error) {
 	dataKeys := []string{"应用池", "工作模式", "启动时间", "接受连接", "监听队列", "最大监听队列", "监听队列长度", "空闲进程数量", "活动进程数量", "总进程数量", "最大活跃进程数量", "达到进程上限次数", "慢请求"}
 	regexKeys := []string{"pool", "process manager", "start time", "accepted conn", "listen queue", "max listen queue", "listen queue len", "idle processes", "active processes", "total processes", "max active processes", "max children reached", "slow requests"}
 
-	data := make([]internal.NV, len(dataKeys))
+	data := make([]types.NV, len(dataKeys))
 	for i := range dataKeys {
 		data[i].Name = dataKeys[i]
 
