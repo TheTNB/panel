@@ -12,6 +12,7 @@ import (
 	"panel/internal"
 	"panel/internal/services"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type S3fsController struct {
@@ -29,7 +30,7 @@ func (r *S3fsController) List(ctx http.Context) http.Response {
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
 
-	var s3fsList []S3fsMount
+	var s3fsList []types.S3fsMount
 	err := json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
@@ -40,7 +41,7 @@ func (r *S3fsController) List(ctx http.Context) http.Response {
 	if startIndex > len(s3fsList) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []S3fsMount{},
+			"items": []types.S3fsMount{},
 		})
 	}
 	if endIndex > len(s3fsList) {
@@ -48,7 +49,7 @@ func (r *S3fsController) List(ctx http.Context) http.Response {
 	}
 	pagedS3fsList := s3fsList[startIndex:endIndex]
 	if pagedS3fsList == nil {
-		pagedS3fsList = []S3fsMount{}
+		pagedS3fsList = []types.S3fsMount{}
 	}
 
 	return controllers.Success(ctx, http.Json{
@@ -94,7 +95,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录必须为空")
 	}
 
-	var s3fsList []S3fsMount
+	var s3fsList []types.S3fsMount
 	err = json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
@@ -124,7 +125,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
 	}
 
-	s3fsList = append(s3fsList, S3fsMount{
+	s3fsList = append(s3fsList, types.S3fsMount{
 		ID:     id,
 		Path:   path,
 		Bucket: bucket,
@@ -149,13 +150,13 @@ func (r *S3fsController) Delete(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载ID不能为空")
 	}
 
-	var s3fsList []S3fsMount
+	var s3fsList []types.S3fsMount
 	err := json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
 
-	var mount S3fsMount
+	var mount types.S3fsMount
 	for _, s := range s3fsList {
 		if cast.ToString(s.ID) == id {
 			mount = s
@@ -182,7 +183,7 @@ func (r *S3fsController) Delete(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	var newS3fsList []S3fsMount
+	var newS3fsList []types.S3fsMount
 	for _, s := range s3fsList {
 		if s.ID != mount.ID {
 			newS3fsList = append(newS3fsList, s)

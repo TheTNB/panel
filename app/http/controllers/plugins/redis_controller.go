@@ -7,6 +7,7 @@ import (
 
 	"panel/app/http/controllers"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type RedisController struct {
@@ -103,7 +104,7 @@ func (r *RedisController) Load(ctx http.Context) http.Response {
 		}
 	}
 
-	data := []LoadInfo{
+	data := []types.NV{
 		{"TCP 端口", dataRaw["tcp_port"]},
 		{"已运行天数", dataRaw["uptime_in_days"]},
 		{"连接的客户端数", dataRaw["connected_clients"]},

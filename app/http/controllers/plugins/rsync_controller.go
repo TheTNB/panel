@@ -12,6 +12,7 @@ import (
 	"panel/internal"
 	"panel/internal/services"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type RsyncController struct {
@@ -119,9 +120,9 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	var modules []RsyncModule
+	var modules []types.RsyncModule
 	lines := strings.Split(config, "\n")
-	var currentModule *RsyncModule
+	var currentModule *types.RsyncModule
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
@@ -135,7 +136,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 				modules = append(modules, *currentModule)
 			}
 			moduleName := line[1 : len(line)-1]
-			currentModule = &RsyncModule{
+			currentModule = &types.RsyncModule{
 				Name: moduleName,
 			}
 		} else if currentModule != nil {
@@ -173,7 +174,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 	if startIndex > len(modules) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []RsyncModule{},
+			"items": []types.RsyncModule{},
 		})
 	}
 	if endIndex > len(modules) {
@@ -181,7 +182,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 	}
 	pagedModules := modules[startIndex:endIndex]
 	if pagedModules == nil {
-		pagedModules = []RsyncModule{}
+		pagedModules = []types.RsyncModule{}
 	}
 
 	return controllers.Success(ctx, http.Json{

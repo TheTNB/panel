@@ -11,6 +11,7 @@ import (
 	"panel/internal"
 	"panel/internal/services"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type Postgresql15Controller struct {
@@ -152,7 +153,7 @@ func (r *Postgresql15Controller) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL空间占用失败")
 	}
 
-	data := []LoadInfo{
+	data := []types.NV{
 		{"启动时间", carbon.Parse(time).ToDateTimeString()},
 		{"进程 PID", pid},
 		{"进程数", process},

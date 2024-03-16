@@ -13,6 +13,7 @@ import (
 	"panel/internal"
 	"panel/internal/services"
 	"panel/pkg/tools"
+	"panel/types"
 )
 
 type Fail2banController struct {
@@ -89,7 +90,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
 	}
 
-	var jails []Fail2banJail
+	var jails []types.Fail2banJail
 	for i, jail := range jailList {
 		if i == 0 {
 			continue
@@ -106,7 +107,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 		jailFindTime := regexp.MustCompile(`findtime = (.*)`).FindStringSubmatch(jailRaw)
 		jailBanTime := regexp.MustCompile(`bantime = (.*)`).FindStringSubmatch(jailRaw)
 
-		jails = append(jails, Fail2banJail{
+		jails = append(jails, types.Fail2banJail{
 			Name:     jailName,
 			Enabled:  jailEnabled,
 			LogPath:  jailLogPath[1],
@@ -121,7 +122,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 	if startIndex > len(jails) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []Fail2banJail{},
+			"items": []types.Fail2banJail{},
 		})
 	}
 	if endIndex > len(jails) {
@@ -129,7 +130,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 	}
 	pagedJails := jails[startIndex:endIndex]
 	if pagedJails == nil {
-		pagedJails = []Fail2banJail{}
+		pagedJails = []types.Fail2banJail{}
 	}
 
 	return controllers.Success(ctx, http.Json{
