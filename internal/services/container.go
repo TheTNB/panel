@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/base64"
 	"io"
 	"strings"
 
@@ -10,8 +11,12 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
+	"github.com/goravel/framework/support/json"
+
+	requests "panel/app/http/requests/container"
 )
 
 type Container struct {
@@ -167,12 +172,37 @@ func (r *Container) NetworkList() ([]types.NetworkResource, error) {
 }
 
 // NetworkCreate 创建网络
-func (r *Container) NetworkCreate(name string) error {
-	_, err := r.client.NetworkCreate(context.Background(), name, types.NetworkCreate{
-		Driver: "bridge",
-	})
+func (r *Container) NetworkCreate(config requests.NetworkCreate) (string, error) {
+	var ipamConfigs []network.IPAMConfig
+	if config.Ipv4.Enabled {
+		ipamConfigs = append(ipamConfigs, network.IPAMConfig{
+			Subnet:  config.Ipv4.Subnet,
+			Gateway: config.Ipv4.Gateway,
+			IPRange: config.Ipv4.IPRange,
+		})
+	}
+	if config.Ipv6.Enabled {
+		ipamConfigs = append(ipamConfigs, network.IPAMConfig{
+			Subnet:  config.Ipv6.Subnet,
+			Gateway: config.Ipv6.Gateway,
+			IPRange: config.Ipv6.IPRange,
+		})
+	}
 
-	return err
+	options := types.NetworkCreate{
+		EnableIPv6: config.Ipv6.Enabled,
+		Driver:     config.Driver,
+		Options:    r.SliceToMap(config.Options),
+		Labels:     r.SliceToMap(config.Labels),
+	}
+	if len(ipamConfigs) > 0 {
+		options.IPAM = &network.IPAM{
+			Config: ipamConfigs,
+		}
+	}
+
+	resp, err := r.client.NetworkCreate(context.Background(), config.Name, options)
+	return resp.ID, err
 }
 
 // NetworkRemove 删除网络
@@ -198,13 +228,13 @@ func (r *Container) NetworkInspect(id string) (types.NetworkResource, error) {
 }
 
 // NetworkConnect 连接网络
-func (r *Container) NetworkConnect(id string, containerID string) error {
-	return r.client.NetworkConnect(context.Background(), id, containerID, nil)
+func (r *Container) NetworkConnect(networkID string, containerID string) error {
+	return r.client.NetworkConnect(context.Background(), networkID, containerID, nil)
 }
 
 // NetworkDisconnect 断开网络
-func (r *Container) NetworkDisconnect(id string, containerID string) error {
-	return r.client.NetworkDisconnect(context.Background(), id, containerID, true)
+func (r *Container) NetworkDisconnect(networkID string, containerID string) error {
+	return r.client.NetworkDisconnect(context.Background(), networkID, containerID, true)
 }
 
 // NetworkPrune 清理未使用的网络
@@ -221,9 +251,9 @@ func (r *Container) ImageList() ([]image.Summary, error) {
 }
 
 // ImageExist 判断镜像是否存在
-func (r *Container) ImageExist(str string) (bool, error) {
+func (r *Container) ImageExist(id string) (bool, error) {
 	var options types.ImageListOptions
-	options.Filters = filters.NewArgs(filters.Arg("reference", str))
+	options.Filters = filters.NewArgs(filters.Arg("reference", id))
 	images, err := r.client.ImageList(context.Background(), options)
 	if err != nil {
 		return false, err
@@ -233,8 +263,22 @@ func (r *Container) ImageExist(str string) (bool, error) {
 }
 
 // ImagePull 拉取镜像
-func (r *Container) ImagePull(str string) error {
-	_, err := r.client.ImagePull(context.Background(), str, types.ImagePullOptions{})
+func (r *Container) ImagePull(config requests.ImagePull) error {
+	options := types.ImagePullOptions{}
+	if config.Auth {
+		authConfig := registry.AuthConfig{
+			Username: config.Username,
+			Password: config.Password,
+		}
+		encodedJSON, err := json.Marshal(authConfig)
+		if err != nil {
+			return err
+		}
+		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
+		options.RegistryAuth = authStr
+	}
+
+	_, err := r.client.ImagePull(context.Background(), config.Name, options)
 	return err
 }
 
@@ -266,19 +310,19 @@ func (r *Container) VolumeList() ([]*volume.Volume, error) {
 }
 
 // VolumeCreate 创建存储卷
-func (r *Container) VolumeCreate(name string, options, labels map[string]string) (volume.Volume, error) {
+func (r *Container) VolumeCreate(config requests.VolumeCreate) (volume.Volume, error) {
 	return r.client.VolumeCreate(context.Background(), volume.CreateOptions{
-		Name:       name,
-		Driver:     "local",
-		DriverOpts: options,
-		Labels:     labels,
+		Name:       config.Name,
+		Driver:     config.Driver,
+		DriverOpts: r.SliceToMap(config.Options),
+		Labels:     r.SliceToMap(config.Labels),
 	})
 }
 
 // VolumeExist 判断存储卷是否存在
-func (r *Container) VolumeExist(name string) (bool, error) {
+func (r *Container) VolumeExist(id string) (bool, error) {
 	var options volume.ListOptions
-	options.Filters = filters.NewArgs(filters.Arg("name", name))
+	options.Filters = filters.NewArgs(filters.Arg("name", id))
 	volumes, err := r.client.VolumeList(context.Background(), options)
 	if err != nil {
 		return false, err
@@ -312,5 +356,6 @@ func (r *Container) SliceToMap(slice []string) map[string]string {
 			m[sps[0]] = sps[1]
 		}
 	}
+
 	return m
 }

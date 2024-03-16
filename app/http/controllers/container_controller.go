@@ -5,10 +5,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/go-connections/nat"
 	"github.com/goravel/framework/contracts/http"
+
+	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/container"
 	"panel/internal/services"
 )
@@ -23,17 +28,61 @@ func NewContainerController() *ContainerController {
 	}
 }
 
+// ContainerList
+//
+//	@Summary		获取容器列表
+//	@Description	获取所有容器列表
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/list [get]
 func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
+	var request commonrequests.Paginate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
 	containers, err := r.container.ContainerListAll()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, containers)
+	startIndex := (request.Page - 1) * request.Limit
+	endIndex := request.Page * request.Limit
+	if startIndex > len(containers) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []types.Container{},
+		})
+	}
+	if endIndex > len(containers) {
+		endIndex = len(containers)
+	}
+	paged := containers[startIndex:endIndex]
+	if paged == nil {
+		paged = []types.Container{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(containers),
+		"items": paged,
+	})
 }
 
+// ContainerSearch
+//
+//	@Summary		搜索容器
+//	@Description	根据容器名称搜索容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			name	query		string	true	"容器名称"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/search [get]
 func (r *ContainerController) ContainerSearch(ctx http.Context) http.Response {
-	fields := strings.Fields(ctx.Request().Query("names"))
+	fields := strings.Fields(ctx.Request().Query("name"))
 	containers, err := r.container.ContainerListByNames(fields)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
@@ -42,6 +91,17 @@ func (r *ContainerController) ContainerSearch(ctx http.Context) http.Response {
 	return Success(ctx, containers)
 }
 
+// ContainerCreate
+//
+//	@Summary		创建容器
+//	@Description	创建一个容器
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ContainerCreate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/create [post]
 func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	var request requests.ContainerCreate
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -125,6 +185,16 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	return Success(ctx, id)
 }
 
+// ContainerRemove
+//
+//	@Summary		删除容器
+//	@Description	删除一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/remove [post]
 func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -138,6 +208,16 @@ func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerStart
+//
+//	@Summary		启动容器
+//	@Description	启动一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/start [post]
 func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -151,6 +231,16 @@ func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerStop
+//
+//	@Summary		停止容器
+//	@Description	停止一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/stop [post]
 func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -164,6 +254,16 @@ func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerRestart
+//
+//	@Summary		重启容器
+//	@Description	重启一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/restart [post]
 func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -177,6 +277,15 @@ func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerPause
+//
+//	@Summary		暂停容器
+//	@Description	暂停一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
 func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -190,6 +299,17 @@ func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerUnpause
+//
+//	@Summary		取消暂停容器
+//	@Description	取消暂停一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//
+//	@Router			/panel/container/unpause [post]
 func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -203,6 +323,16 @@ func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerInspect
+//
+//	@Summary		查看容器
+//	@Description	查看一个容器的详细信息
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/inspect [get]
 func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -217,6 +347,16 @@ func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 	return Success(ctx, data)
 }
 
+// ContainerKill
+//
+//	@Summary		杀死容器
+//	@Description	杀死一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/kill [post]
 func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -230,6 +370,16 @@ func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerRename
+//
+//	@Summary		重命名容器
+//	@Description	重命名一个容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ContainerRename	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/rename [post]
 func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 	var request requests.ContainerRename
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -243,6 +393,16 @@ func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// ContainerStats
+//
+//	@Summary		查看容器状态
+//	@Description	查看一个容器的状态信息
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/stats [get]
 func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -257,6 +417,16 @@ func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 	return Success(ctx, data)
 }
 
+// ContainerExist
+//
+//	@Summary		检查容器是否存在
+//	@Description	检查一个容器是否存在
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/exist [get]
 func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -271,6 +441,16 @@ func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 	return Success(ctx, exist)
 }
 
+// ContainerLogs
+//
+//	@Summary		查看容器日志
+//	@Description	查看一个容器的日志
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/logs [get]
 func (r *ContainerController) ContainerLogs(ctx http.Context) http.Response {
 	var request requests.ID
 	if sanitize := Sanitize(ctx, &request); sanitize != nil {
@@ -285,6 +465,15 @@ func (r *ContainerController) ContainerLogs(ctx http.Context) http.Response {
 	return Success(ctx, data)
 }
 
+// ContainerPrune
+//
+//	@Summary		清理容器
+//	@Description	清理无用的容器
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/container/prune [post]
 func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 	if err := r.container.ContainerPrune(); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
@@ -293,92 +482,517 @@ func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 	return Success(ctx, nil)
 }
 
+// NetworkList
+//
+//	@Summary		获取网络列表
+//	@Description	获取所有网络列表
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/list [get]
 func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
+	var request commonrequests.Paginate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
 	networks, err := r.container.NetworkList()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, networks)
+	startIndex := (request.Page - 1) * request.Limit
+	endIndex := request.Page * request.Limit
+	if startIndex > len(networks) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []types.NetworkResource{},
+		})
+	}
+	if endIndex > len(networks) {
+		endIndex = len(networks)
+	}
+	paged := networks[startIndex:endIndex]
+	if paged == nil {
+		paged = []types.NetworkResource{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(networks),
+		"items": paged,
+	})
 }
 
+// NetworkCreate
+//
+//	@Summary		创建网络
+//	@Description	创建一个网络
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.NetworkCreate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/create [post]
 func (r *ContainerController) NetworkCreate(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.NetworkCreate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	id, err := r.container.NetworkCreate(request)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, id)
 }
 
+// NetworkRemove
+//
+//	@Summary		删除网络
+//	@Description	删除一个网络
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/remove [post]
 func (r *ContainerController) NetworkRemove(ctx http.Context) http.Response {
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.NetworkRemove(request.ID); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// NetworkExist
+//
+//	@Summary		检查网络是否存在
+//	@Description	检查一个网络是否存在
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/exist [get]
 func (r *ContainerController) NetworkExist(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	exist, err := r.container.NetworkExist(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, exist)
 }
 
+// NetworkInspect
+//
+//	@Summary		查看网络
+//	@Description	查看一个网络的详细信息
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/inspect [get]
 func (r *ContainerController) NetworkInspect(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	data, err := r.container.NetworkInspect(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, data)
 }
 
+// NetworkConnect
+//
+//	@Summary		连接容器到网络
+//	@Description	连接一个容器到一个网络
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.NetworkConnectDisConnect	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/connect [post]
 func (r *ContainerController) NetworkConnect(ctx http.Context) http.Response {
+	var request requests.NetworkConnectDisConnect
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.NetworkConnect(request.Network, request.Container); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// NetworkDisconnect
+//
+//	@Summary		从网络断开容器
+//	@Description	从一个网络断开一个容器
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.NetworkConnectDisConnect	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/network/disconnect [post]
 func (r *ContainerController) NetworkDisconnect(ctx http.Context) http.Response {
+	var request requests.NetworkConnectDisConnect
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.NetworkDisconnect(request.Network, request.Container); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// NetworkPrune
+//
+//	@Summary		清理网络
+//	@Description	清理无用的网络
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/container/network/prune [post]
 func (r *ContainerController) NetworkPrune(ctx http.Context) http.Response {
+	if err := r.container.NetworkPrune(); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// ImageList
+//
+//	@Summary		获取镜像列表
+//	@Description	获取所有镜像列表
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/image/list [get]
 func (r *ContainerController) ImageList(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request commonrequests.Paginate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	images, err := r.container.ImageList()
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	startIndex := (request.Page - 1) * request.Limit
+	endIndex := request.Page * request.Limit
+	if startIndex > len(images) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []image.Summary{},
+		})
+	}
+	if endIndex > len(images) {
+		endIndex = len(images)
+	}
+	paged := images[startIndex:endIndex]
+	if paged == nil {
+		paged = []image.Summary{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(images),
+		"items": paged,
+	})
 }
 
+// ImageExist
+//
+//	@Summary		检查镜像是否存在
+//	@Description	检查一个镜像是否存在
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/image/exist [get]
 func (r *ContainerController) ImageExist(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	exist, err := r.container.ImageExist(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, exist)
 }
 
+// ImagePull
+//
+//	@Summary		拉取镜像
+//	@Description	拉取一个镜像
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ImagePull	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/image/pull [post]
 func (r *ContainerController) ImagePull(ctx http.Context) http.Response {
+	var request requests.ImagePull
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.ImagePull(request); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// ImageRemove
+//
+//	@Summary		删除镜像
+//	@Description	删除一个镜像
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/image/remove [post]
 func (r *ContainerController) ImageRemove(ctx http.Context) http.Response {
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.ImageRemove(request.ID); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// ImagePrune
+//
+//	@Summary		清理镜像
+//	@Description	清理无用的镜像
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/container/image/prune [post]
 func (r *ContainerController) ImagePrune(ctx http.Context) http.Response {
+	if err := r.container.ImagePrune(); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// ImageInspect
+//
+//	@Summary		查看镜像
+//	@Description	查看一个镜像的详细信息
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/image/inspect [get]
 func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	data, err := r.container.ImageInspect(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, data)
 }
 
+// VolumeList
+//
+//	@Summary		获取卷列表
+//	@Description	获取所有卷列表
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		commonrequests.Paginate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/volume/list [get]
 func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
+	var request commonrequests.Paginate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
 	volumes, err := r.container.VolumeList()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, volumes)
+	startIndex := (request.Page - 1) * request.Limit
+	endIndex := request.Page * request.Limit
+	if startIndex > len(volumes) {
+		return Success(ctx, http.Json{
+			"total": 0,
+			"items": []*volume.Volume{},
+		})
+	}
+	if endIndex > len(volumes) {
+		endIndex = len(volumes)
+	}
+	paged := volumes[startIndex:endIndex]
+	if paged == nil {
+		paged = []*volume.Volume{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(volumes),
+		"items": paged,
+	})
 }
 
+// VolumeCreate
+//
+//	@Summary		创建卷
+//	@Description	创建一个卷
+//	@Tags			容器
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.VolumeCreate	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/volume/create [post]
 func (r *ContainerController) VolumeCreate(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.VolumeCreate
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	data, err := r.container.VolumeCreate(request)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, data.Name)
 }
 
+// VolumeExist
+//
+//	@Summary		检查卷是否存在
+//	@Description	检查一个卷是否存在
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/volume/exist [get]
 func (r *ContainerController) VolumeExist(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	exist, err := r.container.VolumeExist(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, exist)
 }
 
+// VolumeInspect
+//
+//	@Summary		查看卷
+//	@Description	查看一个卷的详细信息
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	query		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/volume/inspect [get]
 func (r *ContainerController) VolumeInspect(ctx http.Context) http.Response {
-	return Success(ctx, nil)
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	data, err := r.container.VolumeInspect(request.ID)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, data)
 }
 
+// VolumeRemove
+//
+//	@Summary		删除卷
+//	@Description	删除一个卷
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.ID	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/container/volume/remove [post]
 func (r *ContainerController) VolumeRemove(ctx http.Context) http.Response {
+	var request requests.ID
+	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+		return sanitize
+	}
+
+	if err := r.container.VolumeRemove(request.ID); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }
 
+// VolumePrune
+//
+//	@Summary		清理卷
+//	@Description	清理无用的卷
+//	@Tags			容器
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	SuccessResponse
+//	@Router			/panel/container/volume/prune [post]
 func (r *ContainerController) VolumePrune(ctx http.Context) http.Response {
+	if err := r.container.VolumePrune(); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, nil)
 }

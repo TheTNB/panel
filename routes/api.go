@@ -128,7 +128,7 @@ func Api() {
 			r.Post("kill", containerController.ContainerKill)
 			r.Post("rename", containerController.ContainerRename)
 			r.Get("stats", containerController.ContainerStats)
-			r.Post("exist", containerController.ContainerExist)
+			r.Get("exist", containerController.ContainerExist)
 			r.Get("logs", containerController.ContainerLogs)
 			r.Post("prune", containerController.ContainerPrune)
 
@@ -136,7 +136,7 @@ func Api() {
 				r.Get("list", containerController.NetworkList)
 				r.Post("create", containerController.NetworkCreate)
 				r.Post("remove", containerController.NetworkRemove)
-				r.Post("exist", containerController.NetworkExist)
+				r.Get("exist", containerController.NetworkExist)
 				r.Get("inspect", containerController.NetworkInspect)
 				r.Post("connect", containerController.NetworkConnect)
 				r.Post("disconnect", containerController.NetworkDisconnect)
@@ -145,7 +145,7 @@ func Api() {
 
 			r.Prefix("image").Group(func(r route.Router) {
 				r.Get("list", containerController.ImageList)
-				r.Post("exist", containerController.ImageExist)
+				r.Get("exist", containerController.ImageExist)
 				r.Post("pull", containerController.ImagePull)
 				r.Post("remove", containerController.ImageRemove)
 				r.Post("prune", containerController.ImagePrune)
@@ -155,7 +155,7 @@ func Api() {
 			r.Prefix("volume").Group(func(r route.Router) {
 				r.Get("list", containerController.VolumeList)
 				r.Post("create", containerController.VolumeCreate)
-				r.Post("exist", containerController.VolumeExist)
+				r.Get("exist", containerController.VolumeExist)
 				r.Get("inspect", containerController.VolumeInspect)
 				r.Post("remove", containerController.VolumeRemove)
 				r.Post("prune", containerController.VolumePrune)

@@ -6,6 +6,8 @@ import (
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
+
+	requests "panel/app/http/requests/container"
 )
 
 type Container interface {
@@ -27,7 +29,7 @@ type Container interface {
 	ContainerLogs(id string) (string, error)
 	ContainerPrune() error
 	NetworkList() ([]types.NetworkResource, error)
-	NetworkCreate(name string) error
+	NetworkCreate(config requests.NetworkCreate) (string, error)
 	NetworkRemove(id string) error
 	NetworkExist(name string) (bool, error)
 	NetworkInspect(id string) (types.NetworkResource, error)
@@ -35,16 +37,16 @@ type Container interface {
 	NetworkDisconnect(networkID string, containerID string) error
 	NetworkPrune() error
 	ImageList() ([]image.Summary, error)
-	ImageExist(reference string) (bool, error)
-	ImagePull(reference string) error
-	ImageRemove(imageID string) error
+	ImageExist(id string) (bool, error)
+	ImagePull(config requests.ImagePull) error
+	ImageRemove(id string) error
 	ImagePrune() error
-	ImageInspect(imageID string) (types.ImageInspect, error)
+	ImageInspect(id string) (types.ImageInspect, error)
 	VolumeList() ([]*volume.Volume, error)
-	VolumeCreate(name string, options, labels map[string]string) (volume.Volume, error)
+	VolumeCreate(config requests.VolumeCreate) (volume.Volume, error)
 	VolumeExist(name string) (bool, error)
-	VolumeInspect(volumeID string) (volume.Volume, error)
-	VolumeRemove(volumeID string) error
+	VolumeInspect(id string) (volume.Volume, error)
+	VolumeRemove(id string) error
 	VolumePrune() error
 	SliceToMap(slice []string) map[string]string
 }

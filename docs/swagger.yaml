@@ -180,6 +180,11 @@ definitions:
       updated_at:
         type: string
     type: object
+  panel_app_http_requests_container.ID:
+    properties:
+      id:
+        type: string
+    type: object
   panel_app_http_requests_plugins_rsync.Update:
     properties:
       auth_user:
@@ -288,6 +293,88 @@ definitions:
       website_id:
         type: integer
     type: object
+  requests.ContainerCreate:
+    properties:
+      auto_remove:
+        type: boolean
+      command:
+        items:
+          type: string
+        type: array
+      cpu_shares:
+        type: integer
+      cpus:
+        type: integer
+      entrypoint:
+        items:
+          type: string
+        type: array
+      env:
+        items:
+          type: string
+        type: array
+      image:
+        type: string
+      labels:
+        items:
+          type: string
+        type: array
+      memory:
+        type: integer
+      name:
+        type: string
+      network:
+        type: string
+      open_stdin:
+        type: boolean
+      ports:
+        items:
+          $ref: '#/definitions/requests.ContainerPort'
+        type: array
+      privileged:
+        type: boolean
+      publish_all_ports:
+        type: boolean
+      restart_policy:
+        type: string
+      tty:
+        type: boolean
+      volumes:
+        items:
+          $ref: '#/definitions/requests.ContainerVolume'
+        type: array
+    type: object
+  requests.ContainerPort:
+    properties:
+      end:
+        type: integer
+      host:
+        type: string
+      host_end:
+        type: integer
+      host_start:
+        type: integer
+      protocol:
+        type: string
+      start:
+        type: integer
+    type: object
+  requests.ContainerRename:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  requests.ContainerVolume:
+    properties:
+      container:
+        type: string
+      host:
+        type: string
+      mode:
+        type: string
+    type: object
   requests.Copy:
     properties:
       new:
@@ -340,6 +427,17 @@ definitions:
       path:
         type: string
     type: object
+  requests.ImagePull:
+    properties:
+      auth:
+        type: boolean
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   requests.Login:
     properties:
       password:
@@ -353,6 +451,43 @@ definitions:
         type: string
       old:
         type: string
+    type: object
+  requests.Network:
+    properties:
+      enabled:
+        type: boolean
+      gateway:
+        type: string
+      ip_range:
+        type: string
+      subnet:
+        type: string
+    type: object
+  requests.NetworkConnectDisConnect:
+    properties:
+      container:
+        type: string
+      network:
+        type: string
+    type: object
+  requests.NetworkCreate:
+    properties:
+      driver:
+        type: string
+      ipv4:
+        $ref: '#/definitions/requests.Network'
+      ipv6:
+        $ref: '#/definitions/requests.Network'
+      labels:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
     type: object
   requests.NotExist:
     properties:
@@ -478,6 +613,21 @@ definitions:
         type: string
       kid:
         type: string
+    type: object
+  requests.VolumeCreate:
+    properties:
+      driver:
+        type: string
+      labels:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      options:
+        items:
+          type: string
+        type: array
     type: object
 info:
   contact:
@@ -976,6 +1126,729 @@ paths:
       summary: 更新 ACME 用户
       tags:
       - 证书管理
+  /panel/container/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ContainerCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 创建容器
+      tags:
+      - 容器
+  /panel/container/exist:
+    get:
+      description: 检查一个容器是否存在
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 检查容器是否存在
+      tags:
+      - 容器
+  /panel/container/image/exist:
+    get:
+      description: 检查一个镜像是否存在
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 检查镜像是否存在
+      tags:
+      - 容器
+  /panel/container/image/inspect:
+    get:
+      description: 查看一个镜像的详细信息
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看镜像
+      tags:
+      - 容器
+  /panel/container/image/list:
+    get:
+      description: 获取所有镜像列表
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取镜像列表
+      tags:
+      - 容器
+  /panel/container/image/prune:
+    post:
+      description: 清理无用的镜像
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清理镜像
+      tags:
+      - 容器
+  /panel/container/image/pull:
+    post:
+      consumes:
+      - application/json
+      description: 拉取一个镜像
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ImagePull'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 拉取镜像
+      tags:
+      - 容器
+  /panel/container/image/remove:
+    post:
+      description: 删除一个镜像
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除镜像
+      tags:
+      - 容器
+  /panel/container/inspect:
+    get:
+      description: 查看一个容器的详细信息
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看容器
+      tags:
+      - 容器
+  /panel/container/kill:
+    post:
+      description: 杀死一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 杀死容器
+      tags:
+      - 容器
+  /panel/container/list:
+    get:
+      description: 获取所有容器列表
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取容器列表
+      tags:
+      - 容器
+  /panel/container/logs:
+    get:
+      description: 查看一个容器的日志
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看容器日志
+      tags:
+      - 容器
+  /panel/container/network/connect:
+    post:
+      consumes:
+      - application/json
+      description: 连接一个容器到一个网络
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NetworkConnectDisConnect'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 连接容器到网络
+      tags:
+      - 容器
+  /panel/container/network/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建一个网络
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NetworkCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 创建网络
+      tags:
+      - 容器
+  /panel/container/network/disconnect:
+    post:
+      consumes:
+      - application/json
+      description: 从一个网络断开一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.NetworkConnectDisConnect'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 从网络断开容器
+      tags:
+      - 容器
+  /panel/container/network/exist:
+    get:
+      description: 检查一个网络是否存在
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 检查网络是否存在
+      tags:
+      - 容器
+  /panel/container/network/inspect:
+    get:
+      description: 查看一个网络的详细信息
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看网络
+      tags:
+      - 容器
+  /panel/container/network/list:
+    get:
+      description: 获取所有网络列表
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取网络列表
+      tags:
+      - 容器
+  /panel/container/network/prune:
+    post:
+      description: 清理无用的网络
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清理网络
+      tags:
+      - 容器
+  /panel/container/network/remove:
+    post:
+      description: 删除一个网络
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除网络
+      tags:
+      - 容器
+  /panel/container/prune:
+    post:
+      description: 清理无用的容器
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清理容器
+      tags:
+      - 容器
+  /panel/container/remove:
+    post:
+      description: 删除一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除容器
+      tags:
+      - 容器
+  /panel/container/rename:
+    post:
+      description: 重命名一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ContainerRename'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重命名容器
+      tags:
+      - 容器
+  /panel/container/restart:
+    post:
+      description: 重启一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重启容器
+      tags:
+      - 容器
+  /panel/container/search:
+    get:
+      description: 根据容器名称搜索容器
+      parameters:
+      - description: 容器名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 搜索容器
+      tags:
+      - 容器
+  /panel/container/start:
+    post:
+      description: 启动一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启动容器
+      tags:
+      - 容器
+  /panel/container/stats:
+    get:
+      description: 查看一个容器的状态信息
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看容器状态
+      tags:
+      - 容器
+  /panel/container/stop:
+    post:
+      description: 停止一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 停止容器
+      tags:
+      - 容器
+  /panel/container/unpause:
+    post:
+      description: 取消暂停一个容器
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 取消暂停容器
+      tags:
+      - 容器
+  /panel/container/volume/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建一个卷
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.VolumeCreate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 创建卷
+      tags:
+      - 容器
+  /panel/container/volume/exist:
+    get:
+      description: 检查一个卷是否存在
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 检查卷是否存在
+      tags:
+      - 容器
+  /panel/container/volume/inspect:
+    get:
+      description: 查看一个卷的详细信息
+      parameters:
+      - in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 查看卷
+      tags:
+      - 容器
+  /panel/container/volume/list:
+    get:
+      description: 获取所有卷列表
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取卷列表
+      tags:
+      - 容器
+  /panel/container/volume/prune:
+    post:
+      description: 清理无用的卷
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清理卷
+      tags:
+      - 容器
+  /panel/container/volume/remove:
+    post:
+      description: 删除一个卷
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/panel_app_http_requests_container.ID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除卷
+      tags:
+      - 容器
   /panel/file/archive:
     post:
       consumes:
