@@ -34,11 +34,20 @@ func (r *ContainerCreate) Authorize(ctx http.Context) error {
 
 func (r *ContainerCreate) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"name":              "required|string",
-		"image":             "required|string",
-		"ports":             "slice",
-		"network":           "string",
-		"volumes":           "slice",
+		"name":  "required|string",
+		"image": "required|string",
+		"ports": "slice",
+		/*"ports.*.host":            "string",
+		"ports.*.host_start":      "int",
+		"ports.*.host_end":        "int",
+		"ports.*.container_start": "int",
+		"ports.*.container_end":   "int",
+		"ports.*.protocol":        "string|in:tcp,udp",*/
+		"network": "string",
+		"volumes": "slice",
+		/*"volumes.*.host":          "string",
+		"volumes.*.container":     "string",
+		"volumes.*.mode":          "string|in:ro,rw",*/
 		"labels":            "slice",
 		"env":               "slice",
 		"entrypoint":        "slice",

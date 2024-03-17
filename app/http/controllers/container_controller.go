@@ -13,6 +13,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
+	"panel/pkg/tools"
 
 	commonrequests "panel/app/http/requests/common"
 	requests "panel/app/http/requests/container"
@@ -55,7 +56,7 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 	if startIndex > len(containers) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []types.Container{},
+			"items": []any{},
 		})
 	}
 	if endIndex > len(containers) {
@@ -66,7 +67,6 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 		paged = []types.Container{}
 	}
 
-	// 过滤需要的字段
 	var items []any
 	for _, item := range paged {
 		var name string
@@ -530,7 +530,7 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 	if startIndex > len(networks) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []types.NetworkResource{},
+			"items": []any{},
 		})
 	}
 	if endIndex > len(networks) {
@@ -541,9 +541,40 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 		paged = []types.NetworkResource{}
 	}
 
+	var items []any
+	for _, item := range paged {
+		var ipamConfig []any
+		for _, v := range item.IPAM.Config {
+			ipamConfig = append(ipamConfig, map[string]any{
+				"subnet":      v.Subnet,
+				"gateway":     v.Gateway,
+				"ip_range":    v.IPRange,
+				"aux_address": v.AuxAddress,
+			})
+		}
+		items = append(items, map[string]any{
+			"id":         item.ID,
+			"name":       item.Name,
+			"driver":     item.Driver,
+			"ipv6":       item.EnableIPv6,
+			"scope":      item.Scope,
+			"internal":   item.Internal,
+			"attachable": item.Attachable,
+			"ingress":    item.Ingress,
+			"labels":     item.Labels,
+			"options":    item.Options,
+			"ipam": map[string]any{
+				"config":  ipamConfig,
+				"driver":  item.IPAM.Driver,
+				"options": item.IPAM.Options,
+			},
+			"created": carbon.FromStdTime(item.Created).ToDateTimeString(),
+		})
+	}
+
 	return Success(ctx, http.Json{
 		"total": len(networks),
-		"items": paged,
+		"items": items,
 	})
 }
 
@@ -734,7 +765,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 	if startIndex > len(images) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []image.Summary{},
+			"items": []any{},
 		})
 	}
 	if endIndex > len(images) {
@@ -745,9 +776,22 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 		paged = []image.Summary{}
 	}
 
+	var items []any
+	for _, item := range paged {
+		items = append(items, map[string]any{
+			"id":           item.ID,
+			"created":      carbon.FromTimestamp(item.Created).ToDateTimeString(),
+			"containers":   item.Containers,
+			"size":         tools.FormatBytes(float64(item.Size)),
+			"labels":       item.Labels,
+			"repo_tags":    item.RepoTags,
+			"repo_digests": item.RepoDigests,
+		})
+	}
+
 	return Success(ctx, http.Json{
 		"total": len(images),
-		"items": paged,
+		"items": items,
 	})
 }
 
@@ -889,7 +933,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 	if startIndex > len(volumes) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []*volume.Volume{},
+			"items": []any{},
 		})
 	}
 	if endIndex > len(volumes) {
@@ -900,9 +944,27 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 		paged = []*volume.Volume{}
 	}
 
+	var items []any
+	for _, item := range paged {
+		items = append(items, map[string]any{
+			"id":      item.Name,
+			"created": item.CreatedAt,
+			"driver":  item.Driver,
+			"mount":   item.Mountpoint,
+			"labels":  item.Labels,
+			"options": item.Options,
+			"scope":   item.Scope,
+			"status":  item.Status,
+			"usage": map[string]any{
+				"ref_count": item.UsageData.RefCount,
+				"size":      tools.FormatBytes(float64(item.UsageData.Size)),
+			},
+		})
+	}
+
 	return Success(ctx, http.Json{
 		"total": len(volumes),
-		"items": paged,
+		"items": items,
 	})
 }
 
