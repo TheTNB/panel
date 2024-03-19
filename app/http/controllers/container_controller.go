@@ -955,7 +955,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 		}
 		items = append(items, map[string]any{
 			"id":      item.Name,
-			"created": item.CreatedAt,
+			"created": carbon.Parse(item.CreatedAt).ToDateTimeString(),
 			"driver":  item.Driver,
 			"mount":   item.Mountpoint,
 			"labels":  item.Labels,
