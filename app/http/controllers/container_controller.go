@@ -946,6 +946,13 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 
 	var items []any
 	for _, item := range paged {
+		var usage any
+		if item.UsageData != nil {
+			usage = map[string]any{
+				"ref_count": item.UsageData.RefCount,
+				"size":      tools.FormatBytes(float64(item.UsageData.Size)),
+			}
+		}
 		items = append(items, map[string]any{
 			"id":      item.Name,
 			"created": item.CreatedAt,
@@ -955,10 +962,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 			"options": item.Options,
 			"scope":   item.Scope,
 			"status":  item.Status,
-			"usage": map[string]any{
-				"ref_count": item.UsageData.RefCount,
-				"size":      tools.FormatBytes(float64(item.UsageData.Size)),
-			},
+			"usage":   usage,
 		})
 	}
 
