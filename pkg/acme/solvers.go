@@ -19,7 +19,7 @@ type httpSolver struct {
 	path string
 }
 
-func (s httpSolver) Present(ctx context.Context, challenge acme.Challenge) error {
+func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 	var err error
 	if s.path == "" {
 		return nil
@@ -100,7 +100,7 @@ func (s dnsSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error 
 		return fmt.Errorf("获取域名 %q 的顶级域失败: %w", dnsName, err)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
 	_, err = provider.DeleteRecords(ctx, zone+".", *s.records)
@@ -174,12 +174,16 @@ func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) 
 	})
 	s.dataChan <- *s.records
 
+	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	defer cancel()
+
 	// 等待信号以继续
 	<-s.controlChan
 	return nil
 }
 
-func (s manualDNSSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error {
+func (s manualDNSSolver) CleanUp(_ context.Context, _ acme.Challenge) error {
+	s.records = &[]DNSRecord{}
 	return nil
 }
 
