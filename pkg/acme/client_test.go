@@ -1,7 +1,7 @@
 package acme
 
 import (
-	"fmt"
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -16,24 +16,26 @@ func TestClientTestSuite(t *testing.T) {
 }
 
 func (s *ClientTestSuite) TestObtainSSL() {
-	client, err := NewRegisterClient("ci@haozi.net", "https://acme-staging-v02.api.letsencrypt.org/directory", KeyEC256)
+	ctx := context.Background()
+	client, err := NewRegisterAccount(ctx, "ci@haozi.net", CALetsEncryptStaging, nil, KeyEC256)
 	s.Nil(err)
 
-	err = client.UseDns(DnsPod, DNSParam{
-		ID:    "xxx",
-		Token: "xxx",
+	client.UseDns(DnsPod, DNSParam{
+		ID:    "123456",
+		Token: "654321",
 	})
-	s.Nil(err)
 
-	err = client.UseManualDns(false)
-	s.Nil(err)
+	/*client.UseManualDns(2)
 
-	resolves, err := client.GetDNSResolve([]string{"haozi.dev"})
+	resolves, err := client.GetDNSRecords(ctx, []string{"*.haozi.net", "haozi.net"}, KeyEC256)
+	debug.Dump(resolves)
 	s.Nil(err)
 	s.NotNil(resolves)
 
-	ssl, err := client.ObtainSSL([]string{"haozi.dev"})
-	fmt.Println(err.Error())
+	time.Sleep(2 * time.Minute)
+
+	ssl, err := client.ObtainSSLManual()*/
+	ssl, err := client.ObtainSSL(ctx, []string{"*.haozi.net", "haozi.net"}, KeyEC256)
 	s.Error(err)
 	s.NotNil(ssl)
 }

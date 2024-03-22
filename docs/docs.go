@@ -535,9 +535,9 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "$ref": "#/definitions/acme.Resolve"
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/acme.DNSRecord"
                                             }
                                         }
                                     }
@@ -3696,9 +3696,6 @@ const docTemplate = `{
                 "api_key": {
                     "type": "string"
                 },
-                "email": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -3710,12 +3707,9 @@ const docTemplate = `{
                 }
             }
         },
-        "acme.Resolve": {
+        "acme.DNSRecord": {
             "type": "object",
             "properties": {
-                "err": {
-                    "type": "string"
-                },
                 "key": {
                     "type": "string"
                 },

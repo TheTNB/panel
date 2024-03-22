@@ -1,177 +1,195 @@
 package acme
 
 import (
+	"context"
 	"crypto"
 	"crypto/ecdsa"
+	"crypto/ed25519"
+	"crypto/elliptic"
+	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
+	"fmt"
+	"net/http"
+	"strings"
 
-	"github.com/go-acme/lego/v4/certcrypto"
-	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/registration"
+	"github.com/mholt/acmez"
+	"github.com/mholt/acmez/acme"
+	"go.uber.org/zap"
 )
 
 const (
-	CALetEncrypt = "https://acme-v02.api.letsencrypt.org/directory"
-	CAZeroSSL    = "https://acme.zerossl.com/v2/DV90"
-	CAGoogle     = "https://dv.acme-v02.api.pki.goog/directory"
-	CABuypass    = "https://api.buypass.com/acme/directory"
-	CASSLcom     = "https://acme.ssl.com/sslcom-dv-rsa"
+	CALetsEncryptStaging = "https://acme-staging-v02.api.letsencrypt.org/directory"
+	CALetsEncrypt        = "https://acme-v02.api.letsencrypt.org/directory"
+	CAZeroSSL            = "https://acme.zerossl.com/v2/DV90"
+	CAGoogle             = "https://dv.acme-v02.api.pki.goog/directory"
+	CABuypass            = "https://api.buypass.com/acme/directory"
+	CASSLcom             = "https://acme.ssl.com/sslcom-dv-rsa"
 )
 
-type KeyType = certcrypto.KeyType
+type KeyType string
 
 const (
-	KeyEC256   = certcrypto.EC256
-	KeyEC384   = certcrypto.EC384
-	KeyRSA2048 = certcrypto.RSA2048
-	KeyRSA3072 = certcrypto.RSA3072
-	KeyRSA4096 = certcrypto.RSA4096
+	KeyEC256   = KeyType("P256")
+	KeyEC384   = KeyType("P384")
+	KeyRSA2048 = KeyType("2048")
+	KeyRSA3072 = KeyType("3072")
+	KeyRSA4096 = KeyType("4096")
 )
 
-type domainError struct {
-	Domain string
-	Error  error
-}
+type EAB = acme.EAB
 
-type User struct {
-	Email        string
-	Registration *registration.Resource
-	Key          crypto.PrivateKey
-}
+func NewRegisterAccount(ctx context.Context, email, CA string, eab *EAB, keyType KeyType) (*Client, error) {
+	client, err := getClient(CA)
+	if err != nil {
+		return nil, err
+	}
 
-func (u *User) GetEmail() string {
-	return u.Email
-}
-
-func (u *User) GetRegistration() *registration.Resource {
-	return u.Registration
-}
-func (u *User) GetPrivateKey() crypto.PrivateKey {
-	return u.Key
-}
-
-func GetPrivateKey(priKey crypto.PrivateKey, keyType KeyType) ([]byte, error) {
-	var marshal []byte
-	var block *pem.Block
-	var err error
-
-	switch keyType {
-	case KeyEC256, KeyEC384:
-		key := priKey.(*ecdsa.PrivateKey)
-		marshal, err = x509.MarshalECPrivateKey(key)
+	accountPrivateKey, err := generatePrivateKey(keyType)
+	if err != nil {
+		return nil, err
+	}
+	account := acme.Account{
+		Contact:              []string{"mailto:" + email},
+		TermsOfServiceAgreed: true,
+		PrivateKey:           accountPrivateKey,
+	}
+	if eab != nil {
+		err = account.SetExternalAccountBinding(ctx, client.Client, *eab)
 		if err != nil {
 			return nil, err
 		}
-		block = &pem.Block{
-			Type:  "PRIVATE KEY",
-			Bytes: marshal,
+	}
+
+	account, err = client.NewAccount(ctx, account)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{Account: account, zClient: client}, nil
+}
+
+func NewPrivateKeyAccount(email string, privateKey string, CA string, eab *EAB) (*Client, error) {
+	client, err := getClient(CA)
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := parsePrivateKey([]byte(privateKey))
+	if err != nil {
+		return nil, err
+	}
+
+	account := acme.Account{
+		Contact:              []string{"mailto:" + email},
+		TermsOfServiceAgreed: true,
+		PrivateKey:           key,
+	}
+	if eab != nil {
+		err = account.SetExternalAccountBinding(context.Background(), client.Client, *eab)
+		if err != nil {
+			return nil, err
 		}
-	case KeyRSA2048, KeyRSA3072, KeyRSA4096:
-		key := priKey.(*rsa.PrivateKey)
-		marshal = x509.MarshalPKCS1PrivateKey(key)
-		block = &pem.Block{
-			Type:  "privateKey",
-			Bytes: marshal,
+	}
+
+	account, err = client.GetAccount(context.Background(), account)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{Account: account, zClient: client}, nil
+}
+
+func parsePrivateKey(key []byte) (crypto.Signer, error) {
+	keyBlockDER, _ := pem.Decode(key)
+	if keyBlockDER == nil {
+		return nil, errors.New("invalid PEM block")
+	}
+
+	if keyBlockDER.Type != "PRIVATE KEY" && !strings.HasSuffix(keyBlockDER.Type, " PRIVATE KEY") {
+		return nil, fmt.Errorf("unknown PEM header %q", keyBlockDER.Type)
+	}
+
+	if parse, err := x509.ParsePKCS1PrivateKey(keyBlockDER.Bytes); err == nil {
+		return parse, nil
+	}
+
+	if parse, err := x509.ParsePKCS8PrivateKey(keyBlockDER.Bytes); err == nil {
+		switch parse.(type) {
+		case *rsa.PrivateKey, *ecdsa.PrivateKey, ed25519.PrivateKey:
+			return parse.(crypto.Signer), nil
+		default:
+			return nil, fmt.Errorf("found unknown private key type in PKCS#8 wrapping: %T", key)
 		}
 	}
 
-	return pem.EncodeToMemory(block), nil
+	if parse, err := x509.ParseECPrivateKey(keyBlockDER.Bytes); err == nil {
+		return parse, nil
+	}
+
+	return nil, errors.New("解析私钥失败")
 }
 
-func NewRegisterClient(email string, CA string, keyType certcrypto.KeyType) (*Client, error) {
-	privateKey, err := certcrypto.GeneratePrivateKey(keyType)
-	if err != nil {
-		return nil, err
+func generatePrivateKey(keyType KeyType) (crypto.Signer, error) {
+	switch keyType {
+	case KeyEC256:
+		return ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	case KeyEC384:
+		return ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	case KeyRSA2048:
+		return rsa.GenerateKey(rand.Reader, 2048)
+	case KeyRSA3072:
+		return rsa.GenerateKey(rand.Reader, 3072)
+	case KeyRSA4096:
+		return rsa.GenerateKey(rand.Reader, 4096)
 	}
 
-	user := &User{
-		Email: email,
-		Key:   privateKey,
-	}
-	config := lego.NewConfig(user)
-	config.CADirURL = CA
-	config.Certificate.KeyType = keyType
-	client, err := lego.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-	reg, err := client.Registration.Register(registration.RegisterOptions{TermsOfServiceAgreed: true})
-	if err != nil {
-		return nil, err
-	}
-	user.Registration = reg
-
-	acmeClient := &Client{
-		User:   user,
-		Client: client,
-		Config: config,
-	}
-
-	return acmeClient, nil
+	return nil, errors.New("未知的密钥类型")
 }
 
-func NewRegisterWithExternalAccountBindingClient(email, kid, hmac, CA string, keyType certcrypto.KeyType) (*Client, error) {
-	privateKey, err := certcrypto.GeneratePrivateKey(keyType)
-	if err != nil {
-		return nil, err
+func EncodePrivateKey(key crypto.Signer) ([]byte, error) {
+	var pemType string
+	var keyBytes []byte
+	switch key := key.(type) {
+	case *ecdsa.PrivateKey:
+		var err error
+		pemType = "EC"
+		keyBytes, err = x509.MarshalECPrivateKey(key)
+		if err != nil {
+			return nil, err
+		}
+	case *rsa.PrivateKey:
+		pemType = "RSA"
+		keyBytes = x509.MarshalPKCS1PrivateKey(key)
+	case ed25519.PrivateKey:
+		var err error
+		pemType = "ED25519"
+		keyBytes, err = x509.MarshalPKCS8PrivateKey(key)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("未知的密钥类型 %T", key)
 	}
-
-	user := &User{
-		Email: email,
-		Key:   privateKey,
-	}
-	config := lego.NewConfig(user)
-	config.CADirURL = CA
-	config.Certificate.KeyType = keyType
-	client, err := lego.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-	reg, err := client.Registration.RegisterWithExternalAccountBinding(registration.RegisterEABOptions{TermsOfServiceAgreed: true, Kid: kid, HmacEncoded: hmac})
-	if err != nil {
-		return nil, err
-	}
-	user.Registration = reg
-
-	acmeClient := &Client{
-		User:   user,
-		Client: client,
-		Config: config,
-	}
-
-	return acmeClient, nil
+	pemKey := pem.Block{Type: pemType + " PRIVATE KEY", Bytes: keyBytes}
+	return pem.EncodeToMemory(&pemKey), nil
 }
 
-func NewPrivateKeyClient(email string, privateKey string, CA string, keyType certcrypto.KeyType) (*Client, error) {
-	key, err := certcrypto.ParsePEMPrivateKey([]byte(privateKey))
+func getClient(CA string) (acmez.Client, error) {
+	logger, err := zap.NewProduction()
 	if err != nil {
-		return nil, err
+		return acmez.Client{}, err
 	}
 
-	user := &User{
-		Email: email,
-		Key:   key,
-	}
-	config := lego.NewConfig(user)
-	config.CADirURL = CA
-	config.Certificate.KeyType = keyType
-	client, err := lego.NewClient(config)
-	if err != nil {
-		return nil, err
-	}
-	reg, err := client.Registration.ResolveAccountByKey()
-	if err != nil {
-		return nil, err
-	}
-	user.Registration = reg
-
-	acmeClient := &Client{
-		User:   user,
-		Client: client,
-		Config: config,
+	client := acmez.Client{
+		Client: &acme.Client{
+			Directory:  CA,
+			HTTPClient: http.DefaultClient,
+			Logger:     logger,
+		},
 	}
 
-	return acmeClient, nil
+	return client, nil
 }

@@ -1,192 +1,139 @@
 package acme
 
 import (
-	"time"
+	"context"
+	"sort"
 
-	"github.com/go-acme/lego/v4/acme"
-	"github.com/go-acme/lego/v4/acme/api"
-	"github.com/go-acme/lego/v4/certificate"
-	"github.com/go-acme/lego/v4/challenge"
-	"github.com/go-acme/lego/v4/challenge/dns01"
-	"github.com/go-acme/lego/v4/lego"
-	"github.com/go-acme/lego/v4/providers/dns/alidns"
-	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
-	"github.com/go-acme/lego/v4/providers/dns/dnspod"
-	"github.com/go-acme/lego/v4/providers/http/webroot"
+	"github.com/libdns/libdns"
+	"github.com/mholt/acmez"
+	"github.com/mholt/acmez/acme"
 )
 
-type Client struct {
-	Config *lego.Config
-	Client *lego.Client
-	User   *User
+type Certificate struct {
+	PrivateKey []byte
+	acme.Certificate
 }
 
-type DnsType string
-
-const (
-	DnsPod     DnsType = "dnspod"
-	AliYun     DnsType = "aliyun"
-	CloudFlare DnsType = "cloudflare"
-)
-
-type DNSParam struct {
-	ID        string `form:"id" json:"id"`
-	Token     string `form:"token" json:"token"`
-	AccessKey string `form:"access_key" json:"access_key"`
-	SecretKey string `form:"secret_key" json:"secret_key"`
-	Email     string `form:"email" json:"email"`
-	APIkey    string `form:"api_key" json:"api_key"`
+type Client struct {
+	Account acme.Account
+	zClient acmez.Client
+	// 手动 DNS 所需的信号通道
+	manualDNSSolver
 }
 
 // UseDns 使用 DNS 接口验证
-func (c *Client) UseDns(dnsType DnsType, param DNSParam) error {
-	var p challenge.Provider
-	var err error
-	if dnsType == DnsPod {
-		dnsPodConfig := dnspod.NewDefaultConfig()
-		dnsPodConfig.LoginToken = param.ID + "," + param.Token
-		p, err = dnspod.NewDNSProviderConfig(dnsPodConfig)
-		if err != nil {
-			return err
-		}
+func (c *Client) UseDns(dnsType DnsType, param DNSParam) {
+	c.zClient.ChallengeSolvers = map[string]acmez.Solver{
+		acme.ChallengeTypeDNS01: dnsSolver{
+			dns:     dnsType,
+			param:   param,
+			records: &[]libdns.Record{},
+		},
 	}
-	if dnsType == AliYun {
-		aliyunConfig := alidns.NewDefaultConfig()
-		aliyunConfig.SecretKey = param.SecretKey
-		aliyunConfig.APIKey = param.AccessKey
-		p, err = alidns.NewDNSProviderConfig(aliyunConfig)
-		if err != nil {
-			return err
-		}
-	}
-	if dnsType == CloudFlare {
-		cloudflareConfig := cloudflare.NewDefaultConfig()
-		cloudflareConfig.AuthEmail = param.Email
-		cloudflareConfig.AuthToken = param.APIkey
-		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
-		if err != nil {
-			return err
-		}
-	}
-
-	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute))
 }
 
 // UseManualDns 使用手动 DNS 验证
-func (c *Client) UseManualDns(checkDns ...bool) error {
-	p := &manualDnsProvider{}
-	var err error
-
-	if len(checkDns) > 0 && !checkDns[0] {
-		err = c.Client.Challenge.SetDNS01Provider(p, dns01.DisableCompletePropagationRequirement())
-	} else {
-		err = c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute))
+func (c *Client) UseManualDns(total int, check ...bool) {
+	c.controlChan = make(chan struct{})
+	c.dataChan = make(chan any)
+	c.zClient.ChallengeSolvers = map[string]acmez.Solver{
+		acme.ChallengeTypeDNS01: manualDNSSolver{
+			check:       len(check) > 0 && check[0],
+			controlChan: c.controlChan,
+			dataChan:    c.dataChan,
+			records:     &[]DNSRecord{},
+		},
 	}
-
-	return err
 }
 
 // UseHTTP 使用 HTTP 验证
-func (c *Client) UseHTTP(path string) error {
-	httpProvider, err := webroot.NewHTTPProvider(path)
-	if err != nil {
-		return err
+func (c *Client) UseHTTP(path string) {
+	c.zClient.ChallengeSolvers = map[string]acmez.Solver{
+		acme.ChallengeTypeHTTP01: httpSolver{
+			path: path,
+		},
 	}
-
-	err = c.Client.Challenge.SetHTTP01Provider(httpProvider)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // ObtainSSL 签发 SSL 证书
-func (c *Client) ObtainSSL(domains []string) (certificate.Resource, error) {
-	request := certificate.ObtainRequest{
-		Domains:    domains,
-		Bundle:     true,
-		MustStaple: false,
-	}
-
-	certificates, err := c.Client.Certificate.Obtain(request)
+func (c *Client) ObtainSSL(ctx context.Context, domains []string, keyType KeyType) (Certificate, error) {
+	certPrivateKey, err := generatePrivateKey(keyType)
 	if err != nil {
-		return certificate.Resource{}, err
+		return Certificate{}, err
+	}
+	pemPrivateKey, err := EncodePrivateKey(certPrivateKey)
+	if err != nil {
+		return Certificate{}, err
 	}
 
-	return *certificates, nil
+	certs, err := c.zClient.ObtainCertificate(ctx, c.Account, certPrivateKey, domains)
+	if err != nil {
+		return Certificate{}, err
+	}
+
+	cert := c.selectPreferredChain(certs)
+	return Certificate{PrivateKey: pemPrivateKey, Certificate: cert}, nil
+}
+
+// ObtainSSLManual 手动验证 SSL 证书
+func (c *Client) ObtainSSLManual() (Certificate, error) {
+	// 发送信号，开始验证
+	c.controlChan <- struct{}{}
+	// 等待验证完成
+	data := <-c.dataChan
+
+	if err, ok := data.(error); ok {
+		return Certificate{}, err
+	}
+
+	return data.(Certificate), nil
 }
 
 // RenewSSL 续签 SSL 证书
-func (c *Client) RenewSSL(certUrl string) (certificate.Resource, error) {
-	certificates, err := c.Client.Certificate.Get(certUrl, true)
+func (c *Client) RenewSSL(ctx context.Context, certUrl string, domains []string, keyType KeyType) (Certificate, error) {
+	_, err := c.zClient.GetCertificateChain(ctx, c.Account, certUrl)
 	if err != nil {
-		return certificate.Resource{}, err
+		return Certificate{}, err
 	}
 
-	certificates, err = c.Client.Certificate.RenewWithOptions(*certificates, &certificate.RenewOptions{
-		Bundle:     true,
-		MustStaple: false,
-	})
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-
-	return *certificates, nil
+	return c.ObtainSSL(ctx, domains, keyType)
 }
 
-// GetDNSResolve 获取 DNS 解析（手动设置）
-func (c *Client) GetDNSResolve(domains []string) (map[string]Resolve, error) {
-	core, err := api.New(c.Config.HTTPClient, c.Config.UserAgent, c.Config.CADirURL, c.User.Registration.URI, c.User.Key)
-	if err != nil {
+// GetDNSRecords 获取 DNS 解析（手动设置）
+func (c *Client) GetDNSRecords(ctx context.Context, domains []string, keyType KeyType) ([]DNSRecord, error) {
+	go func(ctx context.Context, domains []string, keyType KeyType) {
+		certs, err := c.ObtainSSL(ctx, domains, keyType)
+		// 将证书和错误信息发送到 dataChan
+		if err != nil {
+			c.dataChan <- err
+			return
+		}
+		c.dataChan <- certs
+	}(ctx, domains, keyType)
+
+	// 这里要少一次循环，因为需要卡住最后一次的 dataChan，等待手动 DNS 验证完成
+	for i := 1; i < len(domains); i++ {
+		<-c.dataChan
+		c.controlChan <- struct{}{}
+	}
+
+	// 因为上面少了一次循环，所以这里接收到的即为完整的 DNS 记录切片
+	data := <-c.dataChan
+	if err, ok := data.(error); ok {
 		return nil, err
 	}
-	order, err := core.Orders.New(domains)
-	if err != nil {
-		return nil, err
-	}
-	resolves := make(map[string]Resolve)
-	resChan, errChan := make(chan acme.Authorization), make(chan domainError)
-	for _, authzURL := range order.Authorizations {
-		go func(authzURL string) {
-			authz, err := core.Authorizations.Get(authzURL)
-			if err != nil {
-				errChan <- domainError{Domain: authz.Identifier.Value, Error: err}
-				return
-			}
-			resChan <- authz
-		}(authzURL)
+
+	return data.([]DNSRecord), nil
+}
+
+func (c *Client) selectPreferredChain(certChains []acme.Certificate) acme.Certificate {
+	if len(certChains) == 1 {
+		return certChains[0]
 	}
 
-	var responses []acme.Authorization
-	for i := 0; i < len(order.Authorizations); i++ {
-		select {
-		case res := <-resChan:
-			responses = append(responses, res)
-		case err := <-errChan:
-			resolves[err.Domain] = Resolve{Err: err.Error.Error()}
-		}
-	}
-	close(resChan)
-	close(errChan)
+	sort.Slice(certChains, func(i, j int) bool {
+		return len(certChains[i].ChainPEM) < len(certChains[j].ChainPEM)
+	})
 
-	for _, auth := range responses {
-		domain := challenge.GetTargetedDomain(auth)
-		acmeChallenge, err := challenge.FindChallenge(challenge.DNS01, auth)
-		if err != nil {
-			resolves[domain] = Resolve{Err: err.Error()}
-			continue
-		}
-		keyAuth, err := core.GetKeyAuthorization(acmeChallenge.Token)
-		if err != nil {
-			resolves[domain] = Resolve{Err: err.Error()}
-			continue
-		}
-		challengeInfo := dns01.GetChallengeInfo(domain, keyAuth)
-		resolves[domain] = Resolve{
-			Key:   challengeInfo.FQDN,
-			Value: challengeInfo.Value,
-		}
-	}
-
-	return resolves, nil
+	return certChains[0]
 }

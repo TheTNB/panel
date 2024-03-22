@@ -650,7 +650,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.Obtain	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=map[string]acme.Resolve}
+//	@Success		200		{object}	SuccessResponse{data=[]acme.DNSRecord}
 //	@Router			/panel/cert/manualDNS [post]
 func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain

@@ -26,7 +26,6 @@ func (r *DNSStore) Rules(ctx http.Context) map[string]string {
 		"data.token":      "required_if:type,dnspod",
 		"data.access_key": "required_if:type,aliyun",
 		"data.secret_key": "required_if:type,aliyun",
-		"data.email":      "required_if:type,cloudflare",
 		"data.api_key":    "required_if:type,cloudflare",
 	}
 }

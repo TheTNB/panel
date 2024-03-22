@@ -2,10 +2,10 @@
 package services
 
 import (
+	"context"
 	"errors"
+	"time"
 
-	"github.com/go-acme/lego/v4/certcrypto"
-	"github.com/go-acme/lego/v4/certificate"
 	"github.com/goravel/framework/facades"
 
 	requests "panel/app/http/requests/cert"
@@ -15,6 +15,7 @@ import (
 )
 
 type CertImpl struct {
+	client *acme.Client
 }
 
 func NewCertImpl() *CertImpl {
@@ -34,15 +35,15 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 	var client *acme.Client
 	switch user.CA {
 	case "letsencrypt":
-		client, err = acme.NewRegisterClient(user.Email, acme.CALetEncrypt, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CALetsEncrypt, nil, acme.KeyType(user.KeyType))
 	case "buypass":
-		client, err = acme.NewRegisterClient(user.Email, acme.CABuypass, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAZeroSSL, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "sslcom":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CASSLcom, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAGoogle, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	default:
 		return errors.New("CA 提供商不支持")
 	}
@@ -51,7 +52,7 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
 	}
 
-	privateKey, err := acme.GetPrivateKey(client.User.GetPrivateKey(), acme.KeyType(user.KeyType))
+	privateKey, err := acme.EncodePrivateKey(client.Account.PrivateKey)
 	if err != nil {
 		return errors.New("获取私钥失败")
 	}
@@ -77,15 +78,15 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 	var client *acme.Client
 	switch user.CA {
 	case "letsencrypt":
-		client, err = acme.NewRegisterClient(user.Email, acme.CALetEncrypt, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CALetsEncrypt, nil, acme.KeyType(user.KeyType))
 	case "buypass":
-		client, err = acme.NewRegisterClient(user.Email, acme.CABuypass, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAZeroSSL, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "sslcom":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CASSLcom, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
-		client, err = acme.NewRegisterWithExternalAccountBindingClient(user.Email, *user.Kid, *user.HmacEncoded, acme.CAGoogle, certcrypto.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
 	default:
 		return errors.New("CA 提供商不支持")
 	}
@@ -94,7 +95,7 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
 	}
 
-	privateKey, err := acme.GetPrivateKey(client.User.GetPrivateKey(), acme.KeyType(user.KeyType))
+	privateKey, err := acme.EncodePrivateKey(client.Account.PrivateKey)
 	if err != nil {
 		return errors.New("获取私钥失败")
 	}
@@ -238,67 +239,50 @@ func (s *CertImpl) CertDestroy(ID uint) error {
 }
 
 // ObtainAuto 自动签发证书
-func (s *CertImpl) ObtainAuto(ID uint) (certificate.Resource, error) {
+func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 	var cert models.Cert
 	err := facades.Orm().Query().With("Website").With("User").With("DNS").Where("id = ?", ID).First(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	var ca string
-	switch cert.User.CA {
-	case "letsencrypt":
-		ca = acme.CALetEncrypt
-	case "buypass":
-		ca = acme.CABuypass
-	case "zerossl":
-		ca = acme.CAZeroSSL
-	case "sslcom":
-		ca = acme.CASSLcom
-	case "google":
-		ca = acme.CAGoogle
-	}
-
-	client, err := acme.NewPrivateKeyClient(cert.User.Email, cert.User.PrivateKey, ca, certcrypto.KeyType(cert.User.KeyType))
+	client, err := s.getClient(cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
 	if cert.DNS != nil {
-		err = client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
+		client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
 	} else {
 		if cert.Website == nil {
-			return certificate.Resource{}, errors.New("该证书没有关联网站，无法自动签发")
+			return acme.Certificate{}, errors.New("该证书没有关联网站，无法自动签发")
 		} else {
-			err = client.UseHTTP(cert.Website.Path)
+			client.UseHTTP(cert.Website.Path)
 		}
 	}
+
+	ssl, err := client.ObtainSSL(context.Background(), cert.Domains, acme.KeyType(cert.Type))
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	ssl, err := client.ObtainSSL(cert.Domains)
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-
-	cert.CertURL = &ssl.CertURL
-	cert.Cert = string(ssl.Certificate)
+	cert.CertURL = &ssl.URL
+	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
-			return certificate.Resource{}, err
+		if err = tools.ServiceReload("openresty"); err != nil {
+			return acme.Certificate{}, err
 		}
 	}
 
@@ -306,59 +290,39 @@ func (s *CertImpl) ObtainAuto(ID uint) (certificate.Resource, error) {
 }
 
 // ObtainManual 手动签发证书
-func (s *CertImpl) ObtainManual(ID uint) (certificate.Resource, error) {
+func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 	var cert models.Cert
 	err := facades.Orm().Query().With("User").Where("id = ?", ID).First(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	var ca string
-	switch cert.User.CA {
-	case "letsencrypt":
-		ca = acme.CALetEncrypt
-	case "buypass":
-		ca = acme.CABuypass
-	case "zerossl":
-		ca = acme.CAZeroSSL
-	case "sslcom":
-		ca = acme.CASSLcom
-	case "google":
-		ca = acme.CAGoogle
+	if s.client == nil {
+		return acme.Certificate{}, errors.New("请重新获取 DNS 解析记录")
 	}
 
-	client, err := acme.NewPrivateKeyClient(cert.User.Email, cert.User.PrivateKey, ca, certcrypto.KeyType(cert.User.KeyType))
+	ssl, err := s.client.ObtainSSLManual()
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	err = client.UseManualDns()
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-
-	ssl, err := client.ObtainSSL(cert.Domains)
-	if err != nil {
-		return certificate.Resource{}, err
-	}
-
-	cert.CertURL = &ssl.CertURL
-	cert.Cert = string(ssl.Certificate)
+	cert.CertURL = &ssl.URL
+	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
-			return certificate.Resource{}, err
+		if err = tools.ServiceReload("openresty"); err != nil {
+			return acme.Certificate{}, err
 		}
 	}
 
@@ -366,108 +330,106 @@ func (s *CertImpl) ObtainManual(ID uint) (certificate.Resource, error) {
 }
 
 // ManualDNS 获取手动 DNS 解析信息
-func (s *CertImpl) ManualDNS(ID uint) (map[string]acme.Resolve, error) {
+func (s *CertImpl) ManualDNS(ID uint) ([]acme.DNSRecord, error) {
 	var cert models.Cert
 	err := facades.Orm().Query().With("User").Where("id = ?", ID).First(&cert)
 	if err != nil {
 		return nil, err
 	}
 
-	var ca string
-	switch cert.User.CA {
-	case "letsencrypt":
-		ca = acme.CALetEncrypt
-	case "buypass":
-		ca = acme.CABuypass
-	case "zerossl":
-		ca = acme.CAZeroSSL
-	case "sslcom":
-		ca = acme.CASSLcom
-	case "google":
-		ca = acme.CAGoogle
-	}
-
-	client, err := acme.NewPrivateKeyClient(cert.User.Email, cert.User.PrivateKey, ca, certcrypto.KeyType(cert.User.KeyType))
+	client, err := s.getClient(cert)
 	if err != nil {
 		return nil, err
 	}
 
-	err = client.UseManualDns()
-	if err != nil {
-		return nil, err
-	}
+	client.UseManualDns(len(cert.Domains))
+	records, err := client.GetDNSRecords(context.Background(), cert.Domains, acme.KeyType(cert.Type))
 
-	return client.GetDNSResolve(cert.Domains)
+	// 15 分钟后清理客户端
+	s.client = client
+	time.AfterFunc(15*time.Minute, func() {
+		s.client = nil
+	})
+
+	return records, err
 }
 
 // Renew 续签证书
-func (s *CertImpl) Renew(ID uint) (certificate.Resource, error) {
+func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 	var cert models.Cert
 	err := facades.Orm().Query().With("Website").With("User").With("DNS").Where("id = ?", ID).First(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	var ca string
-	switch cert.User.CA {
-	case "letsencrypt":
-		ca = acme.CALetEncrypt
-	case "buypass":
-		ca = acme.CABuypass
-	case "zerossl":
-		ca = acme.CAZeroSSL
-	case "sslcom":
-		ca = acme.CASSLcom
-	case "google":
-		ca = acme.CAGoogle
-	}
-
-	client, err := acme.NewPrivateKeyClient(cert.User.Email, cert.User.PrivateKey, ca, certcrypto.KeyType(cert.User.KeyType))
+	client, err := s.getClient(cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
 	if cert.CertURL == nil {
-		return certificate.Resource{}, errors.New("该证书没有签发成功，无法续签")
+		return acme.Certificate{}, errors.New("该证书没有签发成功，无法续签")
 	}
 
 	if cert.DNS != nil {
-		err = client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
+		client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
 	} else {
 		if cert.Website == nil {
-			return certificate.Resource{}, errors.New("该证书没有关联网站，无法续签，可以尝试手动签发")
+			return acme.Certificate{}, errors.New("该证书没有关联网站，无法续签，可以尝试手动签发")
 		} else {
-			err = client.UseHTTP(cert.Website.Path)
+			client.UseHTTP(cert.Website.Path)
 		}
 	}
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	ssl, err := client.RenewSSL(*cert.CertURL)
+	ssl, err := client.RenewSSL(context.Background(), *cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
-	cert.CertURL = &ssl.CertURL
-	cert.Cert = string(ssl.Certificate)
+	cert.CertURL = &ssl.URL
+	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
 	if err != nil {
-		return certificate.Resource{}, err
+		return acme.Certificate{}, err
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", string(ssl.Certificate), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", string(ssl.PrivateKey), 0644); err != nil {
-			return certificate.Resource{}, err
+		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+			return acme.Certificate{}, err
 		}
-		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
-			return certificate.Resource{}, err
+		if err = tools.ServiceReload("openresty"); err != nil {
+			return acme.Certificate{}, err
 		}
 	}
 
 	return ssl, nil
+}
+
+func (s *CertImpl) getClient(cert models.Cert) (*acme.Client, error) {
+	var ca string
+	var eab *acme.EAB
+	switch cert.User.CA {
+	case "letsencrypt":
+		ca = acme.CALetsEncrypt
+	case "buypass":
+		ca = acme.CABuypass
+	case "zerossl":
+		ca = acme.CAZeroSSL
+		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+	case "sslcom":
+		ca = acme.CASSLcom
+		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+	case "google":
+		ca = acme.CAGoogle
+		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+	}
+
+	return acme.NewPrivateKeyAccount(cert.User.Email, cert.User.PrivateKey, ca, eab)
 }

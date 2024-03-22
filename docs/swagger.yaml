@@ -6,8 +6,6 @@ definitions:
         type: string
       api_key:
         type: string
-      email:
-        type: string
       id:
         type: string
       secret_key:
@@ -15,10 +13,8 @@ definitions:
       token:
         type: string
     type: object
-  acme.Resolve:
+  acme.DNSRecord:
     properties:
-      err:
-        type: string
       key:
         type: string
       value:
@@ -955,9 +951,9 @@ paths:
             - $ref: '#/definitions/controllers.SuccessResponse'
             - properties:
                 data:
-                  additionalProperties:
-                    $ref: '#/definitions/acme.Resolve'
-                  type: object
+                  items:
+                    $ref: '#/definitions/acme.DNSRecord'
+                  type: array
               type: object
       security:
       - BearerToken: []

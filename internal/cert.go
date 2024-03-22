@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"github.com/go-acme/lego/v4/certificate"
-
 	requests "panel/app/http/requests/cert"
 	"panel/app/models"
 	"panel/pkg/acme"
@@ -21,8 +19,8 @@ type Cert interface {
 	CertUpdate(request requests.CertUpdate) error
 	CertShow(ID uint) (models.Cert, error)
 	CertDestroy(ID uint) error
-	ObtainAuto(ID uint) (certificate.Resource, error)
-	ObtainManual(ID uint) (certificate.Resource, error)
-	ManualDNS(ID uint) (map[string]acme.Resolve, error)
-	Renew(ID uint) (certificate.Resource, error)
+	ObtainAuto(ID uint) (acme.Certificate, error)
+	ObtainManual(ID uint) (acme.Certificate, error)
+	ManualDNS(ID uint) ([]acme.DNSRecord, error)
+	Renew(ID uint) (acme.Certificate, error)
 }
