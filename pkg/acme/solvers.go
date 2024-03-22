@@ -174,7 +174,7 @@ func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) 
 	})
 	s.dataChan <- *s.records
 
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
+	_, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
 	// 等待信号以继续
@@ -183,7 +183,6 @@ func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) 
 }
 
 func (s manualDNSSolver) CleanUp(_ context.Context, _ acme.Challenge) error {
-	s.records = &[]DNSRecord{}
 	return nil
 }
 
