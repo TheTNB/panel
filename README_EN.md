@@ -88,19 +88,6 @@ For usage issues, you can ask questions in the [HaoZi Community Forum](https://f
 
 For issues with the panel itself, you can submit feedback on the `Issues` page of GitHub. Please note [the wisdom of asking questions](http://www.catb.org/~esr/faqs/smart-questions.html).
 
-## Contribute code
-
-### Find/Create Issue
-
-You can find or create an Issue in [Issue List](https://github.com/TheTNB/panel/issues), leave a message to express your willingness to deal with the Issue, and get confirmation from the maintainer. Start processing.
-
-### Create PR
-
-- During the development process, if you encounter a problem, you can describe the problem in detail in the Issue at any time for further communication, but before doing so, please make sure that you have tried your best to solve the problem through Google and other methods;
-- PRs must be submitted to our JiHu GitLab repository [https://git.haozi.net/opensource/panel](https://git.haozi.net/opensource/panel). Do not submit on GitHub;
-- When the PR is completed, please add the `🚀 Review Ready` tag to it, and the maintainer will review it in time;
-- We very much welcome your contributions and will add you to the homepage contributors in the next release; ❤️
-
 ## Sponsor
 
 ### Funding

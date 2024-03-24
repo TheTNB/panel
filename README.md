@@ -88,19 +88,6 @@ panel
 
 面板自身问题，可在 GitHub 的`Issues`页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
 
-## 贡献代码
-
-### 寻找/创建 Issue
-
-您可以在 [Issue 列表](https://github.com/TheTNB/panel/issues) 中寻找或创建一个 Issue，留言表达想要处理该 Issue 的意愿，得到维护者的确认后，即可开始处理。
-
-### 创建 PR
-
-- 在开发过程中，如果遇到问题可以随时在 Issue 中详尽描述该问题，以进一步沟通，但在此之前请确保自己已通过 Google 等方式尽可能的尝试解决问题；
-- PR 须提交至我们的极狐 GitLab 仓库[https://git.haozi.net/opensource/panel](https://git.haozi.net/opensource/panel)，勿在 GitHub 上提交；
-- 当 PR 开发完毕后，请为其添加 `🚀 Review Ready` 标签，维护者将及时进行评审；
-- 我们非常欢迎您的贡献，将在下次发版时将您添加到首页贡献者中；❤️
-
 ## 赞助商
 
 ### 资金
