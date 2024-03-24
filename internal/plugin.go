@@ -20,4 +20,7 @@ type Plugin interface {
 	All() []PanelPlugin
 	GetBySlug(slug string) PanelPlugin
 	GetInstalledBySlug(slug string) models.Plugin
+	Install(slug string) error
+	Uninstall(slug string) error
+	Update(slug string) error
 }

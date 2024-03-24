@@ -48,6 +48,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	arg2 := ctx.Argument(2)
 	arg3 := ctx.Argument(3)
 	arg4 := ctx.Argument(4)
+	arg5 := ctx.Argument(5)
 
 	switch action {
 	case "init":
@@ -564,6 +565,127 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln("删除设置成功")
 
+	case "addSite":
+		name := arg1
+		domain := arg2
+		port := arg3
+		path := arg4
+		php := arg5
+		if len(name) == 0 || len(domain) == 0 || len(port) == 0 || len(path) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		domains := strings.Split(domain, ",")
+		ports := strings.Split(port, ",")
+		if len(domains) == 0 || len(ports) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		var uintPorts []uint
+		for _, p := range ports {
+			uintPorts = append(uintPorts, cast.ToUint(p))
+		}
+
+		website := services.NewWebsiteImpl()
+		id, err := website.GetIDByName(name)
+		if err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+		if id != 0 {
+			color.Redln("网站名已存在")
+			return nil
+		}
+
+		_, err = website.Add(internal.PanelWebsite{
+			Name:    name,
+			Status:  true,
+			Domains: domains,
+			Ports:   uintPorts,
+			Path:    path,
+			Php:     php,
+			Ssl:     false,
+			Db:      false,
+		})
+		if err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+
+		color.Greenln("网站添加成功")
+
+	case "removeSite":
+		name := arg1
+		if len(name) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		website := services.NewWebsiteImpl()
+		id, err := website.GetIDByName(name)
+		if err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+		if id == 0 {
+			color.Redln("网站名不存在")
+			return nil
+		}
+
+		if err = website.Delete(id); err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+
+		color.Greenln("网站删除成功")
+
+	case "installPlugin":
+		slug := arg1
+		if len(slug) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		plugin := services.NewPluginImpl()
+		if err := plugin.Install(slug); err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+
+		color.Greenln("任务已提交")
+
+	case "uninstallPlugin":
+		slug := arg1
+		if len(slug) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		plugin := services.NewPluginImpl()
+		if err := plugin.Uninstall(slug); err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+
+		color.Greenln("任务已提交")
+
+	case "updatePlugin":
+		slug := arg1
+		if len(slug) == 0 {
+			color.Redln("参数错误")
+			return nil
+		}
+
+		plugin := services.NewPluginImpl()
+		if err := plugin.Update(slug); err != nil {
+			color.Redln(err.Error())
+			return nil
+		}
+
+		color.Greenln("任务已提交")
+
 	default:
 		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
 		color.Greenln("请使用以下命令：")
@@ -575,6 +697,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("panel cleanTask 清理面板运行中和等待中的任务[任务卡住时使用]")
 		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} 备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量")
 		color.Greenln("panel cutoff {website_name} {save_copies} 切割网站日志并保留指定数量")
+		color.Greenln("panel installPlugin {slug} 安装插件")
+		color.Greenln("panel uninstallPlugin {slug} 卸载插件")
+		color.Greenln("panel updatePlugin {slug} 更新插件")
+		color.Greenln("panel addSite {name} {domain} {port} {path} {php} 添加网站[域名和端口用英文逗号分隔]")
+		color.Greenln("panel removeSite {name} 删除网站")
 		color.Redln("以下命令请在开发者指导下使用：")
 		color.Yellowln("panel init 初始化面板")
 		color.Yellowln("panel writePlugin {slug} {version} 写入插件安装状态")

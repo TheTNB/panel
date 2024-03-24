@@ -12,6 +12,7 @@ type Website interface {
 	Delete(id uint) error
 	GetConfig(id uint) (WebsiteSetting, error)
 	GetConfigByName(name string) (WebsiteSetting, error)
+	GetIDByName(name string) (uint, error)
 }
 
 type PanelWebsite struct {

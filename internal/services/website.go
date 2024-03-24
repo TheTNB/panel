@@ -620,3 +620,13 @@ func (r *WebsiteImpl) GetConfigByName(name string) (internal.WebsiteSetting, err
 
 	return r.GetConfig(website.ID)
 }
+
+// GetIDByName 根据网站名称获取网站ID
+func (r *WebsiteImpl) GetIDByName(name string) (uint, error) {
+	var website models.Website
+	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
+		return 0, err
+	}
+
+	return website.ID, nil
+}

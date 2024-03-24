@@ -92,162 +92,33 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 // Install 安装插件
 func (r *PluginController) Install(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
-	plugin := r.plugin.GetBySlug(slug)
-	installedPlugin := r.plugin.GetInstalledBySlug(slug)
-	installedPlugins, err := r.plugin.AllInstalled()
-	if err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-		}).Info("检查插件安装状态失败")
+
+	if err := r.plugin.Install(slug); err != nil {
 		return ErrorSystem(ctx)
 	}
 
-	if installedPlugin.ID != 0 {
-		return Error(ctx, http.StatusUnprocessableEntity, "插件已安装")
-	}
-
-	pluginsMap := make(map[string]bool)
-
-	for _, p := range installedPlugins {
-		pluginsMap[p.Slug] = true
-	}
-
-	for _, require := range plugin.Requires {
-		_, requireFound := pluginsMap[require]
-		if !requireFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-		}
-	}
-
-	for _, exclude := range plugin.Excludes {
-		_, excludeFound := pluginsMap[exclude]
-		if excludeFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-		}
-	}
-
-	var task models.Task
-	task.Name = "安装插件 " + plugin.Name
-	task.Status = models.TaskStatusWaiting
-	task.Shell = plugin.Install + ` >> '/tmp/` + plugin.Slug + `.log' 2>&1`
-	task.Log = "/tmp/" + plugin.Slug + ".log"
-	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-			"err":  err.Error(),
-		}).Info("创建任务失败")
-		return ErrorSystem(ctx)
-	}
-
-	r.task.Process(task.ID)
 	return Success(ctx, "任务已提交")
 }
 
 // Uninstall 卸载插件
 func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
-	plugin := r.plugin.GetBySlug(slug)
-	installedPlugin := r.plugin.GetInstalledBySlug(slug)
-	installedPlugins, err := r.plugin.AllInstalled()
-	if err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-		}).Info("检查插件安装状态失败")
+
+	if err := r.plugin.Uninstall(slug); err != nil {
 		return ErrorSystem(ctx)
 	}
 
-	if installedPlugin.ID == 0 {
-		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
-	}
-
-	pluginsMap := make(map[string]bool)
-
-	for _, p := range installedPlugins {
-		pluginsMap[p.Slug] = true
-	}
-
-	for _, require := range plugin.Requires {
-		_, requireFound := pluginsMap[require]
-		if !requireFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-		}
-	}
-
-	for _, exclude := range plugin.Excludes {
-		_, excludeFound := pluginsMap[exclude]
-		if excludeFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-		}
-	}
-
-	var task models.Task
-	task.Name = "卸载插件 " + plugin.Name
-	task.Status = models.TaskStatusWaiting
-	task.Shell = plugin.Uninstall + " >> /tmp/" + plugin.Slug + ".log 2>&1"
-	task.Log = "/tmp/" + plugin.Slug + ".log"
-	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-			"err":  err.Error(),
-		}).Info("创建任务失败")
-		return ErrorSystem(ctx)
-	}
-
-	r.task.Process(task.ID)
 	return Success(ctx, "任务已提交")
 }
 
 // Update 更新插件
 func (r *PluginController) Update(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
-	plugin := r.plugin.GetBySlug(slug)
-	installedPlugin := r.plugin.GetInstalledBySlug(slug)
-	installedPlugins, err := r.plugin.AllInstalled()
-	if err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-		}).Info("检查插件安装状态失败")
+
+	if err := r.plugin.Update(slug); err != nil {
 		return ErrorSystem(ctx)
 	}
 
-	if installedPlugin.ID == 0 {
-		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
-	}
-
-	pluginsMap := make(map[string]bool)
-
-	for _, p := range installedPlugins {
-		pluginsMap[p.Slug] = true
-	}
-
-	for _, require := range plugin.Requires {
-		_, requireFound := pluginsMap[require]
-		if !requireFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 需要依赖 "+require+" 插件")
-		}
-	}
-
-	for _, exclude := range plugin.Excludes {
-		_, excludeFound := pluginsMap[exclude]
-		if excludeFound {
-			return Error(ctx, http.StatusForbidden, "插件 "+slug+" 不兼容 "+exclude+" 插件")
-		}
-	}
-
-	var task models.Task
-	task.Name = "更新插件 " + plugin.Name
-	task.Status = models.TaskStatusWaiting
-	task.Shell = plugin.Update + " >> /tmp/" + plugin.Slug + ".log 2>&1"
-	task.Log = "/tmp/" + plugin.Slug + ".log"
-	if err := facades.Orm().Query().Create(&task); err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "插件中心").With(map[string]any{
-			"slug": slug,
-			"err":  err.Error(),
-		}).Info("创建任务失败")
-		return ErrorSystem(ctx)
-	}
-
-	r.task.Process(task.ID)
 	return Success(ctx, "任务已提交")
 }
 
