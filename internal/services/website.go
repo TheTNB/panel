@@ -393,10 +393,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	// SSL
 	ssl := config.Ssl
 	website.Ssl = ssl
-	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
+	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
 		return err
 	}
-	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
+	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
 		return err
 	}
 	if ssl {

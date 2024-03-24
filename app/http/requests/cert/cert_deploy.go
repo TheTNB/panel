@@ -6,8 +6,8 @@ import (
 )
 
 type CertDeploy struct {
-	ID        uint `form:"id" json:"id"`
-	WebsiteID uint `form:"website_id" json:"website_id"`
+	ID        uint `form:"id" json:"id" filter:"uint"`
+	WebsiteID uint `form:"website_id" json:"website_id" filter:"uint"`
 }
 
 func (r *CertDeploy) Authorize(ctx http.Context) error {

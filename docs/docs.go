@@ -270,6 +270,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/panel/cert/deploy": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "部署面板证书管理的证书",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "证书管理"
+                ],
+                "summary": "部署证书",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CertDeploy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/panel/cert/dns": {
             "get": {
                 "security": [
@@ -4065,6 +4104,17 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "requests.CertDeploy": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "website_id": {
+                    "type": "integer"
                 }
             }
         },

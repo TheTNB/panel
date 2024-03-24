@@ -4,6 +4,7 @@ package services
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/goravel/framework/facades"
@@ -257,6 +258,11 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 		if cert.Website == nil {
 			return acme.Certificate{}, errors.New("该证书没有关联网站，无法自动签发")
 		} else {
+			for _, domain := range cert.Domains {
+				if strings.Contains(domain, "*") {
+					return acme.Certificate{}, errors.New("通配符域名无法使用 HTTP 验证")
+				}
+			}
 			client.UseHTTP(cert.Website.Path)
 		}
 	}
@@ -275,10 +281,10 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = tools.ServiceReload("openresty"); err != nil {
@@ -315,10 +321,10 @@ func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = tools.ServiceReload("openresty"); err != nil {
@@ -377,6 +383,11 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 		if cert.Website == nil {
 			return acme.Certificate{}, errors.New("该证书没有关联网站，无法续签，可以尝试手动签发")
 		} else {
+			for _, domain := range cert.Domains {
+				if strings.Contains(domain, "*") {
+					return acme.Certificate{}, errors.New("通配符域名无法使用 HTTP 验证")
+				}
+			}
 			client.UseHTTP(cert.Website.Path)
 		}
 	}
@@ -398,10 +409,10 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err := tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = tools.ServiceReload("openresty"); err != nil {
@@ -410,6 +421,37 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 	}
 
 	return ssl, nil
+}
+
+// Deploy 部署证书
+func (s *CertImpl) Deploy(ID, WebsiteID uint) error {
+	var cert models.Cert
+	err := facades.Orm().Query().Where("id = ?", ID).First(&cert)
+	if err != nil {
+		return err
+	}
+
+	if cert.Cert == "" || cert.Key == "" {
+		return errors.New("该证书没有签发成功，无法部署")
+	}
+
+	website := models.Website{}
+	err = facades.Orm().Query().Where("id = ?", WebsiteID).First(&website)
+	if err != nil {
+		return err
+	}
+
+	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", cert.Cert, 0644); err != nil {
+		return err
+	}
+	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".key", cert.Key, 0644); err != nil {
+		return err
+	}
+	if err = tools.ServiceReload("openresty"); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *CertImpl) getClient(cert models.Cert) (*acme.Client, error) {

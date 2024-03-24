@@ -80,6 +80,7 @@ func Api() {
 			r.Post("obtain", certController.Obtain)
 			r.Post("renew", certController.Renew)
 			r.Post("manualDNS", certController.ManualDNS)
+			r.Post("deploy", certController.Deploy)
 		})
 		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			pluginController := controllers.NewPluginController()

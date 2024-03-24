@@ -669,3 +669,33 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 
 	return Success(ctx, resolves)
 }
+
+// Deploy
+//
+//	@Summary		部署证书
+//	@Description	部署面板证书管理的证书
+//	@Tags			证书管理
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerToken
+//	@Param			data	body		requests.CertDeploy	true	"request"
+//	@Success		200		{object}	SuccessResponse
+//	@Router			/panel/cert/deploy [post]
+func (r *CertController) Deploy(ctx http.Context) http.Response {
+	var deployRequest requests.CertDeploy
+	sanitize := Sanitize(ctx, &deployRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	err := r.cert.Deploy(deployRequest.ID, deployRequest.WebsiteID)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
+			"certID": deployRequest.ID,
+			"error":  err.Error(),
+		}).Info("部署证书失败")
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return Success(ctx, nil)
+}

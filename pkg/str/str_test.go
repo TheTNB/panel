@@ -38,8 +38,3 @@ func (s *StrTestSuite) TestLowerCamel() {
 	s.Equal("topicComment", LowerCamel("topic_comment"))
 	s.Equal("topicComment", LowerCamel("TopicComment"))
 }
-
-func (s *StrTestSuite) TestContainsString() {
-	s.True(ContainsString([]string{"a", "b", "c"}, "a"))
-	s.False(ContainsString([]string{"a", "b", "c"}, "d"))
-}

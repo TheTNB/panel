@@ -253,6 +253,13 @@ definitions:
           type: string
         type: array
     type: object
+  requests.CertDeploy:
+    properties:
+      id:
+        type: integer
+      website_id:
+        type: integer
+    type: object
   requests.CertStore:
     properties:
       auto_renew:
@@ -791,6 +798,30 @@ paths:
       security:
       - BearerToken: []
       summary: 更新证书
+      tags:
+      - 证书管理
+  /panel/cert/deploy:
+    post:
+      consumes:
+      - application/json
+      description: 部署面板证书管理的证书
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CertDeploy'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 部署证书
       tags:
       - 证书管理
   /panel/cert/dns:

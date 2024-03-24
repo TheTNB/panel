@@ -23,4 +23,5 @@ type Cert interface {
 	ObtainManual(ID uint) (acme.Certificate, error)
 	ManualDNS(ID uint) ([]acme.DNSRecord, error)
 	Renew(ID uint) (acme.Certificate, error)
+	Deploy(ID, WebsiteID uint) error
 }
