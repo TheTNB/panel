@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           cache: true
-          go-version: 'stable'
+          go-version: '1.22'
       - name: Install dependencies
         run: go mod tidy
       - name: Build ${{ matrix.goarch }}
