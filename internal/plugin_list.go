@@ -212,7 +212,7 @@ var PluginToolBox = PanelPlugin{
 	Version:     "1.0.0",
 	Requires:    []string{},
 	Excludes:    []string{},
-	Install:     `panel writePlugin toolbox 1.0`,
+	Install:     `panel writePlugin toolbox 1.0.0`,
 	Uninstall:   `panel deletePlugin toolbox`,
-	Update:      `panel writePlugin toolbox 1.0`,
+	Update:      `panel writePlugin toolbox 1.0.0`,
 }
