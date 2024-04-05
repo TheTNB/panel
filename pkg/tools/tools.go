@@ -407,7 +407,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 	color.Greenln("前置检查...")
 	if Exists("/tmp/panel-storage.zip") || Exists("/tmp/panel.conf.bak") {
-		color.Redln("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
@@ -426,7 +425,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		return err
 	}
 	if !Exists("/tmp/panel-storage.zip") || !Exists("/tmp/panel.conf.bak") {
-		color.Redln("备份面板数据失败")
 		return errors.New("备份面板数据失败")
 	}
 	color.Greenln("备份完成")
@@ -487,7 +485,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		return err
 	}
 	if !Exists("/www/panel/storage/panel.db") || !Exists("/www/panel/panel.conf") {
-		color.Redln("恢复面板数据失败")
 		return errors.New("恢复面板数据失败")
 	}
 	color.Greenln("恢复完成")
