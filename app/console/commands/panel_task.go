@@ -37,6 +37,7 @@ func (receiver *PanelTask) Handle(ctx console.Context) error {
 
 	// 优化数据库
 	if _, err := facades.Orm().Query().Exec("VACUUM"); err != nil {
+		internal.Status = internal.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
@@ -46,6 +47,7 @@ func (receiver *PanelTask) Handle(ctx console.Context) error {
 
 	// 备份面板
 	if err := tools.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
+		internal.Status = internal.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
@@ -55,6 +57,7 @@ func (receiver *PanelTask) Handle(ctx console.Context) error {
 
 	// 清理 7 天前的备份
 	if _, err := tools.Exec(`find /www/backup/panel -mtime +7 -name "*.zip" -exec rm -rf {} \;`); err != nil {
+		internal.Status = internal.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
