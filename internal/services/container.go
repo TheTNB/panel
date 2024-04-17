@@ -245,14 +245,14 @@ func (r *Container) NetworkPrune() error {
 
 // ImageList 列出镜像
 func (r *Container) ImageList() ([]image.Summary, error) {
-	return r.client.ImageList(context.Background(), types.ImageListOptions{
+	return r.client.ImageList(context.Background(), image.ListOptions{
 		All: true,
 	})
 }
 
 // ImageExist 判断镜像是否存在
 func (r *Container) ImageExist(id string) (bool, error) {
-	var options types.ImageListOptions
+	var options image.ListOptions
 	options.Filters = filters.NewArgs(filters.Arg("reference", id))
 	images, err := r.client.ImageList(context.Background(), options)
 	if err != nil {
@@ -264,7 +264,7 @@ func (r *Container) ImageExist(id string) (bool, error) {
 
 // ImagePull 拉取镜像
 func (r *Container) ImagePull(config requests.ImagePull) error {
-	options := types.ImagePullOptions{}
+	options := image.PullOptions{}
 	if config.Auth {
 		authConfig := registry.AuthConfig{
 			Username: config.Username,
@@ -290,7 +290,7 @@ func (r *Container) ImagePull(config requests.ImagePull) error {
 
 // ImageRemove 删除镜像
 func (r *Container) ImageRemove(id string) error {
-	_, err := r.client.ImageRemove(context.Background(), id, types.ImageRemoveOptions{
+	_, err := r.client.ImageRemove(context.Background(), id, image.RemoveOptions{
 		Force:         true,
 		PruneChildren: true,
 	})
