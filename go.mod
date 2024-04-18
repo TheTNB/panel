@@ -50,11 +50,12 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.49.6 // indirect
 	github.com/bytedance/sonic v1.11.0 // indirect
+	github.com/bytedance/sonic/loader v0.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
-	github.com/cloudwego/base64x v0.1.0 // indirect
-	github.com/cloudwego/iasm v0.0.9 // indirect
+	github.com/cloudwego/base64x v0.1.3 // indirect
+	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -224,4 +225,4 @@ require (
 	modernc.org/sqlite v1.28.0 // indirect
 )
 
-replace github.com/bytedance/sonic => github.com/bytedance/sonic v1.11.4
+replace github.com/bytedance/sonic => github.com/bytedance/sonic v1.11.5
