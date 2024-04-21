@@ -90,7 +90,11 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 
 ## Sponsor
 
-### Funding
+If the HaoZi Linux Panel is helpful to you, welcome to [sponsor us](https://opencollective.com/tnb), thanks to the following supporters/sponsors:
+
+**Accept cloud resources and financial sponsorship, you can contact us through QQ group**
+
+### Server
 
 - [微晓朵](https://www.weixiaoduo.com/)
 
@@ -99,17 +103,19 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 - [盾云CDN](http://cdn.ddunyun.com/)
 
-### DevOps
-
-- [JetBrains](https://www.jetbrains.com/)
-
-**Accept cloud resources and financial sponsorship, you can contact us through QQ group**
+<p align="center">
+  <a target="_blank" href="https://afdian.net/a/TheTNB">
+    <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
+  </a>
+</p>
 
 ## Contributor
 
 This project owes its existence to all those who have contributed. To contribute, please check the contributed code section first.
 
-<a href="https://github.com/DevHaoZi" target="_blank"><img src="https://avatars.githubusercontent.com/u/115467771?v=4" width="48" height="48"></a>
+<a href="https://github.com/TheTNB/panel/graphs/contributors">
+  <img alt="contributors" src="https://contrib.rocks/image?repo=TheTNB/panel"/>
+</a>
 
 ## Star History
 

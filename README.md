@@ -90,7 +90,11 @@ panel
 
 ## 赞助商
 
-### 资金
+如果耗子 Linux 面板对你有帮助，欢迎[赞助我们](https://afdian.net/a/TheTNB)，感谢以下支持者/赞助商的支持：
+
+**同时接受云资源赞助，可通过QQ群咨询联系**
+
+### 服务器
 
 - [微晓朵](https://www.weixiaoduo.com/)
 
@@ -99,17 +103,19 @@ panel
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 - [盾云CDN](http://cdn.ddunyun.com/)
 
-### DevOps
-
-- [JetBrains](https://www.jetbrains.com/)
-
-**接受云资源和资金赞助，可通过QQ群咨询联系**
+<p align="center">
+  <a target="_blank" href="https://afdian.net/a/TheTNB">
+    <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
+  </a>
+</p>
 
 ## 贡献者
 
 这个项目的存在要归功于所有做出贡献的人，参与贡献请先查看贡献代码部分。
 
-<a href="https://github.com/DevHaoZi" target="_blank"><img src="https://avatars.githubusercontent.com/u/115467771?v=4" width="48" height="48"></a>
+<a href="https://github.com/TheTNB/panel/graphs/contributors">
+  <img alt="contributors" src="https://contrib.rocks/image?repo=TheTNB/panel"/>
+</a>
 
 ## Star 历史
 
