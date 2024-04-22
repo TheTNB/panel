@@ -59,31 +59,31 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		var check models.User
 		err := facades.Orm().Query().FirstOrFail(&check)
 		if err == nil {
-			color.Redln("面板已初始化")
+			color.Redln(translate.Get("commands.panel.init.exist"))
 			return nil
 		}
 
 		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子 Linux 面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
-			color.Redln("初始化失败")
+			color.Redln(translate.Get("commands.panel.init.fail"))
 			return nil
 		}
 
 		hash, err := facades.Hash().Make(tools.RandomString(32))
 		if err != nil {
-			color.Redln("初始化失败")
+			color.Redln(translate.Get("commands.panel.init.fail"))
 			return nil
 		}
 
 		user := services.NewUserImpl()
 		_, err = user.Create("admin", hash)
 		if err != nil {
-			color.Redln("创建管理员失败")
+			color.Redln(translate.Get("commands.panel.init.adminFail"))
 			return nil
 		}
 
-		color.Greenln("初始化成功")
+		color.Greenln(translate.Get("commands.panel.init.success"))
 
 	case "update":
 		var task models.Task

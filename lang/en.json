@@ -53,7 +53,11 @@
         "description": "remove website"
       },
       "init": {
-        "description": "initialize the panel"
+        "description": "initialize the panel",
+        "exist": "panel has been initialized",
+        "success": "initialization successful",
+        "adminFound": "failed to create administrator",
+        "fail": "initialization failed"
       },
       "writePlugin": {
         "description": "write plugin installation status"

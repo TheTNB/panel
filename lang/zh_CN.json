@@ -53,7 +53,11 @@
         "description": "删除网站"
       },
       "init": {
-        "description": "初始化面板"
+        "description": "初始化面板",
+        "exist": "面板已初始化",
+        "success": "初始化成功",
+        "adminFail": "创建管理员失败",
+        "fail": "初始化失败"
       },
       "writePlugin": {
         "description": "写入插件安装状态"
