@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -31,7 +32,8 @@ func (receiver *Panel) Signature() string {
 
 // Description The console command description.
 func (receiver *Panel) Description() string {
-	return "[面板] 命令行"
+	ctx := context.Background()
+	return facades.Lang(ctx).Get("panel.description")
 }
 
 // Extend The console command extend.
@@ -49,6 +51,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	arg3 := ctx.Argument(3)
 	arg4 := ctx.Argument(4)
 	arg5 := ctx.Argument(5)
+
+	translate := facades.Lang(context.Background())
 
 	switch action {
 	case "init":
@@ -159,10 +163,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("面板端口: " + port)
+		color.Greenln(translate.Get("panel.getPort.port") + ": " + port)
 
 	case "getEntrance":
-		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("panel.getEntrance.entrance") + ": " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
 		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
@@ -687,31 +691,31 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("任务已提交")
 
 	default:
-		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
-		color.Greenln("请使用以下命令：")
-		color.Greenln("panel update 更新 / 修复面板到最新版本")
-		color.Greenln("panel getInfo 重新初始化面板账号信息")
-		color.Greenln("panel getPort 获取面板访问端口")
-		color.Greenln("panel getEntrance 获取面板访问入口")
-		color.Greenln("panel deleteEntrance 删除面板访问入口")
-		color.Greenln("panel cleanTask 清理面板运行中和等待中的任务[任务卡住时使用]")
-		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} 备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量")
-		color.Greenln("panel cutoff {website_name} {save_copies} 切割网站日志并保留指定数量")
-		color.Greenln("panel installPlugin {slug} 安装插件")
-		color.Greenln("panel uninstallPlugin {slug} 卸载插件")
-		color.Greenln("panel updatePlugin {slug} 更新插件")
-		color.Greenln("panel addSite {name} {domain} {port} {path} {php} 添加网站[域名和端口用英文逗号分隔]")
-		color.Greenln("panel removeSite {name} 删除网站")
-		color.Redln("以下命令请在开发者指导下使用：")
-		color.Yellowln("panel init 初始化面板")
-		color.Yellowln("panel writePlugin {slug} {version} 写入插件安装状态")
-		color.Yellowln("panel deletePlugin {slug} 移除插件安装状态")
-		color.Yellowln("panel writeMysqlPassword {password} 写入MySQL root密码")
-		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板")
-		color.Yellowln("panel deleteSite {name} 删除面板网站数据")
-		color.Yellowln("panel getSetting {name} 获取面板设置数据")
-		color.Yellowln("panel writeSetting {name} {value} 写入 / 更新面板设置数据")
-		color.Yellowln("panel deleteSetting {name} 删除面板设置数据")
+		color.Yellowln(facades.Config().GetString("panel.name") + " - " + translate.Get("panel.cmd_tool") + " - " + facades.Config().GetString("panel.version"))
+		color.Greenln(translate.Get("panel.use_commands") + "：")
+		color.Greenln("panel update " + translate.Get("panel.update.description"))
+		color.Greenln("panel getInfo " + translate.Get("panel.getInfo.description"))
+		color.Greenln("panel getPort " + translate.Get("panel.getPort.description"))
+		color.Greenln("panel getEntrance " + translate.Get("panel.getEntrance.description"))
+		color.Greenln("panel deleteEntrance " + translate.Get("panel.deleteEntrance.description"))
+		color.Greenln("panel cleanTask " + translate.Get("panel.cleanTask.description"))
+		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} " + translate.Get("panel.backup.description"))
+		color.Greenln("panel cutoff {website_name} {save_copies} " + translate.Get("panel.cutoff.description"))
+		color.Greenln("panel installPlugin {slug} " + translate.Get("panel.installPlugin.description"))
+		color.Greenln("panel uninstallPlugin {slug} " + translate.Get("panel.uninstallPlugin.description"))
+		color.Greenln("panel updatePlugin {slug} " + translate.Get("panel.updatePlugin.description"))
+		color.Greenln("panel addSite {name} {domain} {port} {path} {php} " + translate.Get("panel.addSite.description"))
+		color.Greenln("panel removeSite {name} " + translate.Get("panel.removeSite.description"))
+		color.Redln(translate.Get("panel.developer_guidance") + ":")
+		color.Yellowln("panel init " + translate.Get("panel.init.description"))
+		color.Yellowln("panel writePlugin {slug} {version} " + translate.Get("panel.writePlugin.description"))
+		color.Yellowln("panel deletePlugin {slug} " + translate.Get("panel.deletePlugin.description"))
+		color.Yellowln("panel writeMysqlPassword {password} " + translate.Get("panel.writeMysqlPassword.description"))
+		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} " + translate.Get("panel.writeSite.description"))
+		color.Yellowln("panel deleteSite {name} " + translate.Get("panel.deleteSite.description"))
+		color.Yellowln("panel getSetting {name} " + translate.Get("panel.getSetting.description"))
+		color.Yellowln("panel writeSetting {name} {value} " + translate.Get("panel.writeSetting.description"))
+		color.Yellowln("panel deleteSetting {name} " + translate.Get("panel.deleteSetting.description"))
 	}
 
 	return nil

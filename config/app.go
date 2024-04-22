@@ -19,6 +19,7 @@ import (
 	"github.com/goravel/framework/schedule"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/testing"
+	"github.com/goravel/framework/translation"
 	"github.com/goravel/framework/validation"
 	"github.com/goravel/gin"
 
@@ -60,7 +61,7 @@ func init() {
 		// The application locale determines the default locale that will be used
 		// by the translation service provider.You are free to set this value
 		// to any of the locales which will be supported by the application.
-		"locale": "zh_CN",
+		"locale": config.Env("APP_LOCALE", "zh_CN"),
 
 		// Application Fallback Locale
 		//
@@ -96,6 +97,7 @@ func init() {
 			&crypt.ServiceProvider{},
 			&filesystem.ServiceProvider{},
 			&validation.ServiceProvider{},
+			&translation.ServiceProvider{},
 			&testing.ServiceProvider{},
 			&providers.AppServiceProvider{},
 			&providers.AuthServiceProvider{},

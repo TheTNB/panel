@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/gookit/color"
@@ -27,7 +28,8 @@ func (receiver *Monitoring) Signature() string {
 
 // Description The console command description.
 func (receiver *Monitoring) Description() string {
-	return "[面板] 系统监控"
+	ctx := context.Background()
+	return facades.Lang(ctx).Get("panel:monitoring.description")
 }
 
 // Extend The console command extend.
@@ -38,7 +40,7 @@ func (receiver *Monitoring) Extend() command.Extend {
 }
 
 // Handle Execute the console command.
-func (receiver *Monitoring) Handle(ctx console.Context) error {
+func (receiver *Monitoring) Handle(console.Context) error {
 	if internal.Status != internal.StatusNormal {
 		return nil
 	}

@@ -1,0 +1,85 @@
+{
+  "panel:cert-renew": {
+    "description": "[Panel] Certificate renewal"
+  },
+  "panel:monitoring": {
+    "description": "[Panel] System Monitoring"
+  },
+  "panel": {
+    "description": "[Panel] Command line",
+    "developer_guidance": "Please use the following commands under the guidance of the developer",
+    "use_commands": "Please use the following commands",
+    "cmd_tool": "command line tool",
+    "update": {
+      "description": "update/fix panel to latest version"
+    },
+    "getInfo": {
+      "description": "reinitialize panel account information"
+    },
+    "getPort": {
+      "description": "get the panel access port",
+      "port": "panel port"
+    },
+    "getEntrance": {
+      "description": "get panel access",
+      "entrance": "entrance"
+    },
+    "deleteEntrance": {
+      "description": "delete panel access"
+    },
+    "cleanTask": {
+      "description": "clean up running and waiting tasks in the panel [used when tasks are stuck]"
+    },
+    "backup": {
+      "description": "back up website/MySQL database/PostgreSQL database to the specified directory and retain the specified amount"
+    },
+    "cutoff": {
+      "description": "cut website logs and keep specified amount"
+    },
+    "installPlugin": {
+      "description": "install plugin"
+    },
+    "uninstallPlugin": {
+      "description": "uninstall plugin"
+    },
+    "updatePlugin": {
+      "description": "update plugin"
+    },
+    "addSite": {
+      "description": "add website [domain name and port separated by commas]"
+    },
+    "removeSite": {
+      "description": "remove website"
+    },
+    "init": {
+      "description": "initialize the panel"
+    },
+    "writePlugin": {
+      "description": "write plugin installation status"
+    },
+    "deletePlugin": {
+      "description": "delete plugin installation status"
+    },
+    "writeMysqlPassword": {
+      "description": "write MySQL root password"
+    },
+    "writeSite": {
+      "description": "write website data to the panel"
+    },
+    "deleteSite": {
+      "description": "delete panel website data"
+    },
+    "getSetting": {
+      "description": "get panel setting data"
+    },
+    "writeSetting": {
+      "description": "write/update panel setting data"
+    },
+    "deleteSetting": {
+      "description": "delete panel setting data"
+    }
+  },
+  "panel:task": {
+    "description": "[Panel] Daily tasks"
+  }
+}

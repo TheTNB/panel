@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"context"
+
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/goravel/framework/facades"
@@ -21,7 +23,7 @@ func (receiver *PanelTask) Signature() string {
 
 // Description The console command description.
 func (receiver *PanelTask) Description() string {
-	return "[面板] 每日任务"
+	return facades.Lang(context.Background()).Get("panel:task.description")
 }
 
 // Extend The console command extend.
@@ -32,7 +34,7 @@ func (receiver *PanelTask) Extend() command.Extend {
 }
 
 // Handle Execute the console command.
-func (receiver *PanelTask) Handle(ctx console.Context) error {
+func (receiver *PanelTask) Handle(console.Context) error {
 	internal.Status = internal.StatusMaintain
 
 	// 优化数据库

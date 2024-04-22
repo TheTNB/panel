@@ -1,0 +1,85 @@
+{
+  "panel:cert-renew": {
+    "description": "[面板] 证书续签"
+  },
+  "panel:monitoring": {
+    "description": "[面板] 系统监控"
+  },
+  "panel": {
+    "description": "[面板] 命令行",
+    "developer_guidance": "以下命令请在开发者指导下使用",
+    "use_commands": "请使用以下命令",
+    "cmd_tool": "命令行工具",
+    "update": {
+      "description": "更新 / 修复面板到最新版本"
+    },
+    "getInfo": {
+      "description": "重新初始化面板账号信息"
+    },
+    "getPort": {
+      "description": "获取面板访问端口",
+      "port": "面板端口"
+    },
+    "getEntrance": {
+      "description": "获取面板访问入口",
+      "entrance": "面板入口"
+    },
+    "deleteEntrance": {
+      "description": "删除面板访问入口"
+    },
+    "cleanTask": {
+      "description": "清理面板运行中和等待中的任务[任务卡住时使用]"
+    },
+    "backup": {
+      "description": "备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量"
+    },
+    "cutoff": {
+      "description": "切割网站日志并保留指定数量"
+    },
+    "installPlugin": {
+      "description": "安装插件"
+    },
+    "uninstallPlugin": {
+      "description": "卸载插件"
+    },
+    "updatePlugin": {
+      "description": "更新插件"
+    },
+    "addSite": {
+      "description": "添加网站[域名和端口用英文逗号分隔]"
+    },
+    "removeSite": {
+      "description": "删除网站"
+    },
+    "init": {
+      "description": "初始化面板"
+    },
+    "writePlugin": {
+      "description": "写入插件安装状态"
+    },
+    "deletePlugin": {
+      "description": "移除插件安装状态"
+    },
+    "writeMysqlPassword": {
+      "description": "写入MySQL root密码"
+    },
+    "writeSite": {
+      "description": "写入网站数据到面板"
+    },
+    "deleteSite": {
+      "description": "删除面板网站数据"
+    },
+    "getSetting": {
+      "description": "获取面板设置数据"
+    },
+    "writeSetting": {
+      "description": "写入 / 更新面板设置数据"
+    },
+    "deleteSetting": {
+      "description": "删除面板设置数据"
+    }
+  },
+  "panel:task": {
+    "description": "[面板] 每日任务"
+  }
+}

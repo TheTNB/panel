@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"crypto/x509"
 	"encoding/pem"
 
@@ -25,7 +26,8 @@ func (receiver *CertRenew) Signature() string {
 
 // Description The console command description.
 func (receiver *CertRenew) Description() string {
-	return "[面板] 证书续签"
+	ctx := context.Background()
+	return facades.Lang(ctx).Get("panel:cert-renew.description")
 }
 
 // Extend The console command extend.
@@ -36,7 +38,7 @@ func (receiver *CertRenew) Extend() command.Extend {
 }
 
 // Handle Execute the console command.
-func (receiver *CertRenew) Handle(ctx console.Context) error {
+func (receiver *CertRenew) Handle(console.Context) error {
 	if internal.Status != internal.StatusNormal {
 		return nil
 	}
