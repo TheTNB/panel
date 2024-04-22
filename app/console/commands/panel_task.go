@@ -23,7 +23,7 @@ func (receiver *PanelTask) Signature() string {
 
 // Description The console command description.
 func (receiver *PanelTask) Description() string {
-	return facades.Lang(context.Background()).Get("panel:task.description")
+	return facades.Lang(context.Background()).Get("commands.panel:task.description")
 }
 
 // Extend The console command extend.

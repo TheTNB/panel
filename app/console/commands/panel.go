@@ -33,7 +33,7 @@ func (receiver *Panel) Signature() string {
 // Description The console command description.
 func (receiver *Panel) Description() string {
 	ctx := context.Background()
-	return facades.Lang(ctx).Get("panel.description")
+	return facades.Lang(ctx).Get("commands.panel.description")
 }
 
 // Extend The console command extend.
@@ -163,10 +163,10 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln(translate.Get("panel.getPort.port") + ": " + port)
+		color.Greenln(translate.Get("commands.panel.getPort.port") + ": " + port)
 
 	case "getEntrance":
-		color.Greenln(translate.Get("panel.getEntrance.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.getEntrance.entrance") + ": " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
 		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
@@ -691,31 +691,31 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Greenln("任务已提交")
 
 	default:
-		color.Yellowln(facades.Config().GetString("panel.name") + " - " + translate.Get("panel.cmd_tool") + " - " + facades.Config().GetString("panel.version"))
-		color.Greenln(translate.Get("panel.use_commands") + "：")
-		color.Greenln("panel update " + translate.Get("panel.update.description"))
-		color.Greenln("panel getInfo " + translate.Get("panel.getInfo.description"))
-		color.Greenln("panel getPort " + translate.Get("panel.getPort.description"))
-		color.Greenln("panel getEntrance " + translate.Get("panel.getEntrance.description"))
-		color.Greenln("panel deleteEntrance " + translate.Get("panel.deleteEntrance.description"))
-		color.Greenln("panel cleanTask " + translate.Get("panel.cleanTask.description"))
-		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} " + translate.Get("panel.backup.description"))
-		color.Greenln("panel cutoff {website_name} {save_copies} " + translate.Get("panel.cutoff.description"))
-		color.Greenln("panel installPlugin {slug} " + translate.Get("panel.installPlugin.description"))
-		color.Greenln("panel uninstallPlugin {slug} " + translate.Get("panel.uninstallPlugin.description"))
-		color.Greenln("panel updatePlugin {slug} " + translate.Get("panel.updatePlugin.description"))
-		color.Greenln("panel addSite {name} {domain} {port} {path} {php} " + translate.Get("panel.addSite.description"))
-		color.Greenln("panel removeSite {name} " + translate.Get("panel.removeSite.description"))
-		color.Redln(translate.Get("panel.developer_guidance") + ":")
-		color.Yellowln("panel init " + translate.Get("panel.init.description"))
-		color.Yellowln("panel writePlugin {slug} {version} " + translate.Get("panel.writePlugin.description"))
-		color.Yellowln("panel deletePlugin {slug} " + translate.Get("panel.deletePlugin.description"))
-		color.Yellowln("panel writeMysqlPassword {password} " + translate.Get("panel.writeMysqlPassword.description"))
-		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} " + translate.Get("panel.writeSite.description"))
-		color.Yellowln("panel deleteSite {name} " + translate.Get("panel.deleteSite.description"))
-		color.Yellowln("panel getSetting {name} " + translate.Get("panel.getSetting.description"))
-		color.Yellowln("panel writeSetting {name} {value} " + translate.Get("panel.writeSetting.description"))
-		color.Yellowln("panel deleteSetting {name} " + translate.Get("panel.deleteSetting.description"))
+		color.Yellowln(facades.Config().GetString("panel.name") + " - " + translate.Get("commands.panel.tool") + " - " + facades.Config().GetString("panel.version"))
+		color.Greenln(translate.Get("commands.panel.use") + "：")
+		color.Greenln("panel update " + translate.Get("commands.panel.update.description"))
+		color.Greenln("panel getInfo " + translate.Get("commands.panel.getInfo.description"))
+		color.Greenln("panel getPort " + translate.Get("commands.panel.getPort.description"))
+		color.Greenln("panel getEntrance " + translate.Get("commands.panel.getEntrance.description"))
+		color.Greenln("panel deleteEntrance " + translate.Get("commands.panel.deleteEntrance.description"))
+		color.Greenln("panel cleanTask " + translate.Get("commands.panel.cleanTask.description"))
+		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} " + translate.Get("commands.panel.backup.description"))
+		color.Greenln("panel cutoff {website_name} {save_copies} " + translate.Get("commands.panel.cutoff.description"))
+		color.Greenln("panel installPlugin {slug} " + translate.Get("commands.panel.installPlugin.description"))
+		color.Greenln("panel uninstallPlugin {slug} " + translate.Get("commands.panel.uninstallPlugin.description"))
+		color.Greenln("panel updatePlugin {slug} " + translate.Get("commands.panel.updatePlugin.description"))
+		color.Greenln("panel addSite {name} {domain} {port} {path} {php} " + translate.Get("commands.panel.addSite.description"))
+		color.Greenln("panel removeSite {name} " + translate.Get("commands.panel.removeSite.description"))
+		color.Redln(translate.Get("commands.panel.forDeveloper") + ":")
+		color.Yellowln("panel init " + translate.Get("commands.panel.init.description"))
+		color.Yellowln("panel writePlugin {slug} {version} " + translate.Get("commands.panel.writePlugin.description"))
+		color.Yellowln("panel deletePlugin {slug} " + translate.Get("commands.panel.deletePlugin.description"))
+		color.Yellowln("panel writeMysqlPassword {password} " + translate.Get("commands.panel.writeMysqlPassword.description"))
+		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} " + translate.Get("commands.panel.writeSite.description"))
+		color.Yellowln("panel deleteSite {name} " + translate.Get("commands.panel.deleteSite.description"))
+		color.Yellowln("panel getSetting {name} " + translate.Get("commands.panel.getSetting.description"))
+		color.Yellowln("panel writeSetting {name} {value} " + translate.Get("commands.panel.writeSetting.description"))
+		color.Yellowln("panel deleteSetting {name} " + translate.Get("commands.panel.deleteSetting.description"))
 	}
 
 	return nil

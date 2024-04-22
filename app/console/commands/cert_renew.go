@@ -27,7 +27,7 @@ func (receiver *CertRenew) Signature() string {
 // Description The console command description.
 func (receiver *CertRenew) Description() string {
 	ctx := context.Background()
-	return facades.Lang(ctx).Get("panel:cert-renew.description")
+	return facades.Lang(ctx).Get("commands.panel:cert-renew.description")
 }
 
 // Extend The console command extend.

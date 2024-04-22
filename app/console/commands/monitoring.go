@@ -29,7 +29,7 @@ func (receiver *Monitoring) Signature() string {
 // Description The console command description.
 func (receiver *Monitoring) Description() string {
 	ctx := context.Background()
-	return facades.Lang(ctx).Get("panel:monitoring.description")
+	return facades.Lang(ctx).Get("commands.panel:monitoring.description")
 }
 
 // Extend The console command extend.
