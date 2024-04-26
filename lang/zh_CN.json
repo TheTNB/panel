@@ -85,7 +85,10 @@
         "success": "移除插件安装状态成功"
       },
       "writeMysqlPassword": {
-        "description": "写入MySQL root密码"
+        "description": "写入MySQL root密码",
+        "paramFail": "参数错误",
+        "fail": "写入MySQL root密码失败",
+        "success": "写入MySQL root密码成功"
       },
       "writeSite": {
         "description": "写入网站数据到面板"

@@ -221,7 +221,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "writeMysqlPassword":
 		password := arg1
 		if len(password) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeMysqlPassword.paramFail"))
 			return nil
 		}
 
@@ -233,11 +233,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 
 		if err != nil {
-			color.Redln("写入MySQL root密码失败")
+			color.Redln(translate.Get("commands.panel.writeMysqlPassword.fail"))
 			return nil
 		}
 
-		color.Greenln("写入MySQL root密码成功")
+		color.Greenln(translate.Get("commands.panel.writeMysqlPassword.success"))
 
 	case "cleanTask":
 		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).Update("status", models.TaskStatusFailed)

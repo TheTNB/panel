@@ -85,7 +85,10 @@
         "success": "plugin installation status removed successfully"
       },
       "writeMysqlPassword": {
-        "description": "write MySQL root password"
+        "description": "write MySQL root password",
+        "paramFail": "MySQL root password is required",
+        "fail": "failed to write MySQL root password",
+        "success": "MySQL root password written successfully"
       },
       "writeSite": {
         "description": "write website data to the panel"
