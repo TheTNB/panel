@@ -11,6 +11,9 @@
       "forDeveloper": "以下命令请在开发者指导下使用",
       "use": "请使用以下命令",
       "tool": "命令行工具",
+      "port": "面板端口",
+      "portFail": "获取面板端口失败",
+      "entrance": "面板入口",
       "update": {
         "description": "更新 / 修复面板到最新版本",
         "taskCheck": "当前有任务正在执行，禁止更新",
@@ -23,23 +26,20 @@
         "adminGetFail": "获取管理员信息失败",
         "adminSaveFail": "保存管理员信息失败",
         "passwordGenerationFail": "生成密码失败",
-        "portFail": "获取面板端口失败",
         "username": "用户名",
         "password": "密码",
-        "port": "面板端口",
-        "entrance": "面板入口",
         "address": "面板地址"
       },
       "getPort": {
-        "description": "获取面板访问端口",
-        "port": "面板端口"
+        "description": "获取面板访问端口"
       },
       "getEntrance": {
-        "description": "获取面板访问入口",
-        "entrance": "面板入口"
+        "description": "获取面板访问入口"
       },
       "deleteEntrance": {
-        "description": "删除面板访问入口"
+        "description": "删除面板访问入口",
+        "fail": "删除面板入口失败",
+        "success": "删除面板入口成功"
       },
       "cleanTask": {
         "description": "清理面板运行中和等待中的任务[任务卡住时使用]"

@@ -138,7 +138,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln(translate.Get("commands.panel.getInfo.portFail"))
+			color.Redln(translate.Get("commands.panel.portFail"))
 			return nil
 		}
 		ip, err := tools.GetPublicIP()
@@ -152,34 +152,34 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		color.Greenln(translate.Get("commands.panel.getInfo.username") + ": " + user.Username)
 		color.Greenln(translate.Get("commands.panel.getInfo.password") + ": " + password)
-		color.Greenln(translate.Get("commands.panel.getInfo.port") + ": " + port)
-		color.Greenln(translate.Get("commands.panel.getInfo.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.port") + ": " + port)
+		color.Greenln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
 		color.Greenln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板端口失败")
+			color.Redln(translate.Get("commands.panel.portFail"))
 			return nil
 		}
 
-		color.Greenln(translate.Get("commands.panel.getPort.port") + ": " + port)
+		color.Greenln(translate.Get("commands.panel.port") + ": " + port)
 
 	case "getEntrance":
-		color.Greenln(translate.Get("commands.panel.getEntrance.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
 		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板入口失败")
+			color.Redln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
 		if _, err = tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf"); err != nil {
-			color.Redln("删除面板入口失败")
+			color.Redln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
 
-		color.Greenln("删除面板入口成功")
+		color.Greenln(translate.Get("commands.panel.deleteEntrance.success"))
 
 	case "writePlugin":
 		slug := arg1

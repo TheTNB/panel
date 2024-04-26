@@ -11,6 +11,9 @@
       "forDeveloper": "Please use the following commands under the guidance of the developer",
       "use": "Please use the following commands",
       "tool": "command line tool",
+      "portFail": "failed to get panel port",
+      "port": "Panel port",
+      "entrance": "Panel entrance",
       "update": {
         "description": "update/fix panel to latest version",
         "taskCheck": "There is currently a task being executed and updates are prohibited.",
@@ -23,23 +26,20 @@
         "adminGetFail": "failed to get administrator information",
         "adminSaveFail": "failed to save administrator information",
         "passwordGenerationFail": "failed to generate password",
-        "portFail": "failed to get panel port",
         "username": "Username",
         "password": "Password",
-        "port": "Panel port",
-        "entrance": "Panel entrance",
         "address": "Panel address"
       },
       "getPort": {
-        "description": "get the panel access port",
-        "port": "panel port"
+        "description": "get the panel access port"
       },
       "getEntrance": {
-        "description": "get panel access",
-        "entrance": "entrance"
+        "description": "get panel access"
       },
       "deleteEntrance": {
-        "description": "delete panel access"
+        "description": "delete panel access",
+        "fail": "failed to delete panel entrance",
+        "success": "panel entrance deleted successfully"
       },
       "cleanTask": {
         "description": "clean up running and waiting tasks in the panel [used when tasks are stuck]"
