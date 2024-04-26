@@ -111,7 +111,7 @@ Prepare_System() {
     fi
 
     # 自动开启 BBR
-    isBBRSupported=$(sysctl net.ipv4.tcp_available_congestion_control | grep -c bbr)
+    isBBRSupported=$(ls -l /lib/modules/*/kernel/net/ipv4/tcp_bbr.ko.xz | grep -c bbr)
     if [ "${isBBRSupported}" != "0" ]; then
         qdisc=$(sysctl net.core.default_qdisc | awk '{print $3}')
         echo "net.core.default_qdisc=${qdisc}" >> /etc/sysctl.conf
