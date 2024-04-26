@@ -19,7 +19,16 @@
         "success": "更新成功"
       },
       "getInfo": {
-        "description": "重新初始化面板账号信息"
+        "description": "重新初始化面板账号信息",
+        "adminGetFail": "获取管理员信息失败",
+        "adminSaveFail": "保存管理员信息失败",
+        "passwordGenerationFail": "生成密码失败",
+        "portFail": "获取面板端口失败",
+        "username": "用户名",
+        "password": "密码",
+        "port": "面板端口",
+        "entrance": "面板入口",
+        "address": "面板地址"
       },
       "getPort": {
         "description": "获取面板访问端口",

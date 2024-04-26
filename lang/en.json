@@ -19,7 +19,16 @@
         "success": "update completed"
       },
       "getInfo": {
-        "description": "reinitialize panel account information"
+        "description": "reinitialize panel account information",
+        "adminGetFail": "failed to get administrator information",
+        "adminSaveFail": "failed to save administrator information",
+        "passwordGenerationFail": "failed to generate password",
+        "portFail": "failed to get panel port",
+        "username": "Username",
+        "password": "Password",
+        "port": "Panel port",
+        "entrance": "Panel entrance",
+        "address": "Panel address"
       },
       "getPort": {
         "description": "get the panel access port",

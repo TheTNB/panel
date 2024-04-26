@@ -114,14 +114,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		var user models.User
 		err := facades.Orm().Query().Where("id", 1).FirstOrFail(&user)
 		if err != nil {
-			color.Redln("获取管理员信息失败")
+			color.Redln(translate.Get("commands.panel.getInfo.adminGetFail"))
 			return nil
 		}
 
 		password := tools.RandomString(16)
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
-			color.Redln("生成密码失败")
+			color.Redln(translate.Get("commands.panel.getInfo.passwordGenerationFail"))
 			return nil
 		}
 		user.Username = tools.RandomString(8)
@@ -132,13 +132,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		err = facades.Orm().Query().Save(&user)
 		if err != nil {
-			color.Redln("保存管理员信息失败")
+			color.Redln(translate.Get("commands.panel.getInfo.adminSaveFail"))
 			return nil
 		}
 
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板端口失败")
+			color.Redln(translate.Get("commands.panel.getInfo.portFail"))
 			return nil
 		}
 		ip, err := tools.GetPublicIP()
@@ -150,11 +150,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			protocol = "https"
 		}
 
-		color.Greenln("用户名: " + user.Username)
-		color.Greenln("密码: " + password)
-		color.Greenln("面板端口: " + port)
-		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
-		color.Greenln("面板地址: " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.getInfo.username") + ": " + user.Username)
+		color.Greenln(translate.Get("commands.panel.getInfo.password") + ": " + password)
+		color.Greenln(translate.Get("commands.panel.getInfo.port") + ": " + port)
+		color.Greenln(translate.Get("commands.panel.getInfo.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
