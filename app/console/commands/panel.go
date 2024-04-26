@@ -242,11 +242,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "cleanTask":
 		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).Update("status", models.TaskStatusFailed)
 		if err != nil {
-			color.Redln("清理任务失败")
+			color.Redln(translate.Get("commands.panel.cleanTask.fail"))
 			return nil
 		}
 
-		color.Greenln("清理任务成功")
+		color.Greenln(translate.Get("commands.panel.cleanTask.success"))
 
 	case "backup":
 		backupType := arg1
@@ -401,44 +401,44 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		save := arg2
 		hr := `+----------------------------------------------------`
 		if len(name) == 0 || len(save) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.cutoff.paramFail"))
 			return nil
 		}
 
 		color.Greenln(hr)
-		color.Greenln("★ 开始切割 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("★ " + translate.Get("commands.panel.cutoff.start") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
-		color.Yellowln("|-目标网站: " + name)
+		color.Yellowln("|-" + translate.Get("commands.panel.cutoff.targetSite") + ": " + name)
 		var website models.Website
 		if err := facades.Orm().Query().Where("name", name).FirstOrFail(&website); err != nil {
-			color.Redln("|-网站不存在")
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.siteNotExist"))
 			color.Greenln(hr)
 			return nil
 		}
 
 		logPath := "/www/wwwlogs/" + website.Name + ".log"
 		if !tools.Exists(logPath) {
-			color.Redln("|-日志文件不存在")
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.logNotExist"))
 			color.Greenln(hr)
 			return nil
 		}
 
 		backupPath := "/www/wwwlogs/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".log.zip"
 		if _, err := tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log"); err != nil {
-			color.Redln("|-备份失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.backupFail") + ": " + err.Error())
 			return nil
 		}
 		if _, err := tools.Exec(`echo "" > ` + logPath); err != nil {
-			color.Redln("|-清空失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.clearFail") + ": " + err.Error())
 			return nil
 		}
-		color.Greenln("|-切割成功")
+		color.Greenln("|-" + translate.Get("commands.panel.cutoff.cutSuccess"))
 
 		color.Greenln(hr)
 		files, err := os.ReadDir("/www/wwwlogs")
 		if err != nil {
-			color.Redln("|-清理失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.cleanupFail") + ": " + err.Error())
 			return nil
 		}
 		var filteredFiles []os.FileInfo
@@ -456,15 +456,15 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join("/www/wwwlogs", filteredFiles[i].Name())
-			color.Yellowln("|-清理日志: " + fileToDelete)
+			color.Yellowln("|-" + translate.Get("commands.panel.cutoff.clearLog") + ": " + fileToDelete)
 			if err := tools.Remove(fileToDelete); err != nil {
-				color.Redln("|-清理失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.cutoff.cleanupFail") + ": " + err.Error())
 				return nil
 			}
 		}
-		color.Greenln("|-清理完成")
+		color.Greenln("|-" + translate.Get("commands.panel.cutoff.cleanupSuccess"))
 		color.Greenln(hr)
-		color.Greenln("☆ 切割完成 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("☆ " + translate.Get("commands.panel.cutoff.end") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
 	case "writeSite":

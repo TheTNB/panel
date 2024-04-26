@@ -42,13 +42,27 @@
         "success": "panel entrance deleted successfully"
       },
       "cleanTask": {
-        "description": "clean up running and waiting tasks in the panel [used when tasks are stuck]"
+        "description": "clean up running and waiting tasks in the panel [used when tasks are stuck]",
+        "fail": "failed to clean up tasks",
+        "success": "tasks cleaned up successfully"
       },
       "backup": {
         "description": "back up website/MySQL database/PostgreSQL database to the specified directory and retain the specified amount"
       },
       "cutoff": {
-        "description": "cut website logs and keep specified amount"
+        "description": "cut website logs and keep specified amount",
+        "paramFail": "website domain name and keep amount are required",
+        "start": "start cutting",
+        "targetSite": "target website",
+        "siteNotExist": "website does not exist",
+        "logNotExist": "log file does not exist",
+        "backupFail": "backup failed",
+        "clearFail": "clearing failed",
+        "cleanupFail": "cleanup failed",
+        "clearLog": "clear log",
+        "cutSuccess": "cutting successful",
+        "cleanupSuccess": "cleanup successful",
+        "end": "cutting completed"
       },
       "installPlugin": {
         "description": "install plugin"
