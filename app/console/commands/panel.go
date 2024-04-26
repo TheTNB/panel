@@ -206,17 +206,17 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "deletePlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deletePlugin.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("slug", slug).Delete(&models.Plugin{})
 		if err != nil {
-			color.Redln("移除插件安装状态失败")
+			color.Redln(translate.Get("commands.panel.deletePlugin.fail"))
 			return nil
 		}
 
-		color.Greenln("移除插件安装状态成功")
+		color.Greenln(translate.Get("commands.panel.deletePlugin.success"))
 
 	case "writeMysqlPassword":
 		password := arg1

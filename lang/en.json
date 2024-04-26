@@ -79,7 +79,10 @@
         "success": "plugin installation status written successfully"
       },
       "deletePlugin": {
-        "description": "delete plugin installation status"
+        "description": "delete plugin installation status",
+        "paramFail": "plugin slug is required",
+        "fail": "failed to remove plugin installation status",
+        "success": "plugin installation status removed successfully"
       },
       "writeMysqlPassword": {
         "description": "write MySQL root password"

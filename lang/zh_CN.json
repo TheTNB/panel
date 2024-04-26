@@ -79,7 +79,10 @@
         "success": "写入插件安装状态成功"
       },
       "deletePlugin": {
-        "description": "移除插件安装状态"
+        "description": "移除插件安装状态",
+        "paramFail": "参数错误",
+        "fail": "移除插件安装状态失败",
+        "success": "移除插件安装状态成功"
       },
       "writeMysqlPassword": {
         "description": "写入MySQL root密码"
