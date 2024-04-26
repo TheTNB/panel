@@ -474,19 +474,19 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		php := cast.ToInt(arg4)
 		ssl := cast.ToBool(ctx.Argument(5))
 		if len(name) == 0 || len(path) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeSite.paramFail"))
 			return nil
 		}
 
 		var website models.Website
 		if err := facades.Orm().Query().Where("name", name).FirstOrFail(&website); err == nil {
-			color.Redln("网站已存在")
+			color.Redln(translate.Get("commands.panel.writeSite.siteExist"))
 			return nil
 		}
 
 		_, err := os.Stat(path)
 		if os.IsNotExist(err) {
-			color.Redln("网站目录不存在")
+			color.Redln(translate.Get("commands.panel.writeSite.pathNotExist"))
 			return nil
 		}
 
@@ -498,32 +498,32 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			Ssl:    ssl,
 		})
 		if err != nil {
-			color.Redln("写入网站失败")
+			color.Redln(translate.Get("commands.panel.writeSite.fail"))
 			return nil
 		}
 
-		color.Greenln("写入网站成功")
+		color.Greenln(translate.Get("commands.panel.writeSite.success"))
 
 	case "deleteSite":
 		name := arg1
 		if len(name) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deleteSite.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("name", name).Delete(&models.Website{})
 		if err != nil {
-			color.Redln("删除网站失败")
+			color.Redln(translate.Get("commands.panel.deleteSite.fail"))
 			return nil
 		}
 
-		color.Greenln("删除网站成功")
+		color.Greenln(translate.Get("commands.panel.deleteSite.success"))
 
 	case "writeSetting":
 		key := arg1
 		value := arg2
 		if len(key) == 0 || len(value) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeSetting.paramFail"))
 			return nil
 		}
 
@@ -534,16 +534,16 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			Value: value,
 		})
 		if err != nil {
-			color.Redln("写入设置失败")
+			color.Redln(translate.Get("commands.panel.writeSetting.fail"))
 			return nil
 		}
 
-		color.Greenln("写入设置成功")
+		color.Greenln(translate.Get("commands.panel.writeSetting.success"))
 
 	case "getSetting":
 		key := arg1
 		if len(key) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.getSetting.paramFail"))
 			return nil
 		}
 
@@ -557,17 +557,17 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "deleteSetting":
 		key := arg1
 		if len(key) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deleteSetting.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("key", key).Delete(&models.Setting{})
 		if err != nil {
-			color.Redln("删除设置失败")
+			color.Redln(translate.Get("commands.panel.deleteSetting.fail"))
 			return nil
 		}
 
-		color.Greenln("删除设置成功")
+		color.Greenln(translate.Get("commands.panel.deleteSetting.success"))
 
 	case "addSite":
 		name := arg1
@@ -648,7 +648,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "installPlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.installPlugin.paramFail"))
 			return nil
 		}
 
@@ -658,12 +658,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.installPlugin.success"))
 
 	case "uninstallPlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.uninstallPlugin.paramFail"))
 			return nil
 		}
 
@@ -673,12 +673,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.uninstallPlugin.success"))
 
 	case "updatePlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.updatePlugin.paramFail"))
 			return nil
 		}
 
@@ -688,7 +688,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.updatePlugin.success"))
 
 	default:
 		color.Yellowln(facades.Config().GetString("panel.name") + " - " + translate.Get("commands.panel.tool") + " - " + facades.Config().GetString("panel.version"))

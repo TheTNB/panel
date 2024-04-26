@@ -65,13 +65,19 @@
         "end": "切割完成"
       },
       "installPlugin": {
-        "description": "安装插件"
+        "description": "安装插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
       },
       "uninstallPlugin": {
-        "description": "卸载插件"
+        "description": "卸载插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
       },
       "updatePlugin": {
-        "description": "更新插件"
+        "description": "更新插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
       },
       "addSite": {
         "description": "添加网站[域名和端口用英文逗号分隔]"
@@ -105,19 +111,34 @@
         "success": "写入MySQL root密码成功"
       },
       "writeSite": {
-        "description": "写入网站数据到面板"
+        "description": "写入网站数据到面板",
+        "paramFail": "参数错误",
+        "siteExist": "网站已存在",
+        "pathNotExist": "网站目录不存在",
+        "fail": "写入网站失败",
+        "success": "写入网站成功"
       },
       "deleteSite": {
-        "description": "删除面板网站数据"
+        "description": "删除面板网站数据",
+        "paramFail": "参数错误",
+        "fail": "删除网站失败",
+        "success": "删除网站成功"
       },
       "getSetting": {
-        "description": "获取面板设置数据"
+        "description": "获取面板设置数据",
+        "paramFail": "参数错误"
       },
       "writeSetting": {
-        "description": "写入 / 更新面板设置数据"
+        "description": "写入 / 更新面板设置数据",
+        "paramFail": "参数错误",
+        "fail": "写入设置失败",
+        "success": "写入设置成功"
       },
       "deleteSetting": {
-        "description": "删除面板设置数据"
+        "description": "删除面板设置数据",
+        "paramFail": "参数错误",
+        "fail": "删除设置失败",
+        "success": "删除设置成功"
       }
     },
     "panel:task": {

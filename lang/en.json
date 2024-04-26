@@ -65,13 +65,19 @@
         "end": "cutting completed"
       },
       "installPlugin": {
-        "description": "install plugin"
+        "description": "install plugin",
+        "paramFail": "plugin slug is required",
+        "success": "task has been submitted"
       },
       "uninstallPlugin": {
-        "description": "uninstall plugin"
+        "description": "uninstall plugin",
+        "paramFail": "plugin slug is required",
+        "success": "task has been submitted"
       },
       "updatePlugin": {
-        "description": "update plugin"
+        "description": "update plugin",
+        "paramFail": "plugin slug is required",
+        "success": "task has been submitted"
       },
       "addSite": {
         "description": "add website [domain name and port separated by commas]"
@@ -105,19 +111,34 @@
         "success": "MySQL root password written successfully"
       },
       "writeSite": {
-        "description": "write website data to the panel"
+        "description": "write website data to the panel",
+        "paramFail": "name and path are required",
+        "siteExist": "website already exists",
+        "pathNotExist": "website directory does not exist",
+        "fail": "failed to write to website",
+        "success": "writing to website successfully"
       },
       "deleteSite": {
-        "description": "delete panel website data"
+        "description": "delete panel website data",
+        "paramFail": "website name is required",
+        "fail": "failed to delete website",
+        "success": "website deleted successfully"
       },
       "getSetting": {
-        "description": "get panel setting data"
+        "description": "get panel setting data",
+        "paramFail": "key is required"
       },
       "writeSetting": {
-        "description": "write/update panel setting data"
+        "description": "write/update panel setting data",
+        "paramFail": "key and value are required",
+        "fail": "Writing settings failed",
+        "success": "settings written successfully"
       },
       "deleteSetting": {
-        "description": "delete panel setting data"
+        "description": "delete panel setting data",
+        "paramFail": "key is required",
+        "fail": "failed to delete settings",
+        "success": "settings deleted successfully"
       }
     },
     "panel:task": {
