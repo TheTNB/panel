@@ -89,25 +89,25 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		var task models.Task
 		err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 		if err == nil {
-			color.Redln("当前有任务正在执行，禁止更新")
+			color.Redln(translate.Get("commands.panel.update.taskCheck"))
 			return nil
 		}
 
 		panel, err := tools.GetLatestPanelVersion()
 		if err != nil {
-			color.Redln("获取最新版本失败")
+			color.Redln(translate.Get("commands.panel.update.versionFail"))
 			return err
 		}
 
 		internal.Status = internal.StatusUpgrade
 		if err = tools.UpdatePanel(panel); err != nil {
 			internal.Status = internal.StatusFailed
-			color.Redln("更新失败: " + err.Error())
+			color.Redln(translate.Get("commands.panel.update.fail") + ": " + err.Error())
 			return nil
 		}
 
 		internal.Status = internal.StatusNormal
-		color.Greenln("更新成功")
+		color.Greenln(translate.Get("commands.panel.update.success"))
 		tools.RestartPanel()
 
 	case "getInfo":

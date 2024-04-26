@@ -12,7 +12,11 @@
       "use": "Please use the following commands",
       "tool": "command line tool",
       "update": {
-        "description": "update/fix panel to latest version"
+        "description": "update/fix panel to latest version",
+        "taskCheck": "There is currently a task being executed and updates are prohibited.",
+        "versionFail": "failed to get latest version",
+        "fail": "update failed",
+        "success": "update completed"
       },
       "getInfo": {
         "description": "reinitialize panel account information"

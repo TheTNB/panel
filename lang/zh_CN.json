@@ -12,7 +12,11 @@
       "use": "请使用以下命令",
       "tool": "命令行工具",
       "update": {
-        "description": "更新 / 修复面板到最新版本"
+        "description": "更新 / 修复面板到最新版本",
+        "taskCheck": "当前有任务正在执行，禁止更新",
+        "versionFail": "获取最新版本失败",
+        "fail": "更新失败",
+        "success": "更新成功"
       },
       "getInfo": {
         "description": "重新初始化面板账号信息"
