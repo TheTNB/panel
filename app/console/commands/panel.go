@@ -185,7 +185,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		slug := arg1
 		version := arg2
 		if len(slug) == 0 || len(version) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writePlugin.paramFail"))
 			return nil
 		}
 
@@ -197,11 +197,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 
 		if err != nil {
-			color.Redln("写入插件安装状态失败")
+			color.Redln(translate.Get("commands.panel.writePlugin.fail"))
 			return nil
 		}
 
-		color.Greenln("写入插件安装状态成功")
+		color.Greenln(translate.Get("commands.panel.writePlugin.success"))
 
 	case "deletePlugin":
 		slug := arg1

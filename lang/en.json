@@ -73,7 +73,10 @@
         "fail": "initialization failed"
       },
       "writePlugin": {
-        "description": "write plugin installation status"
+        "description": "write plugin installation status",
+        "paramFail": "plugin slug and version are required",
+        "fail": "failed to write plugin installation status",
+        "success": "plugin installation status written successfully"
       },
       "deletePlugin": {
         "description": "delete plugin installation status"

@@ -73,7 +73,10 @@
         "fail": "初始化失败"
       },
       "writePlugin": {
-        "description": "写入插件安装状态"
+        "description": "写入插件安装状态",
+        "paramFail": "参数错误",
+        "fail": "写入插件安装状态失败",
+        "success": "写入插件安装状态成功"
       },
       "deletePlugin": {
         "description": "移除插件安装状态"
