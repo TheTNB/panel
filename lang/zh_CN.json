@@ -1,10 +1,17 @@
 {
+  "auth": {
+    "token": {
+      "expired": "登录已过期",
+      "missing": "未登录"
+    }
+  },
   "commands": {
     "panel:cert-renew": {
       "description": "[面板] 证书续签"
     },
     "panel:monitoring": {
-      "description": "[面板] 系统监控"
+      "description": "[面板] 系统监控",
+      "fail": "[面板] 系统监控保存失败"
     },
     "panel": {
       "description": "[面板] 命令行",
@@ -47,7 +54,33 @@
         "success": "清理任务成功"
       },
       "backup": {
-        "description": "备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量"
+        "description": "备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量",
+        "paramFail": "参数错误",
+        "start": "开始备份",
+        "backupDirFail": "创建备份目录失败",
+        "targetSite": "目标网站",
+        "siteNotExist": "网站不存在",
+        "backupFail": "备份失败",
+        "backupSuccess": "备份成功",
+        "mysqlBackupFail": "备份MySQL数据库失败",
+        "targetMysql": "目标MySQL数据库",
+        "startExport": "开始导出",
+        "exportFail": "导出失败",
+        "exportSuccess": "导出成功",
+        "startCompress": "开始压缩",
+        "compressFail": "压缩失败",
+        "compressSuccess": "压缩成功",
+        "startMove": "开始移动",
+        "moveFail": "移动失败",
+        "moveSuccess": "移动成功",
+        "databaseGetFail": "获取数据库失败",
+        "databaseNotExist": "数据库不存在",
+        "targetPostgres": "目标PostgreSQL数据库",
+        "cleanBackup": "清理备份",
+        "cleanupFail": "清理失败",
+        "cleanupSuccess": "清理完成",
+        "deleteFail": "删除失败",
+        "success": "备份完成"
       },
       "cutoff": {
         "description": "切割网站日志并保留指定数量",
@@ -80,10 +113,16 @@
         "success": "任务已提交"
       },
       "addSite": {
-        "description": "添加网站[域名和端口用英文逗号分隔]"
+        "description": "添加网站[域名和端口用英文逗号分隔]",
+        "paramFail": "参数错误",
+        "siteExist": "网站名已存在",
+        "success": "网站添加成功"
       },
       "removeSite": {
-        "description": "删除网站"
+        "description": "删除网站",
+        "paramFail": "参数错误",
+        "siteNotExist": "网站名不存在",
+        "success": "网站删除成功"
       },
       "init": {
         "description": "初始化面板",
@@ -144,5 +183,23 @@
     "panel:task": {
       "description": "[面板] 每日任务"
     }
+  },
+  "errors": {
+    "internal": "系统内部错误",
+    "plugin": {
+      "notExist": "插件不存在",
+      "notInstalled": "插件 :slug 未安装",
+      "dependent": "插件 :slug 需要依赖 :dependency 插件",
+      "incompatible": "插件 :slug 不兼容 :exclude 插件"
+    }
+  },
+  "messages": {
+    "mistake": "错误"
+  },
+  "status": {
+    "upgrade": "面板升级中，请稍后",
+    "maintain": "面板正在运行维护，请稍后",
+    "closed": "面板已关闭",
+    "failed": "面板运行出错，请检查排除或联系支持"
   }
 }

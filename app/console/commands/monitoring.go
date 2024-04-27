@@ -53,6 +53,8 @@ func (receiver *Monitoring) Handle(console.Context) error {
 
 	info := tools.GetMonitoringInfo()
 
+	translate := facades.Lang(context.Background())
+
 	// 去除部分数据以减少数据库存储
 	info.Disk = nil
 	for _, cpu := range info.Cpus {
@@ -72,7 +74,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 	})
 	if err != nil {
 		facades.Log().Infof("[面板] 系统监控保存失败: %s", err.Error())
-		color.Redf("[面板] 系统监控保存失败: %s", err.Error())
+		color.Redf(translate.Get("commands.panel:monitoring.fail")+": %s", err.Error())
 		return nil
 	}
 

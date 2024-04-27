@@ -1,10 +1,17 @@
 {
+  "auth": {
+    "token": {
+      "expired": "login has expired",
+      "missing": "not logged in"
+    }
+  },
   "commands": {
     "panel:cert-renew": {
       "description": "[Panel] Certificate renewal"
     },
     "panel:monitoring": {
-      "description": "[Panel] System Monitoring"
+      "description": "[Panel] System Monitoring",
+      "fail": "[Panel] System monitoring failed to save"
     },
     "panel": {
       "description": "[Panel] Command line",
@@ -47,7 +54,33 @@
         "success": "tasks cleaned up successfully"
       },
       "backup": {
-        "description": "back up website/MySQL database/PostgreSQL database to the specified directory and retain the specified amount"
+        "description": "back up website/MySQL database/PostgreSQL database to the specified directory and retain the specified amount",
+        "paramFail": "backup type, path, name and keep amount are required",
+        "start": "start backup",
+        "backupDirFail": "failed to create backup directory",
+        "targetSite": "target website",
+        "siteNotExist": "website does not exist",
+        "backupFail": "backup failed",
+        "backupSuccess": "backup successful",
+        "mysqlBackupFail": "MySQL database backup failed",
+        "targetMysql": "target MySQL database",
+        "startExport": "start exporting",
+        "exportFail": "export failed",
+        "exportSuccess": "export successful",
+        "startCompress": "start compressing",
+        "compressFail": "compression failed",
+        "compressSuccess": "compression successful",
+        "startMove": "start moving",
+        "moveFail": "move failed",
+        "moveSuccess": "move successful",
+        "databaseGetFail": "failed to get database",
+        "databaseNotExist": "database does not exist",
+        "targetPostgres": "target PostgreSQL database",
+        "cleanBackup" : "clean backup",
+        "cleanupFail": "cleanup failed",
+        "cleanupSuccess": "cleanup successful",
+        "deleteFail": "failed to delete",
+        "success": "backup completed"
       },
       "cutoff": {
         "description": "cut website logs and keep specified amount",
@@ -80,10 +113,16 @@
         "success": "task has been submitted"
       },
       "addSite": {
-        "description": "add website [domain name and port separated by commas]"
+        "description": "add website [domain name and port separated by commas]",
+        "paramFail": "name, domain, port and path are required",
+        "siteExist": "website already exists",
+        "success": "website added successfully"
       },
       "removeSite": {
-        "description": "remove website"
+        "description": "remove website",
+        "paramFail": "name is required",
+        "siteNotExist": "website does not exist",
+        "success": "website deleted successfully"
       },
       "init": {
         "description": "initialize the panel",
@@ -144,5 +183,23 @@
     "panel:task": {
       "description": "[Panel] Daily tasks"
     }
+  },
+  "errors": {
+    "internal": "internal system error",
+    "plugin": {
+      "notExist": "plugin does not exist",
+      "notInstalled": "plugin :slug is not installed",
+      "dependent": "plugin :slug requires dependency :dependency",
+      "incompatible": "plugin :slug is incompatible with :exclude plugin"
+    }
+  },
+  "messages": {
+    "mistake": "mistake"
+  },
+  "status": {
+    "upgrade": "Panel is currently undergoing an upgrade. Please try again later.",
+    "maintain": "Panel is currently undergoing maintenance. Please try again later.",
+    "closed": "Panel is closed.",
+    "failed": "Panel encountered an error during operation. Please check the troubleshooting or contact support."
   }
 }
