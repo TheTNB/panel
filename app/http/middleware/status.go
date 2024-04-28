@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 
 	"panel/internal"
 )
@@ -9,25 +10,26 @@ import (
 // Status 检查程序状态
 func Status() http.Middleware {
 	return func(ctx http.Context) {
+		translate := facades.Lang(ctx)
 		switch internal.Status {
 		case internal.StatusUpgrade:
 			ctx.Request().AbortWithStatusJson(http.StatusServiceUnavailable, http.Json{
-				"message": "面板升级中，请稍后",
+				"message": translate.Get("status.upgrade"),
 			})
 			return
 		case internal.StatusMaintain:
 			ctx.Request().AbortWithStatusJson(http.StatusServiceUnavailable, http.Json{
-				"message": "面板正在运行维护，请稍后",
+				"message": translate.Get("status.maintain"),
 			})
 			return
 		case internal.StatusClosed:
 			ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-				"message": "面板已关闭",
+				"message": translate.Get("status.closed"),
 			})
 			return
 		case internal.StatusFailed:
 			ctx.Request().AbortWithStatusJson(http.StatusInternalServerError, http.Json{
-				"message": "面板运行出错，请检查排除或联系支持",
+				"message": translate.Get("status.failed"),
 			})
 			return
 		default:

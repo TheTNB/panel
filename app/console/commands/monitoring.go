@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/gookit/color"
@@ -27,7 +28,8 @@ func (receiver *Monitoring) Signature() string {
 
 // Description The console command description.
 func (receiver *Monitoring) Description() string {
-	return "[面板] 系统监控"
+	ctx := context.Background()
+	return facades.Lang(ctx).Get("commands.panel:monitoring.description")
 }
 
 // Extend The console command extend.
@@ -38,7 +40,7 @@ func (receiver *Monitoring) Extend() command.Extend {
 }
 
 // Handle Execute the console command.
-func (receiver *Monitoring) Handle(ctx console.Context) error {
+func (receiver *Monitoring) Handle(console.Context) error {
 	if internal.Status != internal.StatusNormal {
 		return nil
 	}
@@ -50,6 +52,8 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 	}
 
 	info := tools.GetMonitoringInfo()
+
+	translate := facades.Lang(context.Background())
 
 	// 去除部分数据以减少数据库存储
 	info.Disk = nil
@@ -70,7 +74,7 @@ func (receiver *Monitoring) Handle(ctx console.Context) error {
 	})
 	if err != nil {
 		facades.Log().Infof("[面板] 系统监控保存失败: %s", err.Error())
-		color.Redf("[面板] 系统监控保存失败: %s", err.Error())
+		color.Redf(translate.Get("commands.panel:monitoring.fail")+": %s", err.Error())
 		return nil
 	}
 

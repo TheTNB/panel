@@ -11,10 +11,11 @@ import (
 // Jwt 确保通过 JWT 鉴权
 func Jwt() http.Middleware {
 	return func(ctx http.Context) {
+		translate := facades.Lang(ctx)
 		token := ctx.Request().Header("Authorization", ctx.Request().Header("Sec-WebSocket-Protocol"))
 		if len(token) == 0 {
 			ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
-				"message": "未登录",
+				"message": translate.Get("auth.token.missing"),
 			})
 			return
 		}
@@ -26,7 +27,7 @@ func Jwt() http.Middleware {
 				if err != nil {
 					// 到达刷新时间上限
 					ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
-						"message": "登录已过期",
+						"message": translate.Get("auth.token.expired"),
 					})
 					return
 				}
@@ -34,7 +35,7 @@ func Jwt() http.Middleware {
 				token = "Bearer " + token
 			} else {
 				ctx.Request().AbortWithStatusJson(http.StatusUnauthorized, http.Json{
-					"message": "登录已过期",
+					"message": translate.Get("auth.token.expired"),
 				})
 				return
 			}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/facades"
 )
 
 // SuccessResponse 通用成功响应
@@ -26,14 +27,14 @@ func Success(ctx http.Context, data any) http.Response {
 // Error 响应错误
 func Error(ctx http.Context, code int, message string) http.Response {
 	return ctx.Response().Json(code, &ErrorResponse{
-		Message: "错误: " + message,
+		Message: facades.Lang(ctx).Get("messages.mistake") + ": " + message,
 	})
 }
 
 // ErrorSystem 响应系统错误
 func ErrorSystem(ctx http.Context) http.Response {
 	return ctx.Response().Json(http.StatusInternalServerError, &ErrorResponse{
-		Message: "系统内部错误",
+		Message: facades.Lang(ctx).Get("errors.internal"),
 	})
 }
 

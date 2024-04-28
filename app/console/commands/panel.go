@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -31,7 +32,8 @@ func (receiver *Panel) Signature() string {
 
 // Description The console command description.
 func (receiver *Panel) Description() string {
-	return "[面板] 命令行"
+	ctx := context.Background()
+	return facades.Lang(ctx).Get("commands.panel.description")
 }
 
 // Extend The console command extend.
@@ -50,74 +52,76 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	arg4 := ctx.Argument(4)
 	arg5 := ctx.Argument(5)
 
+	translate := facades.Lang(context.Background())
+
 	switch action {
 	case "init":
 		var check models.User
 		err := facades.Orm().Query().FirstOrFail(&check)
 		if err == nil {
-			color.Redln("面板已初始化")
+			color.Redln(translate.Get("commands.panel.init.exist"))
 			return nil
 		}
 
 		settings := []models.Setting{{Key: models.SettingKeyName, Value: "耗子 Linux 面板"}, {Key: models.SettingKeyMonitor, Value: "1"}, {Key: models.SettingKeyMonitorDays, Value: "30"}, {Key: models.SettingKeyBackupPath, Value: "/www/backup"}, {Key: models.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: models.SettingKeyVersion, Value: facades.Config().GetString("panel.version")}}
 		err = facades.Orm().Query().Create(&settings)
 		if err != nil {
-			color.Redln("初始化失败")
+			color.Redln(translate.Get("commands.panel.init.fail"))
 			return nil
 		}
 
 		hash, err := facades.Hash().Make(tools.RandomString(32))
 		if err != nil {
-			color.Redln("初始化失败")
+			color.Redln(translate.Get("commands.panel.init.fail"))
 			return nil
 		}
 
 		user := services.NewUserImpl()
 		_, err = user.Create("admin", hash)
 		if err != nil {
-			color.Redln("创建管理员失败")
+			color.Redln(translate.Get("commands.panel.init.adminFail"))
 			return nil
 		}
 
-		color.Greenln("初始化成功")
+		color.Greenln(translate.Get("commands.panel.init.success"))
 
 	case "update":
 		var task models.Task
 		err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
 		if err == nil {
-			color.Redln("当前有任务正在执行，禁止更新")
+			color.Redln(translate.Get("commands.panel.update.taskCheck"))
 			return nil
 		}
 
 		panel, err := tools.GetLatestPanelVersion()
 		if err != nil {
-			color.Redln("获取最新版本失败")
+			color.Redln(translate.Get("commands.panel.update.versionFail"))
 			return err
 		}
 
 		internal.Status = internal.StatusUpgrade
 		if err = tools.UpdatePanel(panel); err != nil {
 			internal.Status = internal.StatusFailed
-			color.Redln("更新失败: " + err.Error())
+			color.Redln(translate.Get("commands.panel.update.fail") + ": " + err.Error())
 			return nil
 		}
 
 		internal.Status = internal.StatusNormal
-		color.Greenln("更新成功")
+		color.Greenln(translate.Get("commands.panel.update.success"))
 		tools.RestartPanel()
 
 	case "getInfo":
 		var user models.User
 		err := facades.Orm().Query().Where("id", 1).FirstOrFail(&user)
 		if err != nil {
-			color.Redln("获取管理员信息失败")
+			color.Redln(translate.Get("commands.panel.getInfo.adminGetFail"))
 			return nil
 		}
 
 		password := tools.RandomString(16)
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
-			color.Redln("生成密码失败")
+			color.Redln(translate.Get("commands.panel.getInfo.passwordGenerationFail"))
 			return nil
 		}
 		user.Username = tools.RandomString(8)
@@ -128,13 +132,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		err = facades.Orm().Query().Save(&user)
 		if err != nil {
-			color.Redln("保存管理员信息失败")
+			color.Redln(translate.Get("commands.panel.getInfo.adminSaveFail"))
 			return nil
 		}
 
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板端口失败")
+			color.Redln(translate.Get("commands.panel.portFail"))
 			return nil
 		}
 		ip, err := tools.GetPublicIP()
@@ -146,42 +150,42 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			protocol = "https"
 		}
 
-		color.Greenln("用户名: " + user.Username)
-		color.Greenln("密码: " + password)
-		color.Greenln("面板端口: " + port)
-		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
-		color.Greenln("面板地址: " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.getInfo.username") + ": " + user.Username)
+		color.Greenln(translate.Get("commands.panel.getInfo.password") + ": " + password)
+		color.Greenln(translate.Get("commands.panel.port") + ": " + port)
+		color.Greenln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
 		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板端口失败")
+			color.Redln(translate.Get("commands.panel.portFail"))
 			return nil
 		}
 
-		color.Greenln("面板端口: " + port)
+		color.Greenln(translate.Get("commands.panel.port") + ": " + port)
 
 	case "getEntrance":
-		color.Greenln("面板入口: " + facades.Config().GetString("http.entrance"))
+		color.Greenln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
 		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
-			color.Redln("获取面板入口失败")
+			color.Redln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
 		if _, err = tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf"); err != nil {
-			color.Redln("删除面板入口失败")
+			color.Redln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
 
-		color.Greenln("删除面板入口成功")
+		color.Greenln(translate.Get("commands.panel.deleteEntrance.success"))
 
 	case "writePlugin":
 		slug := arg1
 		version := arg2
 		if len(slug) == 0 || len(version) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writePlugin.paramFail"))
 			return nil
 		}
 
@@ -193,31 +197,31 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 
 		if err != nil {
-			color.Redln("写入插件安装状态失败")
+			color.Redln(translate.Get("commands.panel.writePlugin.fail"))
 			return nil
 		}
 
-		color.Greenln("写入插件安装状态成功")
+		color.Greenln(translate.Get("commands.panel.writePlugin.success"))
 
 	case "deletePlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deletePlugin.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("slug", slug).Delete(&models.Plugin{})
 		if err != nil {
-			color.Redln("移除插件安装状态失败")
+			color.Redln(translate.Get("commands.panel.deletePlugin.fail"))
 			return nil
 		}
 
-		color.Greenln("移除插件安装状态成功")
+		color.Greenln(translate.Get("commands.panel.deletePlugin.success"))
 
 	case "writeMysqlPassword":
 		password := arg1
 		if len(password) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeMysqlPassword.paramFail"))
 			return nil
 		}
 
@@ -229,20 +233,20 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 
 		if err != nil {
-			color.Redln("写入MySQL root密码失败")
+			color.Redln(translate.Get("commands.panel.writeMysqlPassword.fail"))
 			return nil
 		}
 
-		color.Greenln("写入MySQL root密码成功")
+		color.Greenln(translate.Get("commands.panel.writeMysqlPassword.success"))
 
 	case "cleanTask":
 		_, err := facades.Orm().Query().Model(&models.Task{}).Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).Update("status", models.TaskStatusFailed)
 		if err != nil {
-			color.Redln("清理任务失败")
+			color.Redln(translate.Get("commands.panel.cleanTask.fail"))
 			return nil
 		}
 
-		color.Greenln("清理任务成功")
+		color.Greenln(translate.Get("commands.panel.cleanTask.success"))
 
 	case "backup":
 		backupType := arg1
@@ -251,37 +255,37 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		save := arg4
 		hr := `+----------------------------------------------------`
 		if len(backupType) == 0 || len(name) == 0 || len(path) == 0 || len(save) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.backup.paramFail"))
 			return nil
 		}
 
 		color.Greenln(hr)
-		color.Greenln("★ 开始备份 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("★ " + translate.Get("commands.panel.backup.start") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
 		if !tools.Exists(path) {
 			if err := tools.Mkdir(path, 0644); err != nil {
-				color.Redln("|-创建备份目录失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.backupDirFail") + ": " + err.Error())
 				return nil
 			}
 		}
 
 		switch backupType {
 		case "website":
-			color.Yellowln("|-目标网站: " + name)
+			color.Yellowln("|-" + translate.Get("commands.panel.backup.targetSite") + ": " + name)
 			var website models.Website
 			if err := facades.Orm().Query().Where("name", name).FirstOrFail(&website); err != nil {
-				color.Redln("|-网站不存在")
+				color.Redln("|-" + translate.Get("commands.panel.backup.siteNotExist"))
 				color.Greenln(hr)
 				return nil
 			}
 
 			backupFile := path + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
 			if _, err := tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
-				color.Redln("|-备份失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.backupFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-备份成功")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.backupSuccess"))
 
 		case "mysql":
 			rootPassword := services.NewSettingImpl().Get(models.SettingKeyMysqlRootPassword)
@@ -289,81 +293,81 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			err := os.Setenv("MYSQL_PWD", rootPassword)
 			if err != nil {
-				color.Redln("|-备份MySQL数据库失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.mysqlBackupFail") + ": " + err.Error())
 				color.Greenln(hr)
 				return nil
 			}
 
-			color.Greenln("|-目标MySQL数据库: " + name)
-			color.Greenln("|-开始导出")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.targetMysql") + ": " + name)
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startExport"))
 			if _, err = tools.Exec(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`); err != nil {
-				color.Redln("|-导出失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.exportFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-导出成功")
-			color.Greenln("|-开始压缩")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.exportSuccess"))
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startCompress"))
 			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
-				color.Redln("|-压缩失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
 			if err := tools.Remove("/tmp/" + backupFile); err != nil {
-				color.Redln("|-删除失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.deleteFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-压缩成功")
-			color.Greenln("|-开始移动")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.compressSuccess"))
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startMove"))
 			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
-				color.Redln("|-移动失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.moveFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-移动成功")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.moveSuccess"))
 			_ = os.Unsetenv("MYSQL_PWD")
-			color.Greenln("|-备份成功")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.success"))
 
 		case "postgresql":
 			backupFile := name + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
 			check, err := tools.Exec(`su - postgres -c "psql -l" 2>&1`)
 			if err != nil {
-				color.Redln("|-获取数据库失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.databaseGetFail") + ": " + err.Error())
 				color.Greenln(hr)
 				return nil
 			}
 			if !strings.Contains(check, name) {
-				color.Redln("|-数据库不存在")
+				color.Redln("|-" + translate.Get("commands.panel.backup.databaseNotExist"))
 				color.Greenln(hr)
 				return nil
 			}
 
-			color.Greenln("|-目标PostgreSQL数据库: " + name)
-			color.Greenln("|-开始导出")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.targetPostgres") + ": " + name)
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startExport"))
 			if _, err = tools.Exec(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`); err != nil {
-				color.Redln("|-导出失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.exportFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-导出成功")
-			color.Greenln("|-开始压缩")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.exportSuccess"))
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startCompress"))
 			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
-				color.Redln("|-压缩失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
 			if err := tools.Remove("/tmp/" + backupFile); err != nil {
-				color.Redln("|-删除失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.deleteFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-压缩成功")
-			color.Greenln("|-开始移动")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.compressSuccess"))
+			color.Greenln("|-" + translate.Get("commands.panel.backup.startMove"))
 			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
-				color.Redln("|-移动失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.moveFail") + ": " + err.Error())
 				return nil
 			}
-			color.Greenln("|-移动成功")
-			color.Greenln("|-备份成功")
+			color.Greenln("|-" + translate.Get("commands.panel.backup.moveSuccess"))
+			color.Greenln("|-" + translate.Get("commands.panel.backup.success"))
 		}
 
 		color.Greenln(hr)
 		files, err := os.ReadDir(path)
 		if err != nil {
-			color.Redln("|-清理失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.backup.cleanupFail") + ": " + err.Error())
 			return nil
 		}
 		var filteredFiles []os.FileInfo
@@ -381,15 +385,15 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join(path, filteredFiles[i].Name())
-			color.Yellowln("|-清理备份: " + fileToDelete)
+			color.Yellowln("|-" + translate.Get("commands.panel.backup.cleanBackup") + ": " + fileToDelete)
 			if err := tools.Remove(fileToDelete); err != nil {
-				color.Redln("|-清理失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.backup.cleanupFail") + ": " + err.Error())
 				return nil
 			}
 		}
-		color.Greenln("|-清理完成")
+		color.Greenln("|-" + translate.Get("commands.panel.backup.cleanupSuccess"))
 		color.Greenln(hr)
-		color.Greenln("☆ 备份完成 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("☆ " + translate.Get("commands.panel.backup.success") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
 	case "cutoff":
@@ -397,44 +401,44 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		save := arg2
 		hr := `+----------------------------------------------------`
 		if len(name) == 0 || len(save) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.cutoff.paramFail"))
 			return nil
 		}
 
 		color.Greenln(hr)
-		color.Greenln("★ 开始切割 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("★ " + translate.Get("commands.panel.cutoff.start") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
-		color.Yellowln("|-目标网站: " + name)
+		color.Yellowln("|-" + translate.Get("commands.panel.cutoff.targetSite") + ": " + name)
 		var website models.Website
 		if err := facades.Orm().Query().Where("name", name).FirstOrFail(&website); err != nil {
-			color.Redln("|-网站不存在")
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.siteNotExist"))
 			color.Greenln(hr)
 			return nil
 		}
 
 		logPath := "/www/wwwlogs/" + website.Name + ".log"
 		if !tools.Exists(logPath) {
-			color.Redln("|-日志文件不存在")
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.logNotExist"))
 			color.Greenln(hr)
 			return nil
 		}
 
 		backupPath := "/www/wwwlogs/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".log.zip"
 		if _, err := tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log"); err != nil {
-			color.Redln("|-备份失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.backupFail") + ": " + err.Error())
 			return nil
 		}
 		if _, err := tools.Exec(`echo "" > ` + logPath); err != nil {
-			color.Redln("|-清空失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.clearFail") + ": " + err.Error())
 			return nil
 		}
-		color.Greenln("|-切割成功")
+		color.Greenln("|-" + translate.Get("commands.panel.cutoff.cutSuccess"))
 
 		color.Greenln(hr)
 		files, err := os.ReadDir("/www/wwwlogs")
 		if err != nil {
-			color.Redln("|-清理失败: " + err.Error())
+			color.Redln("|-" + translate.Get("commands.panel.cutoff.cleanupFail") + ": " + err.Error())
 			return nil
 		}
 		var filteredFiles []os.FileInfo
@@ -452,15 +456,15 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		})
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join("/www/wwwlogs", filteredFiles[i].Name())
-			color.Yellowln("|-清理日志: " + fileToDelete)
+			color.Yellowln("|-" + translate.Get("commands.panel.cutoff.clearLog") + ": " + fileToDelete)
 			if err := tools.Remove(fileToDelete); err != nil {
-				color.Redln("|-清理失败: " + err.Error())
+				color.Redln("|-" + translate.Get("commands.panel.cutoff.cleanupFail") + ": " + err.Error())
 				return nil
 			}
 		}
-		color.Greenln("|-清理完成")
+		color.Greenln("|-" + translate.Get("commands.panel.cutoff.cleanupSuccess"))
 		color.Greenln(hr)
-		color.Greenln("☆ 切割完成 [" + carbon.Now().ToDateTimeString() + "]")
+		color.Greenln("☆ " + translate.Get("commands.panel.cutoff.end") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Greenln(hr)
 
 	case "writeSite":
@@ -470,19 +474,19 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		php := cast.ToInt(arg4)
 		ssl := cast.ToBool(ctx.Argument(5))
 		if len(name) == 0 || len(path) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeSite.paramFail"))
 			return nil
 		}
 
 		var website models.Website
 		if err := facades.Orm().Query().Where("name", name).FirstOrFail(&website); err == nil {
-			color.Redln("网站已存在")
+			color.Redln(translate.Get("commands.panel.writeSite.siteExist"))
 			return nil
 		}
 
 		_, err := os.Stat(path)
 		if os.IsNotExist(err) {
-			color.Redln("网站目录不存在")
+			color.Redln(translate.Get("commands.panel.writeSite.pathNotExist"))
 			return nil
 		}
 
@@ -494,32 +498,32 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			Ssl:    ssl,
 		})
 		if err != nil {
-			color.Redln("写入网站失败")
+			color.Redln(translate.Get("commands.panel.writeSite.fail"))
 			return nil
 		}
 
-		color.Greenln("写入网站成功")
+		color.Greenln(translate.Get("commands.panel.writeSite.success"))
 
 	case "deleteSite":
 		name := arg1
 		if len(name) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deleteSite.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("name", name).Delete(&models.Website{})
 		if err != nil {
-			color.Redln("删除网站失败")
+			color.Redln(translate.Get("commands.panel.deleteSite.fail"))
 			return nil
 		}
 
-		color.Greenln("删除网站成功")
+		color.Greenln(translate.Get("commands.panel.deleteSite.success"))
 
 	case "writeSetting":
 		key := arg1
 		value := arg2
 		if len(key) == 0 || len(value) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.writeSetting.paramFail"))
 			return nil
 		}
 
@@ -530,16 +534,16 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			Value: value,
 		})
 		if err != nil {
-			color.Redln("写入设置失败")
+			color.Redln(translate.Get("commands.panel.writeSetting.fail"))
 			return nil
 		}
 
-		color.Greenln("写入设置成功")
+		color.Greenln(translate.Get("commands.panel.writeSetting.success"))
 
 	case "getSetting":
 		key := arg1
 		if len(key) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.getSetting.paramFail"))
 			return nil
 		}
 
@@ -553,17 +557,17 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 	case "deleteSetting":
 		key := arg1
 		if len(key) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.deleteSetting.paramFail"))
 			return nil
 		}
 
 		_, err := facades.Orm().Query().Where("key", key).Delete(&models.Setting{})
 		if err != nil {
-			color.Redln("删除设置失败")
+			color.Redln(translate.Get("commands.panel.deleteSetting.fail"))
 			return nil
 		}
 
-		color.Greenln("删除设置成功")
+		color.Greenln(translate.Get("commands.panel.deleteSetting.success"))
 
 	case "addSite":
 		name := arg1
@@ -572,14 +576,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		path := arg4
 		php := arg5
 		if len(name) == 0 || len(domain) == 0 || len(port) == 0 || len(path) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.addSite.paramFail"))
 			return nil
 		}
 
 		domains := strings.Split(domain, ",")
 		ports := strings.Split(port, ",")
 		if len(domains) == 0 || len(ports) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.addSite.paramFail"))
 			return nil
 		}
 
@@ -595,7 +599,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 		if id != 0 {
-			color.Redln("网站名已存在")
+			color.Redln(translate.Get("commands.panel.addSite.siteExist"))
 			return nil
 		}
 
@@ -614,12 +618,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("网站添加成功")
+		color.Greenln(translate.Get("commands.panel.addSite.success"))
 
 	case "removeSite":
 		name := arg1
 		if len(name) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.removeSite.paramFail"))
 			return nil
 		}
 
@@ -630,7 +634,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 		if id == 0 {
-			color.Redln("网站名不存在")
+			color.Redln(translate.Get("commands.panel.removeSite.siteNotExist"))
 			return nil
 		}
 
@@ -639,12 +643,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("网站删除成功")
+		color.Greenln(translate.Get("commands.panel.removeSite.success"))
 
 	case "installPlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.installPlugin.paramFail"))
 			return nil
 		}
 
@@ -654,12 +658,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.installPlugin.success"))
 
 	case "uninstallPlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.uninstallPlugin.paramFail"))
 			return nil
 		}
 
@@ -669,12 +673,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.uninstallPlugin.success"))
 
 	case "updatePlugin":
 		slug := arg1
 		if len(slug) == 0 {
-			color.Redln("参数错误")
+			color.Redln(translate.Get("commands.panel.updatePlugin.paramFail"))
 			return nil
 		}
 
@@ -684,34 +688,34 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		color.Greenln("任务已提交")
+		color.Greenln(translate.Get("commands.panel.updatePlugin.success"))
 
 	default:
-		color.Yellowln(facades.Config().GetString("panel.name") + "命令行工具 - " + facades.Config().GetString("panel.version"))
-		color.Greenln("请使用以下命令：")
-		color.Greenln("panel update 更新 / 修复面板到最新版本")
-		color.Greenln("panel getInfo 重新初始化面板账号信息")
-		color.Greenln("panel getPort 获取面板访问端口")
-		color.Greenln("panel getEntrance 获取面板访问入口")
-		color.Greenln("panel deleteEntrance 删除面板访问入口")
-		color.Greenln("panel cleanTask 清理面板运行中和等待中的任务[任务卡住时使用]")
-		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} 备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量")
-		color.Greenln("panel cutoff {website_name} {save_copies} 切割网站日志并保留指定数量")
-		color.Greenln("panel installPlugin {slug} 安装插件")
-		color.Greenln("panel uninstallPlugin {slug} 卸载插件")
-		color.Greenln("panel updatePlugin {slug} 更新插件")
-		color.Greenln("panel addSite {name} {domain} {port} {path} {php} 添加网站[域名和端口用英文逗号分隔]")
-		color.Greenln("panel removeSite {name} 删除网站")
-		color.Redln("以下命令请在开发者指导下使用：")
-		color.Yellowln("panel init 初始化面板")
-		color.Yellowln("panel writePlugin {slug} {version} 写入插件安装状态")
-		color.Yellowln("panel deletePlugin {slug} 移除插件安装状态")
-		color.Yellowln("panel writeMysqlPassword {password} 写入MySQL root密码")
-		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} 写入网站数据到面板")
-		color.Yellowln("panel deleteSite {name} 删除面板网站数据")
-		color.Yellowln("panel getSetting {name} 获取面板设置数据")
-		color.Yellowln("panel writeSetting {name} {value} 写入 / 更新面板设置数据")
-		color.Yellowln("panel deleteSetting {name} 删除面板设置数据")
+		color.Yellowln(facades.Config().GetString("panel.name") + " - " + translate.Get("commands.panel.tool") + " - " + facades.Config().GetString("panel.version"))
+		color.Greenln(translate.Get("commands.panel.use") + "：")
+		color.Greenln("panel update " + translate.Get("commands.panel.update.description"))
+		color.Greenln("panel getInfo " + translate.Get("commands.panel.getInfo.description"))
+		color.Greenln("panel getPort " + translate.Get("commands.panel.getPort.description"))
+		color.Greenln("panel getEntrance " + translate.Get("commands.panel.getEntrance.description"))
+		color.Greenln("panel deleteEntrance " + translate.Get("commands.panel.deleteEntrance.description"))
+		color.Greenln("panel cleanTask " + translate.Get("commands.panel.cleanTask.description"))
+		color.Greenln("panel backup {website/mysql/postgresql} {name} {path} {save_copies} " + translate.Get("commands.panel.backup.description"))
+		color.Greenln("panel cutoff {website_name} {save_copies} " + translate.Get("commands.panel.cutoff.description"))
+		color.Greenln("panel installPlugin {slug} " + translate.Get("commands.panel.installPlugin.description"))
+		color.Greenln("panel uninstallPlugin {slug} " + translate.Get("commands.panel.uninstallPlugin.description"))
+		color.Greenln("panel updatePlugin {slug} " + translate.Get("commands.panel.updatePlugin.description"))
+		color.Greenln("panel addSite {name} {domain} {port} {path} {php} " + translate.Get("commands.panel.addSite.description"))
+		color.Greenln("panel removeSite {name} " + translate.Get("commands.panel.removeSite.description"))
+		color.Redln(translate.Get("commands.panel.forDeveloper") + ":")
+		color.Yellowln("panel init " + translate.Get("commands.panel.init.description"))
+		color.Yellowln("panel writePlugin {slug} {version} " + translate.Get("commands.panel.writePlugin.description"))
+		color.Yellowln("panel deletePlugin {slug} " + translate.Get("commands.panel.deletePlugin.description"))
+		color.Yellowln("panel writeMysqlPassword {password} " + translate.Get("commands.panel.writeMysqlPassword.description"))
+		color.Yellowln("panel writeSite {name} {status} {path} {php} {ssl} " + translate.Get("commands.panel.writeSite.description"))
+		color.Yellowln("panel deleteSite {name} " + translate.Get("commands.panel.deleteSite.description"))
+		color.Yellowln("panel getSetting {name} " + translate.Get("commands.panel.getSetting.description"))
+		color.Yellowln("panel writeSetting {name} {value} " + translate.Get("commands.panel.writeSetting.description"))
+		color.Yellowln("panel deleteSetting {name} " + translate.Get("commands.panel.deleteSetting.description"))
 	}
 
 	return nil

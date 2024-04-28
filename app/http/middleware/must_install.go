@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/goravel/framework/contracts/http"
+	"github.com/goravel/framework/contracts/translation"
+	"github.com/goravel/framework/facades"
 
 	"panel/internal/services"
 )
@@ -12,6 +14,7 @@ import (
 func MustInstall() http.Middleware {
 	return func(ctx http.Context) {
 		path := ctx.Request().Path()
+		translate := facades.Lang(ctx)
 		var slug string
 		if strings.HasPrefix(path, "/api/panel/website") {
 			slug = "openresty"
@@ -19,7 +22,7 @@ func MustInstall() http.Middleware {
 			pathArr := strings.Split(path, "/")
 			if len(pathArr) < 4 {
 				ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-					"message": "插件不存在",
+					"message": translate.Get("errors.plugin.notExist"),
 				})
 				return
 			}
@@ -31,14 +34,18 @@ func MustInstall() http.Middleware {
 		installedPlugins, err := services.NewPluginImpl().AllInstalled()
 		if err != nil {
 			ctx.Request().AbortWithStatusJson(http.StatusInternalServerError, http.Json{
-				"message": "系统内部错误",
+				"message": translate.Get("errors.internal"),
 			})
 			return
 		}
 
 		if installedPlugin.Slug != plugin.Slug {
 			ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-				"message": "插件 " + slug + " 未安装",
+				"message": translate.Get("errors.plugin.notInstalled", translation.Option{
+					Replace: map[string]string{
+						"slug": slug,
+					},
+				}),
 			})
 			return
 		}
@@ -53,7 +60,12 @@ func MustInstall() http.Middleware {
 			_, requireFound := pluginsMap[require]
 			if !requireFound {
 				ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-					"message": "插件 " + slug + " 需要依赖 " + require + " 插件",
+					"message": translate.Get("errors.plugin.dependent", translation.Option{
+						Replace: map[string]string{
+							"slug":       slug,
+							"dependency": require,
+						},
+					}),
 				})
 				return
 			}
@@ -63,7 +75,12 @@ func MustInstall() http.Middleware {
 			_, excludeFound := pluginsMap[exclude]
 			if excludeFound {
 				ctx.Request().AbortWithStatusJson(http.StatusForbidden, http.Json{
-					"message": "插件 " + slug + " 不兼容 " + exclude + " 插件",
+					"message": translate.Get("errors.plugin.incompatible", translation.Option{
+						Replace: map[string]string{
+							"slug":    slug,
+							"exclude": exclude,
+						},
+					}),
 				})
 				return
 			}

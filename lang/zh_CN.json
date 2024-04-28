@@ -1,0 +1,205 @@
+{
+  "auth": {
+    "token": {
+      "expired": "登录已过期",
+      "missing": "未登录"
+    }
+  },
+  "commands": {
+    "panel:cert-renew": {
+      "description": "[面板] 证书续签"
+    },
+    "panel:monitoring": {
+      "description": "[面板] 系统监控",
+      "fail": "[面板] 系统监控保存失败"
+    },
+    "panel": {
+      "description": "[面板] 命令行",
+      "forDeveloper": "以下命令请在开发者指导下使用",
+      "use": "请使用以下命令",
+      "tool": "命令行工具",
+      "port": "面板端口",
+      "portFail": "获取面板端口失败",
+      "entrance": "面板入口",
+      "update": {
+        "description": "更新 / 修复面板到最新版本",
+        "taskCheck": "当前有任务正在执行，禁止更新",
+        "versionFail": "获取最新版本失败",
+        "fail": "更新失败",
+        "success": "更新成功"
+      },
+      "getInfo": {
+        "description": "重新初始化面板账号信息",
+        "adminGetFail": "获取管理员信息失败",
+        "adminSaveFail": "保存管理员信息失败",
+        "passwordGenerationFail": "生成密码失败",
+        "username": "用户名",
+        "password": "密码",
+        "address": "面板地址"
+      },
+      "getPort": {
+        "description": "获取面板访问端口"
+      },
+      "getEntrance": {
+        "description": "获取面板访问入口"
+      },
+      "deleteEntrance": {
+        "description": "删除面板访问入口",
+        "fail": "删除面板入口失败",
+        "success": "删除面板入口成功"
+      },
+      "cleanTask": {
+        "description": "清理面板运行中和等待中的任务[任务卡住时使用]",
+        "fail": "清理任务失败",
+        "success": "清理任务成功"
+      },
+      "backup": {
+        "description": "备份网站 / MySQL数据库 / PostgreSQL数据库到指定目录并保留指定数量",
+        "paramFail": "参数错误",
+        "start": "开始备份",
+        "backupDirFail": "创建备份目录失败",
+        "targetSite": "目标网站",
+        "siteNotExist": "网站不存在",
+        "backupFail": "备份失败",
+        "backupSuccess": "备份成功",
+        "mysqlBackupFail": "备份MySQL数据库失败",
+        "targetMysql": "目标MySQL数据库",
+        "startExport": "开始导出",
+        "exportFail": "导出失败",
+        "exportSuccess": "导出成功",
+        "startCompress": "开始压缩",
+        "compressFail": "压缩失败",
+        "compressSuccess": "压缩成功",
+        "startMove": "开始移动",
+        "moveFail": "移动失败",
+        "moveSuccess": "移动成功",
+        "databaseGetFail": "获取数据库失败",
+        "databaseNotExist": "数据库不存在",
+        "targetPostgres": "目标PostgreSQL数据库",
+        "cleanBackup": "清理备份",
+        "cleanupFail": "清理失败",
+        "cleanupSuccess": "清理完成",
+        "deleteFail": "删除失败",
+        "success": "备份完成"
+      },
+      "cutoff": {
+        "description": "切割网站日志并保留指定数量",
+        "paramFail": "参数错误",
+        "start": "开始切割",
+        "targetSite": "目标网站",
+        "siteNotExist": "网站不存在",
+        "logNotExist": "日志文件不存在",
+        "backupFail": "备份失败",
+        "clearFail": "清空失败",
+        "cleanupFail": "清理失败",
+        "clearLog": "清理日志",
+        "cutSuccess": "切割成功",
+        "cleanupSuccess": "清理完成",
+        "end": "切割完成"
+      },
+      "installPlugin": {
+        "description": "安装插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
+      },
+      "uninstallPlugin": {
+        "description": "卸载插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
+      },
+      "updatePlugin": {
+        "description": "更新插件",
+        "paramFail": "参数错误",
+        "success": "任务已提交"
+      },
+      "addSite": {
+        "description": "添加网站[域名和端口用英文逗号分隔]",
+        "paramFail": "参数错误",
+        "siteExist": "网站名已存在",
+        "success": "网站添加成功"
+      },
+      "removeSite": {
+        "description": "删除网站",
+        "paramFail": "参数错误",
+        "siteNotExist": "网站名不存在",
+        "success": "网站删除成功"
+      },
+      "init": {
+        "description": "初始化面板",
+        "exist": "面板已初始化",
+        "success": "初始化成功",
+        "adminFail": "创建管理员失败",
+        "fail": "初始化失败"
+      },
+      "writePlugin": {
+        "description": "写入插件安装状态",
+        "paramFail": "参数错误",
+        "fail": "写入插件安装状态失败",
+        "success": "写入插件安装状态成功"
+      },
+      "deletePlugin": {
+        "description": "移除插件安装状态",
+        "paramFail": "参数错误",
+        "fail": "移除插件安装状态失败",
+        "success": "移除插件安装状态成功"
+      },
+      "writeMysqlPassword": {
+        "description": "写入MySQL root密码",
+        "paramFail": "参数错误",
+        "fail": "写入MySQL root密码失败",
+        "success": "写入MySQL root密码成功"
+      },
+      "writeSite": {
+        "description": "写入网站数据到面板",
+        "paramFail": "参数错误",
+        "siteExist": "网站已存在",
+        "pathNotExist": "网站目录不存在",
+        "fail": "写入网站失败",
+        "success": "写入网站成功"
+      },
+      "deleteSite": {
+        "description": "删除面板网站数据",
+        "paramFail": "参数错误",
+        "fail": "删除网站失败",
+        "success": "删除网站成功"
+      },
+      "getSetting": {
+        "description": "获取面板设置数据",
+        "paramFail": "参数错误"
+      },
+      "writeSetting": {
+        "description": "写入 / 更新面板设置数据",
+        "paramFail": "参数错误",
+        "fail": "写入设置失败",
+        "success": "写入设置成功"
+      },
+      "deleteSetting": {
+        "description": "删除面板设置数据",
+        "paramFail": "参数错误",
+        "fail": "删除设置失败",
+        "success": "删除设置成功"
+      }
+    },
+    "panel:task": {
+      "description": "[面板] 每日任务"
+    }
+  },
+  "errors": {
+    "internal": "系统内部错误",
+    "plugin": {
+      "notExist": "插件不存在",
+      "notInstalled": "插件 :slug 未安装",
+      "dependent": "插件 :slug 需要依赖 :dependency 插件",
+      "incompatible": "插件 :slug 不兼容 :exclude 插件"
+    }
+  },
+  "messages": {
+    "mistake": "错误"
+  },
+  "status": {
+    "upgrade": "面板升级中，请稍后",
+    "maintain": "面板正在运行维护，请稍后",
+    "closed": "面板已关闭",
+    "failed": "面板运行出错，请检查排除或联系支持"
+  }
+}
