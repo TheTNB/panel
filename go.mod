@@ -18,6 +18,7 @@ require (
 	github.com/libdns/dnspod v0.0.3
 	github.com/libdns/libdns v0.2.2
 	github.com/mholt/acmez v1.2.0
+	github.com/mholt/acmez/v2 v2.0.0
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/shirou/gopsutil v3.21.11+incompatible
