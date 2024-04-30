@@ -5,8 +5,8 @@ import (
 	"sort"
 
 	"github.com/libdns/libdns"
-	"github.com/mholt/acmez"
-	"github.com/mholt/acmez/acme"
+	"github.com/mholt/acmez/v2"
+	"github.com/mholt/acmez/v2/acme"
 )
 
 type Certificate struct {
@@ -66,7 +66,7 @@ func (c *Client) ObtainSSL(ctx context.Context, domains []string, keyType KeyTyp
 		return Certificate{}, err
 	}
 
-	certs, err := c.zClient.ObtainCertificate(ctx, c.Account, certPrivateKey, domains)
+	certs, err := c.zClient.ObtainCertificateForSANs(ctx, c.Account, certPrivateKey, domains)
 	if err != nil {
 		return Certificate{}, err
 	}

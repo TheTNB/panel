@@ -11,7 +11,7 @@ import (
 	"github.com/libdns/cloudflare"
 	"github.com/libdns/dnspod"
 	"github.com/libdns/libdns"
-	"github.com/mholt/acmez/acme"
+	"github.com/mholt/acmez/v2/acme"
 	"golang.org/x/net/publicsuffix"
 )
 
