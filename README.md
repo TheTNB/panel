@@ -84,7 +84,7 @@ panel
 
 ## 问题反馈
 
-使用类问题，可在 [鼠片社区](https://forum.haozi.net) 提问或QQ群`@坤坤`寻求 AI 帮助，亦可在群里寻求付费支持。
+使用类问题，可在 [Moe Tom](https://tom.moe) 提问或寻求 AI 帮助，亦可在群里寻求付费支持。
 
 面板自身问题，可在 GitHub 的`Issues`页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
 

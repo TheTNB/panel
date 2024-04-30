@@ -84,7 +84,7 @@ See more usage methods and tips in [Wiki](https://github.com/TheTNB/panel/wiki).
 
 ## Feedback
 
-For usage issues, you can ask questions in the [HaoZi Community Forum](https://forum.haozi.net) or seek AI help in the QQ group `@坤坤`. You can also seek paid support in the group.
+For usage issues, you can ask questions in the [Moe Tom](https://tom.moe) or seek AI help. You can also seek paid support in the group.
 
 For issues with the panel itself, you can submit feedback on the `Issues` page of GitHub. Please note [the wisdom of asking questions](http://www.catb.org/~esr/faqs/smart-questions.html).
 
