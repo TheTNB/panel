@@ -140,11 +140,11 @@ Prepare_System() {
             sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
             dnf makecache -y
         fi
-        dnf config-manager --set-enabled PowerTools
+        # EL 8
         dnf config-manager --set-enabled powertools
-        dnf config-manager --set-enabled CRB
-        dnf config-manager --set-enabled Crb
+        # EL 9
         dnf config-manager --set-enabled crb
+        # Rocky Linux
         /usr/bin/crb enable
         dnf makecache -y
         dnf install -y curl wget zip unzip tar git jq git-core dos2unix podman
@@ -273,7 +273,7 @@ Init_Panel() {
     chmod -R 700 /usr/bin/panel
     # 防火墙放行
     if [ "${OS}" == "centos" ]; then
-        yum install firewalld -y
+        dnf install firewalld -y
         systemctl enable firewalld
         systemctl start firewalld
         firewall-cmd --set-default-zone=public > /dev/null 2>&1
