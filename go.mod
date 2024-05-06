@@ -27,7 +27,7 @@ require (
 	github.com/swaggo/swag v1.16.3
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.23.0
-	golang.org/x/net v0.24.0
+	golang.org/x/net v0.25.0
 )
 
 require (
