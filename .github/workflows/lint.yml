@@ -17,7 +17,7 @@ jobs:
           go-version: '1.22'
           cache: false
       - name: Lint
-        uses: golangci/golangci-lint-action@v5
+        uses: golangci/golangci-lint-action@v6
         with:
           skip-cache: true
           skip-pkg-cache: true
