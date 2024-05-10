@@ -162,7 +162,9 @@ Prepare_System() {
         exit 1
     fi
 
+    systemctl enable rsyslog
     systemctl enable podman
+    systemctl start rsyslog
     systemctl start podman
     if [ "$?" != "0" ]; then
         echo -e $HR
