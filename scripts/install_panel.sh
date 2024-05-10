@@ -147,7 +147,7 @@ Prepare_System() {
         # Rocky Linux
         /usr/bin/crb enable
         dnf makecache -y
-        dnf install -y curl wget zip unzip tar git jq git-core dos2unix podman
+        dnf install -y curl wget zip unzip tar git jq git-core dos2unix podman rsyslog
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
