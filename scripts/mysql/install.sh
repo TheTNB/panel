@@ -31,8 +31,11 @@ cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 source ${setupPath}/panel/scripts/calculate_j.sh
 j=$(calculate_j)
 
-if [[ "${1}" == "80" ]]; then
-    mysqlVersion="8.0.36"
+if [[ "${1}" == "84" ]]; then
+    mysqlVersion="8.4.0"
+    j=$(calculate_j2)
+elif [[ "${1}" == "80" ]]; then
+    mysqlVersion="8.0.37"
     j=$(calculate_j2)
 elif [[ "${1}" == "57" ]]; then
     mysqlVersion="5.7.44"
@@ -46,11 +49,11 @@ fi
 if [ "${OS}" == "centos" ]; then
     dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel -y
+    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel p7zip p7zip-plugins -y
     dnf install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-binutils gcc-toolset-12-annobin-annocheck gcc-toolset-12-annobin-plugin-gcc -y
 elif [ "${OS}" == "debian" ]; then
     apt-get update
-    apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
+    apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf p7zip p7zip-full -y
 else
     echo -e $HR
     echo "错误：耗子 Linux 面板不支持该系统"
@@ -69,53 +72,33 @@ mkdir -p ${mysqlPath}
 cd ${mysqlPath}
 
 # 下载源码
-wget -T 120 -t 3 -O ${mysqlPath}/mysql-boost-${mysqlVersion}.tar.gz ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz
-wget -T 20 -t 3 -O ${mysqlPath}/mysql-boost-${mysqlVersion}.tar.gz.checksum.txt ${downloadUrl}/mysql-boost-${mysqlVersion}.tar.gz.checksum.txt
-
-# 校验
-if ! sha256sum --status -c mysql-boost-${mysqlVersion}.tar.gz.checksum.txt; then
+wget -T 120 -t 3 -O ${mysqlPath}/mysql-${mysqlVersion}.7z ${downloadUrl}/mysql-${mysqlVersion}.7z
+wget -T 20 -t 3 -O ${mysqlPath}/mysql-${mysqlVersion}.7z.checksum.txt ${downloadUrl}/mysql-${mysqlVersion}.7z.checksum.txt
+if ! sha256sum --status -c mysql-${mysqlVersion}.7z.checksum.txt; then
     echo -e $HR
     echo "错误：MySQL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${mysqlPath}
     exit 1
 fi
 
-tar -zxvf mysql-boost-${mysqlVersion}.tar.gz
-rm -f mysql-boost-${mysqlVersion}.tar.gz
-rm -f mysql-boost-${mysqlVersion}.tar.gz.checksum.txt
-mv mysql-${mysqlVersion} src
-
-# openssl
-wget -T 120 -t 3 -O ${mysqlPath}/openssl-1.1.1w.tar.gz ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz
-wget -T 20 -t 3 -O ${mysqlPath}/openssl-1.1.1w.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz.checksum.txt
-
-# 校验
-if ! sha256sum --status -c openssl-1.1.1w.tar.gz.checksum.txt; then
-    echo -e $HR
-    echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
-    rm -rf ${mysqlPath}
-    exit 1
-fi
-
-tar -zxvf openssl-1.1.1w.tar.gz
-rm -f openssl-1.1.1w.tar.gz
-rm -f openssl-1.1.1w.tar.gz.checksum.txt
-mv openssl-1.1.1w openssl
-cd openssl
-./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1 no-tests
-make -j$(nproc)
-make install
-echo "/usr/local/openssl-1.1/lib" > /etc/ld.so.conf.d/openssl-1.1.conf
-ldconfig
-cd ..
-rm -rf openssl
+7z x mysql-${mysqlVersion}.7z
+rm -f mysql-${mysqlVersion}.7z
+rm -f mysql-${mysqlVersion}.7z.checksum.txt
 
 # 编译
+mv mysql-${mysqlVersion} src
 cd src
+rm mysql-test/CMakeLists.txt
+sed -i 's/ADD_SUBDIRECTORY(mysql-test)//g' CMakeLists.txt
 mkdir build
 cd build
 
-cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_DEBUG=0 -DWITH_UNIT_TESTS=OFF -DCMAKE_BUILD_TYPE=Release -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} -DWITH_SSL=/usr/local/openssl-1.1 -DWITH_BOOST=../boost
+# 5.7 需要 boost
+if [[ "${1}" == "57" ]]; then
+    MAYBE_WITH_BOOST="-DWITH_BOOST=../boost"
+fi
+
+cmake .. -DCMAKE_INSTALL_PREFIX=${mysqlPath} -DMYSQL_DATADIR=${mysqlPath}/data -DSYSCONFDIR=${mysqlPath}/conf -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_ARCHIVE_STORAGE_ENGINE=1 -DWITH_FEDERATED_STORAGE_ENGINE=1 -DWITH_BLACKHOLE_STORAGE_ENGINE=1 -DDEFAULT_CHARSET=utf8mb4 -DDEFAULT_COLLATION=utf8mb4_general_ci -DENABLED_LOCAL_INFILE=1 -DWITH_DEBUG=0 -DWITH_UNIT_TESTS=OFF -DINSTALL_MYSQLTESTDIR= -DCMAKE_BUILD_TYPE=Release -DWITH_SYSTEMD=1 -DSYSTEMD_PID_DIR=${mysqlPath} ${MAYBE_WITH_BOOST}
 if [ "$?" != "0" ]; then
     echo -e $HR
     echo "错误：MySQL 编译初始化失败，请截图错误信息寻求帮助。"
@@ -210,7 +193,7 @@ EOF
 sed -i 's/innodb_write_io_threads = 4/innodb_write_io_threads = '${cpuCore}'/g' ${mysqlPath}/conf/my.cnf
 sed -i 's/innodb_read_io_threads = 4/innodb_read_io_threads = '${cpuCore}'/g' ${mysqlPath}/conf/my.cnf
 
-if [[ "${1}" == "80" ]]; then
+if [[ "${1}" == "84" ]] || [[ "${1}" == "80" ]]; then
     sed -i '/query_cache_size/d' ${mysqlPath}/conf/my.cnf
 fi
 if [[ "${1}" == "57" ]]; then
