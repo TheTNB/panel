@@ -36,6 +36,7 @@ func (r *PluginImpl) All() []internal.PanelPlugin {
 		internal.PluginOpenResty,
 		internal.PluginMySQL57,
 		internal.PluginMySQL80,
+		internal.PluginMySQL84,
 		internal.PluginPostgreSQL15,
 		internal.PluginPostgreSQL16,
 		internal.PluginPHP74,
