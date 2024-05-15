@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
-downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/php_extensions"
+downloadUrl="https://dl.cdn.haozi.net/panel/php_extensions"
 action="$1"
 phpVersion="$2"
 imagickVersion="3.7.0"

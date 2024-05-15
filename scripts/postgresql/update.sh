@@ -22,7 +22,7 @@ HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 memTotal=$(LC_ALL=C free -m | grep Mem | awk '{print  $2}')
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/postgresql"
+downloadUrl="https://dl.cdn.haozi.net/panel/postgresql"
 setupPath="/www"
 postgresqlPath="${setupPath}/server/postgresql"
 postgresqlVersion=""

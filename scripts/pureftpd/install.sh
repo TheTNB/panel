@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/pure-ftpd"
+downloadUrl="https://dl.cdn.haozi.net/panel/pure-ftpd"
 setupPath="/www"
 pureftpdPath="${setupPath}/server/pure-ftpd"
 pureftpdVersion="1.0.50"

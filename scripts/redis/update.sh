@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://git.haozi.net/opensource/download/-/raw/main/panel/redis"
+downloadUrl="https://dl.cdn.haozi.net/panel/redis"
 setupPath="/www"
 redisPath="${setupPath}/server/redis"
 redisVersion="7.2.4"
