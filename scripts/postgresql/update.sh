@@ -31,9 +31,9 @@ source ${setupPath}/panel/scripts/calculate_j.sh
 j=$(calculate_j)
 
 if [[ "${1}" == "15" ]]; then
-    postgresqlVersion="15.6"
+    postgresqlVersion="15.7"
 elif [[ "${1}" == "16" ]]; then
-    postgresqlVersion="16.2"
+    postgresqlVersion="16.3"
 else
     echo -e $HR
     echo "错误：不支持的 PostgreSQL 版本！"
@@ -62,18 +62,18 @@ rm -rf ${postgresqlPath}/src
 cd ${postgresqlPath}
 
 # 下载源码
-wget -T 120 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz
-wget -T 20 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.tar.gz.checksum.txt ${downloadUrl}/postgresql-${postgresqlVersion}.tar.gz.checksum.txt
+wget -T 120 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.7z ${downloadUrl}/postgresql-${postgresqlVersion}.7z
+wget -T 20 -t 3 -O ${postgresqlPath}/postgresql-${postgresqlVersion}.7z.checksum.txt ${downloadUrl}/postgresql-${postgresqlVersion}.7z.checksum.txt
 
-if ! sha256sum --status -c postgresql-${postgresqlVersion}.tar.gz.checksum.txt; then
+if ! sha256sum --status -c postgresql-${postgresqlVersion}.7z.checksum.txt; then
     echo -e $HR
     echo "错误：PostgreSQL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     exit 1
 fi
 
-tar -zxvf postgresql-${postgresqlVersion}.tar.gz
-rm -f postgresql-${postgresqlVersion}.tar.gz
-rm -f postgresql-${postgresqlVersion}.tar.gz.checksum.txt
+7z x postgresql-${postgresqlVersion}.7z
+rm -f postgresql-${postgresqlVersion}.7z
+rm -f postgresql-${postgresqlVersion}.7z.checksum.txt
 mv postgresql-${postgresqlVersion} src
 
 # 编译

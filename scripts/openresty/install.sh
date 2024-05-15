@@ -66,19 +66,19 @@ mv openresty-${openrestyVersion} src
 cd src
 
 # openssl
-wget -T 120 -t 3 -O openssl-3.0.12.tar.gz ${downloadUrl}/openssl/openssl-3.0.12.tar.gz
-wget -T 20 -t 3 -O openssl-3.0.12.tar.gz.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12.tar.gz.checksum.txt
+wget -T 120 -t 3 -O openssl-3.0.12.7z ${downloadUrl}/openssl/openssl-3.0.12.7z
+wget -T 20 -t 3 -O openssl-3.0.12.7z.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12.7z.checksum.txt
 
-if ! sha256sum --status -c openssl-3.0.12.tar.gz.checksum.txt; then
+if ! sha256sum --status -c openssl-3.0.12.7z.checksum.txt; then
     echo -e $HR
     echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-tar -zxvf openssl-3.0.12.tar.gz
-rm -f openssl-3.0.12.tar.gz
-rm -f openssl-3.0.12.tar.gz.checksum.txt
+7z x openssl-3.0.12.7z
+rm -f openssl-3.0.12.7z
+rm -f openssl-3.0.12.7z.checksum.txt
 mv openssl-3.0.12 openssl
 
 # patch openssl
@@ -99,19 +99,19 @@ rm -f openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
 cd ../
 
 # pcre2
-wget -T 60 -t 3 -O pcre2-10.42.tar.gz ${downloadUrl}/pcre/pcre2-10.42.tar.gz
-wget -T 20 -t 3 -O pcre2-10.42.tar.gz.checksum.txt ${downloadUrl}/pcre/pcre2-10.42.tar.gz.checksum.txt
+wget -T 60 -t 3 -O pcre2-10.43.7z ${downloadUrl}/pcre/pcre2-10.43.7z
+wget -T 20 -t 3 -O pcre2-10.43.7z.checksum.txt ${downloadUrl}/pcre/pcre2-10.43.7z.checksum.txt
 
-if ! sha256sum --status -c pcre2-10.42.tar.gz.checksum.txt; then
+if ! sha256sum --status -c pcre2-10.43.7z.checksum.txt; then
     echo -e $HR
     echo "错误：pcre2 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-tar -zxvf pcre2-10.42.tar.gz
-rm -f pcre2-10.42.tar.gz
-rm -f pcre2-10.42.tar.gz.checksum.txt
+7z x pcre2-10.43.7z
+rm -f pcre2-10.43.7z
+rm -f pcre2-10.43.7z.checksum.txt
 mv pcre2-10.42 pcre2
 
 # ngx_cache_purge

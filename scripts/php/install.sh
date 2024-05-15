@@ -65,30 +65,30 @@ if [ "${phpVersion}" == "74" ]; then
 elif [ "${phpVersion}" == "80" ]; then
     phpVersionCode="8.0.30"
 elif [ "${phpVersion}" == "81" ]; then
-    phpVersionCode="8.1.27"
+    phpVersionCode="8.1.28"
 elif [ "${phpVersion}" == "82" ]; then
-    phpVersionCode="8.2.16"
+    phpVersionCode="8.2.19"
 elif [ "${phpVersion}" == "83" ]; then
-    phpVersionCode="8.3.3"
+    phpVersionCode="8.3.7"
 else
     echo -e $HR
     echo "错误：PHP-${phpVersion}不支持，请检查版本号是否正确。"
     exit 1
 fi
 
-wget -T 120 -t 3 -O ${phpPath}/php-${phpVersionCode}.tar.gz ${downloadUrl}/php-${phpVersionCode}.tar.gz
-wget -T 20 -t 3 -O ${phpPath}/php-${phpVersionCode}.tar.gz.checksum.txt ${downloadUrl}/php-${phpVersionCode}.tar.gz.checksum.txt
+wget -T 120 -t 3 -O ${phpPath}/php-${phpVersionCode}.7z ${downloadUrl}/php-${phpVersionCode}.7z
+wget -T 20 -t 3 -O ${phpPath}/php-${phpVersionCode}.7z.checksum.txt ${downloadUrl}/php-${phpVersionCode}.7z.checksum.txt
 
-if ! sha256sum --status -c php-${phpVersionCode}.tar.gz.checksum.txt; then
+if ! sha256sum --status -c php-${phpVersionCode}.7z.checksum.txt; then
     echo -e $HR
     echo "错误：PHP-${phpVersion}源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${phpPath}
     exit 1
 fi
 
-tar -xvf php-${phpVersionCode}.tar.gz
-rm -f php-${phpVersionCode}.tar.gz
-rm -f php-${phpVersionCode}.tar.gz.checksum.txt
+7z x php-${phpVersionCode}.7z
+rm -f php-${phpVersionCode}.7z
+rm -f php-${phpVersionCode}.7z.checksum.txt
 mv php-* src
 
 if [ "${phpVersion}" -le "80" ]; then

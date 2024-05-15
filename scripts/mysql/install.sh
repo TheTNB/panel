@@ -49,11 +49,11 @@ fi
 if [ "${OS}" == "centos" ]; then
     dnf makecache -y
     dnf groupinstall "Development Tools" -y
-    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel p7zip p7zip-plugins -y
+    dnf install cmake bison ncurses-devel libtirpc-devel openssl-devel pkg-config openldap-devel libudev-devel cyrus-sasl-devel patchelf rpcgen rpcsvc-proto-devel -y
     dnf install gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ gcc-toolset-12-binutils gcc-toolset-12-annobin-annocheck gcc-toolset-12-annobin-plugin-gcc -y
 elif [ "${OS}" == "debian" ]; then
     apt-get update
-    apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf p7zip p7zip-full -y
+    apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
 else
     echo -e $HR
     echo "错误：耗子 Linux 面板不支持该系统"

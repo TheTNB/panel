@@ -90,8 +90,8 @@ if version_lt "$oldVersion" "2.1.39"; then
     echo "更新面板到 v2.1.39 ..."
     echo "Update panel to v2.1.39 ..."
     if [ "${OS}" == "centos" ]; then
-        yum makecache
-        yum install -y podman
+        dnf makecache
+        dnf install -y podman
     else
         apt-get update -y
         apt-get install -y podman
@@ -99,6 +99,18 @@ if version_lt "$oldVersion" "2.1.39"; then
 
     systemctl enable podman
     systemctl start podman
+fi
+
+if version_lt "$oldVersion" "2.1.40"; then
+    echo "更新面板到 v2.1.40 ..."
+    echo "Update panel to v2.1.40 ..."
+    if [ "${OS}" == "centos" ]; then
+        dnf makecache
+        dnf install -y p7zip p7zip-plugins
+    else
+        apt-get update -y
+        apt-get install -y p7zip p7zip-full
+    fi
 fi
 
 echo $HR
