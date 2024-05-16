@@ -12,7 +12,7 @@ require (
 	github.com/goravel/gin v1.1.6-0.20240426085159-718e4d6d5f4f
 	github.com/gorilla/websocket v1.5.1
 	github.com/iancoleman/strcase v0.3.0
-	github.com/imroc/req/v3 v3.43.4
+	github.com/imroc/req/v3 v3.43.5
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.1
 	github.com/libdns/dnspod v0.0.3
