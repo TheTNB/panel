@@ -9,12 +9,12 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/goravel/framework/support"
 	"github.com/goravel/framework/support/env"
 	"github.com/mholt/archiver/v3"
+	"github.com/spf13/cast"
 )
 
 // Write 写入文件
@@ -266,9 +266,15 @@ func IsSymlink(mode os.FileMode) bool {
 	return mode&os.ModeSymlink != 0
 }
 
+// IsHidden 判断是否为隐藏文件
+func IsHidden(path string) bool {
+	_, file := filepath.Split(path)
+	return strings.HasPrefix(file, ".")
+}
+
 // GetUser 通过 uid 获取用户名
 func GetUser(uid uint32) string {
-	usr, err := user.LookupId(strconv.Itoa(int(uid)))
+	usr, err := user.LookupId(cast.ToString(uid))
 	if err != nil {
 		return ""
 	}
@@ -277,7 +283,7 @@ func GetUser(uid uint32) string {
 
 // GetGroup 通过 gid 获取组名
 func GetGroup(gid uint32) string {
-	usr, err := user.LookupGroupId(strconv.Itoa(int(gid)))
+	usr, err := user.LookupGroupId(cast.ToString(gid))
 	if err != nil {
 		return ""
 	}
