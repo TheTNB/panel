@@ -481,12 +481,7 @@ func (r *FileController) List(ctx http.Context) http.Response {
 	var paths []any
 	for _, fileInfo := range fileInfoList {
 		info, _ := fileInfo.Info()
-		var owner, group string
-		stat, ok := info.Sys().(*syscall.Stat_t)
-		if ok {
-			owner = tools.GetUser(stat.Uid)
-			group = tools.GetGroup(stat.Gid)
-		}
+		stat := info.Sys().(*syscall.Stat_t)
 
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
@@ -494,8 +489,13 @@ func (r *FileController) List(ctx http.Context) http.Response {
 			"size":     tools.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
-			"owner":    owner,
-			"group":    group,
+			"owner":    tools.GetUser(stat.Uid),
+			"group":    tools.GetGroup(stat.Gid),
+			"uid":      stat.Uid,
+			"gid":      stat.Gid,
+			"hidden":   tools.IsHidden(info.Name()),
+			"symlink":  tools.IsSymlink(info.Mode()),
+			"link":     tools.GetSymlink(filepath.Join(request.Path, info.Name())),
 			"dir":      info.IsDir(),
 			"modify":   carbon.FromStdTime(info.ModTime()).ToDateTimeString(),
 		})

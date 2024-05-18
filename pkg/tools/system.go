@@ -272,6 +272,15 @@ func IsHidden(path string) bool {
 	return strings.HasPrefix(file, ".")
 }
 
+// GetSymlink 获取软链接目标
+func GetSymlink(path string) string {
+	linkPath, err := os.Readlink(path)
+	if err != nil {
+		return ""
+	}
+	return linkPath
+}
+
 // GetUser 通过 uid 获取用户名
 func GetUser(uid uint32) string {
 	usr, err := user.LookupId(cast.ToString(uid))
