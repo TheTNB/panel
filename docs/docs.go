@@ -2339,6 +2339,16 @@ const docTemplate = `{
                         "type": "string",
                         "name": "path",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {

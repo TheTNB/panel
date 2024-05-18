@@ -7,7 +7,9 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/goravel/framework/support"
@@ -257,4 +259,27 @@ func TempDir(prefix string) (string, error) {
 // TempFile 创建临时文件
 func TempFile(prefix string) (*os.File, error) {
 	return os.CreateTemp("", prefix)
+}
+
+// IsSymlink 判读是否为软链接
+func IsSymlink(mode os.FileMode) bool {
+	return mode&os.ModeSymlink != 0
+}
+
+// GetUser 通过 uid 获取用户名
+func GetUser(uid uint32) string {
+	usr, err := user.LookupId(strconv.Itoa(int(uid)))
+	if err != nil {
+		return ""
+	}
+	return usr.Username
+}
+
+// GetGroup 通过 gid 获取组名
+func GetGroup(gid uint32) string {
+	usr, err := user.LookupGroupId(strconv.Itoa(int(gid)))
+	if err != nil {
+		return ""
+	}
+	return usr.Name
 }

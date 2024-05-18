@@ -6,9 +6,11 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
+	commonrequests "panel/app/http/requests/common"
 
 	requests "panel/app/http/requests/file"
 	"panel/pkg/tools"
@@ -454,7 +456,8 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 //	@Tags			文件管理
 //	@Accept			json
 //	@Produce		json
-//	@Param			data	query		requests.Exist	true	"request"
+//	@Param			data	query		requests.Exist			true	"request"
+//	@Param			data	query		commonrequests.Paginate	true	"request"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/file/list [get]
 func (r *FileController) List(ctx http.Context) http.Response {
@@ -462,6 +465,12 @@ func (r *FileController) List(ctx http.Context) http.Response {
 	sanitize := Sanitize(ctx, &request)
 	if sanitize != nil {
 		return sanitize
+	}
+
+	var paginate commonrequests.Paginate
+	paginateSanitize := Sanitize(ctx, &paginate)
+	if paginateSanitize != nil {
+		return paginateSanitize
 	}
 
 	fileInfoList, err := os.ReadDir(request.Path)
@@ -472,17 +481,44 @@ func (r *FileController) List(ctx http.Context) http.Response {
 	var paths []any
 	for _, fileInfo := range fileInfoList {
 		info, _ := fileInfo.Info()
+		var owner, group string
+		stat, ok := info.Sys().(*syscall.Stat_t)
+		if ok {
+			owner = tools.GetUser(stat.Uid)
+			group = tools.GetGroup(stat.Gid)
+		}
+
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
+			"full":     filepath.Join(request.Path, info.Name()),
 			"size":     tools.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
+			"owner":    owner,
+			"group":    group,
 			"dir":      info.IsDir(),
 			"modify":   carbon.FromStdTime(info.ModTime()).ToDateTimeString(),
 		})
 	}
 
-	return Success(ctx, paths)
+	start := paginate.Limit * (paginate.Page - 1)
+	end := paginate.Limit * paginate.Page
+	if start > len(paths) {
+		start = len(paths)
+	}
+	if end > len(paths) {
+		end = len(paths)
+	}
+
+	paged := paths[start:end]
+	if paged == nil {
+		paged = []any{}
+	}
+
+	return Success(ctx, http.Json{
+		"total": len(paths),
+		"items": paged,
+	})
 }
 
 // setPermission

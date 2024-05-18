@@ -1,12 +1,10 @@
 package models
 
 import (
-	"github.com/goravel/framework/database/orm"
 	"github.com/goravel/framework/support/carbon"
 )
 
 type Cert struct {
-	orm.Model
 	ID        uint            `gorm:"primaryKey" json:"id"`
 	UserID    uint            `gorm:"default:null" json:"user_id"`              // 关联的 ACME 用户 ID
 	WebsiteID *uint           `gorm:"default:null" json:"website_id"`           // 关联的网站 ID
