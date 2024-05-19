@@ -75,6 +75,7 @@ fi
 rm -f postgresql-${postgresqlVersion}.7z
 rm -f postgresql-${postgresqlVersion}.7z.checksum.txt
 mv postgresql-${postgresqlVersion} src
+chmod -R 755 src
 
 # 编译
 cd src

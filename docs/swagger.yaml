@@ -426,9 +426,9 @@ definitions:
     type: object
   requests.Move:
     properties:
-      new:
+      source:
         type: string
-      old:
+      target:
         type: string
     type: object
   requests.NetworkConnectDisConnect:

@@ -90,6 +90,7 @@ fi
 rm -f php-${phpVersionCode}.7z
 rm -f php-${phpVersionCode}.7z.checksum.txt
 mv php-* src
+chmod -R 755 src
 
 if [ "${phpVersion}" -le "80" ]; then
     wget -T 120 -t 3 -O ${phpPath}/openssl-1.1.1w.tar.gz ${downloadUrl}/openssl/openssl-1.1.1w.tar.gz

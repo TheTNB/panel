@@ -82,7 +82,7 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "目标路径不是文件")
 	}
 	if fileInfo.Size() > 10*1024*1024 {
-		return Error(ctx, http.StatusInternalServerError, "文件大小超过 10M")
+		return Error(ctx, http.StatusInternalServerError, "文件大小超过 10 M，不支持在线编辑")
 	}
 
 	content, err := tools.Read(request.Path)
@@ -209,15 +209,15 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if tools.Exists(request.New) && !ctx.Request().InputBool("force") {
+	if tools.Exists(request.Target) && !ctx.Request().InputBool("force") {
 		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
-	if err := tools.Mv(request.Old, request.New); err != nil {
+	if err := tools.Mv(request.Source, request.Target); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	r.setPermission(request.New, 0755, "www", "www")
+	r.setPermission(request.Target, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 

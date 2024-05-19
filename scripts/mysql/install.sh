@@ -87,6 +87,7 @@ rm -f mysql-${mysqlVersion}.7z.checksum.txt
 
 # 编译
 mv mysql-${mysqlVersion} src
+chmod -R 755 src
 cd src
 rm mysql-test/CMakeLists.txt
 sed -i 's/ADD_SUBDIRECTORY(mysql-test)//g' CMakeLists.txt

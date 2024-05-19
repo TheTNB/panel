@@ -4383,10 +4383,10 @@ const docTemplate = `{
         "requests.Move": {
             "type": "object",
             "properties": {
-                "new": {
+                "source": {
                     "type": "string"
                 },
-                "old": {
+                "target": {
                     "type": "string"
                 }
             }
