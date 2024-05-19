@@ -16,8 +16,8 @@ func (r *Move) Authorize(ctx http.Context) error {
 
 func (r *Move) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"source": "regex:^/[a-zA-Z0-9_.@#$%-]+(\\/[a-zA-Z0-9_.@#$%-]+)*$|path_exists",
-		"target": "regex:^/[a-zA-Z0-9_.@#$%-]+(\\/[a-zA-Z0-9_.@#$%-]+)*$",
+		"source": "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$|path_exists",
+		"target": "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$",
 	}
 }
 
