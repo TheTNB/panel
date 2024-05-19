@@ -18,7 +18,7 @@ func (r *Permission) Authorize(ctx http.Context) error {
 
 func (r *Permission) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"path":  "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$|path_exists",
+		"path":  `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
 		"mode":  "regex:^[0-7]{3}$|uint",
 		"owner": "regex:^[a-zA-Z0-9_-]+$",
 		"group": "regex:^[a-zA-Z0-9_-]+$",

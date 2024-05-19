@@ -21,7 +21,7 @@ func (r *Update) Authorize(ctx http.Context) error {
 func (r *Update) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"name":        "required|regex:^[a-zA-Z0-9-_]+$",
-		"path":        "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$",
+		"path":        `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
 		"comment":     "string",
 		"auth_user":   "required|regex:^[a-zA-Z0-9-_]+$",
 		"secret":      "required|min_len:8",

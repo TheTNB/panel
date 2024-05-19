@@ -16,7 +16,7 @@ func (r *Search) Authorize(ctx http.Context) error {
 
 func (r *Search) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"path":    "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$|path_exists",
+		"path":    `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
 		"keyword": "required|string",
 	}
 }

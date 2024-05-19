@@ -17,8 +17,8 @@ func (r *Archive) Authorize(ctx http.Context) error {
 func (r *Archive) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"paths":   "array",
-		"paths.*": "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$|path_exists",
-		"file":    "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$|path_not_exists",
+		"paths.*": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
+		"file":    `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_not_exists`,
 	}
 }
 

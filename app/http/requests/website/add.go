@@ -27,7 +27,7 @@ func (r *Add) Rules(ctx http.Context) map[string]string {
 		"name":        "required|regex:^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$|not_exists:websites,name|not_in:phpmyadmin,mysql,panel,ssh",
 		"domains":     "required|slice",
 		"ports":       "required|slice",
-		"path":        "regex:^/[a-zA-Z0-9_.@#$%- []()]+(/[a-zA-Z0-9_.@#$%- []()]+)*$",
+		"path":        `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
 		"php":         "required",
 		"db":          "bool",
 		"db_type":     "required_if:db,true|in:0,mysql,postgresql",
