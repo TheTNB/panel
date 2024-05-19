@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/gookit/color"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/support/env"
-	"github.com/imroc/req/v3"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -526,13 +526,12 @@ func RestartPanel() {
 
 // IsChina 是否中国大陆
 func IsChina() bool {
-	client := req.C()
+	client := resty.New()
 	client.SetTimeout(5 * time.Second)
-	client.SetCommonRetryCount(2)
-	client.ImpersonateSafari()
+	client.SetRetryCount(2)
 
 	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
-	if err != nil || !resp.IsSuccessState() {
+	if err != nil || !resp.IsSuccess() {
 		return false
 	}
 
@@ -545,13 +544,12 @@ func IsChina() bool {
 
 // GetPublicIP 获取公网IP
 func GetPublicIP() (string, error) {
-	client := req.C()
+	client := resty.New()
 	client.SetTimeout(5 * time.Second)
-	client.SetCommonRetryCount(2)
-	client.ImpersonateSafari()
+	client.SetTimeout(2)
 
 	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
-	if err != nil || !resp.IsSuccessState() {
+	if err != nil || !resp.IsSuccess() {
 		return "", errors.New("获取公网IP失败")
 	}
 

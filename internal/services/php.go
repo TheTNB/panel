@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/goravel/framework/facades"
-	"github.com/imroc/req/v3"
 	"github.com/spf13/cast"
 
 	"panel/app/models"
@@ -73,9 +73,9 @@ func (r *PHPImpl) SaveFPMConfig(config string) error {
 }
 
 func (r *PHPImpl) Load() ([]types.NV, error) {
-	client := req.C().SetTimeout(10 * time.Second)
+	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + r.version)
-	if err != nil || !resp.IsSuccessState() {
+	if err != nil || !resp.IsSuccess() {
 		return nil, errors.New("获取 PHP-" + r.version + " 运行状态失败")
 	}
 

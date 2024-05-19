@@ -4,8 +4,8 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/goravel/framework/contracts/http"
-	"github.com/imroc/req/v3"
 	"github.com/spf13/cast"
 
 	"panel/app/http/controllers"
@@ -117,9 +117,9 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *OpenRestyController) Load(ctx http.Context) http.Response {
-	client := req.C().SetTimeout(10 * time.Second)
+	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
-	if err != nil || !resp.IsSuccessState() {
+	if err != nil || !resp.IsSuccess() {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
 	}
 
