@@ -112,7 +112,7 @@ fi
 7z x pcre2-10.43.7z
 rm -f pcre2-10.43.7z
 rm -f pcre2-10.43.7z.checksum.txt
-mv pcre2-10.42 pcre2
+mv pcre2-10.43 pcre2
 
 # ngx_cache_purge
 wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
