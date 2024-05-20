@@ -546,7 +546,7 @@ func IsChina() bool {
 func GetPublicIP() (string, error) {
 	client := resty.New()
 	client.SetTimeout(5 * time.Second)
-	client.SetTimeout(2)
+	client.SetRetryCount(2)
 
 	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
