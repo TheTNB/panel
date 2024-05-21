@@ -210,7 +210,7 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 	}
 
 	if tools.Exists(request.Target) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
+		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
 	if err := tools.Mv(request.Source, request.Target); err != nil {
@@ -239,15 +239,15 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if tools.Exists(request.New) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
+	if tools.Exists(request.Target) && !ctx.Request().InputBool("force") {
+		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
-	if err := tools.Cp(request.Old, request.New); err != nil {
+	if err := tools.Cp(request.Source, request.Target); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	r.setPermission(request.New, 0755, "www", "www")
+	r.setPermission(request.Source, 0755, "www", "www")
 	return Success(ctx, nil)
 }
 

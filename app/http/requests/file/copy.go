@@ -6,8 +6,8 @@ import (
 )
 
 type Copy struct {
-	Old string `form:"old" json:"old"`
-	New string `form:"new" json:"new"`
+	Source string `form:"source" json:"source"`
+	Target string `form:"target" json:"target"`
 }
 
 func (r *Copy) Authorize(ctx http.Context) error {
@@ -16,8 +16,8 @@ func (r *Copy) Authorize(ctx http.Context) error {
 
 func (r *Copy) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"old": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
-		"new": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
+		"source": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
+		"target": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
 	}
 }
 
