@@ -353,7 +353,7 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Chmod(request.Path, os.FileMode(request.Mode)); err != nil {
+	if err := tools.Chmod(request.Path, request.Mode); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err := tools.Chown(request.Path, request.Owner, request.Group); err != nil {
@@ -523,6 +523,6 @@ func (r *FileController) List(ctx http.Context) http.Response {
 
 // setPermission
 func (r *FileController) setPermission(path string, mode uint, owner, group string) {
-	_ = tools.Chmod(path, os.FileMode(mode))
+	_ = tools.Chmod(path, mode)
 	_ = tools.Chown(path, owner, group)
 }

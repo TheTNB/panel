@@ -112,8 +112,13 @@ func Mkdir(path string, permission os.FileMode) error {
 }
 
 // Chmod 修改文件/目录权限
-func Chmod(path string, permission os.FileMode) error {
-	return os.Chmod(path, permission)
+func Chmod(path string, permission uint) error {
+	if env.IsWindows() {
+		return errors.New("chmod is not supported on Windows")
+	}
+
+	cmd := exec.Command("chmod", "-R", cast.ToString(permission), path)
+	return cmd.Run()
 }
 
 // Chown 修改文件或目录所有者
