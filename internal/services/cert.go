@@ -185,13 +185,8 @@ func (s *CertImpl) CertStore(request requests.CertStore) error {
 	cert.Domains = request.Domains
 	cert.AutoRenew = request.AutoRenew
 	cert.UserID = request.UserID
-
-	if request.DNSID != nil {
-		cert.DNSID = request.DNSID
-	}
-	if request.WebsiteID != nil {
-		cert.WebsiteID = request.WebsiteID
-	}
+	cert.DNSID = request.DNSID
+	cert.WebsiteID = request.WebsiteID
 
 	return facades.Orm().Query().Create(&cert)
 }
@@ -208,13 +203,8 @@ func (s *CertImpl) CertUpdate(request requests.CertUpdate) error {
 	cert.Domains = request.Domains
 	cert.AutoRenew = request.AutoRenew
 	cert.UserID = request.UserID
-
-	if request.DNSID != nil {
-		cert.DNSID = request.DNSID
-	}
-	if request.WebsiteID != nil {
-		cert.WebsiteID = request.WebsiteID
-	}
+	cert.DNSID = request.DNSID
+	cert.WebsiteID = request.WebsiteID
 
 	return facades.Orm().Query().Save(&cert)
 }
@@ -390,9 +380,6 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 			}
 			client.UseHTTP(cert.Website.Path)
 		}
-	}
-	if err != nil {
-		return acme.Certificate{}, err
 	}
 
 	ssl, err := client.RenewSSL(context.Background(), *cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
