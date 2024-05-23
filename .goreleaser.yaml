@@ -26,7 +26,7 @@ upx:
     # Whether to try LZMA (slower).
     lzma: true
     # Whether to try all methods and filters (slow).
-    brute: true
+    brute: false
 
 archives:
   - id: panel-archive
