@@ -175,8 +175,8 @@ func (s *SystemHelperTestSuite) TestChmod() {
 	err := Write(filePath.Name(), "test data", 0644)
 	s.Nil(err)
 
-	s.Nil(Chmod(filePath.Name(), 0755))
 	s.Nil(filePath.Close())
+	s.Nil(Chmod(filePath.Name(), 0755))
 	s.Nil(Remove(filePath.Name()))
 }
 
