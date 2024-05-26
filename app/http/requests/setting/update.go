@@ -7,6 +7,7 @@ import (
 
 type Update struct {
 	Name        string `form:"name" json:"name"`
+	Language    string `form:"language" json:"language"`
 	Port        uint   `form:"port" json:"port" filter:"uint"`
 	BackupPath  string `form:"backup_path" json:"backup_path"`
 	WebsitePath string `form:"website_path" json:"website_path"`
@@ -24,6 +25,7 @@ func (r *Update) Authorize(ctx http.Context) error {
 func (r *Update) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"name":         "required|string:2,20",
+		"language":     "required|in:zh_CN,en",
 		"port":         "required|int:1000,65535",
 		"backup_path":  "required|string:2,255",
 		"website_path": "required|string:2,255",

@@ -4042,6 +4042,9 @@ const docTemplate = `{
                 "entrance": {
                     "type": "string"
                 },
+                "language": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -4274,10 +4277,10 @@ const docTemplate = `{
         "requests.Copy": {
             "type": "object",
             "properties": {
-                "new": {
+                "source": {
                     "type": "string"
                 },
-                "old": {
+                "target": {
                     "type": "string"
                 }
             }

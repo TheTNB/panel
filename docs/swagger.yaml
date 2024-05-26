@@ -204,6 +204,8 @@ definitions:
         type: string
       entrance:
         type: string
+      language:
+        type: string
       name:
         type: string
       password:
@@ -356,9 +358,9 @@ definitions:
     type: object
   requests.Copy:
     properties:
-      new:
+      source:
         type: string
-      old:
+      target:
         type: string
     type: object
   requests.Create:

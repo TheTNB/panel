@@ -41,6 +41,11 @@ func (r *InfoController) Name(ctx http.Context) http.Response {
 	})
 }
 
+// Language 获取面板语言
+func (r *InfoController) Language(ctx http.Context) http.Response {
+	return Success(ctx, facades.Config().GetString("app.locale"))
+}
+
 // HomePlugins 获取首页插件
 func (r *InfoController) HomePlugins(ctx http.Context) http.Response {
 	var plugins []models.Plugin

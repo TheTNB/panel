@@ -60,6 +60,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 
 	return Success(ctx, http.Json{
 		"name":         r.setting.Get(models.SettingKeyName),
+		"language":     facades.Config().GetString("app.locale"),
 		"entrance":     facades.Config().GetString("http.entrance"),
 		"ssl":          facades.Config().GetBool("panel.ssl"),
 		"website_path": r.setting.Get(models.SettingKeyWebsitePath),
@@ -189,10 +190,22 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}).Info("获取面板入口失败")
 		return ErrorSystem(ctx)
 	}
-
 	entrance := cast.ToString(updateRequest.Entrance)
 	if oldEntrance != entrance {
 		if out, err := tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf"); err != nil {
+			return Error(ctx, http.StatusInternalServerError, out)
+		}
+	}
+
+	oldLanguage, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_LOCALE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	if err != nil {
+		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
+			"error": err.Error(),
+		}).Info("获取面板语言失败")
+		return ErrorSystem(ctx)
+	}
+	if oldLanguage != updateRequest.Language {
+		if out, err := tools.Exec("sed -i 's/APP_LOCALE=" + oldLanguage + "/APP_LOCALE=" + updateRequest.Language + "/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
@@ -207,7 +220,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}
 	}
 
-	if oldPort != port || oldEntrance != entrance || updateRequest.SSL != facades.Config().GetBool("panel.ssl") {
+	if oldPort != port || oldEntrance != entrance || oldLanguage != updateRequest.Language || updateRequest.SSL != facades.Config().GetBool("panel.ssl") {
 		tools.RestartPanel()
 	}
 
