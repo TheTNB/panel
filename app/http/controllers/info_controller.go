@@ -34,16 +34,12 @@ func NewInfoController() *InfoController {
 	}
 }
 
-// Name 获取面板名称
-func (r *InfoController) Name(ctx http.Context) http.Response {
+// Panel 获取面板信息
+func (r *InfoController) Panel(ctx http.Context) http.Response {
 	return Success(ctx, http.Json{
-		"name": r.setting.Get(models.SettingKeyName),
+		"name":     r.setting.Get(models.SettingKeyName),
+		"language": facades.Config().GetString("app.locale"),
 	})
-}
-
-// Language 获取面板语言
-func (r *InfoController) Language(ctx http.Context) http.Response {
-	return Success(ctx, facades.Config().GetString("app.locale"))
 }
 
 // HomePlugins 获取首页插件

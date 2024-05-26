@@ -12,8 +12,7 @@ func Api() {
 	facades.Route().Prefix("api/panel").Group(func(r route.Router) {
 		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
-			r.Get("name", infoController.Name)
-			r.Get("language", infoController.Language)
+			r.Get("panel", infoController.Panel)
 			r.Middleware(middleware.Jwt()).Get("homePlugins", infoController.HomePlugins)
 			r.Middleware(middleware.Jwt()).Get("nowMonitor", infoController.NowMonitor)
 			r.Middleware(middleware.Jwt()).Get("systemInfo", infoController.SystemInfo)
