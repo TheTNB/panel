@@ -302,7 +302,7 @@ func (r *SafeController) GetSshPort(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return Success(ctx, out)
+	return Success(ctx, cast.ToInt(out))
 }
 
 // SetSshPort 设置 SSH 端口
