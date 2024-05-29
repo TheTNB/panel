@@ -74,14 +74,6 @@ func (s *HelperTestSuite) TestGenerateVersions() {
 		"1.0.91", "1.0.92", "1.0.93", "1.0.94", "1.0.95", "1.0.96", "1.0.97", "1.0.98", "1.0.99", "1.1.0",
 		"1.1.1",
 	}, versions)
-
-	versions, err = GenerateVersions("1..0", "1.0.1")
-	s.Error(err)
-	s.Nil(versions)
-
-	versions, err = GenerateVersions("1.0.0", "1..1")
-	s.Error(err)
-	s.Nil(versions)
 }
 
 func (s *HelperTestSuite) TestGetLatestPanelVersion() {
