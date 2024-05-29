@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/goravel/framework/contracts/http"
 
-	"panel/app/http/middleware"
+	"github.com/TheTNB/panel/app/http/middleware"
 )
 
 type Kernel struct {

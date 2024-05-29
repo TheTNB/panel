@@ -8,8 +8,8 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
-	"panel/internal"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 // PanelTask 面板每日任务

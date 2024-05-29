@@ -1,8 +1,8 @@
 package internal
 
 import (
-	requests "panel/app/http/requests/website"
-	"panel/app/models"
+	requests "github.com/TheTNB/panel/app/http/requests/website"
+	"github.com/TheTNB/panel/app/models"
 )
 
 type Website interface {

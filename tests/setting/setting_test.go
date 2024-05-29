@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"panel/internal"
-	"panel/internal/services"
-	"panel/tests"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/tests"
 )
 
 type SettingTestSuite struct {

@@ -3,8 +3,8 @@ package services
 import (
 	"strings"
 
-	"panel/app/models"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type CronImpl struct {

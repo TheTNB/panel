@@ -1,9 +1,9 @@
 package rules
 
 import (
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/contracts/validation"
 	"github.com/spf13/cast"
-	"panel/pkg/tools"
 )
 
 type PathExists struct {

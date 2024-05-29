@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -13,11 +14,10 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
-	"panel/pkg/tools"
 
-	commonrequests "panel/app/http/requests/common"
-	requests "panel/app/http/requests/container"
-	"panel/internal/services"
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
+	requests "github.com/TheTNB/panel/app/http/requests/container"
+	"github.com/TheTNB/panel/internal/services"
 )
 
 type ContainerController struct {

@@ -12,10 +12,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/spf13/cast"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/ssh"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/ssh"
 )
 
 type SshController struct {

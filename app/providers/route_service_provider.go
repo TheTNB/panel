@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/foundation"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/http"
-	"panel/routes"
+	"github.com/TheTNB/panel/app/http"
+	"github.com/TheTNB/panel/routes"
 )
 
 type RouteServiceProvider struct {

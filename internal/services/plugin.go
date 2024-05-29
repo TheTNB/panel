@@ -6,8 +6,8 @@ import (
 
 	"github.com/goravel/framework/facades"
 
-	"panel/app/models"
-	"panel/internal"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
 )
 
 type PluginImpl struct {

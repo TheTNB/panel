@@ -8,12 +8,12 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	commonrequests "panel/app/http/requests/common"
-	requests "panel/app/http/requests/website"
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
+	requests "github.com/TheTNB/panel/app/http/requests/website"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type WebsiteController struct {

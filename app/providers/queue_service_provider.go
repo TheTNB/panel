@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/queue"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/jobs"
+	"github.com/TheTNB/panel/app/jobs"
 )
 
 type QueueServiceProvider struct {

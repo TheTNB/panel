@@ -4,11 +4,11 @@ import (
 	"regexp"
 	"strings"
 
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
-	commonrequests "panel/app/http/requests/common"
 
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SafeController struct {

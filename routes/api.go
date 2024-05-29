@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/http/controllers"
-	"panel/app/http/middleware"
+	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/app/http/middleware"
 )
 
 func Api() {

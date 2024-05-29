@@ -10,9 +10,9 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
 )
 
 // CertRenew 证书续签

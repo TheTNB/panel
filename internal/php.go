@@ -1,6 +1,6 @@
 package internal
 
-import "panel/types"
+import "github.com/TheTNB/panel/types"
 
 type PHPExtension struct {
 	Name        string `json:"name"`

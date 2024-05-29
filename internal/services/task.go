@@ -3,8 +3,8 @@ package services
 import (
 	"github.com/goravel/framework/facades"
 
-	"panel/app/jobs"
-	"panel/app/models"
+	"github.com/TheTNB/panel/app/jobs"
+	"github.com/TheTNB/panel/app/models"
 )
 
 type TaskImpl struct {

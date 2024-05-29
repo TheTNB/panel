@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/models"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type TaskController struct {

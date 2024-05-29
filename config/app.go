@@ -23,7 +23,7 @@ import (
 	"github.com/goravel/framework/validation"
 	"github.com/goravel/gin"
 
-	"panel/app/providers"
+	"github.com/TheTNB/panel/app/providers"
 )
 
 // Boot Start all init methods of the current folder to bootstrap all config.

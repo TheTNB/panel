@@ -1,10 +1,10 @@
 package plugins
 
 import (
+	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
 	"github.com/goravel/framework/contracts/http"
-	"panel/app/http/controllers"
-	"panel/internal"
-	"panel/internal/services"
 )
 
 type PHPController struct {

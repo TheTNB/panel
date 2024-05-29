@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/goravel/framework/support/carbon"
 
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type Monitor struct {

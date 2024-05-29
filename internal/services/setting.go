@@ -2,8 +2,8 @@
 package services
 
 import (
+	"github.com/TheTNB/panel/app/models"
 	"github.com/goravel/framework/facades"
-	"panel/app/models"
 )
 
 type SettingImpl struct {

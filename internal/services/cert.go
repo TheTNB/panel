@@ -9,10 +9,10 @@ import (
 
 	"github.com/goravel/framework/facades"
 
-	requests "panel/app/http/requests/cert"
-	"panel/app/models"
-	"panel/pkg/acme"
-	"panel/pkg/tools"
+	requests "github.com/TheTNB/panel/app/http/requests/cert"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type CertImpl struct {

@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/http/controllers/plugins"
-	"panel/app/http/middleware"
+	"github.com/TheTNB/panel/app/http/controllers/plugins"
+	"github.com/TheTNB/panel/app/http/middleware"
 )
 
 // Plugin 加载插件路由

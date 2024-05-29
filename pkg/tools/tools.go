@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/gookit/color"
 	"github.com/goravel/framework/support/carbon"
+	"github.com/goravel/framework/support/color"
 	"github.com/goravel/framework/support/env"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -402,108 +402,108 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 
 // UpdatePanel 更新面板
 func UpdatePanel(panelInfo PanelInfo) error {
-	color.Greenln("目标版本: " + panelInfo.Version)
-	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
+	color.Green().Printfln("目标版本: " + panelInfo.Version)
+	color.Green().Printfln("下载链接: " + panelInfo.DownloadUrl)
 
-	color.Greenln("前置检查...")
+	color.Green().Printfln("前置检查...")
 	if Exists("/tmp/panel-storage.zip") || Exists("/tmp/panel.conf.bak") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
-	color.Greenln("备份面板数据...")
+	color.Green().Printfln("备份面板数据...")
 	// 备份面板
 	if err := Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
-		color.Redln("备份面板失败")
+		color.Red().Printfln("备份面板失败")
 		return err
 	}
 	if _, err := Exec("cd /www/panel/storage && zip -r /tmp/panel-storage.zip *"); err != nil {
-		color.Redln("备份面板数据失败")
+		color.Red().Printfln("备份面板数据失败")
 		return err
 	}
 	if _, err := Exec("cp -f /www/panel/panel.conf /tmp/panel.conf.bak"); err != nil {
-		color.Redln("备份面板配置失败")
+		color.Red().Printfln("备份面板配置失败")
 		return err
 	}
 	if !Exists("/tmp/panel-storage.zip") || !Exists("/tmp/panel.conf.bak") {
 		return errors.New("备份面板数据失败")
 	}
-	color.Greenln("备份完成")
+	color.Green().Printfln("备份完成")
 
-	color.Greenln("清理旧版本...")
+	color.Green().Printfln("清理旧版本...")
 	if _, err := Exec("rm -rf /www/panel/*"); err != nil {
-		color.Redln("清理旧版本失败")
+		color.Red().Printfln("清理旧版本失败")
 		return err
 	}
-	color.Greenln("清理完成")
+	color.Green().Printfln("清理完成")
 
-	color.Greenln("正在下载...")
+	color.Green().Printfln("正在下载...")
 	if _, err := Exec("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl); err != nil {
-		color.Redln("下载失败")
+		color.Red().Printfln("下载失败")
 		return err
 	}
 	if _, err := Exec("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl); err != nil {
-		color.Redln("下载失败")
+		color.Red().Printfln("下载失败")
 		return err
 	}
 	if !Exists("/www/panel/"+panelInfo.DownloadName) || !Exists("/www/panel/"+panelInfo.Checksums) {
 		return errors.New("下载失败")
 	}
-	color.Greenln("下载完成")
+	color.Green().Printfln("下载完成")
 
-	color.Greenln("校验下载文件...")
+	color.Green().Printfln("校验下载文件...")
 	check, err := Exec("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
 	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
 	if err = Remove("/www/panel/" + panelInfo.Checksums); err != nil {
-		color.Redln("清理临时文件失败")
+		color.Red().Printfln("清理临时文件失败")
 		return err
 	}
-	color.Greenln("文件校验完成")
+	color.Green().Printfln("文件校验完成")
 
-	color.Greenln("更新新版本...")
+	color.Green().Printfln("更新新版本...")
 	if _, err = Exec("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName); err != nil {
-		color.Redln("更新失败")
+		color.Red().Printfln("更新失败")
 		return err
 	}
 	if !Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
-	color.Greenln("更新完成")
+	color.Green().Printfln("更新完成")
 
-	color.Greenln("恢复面板数据...")
+	color.Green().Printfln("恢复面板数据...")
 	if _, err = Exec("cp -f /tmp/panel-storage.zip /www/panel/storage/panel-storage.zip && cd /www/panel/storage && unzip -o panel-storage.zip && rm -rf panel-storage.zip"); err != nil {
-		color.Redln("恢复面板数据失败")
+		color.Red().Printfln("恢复面板数据失败")
 		return err
 	}
 	if _, err = Exec("cp -f /tmp/panel.conf.bak /www/panel/panel.conf"); err != nil {
-		color.Redln("恢复面板配置失败")
+		color.Red().Printfln("恢复面板配置失败")
 		return err
 	}
 	if _, err = Exec("cp -f /www/panel/scripts/panel.sh /usr/bin/panel"); err != nil {
-		color.Redln("恢复面板脚本失败")
+		color.Red().Printfln("恢复面板脚本失败")
 		return err
 	}
 	if !Exists("/www/panel/storage/panel.db") || !Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板数据失败")
 	}
-	color.Greenln("恢复完成")
+	color.Green().Printfln("恢复完成")
 
-	color.Greenln("设置面板文件权限...")
+	color.Green().Printfln("设置面板文件权限...")
 	_, _ = Exec("chmod -R 700 /www/panel")
 	_, _ = Exec("chmod -R 700 /usr/bin/panel")
-	color.Greenln("设置完成")
+	color.Green().Printfln("设置完成")
 
 	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
-		color.Redln("运行面板数据库迁移失败")
+		color.Red().Printfln("运行面板数据库迁移失败")
 		return err
 	}
 	if _, err = Exec("bash /www/panel/scripts/update_panel.sh"); err != nil {
-		color.Redln("执行面板升级后脚本失败")
+		color.Red().Printfln("执行面板升级后脚本失败")
 		return err
 	}
 	if _, err = Exec("panel writeSetting version " + panelInfo.Version); err != nil {
-		color.Redln("写入面板版本号失败")
+		color.Red().Printfln("写入面板版本号失败")
 		return err
 	}
 
@@ -514,14 +514,14 @@ func UpdatePanel(panelInfo PanelInfo) error {
 }
 
 func RestartPanel() {
-	color.Greenln("重启面板...")
+	color.Green().Printfln("重启面板...")
 	err := ExecAsync("sleep 2 && systemctl restart panel")
 	if err != nil {
-		color.Redln("重启失败")
+		color.Red().Printfln("重启失败")
 		return
 	}
 
-	color.Greenln("重启完成")
+	color.Green().Printfln("重启完成")
 }
 
 // IsChina 是否中国大陆

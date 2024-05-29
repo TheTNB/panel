@@ -9,10 +9,10 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type CronController struct {

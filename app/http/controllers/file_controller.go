@@ -8,12 +8,12 @@ import (
 	"strings"
 	"syscall"
 
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
-	commonrequests "panel/app/http/requests/common"
 
-	requests "panel/app/http/requests/file"
-	"panel/pkg/tools"
+	requests "github.com/TheTNB/panel/app/http/requests/file"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type FileController struct {

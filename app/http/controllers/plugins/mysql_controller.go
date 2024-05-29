@@ -8,11 +8,11 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
-	"panel/app/http/controllers"
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type MySQLController struct {

@@ -5,11 +5,11 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
-	requests "panel/app/http/requests/setting"
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	requests "github.com/TheTNB/panel/app/http/requests/setting"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SettingController struct {

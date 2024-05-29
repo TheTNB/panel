@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/swaggo/http-swagger/v2"
 
-	_ "panel/docs"
+	_ "github.com/TheTNB/panel/docs"
 )
 
 type SwaggerController struct {

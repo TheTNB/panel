@@ -5,7 +5,7 @@ import (
 
 	"github.com/goravel/framework/facades"
 
-	"panel/app/models"
+	"github.com/TheTNB/panel/app/models"
 )
 
 // ProcessTask 处理面板任务

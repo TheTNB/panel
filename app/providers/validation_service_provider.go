@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/validation"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/rules"
+	"github.com/TheTNB/panel/app/rules"
 )
 
 type ValidationServiceProvider struct {

@@ -1,4 +1,4 @@
-module panel
+module github.com/TheTNB/panel
 
 go 1.22
 
@@ -6,7 +6,6 @@ require (
 	github.com/docker/docker v26.1.3+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/go-resty/resty/v2 v2.13.1
-	github.com/gookit/color v1.5.4
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.13.1-0.20240529102137-443e5efce883
 	github.com/goravel/gin v1.1.6-0.20240426085159-718e4d6d5f4f
@@ -102,6 +101,7 @@ require (
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/google/wire v0.6.0 // indirect
+	github.com/gookit/color v1.5.4 // indirect
 	github.com/gookit/filter v1.2.1 // indirect
 	github.com/gookit/goutil v0.6.15 // indirect
 	github.com/goravel/file-rotatelogs/v2 v2.4.2 // indirect

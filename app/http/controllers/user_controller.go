@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/app/http/requests/user"
-	"panel/app/models"
+	"github.com/TheTNB/panel/app/http/requests/user"
+	"github.com/TheTNB/panel/app/models"
 )
 
 type UserController struct {

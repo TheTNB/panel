@@ -1,9 +1,9 @@
 package internal
 
 import (
-	requests "panel/app/http/requests/cert"
-	"panel/app/models"
-	"panel/pkg/acme"
+	requests "github.com/TheTNB/panel/app/http/requests/cert"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/acme"
 )
 
 type Cert interface {

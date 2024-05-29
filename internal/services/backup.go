@@ -9,9 +9,9 @@ import (
 
 	"github.com/goravel/framework/support/carbon"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type BackupImpl struct {

@@ -7,8 +7,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
-	"panel/app/http/controllers"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type ToolBoxController struct {

@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/contracts/http"
-	"panel/pkg/tools"
 
-	"panel/app/http/controllers"
+	"github.com/TheTNB/panel/app/http/controllers"
 )
 
 type SupervisorController struct {

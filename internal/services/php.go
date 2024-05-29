@@ -12,10 +12,10 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/pkg/tools"
-	"panel/types"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type PHPImpl struct {

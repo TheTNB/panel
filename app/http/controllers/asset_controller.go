@@ -7,9 +7,9 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type AssetController struct {

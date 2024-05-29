@@ -1,6 +1,6 @@
 package internal
 
-import "panel/app/models"
+import "github.com/TheTNB/panel/app/models"
 
 // PanelPlugin 插件元数据结构
 type PanelPlugin struct {

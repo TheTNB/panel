@@ -5,9 +5,9 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"panel/app/http/controllers"
-	"panel/pkg/tools"
-	"panel/types"
+	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type RedisController struct {

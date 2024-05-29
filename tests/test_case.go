@@ -3,7 +3,7 @@ package tests
 import (
 	"github.com/goravel/framework/testing"
 
-	"panel/bootstrap"
+	"github.com/TheTNB/panel/bootstrap"
 )
 
 func init() {

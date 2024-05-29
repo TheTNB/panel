@@ -19,7 +19,7 @@ package main
 import (
 	"github.com/goravel/framework/facades"
 
-	"panel/bootstrap"
+	"github.com/TheTNB/panel/bootstrap"
 )
 
 //	@title			耗子 Linux 面板 API
@@ -27,7 +27,7 @@ import (
 //	@description	耗子 Linux 面板的 API 信息
 
 //	@contact.name	耗子科技
-//	@contact.email	i@haozi.net
+//	@contact.email	admin@haozi.net
 
 //	@license.name	GNU Affero General Public License v3
 //	@license		url   https://www.gnu.org/licenses/agpl-3.0.html

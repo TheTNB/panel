@@ -1,6 +1,6 @@
 package internal
 
-import "panel/app/models"
+import "github.com/TheTNB/panel/app/models"
 
 type Cron interface {
 	AddToSystem(cron models.Cron) error

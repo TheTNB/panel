@@ -4,17 +4,17 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/gookit/color"
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
+	"github.com/goravel/framework/support/color"
 	"github.com/spf13/cast"
 
-	"panel/app/models"
-	"panel/internal"
-	"panel/internal/services"
-	"panel/pkg/tools"
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 // Monitoring 系统监控
@@ -77,7 +77,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 	})
 	if err != nil {
 		facades.Log().Infof("[面板] 系统监控保存失败: %s", err.Error())
-		color.Redf(translate.Get("commands.panel:monitoring.fail")+": %s", err.Error())
+		color.Red().Printfln(translate.Get("commands.panel:monitoring.fail")+": %s", err.Error())
 		return nil
 	}
 
