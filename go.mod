@@ -7,7 +7,7 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.13.1-0.20240529102137-443e5efce883
+	github.com/goravel/framework v1.13.1-0.20240529174304-bddcb8bcc28a
 	github.com/goravel/gin v1.1.6-0.20240426085159-718e4d6d5f4f
 	github.com/gorilla/websocket v1.5.1
 	github.com/libdns/alidns v1.0.3
