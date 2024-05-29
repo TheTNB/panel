@@ -12,9 +12,9 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-The HaoZi Linux Panel is a lightweight Linux server operation and maintenance management panel developed using Golang and Vue. It is open source under the GNU Affero General Public License v3.0 protocol.
+The HaoZi Linux Panel is an open source lightweight Linux server operation and maintenance management panel developed using Golang and Vue.
 
-Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | QQ channel: [pd.qq.com/s/fyol46wfy](https://pd.qq.com/s/fyol46wfy)
+Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
 
 ## Advantages
 
@@ -36,9 +36,7 @@ HaoZi Linux Panel only supports the latest version of mainstream systems under t
 
 Recommended to use `Debian` for low-configuration machines, as its resource usage is lower than that of the `RHEL` system. For other machines, recommended to use `RockyLinux` | `AlmaLinux`, which has a longer maintenance cycle and is more stable.
 
-For other RHEL 9.x systems not in the table, you can try to install it yourself, but normal operation is not guaranteed, and free technical support is not provided (theoretically there will be no major question).
-
-CentOS Stream can be migrated to a supported system using the migration script: [CentOS 8/9 Migration Script](https://github.com/TheTNB/byecentos)
+For other RHEL 9.x systems not in the table, you can try to install it yourself, but normal operation is not guaranteed, and technical support is not provided (theoretically there will be no major question).
 
 | OS         | Version |
 |------------|---------|
