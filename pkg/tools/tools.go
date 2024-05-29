@@ -4,8 +4,8 @@ package tools
 import (
 	"errors"
 	"fmt"
+	"github.com/spf13/cast"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -101,30 +101,12 @@ func GenerateVersions(start, end string) ([]string, error) {
 		return nil, fmt.Errorf("版本格式错误")
 	}
 
-	startMajor, err := strconv.Atoi(startParts[0])
-	if err != nil {
-		return nil, fmt.Errorf("无效的起始主版本号: %v", err)
-	}
-	startMinor, err := strconv.Atoi(startParts[1])
-	if err != nil {
-		return nil, fmt.Errorf("无效的起始次版本号: %v", err)
-	}
-	startPatch, err := strconv.Atoi(startParts[2])
-	if err != nil {
-		return nil, fmt.Errorf("无效的起始修订号: %v", err)
-	}
-	endMajor, err := strconv.Atoi(endParts[0])
-	if err != nil {
-		return nil, fmt.Errorf("无效的结束主版本号: %v", err)
-	}
-	endMinor, err := strconv.Atoi(endParts[1])
-	if err != nil {
-		return nil, fmt.Errorf("无效的结束次版本号: %v", err)
-	}
-	endPatch, err := strconv.Atoi(endParts[2])
-	if err != nil {
-		return nil, fmt.Errorf("无效的结束修订号: %v", err)
-	}
+	startMajor := cast.ToInt(startParts[0])
+	startMinor := cast.ToInt(startParts[1])
+	startPatch := cast.ToInt(startParts[2])
+	endMajor := cast.ToInt(endParts[0])
+	endMinor := cast.ToInt(endParts[1])
+	endPatch := cast.ToInt(endParts[2])
 
 	for major := startMajor; major <= endMajor; major++ {
 		for minor := 0; minor <= 99; minor++ {

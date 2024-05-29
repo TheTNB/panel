@@ -2,7 +2,6 @@ package commands
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
@@ -82,12 +81,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 	}
 
 	// 删除过期数据
-	monitorDays := setting.Get(models.SettingKeyMonitorDays)
-	days, err := strconv.Atoi(monitorDays)
-	if err != nil {
-		return nil
-	}
-
+	days := cast.ToInt(setting.Get(models.SettingKeyMonitorDays))
 	if days <= 0 || internal.Status != internal.StatusNormal {
 		return nil
 	}

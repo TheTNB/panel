@@ -12,7 +12,9 @@ type QueueServiceProvider struct {
 }
 
 func (receiver *QueueServiceProvider) Register(app foundation.Application) {
-	facades.Queue().Register(receiver.Jobs())
+	if err := facades.Queue().Register(receiver.Jobs()); err != nil {
+		panic(err.Error())
+	}
 }
 
 func (receiver *QueueServiceProvider) Boot(app foundation.Application) {
