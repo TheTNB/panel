@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"os/exec"
-	"time"
 
 	"github.com/goravel/framework/facades"
 
@@ -24,13 +23,6 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 	if !ok {
 		facades.Log().Info("[面板][ProcessTask] 任务ID参数错误")
 		return nil
-	}
-
-	for {
-		if !haveRunningTask() {
-			break
-		}
-		time.Sleep(5 * time.Second)
 	}
 
 	var task models.Task
@@ -66,19 +58,4 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 
 	facades.Log().Infof("[面板][ProcessTask] 任务%d执行成功", taskID)
 	return nil
-}
-
-// haveRunningTask 是否有任务正在执行
-func haveRunningTask() bool {
-	var task models.Task
-	if err := facades.Orm().Query().Where("status = ?", models.TaskStatusRunning).Get(&task); err != nil {
-		facades.Log().Info("[面板][ProcessTask] 获取任务失败: " + err.Error())
-		return true
-	}
-
-	if task.ID != 0 {
-		return true
-	}
-
-	return false
 }

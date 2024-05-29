@@ -45,6 +45,10 @@ func (receiver *Monitoring) Handle(console.Context) error {
 		return nil
 	}
 
+	// 将等待中的任务分发
+	task := services.NewTaskImpl()
+	_ = task.DispatchWaiting()
+
 	setting := services.NewSettingImpl()
 	monitor := setting.Get(models.SettingKeyMonitor)
 	if !cast.ToBool(monitor) {
