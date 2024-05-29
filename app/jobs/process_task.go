@@ -1,8 +1,7 @@
 package jobs
 
 import (
-	"os/exec"
-
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/app/models"
@@ -21,41 +20,61 @@ func (receiver *ProcessTask) Signature() string {
 func (receiver *ProcessTask) Handle(args ...any) error {
 	taskID, ok := args[0].(uint)
 	if !ok {
-		facades.Log().Info("[面板][ProcessTask] 任务ID参数错误")
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"args": args,
+		}).Infof("参数错误")
 		return nil
 	}
 
 	var task models.Task
 	if err := facades.Orm().Query().Where("id = ?", taskID).Get(&task); err != nil {
-		facades.Log().Infof("[面板][ProcessTask] 获取任务%d失败: %s", taskID, err.Error())
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("获取任务失败")
 		return nil
 	}
 
 	task.Status = models.TaskStatusRunning
 	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("更新任务失败")
 		return nil
 	}
 
-	facades.Log().Infof("[面板][ProcessTask] 开始执行任务%d", taskID)
-	cmd := exec.Command("bash", "-c", task.Shell)
-	err := cmd.Run()
-	if err != nil {
+	facades.Log().Tags("面板", "异步任务").With(map[string]any{
+		"task_id": taskID,
+	}).Infof("开始执行任务")
+
+	if _, err := tools.Exec(task.Shell); err != nil {
 		task.Status = models.TaskStatusFailed
 		if err := facades.Orm().Query().Save(&task); err != nil {
-			facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+			facades.Log().Tags("面板", "异步任务").With(map[string]any{
+				"task_id": taskID,
+				"error":   err.Error(),
+			}).Infof("更新任务失败")
 			return nil
 		}
-		facades.Log().Infof("[面板][ProcessTask] 任务%d执行失败: %s", taskID, err.Error())
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("执行任务失败")
 		return nil
 	}
 
 	task.Status = models.TaskStatusSuccess
 	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Infof("[面板][ProcessTask] 更新任务%d失败: %s", taskID, err.Error())
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("更新任务失败")
 		return nil
 	}
 
-	facades.Log().Infof("[面板][ProcessTask] 任务%d执行成功", taskID)
+	facades.Log().Tags("面板", "异步任务").With(map[string]any{
+		"task_id": taskID,
+	}).Infof("执行任务成功")
 	return nil
 }

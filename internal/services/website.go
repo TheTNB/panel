@@ -460,8 +460,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 
-	_, err = tools.Exec("systemctl reload openresty")
-	return err
+	return tools.ServiceReload("openresty")
 }
 
 // Delete 删除网站
@@ -495,8 +494,7 @@ func (r *WebsiteImpl) Delete(id uint) error {
 		return err
 	}
 
-	_, err := tools.Exec("systemctl reload openresty")
-	return err
+	return tools.ServiceReload("openresty")
 }
 
 // GetConfig 获取网站配置

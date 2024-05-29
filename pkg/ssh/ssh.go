@@ -15,7 +15,7 @@ const (
 	PUBLICKEY
 )
 
-type SSHClientConfig struct {
+type ClientConfig struct {
 	AuthMethod AuthMethod
 	HostAddr   string
 	User       string
@@ -24,8 +24,8 @@ type SSHClientConfig struct {
 	Timeout    time.Duration
 }
 
-func SSHClientConfigPassword(hostAddr, user, Password string) *SSHClientConfig {
-	return &SSHClientConfig{
+func ClientConfigPassword(hostAddr, user, Password string) *ClientConfig {
+	return &ClientConfig{
 		Timeout:    time.Second * 5,
 		AuthMethod: PASSWORD,
 		HostAddr:   hostAddr,
@@ -34,8 +34,8 @@ func SSHClientConfigPassword(hostAddr, user, Password string) *SSHClientConfig {
 	}
 }
 
-func SSHClientConfigPulicKey(hostAddr, user, keyPath string) *SSHClientConfig {
-	return &SSHClientConfig{
+func ClientConfigPublicKey(hostAddr, user, keyPath string) *ClientConfig {
+	return &ClientConfig{
 		Timeout:    time.Second * 5,
 		AuthMethod: PUBLICKEY,
 		HostAddr:   hostAddr,
@@ -44,7 +44,7 @@ func SSHClientConfigPulicKey(hostAddr, user, keyPath string) *SSHClientConfig {
 	}
 }
 
-func NewSSHClient(conf *SSHClientConfig) (*ssh.Client, error) {
+func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 	config := &ssh.ClientConfig{
 		Timeout:         conf.Timeout,
 		User:            conf.User,

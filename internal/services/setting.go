@@ -2,8 +2,10 @@
 package services
 
 import (
-	"github.com/TheTNB/panel/app/models"
 	"github.com/goravel/framework/facades"
+
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SettingImpl struct {
@@ -17,19 +19,11 @@ func NewSettingImpl() *SettingImpl {
 func (r *SettingImpl) Get(key string, defaultValue ...string) string {
 	var setting models.Setting
 	if err := facades.Orm().Query().Where("key", key).FirstOrFail(&setting); err != nil {
-		if len(defaultValue) == 0 {
-			return ""
-		}
-
-		return defaultValue[0]
+		return tools.FirstElement(defaultValue)
 	}
 
 	if len(setting.Value) == 0 {
-		if len(defaultValue) == 0 {
-			return ""
-		}
-
-		return defaultValue[0]
+		return tools.FirstElement(defaultValue)
 	}
 
 	return setting.Value

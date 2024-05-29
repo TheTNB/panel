@@ -58,7 +58,7 @@ func (r *PluginImpl) All() []types.Plugin {
 	return plugins
 }
 
-// GetBySlug 根据slug获取插件
+// GetBySlug 根据 slug 获取插件
 func (r *PluginImpl) GetBySlug(slug string) types.Plugin {
 	for _, item := range r.All() {
 		if item.Slug == slug {
@@ -69,7 +69,7 @@ func (r *PluginImpl) GetBySlug(slug string) types.Plugin {
 	return types.Plugin{}
 }
 
-// GetInstalledBySlug 根据slug获取已安装的插件
+// GetInstalledBySlug 根据 slug 获取已安装的插件
 func (r *PluginImpl) GetInstalledBySlug(slug string) models.Plugin {
 	var plugin models.Plugin
 	if err := facades.Orm().Query().Where("slug", slug).Get(&plugin); err != nil {

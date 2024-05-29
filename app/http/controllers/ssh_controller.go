@@ -103,7 +103,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	}
 	defer ws.Close()
 
-	config := ssh.SSHClientConfigPassword(
+	config := ssh.ClientConfigPassword(
 		r.setting.Get(models.SettingKeySshHost)+":"+r.setting.Get(models.SettingKeySshPort),
 		r.setting.Get(models.SettingKeySshUser),
 		r.setting.Get(models.SettingKeySshPassword),
