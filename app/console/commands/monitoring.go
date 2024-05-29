@@ -56,7 +56,6 @@ func (receiver *Monitoring) Handle(console.Context) error {
 	}
 
 	info := tools.GetMonitoringInfo()
-
 	translate := facades.Lang(context.Background())
 
 	// 去除部分数据以减少数据库存储

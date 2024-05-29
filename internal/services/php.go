@@ -328,8 +328,7 @@ func (r *PHPImpl) InstallExtension(slug string) error {
 		return err
 	}
 
-	NewTaskImpl().Process(task.ID)
-	return nil
+	return NewTaskImpl().Process(task.ID)
 }
 
 func (r *PHPImpl) UninstallExtension(slug string) error {
@@ -353,8 +352,7 @@ func (r *PHPImpl) UninstallExtension(slug string) error {
 		return err
 	}
 
-	NewTaskImpl().Process(task.ID)
-	return nil
+	return NewTaskImpl().Process(task.ID)
 }
 
 func (r *PHPImpl) checkExtension(slug string) bool {

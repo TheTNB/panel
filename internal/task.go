@@ -1,6 +1,6 @@
 package internal
 
 type Task interface {
-	Process(taskID uint)
+	Process(taskID uint) error
 	DispatchWaiting() error
 }

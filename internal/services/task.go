@@ -14,12 +14,8 @@ func NewTaskImpl() *TaskImpl {
 	return &TaskImpl{}
 }
 
-func (r *TaskImpl) Process(taskID uint) {
-	err := facades.Queue().Job(&jobs.ProcessTask{}, []any{taskID}).Dispatch()
-	if err != nil {
-		facades.Log().Info("[面板][TaskService] 运行任务失败: " + err.Error())
-		return
-	}
+func (r *TaskImpl) Process(taskID uint) error {
+	return facades.Queue().Job(&jobs.ProcessTask{}, []any{taskID}).Dispatch()
 }
 
 func (r *TaskImpl) DispatchWaiting() error {
@@ -29,7 +25,9 @@ func (r *TaskImpl) DispatchWaiting() error {
 	}
 
 	for _, task := range tasks {
-		r.Process(task.ID)
+		if err := r.Process(task.ID); err != nil {
+			return err
+		}
 	}
 
 	return nil

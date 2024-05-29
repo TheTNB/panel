@@ -120,8 +120,7 @@ func (r *PluginImpl) Install(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	r.task.Process(task.ID)
-	return nil
+	return r.task.Process(task.ID)
 }
 
 // Uninstall 卸载插件
@@ -166,8 +165,7 @@ func (r *PluginImpl) Uninstall(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	r.task.Process(task.ID)
-	return nil
+	return r.task.Process(task.ID)
 }
 
 // Update 更新插件
@@ -212,6 +210,5 @@ func (r *PluginImpl) Update(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	r.task.Process(task.ID)
-	return nil
+	return r.task.Process(task.ID)
 }
