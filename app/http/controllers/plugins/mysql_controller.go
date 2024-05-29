@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type MySQLController struct {
@@ -377,7 +378,7 @@ func (r *MySQLController) BackupList(ctx http.Context) http.Response {
 	if startIndex > len(backupList) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []internal.BackupFile{},
+			"items": []types.BackupFile{},
 		})
 	}
 	if endIndex > len(backupList) {
@@ -385,7 +386,7 @@ func (r *MySQLController) BackupList(ctx http.Context) http.Response {
 	}
 	pagedBackupList := backupList[startIndex:endIndex]
 	if pagedBackupList == nil {
-		pagedBackupList = []internal.BackupFile{}
+		pagedBackupList = []types.BackupFile{}
 	}
 
 	return controllers.Success(ctx, http.Json{

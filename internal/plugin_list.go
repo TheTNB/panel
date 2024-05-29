@@ -1,7 +1,9 @@
 // Package internal 插件定义文件
 package internal
 
-var PluginOpenResty = PanelPlugin{
+import "github.com/TheTNB/panel/types"
+
+var PluginOpenResty = types.Plugin{
 	Name:        "OpenResty",
 	Description: "OpenResty® 是一款基于 NGINX 和 LuaJIT 的 Web 平台。",
 	Slug:        "openresty",
@@ -13,7 +15,7 @@ var PluginOpenResty = PanelPlugin{
 	Update:      "bash /www/panel/scripts/openresty/install.sh",
 }
 
-var PluginMySQL57 = PanelPlugin{
+var PluginMySQL57 = types.Plugin{
 	Name:        "MySQL-5.7",
 	Description: "MySQL 是最流行的关系型数据库管理系统之一，Oracle 旗下产品。（已停止维护，不建议使用！预计 2025 年 12 月移除）",
 	Slug:        "mysql57",
@@ -25,7 +27,7 @@ var PluginMySQL57 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/mysql/update.sh 57`,
 }
 
-var PluginMySQL80 = PanelPlugin{
+var PluginMySQL80 = types.Plugin{
 	Name:        "MySQL-8.0",
 	Description: "MySQL 是最流行的关系型数据库管理系统之一，Oracle 旗下产品。（建议内存 > 2G 安装）",
 	Slug:        "mysql80",
@@ -37,7 +39,7 @@ var PluginMySQL80 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/mysql/update.sh 80`,
 }
 
-var PluginMySQL84 = PanelPlugin{
+var PluginMySQL84 = types.Plugin{
 	Name:        "MySQL-8.4",
 	Description: "MySQL 是最流行的关系型数据库管理系统之一，Oracle 旗下产品。（建议内存 > 2G 安装）",
 	Slug:        "mysql84",
@@ -49,7 +51,7 @@ var PluginMySQL84 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/mysql/update.sh 84`,
 }
 
-var PluginPostgreSQL15 = PanelPlugin{
+var PluginPostgreSQL15 = types.Plugin{
 	Name:        "PostgreSQL-15",
 	Description: "PostgreSQL 是世界上最先进的开源关系数据库，在类似 BSD 与 MIT 许可的 PostgreSQL 许可下发行。",
 	Slug:        "postgresql15",
@@ -61,7 +63,7 @@ var PluginPostgreSQL15 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/postgresql/update.sh 15`,
 }
 
-var PluginPostgreSQL16 = PanelPlugin{
+var PluginPostgreSQL16 = types.Plugin{
 	Name:        "PostgreSQL-16",
 	Description: "PostgreSQL 是世界上最先进的开源关系数据库，在类似 BSD 与 MIT 许可的 PostgreSQL 许可下发行。",
 	Slug:        "postgresql16",
@@ -73,7 +75,7 @@ var PluginPostgreSQL16 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/postgresql/update.sh 16`,
 }
 
-var PluginPHP74 = PanelPlugin{
+var PluginPHP74 = types.Plugin{
 	Name:        "PHP-7.4",
 	Description: "PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。（已停止维护，不建议使用！预计 2024 年 12 月移除）",
 	Slug:        "php74",
@@ -85,7 +87,7 @@ var PluginPHP74 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/php/install.sh 74`,
 }
 
-var PluginPHP80 = PanelPlugin{
+var PluginPHP80 = types.Plugin{
 	Name:        "PHP-8.0",
 	Description: "PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。（已停止维护，不建议使用！预计 2025 年 12 月移除）",
 	Slug:        "php80",
@@ -97,7 +99,7 @@ var PluginPHP80 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/php/install.sh 80`,
 }
 
-var PluginPHP81 = PanelPlugin{
+var PluginPHP81 = types.Plugin{
 	Name:        "PHP-8.1",
 	Description: "PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。",
 	Slug:        "php81",
@@ -109,7 +111,7 @@ var PluginPHP81 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/php/install.sh 81`,
 }
 
-var PluginPHP82 = PanelPlugin{
+var PluginPHP82 = types.Plugin{
 	Name:        "PHP-8.2",
 	Description: "PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。",
 	Slug:        "php82",
@@ -121,7 +123,7 @@ var PluginPHP82 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/php/install.sh 82`,
 }
 
-var PluginPHP83 = PanelPlugin{
+var PluginPHP83 = types.Plugin{
 	Name:        "PHP-8.3",
 	Description: "PHP 是一种创建动态交互性站点的强有力的服务器端脚本语言。",
 	Slug:        "php83",
@@ -133,7 +135,7 @@ var PluginPHP83 = PanelPlugin{
 	Update:      `bash /www/panel/scripts/php/install.sh 83`,
 }
 
-var PluginPHPMyAdmin = PanelPlugin{
+var PluginPHPMyAdmin = types.Plugin{
 	Name:        "phpMyAdmin",
 	Description: "phpMyAdmin 是一个以 PHP 为基础，以 Web-Base 方式架构在网站主机上的 MySQL 数据库管理工具。",
 	Slug:        "phpmyadmin",
@@ -145,7 +147,7 @@ var PluginPHPMyAdmin = PanelPlugin{
 	Update:      `bash /www/panel/scripts/phpmyadmin/uninstall.sh && bash /www/panel/scripts/phpmyadmin/install.sh`,
 }
 
-var PluginPureFTPd = PanelPlugin{
+var PluginPureFTPd = types.Plugin{
 	Name:        "Pure-FTPd",
 	Description: "Pure-Ftpd 是一个快速、高效、轻便、安全的 FTP 服务器，它以安全和配置简单为设计目标，支持虚拟主机，IPV6，PAM 等功能。",
 	Slug:        "pureftpd",
@@ -157,7 +159,7 @@ var PluginPureFTPd = PanelPlugin{
 	Update:      `bash /www/panel/scripts/pureftpd/update.sh`,
 }
 
-var PluginRedis = PanelPlugin{
+var PluginRedis = types.Plugin{
 	Name:        "Redis",
 	Description: "Redis 是一个开源的使用 ANSI C 语言编写、支持网络、可基于内存亦可持久化的日志型、Key-Value 数据库，并提供多种语言的 API。",
 	Slug:        "redis",
@@ -169,7 +171,7 @@ var PluginRedis = PanelPlugin{
 	Update:      `bash /www/panel/scripts/redis/update.sh`,
 }
 
-var PluginS3fs = PanelPlugin{
+var PluginS3fs = types.Plugin{
 	Name:        "S3fs",
 	Description: "S3fs 通过 FUSE 挂载兼容 S3 标准的存储桶，例如 Amazon S3、阿里云 OSS、腾讯云 COS、七牛云 Kodo 等。",
 	Slug:        "s3fs",
@@ -181,7 +183,7 @@ var PluginS3fs = PanelPlugin{
 	Update:      `bash /www/panel/scripts/s3fs/update.sh`,
 }
 
-var PluginRsync = PanelPlugin{
+var PluginRsync = types.Plugin{
 	Name:        "Rsync",
 	Description: "Rsync 是一款提供快速增量文件传输的开源工具。",
 	Slug:        "rsync",
@@ -193,7 +195,7 @@ var PluginRsync = PanelPlugin{
 	Update:      `bash /www/panel/scripts/rsync/install.sh`,
 }
 
-var PluginSupervisor = PanelPlugin{
+var PluginSupervisor = types.Plugin{
 	Name:        "Supervisor",
 	Description: "Supervisor 是一个客户端/服务器系统，允许用户监视和控制类 UNIX 操作系统上的多个进程。",
 	Slug:        "supervisor",
@@ -205,7 +207,7 @@ var PluginSupervisor = PanelPlugin{
 	Update:      `bash /www/panel/scripts/supervisor/update.sh`,
 }
 
-var PluginFail2ban = PanelPlugin{
+var PluginFail2ban = types.Plugin{
 	Name:        "Fail2ban",
 	Description: "Fail2ban 扫描系统日志文件并从中找出多次尝试失败的IP地址，将该IP地址加入防火墙的拒绝访问列表中。",
 	Slug:        "fail2ban",
@@ -217,7 +219,7 @@ var PluginFail2ban = PanelPlugin{
 	Update:      `bash /www/panel/scripts/fail2ban/update.sh`,
 }
 
-var PluginToolBox = PanelPlugin{
+var PluginToolBox = types.Plugin{
 	Name:        "系统工具箱",
 	Description: "可视化调整一些常用的配置项，如 DNS、SWAP、时区等",
 	Slug:        "toolbox",

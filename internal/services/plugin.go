@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/types"
 )
 
 type PluginImpl struct {
@@ -31,8 +32,8 @@ func (r *PluginImpl) AllInstalled() ([]models.Plugin, error) {
 }
 
 // All 获取所有插件
-func (r *PluginImpl) All() []internal.PanelPlugin {
-	var plugins = []internal.PanelPlugin{
+func (r *PluginImpl) All() []types.Plugin {
+	var plugins = []types.Plugin{
 		internal.PluginOpenResty,
 		internal.PluginMySQL57,
 		internal.PluginMySQL80,
@@ -58,14 +59,14 @@ func (r *PluginImpl) All() []internal.PanelPlugin {
 }
 
 // GetBySlug 根据slug获取插件
-func (r *PluginImpl) GetBySlug(slug string) internal.PanelPlugin {
+func (r *PluginImpl) GetBySlug(slug string) types.Plugin {
 	for _, item := range r.All() {
 		if item.Slug == slug {
 			return item
 		}
 	}
 
-	return internal.PanelPlugin{}
+	return types.Plugin{}
 }
 
 // GetInstalledBySlug 根据slug获取已安装的插件

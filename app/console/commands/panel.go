@@ -16,9 +16,9 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 // Panel 面板命令行
@@ -99,14 +99,14 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return err
 		}
 
-		internal.Status = internal.StatusUpgrade
+		types.Status = types.StatusUpgrade
 		if err = tools.UpdatePanel(panel); err != nil {
-			internal.Status = internal.StatusFailed
+			types.Status = types.StatusFailed
 			color.Red().Printfln(translate.Get("commands.panel.update.fail") + ": " + err.Error())
 			return nil
 		}
 
-		internal.Status = internal.StatusNormal
+		types.Status = types.StatusNormal
 		color.Green().Printfln(translate.Get("commands.panel.update.success"))
 		tools.RestartPanel()
 
@@ -603,7 +603,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		_, err = website.Add(internal.PanelWebsite{
+		_, err = website.Add(types.Website{
 			Name:    name,
 			Status:  true,
 			Domains: domains,

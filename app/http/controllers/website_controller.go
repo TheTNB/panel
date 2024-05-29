@@ -14,6 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type WebsiteController struct {
@@ -83,7 +84,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 		addRequest.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + addRequest.Name
 	}
 
-	website := internal.PanelWebsite{
+	website := types.Website{
 		Name:       addRequest.Name,
 		Status:     true,
 		Domains:    addRequest.Domains,
@@ -205,7 +206,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse{data=internal.PanelWebsite}
+//	@Success		200	{object}	SuccessResponse{data=types.Website}
 //	@Router			/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
@@ -328,7 +329,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	query		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=[]internal.BackupFile}
+//	@Success		200		{object}	SuccessResponse{data=[]types.BackupFile}
 //	@Router			/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
@@ -350,7 +351,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	if startIndex > len(backupList) {
 		return Success(ctx, http.Json{
 			"total": 0,
-			"items": []internal.BackupFile{},
+			"items": []types.BackupFile{},
 		})
 	}
 	if endIndex > len(backupList) {
@@ -358,7 +359,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	}
 	pagedBackupList := backupList[startIndex:endIndex]
 	if pagedBackupList == nil {
-		pagedBackupList = []internal.BackupFile{}
+		pagedBackupList = []types.BackupFile{}
 	}
 
 	return Success(ctx, http.Json{

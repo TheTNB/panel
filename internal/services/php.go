@@ -13,7 +13,6 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -122,8 +121,8 @@ func (r *PHPImpl) ClearSlowLog() error {
 	return nil
 }
 
-func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
-	extensions := []internal.PHPExtension{
+func (r *PHPImpl) GetExtensions() ([]types.PHPExtension, error) {
+	extensions := []types.PHPExtension{
 		{
 			Name:        "fileinfo",
 			Slug:        "fileinfo",
@@ -264,7 +263,7 @@ func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
 
 	// ionCube 只支持 PHP 8.3 以下版本
 	if cast.ToUint(r.version) < 83 {
-		extensions = append(extensions, internal.PHPExtension{
+		extensions = append(extensions, types.PHPExtension{
 			Name:        "ionCube",
 			Slug:        "ionCube Loader",
 			Description: "ionCube 是一个专业级的 PHP 加密解密工具。",
@@ -273,13 +272,13 @@ func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
 	}
 	// Swoole 和 Swow 不支持 PHP 8.0 以下版本
 	if cast.ToUint(r.version) >= 80 {
-		extensions = append(extensions, internal.PHPExtension{
+		extensions = append(extensions, types.PHPExtension{
 			Name:        "Swoole",
 			Slug:        "swoole",
 			Description: "Swoole 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
 			Installed:   false,
 		})
-		extensions = append(extensions, internal.PHPExtension{
+		extensions = append(extensions, types.PHPExtension{
 			Name:        "Swow",
 			Slug:        "Swow",
 			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
@@ -292,7 +291,7 @@ func (r *PHPImpl) GetExtensions() ([]internal.PHPExtension, error) {
 		return extensions, err
 	}
 
-	extensionMap := make(map[string]*internal.PHPExtension)
+	extensionMap := make(map[string]*types.PHPExtension)
 	for i := range extensions {
 		extensionMap[extensions[i].Slug] = &extensions[i]
 	}

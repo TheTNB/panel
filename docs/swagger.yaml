@@ -31,45 +31,48 @@ definitions:
       message:
         type: string
     type: object
-  internal.BackupFile:
+  github_com_TheTNB_panel_app_http_requests_container.ID:
     properties:
-      name:
-        type: string
-      size:
+      id:
         type: string
     type: object
-  internal.PanelWebsite:
+  github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update:
     properties:
-      db:
-        type: boolean
-      db_name:
+      auth_user:
         type: string
-      db_password:
+      comment:
         type: string
-      db_type:
+      hosts_allow:
         type: string
-      db_user:
-        type: string
-      domains:
-        items:
-          type: string
-        type: array
       name:
         type: string
       path:
         type: string
-      php:
+      secret:
         type: string
-      ports:
-        items:
-          type: integer
-        type: array
-      remark:
+    type: object
+  github_com_TheTNB_panel_app_http_requests_setting.Update:
+    properties:
+      backup_path:
         type: string
+      email:
+        type: string
+      entrance:
+        type: string
+      language:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
       ssl:
         type: boolean
-      status:
-        type: boolean
+      username:
+        type: string
+      website_path:
+        type: string
     type: object
   models.Cert:
     properties:
@@ -174,49 +177,6 @@ definitions:
       status:
         type: boolean
       updated_at:
-        type: string
-    type: object
-  panel_app_http_requests_container.ID:
-    properties:
-      id:
-        type: string
-    type: object
-  panel_app_http_requests_plugins_rsync.Update:
-    properties:
-      auth_user:
-        type: string
-      comment:
-        type: string
-      hosts_allow:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      secret:
-        type: string
-    type: object
-  panel_app_http_requests_setting.Update:
-    properties:
-      backup_path:
-        type: string
-      email:
-        type: string
-      entrance:
-        type: string
-      language:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      port:
-        type: integer
-      ssl:
-        type: boolean
-      username:
-        type: string
-      website_path:
         type: string
     type: object
   requests.Add:
@@ -599,6 +559,13 @@ definitions:
           $ref: '#/definitions/types.KV'
         type: array
     type: object
+  types.BackupFile:
+    properties:
+      name:
+        type: string
+      size:
+        type: string
+    type: object
   types.ContainerNetwork:
     properties:
       enabled:
@@ -641,9 +608,42 @@ definitions:
       value:
         type: string
     type: object
+  types.Website:
+    properties:
+      db:
+        type: boolean
+      db_name:
+        type: string
+      db_password:
+        type: string
+      db_type:
+        type: string
+      db_user:
+        type: string
+      domains:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      path:
+        type: string
+      php:
+        type: string
+      ports:
+        items:
+          type: integer
+        type: array
+      remark:
+        type: string
+      ssl:
+        type: boolean
+      status:
+        type: boolean
+    type: object
 info:
   contact:
-    email: i@haozi.net
+    email: admin@haozi.net
     name: 耗子科技
   description: 耗子 Linux 面板的 API 信息
   license:
@@ -1313,7 +1313,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1354,7 +1354,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1564,7 +1564,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1601,7 +1601,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1645,7 +1645,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1688,7 +1688,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1729,7 +1729,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1751,7 +1751,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -1872,7 +1872,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_container.ID'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID'
       produces:
       - application/json
       responses:
@@ -2271,7 +2271,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_setting.Update'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_setting.Update'
       produces:
       - application/json
       responses:
@@ -2350,7 +2350,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/internal.BackupFile'
+                    $ref: '#/definitions/types.BackupFile'
                   type: array
               type: object
       security:
@@ -2541,7 +2541,7 @@ paths:
             - $ref: '#/definitions/controllers.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/internal.PanelWebsite'
+                  $ref: '#/definitions/types.Website'
               type: object
       security:
       - BearerToken: []
@@ -2827,7 +2827,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/panel_app_http_requests_plugins_rsync.Update'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update'
       produces:
       - application/json
       responses:

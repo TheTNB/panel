@@ -2,13 +2,6 @@ package internal
 
 import "github.com/TheTNB/panel/types"
 
-type PHPExtension struct {
-	Name        string `json:"name"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-	Installed   bool   `json:"installed"`
-}
-
 type PHP interface {
 	Status() (bool, error)
 	Reload() error
@@ -24,7 +17,7 @@ type PHP interface {
 	GetSlowLog() (string, error)
 	ClearErrorLog() error
 	ClearSlowLog() error
-	GetExtensions() ([]PHPExtension, error)
+	GetExtensions() ([]types.PHPExtension, error)
 	InstallExtension(slug string) error
 	UninstallExtension(slug string) error
 }

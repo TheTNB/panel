@@ -11,8 +11,8 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/types"
 )
 
 // CertRenew 证书续签
@@ -39,7 +39,7 @@ func (receiver *CertRenew) Extend() command.Extend {
 
 // Handle Execute the console command.
 func (receiver *CertRenew) Handle(console.Context) error {
-	if internal.Status != internal.StatusNormal {
+	if types.Status != types.StatusNormal {
 		return nil
 	}
 

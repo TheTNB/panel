@@ -8,8 +8,8 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 // PanelTask 面板每日任务
@@ -35,11 +35,11 @@ func (receiver *PanelTask) Extend() command.Extend {
 
 // Handle Execute the console command.
 func (receiver *PanelTask) Handle(console.Context) error {
-	internal.Status = internal.StatusMaintain
+	types.Status = types.StatusMaintain
 
 	// 优化数据库
 	if _, err := facades.Orm().Query().Exec("VACUUM"); err != nil {
-		internal.Status = internal.StatusFailed
+		types.Status = types.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
@@ -49,7 +49,7 @@ func (receiver *PanelTask) Handle(console.Context) error {
 
 	// 备份面板
 	if err := tools.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
-		internal.Status = internal.StatusFailed
+		types.Status = types.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
@@ -59,7 +59,7 @@ func (receiver *PanelTask) Handle(console.Context) error {
 
 	// 清理 7 天前的备份
 	if _, err := tools.Exec(`find /www/backup/panel -mtime +7 -name "*.zip" -exec rm -rf {} \;`); err != nil {
-		internal.Status = internal.StatusFailed
+		types.Status = types.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{
 				"error": err.Error(),
@@ -67,6 +67,6 @@ func (receiver *PanelTask) Handle(console.Context) error {
 		return err
 	}
 
-	internal.Status = internal.StatusNormal
+	types.Status = types.StatusNormal
 	return nil
 }

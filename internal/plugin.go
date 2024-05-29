@@ -1,24 +1,14 @@
 package internal
 
-import "github.com/TheTNB/panel/app/models"
-
-// PanelPlugin 插件元数据结构
-type PanelPlugin struct {
-	Name        string
-	Description string
-	Slug        string
-	Version     string
-	Requires    []string
-	Excludes    []string
-	Install     string
-	Uninstall   string
-	Update      string
-}
+import (
+	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/types"
+)
 
 type Plugin interface {
 	AllInstalled() ([]models.Plugin, error)
-	All() []PanelPlugin
-	GetBySlug(slug string) PanelPlugin
+	All() []types.Plugin
+	GetBySlug(slug string) types.Plugin
 	GetInstalledBySlug(slug string) models.Plugin
 	Install(slug string) error
 	Uninstall(slug string) error

@@ -1,4 +1,4 @@
-package internal
+package types
 
 // 定义面板状态常量
 const (

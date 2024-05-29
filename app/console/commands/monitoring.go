@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 // Monitoring 系统监控
@@ -40,7 +40,7 @@ func (receiver *Monitoring) Extend() command.Extend {
 
 // Handle Execute the console command.
 func (receiver *Monitoring) Handle(console.Context) error {
-	if internal.Status != internal.StatusNormal {
+	if types.Status != types.StatusNormal {
 		return nil
 	}
 
@@ -68,7 +68,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 		cpu.Flags = nil
 	}
 
-	if internal.Status != internal.StatusNormal {
+	if types.Status != types.StatusNormal {
 		return nil
 	}
 	err := facades.Orm().Query().Create(&models.Monitor{
@@ -82,7 +82,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 
 	// 删除过期数据
 	days := cast.ToInt(setting.Get(models.SettingKeyMonitorDays))
-	if days <= 0 || internal.Status != internal.StatusNormal {
+	if days <= 0 || types.Status != types.StatusNormal {
 		return nil
 	}
 	if _, err = facades.Orm().Query().Where("created_at < ?", carbon.Now().SubDays(days).ToDateTimeString()).Delete(&models.Monitor{}); err != nil {

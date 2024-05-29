@@ -10,13 +10,14 @@ import (
 	"strconv"
 	"strings"
 
-	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
+	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type WebsiteImpl struct {
@@ -41,7 +42,7 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 }
 
 // Add 添加网站
-func (r *WebsiteImpl) Add(website internal.PanelWebsite) (models.Website, error) {
+func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 	w := models.Website{
 		Name:   website.Name,
 		Status: website.Status,
@@ -499,18 +500,18 @@ func (r *WebsiteImpl) Delete(id uint) error {
 }
 
 // GetConfig 获取网站配置
-func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("id", id).First(&website); err != nil {
-		return internal.WebsiteSetting{}, err
+		return types.WebsiteSetting{}, err
 	}
 
 	config, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
-		return internal.WebsiteSetting{}, err
+		return types.WebsiteSetting{}, err
 	}
 
-	var setting internal.WebsiteSetting
+	var setting types.WebsiteSetting
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.Ssl = website.Ssl
@@ -612,10 +613,10 @@ func (r *WebsiteImpl) GetConfig(id uint) (internal.WebsiteSetting, error) {
 }
 
 // GetConfigByName 根据网站名称获取网站配置
-func (r *WebsiteImpl) GetConfigByName(name string) (internal.WebsiteSetting, error) {
+func (r *WebsiteImpl) GetConfigByName(name string) (types.WebsiteSetting, error) {
 	var website models.Website
 	if err := facades.Orm().Query().Where("name", name).First(&website); err != nil {
-		return internal.WebsiteSetting{}, err
+		return types.WebsiteSetting{}, err
 	}
 
 	return r.GetConfig(website.ID)

@@ -11,7 +11,7 @@ const docTemplate = `{
         "title": "{{.Title}}",
         "contact": {
             "name": "耗子科技",
-            "email": "i@haozi.net"
+            "email": "admin@haozi.net"
         },
         "license": {
             "name": "GNU Affero General Public License v3"
@@ -1122,7 +1122,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1190,7 +1190,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1538,7 +1538,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1599,7 +1599,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1671,7 +1671,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1741,7 +1741,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1809,7 +1809,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -1845,7 +1845,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -2046,7 +2046,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_container.ID"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_container.ID"
                         }
                     }
                 ],
@@ -2693,7 +2693,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_setting.Update"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_setting.Update"
                         }
                     }
                 ],
@@ -2819,7 +2819,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/internal.BackupFile"
+                                                "$ref": "#/definitions/types.BackupFile"
                                             }
                                         }
                                     }
@@ -3136,7 +3136,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/internal.PanelWebsite"
+                                            "$ref": "#/definitions/types.Website"
                                         }
                                     }
                                 }
@@ -3571,7 +3571,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/panel_app_http_requests_plugins_rsync.Update"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update"
                         }
                     }
                 ],
@@ -3784,40 +3784,25 @@ const docTemplate = `{
                 }
             }
         },
-        "internal.BackupFile": {
+        "github_com_TheTNB_panel_app_http_requests_container.ID": {
             "type": "object",
             "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "size": {
+                "id": {
                     "type": "string"
                 }
             }
         },
-        "internal.PanelWebsite": {
+        "github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update": {
             "type": "object",
             "properties": {
-                "db": {
-                    "type": "boolean"
-                },
-                "db_name": {
+                "auth_user": {
                     "type": "string"
                 },
-                "db_password": {
+                "comment": {
                     "type": "string"
                 },
-                "db_type": {
+                "hosts_allow": {
                     "type": "string"
-                },
-                "db_user": {
-                    "type": "string"
-                },
-                "domains": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 },
                 "name": {
                     "type": "string"
@@ -3825,23 +3810,43 @@ const docTemplate = `{
                 "path": {
                     "type": "string"
                 },
-                "php": {
+                "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_TheTNB_panel_app_http_requests_setting.Update": {
+            "type": "object",
+            "properties": {
+                "backup_path": {
                     "type": "string"
                 },
-                "ports": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "remark": {
+                "email": {
                     "type": "string"
+                },
+                "entrance": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
                 },
                 "ssl": {
                     "type": "boolean"
                 },
-                "status": {
-                    "type": "boolean"
+                "username": {
+                    "type": "string"
+                },
+                "website_path": {
+                    "type": "string"
                 }
             }
         },
@@ -3995,72 +4000,6 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "panel_app_http_requests_container.ID": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "panel_app_http_requests_plugins_rsync.Update": {
-            "type": "object",
-            "properties": {
-                "auth_user": {
-                    "type": "string"
-                },
-                "comment": {
-                    "type": "string"
-                },
-                "hosts_allow": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "secret": {
-                    "type": "string"
-                }
-            }
-        },
-        "panel_app_http_requests_setting.Update": {
-            "type": "object",
-            "properties": {
-                "backup_path": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "entrance": {
-                    "type": "string"
-                },
-                "language": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "port": {
-                    "type": "integer"
-                },
-                "ssl": {
-                    "type": "boolean"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "website_path": {
                     "type": "string"
                 }
             }
@@ -4650,6 +4589,17 @@ const docTemplate = `{
                 }
             }
         },
+        "types.BackupFile": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                }
+            }
+        },
         "types.ContainerNetwork": {
             "type": "object",
             "properties": {
@@ -4712,6 +4662,56 @@ const docTemplate = `{
                 },
                 "value": {
                     "type": "string"
+                }
+            }
+        },
+        "types.Website": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "boolean"
+                },
+                "db_name": {
+                    "type": "string"
+                },
+                "db_password": {
+                    "type": "string"
+                },
+                "db_type": {
+                    "type": "string"
+                },
+                "db_user": {
+                    "type": "string"
+                },
+                "domains": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "php": {
+                    "type": "string"
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "ssl": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "boolean"
                 }
             }
         }
