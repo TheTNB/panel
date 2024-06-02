@@ -40,6 +40,7 @@ else
 fi
 
 # 下载frp
+cd ${frpPath}
 wget -T 120 -t 3 -O ${frpPath}/${frpFile} ${downloadUrl}/${frpFile}
 wget -T 20 -t 3 -O ${frpPath}/${frpFile}.checksum.txt ${downloadUrl}/${frpFile}.checksum.txt
 if ! sha256sum --status -c ${frpPath}/${frpFile}.checksum.txt; then
