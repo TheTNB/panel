@@ -9,20 +9,15 @@ import (
 	"github.com/TheTNB/panel/app/http/controllers"
 	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
 type RsyncController struct {
-	setting internal.Setting
 }
 
 func NewRsyncController() *RsyncController {
-	return &RsyncController{
-		setting: services.NewSettingImpl(),
-	}
+	return &RsyncController{}
 }
 
 // Status

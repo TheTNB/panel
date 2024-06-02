@@ -19,20 +19,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
 HR="+----------------------------------------------------"
-OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
+frpPath="/usr/local/frp"
 
-if [ "${OS}" == "centos" ]; then
-    systemctl stop supervisord
-    systemctl disable supervisord
-    dnf remove -y supervisor
-elif [ "${OS}" == "debian" ]; then
-    systemctl stop supervisor
-    systemctl disable supervisor
-    apt-get purge -y supervisor
-else
-    echo -e $HR
-    echo "错误：不支持的操作系统"
-    exit 1
-fi
+systemctl stop frps
+systemctl stop frpc
+systemctl disable frps
+systemctl disable frpc
 
-panel deletePlugin supervisor
+rm -rf ${frpPath}
+rm -f /etc/systemd/system/frps.service
+rm -f /etc/systemd/system/frpc.service
+systemctl daemon-reload
+
+panel deletePlugin frp
+echo -e $HR
+echo "frp 卸载完成"
+echo -e $HR

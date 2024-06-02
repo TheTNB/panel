@@ -36,6 +36,13 @@ definitions:
       id:
         type: string
     type: object
+  github_com_TheTNB_panel_app_http_requests_plugins_frp.UpdateConfig:
+    properties:
+      config:
+        type: string
+      service:
+        type: string
+    type: object
   github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update:
     properties:
       auth_user:
@@ -49,6 +56,11 @@ definitions:
       path:
         type: string
       secret:
+        type: string
+    type: object
+  github_com_TheTNB_panel_app_http_requests_plugins_rsync.UpdateConfig:
+    properties:
+      config:
         type: string
     type: object
   github_com_TheTNB_panel_app_http_requests_setting.Update:
@@ -504,16 +516,16 @@ definitions:
       path:
         type: string
     type: object
+  requests.Service:
+    properties:
+      service:
+        type: string
+    type: object
   requests.UnArchive:
     properties:
       file:
         type: string
       path:
-        type: string
-    type: object
-  requests.UpdateConfig:
-    properties:
-      config:
         type: string
     type: object
   requests.UserStore:
@@ -2714,6 +2726,172 @@ paths:
       summary: 更新备注
       tags:
       - 网站管理
+  /plugins/frp/config:
+    get:
+      description: 获取 Frp 配置
+      parameters:
+      - description: 服务
+        in: query
+        name: service
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 插件-Frp
+    post:
+      description: 更新 Frp 配置
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_frp.UpdateConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新配置
+      tags:
+      - 插件-Frp
+  /plugins/frp/disable:
+    post:
+      description: 禁用 Frp 服务
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 禁用服务
+      tags:
+      - 插件-Frp
+  /plugins/frp/enable:
+    post:
+      description: 启用 Frp 服务
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启用服务
+      tags:
+      - 插件-Frp
+  /plugins/frp/restart:
+    post:
+      description: 重启 Frp 服务
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重启服务
+      tags:
+      - 插件-Frp
+  /plugins/frp/start:
+    post:
+      description: 启动 Frp 服务
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启动服务
+      tags:
+      - 插件-Frp
+  /plugins/frp/status:
+    get:
+      description: 获取 Frp 服务状态
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 服务状态
+      tags:
+      - 插件-Frp
+  /plugins/frp/stop:
+    post:
+      description: 停止 Frp 服务
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 停止服务
+      tags:
+      - 插件-Frp
   /plugins/rsync/config:
     get:
       description: 获取 Rsync 配置
@@ -2737,7 +2915,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/requests.UpdateConfig'
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_rsync.UpdateConfig'
       produces:
       - application/json
       responses:

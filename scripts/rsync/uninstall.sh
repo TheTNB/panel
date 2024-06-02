@@ -21,6 +21,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 
+systemctl stop rsync
+systemctl disable rsync
+rm -f /etc/systemd/system/rsyncd.service
+systemctl daemon-reload
+
 if [ "${OS}" == "centos" ]; then
     dnf remove -y rsync
 elif [ "${OS}" == "debian" ]; then

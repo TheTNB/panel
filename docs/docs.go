@@ -3412,6 +3412,278 @@ const docTemplate = `{
                 }
             }
         },
+        "/plugins/frp/config": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Frp 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "获取配置",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "服务",
+                        "name": "service",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Frp 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "更新配置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_frp.UpdateConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/disable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "禁用 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "禁用服务",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/enable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启用 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "启用服务",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/restart": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "重启 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "重启服务",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启动 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "启动服务",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Frp 服务状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "服务状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/frp/stop": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "停止 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "停止服务",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/plugins/rsync/config": {
             "get": {
                 "security": [
@@ -3457,7 +3729,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/requests.UpdateConfig"
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_rsync.UpdateConfig"
                         }
                     }
                 ],
@@ -3792,6 +4064,17 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_TheTNB_panel_app_http_requests_plugins_frp.UpdateConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "string"
+                },
+                "service": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update": {
             "type": "object",
             "properties": {
@@ -3811,6 +4094,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "secret": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_TheTNB_panel_app_http_requests_plugins_rsync.UpdateConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
                     "type": "string"
                 }
             }
@@ -4504,6 +4795,14 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.Service": {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.UnArchive": {
             "type": "object",
             "properties": {
@@ -4511,14 +4810,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "path": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.UpdateConfig": {
-            "type": "object",
-            "properties": {
-                "config": {
                     "type": "string"
                 }
             }

@@ -353,6 +353,17 @@ func Plugin() {
 			route.Get("config", rsyncController.GetConfig)
 			route.Post("config", rsyncController.UpdateConfig)
 		})
+		r.Prefix("frp").Group(func(route route.Router) {
+			frpController := plugins.NewFrpController()
+			route.Get("status", frpController.Status)
+			route.Get("enable", frpController.Enable)
+			route.Get("disable", frpController.Disable)
+			route.Post("start", frpController.Start)
+			route.Post("stop", frpController.Stop)
+			route.Post("restart", frpController.Restart)
+			route.Get("config", frpController.GetConfig)
+			route.Post("config", frpController.UpdateConfig)
+		})
 		r.Prefix("toolbox").Group(func(route route.Router) {
 			toolboxController := plugins.NewToolBoxController()
 			route.Get("dns", toolboxController.GetDNS)
