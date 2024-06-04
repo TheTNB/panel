@@ -26,13 +26,11 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 	}
 
 	challengeFilePath := filepath.Join(s.path, challenge.HTTP01ResourcePath())
-	err = os.MkdirAll(filepath.Dir(challengeFilePath), 0o755)
-	if err != nil {
+	if err = os.MkdirAll(filepath.Dir(challengeFilePath), 0o755); err != nil {
 		return fmt.Errorf("无法在网站目录创建 HTTP 挑战所需的目录: %w", err)
 	}
 
-	err = os.WriteFile(challengeFilePath, []byte(challenge.KeyAuthorization), 0o644)
-	if err != nil {
+	if err = os.WriteFile(challengeFilePath, []byte(challenge.KeyAuthorization), 0o644); err != nil {
 		return fmt.Errorf("无法在网站目录创建 HTTP 挑战所需的文件: %w", err)
 	}
 
@@ -45,8 +43,7 @@ func (s httpSolver) CleanUp(_ context.Context, challenge acme.Challenge) error {
 		return nil
 	}
 
-	err := os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath()))
-	if err != nil {
+	if err := os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath())); err != nil {
 		return fmt.Errorf("无法删除 HTTP 挑战文件: %w", err)
 	}
 
@@ -167,7 +164,6 @@ func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) 
 	dnsName := challenge.DNS01TXTRecordName()
 	keyAuth := challenge.DNS01KeyAuthorization()
 
-	// 追加记录到 records 中
 	*s.records = append(*s.records, DNSRecord{
 		Key:   dnsName,
 		Value: keyAuth,
@@ -177,7 +173,6 @@ func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) 
 	_, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	// 等待信号以继续
 	<-s.controlChan
 	return nil
 }
