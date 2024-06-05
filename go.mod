@@ -3,7 +3,7 @@ module github.com/TheTNB/panel
 go 1.22
 
 require (
-	github.com/docker/docker v26.1.3+incompatible
+	github.com/docker/docker v26.1.4+incompatible
 	github.com/docker/go-connections v0.5.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gookit/validate v1.5.2
