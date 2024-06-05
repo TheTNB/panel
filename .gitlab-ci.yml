@@ -59,7 +59,7 @@ fetch:
   stage: build
   image: alpine:latest
   before_script:
-    - sed -i 's/dl-cdn.alpinelinux.org/mirror.sjtu.edu.cn/g' /etc/apk/repositories
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
     - apk add --no-cache curl jq unzip zip
   script:
     - curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
@@ -87,6 +87,6 @@ release:
     # generate a changelog.
     GIT_DEPTH: 0
   script:
-    - sed -i 's/dl-cdn.alpinelinux.org/mirror.sjtu.edu.cn/g' /etc/apk/repositories
+    - sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
     - apk add --no-cache upx
     - goreleaser release --clean

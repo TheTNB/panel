@@ -123,9 +123,11 @@ Prepare_System() {
         if ${inChina}; then
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
                 -e 's|^#baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.cloud.tencent.com/rocky|g' \
+                -e 's|^# baseurl=http://dl.rockylinux.org/$contentdir|baseurl=https://mirrors.cloud.tencent.com/rocky|g' \
                 -i.bak \
                 /etc/yum.repos.d/[Rr]ocky*.repo
             sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+                -e 's|^#baseurl=https://repo.almalinux.org|baseurl=https://mirrors.cloud.tencent.com|g' \
                 -e 's|^# baseurl=https://repo.almalinux.org|baseurl=https://mirrors.cloud.tencent.com|g' \
                 -i.bak \
                 /etc/yum.repos.d/[Aa]lmalinux*.repo
@@ -137,6 +139,7 @@ Prepare_System() {
         dnf config-manager --set-enabled epel
         if ${inChina}; then
             sed -i 's|^#baseurl=https://download.example/pub|baseurl=https://mirrors.cloud.tencent.com|' /etc/yum.repos.d/epel*
+            sed -i 's|^# baseurl=https://download.example/pub|baseurl=https://mirrors.cloud.tencent.com|' /etc/yum.repos.d/epel*
             sed -i 's|^metalink|#metalink|' /etc/yum.repos.d/epel*
             dnf makecache -y
         fi
@@ -150,8 +153,8 @@ Prepare_System() {
         dnf install -y curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix podman rsyslog
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
-            sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
-            sed -i 's/security.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list
+            sed -i 's/deb.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list
+            sed -i 's/security.debian.org/mirrors.cloud.tencent.com/g' /etc/apt/sources.list
         fi
         apt-get update -y
         apt-get install -y curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix podman rsyslog
