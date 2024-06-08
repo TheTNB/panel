@@ -29,11 +29,36 @@ func NewFrpController() *FrpController {
 func (r *FrpController) Status(ctx http.Context) http.Response {
 	frps, err := tools.ServiceStatus("frps")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frpc 服务运行状态失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frps 服务运行状态失败")
 	}
 	frpc, err := tools.ServiceStatus("frpc")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frpc 服务运行状态失败")
+	}
+
+	return controllers.Success(ctx, http.Json{
+		"frps": frps,
+		"frpc": frpc,
+	})
+}
+
+// IsEnabled
+//
+//	@Summary		是否启用服务
+//	@Description	获取是否启用 Frp 服务
+//	@Tags			插件-Frp
+//	@Produce		json
+//	@Security		BearerToken
+//	@Success		200	{object}	controllers.SuccessResponse
+//	@Router			/plugins/frp/isEnabled [get]
+func (r *FrpController) IsEnabled(ctx http.Context) http.Response {
+	frps, err := tools.ServiceIsEnabled("frps")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frps 服务启用状态失败："+err.Error())
+	}
+	frpc, err := tools.ServiceIsEnabled("frpc")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frpc 服务启用状态失败")
 	}
 
 	return controllers.Success(ctx, http.Json{

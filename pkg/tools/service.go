@@ -1,6 +1,11 @@
 package tools
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os/exec"
+	"strings"
+)
 
 // ServiceStatus 获取服务状态
 func ServiceStatus(name string) (bool, error) {
@@ -10,8 +15,24 @@ func ServiceStatus(name string) (bool, error) {
 
 // ServiceIsEnabled 服务是否启用
 func ServiceIsEnabled(name string) (bool, error) {
-	output, err := Exec(fmt.Sprintf("systemctl is-enabled %s", name))
-	return output == "enabled", err
+	cmd := exec.Command("systemctl", "is-enabled", name)
+	output, _ := cmd.CombinedOutput()
+	status := strings.TrimSpace(string(output))
+
+	switch status {
+	case "enabled":
+		return true, nil
+	case "disabled":
+		return false, nil
+	case "masked":
+		return false, errors.New("服务已被屏蔽")
+	case "static":
+		return false, errors.New("服务已被静态启用")
+	case "indirect":
+		return false, errors.New("服务已被间接启用")
+	default:
+		return false, errors.New("无法确定服务状态")
+	}
 }
 
 // ServiceStart 启动服务

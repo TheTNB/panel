@@ -356,8 +356,9 @@ func Plugin() {
 		r.Prefix("frp").Group(func(route route.Router) {
 			frpController := plugins.NewFrpController()
 			route.Get("status", frpController.Status)
-			route.Get("enable", frpController.Enable)
-			route.Get("disable", frpController.Disable)
+			route.Get("isEnabled", frpController.IsEnabled)
+			route.Post("enable", frpController.Enable)
+			route.Post("disable", frpController.Disable)
 			route.Post("start", frpController.Start)
 			route.Post("stop", frpController.Stop)
 			route.Post("restart", frpController.Restart)
