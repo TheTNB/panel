@@ -38,7 +38,7 @@ func (r *Fail2banController) Status(ctx http.Context) http.Response {
 
 // Reload 重载配置
 func (r *Fail2banController) Reload(ctx http.Context) http.Response {
-	if _, err := tools.Exec("systemctl reload fail2ban"); err != nil {
+	if err := tools.ServiceReload("fail2ban"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 

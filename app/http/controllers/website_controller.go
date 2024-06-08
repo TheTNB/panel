@@ -606,8 +606,8 @@ server
 	if err := tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
 		return nil
 	}
-	if exec, err := tools.Exec("systemctl reload openresty"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, exec)
+	if err := tools.ServiceReload("openresty"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -670,11 +670,11 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 		}
 	}
 
-	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+	if err = tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return ErrorSystem(ctx)
 	}
-	if exec, err := tools.Exec("systemctl reload openresty"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, exec)
+	if err = tools.ServiceReload("openresty"); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)

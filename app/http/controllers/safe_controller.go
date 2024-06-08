@@ -28,24 +28,23 @@ func (r *SafeController) GetFirewallStatus(ctx http.Context) http.Response {
 
 // SetFirewallStatus 设置防火墙状态
 func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
-	var out string
 	var err error
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
-			out, err = tools.Exec("systemctl start firewalld")
+			err = tools.ServiceStart("firewalld")
 		} else {
-			out, err = tools.Exec("echo y | ufw enable")
+			_, err = tools.Exec("echo y | ufw enable")
 		}
 	} else {
 		if tools.IsRHEL() {
-			out, err = tools.Exec("systemctl stop firewalld")
+			err = tools.ServiceStop("firewalld")
 		} else {
-			out, err = tools.Exec("ufw disable")
+			_, err = tools.Exec("ufw disable")
 		}
 	}
 
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, out)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -213,27 +212,11 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 
 // firewallStatus 获取防火墙状态
 func (r *SafeController) firewallStatus() bool {
-	var out string
-	var err error
 	var running bool
 	if tools.IsRHEL() {
-		out, err = tools.Exec("systemctl status firewalld | grep Active | awk '{print $3}'")
-		if out == "(running)" {
-			running = true
-		} else {
-			running = false
-		}
+		running, _ = tools.ServiceStatus("firewalld")
 	} else {
-		out, err = tools.Exec("ufw status | grep Status | awk '{print $2}'")
-		if out == "active" {
-			running = true
-		} else {
-			running = false
-		}
-	}
-
-	if err != nil {
-		return false
+		running, _ = tools.ServiceStatus("ufw")
 	}
 
 	return running
@@ -241,53 +224,53 @@ func (r *SafeController) firewallStatus() bool {
 
 // GetSshStatus 获取 SSH 状态
 func (r *SafeController) GetSshStatus(ctx http.Context) http.Response {
-	var out string
+	var running bool
 	var err error
 	if tools.IsRHEL() {
-		out, err = tools.Exec("systemctl status sshd | grep Active | awk '{print $3}'")
+		running, err = tools.ServiceStatus("sshd")
 	} else {
-		out, err = tools.Exec("systemctl status ssh | grep Active | awk '{print $3}'")
+		running, err = tools.ServiceStatus("ssh")
 	}
 
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, out)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, out == "(running)")
+	return Success(ctx, running)
 }
 
 // SetSshStatus 设置 SSH 状态
 func (r *SafeController) SetSshStatus(ctx http.Context) http.Response {
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
-			if out, err := tools.Exec("systemctl enable sshd"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceEnable("sshd"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
-			if out, err := tools.Exec("systemctl start sshd"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceStart("sshd"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
 		} else {
-			if out, err := tools.Exec("systemctl enable ssh"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceEnable("ssh"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
-			if out, err := tools.Exec("systemctl start ssh"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceStart("ssh"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
 		}
 	} else {
 		if tools.IsRHEL() {
-			if out, err := tools.Exec("systemctl stop sshd"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceStop("sshd"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
-			if out, err := tools.Exec("systemctl disable sshd"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceDisable("sshd"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
 		} else {
-			if out, err := tools.Exec("systemctl stop ssh"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceStop("ssh"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
-			if out, err := tools.Exec("systemctl disable ssh"); err != nil {
-				return Error(ctx, http.StatusInternalServerError, out)
+			if err := tools.ServiceDisable("ssh"); err != nil {
+				return Error(ctx, http.StatusInternalServerError, err.Error())
 			}
 		}
 	}
@@ -319,12 +302,19 @@ func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 	_, _ = tools.Exec("sed -i 's/#Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
 	_, _ = tools.Exec("sed -i 's/Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
 
-	out, err := tools.Exec("systemctl status sshd | grep Active | awk '{print $3}'")
-	if err != nil || out != "(running)" {
-		Error(ctx, http.StatusInternalServerError, out)
+	var sshName string
+	if tools.IsRHEL() {
+		sshName = "sshd"
+	} else {
+		sshName = "ssh"
 	}
 
-	_, _ = tools.Exec("systemctl restart sshd")
+	status, _ := tools.ServiceStatus(sshName)
+	if !status {
+		Error(ctx, http.StatusInternalServerError, "SSH 服务未运行")
+	}
+
+	_ = tools.ServiceRestart(sshName)
 	return Success(ctx, nil)
 }
 

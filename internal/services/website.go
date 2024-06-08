@@ -224,7 +224,7 @@ server
 		return models.Website{}, err
 	}
 
-	if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+	if err := tools.ServiceReload("openresty"); err != nil {
 		return models.Website{}, err
 	}
 
@@ -265,10 +265,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 	if strings.TrimSpace(raw) != strings.TrimSpace(config.Raw) {
-		if err := tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
+		if err = tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
 		}
-		if _, err := tools.Exec("systemctl reload openresty"); err != nil {
+		if err = tools.ServiceReload("openresty"); err != nil {
 			return err
 		}
 

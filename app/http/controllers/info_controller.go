@@ -108,8 +108,8 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 	}
 	var databaseCount int64
 	if mysqlInstalled {
-		status, err := tools.Exec("systemctl status mysqld | grep Active | grep -v grep | awk '{print $2}'")
-		if status == "active" && err == nil {
+		status, err := tools.ServiceStatus("mysqld")
+		if status && err == nil {
 			rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 			type database struct {
 				Name string `json:"name"`
@@ -150,8 +150,8 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 		}
 	}
 	if postgresqlInstalled {
-		status, err := tools.Exec("systemctl status postgresql | grep Active | grep -v grep | awk '{print $2}'")
-		if status == "active" && err == nil {
+		status, err := tools.ServiceStatus("postgresql")
+		if status && err == nil {
 			raw, err := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
 			if err == nil {
 				databases := strings.Split(raw, "\n")
