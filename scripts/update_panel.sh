@@ -105,6 +105,11 @@ if version_lt "$oldVersion" "2.2.0"; then
     echo "更新面板到 v2.2.0 ..."
     echo "Update panel to v2.2.0 ..."
     echo "APP_LOCALE=zh_CN" >> $panelPath/panel.conf
+fi
+
+if version_lt "$oldVersion" "2.2.4"; then
+    echo "更新面板到 v2.2.4 ..."
+    echo "Update panel to v2.2.4 ..."
     if [ "${OS}" == "centos" ]; then
         dnf makecache
         dnf install -y p7zip p7zip-plugins rsyslog
