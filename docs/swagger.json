@@ -3544,6 +3544,31 @@
                 }
             }
         },
+        "/plugins/frp/isEnabled": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取是否启用 Frp 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Frp"
+                ],
+                "summary": "是否启用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/plugins/frp/restart": {
             "post": {
                 "security": [
@@ -3667,6 +3692,240 @@
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/config": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Gitea 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "获取配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Gitea 配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "更新配置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_gitea.UpdateConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/disable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "禁用 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "禁用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/enable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启用 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "启用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/isEnabled": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取是否启用 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "是否启用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/restart": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "重启 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "重启服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启动 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "启动服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Gitea 服务状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "服务状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/gitea/stop": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "停止 Gitea 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Gitea"
+                ],
+                "summary": "停止服务",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4064,6 +4323,14 @@
                     "type": "string"
                 },
                 "service": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_TheTNB_panel_app_http_requests_plugins_gitea.UpdateConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
                     "type": "string"
                 }
             }

@@ -58,7 +58,7 @@ func (r *GiteaController) IsEnabled(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/enable [post]
 func (r *GiteaController) Enable(ctx http.Context) http.Response {
 	if err := tools.ServiceEnable("gitea"); err != nil {
@@ -75,7 +75,7 @@ func (r *GiteaController) Enable(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/disable [post]
 func (r *GiteaController) Disable(ctx http.Context) http.Response {
 	if err := tools.ServiceDisable("gitea"); err != nil {
@@ -92,7 +92,7 @@ func (r *GiteaController) Disable(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/restart [post]
 func (r *GiteaController) Restart(ctx http.Context) http.Response {
 	if err := tools.ServiceRestart("gitea"); err != nil {
@@ -109,7 +109,7 @@ func (r *GiteaController) Restart(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/start [post]
 func (r *GiteaController) Start(ctx http.Context) http.Response {
 	if err := tools.ServiceStart("gitea"); err != nil {
@@ -131,7 +131,7 @@ func (r *GiteaController) Start(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/stop [post]
 func (r *GiteaController) Stop(ctx http.Context) http.Response {
 	if err := tools.ServiceStop("gitea"); err != nil {
@@ -153,7 +153,7 @@ func (r *GiteaController) Stop(ctx http.Context) http.Response {
 //	@Tags			插件-Gitea
 //	@Produce		json
 //	@Security		BearerToken
-//	@Success		200		{object}	controllers.SuccessResponse
+//	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/config [get]
 func (r *GiteaController) GetConfig(ctx http.Context) http.Response {
 	config, err := tools.Read("/www/server/gitea/app.ini")

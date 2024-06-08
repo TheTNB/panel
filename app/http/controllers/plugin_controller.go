@@ -94,7 +94,7 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Install(slug); err != nil {
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, "任务已提交")
@@ -105,7 +105,7 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Uninstall(slug); err != nil {
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, "任务已提交")
@@ -116,7 +116,7 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Update(slug); err != nil {
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, "任务已提交")

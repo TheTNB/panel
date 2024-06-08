@@ -43,6 +43,11 @@ definitions:
       service:
         type: string
     type: object
+  github_com_TheTNB_panel_app_http_requests_plugins_gitea.UpdateConfig:
+    properties:
+      config:
+        type: string
+    type: object
   github_com_TheTNB_panel_app_http_requests_plugins_rsync.Update:
     properties:
       auth_user:
@@ -2811,6 +2816,21 @@ paths:
       summary: 启用服务
       tags:
       - 插件-Frp
+  /plugins/frp/isEnabled:
+    get:
+      description: 获取是否启用 Frp 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 是否启用服务
+      tags:
+      - 插件-Frp
   /plugins/frp/restart:
     post:
       description: 重启 Frp 服务
@@ -2892,6 +2912,147 @@ paths:
       summary: 停止服务
       tags:
       - 插件-Frp
+  /plugins/gitea/config:
+    get:
+      description: 获取 Gitea 配置
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 插件-Gitea
+    post:
+      description: 更新 Gitea 配置
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_TheTNB_panel_app_http_requests_plugins_gitea.UpdateConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新配置
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/disable:
+    post:
+      description: 禁用 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 禁用服务
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/enable:
+    post:
+      description: 启用 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启用服务
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/isEnabled:
+    get:
+      description: 获取是否启用 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 是否启用服务
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/restart:
+    post:
+      description: 重启 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重启服务
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/start:
+    post:
+      description: 启动 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启动服务
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/status:
+    get:
+      description: 获取 Gitea 服务状态
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 服务状态
+      tags:
+      - 插件-Gitea
+  /plugins/gitea/stop:
+    post:
+      description: 停止 Gitea 服务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 停止服务
+      tags:
+      - 插件-Gitea
   /plugins/rsync/config:
     get:
       description: 获取 Rsync 配置
