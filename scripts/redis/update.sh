@@ -24,7 +24,7 @@ OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || 
 downloadUrl="https://dl.cdn.haozi.net/panel/redis"
 setupPath="/www"
 redisPath="${setupPath}/server/redis"
-redisVersion="7.2.4"
+redisVersion="7.2.5"
 cpuCore=$(cat /proc/cpuinfo | grep "processor" | wc -l)
 
 # 读取信息

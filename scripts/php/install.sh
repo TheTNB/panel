@@ -65,11 +65,11 @@ if [ "${phpVersion}" == "74" ]; then
 elif [ "${phpVersion}" == "80" ]; then
     phpVersionCode="8.0.30"
 elif [ "${phpVersion}" == "81" ]; then
-    phpVersionCode="8.1.28"
+    phpVersionCode="8.1.29"
 elif [ "${phpVersion}" == "82" ]; then
-    phpVersionCode="8.2.19"
+    phpVersionCode="8.2.20"
 elif [ "${phpVersion}" == "83" ]; then
-    phpVersionCode="8.3.7"
+    phpVersionCode="8.3.8"
 else
     echo -e $HR
     echo "错误：PHP-${phpVersion}不支持，请检查版本号是否正确。"
