@@ -94,8 +94,8 @@ sed -i 's/ADD_SUBDIRECTORY(mysql-test)//g' CMakeLists.txt
 mkdir build
 cd build
 
-# 5.7 需要 boost
-if [[ "${1}" == "57" ]]; then
+# 5.7 和 8.0 需要 boost
+if [[ "${1}" == "57" ]] || [[ "${1}" == "80" ]]; then
     MAYBE_WITH_BOOST="-DWITH_BOOST=../boost"
 fi
 

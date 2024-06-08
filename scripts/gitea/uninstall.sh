@@ -19,19 +19,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
 HR="+----------------------------------------------------"
-frpPath="/www/server/frp"
+giteaPath="/www/server/gitea"
 
-systemctl stop frps
-systemctl stop frpc
-systemctl disable frps
-systemctl disable frpc
+systemctl stop gitea
+systemctl disable gitea
 
-rm -rf ${frpPath}
-rm -f /etc/systemd/system/frps.service
-rm -f /etc/systemd/system/frpc.service
+rm -f /usr/local/bin/gitea
+rm -rf ${giteaPath}
+rm -f /etc/systemd/system/gitea.service
 systemctl daemon-reload
 
-panel deletePlugin frp
+panel deletePlugin gitea
 echo -e $HR
-echo "frp 卸载完成"
+echo "gitea 卸载完成，数据库可能需自行删除"
 echo -e $HR

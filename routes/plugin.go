@@ -365,6 +365,18 @@ func Plugin() {
 			route.Get("config", frpController.GetConfig)
 			route.Post("config", frpController.UpdateConfig)
 		})
+		r.Prefix("gitea").Group(func(route route.Router) {
+			giteaController := plugins.NewGiteaController()
+			route.Get("status", giteaController.Status)
+			route.Get("isEnabled", giteaController.IsEnabled)
+			route.Post("enable", giteaController.Enable)
+			route.Post("disable", giteaController.Disable)
+			route.Post("start", giteaController.Start)
+			route.Post("stop", giteaController.Stop)
+			route.Post("restart", giteaController.Restart)
+			route.Get("config", giteaController.GetConfig)
+			route.Post("config", giteaController.UpdateConfig)
+		})
 		r.Prefix("toolbox").Group(func(route route.Router) {
 			toolboxController := plugins.NewToolBoxController()
 			route.Get("dns", toolboxController.GetDNS)

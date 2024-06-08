@@ -96,4 +96,7 @@ systemctl start frps
 systemctl start frpc
 
 panel writePlugin frp ${frpVersion}
-echo -e "${HR}\nfrp 安装完成\n${HR}"
+echo -e ${HR}
+echo "frp 安装完成"
+echo -e ${HR}
+

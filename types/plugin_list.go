@@ -228,6 +228,18 @@ var PluginFrp = Plugin{
 	Update:      `bash /www/panel/scripts/frp/install.sh`,
 }
 
+var PluginGitea = Plugin{
+	Name:        "Gitea",
+	Description: "Gitea 是一款极易搭建的自助 Git 服务，它包括 Git 托管、代码审查、团队协作、软件包注册和 CI/CD。",
+	Slug:        "gitea",
+	Version:     "1.22.0",
+	Requires:    []string{},
+	Excludes:    []string{},
+	Install:     `bash /www/panel/scripts/gitea/install.sh`,
+	Uninstall:   `bash /www/panel/scripts/gitea/uninstall.sh`,
+	Update:      `bash /www/panel/scripts/gitea/install.sh`,
+}
+
 var PluginToolBox = Plugin{
 	Name:        "系统工具箱",
 	Description: "可视化调整一些常用的配置项，如 DNS、SWAP、时区等",
