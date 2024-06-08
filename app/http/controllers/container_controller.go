@@ -63,11 +63,8 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 		endIndex = len(containers)
 	}
 	paged := containers[startIndex:endIndex]
-	if paged == nil {
-		paged = []types.Container{}
-	}
 
-	var items []any
+	items := make([]any, 0)
 	for _, item := range paged {
 		var name string
 		if len(item.Names) > 0 {
