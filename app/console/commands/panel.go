@@ -87,9 +87,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 	case "update":
 		var task models.Task
-		err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
-		if err == nil {
+		if err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task); err == nil {
 			color.Red().Printfln(translate.Get("commands.panel.update.taskCheck"))
+			return nil
+		}
+		if _, err := facades.Orm().Query().Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
+			types.Status = types.StatusFailed
+			color.Red().Printfln(translate.Get("commands.panel.update.dbFail"))
 			return nil
 		}
 
@@ -98,6 +102,9 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			color.Red().Printfln(translate.Get("commands.panel.update.versionFail"))
 			return err
 		}
+
+		// 停止面板服务，因为在shell中运行的和systemd的不同
+		_ = tools.ServiceStop("panel")
 
 		types.Status = types.StatusUpgrade
 		if err = tools.UpdatePanel(panel); err != nil {

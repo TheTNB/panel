@@ -24,6 +24,7 @@
       "update": {
         "description": "更新 / 修复面板到最新版本",
         "taskCheck": "当前有任务正在执行，禁止更新",
+        "dbFail": "面板数据库异常，已终止操作",
         "versionFail": "获取最新版本失败",
         "fail": "更新失败",
         "success": "更新成功"

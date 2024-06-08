@@ -298,9 +298,12 @@ func (r *InfoController) UpdateInfo(ctx http.Context) http.Response {
 // Update 更新面板
 func (r *InfoController) Update(ctx http.Context) http.Response {
 	var task models.Task
-	err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task)
-	if err == nil {
+	if err := facades.Orm().Query().Where("status", models.TaskStatusRunning).OrWhere("status", models.TaskStatusWaiting).FirstOrFail(&task); err == nil {
 		return Error(ctx, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
+	}
+	if _, err := facades.Orm().Query().Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
+		types.Status = types.StatusFailed
+		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("面板数据库异常，已终止操作：%s", err.Error()))
 	}
 
 	panel, err := tools.GetLatestPanelVersion()

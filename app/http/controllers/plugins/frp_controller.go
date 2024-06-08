@@ -54,7 +54,7 @@ func (r *FrpController) Status(ctx http.Context) http.Response {
 func (r *FrpController) IsEnabled(ctx http.Context) http.Response {
 	frps, err := tools.ServiceIsEnabled("frps")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frps 服务启用状态失败："+err.Error())
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取 frps 服务启用状态失败")
 	}
 	frpc, err := tools.ServiceIsEnabled("frpc")
 	if err != nil {

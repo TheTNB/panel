@@ -24,6 +24,7 @@
       "update": {
         "description": "update/fix panel to latest version",
         "taskCheck": "There is currently a task being executed and updates are prohibited.",
+        "dbFail": "panel database exception, operation terminated",
         "versionFail": "failed to get latest version",
         "fail": "update failed",
         "success": "update completed"
@@ -76,7 +77,7 @@
         "databaseGetFail": "failed to get database",
         "databaseNotExist": "database does not exist",
         "targetPostgres": "target PostgreSQL database",
-        "cleanBackup" : "clean backup",
+        "cleanBackup": "clean backup",
         "cleanupFail": "cleanup failed",
         "cleanupSuccess": "cleanup successful",
         "deleteFail": "failed to delete",
