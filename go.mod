@@ -9,7 +9,7 @@ require (
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.14.1-0.20240608091017-72e9e3621f24
 	github.com/goravel/gin v1.2.1
-	github.com/gorilla/websocket v1.5.1
+	github.com/gorilla/websocket v1.5.2
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.1
 	github.com/libdns/dnspod v0.0.3
