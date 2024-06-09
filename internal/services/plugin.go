@@ -53,6 +53,7 @@ func (r *PluginImpl) All() []types.Plugin {
 		types.PluginRsync,
 		types.PluginSupervisor,
 		types.PluginFail2ban,
+		types.PluginPodman,
 		types.PluginFrp,
 		types.PluginGitea,
 		types.PluginToolBox,
