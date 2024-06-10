@@ -106,6 +106,14 @@ if version_lt "$oldVersion" "2.2.4"; then
     fi
 fi
 
+if version_lt "$oldVersion" "2.2.6"; then
+    echo "更新面板到 v2.2.6 ..."
+    echo "Update panel to v2.2.6 ..."
+    if [ -f "/usr/bin/podman" ]; then
+        panel writePlugin podman 4.0.0
+    fi
+fi
+
 echo $HR
 echo "更新结束"
 echo "Update finished"
