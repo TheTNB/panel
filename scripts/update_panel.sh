@@ -86,21 +86,6 @@ if version_lt "$oldVersion" "2.1.30"; then
     openssl req -x509 -nodes -days 36500 -newkey ec:<(openssl ecparam -name secp384r1) -keyout $panelPath/storage/ssl.key -out $panelPath/storage/ssl.crt -subj "/C=CN/ST=Tianjin/L=Tianjin/O=HaoZi Technology Co., Ltd./OU=HaoZi Panel/CN=Panel"
 fi
 
-if version_lt "$oldVersion" "2.1.39"; then
-    echo "更新面板到 v2.1.39 ..."
-    echo "Update panel to v2.1.39 ..."
-    if [ "${OS}" == "centos" ]; then
-        dnf makecache
-        dnf install -y podman
-    else
-        apt-get update -y
-        apt-get install -y podman
-    fi
-
-    systemctl enable podman
-    systemctl start podman
-fi
-
 if version_lt "$oldVersion" "2.2.0"; then
     echo "更新面板到 v2.2.0 ..."
     echo "Update panel to v2.2.0 ..."

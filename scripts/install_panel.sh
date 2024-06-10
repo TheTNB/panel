@@ -150,14 +150,14 @@ Prepare_System() {
         # Rocky Linux
         /usr/bin/crb enable
         dnf makecache -y
-        dnf install -y curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix podman rsyslog
+        dnf install -y curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix rsyslog
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
         fi
         apt-get update -y
-        apt-get install -y curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix podman rsyslog
+        apt-get install -y curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix rsyslog
     fi
     if [ "$?" != "0" ]; then
         echo -e $HR
@@ -166,9 +166,7 @@ Prepare_System() {
     fi
 
     systemctl enable rsyslog
-    systemctl enable podman
     systemctl start rsyslog
-    systemctl start podman
     if [ "$?" != "0" ]; then
         echo -e $HR
         echo "错误：安装面板依赖软件失败，请截图错误信息寻求帮助。"
