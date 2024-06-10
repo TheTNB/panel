@@ -3943,6 +3943,299 @@ const docTemplate = `{
                 }
             }
         },
+        "/plugins/podman/disable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "禁用 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "禁用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/enable": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启用 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "启用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/isEnabled": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取是否启用 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "是否启用服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/registryConfig": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Podman 注册表配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "获取注册表配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Podman 注册表配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "更新注册表配置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateRegistryConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/restart": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "重启 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "重启服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/start": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "启动 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "启动服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/status": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Podman 服务状态",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "服务状态",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/stop": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "停止 Podman 服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "停止服务",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/plugins/podman/storageConfig": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "获取 Podman 存储配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "获取存储配置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "更新 Podman 存储配置",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件-Podman"
+                ],
+                "summary": "更新存储配置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateStorageConfig"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/plugins/rsync/config": {
             "get": {
                 "security": [
@@ -5077,6 +5370,22 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UpdateRegistryConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.UpdateStorageConfig": {
+            "type": "object",
+            "properties": {
+                "config": {
                     "type": "string"
                 }
             }

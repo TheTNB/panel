@@ -18,6 +18,8 @@ func MustInstall() http.Middleware {
 		var slug string
 		if strings.HasPrefix(path, "/api/panel/website") {
 			slug = "openresty"
+		} else if strings.HasPrefix(path, "/api/panel/container") {
+			slug = "podman"
 		} else {
 			pathArr := strings.Split(path, "/")
 			if len(pathArr) < 4 {

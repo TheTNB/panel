@@ -114,7 +114,7 @@ func Api() {
 			r.Get("pingStatus", safeController.GetPingStatus)
 			r.Post("pingStatus", safeController.SetPingStatus)
 		})
-		r.Prefix("container").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("container").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
 			containerController := controllers.NewContainerController()
 			r.Get("list", containerController.ContainerList)
 			r.Get("search", containerController.ContainerSearch)
