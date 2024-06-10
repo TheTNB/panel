@@ -117,6 +117,67 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 		return models.Website{}, err
 	}
 
+	notFound := `<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Not Found</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5em;
+        }
+        p {
+            color: #555;
+            line-height: 1.8;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 2em 15px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>404 Not Found</h1>
+        <p>由 <a target="_blank" href="https://github.com/TheTNB/panel">耗子面板</a> 强力驱动</p>
+    </div>
+</body>
+</html>
+
+`
+	if err := tools.Write(website.Path+"/404.html", notFound, 0644); err != nil {
+		return models.Website{}, err
+	}
+
 	portList := ""
 	domainList := ""
 	portUsed := make(map[uint]bool)
@@ -174,7 +235,7 @@ server
     # waf标记位结束
 
     # 错误页配置，可自行设置
-    #error_page 404 /404.html;
+    error_page 404 /404.html;
     #error_page 502 /502.html;
 
     # 伪静态规则引入，修改后将导致面板设置的伪静态规则失效
@@ -211,13 +272,7 @@ server
 		return models.Website{}, err
 	}
 
-	if err := tools.Chmod(r.setting.Get(models.SettingKeyWebsitePath), 0755); err != nil {
-		return models.Website{}, err
-	}
 	if err := tools.Chmod(website.Path, 0755); err != nil {
-		return models.Website{}, err
-	}
-	if err := tools.Chown(r.setting.Get(models.SettingKeyWebsitePath), "www", "www"); err != nil {
 		return models.Website{}, err
 	}
 	if err := tools.Chown(website.Path, "www", "www"); err != nil {
