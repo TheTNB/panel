@@ -117,7 +117,7 @@ func Chmod(path string, permission os.FileMode) error {
 		return errors.New("chmod is not supported on Windows")
 	}
 
-	cmd := exec.Command("chmod", "-R", permission.String(), path)
+	cmd := exec.Command("chmod", "-R", fmt.Sprintf("%o", permission), path)
 	return cmd.Run()
 }
 
