@@ -42,7 +42,7 @@ Install() {
         apt-get install imagemagick libmagickwand-dev -y
     else
         echo -e $HR
-        echo "错误：耗子 Linux 面板不支持该系统"
+        echo "错误：耗子面板不支持该系统"
         exit 1
     fi
 

@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "耗子 Linux 面板的 API 信息",
-        "title": "耗子 Linux 面板 API",
+        "description": "耗子面板的 API 信息",
+        "title": "耗子面板 API",
         "contact": {
             "name": "耗子科技",
             "email": "admin@haozi.net"

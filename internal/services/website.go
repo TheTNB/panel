@@ -64,7 +64,7 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>耗子 Linux 面板</title>
+    <title>耗子面板</title>
     <style>
         body {
             background-color: #f9f9f9;
@@ -105,8 +105,8 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 </head>
 <body>
     <div class="container">
-        <h1>耗子 Linux 面板</h1>
-        <p>这是耗子 Linux 面板的网站默认页面！</p>
+        <h1>耗子面板</h1>
+        <p>这是耗子面板的网站默认页面！</p>
         <p>当您看到此页面，说明您的网站已创建成功。</p>
     </div>
 </body>

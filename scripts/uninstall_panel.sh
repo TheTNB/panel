@@ -18,7 +18,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 '
 
-LOGO="+----------------------------------------------------\n| 耗子 Linux 面板卸载脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
+LOGO="+----------------------------------------------------\n| 耗子面板卸载脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
 HR="+----------------------------------------------------"
 download_Url=""
 setup_Path="/www"
@@ -33,7 +33,7 @@ Prepare_System() {
     isInstalled=$(systemctl status panel 2>&1 | grep "Active")
     if [ "${isInstalled}" == "" ]; then
         echo -e $HR
-        echo "错误：耗子 Linux 面板未安装，无需卸载。"
+        echo "错误：耗子面板未安装，无需卸载。"
         exit 1
     fi
 
@@ -80,7 +80,7 @@ if [ "${uninstall}" != 'y' ]; then
 fi
 
 echo -e "${LOGO}"
-echo '正在卸载耗子 Linux 面板...'
+echo '正在卸载耗子面板...'
 echo -e $HR
 
 Prepare_System
@@ -90,8 +90,8 @@ Remove_Panel
 clear
 
 echo -e "${LOGO}"
-echo '耗子 Linux 面板卸载完成。'
-echo '感谢您的使用，欢迎您再次使用耗子 Linux 面板。'
+echo '耗子面板卸载完成。'
+echo '感谢您的使用，欢迎您再次使用耗子面板。'
 echo -e $HR
 
 rm -f uninstall_panel.sh

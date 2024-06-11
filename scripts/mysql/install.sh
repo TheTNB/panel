@@ -56,7 +56,7 @@ elif [ "${OS}" == "debian" ]; then
     apt-get install build-essential cmake bison libncurses5-dev libtirpc-dev libssl-dev pkg-config libldap2-dev libudev-dev libsasl2-dev patchelf -y
 else
     echo -e $HR
-    echo "错误：耗子 Linux 面板不支持该系统"
+    echo "错误：耗子面板不支持该系统"
     exit 1
 fi
 

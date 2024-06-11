@@ -672,10 +672,10 @@ info:
   contact:
     email: admin@haozi.net
     name: 耗子科技
-  description: 耗子 Linux 面板的 API 信息
+  description: 耗子面板的 API 信息
   license:
     name: GNU Affero General Public License v3
-  title: 耗子 Linux 面板 API
+  title: 耗子面板 API
   version: "2"
 paths:
   /panel/cert/algorithms:

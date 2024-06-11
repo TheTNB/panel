@@ -22,9 +22,9 @@ import (
 	"github.com/TheTNB/panel/bootstrap"
 )
 
-//	@title			耗子 Linux 面板 API
+//	@title			耗子面板 API
 //	@version		2
-//	@description	耗子 Linux 面板的 API 信息
+//	@description	耗子面板的 API 信息
 
 //	@contact.name	耗子科技
 //	@contact.email	admin@haozi.net

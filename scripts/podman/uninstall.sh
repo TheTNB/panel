@@ -30,7 +30,7 @@ elif [ "${OS}" == "debian" ]; then
     apt-get remove podman -y
 else
     echo -e $HR
-    echo "错误：耗子 Linux 面板不支持该系统"
+    echo "错误：耗子面板不支持该系统"
     exit 1
 fi
 

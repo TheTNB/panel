@@ -2,7 +2,7 @@
 [简体中文] | [<a href="README_EN.md">English</a>]
 </p>
 
-<h1 align="center">耗子 Linux 面板</h1>
+<h1 align="center">耗子面板</h1>
 
 <p align="center">
   <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
@@ -12,7 +12,7 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-耗子 Linux 面板是使用 Golang + Vue 开发的开源轻量 Linux 服务器运维管理面板。
+耗子面板是使用 Golang + Vue 开发的开源轻量 Linux 服务器运维管理面板。
 
 交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 论坛：[tom.moe](https://tom.moe) | 赞助：[爱发电](https://afdian.net/a/TheTNB)
 
@@ -32,7 +32,7 @@
 
 ## 运行环境
 
-耗子 Linux 面板仅支持 `amd64` | `arm64` 架构下的主流系统的最新版本，不支持 `Ubuntu`，因为其发版太过频繁，难以维护。
+耗子面板仅支持 `amd64` | `arm64` 架构下的主流系统的最新版本，不支持 `Ubuntu`，因为其发版太过频繁，难以维护。
 
 低配机器建议使用 `Debian`，资源占用较 `RHEL` 系更低。其他机器建议使用 `AlmaLinux` | `RockyLinux`，维护周期更长也更稳定。
 
@@ -50,7 +50,7 @@
 ## 安装面板
 
 > **Warning**
-> 安装面板前，你需要了解 LNMP 环境的基本知识，以及如何处理常见的 LNMP 环境问题，不建议 0 基础的用户安装和使用耗子 Linux 面板。
+> 安装面板前，你需要了解 LNMP 环境的基本知识，以及如何处理常见的 LNMP 环境问题，不建议 0 基础的用户安装和使用耗子面板。
 
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
@@ -88,7 +88,7 @@ panel
 
 ## 赞助商
 
-如果耗子 Linux 面板对你有帮助，欢迎[赞助我们](https://afdian.net/a/TheTNB)，感谢以下支持者/赞助商的支持：
+如果耗子面板对你有帮助，欢迎[赞助我们](https://afdian.net/a/TheTNB)，感谢以下支持者/赞助商的支持：
 
 **同时接受云资源赞助，可通过QQ群咨询联系**
 
@@ -127,4 +127,4 @@ panel
 
 ## 免责声明
 
-严禁使用耗子 Linux 面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。
+严禁使用耗子面板从事任何非法活动，非法站点请勿向我们请求任何形式的技术支持，如果在技术支持过程中发现非法内容，我们将立即停止技术支持并留存相关证据。

@@ -22,7 +22,7 @@ HR="+----------------------------------------------------"
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
 if [ "${OS}" == "unknown" ]; then
     echo -e $HR
-    echo "错误：该系统不支持安装耗子 Linux 面板，请更换 Debian 12.x / RHEL 9.x 安装。"
+    echo "错误：该系统不支持安装耗子面板，请更换 Debian 12.x / RHEL 9.x 安装。"
     exit 1
 fi
 
