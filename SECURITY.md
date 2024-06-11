@@ -13,9 +13,9 @@
 
 ## Security Policy
 
-Security is one of our biggest concerns. We have widely used HaoZi Linux Panel in production environments for many different applications, and there has been no safety incident so far.
+Security is one of our biggest concerns. We have widely used Rat Panel in production environments for many different applications, and there has been no safety incident so far.
 
-HaoZi Linux Panel adopts various solutions in the industry to ensure the security of the panel as much as possible, but we cannot guarantee the absolute security of the panel, **therefore we do not make any guarantees on the security of the panel**.
+Rat Panel adopts various solutions in the industry to ensure the security of the panel as much as possible, but we cannot guarantee the absolute security of the panel, **therefore we do not make any guarantees on the security of the panel**.
 
 If you find any security issues while using the panel, please do not submit an Issue. You can contact us directly through the following methods:
 

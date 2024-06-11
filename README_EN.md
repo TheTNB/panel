@@ -2,7 +2,7 @@
 [<a href="README.md">简体中文</a>] | [English]
 </p>
 
-<h1 align="center">HaoZi Linux Panel</h1>
+<h1 align="center">Rat Panel</h1>
 
 <p align="center">
   <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
@@ -12,7 +12,7 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-The HaoZi Linux Panel is an open source lightweight Linux server operation and maintenance management panel developed using Golang and Vue.
+The Rat Panel is an open source lightweight Linux server operation and maintenance management panel developed using Golang and Vue.
 
 Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
 
@@ -32,7 +32,7 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | For
 
 ## Operating Environment
 
-HaoZi Linux Panel only supports the latest version of mainstream systems under the `amd64` | `arm64` architecture. It does not support `Ubuntu` because its releases are too frequent and difficult to maintain.
+Rat Panel only supports the latest version of mainstream systems under the `amd64` | `arm64` architecture. It does not support `Ubuntu` because its releases are too frequent and difficult to maintain.
 
 Recommended to use `Debian` for low-configuration machines, as its resource usage is lower than that of the `RHEL` system. For other machines, recommended to use `RockyLinux` | `AlmaLinux`, which has a longer maintenance cycle and is more stable.
 
@@ -50,7 +50,7 @@ As system versions are constantly updated, we may also terminate support for som
 ## Install Panel
 
 > **Warning**
-> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. It is not recommended for users with zero basic knowledge to install and use HaoZi Linux Panel.
+> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. It is not recommended for users with zero basic knowledge to install and use Rat Panel.
 
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
@@ -88,7 +88,7 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 
 ## Sponsor
 
-If the HaoZi Linux Panel is helpful to you, welcome to [sponsor us](https://opencollective.com/tnb), thanks to the following supporters/sponsors:
+If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollective.com/tnb), thanks to the following supporters/sponsors:
 
 **Accept cloud resources and financial sponsorship, you can contact us through QQ group**
 
@@ -127,4 +127,4 @@ This project owes its existence to all those who have contributed. To contribute
 
 ## Disclaimer
 
-It is strictly prohibited to use the HaoZi Linux Panel to engage in any illegal activities. Please do not request any form of technical support from us for illegal sites. If illegal content is discovered during the technical support process, we will immediately stop technical support and retain relevant evidence.
+It is strictly prohibited to use the Rat Panel to engage in any illegal activities. Please do not request any form of technical support from us for illegal sites. If illegal content is discovered during the technical support process, we will immediately stop technical support and retain relevant evidence.
