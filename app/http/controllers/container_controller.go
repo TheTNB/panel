@@ -201,6 +201,10 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
+	if err = r.container.ContainerStart(id); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
 	return Success(ctx, id)
 }
 
