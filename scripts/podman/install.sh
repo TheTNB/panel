@@ -35,7 +35,9 @@ else
 fi
 
 systemctl enable podman
+systemctl enable podman-restart
 systemctl start podman
+systemctl start podman-restart
 
 panel writePlugin podman ${podmanVersion}
 echo -e ${HR}
