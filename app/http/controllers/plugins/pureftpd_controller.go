@@ -9,14 +9,10 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type PureFtpdController struct {
-}
-
-type User struct {
-	Username string `json:"username"`
-	Path     string `json:"path"`
 }
 
 func NewPureFtpdController() *PureFtpdController {
@@ -29,19 +25,19 @@ func (r *PureFtpdController) List(ctx http.Context) http.Response {
 	if err != nil {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []User{},
+			"items": []types.PureFtpdUser{},
 		})
 	}
 
 	listArr := strings.Split(listRaw, "\n")
-	var users []User
+	var users []types.PureFtpdUser
 	for _, v := range listArr {
 		if len(v) == 0 {
 			continue
 		}
 
 		match := regexp.MustCompile(`(\S+)\s+(\S+)`).FindStringSubmatch(v)
-		users = append(users, User{
+		users = append(users, types.PureFtpdUser{
 			Username: match[1],
 			Path:     strings.Replace(match[2], "/./", "/", 1),
 		})
@@ -54,7 +50,7 @@ func (r *PureFtpdController) List(ctx http.Context) http.Response {
 	if startIndex > len(users) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []User{},
+			"items": []types.PureFtpdUser{},
 		})
 	}
 	if endIndex > len(users) {
