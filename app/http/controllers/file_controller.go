@@ -36,7 +36,7 @@ func NewFileController() *FileController {
 //	@Router			/panel/file/create [post]
 func (r *FileController) Create(ctx http.Context) http.Response {
 	var request requests.NotExist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -69,7 +69,7 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 //	@Router			/panel/file/content [get]
 func (r *FileController) Content(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -106,7 +106,7 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 //	@Router			/panel/file/save [post]
 func (r *FileController) Save(ctx http.Context) http.Response {
 	var request requests.Save
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -136,7 +136,7 @@ func (r *FileController) Save(ctx http.Context) http.Response {
 //	@Router			/panel/file/delete [post]
 func (r *FileController) Delete(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -162,7 +162,7 @@ func (r *FileController) Delete(ctx http.Context) http.Response {
 //	@Router			/panel/file/upload [post]
 func (r *FileController) Upload(ctx http.Context) http.Response {
 	var request requests.Upload
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -203,7 +203,7 @@ func (r *FileController) Upload(ctx http.Context) http.Response {
 //	@Router			/panel/file/move [post]
 func (r *FileController) Move(ctx http.Context) http.Response {
 	var request requests.Move
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -233,7 +233,7 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 //	@Router			/panel/file/copy [post]
 func (r *FileController) Copy(ctx http.Context) http.Response {
 	var request requests.Copy
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -263,7 +263,7 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 //	@Router			/panel/file/download [get]
 func (r *FileController) Download(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -292,7 +292,7 @@ func (r *FileController) Download(ctx http.Context) http.Response {
 //	@Router			/panel/file/remoteDownload [post]
 func (r *FileController) RemoteDownload(ctx http.Context) http.Response {
 	var request requests.NotExist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -314,7 +314,7 @@ func (r *FileController) RemoteDownload(ctx http.Context) http.Response {
 //	@Router			/panel/file/info [get]
 func (r *FileController) Info(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -347,7 +347,7 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 //	@Router			/panel/file/permission [post]
 func (r *FileController) Permission(ctx http.Context) http.Response {
 	var request requests.Permission
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -375,7 +375,7 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 //	@Router			/panel/file/archive [post]
 func (r *FileController) Archive(ctx http.Context) http.Response {
 	var request requests.Archive
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -401,7 +401,7 @@ func (r *FileController) Archive(ctx http.Context) http.Response {
 //	@Router			/panel/file/unArchive [post]
 func (r *FileController) UnArchive(ctx http.Context) http.Response {
 	var request requests.UnArchive
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -426,7 +426,7 @@ func (r *FileController) UnArchive(ctx http.Context) http.Response {
 //	@Router			/panel/file/search [post]
 func (r *FileController) Search(ctx http.Context) http.Response {
 	var request requests.Search
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -461,13 +461,13 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 //	@Router			/panel/file/list [get]
 func (r *FileController) List(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := Sanitize(ctx, &request)
+	sanitize := SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	var paginate commonrequests.Paginate
-	paginateSanitize := Sanitize(ctx, &paginate)
+	paginateSanitize := SanitizeRequest(ctx, &paginate)
 	if paginateSanitize != nil {
 		return paginateSanitize
 	}

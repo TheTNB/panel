@@ -42,7 +42,7 @@ func NewContainerController() *ContainerController {
 //	@Router			/panel/container/list [get]
 func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 	var request commonrequests.Paginate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -123,7 +123,7 @@ func (r *ContainerController) ContainerSearch(ctx http.Context) http.Response {
 //	@Router			/panel/container/create [post]
 func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	var request requests.ContainerCreate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -220,7 +220,7 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/remove [post]
 func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -243,7 +243,7 @@ func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/start [post]
 func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -266,7 +266,7 @@ func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 //	@Router			/panel/container/stop [post]
 func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -289,7 +289,7 @@ func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 //	@Router			/panel/container/restart [post]
 func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -311,7 +311,7 @@ func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -335,7 +335,7 @@ func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 //	@Router			/panel/container/unpause [post]
 func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -358,7 +358,7 @@ func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 //	@Router			/panel/container/inspect [get]
 func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -382,7 +382,7 @@ func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/kill [post]
 func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -405,7 +405,7 @@ func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 //	@Router			/panel/container/rename [post]
 func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 	var request requests.ContainerRename
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -428,7 +428,7 @@ func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 //	@Router			/panel/container/stats [get]
 func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -452,7 +452,7 @@ func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 //	@Router			/panel/container/exist [get]
 func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -476,7 +476,7 @@ func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/logs [get]
 func (r *ContainerController) ContainerLogs(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -517,7 +517,7 @@ func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/list [get]
 func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 	var request commonrequests.Paginate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -592,7 +592,7 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/create [post]
 func (r *ContainerController) NetworkCreate(ctx http.Context) http.Response {
 	var request requests.NetworkCreate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -616,7 +616,7 @@ func (r *ContainerController) NetworkCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/remove [post]
 func (r *ContainerController) NetworkRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -639,7 +639,7 @@ func (r *ContainerController) NetworkRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/exist [get]
 func (r *ContainerController) NetworkExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -663,7 +663,7 @@ func (r *ContainerController) NetworkExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/inspect [get]
 func (r *ContainerController) NetworkInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -688,7 +688,7 @@ func (r *ContainerController) NetworkInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/connect [post]
 func (r *ContainerController) NetworkConnect(ctx http.Context) http.Response {
 	var request requests.NetworkConnectDisConnect
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -712,7 +712,7 @@ func (r *ContainerController) NetworkConnect(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/disconnect [post]
 func (r *ContainerController) NetworkDisconnect(ctx http.Context) http.Response {
 	var request requests.NetworkConnectDisConnect
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -752,7 +752,7 @@ func (r *ContainerController) NetworkPrune(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/list [get]
 func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 	var request commonrequests.Paginate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -808,7 +808,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/exist [get]
 func (r *ContainerController) ImageExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -833,7 +833,7 @@ func (r *ContainerController) ImageExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/pull [post]
 func (r *ContainerController) ImagePull(ctx http.Context) http.Response {
 	var request requests.ImagePull
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -856,7 +856,7 @@ func (r *ContainerController) ImagePull(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/remove [post]
 func (r *ContainerController) ImageRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -896,7 +896,7 @@ func (r *ContainerController) ImagePrune(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/inspect [get]
 func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -920,7 +920,7 @@ func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/list [get]
 func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 	var request commonrequests.Paginate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -986,7 +986,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/create [post]
 func (r *ContainerController) VolumeCreate(ctx http.Context) http.Response {
 	var request requests.VolumeCreate
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -1010,7 +1010,7 @@ func (r *ContainerController) VolumeCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/exist [get]
 func (r *ContainerController) VolumeExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -1034,7 +1034,7 @@ func (r *ContainerController) VolumeExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/inspect [get]
 func (r *ContainerController) VolumeInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -1058,7 +1058,7 @@ func (r *ContainerController) VolumeInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/remove [post]
 func (r *ContainerController) VolumeRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := Sanitize(ctx, &request); sanitize != nil {
+	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 

@@ -32,7 +32,7 @@ func NewUserController() *UserController {
 //	@Router			/panel/user/login [post]
 func (r *UserController) Login(ctx http.Context) http.Response {
 	var loginRequest requests.Login
-	sanitize := Sanitize(ctx, &loginRequest)
+	sanitize := SanitizeRequest(ctx, &loginRequest)
 	if sanitize != nil {
 		return sanitize
 	}

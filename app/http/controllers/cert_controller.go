@@ -126,7 +126,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -160,7 +160,7 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users [post]
 func (r *CertController) UserStore(ctx http.Context) http.Response {
 	var storeRequest requests.UserStore
-	sanitize := Sanitize(ctx, &storeRequest)
+	sanitize := SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -190,7 +190,7 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [put]
 func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.UserUpdate
-	sanitize := Sanitize(ctx, &updateRequest)
+	sanitize := SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -219,7 +219,7 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [get]
 func (r *CertController) UserShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -249,7 +249,7 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [delete]
 func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -278,7 +278,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -312,7 +312,7 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns [post]
 func (r *CertController) DNSStore(ctx http.Context) http.Response {
 	var storeRequest requests.DNSStore
-	sanitize := Sanitize(ctx, &storeRequest)
+	sanitize := SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -340,7 +340,7 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [get]
 func (r *CertController) DNSShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -371,7 +371,7 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [put]
 func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.DNSUpdate
-	sanitize := Sanitize(ctx, &updateRequest)
+	sanitize := SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -401,7 +401,7 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [delete]
 func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -430,7 +430,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -464,7 +464,7 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs [post]
 func (r *CertController) CertStore(ctx http.Context) http.Response {
 	var storeRequest requests.CertStore
-	sanitize := Sanitize(ctx, &storeRequest)
+	sanitize := SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -494,7 +494,7 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [put]
 func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.CertUpdate
-	sanitize := Sanitize(ctx, &updateRequest)
+	sanitize := SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -523,7 +523,7 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [get]
 func (r *CertController) CertShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -553,7 +553,7 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [delete]
 func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
-	sanitize := Sanitize(ctx, &showAndDestroyRequest)
+	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -583,7 +583,7 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/obtain [post]
 func (r *CertController) Obtain(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
-	sanitize := Sanitize(ctx, &obtainRequest)
+	sanitize := SanitizeRequest(ctx, &obtainRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -625,7 +625,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 //	@Router			/panel/cert/renew [post]
 func (r *CertController) Renew(ctx http.Context) http.Response {
 	var renewRequest requests.Renew
-	sanitize := Sanitize(ctx, &renewRequest)
+	sanitize := SanitizeRequest(ctx, &renewRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -654,7 +654,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 //	@Router			/panel/cert/manualDNS [post]
 func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
-	sanitize := Sanitize(ctx, &obtainRequest)
+	sanitize := SanitizeRequest(ctx, &obtainRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -683,7 +683,7 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 //	@Router			/panel/cert/deploy [post]
 func (r *CertController) Deploy(ctx http.Context) http.Response {
 	var deployRequest requests.CertDeploy
-	sanitize := Sanitize(ctx, &deployRequest)
+	sanitize := SanitizeRequest(ctx, &deployRequest)
 	if sanitize != nil {
 		return sanitize
 	}

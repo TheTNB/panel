@@ -60,7 +60,7 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 // GetFirewallRules 获取防火墙规则
 func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}

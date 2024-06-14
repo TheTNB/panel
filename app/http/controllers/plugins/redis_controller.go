@@ -17,43 +17,6 @@ func NewRedisController() *RedisController {
 	return &RedisController{}
 }
 
-// Status 获取运行状态
-func (r *RedisController) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("redis")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Restart 重启服务
-func (r *RedisController) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart("redis"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Start 启动服务
-func (r *RedisController) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart("redis"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动Redis失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止服务
-func (r *RedisController) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop("redis"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "停止Redis失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
 // GetConfig 获取配置
 func (r *RedisController) GetConfig(ctx http.Context) http.Response {
 	// 获取配置
@@ -76,7 +39,11 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 
-	return r.Restart(ctx)
+	if err := tools.ServiceRestart("redis"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // Load 获取负载

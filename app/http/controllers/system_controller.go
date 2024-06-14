@@ -25,6 +25,12 @@ func NewSystemController() *SystemController {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/status [get]
 func (r *SystemController) ServiceStatus(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Query("service")
 	status, err := tools.ServiceStatus(service)
 	if err != nil {
@@ -44,6 +50,12 @@ func (r *SystemController) ServiceStatus(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/isEnabled [get]
 func (r *SystemController) ServiceIsEnabled(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Query("service")
 	enabled, err := tools.ServiceIsEnabled(service)
 	if err != nil {
@@ -63,6 +75,12 @@ func (r *SystemController) ServiceIsEnabled(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/enable [post]
 func (r *SystemController) ServiceEnable(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceEnable(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("启用 %s 服务失败", service))
@@ -81,6 +99,12 @@ func (r *SystemController) ServiceEnable(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/disable [post]
 func (r *SystemController) ServiceDisable(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceDisable(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("禁用 %s 服务失败", service))
@@ -99,6 +123,12 @@ func (r *SystemController) ServiceDisable(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/restart [post]
 func (r *SystemController) ServiceRestart(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceRestart(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", service))
@@ -117,6 +147,12 @@ func (r *SystemController) ServiceRestart(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/reload [post]
 func (r *SystemController) ServiceReload(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceReload(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载 %s 服务失败", service))
@@ -135,6 +171,12 @@ func (r *SystemController) ServiceReload(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/start [post]
 func (r *SystemController) ServiceStart(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceStart(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("启动 %s 服务失败", service))
@@ -153,6 +195,12 @@ func (r *SystemController) ServiceStart(ctx http.Context) http.Response {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/panel/system/service/stop [post]
 func (r *SystemController) ServiceStop(ctx http.Context) http.Response {
+	if sanitize := Sanitize(ctx, map[string]string{
+		"service": "required|string",
+	}); sanitize != nil {
+		return sanitize
+	}
+
 	service := ctx.Request().Input("service")
 	if err := tools.ServiceStop(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("停止 %s 服务失败", service))

@@ -29,7 +29,7 @@ func NewFrpController() *FrpController {
 //	@Router			/plugins/frp/config [get]
 func (r *FrpController) GetConfig(ctx http.Context) http.Response {
 	var serviceRequest requests.Service
-	sanitize := controllers.Sanitize(ctx, &serviceRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &serviceRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -54,7 +54,7 @@ func (r *FrpController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/frp/config [post]
 func (r *FrpController) UpdateConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateConfig
-	sanitize := controllers.Sanitize(ctx, &updateRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}

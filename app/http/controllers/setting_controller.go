@@ -85,7 +85,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 //	@Router			/panel/setting/update [post]
 func (r *SettingController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
-	sanitize := Sanitize(ctx, &updateRequest)
+	sanitize := SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}

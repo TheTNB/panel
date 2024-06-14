@@ -43,7 +43,7 @@ func NewWebsiteController() *WebsiteController {
 //	@Router			/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -75,7 +75,7 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 //	@Router			/panel/websites [post]
 func (r *WebsiteController) Add(ctx http.Context) http.Response {
 	var addRequest requests.Add
-	sanitize := Sanitize(ctx, &addRequest)
+	sanitize := SanitizeRequest(ctx, &addRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -123,7 +123,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id} [delete]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -210,7 +210,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -241,7 +241,7 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/config [post]
 func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	var saveConfigRequest requests.SaveConfig
-	sanitize := Sanitize(ctx, &saveConfigRequest)
+	sanitize := SanitizeRequest(ctx, &saveConfigRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -267,7 +267,7 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/log [delete]
 func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -298,7 +298,7 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/updateRemark [post]
 func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -333,7 +333,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Router			/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := Sanitize(ctx, &paginateRequest)
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -381,7 +381,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/createBackup [post]
 func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -455,7 +455,7 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/restoreBackup [post]
 func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
-	sanitize := Sanitize(ctx, &restoreBackupRequest)
+	sanitize := SanitizeRequest(ctx, &restoreBackupRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -490,7 +490,7 @@ func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 //	@Router			/panel/website/deleteBackup [delete]
 func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	var deleteBackupRequest requests.DeleteBackup
-	sanitize := Sanitize(ctx, &deleteBackupRequest)
+	sanitize := SanitizeRequest(ctx, &deleteBackupRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -522,7 +522,7 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 //	@Router			/panel/websites/{id}/resetConfig [post]
 func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -626,7 +626,7 @@ server
 //	@Router			/panel/websites/{id}/status [post]
 func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := Sanitize(ctx, &idRequest)
+	sanitize := SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}

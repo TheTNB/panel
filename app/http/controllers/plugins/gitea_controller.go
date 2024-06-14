@@ -45,7 +45,7 @@ func (r *GiteaController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/gitea/config [post]
 func (r *GiteaController) UpdateConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateConfig
-	sanitize := controllers.Sanitize(ctx, &updateRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}

@@ -32,7 +32,7 @@ func NewRsyncController() *RsyncController {
 //	@Router			/plugins/rsync/modules [get]
 func (r *RsyncController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := controllers.Sanitize(ctx, &paginateRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -125,7 +125,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/modules [post]
 func (r *RsyncController) Create(ctx http.Context) http.Response {
 	var createRequest requests.Create
-	sanitize := controllers.Sanitize(ctx, &createRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &createRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -222,7 +222,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/modules/{name} [post]
 func (r *RsyncController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
-	sanitize := controllers.Sanitize(ctx, &updateRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -300,7 +300,7 @@ func (r *RsyncController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/config [post]
 func (r *RsyncController) UpdateConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateConfig
-	sanitize := controllers.Sanitize(ctx, &updateRequest)
+	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
