@@ -40,7 +40,6 @@ unit_test:
     - cp panel-example.conf .env
     - echo "DB_FILE=$(pwd)/storage/panel.db" >> .env
     - go run . artisan key:generate
-    - go run . artisan migrate
     - go test -v -coverprofile=coverage.txt -covermode=atomic ./...
 
 build:

@@ -476,10 +476,6 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	_, _ = Exec("chmod -R 700 /usr/bin/panel")
 	color.Green().Printfln("设置完成")
 
-	if _, err = Exec("/www/panel/panel --env=panel.conf artisan migrate"); err != nil {
-		color.Red().Printfln("运行面板数据库迁移失败")
-		return err
-	}
 	if _, err = Exec("bash /www/panel/scripts/update_panel.sh"); err != nil {
 		color.Red().Printfln("执行面板升级后脚本失败")
 		return err
