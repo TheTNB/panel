@@ -1,6 +1,8 @@
 package config
 
 import (
+	"path/filepath"
+
 	"github.com/goravel/framework/auth"
 	"github.com/goravel/framework/cache"
 	"github.com/goravel/framework/console"
@@ -17,6 +19,7 @@ import (
 	"github.com/goravel/framework/queue"
 	"github.com/goravel/framework/route"
 	"github.com/goravel/framework/schedule"
+	"github.com/goravel/framework/support"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/testing"
 	"github.com/goravel/framework/translation"
@@ -69,6 +72,10 @@ func init() {
 		// is not available.You may change the value to correspond to any of
 		// the language folders that are provided through your application.
 		"fallback_locale": "zh_CN",
+
+		// Application Translation Path
+		//
+		"lang_path": filepath.Join(support.RootPath, "lang"),
 
 		// Encryption Key
 		//

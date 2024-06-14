@@ -24,7 +24,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: linux
           GOARCH: ${{ matrix.goarch }}
-        run: go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }}
+        run: go build -ldflags '-s -w --extldflags "-static"' -tags='nomsgpack' -o panel-${{ matrix.goarch }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

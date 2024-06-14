@@ -1,7 +1,10 @@
 package config
 
 import (
+	"path/filepath"
+
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/support"
 )
 
 func init() {
@@ -14,7 +17,7 @@ func init() {
 		"connections": map[string]any{
 			"panel": map[string]any{
 				"driver":   "sqlite",
-				"database": config.Env("DB_FILE", "/www/panel/storage/panel.db"),
+				"database": config.Env("DB_FILE", filepath.Join(support.RootPath, "storage/panel.db")),
 				"prefix":   "",
 				"singular": false, // Table name is singular
 			},

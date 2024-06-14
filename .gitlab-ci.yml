@@ -48,7 +48,7 @@ build:
   extends: .go_cache
   script:
     - go mod download
-    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static"' -o panel
+    - CGO_ENABLED=0 go build -ldflags '-s -w --extldflags "-static"' -tags='nomsgpack' -o panel
   artifacts:
     name: "panel"
     paths:
