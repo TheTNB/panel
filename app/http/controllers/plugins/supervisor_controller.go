@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -11,66 +12,25 @@ import (
 )
 
 type SupervisorController struct {
-	ServiceName string
+	service string
 }
 
 func NewSupervisorController() *SupervisorController {
-	var serviceName string
+	var service string
 	if tools.IsRHEL() {
-		serviceName = "supervisord"
+		service = "supervisord"
 	} else {
-		serviceName = "supervisor"
+		service = "supervisor"
 	}
 
 	return &SupervisorController{
-		ServiceName: serviceName,
+		service: service,
 	}
 }
 
-// Status 状态
-func (r *SupervisorController) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus(r.ServiceName)
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Supervisor状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Start 启动
-func (r *SupervisorController) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart(r.ServiceName); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动Supervisor失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止
-func (r *SupervisorController) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop(r.ServiceName); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "停止Supervisor失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Restart 重启
-func (r *SupervisorController) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart(r.ServiceName); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启Supervisor失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Reload 重载
-func (r *SupervisorController) Reload(ctx http.Context) http.Response {
-	if err := tools.ServiceReload(r.ServiceName); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载Supervisor失败")
-	}
-
-	return controllers.Success(ctx, nil)
+// Service 获取服务名称
+func (r *SupervisorController) Service(ctx http.Context) http.Response {
+	return controllers.Success(ctx, r.service)
 }
 
 // Log 日志
@@ -123,7 +83,11 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return r.Restart(ctx)
+	if err = tools.ServiceRestart(r.service); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", r.service))
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // Processes 进程列表

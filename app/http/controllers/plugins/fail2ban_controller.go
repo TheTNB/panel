@@ -26,56 +26,6 @@ func NewFail2banController() *Fail2banController {
 	}
 }
 
-// Status 获取运行状态
-func (r *Fail2banController) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("fail2ban")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Reload 重载配置
-func (r *Fail2banController) Reload(ctx http.Context) http.Response {
-	if err := tools.ServiceReload("fail2ban"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Restart 重启服务
-func (r *Fail2banController) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart("fail2ban"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启服务失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Start 启动服务
-func (r *Fail2banController) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart("fail2ban"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动服务失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止服务
-func (r *Fail2banController) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop("fail2ban"); err != nil {
-		return nil
-	}
-	status, err := tools.ServiceStatus("fail2ban")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取服务运行状态失败")
-	}
-
-	return controllers.Success(ctx, !status)
-}
-
 // List 所有 Fail2ban 规则
 func (r *Fail2banController) List(ctx http.Context) http.Response {
 	page := ctx.Request().QueryInt("page", 1)

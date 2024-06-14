@@ -28,52 +28,6 @@ func NewMySQLController() *MySQLController {
 	}
 }
 
-// Status 获取运行状态
-func (r *MySQLController) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("mysqld")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Reload 重载配置
-func (r *MySQLController) Reload(ctx http.Context) http.Response {
-	if err := tools.ServiceReload("mysqld"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL配置失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Restart 重启服务
-func (r *MySQLController) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart("mysqld"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启MySQL服务失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Start 启动服务
-func (r *MySQLController) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart("mysqld"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动MySQL服务失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止服务
-func (r *MySQLController) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop("mysqld"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "停止MySQL服务失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
 // GetConfig 获取配置
 func (r *MySQLController) GetConfig(ctx http.Context) http.Response {
 	config, err := tools.Read("/www/server/mysql/conf/my.cnf")
@@ -95,7 +49,11 @@ func (r *MySQLController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 	}
 
-	return r.Restart(ctx)
+	if err := tools.ServiceReload("mysqld"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // Load 获取负载
