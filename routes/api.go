@@ -199,6 +199,17 @@ func Api() {
 			r.Get("list", settingController.List)
 			r.Post("update", settingController.Update)
 		})
+		r.Prefix("system").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+			controller := controllers.NewSystemController()
+			r.Get("service/status", controller.ServiceStatus)
+			r.Get("service/isEnabled", controller.ServiceIsEnabled)
+			r.Post("service/enable", controller.ServiceEnable)
+			r.Post("service/disable", controller.ServiceDisable)
+			r.Post("service/restart", controller.ServiceRestart)
+			r.Post("service/reload", controller.ServiceReload)
+			r.Post("service/start", controller.ServiceStart)
+			r.Post("service/stop", controller.ServiceStop)
+		})
 	})
 
 	// 文档

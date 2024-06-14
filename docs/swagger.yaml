@@ -2180,12 +2180,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/requests.Save'
-      - description: content
-        in: body
-        name: content
-        required: true
-        schema:
-          type: string
       produces:
       - application/json
       responses:
@@ -2311,6 +2305,172 @@ paths:
       summary: 更新设置
       tags:
       - 面板设置
+  /panel/system/service/disable:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 禁用服务
+      tags:
+      - 系统
+  /panel/system/service/enable:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启用服务
+      tags:
+      - 系统
+  /panel/system/service/isEnabled:
+    get:
+      parameters:
+      - description: request
+        in: query
+        name: data
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 是否启用服务
+      tags:
+      - 系统
+  /panel/system/service/reload:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重载服务
+      tags:
+      - 系统
+  /panel/system/service/restart:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 重启服务
+      tags:
+      - 系统
+  /panel/system/service/start:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 启动服务
+      tags:
+      - 系统
+  /panel/system/service/status:
+    get:
+      parameters:
+      - description: request
+        in: query
+        name: data
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 服务状态
+      tags:
+      - 系统
+  /panel/system/service/stop:
+    post:
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 停止服务
+      tags:
+      - 系统
   /panel/user/info:
     get:
       description: 获取当前登录用户信息

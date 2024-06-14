@@ -102,7 +102,6 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.Save	true	"request"
-//	@Param			content	body		string			true	"content"
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/file/save [post]
 func (r *FileController) Save(ctx http.Context) http.Response {
