@@ -12,8 +12,8 @@ type CertUpdate struct {
 	Domains   []string `form:"domains" json:"domains"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
 	UserID    uint     `form:"user_id" json:"user_id"`
-	DNSID     *uint    `form:"dns_id" json:"dns_id"`
-	WebsiteID *uint    `form:"website_id" json:"website_id"`
+	DNSID     uint     `form:"dns_id" json:"dns_id"`
+	WebsiteID uint     `form:"website_id" json:"website_id"`
 }
 
 func (r *CertUpdate) Authorize(ctx http.Context) error {

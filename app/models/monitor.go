@@ -1,14 +1,12 @@
 package models
 
 import (
-	"github.com/goravel/framework/support/carbon"
+	"github.com/goravel/framework/database/orm"
 
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type Monitor struct {
-	ID        uint                 `gorm:"primaryKey" json:"id"`
-	Info      tools.MonitoringInfo `gorm:"type:json;serializer:json" json:"info"`
-	CreatedAt carbon.DateTime      `gorm:"autoCreateTime;column:created_at" json:"created_at"`
-	UpdatedAt carbon.DateTime      `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
+	orm.Model
+	Info tools.MonitoringInfo `gorm:"not null;serializer:json" json:"info"`
 }

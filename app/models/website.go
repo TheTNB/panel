@@ -1,19 +1,15 @@
 package models
 
-import (
-	"github.com/goravel/framework/support/carbon"
-)
+import "github.com/goravel/framework/database/orm"
 
 type Website struct {
-	ID        uint            `gorm:"primaryKey" json:"id"`
-	Name      string          `json:"name"`
-	Status    bool            `gorm:"default:true" json:"status"`
-	Path      string          `json:"path"`
-	Php       int             `gorm:"default:0;not null;index" json:"php"`
-	Ssl       bool            `gorm:"default:false;not null;index" json:"ssl"`
-	Remark    string          `gorm:"default:''" json:"remark"`
-	CreatedAt carbon.DateTime `gorm:"autoCreateTime;column:created_at" json:"created_at"`
-	UpdatedAt carbon.DateTime `gorm:"autoUpdateTime;column:updated_at" json:"updated_at"`
+	orm.Model
+	Name   string `gorm:"not null;unique" json:"name"`
+	Status bool   `gorm:"not null;default:true" json:"status"`
+	Path   string `gorm:"not null" json:"path"`
+	Php    int    `gorm:"not null" json:"php"`
+	Ssl    bool   `gorm:"not null" json:"ssl"`
+	Remark string `gorm:"not null" json:"remark"`
 
 	Cert *Cert `gorm:"foreignKey:WebsiteID" json:"cert"`
 }

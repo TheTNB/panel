@@ -28,8 +28,8 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 	var user models.CertUser
 	user.CA = request.CA
 	user.Email = request.Email
-	user.Kid = &request.Kid
-	user.HmacEncoded = &request.HmacEncoded
+	user.Kid = request.Kid
+	user.HmacEncoded = request.HmacEncoded
 	user.KeyType = request.KeyType
 
 	var err error
@@ -40,11 +40,11 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "sslcom":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	default:
 		return errors.New("CA 提供商不支持")
 	}
@@ -72,8 +72,8 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 
 	user.CA = request.CA
 	user.Email = request.Email
-	user.Kid = &request.Kid
-	user.HmacEncoded = &request.HmacEncoded
+	user.Kid = request.Kid
+	user.HmacEncoded = request.HmacEncoded
 	user.KeyType = request.KeyType
 
 	var client *acme.Client
@@ -83,11 +83,11 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "sslcom":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: *user.Kid, MACKey: *user.HmacEncoded}, acme.KeyType(user.KeyType))
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAGoogle, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	default:
 		return errors.New("CA 提供商不支持")
 	}
@@ -262,7 +262,7 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 		return acme.Certificate{}, err
 	}
 
-	cert.CertURL = &ssl.URL
+	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
@@ -302,7 +302,7 @@ func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 		return acme.Certificate{}, err
 	}
 
-	cert.CertURL = &ssl.URL
+	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
@@ -363,7 +363,7 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 		return acme.Certificate{}, err
 	}
 
-	if cert.CertURL == nil {
+	if cert.CertURL == "" {
 		return acme.Certificate{}, errors.New("该证书没有签发成功，无法续签")
 	}
 
@@ -382,12 +382,12 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 		}
 	}
 
-	ssl, err := client.RenewSSL(context.Background(), *cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
+	ssl, err := client.RenewSSL(context.Background(), cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
 	if err != nil {
 		return acme.Certificate{}, err
 	}
 
-	cert.CertURL = &ssl.URL
+	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
 	err = facades.Orm().Query().Save(&cert)
@@ -451,13 +451,13 @@ func (s *CertImpl) getClient(cert models.Cert) (*acme.Client, error) {
 		ca = acme.CABuypass
 	case "zerossl":
 		ca = acme.CAZeroSSL
-		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
 	case "sslcom":
 		ca = acme.CASSLcom
-		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
 	case "google":
 		ca = acme.CAGoogle
-		eab = &acme.EAB{KeyID: *cert.User.Kid, MACKey: *cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
 	}
 
 	return acme.NewPrivateKeyAccount(cert.User.Email, cert.User.PrivateKey, ca, eab)
