@@ -42,7 +42,6 @@ archives:
       - docs/*
       - public/*
       - storage/*
-      - database/*
       - lang/*
       - scripts/*
       - panel-example.conf
