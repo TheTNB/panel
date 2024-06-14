@@ -17,62 +17,14 @@ type OpenRestyController struct {
 }
 
 func NewOpenrestyController() *OpenRestyController {
-	return &OpenRestyController{
-		// Inject services
-	}
-}
-
-// Status 获取运行状态
-func (r *OpenRestyController) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("openresty")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Reload 重载配置
-func (r *OpenRestyController) Reload(ctx http.Context) http.Response {
-	if err := tools.ServiceReload("openresty"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Start 启动OpenResty
-func (r *OpenRestyController) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart("openresty"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动OpenResty失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止OpenResty
-func (r *OpenRestyController) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop("openresty"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "停止OpenResty失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Restart 重启OpenResty
-func (r *OpenRestyController) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart("openresty"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启OpenResty失败")
-	}
-
-	return controllers.Success(ctx, nil)
+	return &OpenRestyController{}
 }
 
 // GetConfig 获取配置
 func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 	config, err := tools.Read("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty配置失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取配置失败")
 	}
 
 	return controllers.Success(ctx, config)
@@ -86,10 +38,14 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 	}
 
 	if err := tools.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "保存OpenResty配置失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "保存配置失败")
 	}
 
-	return r.Reload(ctx)
+	if err := tools.ServiceReload("openresty"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // ErrorLog 获取错误日志
@@ -120,7 +76,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccess() {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 
 	raw := resp.String()
@@ -132,7 +88,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	workers, err := tools.Exec("ps aux | grep nginx | grep 'worker process' | wc -l")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 	data = append(data, nginxStatus{
 		Name:  "工作进程",
@@ -141,7 +97,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	out, err := tools.Exec("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取OpenResty负载失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 	mem := tools.FormatBytes(cast.ToFloat64(out))
 	data = append(data, nginxStatus{
