@@ -112,7 +112,7 @@ if version_lt "$oldVersion" "2.2.9"; then
     if [ -f "/usr/bin/podman" ]; then
         panel writePlugin podman 4.0.0
         if [ "${OS}" == "debian" ]; then
-            apt-get install podman containers-storage -y
+            apt-get install containers-storage -y
             cp /usr/share/containers/storage.conf /etc/containers/storage.conf
         fi
         systemctl enable podman
