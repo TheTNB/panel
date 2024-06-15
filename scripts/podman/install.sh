@@ -27,7 +27,9 @@ if [ "${OS}" == "centos" ]; then
     dnf install podman -y
 elif [ "${OS}" == "debian" ]; then
     apt-get update
-    apt-get install podman -y
+    apt-get install podman containers-storage -y
+    # Debian下不清楚是不是Bug，需要手动复制存储配置到正确位置
+    cp /usr/share/containers/storage.conf /etc/containers/storage.conf
 else
     echo -e $HR
     echo "错误：耗子面板不支持该系统"

@@ -33,6 +33,7 @@ import (
 func Boot() {}
 
 func init() {
+	support.RootPath = "/www/panel" // TODO remove this line
 	config := facades.Config()
 	config.Add("app", map[string]any{
 		// Application Name
