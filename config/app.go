@@ -74,8 +74,10 @@ func init() {
 		// the language folders that are provided through your application.
 		"fallback_locale": "zh_CN",
 
-		// Application Translation Path
+		// Application Lang Path
 		//
+		// The path to the language files for the application. You may change
+		// the path to a different directory if you would like to customize it.
 		"lang_path": filepath.Join(support.RootPath, "lang"),
 
 		// Encryption Key

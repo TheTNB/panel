@@ -116,8 +116,10 @@ if version_lt "$oldVersion" "2.2.9"; then
             cp /usr/share/containers/storage.conf /etc/containers/storage.conf
         fi
         systemctl enable podman
+        systemctl enable podman.socket
         systemctl enable podman-restart
         systemctl start podman
+        systemctl start podman.socket
         systemctl start podman-restart
     fi
 fi

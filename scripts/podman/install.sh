@@ -37,8 +37,10 @@ else
 fi
 
 systemctl enable podman
+systemctl enable podman.socket
 systemctl enable podman-restart
 systemctl start podman
+systemctl start podman.socket
 systemctl start podman-restart
 
 panel writePlugin podman ${podmanVersion}
