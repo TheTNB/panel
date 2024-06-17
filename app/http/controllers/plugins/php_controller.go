@@ -2,64 +2,19 @@ package plugins
 
 import (
 	"github.com/TheTNB/panel/app/http/controllers"
-	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/goravel/framework/contracts/http"
 )
 
-type PHPController struct {
-	service internal.PHP
-}
+type PHPController struct{}
 
-func NewPHPController(version uint) *PHPController {
-	return &PHPController{
-		service: services.NewPHPImpl(version),
-	}
-}
-
-func (r *PHPController) Status(ctx http.Context) http.Response {
-	status, err := r.service.Status()
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-func (r *PHPController) Reload(ctx http.Context) http.Response {
-	if err := r.service.Reload(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-func (r *PHPController) Start(ctx http.Context) http.Response {
-	if err := r.service.Start(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-func (r *PHPController) Stop(ctx http.Context) http.Response {
-	if err := r.service.Stop(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-func (r *PHPController) Restart(ctx http.Context) http.Response {
-	if err := r.service.Restart(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-
-	return controllers.Success(ctx, nil)
+func NewPHPController() *PHPController {
+	return &PHPController{}
 }
 
 func (r *PHPController) GetConfig(ctx http.Context) http.Response {
-	config, err := r.service.GetConfig()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	config, err := service.GetConfig()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -68,8 +23,9 @@ func (r *PHPController) GetConfig(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) SaveConfig(ctx http.Context) http.Response {
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config := ctx.Request().Input("config")
-	if err := r.service.SaveConfig(config); err != nil {
+	if err := service.SaveConfig(config); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -77,7 +33,8 @@ func (r *PHPController) SaveConfig(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) GetFPMConfig(ctx http.Context) http.Response {
-	config, err := r.service.GetFPMConfig()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	config, err := service.GetFPMConfig()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -86,8 +43,9 @@ func (r *PHPController) GetFPMConfig(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) SaveFPMConfig(ctx http.Context) http.Response {
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config := ctx.Request().Input("config")
-	if err := r.service.SaveFPMConfig(config); err != nil {
+	if err := service.SaveFPMConfig(config); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -95,7 +53,8 @@ func (r *PHPController) SaveFPMConfig(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) Load(ctx http.Context) http.Response {
-	load, err := r.service.Load()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	load, err := service.Load()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -104,17 +63,20 @@ func (r *PHPController) Load(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) ErrorLog(ctx http.Context) http.Response {
-	log, _ := r.service.GetErrorLog()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	log, _ := service.GetErrorLog()
 	return controllers.Success(ctx, log)
 }
 
 func (r *PHPController) SlowLog(ctx http.Context) http.Response {
-	log, _ := r.service.GetSlowLog()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	log, _ := service.GetSlowLog()
 	return controllers.Success(ctx, log)
 }
 
 func (r *PHPController) ClearErrorLog(ctx http.Context) http.Response {
-	err := r.service.ClearErrorLog()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	err := service.ClearErrorLog()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -123,7 +85,8 @@ func (r *PHPController) ClearErrorLog(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) ClearSlowLog(ctx http.Context) http.Response {
-	err := r.service.ClearSlowLog()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	err := service.ClearSlowLog()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -132,7 +95,8 @@ func (r *PHPController) ClearSlowLog(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) GetExtensionList(ctx http.Context) http.Response {
-	extensions, err := r.service.GetExtensions()
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
+	extensions, err := service.GetExtensions()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -141,12 +105,13 @@ func (r *PHPController) GetExtensionList(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) InstallExtension(ctx http.Context) http.Response {
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
-	if err := r.service.InstallExtension(slug); err != nil {
+	if err := service.InstallExtension(slug); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -154,12 +119,13 @@ func (r *PHPController) InstallExtension(ctx http.Context) http.Response {
 }
 
 func (r *PHPController) UninstallExtension(ctx http.Context) http.Response {
+	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	slug := ctx.Request().Input("slug")
 	if len(slug) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
-	if err := r.service.UninstallExtension(slug); err != nil {
+	if err := service.UninstallExtension(slug); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

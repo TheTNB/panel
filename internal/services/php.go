@@ -27,24 +27,8 @@ func NewPHPImpl(version uint) *PHPImpl {
 	}
 }
 
-func (r *PHPImpl) Status() (bool, error) {
-	return tools.ServiceStatus("php-fpm-" + r.version)
-}
-
 func (r *PHPImpl) Reload() error {
 	return tools.ServiceReload("php-fpm-" + r.version)
-}
-
-func (r *PHPImpl) Start() error {
-	return tools.ServiceStart("php-fpm-" + r.version)
-}
-
-func (r *PHPImpl) Stop() error {
-	return tools.ServiceStop("php-fpm-" + r.version)
-}
-
-func (r *PHPImpl) Restart() error {
-	return tools.ServiceRestart("php-fpm-" + r.version)
 }
 
 func (r *PHPImpl) GetConfig() (string, error) {
@@ -75,7 +59,7 @@ func (r *PHPImpl) Load() ([]types.NV, error) {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/phpfpm_status/" + r.version)
 	if err != nil || !resp.IsSuccess() {
-		return nil, errors.New("获取 PHP-" + r.version + " 运行状态失败")
+		return []types.NV{}, nil
 	}
 
 	raw := resp.String()
