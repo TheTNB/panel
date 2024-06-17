@@ -109,7 +109,7 @@ func Plugin() {
 			route.Get("{version}/slowLog", phpController.SlowLog)
 			route.Post("{version}/clearErrorLog", phpController.ClearErrorLog)
 			route.Post("{version}/clearSlowLog", phpController.ClearSlowLog)
-			route.Get("{version}/extensions", phpController.GetExtensionList)
+			route.Get("{version}/extensions", phpController.ExtensionList)
 			route.Post("{version}/extensions", phpController.InstallExtension)
 			route.Delete("{version}/extensions", phpController.UninstallExtension)
 		})

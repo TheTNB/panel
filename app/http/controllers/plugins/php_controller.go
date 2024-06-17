@@ -12,6 +12,15 @@ func NewPHPController() *PHPController {
 	return &PHPController{}
 }
 
+// GetConfig
+//
+//	@Summary	获取配置
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/config [get]
 func (r *PHPController) GetConfig(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config, err := service.GetConfig()
@@ -22,6 +31,16 @@ func (r *PHPController) GetConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, config)
 }
 
+// SaveConfig
+//
+//	@Summary	保存配置
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int		true	"PHP 版本"
+//	@Param		config	body		string	true	"配置"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/config [post]
 func (r *PHPController) SaveConfig(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config := ctx.Request().Input("config")
@@ -32,6 +51,15 @@ func (r *PHPController) SaveConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
+// GetFPMConfig
+//
+//	@Summary	获取 FPM 配置
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/fpmConfig [get]
 func (r *PHPController) GetFPMConfig(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config, err := service.GetFPMConfig()
@@ -42,6 +70,16 @@ func (r *PHPController) GetFPMConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, config)
 }
 
+// SaveFPMConfig
+//
+//	@Summary	保存 FPM 配置
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int		true	"PHP 版本"
+//	@Param		config	body		string	true	"配置"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/fpmConfig [post]
 func (r *PHPController) SaveFPMConfig(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	config := ctx.Request().Input("config")
@@ -52,6 +90,15 @@ func (r *PHPController) SaveFPMConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
+// Load
+//
+//	@Summary	获取负载状态
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/load [get]
 func (r *PHPController) Load(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	load, err := service.Load()
@@ -62,18 +109,45 @@ func (r *PHPController) Load(ctx http.Context) http.Response {
 	return controllers.Success(ctx, load)
 }
 
+// ErrorLog
+//
+//	@Summary	获取错误日志
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/errorLog [get]
 func (r *PHPController) ErrorLog(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	log, _ := service.GetErrorLog()
 	return controllers.Success(ctx, log)
 }
 
+// SlowLog
+//
+//	@Summary	获取慢日志
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/slowLog [get]
 func (r *PHPController) SlowLog(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	log, _ := service.GetSlowLog()
 	return controllers.Success(ctx, log)
 }
 
+// ClearErrorLog
+//
+//	@Summary	清空错误日志
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/clearErrorLog [post]
 func (r *PHPController) ClearErrorLog(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	err := service.ClearErrorLog()
@@ -84,6 +158,15 @@ func (r *PHPController) ClearErrorLog(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
+// ClearSlowLog
+//
+//	@Summary	清空慢日志
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/clearSlowLog [post]
 func (r *PHPController) ClearSlowLog(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	err := service.ClearSlowLog()
@@ -94,7 +177,16 @@ func (r *PHPController) ClearSlowLog(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
-func (r *PHPController) GetExtensionList(ctx http.Context) http.Response {
+// ExtensionList
+//
+//	@Summary	获取扩展列表
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int	true	"PHP 版本"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/extensions [get]
+func (r *PHPController) ExtensionList(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	extensions, err := service.GetExtensions()
 	if err != nil {
@@ -104,6 +196,16 @@ func (r *PHPController) GetExtensionList(ctx http.Context) http.Response {
 	return controllers.Success(ctx, extensions)
 }
 
+// InstallExtension
+//
+//	@Summary	安装扩展
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int		true	"PHP 版本"
+//	@Param		slug	query		string	true	"slug"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/extensions [post]
 func (r *PHPController) InstallExtension(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	slug := ctx.Request().Input("slug")
@@ -118,6 +220,16 @@ func (r *PHPController) InstallExtension(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
+// UninstallExtension
+//
+//	@Summary	卸载扩展
+//	@Tags		插件-PHP
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		version	path		int		true	"PHP 版本"
+//	@Param		slug	query		string	true	"slug"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/php/{version}/extensions [delete]
 func (r *PHPController) UninstallExtension(ctx http.Context) http.Response {
 	service := services.NewPHPImpl(uint(ctx.Request().RouteInt("version")))
 	slug := ctx.Request().Input("slug")

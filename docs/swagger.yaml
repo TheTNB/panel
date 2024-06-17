@@ -3096,6 +3096,264 @@ paths:
       summary: 更新配置
       tags:
       - 插件-Gitea
+  /plugins/php/{version}/clearErrorLog:
+    post:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清空错误日志
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/clearSlowLog:
+    post:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清空慢日志
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/config:
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 插件-PHP
+    post:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      - description: 配置
+        in: body
+        name: config
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 保存配置
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/errorLog:
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取错误日志
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/extensions:
+    delete:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      - description: slug
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 卸载扩展
+      tags:
+      - 插件-PHP
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取扩展列表
+      tags:
+      - 插件-PHP
+    post:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      - description: slug
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 安装扩展
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/fpmConfig:
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取 FPM 配置
+      tags:
+      - 插件-PHP
+    post:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      - description: 配置
+        in: body
+        name: config
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 保存 FPM 配置
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/load:
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取负载状态
+      tags:
+      - 插件-PHP
+  /plugins/php/{version}/slowLog:
+    get:
+      parameters:
+      - description: PHP 版本
+        in: path
+        name: version
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取慢日志
+      tags:
+      - 插件-PHP
   /plugins/podman/registryConfig:
     get:
       description: 获取 Podman 注册表配置
