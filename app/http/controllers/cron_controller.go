@@ -50,18 +50,14 @@ func (r *CronController) List(ctx http.Context) http.Response {
 
 // Add 添加计划任务
 func (r *CronController) Add(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := Sanitize(ctx, map[string]string{
 		"name":        "required|min_len:1|max_len:255",
 		"time":        "required",
 		"script":      "required",
 		"type":        "required|in:shell,backup,cutoff",
 		"backup_type": "required_if:type,backup|in:website,mysql,postgresql",
-	})
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	// 单独验证时间格式
@@ -121,7 +117,7 @@ panel cutoff ${name} ${save} 2>&1
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if err = tools.Write(shellDir+shellFile+".sh", shell, 0700); err != nil {
+	if err := tools.Write(shellDir+shellFile+".sh", shell, 0700); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := tools.Exec("dos2unix " + shellDir + shellFile + ".sh"); err != nil {
@@ -136,8 +132,7 @@ panel cutoff ${name} ${save} 2>&1
 	cron.Shell = shellDir + shellFile + ".sh"
 	cron.Log = shellLogDir + shellFile + ".log"
 
-	err = facades.Orm().Query().Create(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Create(&cron); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存计划任务失败")
@@ -171,16 +166,12 @@ func (r *CronController) Script(ctx http.Context) http.Response {
 
 // Update 更新计划任务
 func (r *CronController) Update(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := Sanitize(ctx, map[string]string{
 		"name":   "required|min_len:1|max_len:255",
 		"time":   "required",
 		"script": "required",
-	})
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	// 单独验证时间格式
@@ -189,8 +180,7 @@ func (r *CronController) Update(ctx http.Context) http.Response {
 	}
 
 	var cron models.Cron
-	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron); err != nil {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
@@ -200,15 +190,14 @@ func (r *CronController) Update(ctx http.Context) http.Response {
 
 	cron.Time = ctx.Request().Input("time")
 	cron.Name = ctx.Request().Input("name")
-	err = facades.Orm().Query().Save(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Save(&cron); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
 			"error": err.Error(),
 		}).Info("更新计划任务失败")
 		return ErrorSystem(ctx)
 	}
 
-	if err = tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
+	if err := tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := tools.Exec("dos2unix " + cron.Shell); err != nil {
@@ -253,25 +242,19 @@ func (r *CronController) Delete(ctx http.Context) http.Response {
 
 // Status 更新计划任务状态
 func (r *CronController) Status(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := Sanitize(ctx, map[string]string{
 		"status": "bool",
-	})
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	var cron models.Cron
-	err = facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Where("id", ctx.Request().Input("id")).FirstOrFail(&cron); err != nil {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
 	cron.Status = ctx.Request().InputBool("status")
-	err = facades.Orm().Query().Save(&cron)
-	if err != nil {
+	if err := facades.Orm().Query().Save(&cron); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "计划任务").With(map[string]any{
 			"error": err.Error(),
 		}).Info("更新计划任务状态失败")

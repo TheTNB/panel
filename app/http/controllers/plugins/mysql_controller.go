@@ -272,16 +272,12 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -307,14 +303,10 @@ func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 
 // DeleteDatabase 删除数据库
 func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -382,19 +374,14 @@ func (r *MySQLController) UploadBackup(ctx http.Context) http.Response {
 
 // CreateBackup 创建备份
 func (r *MySQLController) CreateBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	database := ctx.Request().Input("database")
-	err = r.backup.MysqlBackup(database)
-	if err != nil {
+	if err := r.backup.MysqlBackup(database); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -403,14 +390,10 @@ func (r *MySQLController) CreateBackup(ctx http.Context) http.Response {
 
 // DeleteBackup 删除备份
 func (r *MySQLController) DeleteBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"name": "required|min_len:1|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/mysql"
@@ -424,19 +407,14 @@ func (r *MySQLController) DeleteBackup(ctx http.Context) http.Response {
 
 // RestoreBackup 还原备份
 func (r *MySQLController) RestoreBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
-	err = r.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
-	if err != nil {
+	if err := r.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup")); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -528,16 +506,12 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (r *MySQLController) AddUser(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -559,14 +533,10 @@ func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 
 // DeleteUser 删除用户
 func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -580,15 +550,11 @@ func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 
 // SetUserPassword 设置用户密码
 func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -606,15 +572,11 @@ func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 
 // SetUserPrivileges 设置用户权限
 func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"database": "required|min_len:1|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)

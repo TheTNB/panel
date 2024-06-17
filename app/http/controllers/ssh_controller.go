@@ -50,33 +50,29 @@ func (r *SshController) GetInfo(ctx http.Context) http.Response {
 
 // UpdateInfo 更新 SSH 配置
 func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := Sanitize(ctx, map[string]string{
 		"host":     "required",
 		"port":     "required",
 		"user":     "required",
 		"password": "required",
-	})
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	host := ctx.Request().Input("host")
 	port := ctx.Request().Input("port")
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	if err = r.setting.Set(models.SettingKeySshHost, host); err != nil {
+	if err := r.setting.Set(models.SettingKeySshHost, host); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err = r.setting.Set(models.SettingKeySshPort, port); err != nil {
+	if err := r.setting.Set(models.SettingKeySshPort, port); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err = r.setting.Set(models.SettingKeySshUser, user); err != nil {
+	if err := r.setting.Set(models.SettingKeySshUser, user); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err = r.setting.Set(models.SettingKeySshPassword, password); err != nil {
+	if err := r.setting.Set(models.SettingKeySshPassword, password); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

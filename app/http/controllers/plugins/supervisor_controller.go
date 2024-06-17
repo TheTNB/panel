@@ -269,18 +269,14 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 
 // AddProcess 添加进程
 func (r *SupervisorController) AddProcess(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"name":    "required|alpha_dash",
 		"user":    "required|alpha_dash",
 		"path":    "required",
 		"command": "required",
 		"num":     "required",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	name := ctx.Request().Input("name")
@@ -300,6 +296,8 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/` + name + `.log
 stdout_logfile_maxbytes=2MB
 `
+
+	var err error
 	if tools.IsRHEL() {
 		err = tools.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
 	} else {

@@ -91,7 +91,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 
 // Add 添加 Fail2ban 规则
 func (r *Fail2banController) Add(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"name":         "required",
 		"type":         "required|in:website,service",
 		"maxretry":     "required",
@@ -100,12 +100,8 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 		"website_name": "required_if:type,website",
 		"website_mode": "required_if:type,website",
 		"website_path": "required_if:website_mode,path",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	jailName := ctx.Request().Input("name")

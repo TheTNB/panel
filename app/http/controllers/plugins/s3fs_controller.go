@@ -60,18 +60,14 @@ func (r *S3fsController) List(ctx http.Context) http.Response {
 
 // Add 添加 S3fs 挂载
 func (r *S3fsController) Add(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"ak":     "required|regex:^[a-zA-Z0-9]*$",
 		"sk":     "required|regex:^[a-zA-Z0-9]*$",
 		"bucket": "required|regex:^[a-zA-Z0-9_-]*$",
 		"url":    "required|full_url",
 		"path":   "required|regex:^/[a-zA-Z0-9_-]+$",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	ak := ctx.Request().Input("ak")
@@ -87,7 +83,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 	// 检查挂载目录是否存在且为空
 	if !tools.Exists(path) {
-		if err = tools.Mkdir(path, 0755); err != nil {
+		if err := tools.Mkdir(path, 0755); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录创建失败")
 		}
 	}
@@ -96,8 +92,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 	}
 
 	var s3fsList []types.S3fsMount
-	err = json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList)
-	if err != nil {
+	if err := json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
 
@@ -109,7 +104,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 	id := carbon.Now().TimestampMilli()
 	password := ak + ":" + sk
-	if err = tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
+	if err := tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
 		return nil
 	}
 	out, err := tools.Exec(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
