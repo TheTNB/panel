@@ -91,6 +91,10 @@ definitions:
       website_path:
         type: string
     type: object
+  github_com_goravel_framework_support_carbon.DateTime:
+    properties:
+      error: {}
+    type: object
   models.Cert:
     properties:
       auto_renew:
@@ -103,7 +107,7 @@ definitions:
         description: 证书 URL (续签时使用)
         type: string
       created_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
       dns:
         $ref: '#/definitions/models.CertDNS'
       dns_id:
@@ -122,7 +126,7 @@ definitions:
         description: 证书类型 (P256, P384, 2048, 4096)
         type: string
       updated_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
       user:
         $ref: '#/definitions/models.CertUser'
       user_id:
@@ -137,7 +141,7 @@ definitions:
   models.CertDNS:
     properties:
       created_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
       dns_param:
         $ref: '#/definitions/acme.DNSParam'
       id:
@@ -149,7 +153,7 @@ definitions:
         description: DNS 提供商 (dnspod, aliyun, cloudflare)
         type: string
       updated_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
     type: object
   models.CertUser:
     properties:
@@ -157,7 +161,7 @@ definitions:
         description: CA 提供商 (letsencrypt, zerossl, sslcom, google, buypass)
         type: string
       created_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
       email:
         type: string
       hmac_encoded:
@@ -171,14 +175,14 @@ definitions:
       private_key:
         type: string
       updated_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
     type: object
   models.Website:
     properties:
       cert:
         $ref: '#/definitions/models.Cert'
       created_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
       id:
         type: integer
       name:
@@ -194,7 +198,7 @@ definitions:
       status:
         type: boolean
       updated_at:
-        type: string
+        $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'
     type: object
   requests.Add:
     properties:
@@ -519,11 +523,6 @@ definitions:
       keyword:
         type: string
       path:
-        type: string
-    type: object
-  requests.Service:
-    properties:
-      service:
         type: string
     type: object
   requests.UnArchive:
@@ -2266,6 +2265,125 @@ paths:
       summary: 上传文件
       tags:
       - 文件管理
+  /panel/plugin/install:
+    post:
+      parameters:
+      - description: request
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 安装插件
+      tags:
+      - 插件
+  /panel/plugin/isInstalled:
+    get:
+      parameters:
+      - description: request
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 检查插件是否已安装
+      tags:
+      - 插件
+  /panel/plugin/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 插件列表
+      tags:
+      - 插件
+  /panel/plugin/uninstall:
+    post:
+      parameters:
+      - description: request
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 卸载插件
+      tags:
+      - 插件
+  /panel/plugin/update:
+    post:
+      parameters:
+      - description: request
+        in: query
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新插件
+      tags:
+      - 插件
+  /panel/plugin/updateShow:
+    post:
+      parameters:
+      - description: request
+        in: query
+        name: slug
+        required: true
+        type: string
+      - description: request
+        in: query
+        name: show
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新插件首页显示状态
+      tags:
+      - 插件
   /panel/setting/list:
     get:
       description: 获取面板设置列表
@@ -2942,146 +3060,6 @@ paths:
       summary: 更新配置
       tags:
       - 插件-Frp
-  /plugins/frp/disable:
-    post:
-      description: 禁用 Frp 服务
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Service'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 禁用服务
-      tags:
-      - 插件-Frp
-  /plugins/frp/enable:
-    post:
-      description: 启用 Frp 服务
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Service'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启用服务
-      tags:
-      - 插件-Frp
-  /plugins/frp/isEnabled:
-    get:
-      description: 获取是否启用 Frp 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 是否启用服务
-      tags:
-      - 插件-Frp
-  /plugins/frp/restart:
-    post:
-      description: 重启 Frp 服务
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Service'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 重启服务
-      tags:
-      - 插件-Frp
-  /plugins/frp/start:
-    post:
-      description: 启动 Frp 服务
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Service'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启动服务
-      tags:
-      - 插件-Frp
-  /plugins/frp/status:
-    get:
-      description: 获取 Frp 服务状态
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 服务状态
-      tags:
-      - 插件-Frp
-  /plugins/frp/stop:
-    post:
-      description: 停止 Frp 服务
-      parameters:
-      - description: request
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/requests.Service'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 停止服务
-      tags:
-      - 插件-Frp
   /plugins/gitea/config:
     get:
       description: 获取 Gitea 配置
@@ -3118,156 +3096,6 @@ paths:
       summary: 更新配置
       tags:
       - 插件-Gitea
-  /plugins/gitea/disable:
-    post:
-      description: 禁用 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 禁用服务
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/enable:
-    post:
-      description: 启用 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启用服务
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/isEnabled:
-    get:
-      description: 获取是否启用 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 是否启用服务
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/restart:
-    post:
-      description: 重启 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 重启服务
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/start:
-    post:
-      description: 启动 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启动服务
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/status:
-    get:
-      description: 获取 Gitea 服务状态
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 服务状态
-      tags:
-      - 插件-Gitea
-  /plugins/gitea/stop:
-    post:
-      description: 停止 Gitea 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 停止服务
-      tags:
-      - 插件-Gitea
-  /plugins/podman/disable:
-    post:
-      description: 禁用 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 禁用服务
-      tags:
-      - 插件-Podman
-  /plugins/podman/enable:
-    post:
-      description: 启用 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启用服务
-      tags:
-      - 插件-Podman
-  /plugins/podman/isEnabled:
-    get:
-      description: 获取是否启用 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 是否启用服务
-      tags:
-      - 插件-Podman
   /plugins/podman/registryConfig:
     get:
       description: 获取 Podman 注册表配置
@@ -3302,66 +3130,6 @@ paths:
       security:
       - BearerToken: []
       summary: 更新注册表配置
-      tags:
-      - 插件-Podman
-  /plugins/podman/restart:
-    post:
-      description: 重启 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 重启服务
-      tags:
-      - 插件-Podman
-  /plugins/podman/start:
-    post:
-      description: 启动 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启动服务
-      tags:
-      - 插件-Podman
-  /plugins/podman/status:
-    get:
-      description: 获取 Podman 服务状态
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 服务状态
-      tags:
-      - 插件-Podman
-  /plugins/podman/stop:
-    post:
-      description: 停止 Podman 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 停止服务
       tags:
       - 插件-Podman
   /plugins/podman/storageConfig:
@@ -3524,66 +3292,6 @@ paths:
       security:
       - BearerToken: []
       summary: 更新模块
-      tags:
-      - 插件-Rsync
-  /plugins/rsync/restart:
-    post:
-      description: 重启 Rsync 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 重启服务
-      tags:
-      - 插件-Rsync
-  /plugins/rsync/start:
-    post:
-      description: 启动 Rsync 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 启动服务
-      tags:
-      - 插件-Rsync
-  /plugins/rsync/status:
-    get:
-      description: 获取 Rsync 服务状态
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 服务状态
-      tags:
-      - 插件-Rsync
-  /plugins/rsync/stop:
-    post:
-      description: 停止 Rsync 服务
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 停止服务
       tags:
       - 插件-Rsync
   /swagger:

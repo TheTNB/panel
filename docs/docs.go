@@ -2634,6 +2634,202 @@ const docTemplate = `{
                 }
             }
         },
+        "/panel/plugin/install": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "安装插件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/plugin/isInstalled": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "检查插件是否已安装",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/plugin/list": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "插件列表",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/plugin/uninstall": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "卸载插件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/plugin/update": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "更新插件",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/plugin/updateShow": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "插件"
+                ],
+                "summary": "更新插件首页显示状态",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "request",
+                        "name": "show",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/panel/setting/list": {
             "get": {
                 "security": [
@@ -3746,236 +3942,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/plugins/frp/disable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "禁用 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "禁用服务",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Service"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/enable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启用 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "启用服务",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Service"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/isEnabled": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取是否启用 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "是否启用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/restart": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "重启 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "重启服务",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Service"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/start": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启动 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "启动服务",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Service"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/status": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取 Frp 服务状态",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "服务状态",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/frp/stop": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "停止 Frp 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Frp"
-                ],
-                "summary": "停止服务",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.Service"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/plugins/gitea/config": {
             "get": {
                 "security": [
@@ -4035,256 +4001,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/plugins/gitea/disable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "禁用 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "禁用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/enable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启用 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "启用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/isEnabled": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取是否启用 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "是否启用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/restart": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "重启 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "重启服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/start": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启动 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "启动服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/status": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取 Gitea 服务状态",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "服务状态",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/gitea/stop": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "停止 Gitea 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Gitea"
-                ],
-                "summary": "停止服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/disable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "禁用 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "禁用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/enable": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启用 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "启用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/isEnabled": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取是否启用 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "是否启用服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/plugins/podman/registryConfig": {
             "get": {
                 "security": [
@@ -4334,106 +4050,6 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/restart": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "重启 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "重启服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/start": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启动 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "启动服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/status": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取 Podman 服务状态",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "服务状态",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/podman/stop": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "停止 Podman 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Podman"
-                ],
-                "summary": "停止服务",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -4708,106 +4324,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/plugins/rsync/restart": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "重启 Rsync 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Rsync"
-                ],
-                "summary": "重启服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/rsync/start": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "启动 Rsync 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Rsync"
-                ],
-                "summary": "启动服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/rsync/status": {
-            "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "获取 Rsync 服务状态",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Rsync"
-                ],
-                "summary": "服务状态",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/plugins/rsync/stop": {
-            "post": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
-                "description": "停止 Rsync 服务",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "插件-Rsync"
-                ],
-                "summary": "停止服务",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controllers.SuccessResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/swagger": {
             "get": {
                 "description": "Swagger UI",
@@ -4968,6 +4484,12 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_goravel_framework_support_carbon.DateTime": {
+            "type": "object",
+            "properties": {
+                "error": {}
+            }
+        },
         "models.Cert": {
             "type": "object",
             "properties": {
@@ -4984,7 +4506,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 },
                 "dns": {
                     "$ref": "#/definitions/models.CertDNS"
@@ -5011,7 +4533,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 },
                 "user": {
                     "$ref": "#/definitions/models.CertUser"
@@ -5033,7 +4555,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 },
                 "dns_param": {
                     "$ref": "#/definitions/acme.DNSParam"
@@ -5050,7 +4572,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 }
             }
         },
@@ -5062,7 +4584,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 },
                 "email": {
                     "type": "string"
@@ -5083,7 +4605,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 }
             }
         },
@@ -5094,7 +4616,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.Cert"
                 },
                 "created_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 },
                 "id": {
                     "type": "integer"
@@ -5118,7 +4640,7 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "$ref": "#/definitions/github_com_goravel_framework_support_carbon.DateTime"
                 }
             }
         },
@@ -5618,14 +5140,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "path": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.Service": {
-            "type": "object",
-            "properties": {
-                "service": {
                     "type": "string"
                 }
             }

@@ -186,13 +186,7 @@
     }
   },
   "errors": {
-    "internal": "internal system error",
-    "plugin": {
-      "notExist": "plugin does not exist",
-      "notInstalled": "plugin :slug is not installed",
-      "dependent": "plugin :slug requires dependency :dependency",
-      "incompatible": "plugin :slug is incompatible with :exclude plugin"
-    }
+    "internal": "internal system error"
   },
   "messages": {
     "mistake": "mistake"

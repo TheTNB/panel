@@ -76,10 +76,7 @@ func (r *PluginImpl) GetBySlug(slug string) types.Plugin {
 // GetInstalledBySlug 根据 slug 获取已安装的插件
 func (r *PluginImpl) GetInstalledBySlug(slug string) models.Plugin {
 	var plugin models.Plugin
-	if err := facades.Orm().Query().Where("slug", slug).Get(&plugin); err != nil {
-		return plugin
-	}
-
+	_ = facades.Orm().Query().Where("slug", slug).Get(&plugin)
 	return plugin
 }
 

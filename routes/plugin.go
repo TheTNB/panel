@@ -10,7 +10,7 @@ import (
 
 // Plugin 加载插件路由
 func Plugin() {
-	facades.Route().Prefix("api/plugins").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
+	facades.Route().Prefix("api/plugins").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 		r.Prefix("openresty").Group(func(route route.Router) {
 			openRestyController := plugins.NewOpenrestyController()
 			route.Get("load", openRestyController.Load)

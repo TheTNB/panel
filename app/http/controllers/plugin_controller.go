@@ -21,7 +21,14 @@ func NewPluginController() *PluginController {
 	}
 }
 
-// List 列出所有插件
+// List
+//
+//	@Summary	插件列表
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/list [get]
 func (r *PluginController) List(ctx http.Context) http.Response {
 	plugins := r.plugin.All()
 	installedPlugins, err := r.plugin.AllInstalled()
@@ -89,7 +96,15 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 	})
 }
 
-// Install 安装插件
+// Install
+//
+//	@Summary	安装插件
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		slug	query		string	true	"request"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/install [post]
 func (r *PluginController) Install(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
@@ -100,7 +115,15 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	return Success(ctx, "任务已提交")
 }
 
-// Uninstall 卸载插件
+// Uninstall
+//
+//	@Summary	卸载插件
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		slug	query		string	true	"request"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/uninstall [post]
 func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
@@ -111,7 +134,15 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	return Success(ctx, "任务已提交")
 }
 
-// Update 更新插件
+// Update
+//
+//	@Summary	更新插件
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		slug	query		string	true	"request"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/update [post]
 func (r *PluginController) Update(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
@@ -122,7 +153,16 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	return Success(ctx, "任务已提交")
 }
 
-// UpdateShow 更新插件首页显示状态
+// UpdateShow
+//
+//	@Summary	更新插件首页显示状态
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		slug	query		string	true	"request"
+//	@Param		show	query		bool	true	"request"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/updateShow [post]
 func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 	show := ctx.Request().InputBool("show")
@@ -149,4 +189,24 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 	}
 
 	return Success(ctx, "操作成功")
+}
+
+// IsInstalled
+//
+//	@Summary	检查插件是否已安装
+//	@Tags		插件
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		slug	query		string	true	"request"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/panel/plugin/isInstalled [get]
+func (r *PluginController) IsInstalled(ctx http.Context) http.Response {
+	slug := ctx.Request().Input("slug")
+
+	plugin := r.plugin.GetInstalledBySlug(slug)
+	if plugin.Slug != slug {
+		return Success(ctx, false)
+	}
+
+	return Success(ctx, true)
 }
