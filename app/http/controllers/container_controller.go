@@ -542,7 +542,7 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 		paged = []types.NetworkResource{}
 	}
 
-	var items []any
+	items := make([]any, 0)
 	for _, item := range paged {
 		var ipamConfig []any
 		for _, v := range item.IPAM.Config {
@@ -777,7 +777,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 		paged = []image.Summary{}
 	}
 
-	var items []any
+	items := make([]any, 0)
 	for _, item := range paged {
 		items = append(items, map[string]any{
 			"id":           item.ID,
@@ -945,7 +945,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 		paged = []*volume.Volume{}
 	}
 
-	var items []any
+	items := make([]any, 0)
 	for _, item := range paged {
 		var usage any
 		if item.UsageData != nil {
