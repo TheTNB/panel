@@ -125,6 +125,10 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 	}
 	pagedRules := rules[startIndex:endIndex]
 
+	if pagedRules == nil {
+		pagedRules = []map[string]string{}
+	}
+
 	return Success(ctx, http.Json{
 		"total": len(rules),
 		"items": pagedRules,

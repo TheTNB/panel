@@ -260,6 +260,10 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 	}
 	pagedDatabases := databases[startIndex:endIndex]
 
+	if pagedDatabases == nil {
+		pagedDatabases = []database{}
+	}
+
 	return controllers.Success(ctx, http.Json{
 		"total": len(databases),
 		"items": pagedDatabases,
@@ -511,6 +515,10 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 		endIndex = len(userGrants)
 	}
 	pagedUserGrants := userGrants[startIndex:endIndex]
+
+	if pagedUserGrants == nil {
+		pagedUserGrants = []user{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(userGrants),

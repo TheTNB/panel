@@ -80,4 +80,4 @@ systemctl unmask fail2ban
 systemctl enable fail2ban
 systemctl start fail2ban
 
-panel writePlugin fail2ban 1.0.0
+panel writePlugin fail2ban 1.0.2

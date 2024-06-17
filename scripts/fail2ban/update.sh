@@ -38,3 +38,5 @@ if [ "$?" != "0" ]; then
 fi
 
 systemctl restart fail2ban
+
+panel writePlugin fail2ban 1.0.2

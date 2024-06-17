@@ -58,6 +58,10 @@ func (r *PureFtpdController) List(ctx http.Context) http.Response {
 	}
 	pagedUsers := users[startIndex:endIndex]
 
+	if pagedUsers == nil {
+		pagedUsers = []types.PureFtpdUser{}
+	}
+
 	return controllers.Success(ctx, http.Json{
 		"total": len(users),
 		"items": pagedUsers,

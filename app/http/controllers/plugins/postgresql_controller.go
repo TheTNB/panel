@@ -200,6 +200,10 @@ func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
 	}
 	pagedDatabases := databases[startIndex:endIndex]
 
+	if pagedDatabases == nil {
+		pagedDatabases = []database{}
+	}
+
 	return controllers.Success(ctx, http.Json{
 		"total": len(databases),
 		"items": pagedDatabases,
@@ -440,6 +444,10 @@ func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
 		endIndex = len(roles)
 	}
 	pagedRoles := roles[startIndex:endIndex]
+
+	if pagedRoles == nil {
+		pagedRoles = []role{}
+	}
 
 	return controllers.Success(ctx, http.Json{
 		"total": len(roles),
