@@ -1,10 +1,11 @@
 package plugins
 
 import (
-	"strings"
+	"database/sql"
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
+	_ "github.com/lib/pq"
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/app/models"
@@ -14,66 +15,20 @@ import (
 	"github.com/TheTNB/panel/types"
 )
 
-type Postgresql16Controller struct {
+type PostgreSQLController struct {
 	setting internal.Setting
 	backup  internal.Backup
 }
 
-func NewPostgresql16Controller() *Postgresql16Controller {
-	return &Postgresql16Controller{
+func NewPostgreSQLController() *PostgreSQLController {
+	return &PostgreSQLController{
 		setting: services.NewSettingImpl(),
 		backup:  services.NewBackupImpl(),
 	}
 }
 
-// Status 获取运行状态
-func (r *Postgresql16Controller) Status(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("postgresql")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
-	}
-
-	return controllers.Success(ctx, status)
-}
-
-// Reload 重载配置
-func (r *Postgresql16Controller) Reload(ctx http.Context) http.Response {
-	if err := tools.ServiceReload("postgresql"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载PostgreSQL失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Restart 重启服务
-func (r *Postgresql16Controller) Restart(ctx http.Context) http.Response {
-	if err := tools.ServiceRestart("postgresql"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启PostgreSQL失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Start 启动服务
-func (r *Postgresql16Controller) Start(ctx http.Context) http.Response {
-	if err := tools.ServiceStart("postgresql"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "启动PostgreSQL失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
-// Stop 停止服务
-func (r *Postgresql16Controller) Stop(ctx http.Context) http.Response {
-	if err := tools.ServiceStop("postgresql"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "停止PostgreSQL失败")
-	}
-
-	return controllers.Success(ctx, nil)
-}
-
 // GetConfig 获取配置
-func (r *Postgresql16Controller) GetConfig(ctx http.Context) http.Response {
+func (r *PostgreSQLController) GetConfig(ctx http.Context) http.Response {
 	// 获取配置
 	config, err := tools.Read("/www/server/postgresql/data/postgresql.conf")
 	if err != nil {
@@ -84,7 +39,7 @@ func (r *Postgresql16Controller) GetConfig(ctx http.Context) http.Response {
 }
 
 // GetUserConfig 获取用户配置
-func (r *Postgresql16Controller) GetUserConfig(ctx http.Context) http.Response {
+func (r *PostgreSQLController) GetUserConfig(ctx http.Context) http.Response {
 	// 获取配置
 	config, err := tools.Read("/www/server/postgresql/data/pg_hba.conf")
 	if err != nil {
@@ -95,7 +50,7 @@ func (r *Postgresql16Controller) GetUserConfig(ctx http.Context) http.Response {
 }
 
 // SaveConfig 保存配置
-func (r *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
+func (r *PostgreSQLController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -105,11 +60,15 @@ func (r *Postgresql16Controller) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
-	return r.Restart(ctx)
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // SaveUserConfig 保存用户配置
-func (r *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response {
+func (r *PostgreSQLController) SaveUserConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
@@ -119,11 +78,15 @@ func (r *Postgresql16Controller) SaveUserConfig(ctx http.Context) http.Response 
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
-	return r.Restart(ctx)
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // Load 获取负载
-func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
+func (r *PostgreSQLController) Load(ctx http.Context) http.Response {
 	status, err := tools.ServiceStatus("postgresql")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
@@ -165,7 +128,7 @@ func (r *Postgresql16Controller) Load(ctx http.Context) http.Response {
 }
 
 // Log 获取日志
-func (r *Postgresql16Controller) Log(ctx http.Context) http.Response {
+func (r *PostgreSQLController) Log(ctx http.Context) http.Response {
 	log, err := tools.Exec("tail -n 100 /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
@@ -175,7 +138,7 @@ func (r *Postgresql16Controller) Log(ctx http.Context) http.Response {
 }
 
 // ClearLog 清空日志
-func (r *Postgresql16Controller) ClearLog(ctx http.Context) http.Response {
+func (r *PostgreSQLController) ClearLog(ctx http.Context) http.Response {
 	if out, err := tools.Exec("echo '' > /www/server/postgresql/logs/postgresql-" + carbon.Now().ToDateString() + ".log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -184,14 +147,25 @@ func (r *Postgresql16Controller) ClearLog(ctx http.Context) http.Response {
 }
 
 // DatabaseList 获取数据库列表
-func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("postgresql")
+func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
+	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if !status {
-		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL已停止运行")
+	if err = db.Ping(); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
+
+	query := `
+        SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba), pg_catalog.pg_encoding_to_char(d.encoding)
+        FROM pg_catalog.pg_database d
+        WHERE datistemplate = false;
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	defer rows.Close()
 
 	type database struct {
 		Name     string `json:"name"`
@@ -199,67 +173,47 @@ func (r *Postgresql16Controller) DatabaseList(ctx http.Context) http.Response {
 		Encoding string `json:"encoding"`
 	}
 
-	raw, err := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, raw)
-	}
-	databases := strings.Split(raw, "\n")
-	if len(databases) >= 4 {
-		databases = databases[3 : len(databases)-1]
-	} else {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []database{},
-		})
-	}
-
-	var databaseList []database
-	for _, db := range databases {
-		parts := strings.Split(db, "|")
-		if len(parts) != 9 || len(strings.TrimSpace(parts[0])) == 0 {
-			continue
+	var databases []database
+	for rows.Next() {
+		var db database
+		if err := rows.Scan(&db.Name, &db.Owner, &db.Encoding); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
-
-		databaseList = append(databaseList, database{
-			Name:     strings.TrimSpace(parts[0]),
-			Owner:    strings.TrimSpace(parts[1]),
-			Encoding: strings.TrimSpace(parts[2]),
-		})
+		databases = append(databases, db)
+	}
+	if err = rows.Err(); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
-	if startIndex > len(databaseList) {
+	if startIndex > len(databases) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
 			"items": []database{},
 		})
 	}
-	if endIndex > len(databaseList) {
-		endIndex = len(databaseList)
+	if endIndex > len(databases) {
+		endIndex = len(databases)
 	}
-	pagedDatabases := databaseList[startIndex:endIndex]
+	pagedDatabases := databases[startIndex:endIndex]
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(databaseList),
+		"total": len(databases),
 		"items": pagedDatabases,
 	})
 }
 
 // AddDatabase 添加数据库
-func (r *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+func (r *PostgreSQLController) AddDatabase(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	database := ctx.Request().Input("database")
@@ -284,19 +238,19 @@ func (r *Postgresql16Controller) AddDatabase(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return r.Reload(ctx)
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
 // DeleteDatabase 删除数据库
-func (r *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+func (r *PostgreSQLController) DeleteDatabase(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	database := ctx.Request().Input("database")
@@ -308,7 +262,7 @@ func (r *Postgresql16Controller) DeleteDatabase(ctx http.Context) http.Response 
 }
 
 // BackupList 获取备份列表
-func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
+func (r *PostgreSQLController) BackupList(ctx http.Context) http.Response {
 	backupList, err := r.backup.PostgresqlList()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
@@ -339,7 +293,7 @@ func (r *Postgresql16Controller) BackupList(ctx http.Context) http.Response {
 }
 
 // UploadBackup 上传备份
-func (r *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
+func (r *PostgreSQLController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
@@ -362,20 +316,15 @@ func (r *Postgresql16Controller) UploadBackup(ctx http.Context) http.Response {
 }
 
 // CreateBackup 创建备份
-func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+func (r *PostgreSQLController) CreateBackup(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	database := ctx.Request().Input("database")
-	err = r.backup.PostgresqlBackup(database)
-	if err != nil {
+	if err := r.backup.PostgresqlBackup(database); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -383,15 +332,11 @@ func (r *Postgresql16Controller) CreateBackup(ctx http.Context) http.Response {
 }
 
 // DeleteBackup 删除备份
-func (r *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+func (r *PostgreSQLController) DeleteBackup(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"name": "required|min_len:1|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
@@ -404,89 +349,112 @@ func (r *Postgresql16Controller) DeleteBackup(ctx http.Context) http.Response {
 }
 
 // RestoreBackup 还原备份
-func (r *Postgresql16Controller) RestoreBackup(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+func (r *PostgreSQLController) RestoreBackup(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
-	err = r.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup"))
-	if err != nil {
+	if err := r.backup.PostgresqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup")); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "还原失败: "+err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
 }
 
-// UserList 用户列表
-func (r *Postgresql16Controller) UserList(ctx http.Context) http.Response {
-	type user struct {
-		User string `json:"user"`
-		Role string `json:"role"`
-	}
-
-	raw, err := tools.Exec(`echo "\du" | su - postgres -c "psql"`)
+// RoleList 角色列表
+func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
+	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, raw)
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	users := strings.Split(raw, "\n")
-	if len(users) < 4 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "用户列表为空")
+	if err = db.Ping(); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	users = users[3:]
 
-	var userList []user
-	for _, u := range users {
-		userInfo := strings.Split(u, "|")
-		if len(userInfo) != 2 {
-			continue
+	query := `
+        SELECT rolname,
+               rolsuper,
+               rolcreaterole,
+               rolcreatedb,
+               rolreplication,
+               rolbypassrls
+        FROM pg_roles
+        WHERE rolcanlogin = true;
+    `
+	rows, err := db.Query(query)
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	defer rows.Close()
+
+	type role struct {
+		Role       string   `json:"role"`
+		Attributes []string `json:"attributes"`
+	}
+
+	var roles []role
+	for rows.Next() {
+		var r role
+		var super, canCreateRole, canCreateDb, replication, bypassRls bool
+		if err = rows.Scan(&r.Role, &super, &canCreateRole, &canCreateDb, &replication, &bypassRls); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 
-		userList = append(userList, user{
-			User: strings.TrimSpace(userInfo[0]),
-			Role: strings.TrimSpace(userInfo[1]),
-		})
+		permissions := map[string]bool{
+			"超级用户":   super,
+			"创建角色":   canCreateRole,
+			"创建数据库":  canCreateDb,
+			"可以复制":   replication,
+			"绕过行级安全": bypassRls,
+		}
+		for perm, enabled := range permissions {
+			if enabled {
+				r.Attributes = append(r.Attributes, perm)
+			}
+		}
+
+		if len(r.Attributes) == 0 {
+			r.Attributes = append(r.Attributes, "无")
+		}
+
+		roles = append(roles, r)
+	}
+	if err = rows.Err(); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	page := ctx.Request().QueryInt("page", 1)
 	limit := ctx.Request().QueryInt("limit", 10)
 	startIndex := (page - 1) * limit
 	endIndex := page * limit
-	if startIndex > len(userList) {
+	if startIndex > len(roles) {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []user{},
+			"items": []role{},
 		})
 	}
-	if endIndex > len(userList) {
-		endIndex = len(userList)
+	if endIndex > len(roles) {
+		endIndex = len(roles)
 	}
-	pagedUsers := userList[startIndex:endIndex]
+	pagedRoles := roles[startIndex:endIndex]
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(userList),
-		"items": pagedUsers,
+		"total": len(roles),
+		"items": pagedRoles,
 	})
 }
 
-// AddUser 添加用户
-func (r *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+// AddRole 添加角色
+func (r *PostgreSQLController) AddRole(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	user := ctx.Request().Input("user")
@@ -504,19 +472,19 @@ func (r *Postgresql16Controller) AddUser(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return r.Reload(ctx)
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
-// DeleteUser 删除用户
-func (r *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+// DeleteRole 删除角色
+func (r *PostgreSQLController) DeleteRole(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	user := ctx.Request().Input("user")
@@ -527,20 +495,20 @@ func (r *Postgresql16Controller) DeleteUser(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return r.Reload(ctx)
+	if err := tools.ServiceReload("postgresql"); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
+	}
+
+	return controllers.Success(ctx, nil)
 }
 
-// SetUserPassword 设置用户密码
-func (r *Postgresql16Controller) SetUserPassword(ctx http.Context) http.Response {
-	validator, err := ctx.Request().Validate(map[string]string{
+// SetRolePassword 设置用户密码
+func (r *PostgreSQLController) SetRolePassword(ctx http.Context) http.Response {
+	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:255",
-	})
-	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
+	}); sanitize != nil {
+		return sanitize
 	}
 
 	user := ctx.Request().Input("user")
