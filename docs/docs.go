@@ -33,7 +33,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取算法列表",
                 "responses": {
@@ -58,7 +58,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取 CA 提供商",
                 "responses": {
@@ -83,7 +83,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取证书列表",
                 "parameters": [
@@ -121,7 +121,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "添加证书",
                 "parameters": [
@@ -157,7 +157,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取证书",
                 "parameters": [
@@ -204,7 +204,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "更新证书",
                 "parameters": [
@@ -248,7 +248,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "删除证书",
                 "parameters": [
@@ -285,7 +285,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "部署证书",
                 "parameters": [
@@ -321,7 +321,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取 DNS 接口列表",
                 "parameters": [
@@ -359,7 +359,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "添加 DNS 接口",
                 "parameters": [
@@ -395,7 +395,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取 DNS 接口",
                 "parameters": [
@@ -442,7 +442,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "更新 DNS 接口",
                 "parameters": [
@@ -486,7 +486,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "删除 DNS 接口",
                 "parameters": [
@@ -520,7 +520,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取 DNS 提供商",
                 "responses": {
@@ -548,7 +548,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取手动 DNS 记录",
                 "parameters": [
@@ -602,7 +602,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "签发证书",
                 "parameters": [
@@ -641,7 +641,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "续签证书",
                 "parameters": [
@@ -677,7 +677,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取用户列表",
                 "parameters": [
@@ -715,7 +715,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "添加 ACME 用户",
                 "parameters": [
@@ -751,7 +751,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "获取 ACME 用户",
                 "parameters": [
@@ -798,7 +798,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "更新 ACME 用户",
                 "parameters": [
@@ -842,7 +842,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "证书管理"
+                    "TLS证书"
                 ],
                 "summary": "删除 ACME 用户",
                 "parameters": [
@@ -2075,7 +2075,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "压缩文件/目录",
                 "parameters": [
@@ -2114,7 +2114,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "获取文件内容",
                 "parameters": [
@@ -2149,7 +2149,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "复制文件/目录",
                 "parameters": [
@@ -2188,7 +2188,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "创建文件/目录",
                 "parameters": [
@@ -2227,7 +2227,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "删除文件/目录",
                 "parameters": [
@@ -2266,7 +2266,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "下载文件",
                 "parameters": [
@@ -2301,7 +2301,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "获取文件/目录信息",
                 "parameters": [
@@ -2331,7 +2331,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "获取文件/目录列表",
                 "parameters": [
@@ -2376,7 +2376,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "移动文件/目录",
                 "parameters": [
@@ -2415,7 +2415,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "修改文件/目录权限",
                 "parameters": [
@@ -2454,7 +2454,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "下载远程文件",
                 "parameters": [
@@ -2493,7 +2493,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "保存文件内容",
                 "parameters": [
@@ -2527,7 +2527,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "搜索文件/目录",
                 "parameters": [
@@ -2566,7 +2566,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "解压文件/目录",
                 "parameters": [
@@ -2605,7 +2605,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "文件管理"
+                    "文件"
                 ],
                 "summary": "上传文件",
                 "parameters": [

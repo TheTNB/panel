@@ -27,7 +27,7 @@ func NewFileController() *FileController {
 //
 //	@Summary		创建文件/目录
 //	@Description	创建文件/目录到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -60,7 +60,7 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 //
 //	@Summary		获取文件内容
 //	@Description	获取给定路径的文件内容
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -97,7 +97,7 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 //
 //	@Summary		保存文件内容
 //	@Description	保存给定路径的文件内容
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -127,7 +127,7 @@ func (r *FileController) Save(ctx http.Context) http.Response {
 //
 //	@Summary		删除文件/目录
 //	@Description	删除给定路径的文件/目录
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -152,7 +152,7 @@ func (r *FileController) Delete(ctx http.Context) http.Response {
 //
 //	@Summary		上传文件
 //	@Description	上传文件到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -194,7 +194,7 @@ func (r *FileController) Upload(ctx http.Context) http.Response {
 //
 //	@Summary		移动文件/目录
 //	@Description	移动文件/目录到给定路径，等效于重命名
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -224,7 +224,7 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 //
 //	@Summary		复制文件/目录
 //	@Description	复制文件/目录到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -254,7 +254,7 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 //
 //	@Summary		下载文件
 //	@Description	下载给定路径的文件
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -283,7 +283,7 @@ func (r *FileController) Download(ctx http.Context) http.Response {
 //
 //	@Summary		下载远程文件
 //	@Description	下载远程文件到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -305,7 +305,7 @@ func (r *FileController) RemoteDownload(ctx http.Context) http.Response {
 //
 //	@Summary		获取文件/目录信息
 //	@Description	获取给定路径的文件/目录信息
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -338,7 +338,7 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 //
 //	@Summary		修改文件/目录权限
 //	@Description	修改给定路径的文件/目录权限
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -366,7 +366,7 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 //
 //	@Summary		压缩文件/目录
 //	@Description	压缩文件/目录到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -392,7 +392,7 @@ func (r *FileController) Archive(ctx http.Context) http.Response {
 //
 //	@Summary		解压文件/目录
 //	@Description	解压文件/目录到给定路径
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Security		BearerToken
@@ -418,7 +418,7 @@ func (r *FileController) UnArchive(ctx http.Context) http.Response {
 //
 //	@Summary		搜索文件/目录
 //	@Description	通过关键词搜索给定路径的文件/目录
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	body		requests.Search	true	"request"
@@ -452,7 +452,7 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 //
 //	@Summary		获取文件/目录列表
 //	@Description	获取给定路径的文件/目录列表
-//	@Tags			文件管理
+//	@Tags			文件
 //	@Accept			json
 //	@Produce		json
 //	@Param			data	query		requests.Exist			true	"request"

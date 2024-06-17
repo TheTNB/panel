@@ -691,7 +691,7 @@ paths:
       - BearerToken: []
       summary: 获取算法列表
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/caProviders:
     get:
       description: 获取面板证书管理支持的 CA 提供商
@@ -706,7 +706,7 @@ paths:
       - BearerToken: []
       summary: 获取 CA 提供商
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/certs:
     get:
       description: 获取面板证书管理的证书列表
@@ -728,7 +728,7 @@ paths:
       - BearerToken: []
       summary: 获取证书列表
       tags:
-      - 证书管理
+      - TLS证书
     post:
       consumes:
       - application/json
@@ -751,7 +751,7 @@ paths:
       - BearerToken: []
       summary: 添加证书
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/certs/{id}:
     delete:
       consumes:
@@ -774,7 +774,7 @@ paths:
       - BearerToken: []
       summary: 删除证书
       tags:
-      - 证书管理
+      - TLS证书
     get:
       description: 获取面板证书管理的证书
       parameters:
@@ -799,7 +799,7 @@ paths:
       - BearerToken: []
       summary: 获取证书
       tags:
-      - 证书管理
+      - TLS证书
     put:
       consumes:
       - application/json
@@ -827,7 +827,7 @@ paths:
       - BearerToken: []
       summary: 更新证书
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/deploy:
     post:
       consumes:
@@ -851,7 +851,7 @@ paths:
       - BearerToken: []
       summary: 部署证书
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/dns:
     get:
       description: 获取面板证书管理的 DNS 接口列表
@@ -873,7 +873,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 接口列表
       tags:
-      - 证书管理
+      - TLS证书
     post:
       consumes:
       - application/json
@@ -896,7 +896,7 @@ paths:
       - BearerToken: []
       summary: 添加 DNS 接口
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/dns/{id}:
     delete:
       consumes:
@@ -919,7 +919,7 @@ paths:
       - BearerToken: []
       summary: 删除 DNS 接口
       tags:
-      - 证书管理
+      - TLS证书
     get:
       description: 获取面板证书管理的 DNS 接口
       parameters:
@@ -944,7 +944,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 接口
       tags:
-      - 证书管理
+      - TLS证书
     put:
       consumes:
       - application/json
@@ -972,7 +972,7 @@ paths:
       - BearerToken: []
       summary: 更新 DNS 接口
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/dnsProviders:
     get:
       description: 获取面板证书管理支持的 DNS 提供商
@@ -987,7 +987,7 @@ paths:
       - BearerToken: []
       summary: 获取 DNS 提供商
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/manualDNS:
     post:
       consumes:
@@ -1018,7 +1018,7 @@ paths:
       - BearerToken: []
       summary: 获取手动 DNS 记录
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/obtain:
     post:
       consumes:
@@ -1042,7 +1042,7 @@ paths:
       - BearerToken: []
       summary: 签发证书
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/renew:
     post:
       consumes:
@@ -1066,7 +1066,7 @@ paths:
       - BearerToken: []
       summary: 续签证书
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/users:
     get:
       description: 获取面板证书管理的 ACME 用户列表
@@ -1088,7 +1088,7 @@ paths:
       - BearerToken: []
       summary: 获取用户列表
       tags:
-      - 证书管理
+      - TLS证书
     post:
       consumes:
       - application/json
@@ -1111,7 +1111,7 @@ paths:
       - BearerToken: []
       summary: 添加 ACME 用户
       tags:
-      - 证书管理
+      - TLS证书
   /panel/cert/users/{id}:
     delete:
       consumes:
@@ -1134,7 +1134,7 @@ paths:
       - BearerToken: []
       summary: 删除 ACME 用户
       tags:
-      - 证书管理
+      - TLS证书
     get:
       description: 获取面板证书管理的 ACME 用户
       parameters:
@@ -1159,7 +1159,7 @@ paths:
       - BearerToken: []
       summary: 获取 ACME 用户
       tags:
-      - 证书管理
+      - TLS证书
     put:
       consumes:
       - application/json
@@ -1187,7 +1187,7 @@ paths:
       - BearerToken: []
       summary: 更新 ACME 用户
       tags:
-      - 证书管理
+      - TLS证书
   /panel/container/create:
     post:
       consumes:
@@ -1934,7 +1934,7 @@ paths:
       - BearerToken: []
       summary: 压缩文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/content:
     get:
       consumes:
@@ -1955,7 +1955,7 @@ paths:
       - BearerToken: []
       summary: 获取文件内容
       tags:
-      - 文件管理
+      - 文件
   /panel/file/copy:
     post:
       consumes:
@@ -1979,7 +1979,7 @@ paths:
       - BearerToken: []
       summary: 复制文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/create:
     post:
       consumes:
@@ -2003,7 +2003,7 @@ paths:
       - BearerToken: []
       summary: 创建文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/delete:
     post:
       consumes:
@@ -2027,7 +2027,7 @@ paths:
       - BearerToken: []
       summary: 删除文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/download:
     get:
       consumes:
@@ -2048,7 +2048,7 @@ paths:
       - BearerToken: []
       summary: 下载文件
       tags:
-      - 文件管理
+      - 文件
   /panel/file/info:
     get:
       consumes:
@@ -2069,7 +2069,7 @@ paths:
       - BearerToken: []
       summary: 获取文件/目录信息
       tags:
-      - 文件管理
+      - 文件
   /panel/file/list:
     get:
       consumes:
@@ -2094,7 +2094,7 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       summary: 获取文件/目录列表
       tags:
-      - 文件管理
+      - 文件
   /panel/file/move:
     post:
       consumes:
@@ -2118,7 +2118,7 @@ paths:
       - BearerToken: []
       summary: 移动文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/permission:
     post:
       consumes:
@@ -2142,7 +2142,7 @@ paths:
       - BearerToken: []
       summary: 修改文件/目录权限
       tags:
-      - 文件管理
+      - 文件
   /panel/file/remoteDownload:
     post:
       consumes:
@@ -2166,7 +2166,7 @@ paths:
       - BearerToken: []
       summary: 下载远程文件
       tags:
-      - 文件管理
+      - 文件
   /panel/file/save:
     post:
       consumes:
@@ -2190,7 +2190,7 @@ paths:
       - BearerToken: []
       summary: 保存文件内容
       tags:
-      - 文件管理
+      - 文件
   /panel/file/search:
     post:
       consumes:
@@ -2212,7 +2212,7 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       summary: 搜索文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/unArchive:
     post:
       consumes:
@@ -2236,7 +2236,7 @@ paths:
       - BearerToken: []
       summary: 解压文件/目录
       tags:
-      - 文件管理
+      - 文件
   /panel/file/upload:
     post:
       consumes:
@@ -2264,7 +2264,7 @@ paths:
       - BearerToken: []
       summary: 上传文件
       tags:
-      - 文件管理
+      - 文件
   /panel/plugin/install:
     post:
       parameters:
