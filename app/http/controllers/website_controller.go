@@ -33,14 +33,13 @@ func NewWebsiteController() *WebsiteController {
 
 // List
 //
-//	@Summary		获取网站列表
-//	@Description	获取网站管理的网站列表
-//	@Tags			网站管理
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	query		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/websites [get]
+//	@Summary	获取网站列表
+//	@Tags		网站
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	query		commonrequests.Paginate	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := SanitizeRequest(ctx, &paginateRequest)
@@ -64,15 +63,14 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 
 // Add
 //
-//	@Summary		添加网站
-//	@Description	添加网站到网站管理
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.Add	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/websites [post]
+//	@Summary	添加网站
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	body		requests.Add	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/websites [post]
 func (r *WebsiteController) Add(ctx http.Context) http.Response {
 	var addRequest requests.Add
 	sanitize := SanitizeRequest(ctx, &addRequest)
@@ -112,15 +110,14 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 
 // Delete
 //
-//	@Summary		删除网站
-//	@Description	删除网站管理的网站
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id} [delete]
+//	@Summary	删除网站
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id} [delete]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -142,13 +139,12 @@ func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 
 // GetDefaultConfig
 //
-//	@Summary		获取默认配置
-//	@Description	获取默认首页和停止页配置
-//	@Tags			网站管理
-//	@Produce		json
-//	@Security		BearerToken
-//	@Success		200	{object}	SuccessResponse{data=map[string]string}
-//	@Router			/panel/website/defaultConfig [get]
+//	@Summary	获取默认配置
+//	@Tags		网站
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	SuccessResponse{data=map[string]string}
+//	@Router		/panel/website/defaultConfig [get]
 func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	index, err := tools.Read("/www/server/openresty/html/index.html")
 	if err != nil {
@@ -167,15 +163,14 @@ func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 
 // SaveDefaultConfig
 //
-//	@Summary		保存默认配置
-//	@Description	保存默认首页和停止页配置
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		map[string]string	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/defaultConfig [post]
+//	@Summary	保存默认配置
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	body		map[string]string	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/website/defaultConfig [post]
 func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
@@ -199,15 +194,14 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 
 // GetConfig
 //
-//	@Summary		获取配置
-//	@Description	获取网站的配置
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse{data=types.Website}
-//	@Router			/panel/websites/{id}/config [get]
+//	@Summary	获取网站配置
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse{data=types.Website}
+//	@Router		/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -229,16 +223,15 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 
 // SaveConfig
 //
-//	@Summary		保存配置
-//	@Description	保存网站的配置
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id		path		int					true	"网站 ID"
-//	@Param			data	body		requests.SaveConfig	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/config [post]
+//	@Summary	保存网站配置
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id		path		int					true	"网站 ID"
+//	@Param		data	body		requests.SaveConfig	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/config [post]
 func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	var saveConfigRequest requests.SaveConfig
 	sanitize := SanitizeRequest(ctx, &saveConfigRequest)
@@ -256,15 +249,14 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 
 // ClearLog
 //
-//	@Summary		清空日志
-//	@Description	清空网站的日志
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/log [delete]
+//	@Summary	清空网站日志
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/log [delete]
 func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -287,15 +279,14 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 
 // UpdateRemark
 //
-//	@Summary		更新备注
-//	@Description	更新网站的备注
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/updateRemark [post]
+//	@Summary	更新网站备注
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/updateRemark [post]
 func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -323,14 +314,13 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 
 // BackupList
 //
-//	@Summary		获取备份列表
-//	@Description	获取网站的备份列表
-//	@Tags			网站管理
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	query		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	SuccessResponse{data=[]types.BackupFile}
-//	@Router			/panel/website/backupList [get]
+//	@Summary	获取网站备份列表
+//	@Tags		网站
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	query		commonrequests.Paginate	true	"request"
+//	@Success	200		{object}	SuccessResponse{data=[]types.BackupFile}
+//	@Router		/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
 	sanitize := SanitizeRequest(ctx, &paginateRequest)
@@ -370,15 +360,14 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 
 // CreateBackup
 //
-//	@Summary		创建备份
-//	@Description	创建网站的备份
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/createBackup [post]
+//	@Summary	创建网站备份
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/createBackup [post]
 func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -408,15 +397,14 @@ func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 
 // UploadBackup
 //
-//	@Summary		上传备份
-//	@Description	上传网站的备份
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			file	formData	file	true	"备份文件"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/uploadBackup [put]
+//	@Summary	上传网站备份
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		file	formData	file	true	"备份文件"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/website/uploadBackup [put]
 func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
@@ -444,15 +432,14 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 
 // RestoreBackup
 //
-//	@Summary		还原备份
-//	@Description	还原网站的备份
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/restoreBackup [post]
+//	@Summary	还原网站备份
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/restoreBackup [post]
 func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
 	sanitize := SanitizeRequest(ctx, &restoreBackupRequest)
@@ -479,15 +466,14 @@ func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 
 // DeleteBackup
 //
-//	@Summary		删除备份
-//	@Description	删除网站的备份
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.DeleteBackup	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/website/deleteBackup [delete]
+//	@Summary	删除网站备份
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	body		requests.DeleteBackup	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/website/deleteBackup [delete]
 func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	var deleteBackupRequest requests.DeleteBackup
 	sanitize := SanitizeRequest(ctx, &deleteBackupRequest)
@@ -511,15 +497,14 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 
 // ResetConfig
 //
-//	@Summary		重置配置
-//	@Description	重置网站的配置
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/resetConfig [post]
+//	@Summary	重置网站配置
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/resetConfig [post]
 func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)
@@ -615,15 +600,14 @@ server
 
 // Status
 //
-//	@Summary		状态
-//	@Description	启用或停用网站
-//	@Tags			网站管理
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			id	path		int	true	"网站 ID"
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/websites/{id}/status [post]
+//	@Summary	获取网站状态
+//	@Tags		网站
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		id	path		int	true	"网站 ID"
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/websites/{id}/status [post]
 func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	var idRequest requests.ID
 	sanitize := SanitizeRequest(ctx, &idRequest)

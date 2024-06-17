@@ -3248,14 +3248,13 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取网站的备份列表",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "获取备份列表",
+                "summary": "获取网站备份列表",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3300,12 +3299,11 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取默认首页和停止页配置",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
                 "summary": "获取默认配置",
                 "responses": {
@@ -3338,7 +3336,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "保存默认首页和停止页配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -3346,7 +3343,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
                 "summary": "保存默认配置",
                 "parameters": [
@@ -3380,7 +3377,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "删除网站的备份",
                 "consumes": [
                     "application/json"
                 ],
@@ -3388,9 +3384,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "删除备份",
+                "summary": "删除网站备份",
                 "parameters": [
                     {
                         "description": "request",
@@ -3419,7 +3415,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "上传网站的备份",
                 "consumes": [
                     "application/json"
                 ],
@@ -3427,9 +3422,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "上传备份",
+                "summary": "上传网站备份",
                 "parameters": [
                     {
                         "type": "file",
@@ -3456,12 +3451,11 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取网站管理的网站列表",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
                 "summary": "获取网站列表",
                 "parameters": [
@@ -3491,7 +3485,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "添加网站到网站管理",
                 "consumes": [
                     "application/json"
                 ],
@@ -3499,7 +3492,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
                 "summary": "添加网站",
                 "parameters": [
@@ -3530,7 +3523,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "删除网站管理的网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -3538,7 +3530,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
                 "summary": "删除网站",
                 "parameters": [
@@ -3567,7 +3559,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取网站的配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -3575,9 +3566,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "获取配置",
+                "summary": "获取网站配置",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3614,7 +3605,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "保存网站的配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -3622,9 +3612,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "保存配置",
+                "summary": "保存网站配置",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3660,7 +3650,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "创建网站的备份",
                 "consumes": [
                     "application/json"
                 ],
@@ -3668,9 +3657,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "创建备份",
+                "summary": "创建网站备份",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3697,7 +3686,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "清空网站的日志",
                 "consumes": [
                     "application/json"
                 ],
@@ -3705,9 +3693,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "清空日志",
+                "summary": "清空网站日志",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3734,7 +3722,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "重置网站的配置",
                 "consumes": [
                     "application/json"
                 ],
@@ -3742,9 +3729,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "重置配置",
+                "summary": "重置网站配置",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3771,7 +3758,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "还原网站的备份",
                 "consumes": [
                     "application/json"
                 ],
@@ -3779,9 +3765,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "还原备份",
+                "summary": "还原网站备份",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3808,7 +3794,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "启用或停用网站",
                 "consumes": [
                     "application/json"
                 ],
@@ -3816,9 +3801,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "状态",
+                "summary": "获取网站状态",
                 "parameters": [
                     {
                         "type": "integer",
@@ -3845,7 +3830,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "更新网站的备注",
                 "consumes": [
                     "application/json"
                 ],
@@ -3853,9 +3837,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "网站管理"
+                    "网站"
                 ],
-                "summary": "更新备注",
+                "summary": "更新网站备注",
                 "parameters": [
                     {
                         "type": "integer",

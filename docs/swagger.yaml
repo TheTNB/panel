@@ -2636,7 +2636,6 @@ paths:
       - 用户鉴权
   /panel/website/backupList:
     get:
-      description: 获取网站的备份列表
       parameters:
       - in: query
         name: limit
@@ -2660,12 +2659,11 @@ paths:
               type: object
       security:
       - BearerToken: []
-      summary: 获取备份列表
+      summary: 获取网站备份列表
       tags:
-      - 网站管理
+      - 网站
   /panel/website/defaultConfig:
     get:
-      description: 获取默认首页和停止页配置
       produces:
       - application/json
       responses:
@@ -2684,11 +2682,10 @@ paths:
       - BearerToken: []
       summary: 获取默认配置
       tags:
-      - 网站管理
+      - 网站
     post:
       consumes:
       - application/json
-      description: 保存默认首页和停止页配置
       parameters:
       - description: request
         in: body
@@ -2709,12 +2706,11 @@ paths:
       - BearerToken: []
       summary: 保存默认配置
       tags:
-      - 网站管理
+      - 网站
   /panel/website/deleteBackup:
     delete:
       consumes:
       - application/json
-      description: 删除网站的备份
       parameters:
       - description: request
         in: body
@@ -2731,14 +2727,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 删除备份
+      summary: 删除网站备份
       tags:
-      - 网站管理
+      - 网站
   /panel/website/uploadBackup:
     put:
       consumes:
       - application/json
-      description: 上传网站的备份
       parameters:
       - description: 备份文件
         in: formData
@@ -2754,12 +2749,11 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 上传备份
+      summary: 上传网站备份
       tags:
-      - 网站管理
+      - 网站
   /panel/websites:
     get:
-      description: 获取网站管理的网站列表
       parameters:
       - in: query
         name: limit
@@ -2778,11 +2772,10 @@ paths:
       - BearerToken: []
       summary: 获取网站列表
       tags:
-      - 网站管理
+      - 网站
     post:
       consumes:
       - application/json
-      description: 添加网站到网站管理
       parameters:
       - description: request
         in: body
@@ -2801,12 +2794,11 @@ paths:
       - BearerToken: []
       summary: 添加网站
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}:
     delete:
       consumes:
       - application/json
-      description: 删除网站管理的网站
       parameters:
       - description: 网站 ID
         in: path
@@ -2824,12 +2816,11 @@ paths:
       - BearerToken: []
       summary: 删除网站
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/config:
     get:
       consumes:
       - application/json
-      description: 获取网站的配置
       parameters:
       - description: 网站 ID
         in: path
@@ -2850,13 +2841,12 @@ paths:
               type: object
       security:
       - BearerToken: []
-      summary: 获取配置
+      summary: 获取网站配置
       tags:
-      - 网站管理
+      - 网站
     post:
       consumes:
       - application/json
-      description: 保存网站的配置
       parameters:
       - description: 网站 ID
         in: path
@@ -2878,14 +2868,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 保存配置
+      summary: 保存网站配置
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/createBackup:
     post:
       consumes:
       - application/json
-      description: 创建网站的备份
       parameters:
       - description: 网站 ID
         in: path
@@ -2901,14 +2890,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 创建备份
+      summary: 创建网站备份
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/log:
     delete:
       consumes:
       - application/json
-      description: 清空网站的日志
       parameters:
       - description: 网站 ID
         in: path
@@ -2924,14 +2912,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 清空日志
+      summary: 清空网站日志
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/resetConfig:
     post:
       consumes:
       - application/json
-      description: 重置网站的配置
       parameters:
       - description: 网站 ID
         in: path
@@ -2947,14 +2934,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 重置配置
+      summary: 重置网站配置
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/restoreBackup:
     post:
       consumes:
       - application/json
-      description: 还原网站的备份
       parameters:
       - description: 网站 ID
         in: path
@@ -2970,14 +2956,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 还原备份
+      summary: 还原网站备份
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/status:
     post:
       consumes:
       - application/json
-      description: 启用或停用网站
       parameters:
       - description: 网站 ID
         in: path
@@ -2993,14 +2978,13 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 状态
+      summary: 获取网站状态
       tags:
-      - 网站管理
+      - 网站
   /panel/websites/{id}/updateRemark:
     post:
       consumes:
       - application/json
-      description: 更新网站的备注
       parameters:
       - description: 网站 ID
         in: path
@@ -3016,9 +3000,9 @@ paths:
             $ref: '#/definitions/controllers.SuccessResponse'
       security:
       - BearerToken: []
-      summary: 更新备注
+      summary: 更新网站备注
       tags:
-      - 网站管理
+      - 网站
   /plugins/frp/config:
     get:
       description: 获取 Frp 配置
