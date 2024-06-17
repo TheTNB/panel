@@ -3096,6 +3096,82 @@ paths:
       summary: 更新配置
       tags:
       - 插件-Gitea
+  /plugins/openresty/clearErrorLog:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 清空错误日志
+      tags:
+      - 插件-OpenResty
+  /plugins/openresty/config:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取配置
+      tags:
+      - 插件-OpenResty
+    post:
+      parameters:
+      - description: 配置
+        in: body
+        name: config
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 保存配置
+      tags:
+      - 插件-OpenResty
+  /plugins/openresty/errorLog:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取错误日志
+      tags:
+      - 插件-OpenResty
+  /plugins/openresty/load:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取负载状态
+      tags:
+      - 插件-OpenResty
   /plugins/php/{version}/clearErrorLog:
     post:
       parameters:

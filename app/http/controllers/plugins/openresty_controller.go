@@ -20,7 +20,14 @@ func NewOpenrestyController() *OpenRestyController {
 	return &OpenRestyController{}
 }
 
-// GetConfig 获取配置
+// GetConfig
+//
+//	@Summary	获取配置
+//	@Tags		插件-OpenResty
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	controllers.SuccessResponse
+//	@Router		/plugins/openresty/config [get]
 func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 	config, err := tools.Read("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
@@ -30,7 +37,15 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, config)
 }
 
-// SaveConfig 保存配置
+// SaveConfig
+//
+//	@Summary	保存配置
+//	@Tags		插件-OpenResty
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		config	body		string	true	"配置"
+//	@Success	200		{object}	controllers.SuccessResponse
+//	@Router		/plugins/openresty/config [post]
 func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
@@ -48,7 +63,14 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
-// ErrorLog 获取错误日志
+// ErrorLog
+//
+//	@Summary	获取错误日志
+//	@Tags		插件-OpenResty
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	controllers.SuccessResponse
+//	@Router		/plugins/openresty/errorLog [get]
 func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 	if !tools.Exists("/www/wwwlogs/nginx_error.log") {
 		return controllers.Success(ctx, "")
@@ -62,7 +84,14 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 	return controllers.Success(ctx, out)
 }
 
-// ClearErrorLog 清空错误日志
+// ClearErrorLog
+//
+//	@Summary	清空错误日志
+//	@Tags		插件-OpenResty
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	controllers.SuccessResponse
+//	@Router		/plugins/openresty/clearErrorLog [post]
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 	if out, err := tools.Exec("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
@@ -71,7 +100,14 @@ func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 	return controllers.Success(ctx, nil)
 }
 
-// Load 获取负载
+// Load
+//
+//	@Summary	获取负载状态
+//	@Tags		插件-OpenResty
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	controllers.SuccessResponse
+//	@Router		/plugins/openresty/load [get]
 func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
