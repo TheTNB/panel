@@ -186,7 +186,13 @@
     }
   },
   "errors": {
-    "internal": "系统内部错误"
+    "internal": "系统内部错误",
+    "plugin": {
+      "notExist": "插件不存在",
+      "notInstalled": "插件 :slug 未安装",
+      "dependent": "插件 :slug 需要依赖 :dependency 插件",
+      "incompatible": "插件 :slug 不兼容 :exclude 插件"
+    }
   },
   "messages": {
     "mistake": "错误"

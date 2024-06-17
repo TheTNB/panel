@@ -35,7 +35,7 @@ func Api() {
 			r.Get("log", taskController.Log)
 			r.Post("delete", taskController.Delete)
 		})
-		r.Prefix("website").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("website").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("defaultConfig", websiteController.GetDefaultConfig)
 			r.Post("defaultConfig", websiteController.SaveDefaultConfig)
@@ -43,7 +43,7 @@ func Api() {
 			r.Put("uploadBackup", websiteController.UploadBackup)
 			r.Delete("deleteBackup", websiteController.DeleteBackup)
 		})
-		r.Prefix("websites").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("websites").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("/", websiteController.List)
 			r.Post("/", websiteController.Add)
@@ -115,7 +115,7 @@ func Api() {
 			r.Get("pingStatus", safeController.GetPingStatus)
 			r.Post("pingStatus", safeController.SetPingStatus)
 		})
-		r.Prefix("container").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("container").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
 			containerController := controllers.NewContainerController()
 			r.Get("list", containerController.ContainerList)
 			r.Get("search", containerController.ContainerSearch)
