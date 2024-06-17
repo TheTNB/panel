@@ -204,9 +204,16 @@ func (r *PluginController) IsInstalled(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	plugin := r.plugin.GetInstalledBySlug(slug)
+	info := r.plugin.GetBySlug(slug)
 	if plugin.Slug != slug {
-		return Success(ctx, false)
+		return Success(ctx, http.Json{
+			"name":      info.Name,
+			"installed": false,
+		})
 	}
 
-	return Success(ctx, true)
+	return Success(ctx, http.Json{
+		"name":      info.Name,
+		"installed": true,
+	})
 }
