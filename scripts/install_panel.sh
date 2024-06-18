@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 LOGO="+----------------------------------------------------\n| 耗子面板安装脚本\n+----------------------------------------------------\n| Copyright © 2022-"$(date +%Y)" 耗子科技 All rights reserved.\n+----------------------------------------------------"
 HR="+----------------------------------------------------"
 setup_Path="/www"
+current_Path=$(pwd)
 sshPort=$(cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}')
 inChina=$(curl --retry 2 -m 10 -L https://www.cloudflare-cn.com/cdn-cgi/trace 2> /dev/null | grep -qx 'loc=CN' && echo "true" || echo "false")
 
@@ -338,6 +339,8 @@ EOF
     echo -e $HR
     panel init
     panel getInfo
+
+    cd ${current_Path}
     rm -f install_panel.sh
     rm -f install_panel.sh.checksum.txt
 }
