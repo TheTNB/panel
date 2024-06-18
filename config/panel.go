@@ -8,7 +8,7 @@ func init() {
 	config := facades.Config()
 	config.Add("panel", map[string]any{
 		"name":    "耗子面板",
-		"version": "v2.2.10",
+		"version": "v2.2.11",
 		"ssl":     config.Env("APP_SSL", false),
 	})
 }
