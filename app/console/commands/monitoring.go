@@ -60,14 +60,7 @@ func (receiver *Monitoring) Handle(console.Context) error {
 
 	// 去除部分数据以减少数据库存储
 	info.Disk = nil
-	for _, cpu := range info.Cpus {
-		cpu.VendorID = ""
-		cpu.Family = ""
-		cpu.Model = ""
-		cpu.PhysicalID = ""
-		cpu.ModelName = ""
-		cpu.Flags = nil
-	}
+	info.Cpus = nil
 
 	if types.Status != types.StatusNormal {
 		return nil
