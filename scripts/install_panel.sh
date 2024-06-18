@@ -289,6 +289,8 @@ Init_Panel() {
     elif [ "${OS}" == "debian" ]; then
         apt-get install ufw -y
         echo y | ufw enable
+        systemctl enable ufw
+        systemctl start ufw
         ufw allow 22/tcp
         ufw allow 80/tcp
         ufw allow 443/tcp

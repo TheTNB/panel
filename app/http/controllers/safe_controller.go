@@ -39,14 +39,32 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
 			err = tools.ServiceStart("firewalld")
+			if err == nil {
+				err = tools.ServiceEnable("firewalld")
+			}
 		} else {
 			_, err = tools.Exec("echo y | ufw enable")
+			if err == nil {
+				err = tools.ServiceStart("ufw")
+			}
+			if err == nil {
+				err = tools.ServiceEnable("ufw")
+			}
 		}
 	} else {
 		if tools.IsRHEL() {
 			err = tools.ServiceStop("firewalld")
+			if err == nil {
+				err = tools.ServiceDisable("firewalld")
+			}
 		} else {
 			_, err = tools.Exec("ufw disable")
+			if err == nil {
+				err = tools.ServiceStop("ufw")
+			}
+			if err == nil {
+				err = tools.ServiceDisable("ufw")
+			}
 		}
 	}
 
