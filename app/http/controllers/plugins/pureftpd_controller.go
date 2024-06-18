@@ -43,28 +43,11 @@ func (r *PureFtpdController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(users) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.PureFtpdUser{},
-		})
-	}
-	if endIndex > len(users) {
-		endIndex = len(users)
-	}
-	pagedUsers := users[startIndex:endIndex]
-
-	if pagedUsers == nil {
-		pagedUsers = []types.PureFtpdUser{}
-	}
+	paged, total := controllers.Paginate(ctx, users)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(users),
-		"items": pagedUsers,
+		"total": total,
+		"items": paged,
 	})
 }
 

@@ -7,7 +7,6 @@ import (
 	"github.com/goravel/framework/contracts/http"
 
 	"github.com/TheTNB/panel/app/http/controllers"
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -31,12 +30,6 @@ func NewRsyncController() *RsyncController {
 //	@Success		200		{object}	controllers.SuccessResponse
 //	@Router			/plugins/rsync/modules [get]
 func (r *RsyncController) List(ctx http.Context) http.Response {
-	var paginateRequest commonrequests.Paginate
-	sanitize := controllers.SanitizeRequest(ctx, &paginateRequest)
-	if sanitize != nil {
-		return sanitize
-	}
-
 	config, err := tools.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
@@ -91,25 +84,11 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 		modules = append(modules, *currentModule)
 	}
 
-	startIndex := (paginateRequest.Page - 1) * paginateRequest.Limit
-	endIndex := paginateRequest.Page * paginateRequest.Limit
-	if startIndex > len(modules) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.RsyncModule{},
-		})
-	}
-	if endIndex > len(modules) {
-		endIndex = len(modules)
-	}
-	pagedModules := modules[startIndex:endIndex]
-	if pagedModules == nil {
-		pagedModules = []types.RsyncModule{}
-	}
+	paged, total := controllers.Paginate(ctx, modules)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(modules),
-		"items": pagedModules,
+		"total": total,
+		"items": paged,
 	})
 }
 

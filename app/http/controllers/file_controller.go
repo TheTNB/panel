@@ -8,7 +8,6 @@ import (
 	"strings"
 	"syscall"
 
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
 
@@ -466,12 +465,6 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	var paginate commonrequests.Paginate
-	paginateSanitize := SanitizeRequest(ctx, &paginate)
-	if paginateSanitize != nil {
-		return paginateSanitize
-	}
-
 	fileInfoList, err := os.ReadDir(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
@@ -500,22 +493,10 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	start := paginate.Limit * (paginate.Page - 1)
-	end := paginate.Limit * paginate.Page
-	if start > len(paths) {
-		start = len(paths)
-	}
-	if end > len(paths) {
-		end = len(paths)
-	}
-
-	paged := paths[start:end]
-	if paged == nil {
-		paged = []any{}
-	}
+	paged, total := Paginate(ctx, paths)
 
 	return Success(ctx, http.Json{
-		"total": len(paths),
+		"total": total,
 		"items": paged,
 	})
 }

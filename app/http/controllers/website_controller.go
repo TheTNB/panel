@@ -328,7 +328,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	backupList, err := r.backup.WebsiteList()
+	backups, err := r.backup.WebsiteList()
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
@@ -336,25 +336,11 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	startIndex := (paginateRequest.Page - 1) * paginateRequest.Limit
-	endIndex := paginateRequest.Page * paginateRequest.Limit
-	if startIndex > len(backupList) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.BackupFile{},
-		})
-	}
-	if endIndex > len(backupList) {
-		endIndex = len(backupList)
-	}
-	pagedBackupList := backupList[startIndex:endIndex]
-	if pagedBackupList == nil {
-		pagedBackupList = []types.BackupFile{}
-	}
+	paged, total := Paginate(ctx, backups)
 
 	return Success(ctx, http.Json{
-		"total": len(backupList),
-		"items": pagedBackupList,
+		"total": total,
+		"items": paged,
 	})
 }
 

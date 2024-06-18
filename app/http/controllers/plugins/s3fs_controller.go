@@ -27,34 +27,17 @@ func NewS3fsController() *S3fsController {
 
 // List 所有 S3fs 挂载
 func (r *S3fsController) List(ctx http.Context) http.Response {
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-
 	var s3fsList []types.S3fsMount
 	err := json.UnmarshalString(r.setting.Get("s3fs", "[]"), &s3fsList)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取 S3fs 挂载失败")
 	}
 
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(s3fsList) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.S3fsMount{},
-		})
-	}
-	if endIndex > len(s3fsList) {
-		endIndex = len(s3fsList)
-	}
-	pagedS3fsList := s3fsList[startIndex:endIndex]
-	if pagedS3fsList == nil {
-		pagedS3fsList = []types.S3fsMount{}
-	}
+	paged, total := controllers.Paginate(ctx, s3fsList)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(s3fsList),
-		"items": pagedS3fsList,
+		"total": total,
+		"items": paged,
 	})
 }
 

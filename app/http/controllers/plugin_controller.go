@@ -75,24 +75,11 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(pluginArr) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []plugin{},
-		})
-	}
-	if endIndex > len(pluginArr) {
-		endIndex = len(pluginArr)
-	}
-	pagedPlugins := pluginArr[startIndex:endIndex]
+	paged, total := Paginate(ctx, pluginArr)
 
 	return Success(ctx, http.Json{
-		"total": len(pluginArr),
-		"items": pagedPlugins,
+		"total": total,
+		"items": paged,
 	})
 }
 

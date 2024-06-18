@@ -28,8 +28,6 @@ func NewFail2banController() *Fail2banController {
 
 // List 所有 Fail2ban 规则
 func (r *Fail2banController) List(ctx http.Context) http.Response {
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
 	raw, err := tools.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -67,25 +65,11 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(jails) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.Fail2banJail{},
-		})
-	}
-	if endIndex > len(jails) {
-		endIndex = len(jails)
-	}
-	pagedJails := jails[startIndex:endIndex]
-	if pagedJails == nil {
-		pagedJails = []types.Fail2banJail{}
-	}
+	paged, total := controllers.Paginate(ctx, jails)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(jails),
-		"items": pagedJails,
+		"total": total,
+		"items": paged,
 	})
 }
 

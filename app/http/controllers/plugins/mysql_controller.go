@@ -187,21 +187,16 @@ func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
 
 	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
-		if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + rootPassword + "';\""); err != nil {
+		if _, err = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, oldRootPassword, rootPassword)); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置root密码失败: %v", err))
+		}
+		if _, err = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, rootPassword)); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 		}
-		if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + oldRootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
-		}
-		err := r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword)
-		if err != nil {
-			if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER 'root'@'localhost' IDENTIFIED BY '" + oldRootPassword + "';\""); err != nil {
-				return nil
-			}
-			if _, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-				return nil
-			}
-			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
+		if err = r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword); err != nil {
+			_, _ = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, rootPassword, oldRootPassword))
+			_, _ = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, oldRootPassword))
+			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
 		}
 	}
 
@@ -240,40 +235,22 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 	var databases []database
 	for rows.Next() {
 		var d database
-		err := rows.Scan(&d.Name)
-		if err != nil {
+		if err = rows.Scan(&d.Name); err != nil {
 			continue
 		}
 
 		databases = append(databases, d)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(databases) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []database{},
-		})
-	}
-	if endIndex > len(databases) {
-		endIndex = len(databases)
-	}
-	pagedDatabases := databases[startIndex:endIndex]
-
-	if pagedDatabases == nil {
-		pagedDatabases = []database{}
-	}
+	paged, total := controllers.Paginate(ctx, databases)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(databases),
-		"items": pagedDatabases,
+		"total": total,
+		"items": paged,
 	})
 }
 
@@ -327,32 +304,16 @@ func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
 
 // BackupList 获取备份列表
 func (r *MySQLController) BackupList(ctx http.Context) http.Response {
-	backupList, err := r.backup.MysqlList()
+	backups, err := r.backup.MysqlList()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(backupList) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.BackupFile{},
-		})
-	}
-	if endIndex > len(backupList) {
-		endIndex = len(backupList)
-	}
-	pagedBackupList := backupList[startIndex:endIndex]
-	if pagedBackupList == nil {
-		pagedBackupList = []types.BackupFile{}
-	}
+	paged, total := controllers.Paginate(ctx, backups)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(backupList),
-		"items": pagedBackupList,
+		"total": total,
+		"items": paged,
 	})
 }
 
@@ -463,8 +424,7 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 
 	for rows.Next() {
 		var u user
-		err := rows.Scan(&u.User, &u.Host)
-		if err != nil {
+		if err = rows.Scan(&u.User, &u.Host); err != nil {
 			continue
 		}
 
@@ -477,47 +437,29 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 
 		for grantsRows.Next() {
 			var grant string
-			err := grantsRows.Scan(&grant)
-			if err != nil {
+			if err = grantsRows.Scan(&grant); err != nil {
 				continue
 			}
 
 			u.Grants = append(u.Grants, grant)
 		}
 
-		if err := grantsRows.Err(); err != nil {
+		if err = grantsRows.Err(); err != nil {
 			continue
 		}
 
 		userGrants = append(userGrants, u)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(userGrants) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []user{},
-		})
-	}
-	if endIndex > len(userGrants) {
-		endIndex = len(userGrants)
-	}
-	pagedUserGrants := userGrants[startIndex:endIndex]
-
-	if pagedUserGrants == nil {
-		pagedUserGrants = []user{}
-	}
+	paged, total := controllers.Paginate(ctx, userGrants)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(userGrants),
-		"items": pagedUserGrants,
+		"total": total,
+		"items": paged,
 	})
 }
 

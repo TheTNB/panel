@@ -6,16 +6,12 @@ import (
 	"strings"
 
 	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/go-connections/nat"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
 
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	requests "github.com/TheTNB/panel/app/http/requests/container"
 	"github.com/TheTNB/panel/internal/services"
 )
@@ -41,28 +37,12 @@ func NewContainerController() *ContainerController {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/container/list [get]
 func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
-	var request commonrequests.Paginate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
-		return sanitize
-	}
-
 	containers, err := r.container.ContainerListAll()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	startIndex := (request.Page - 1) * request.Limit
-	endIndex := request.Page * request.Limit
-	if startIndex > len(containers) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []any{},
-		})
-	}
-	if endIndex > len(containers) {
-		endIndex = len(containers)
-	}
-	paged := containers[startIndex:endIndex]
+	paged, total := Paginate(ctx, containers)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -85,7 +65,7 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 	}
 
 	return Success(ctx, http.Json{
-		"total": len(containers),
+		"total": total,
 		"items": items,
 	})
 }
@@ -516,31 +496,12 @@ func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/container/network/list [get]
 func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
-	var request commonrequests.Paginate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
-		return sanitize
-	}
-
 	networks, err := r.container.NetworkList()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	startIndex := (request.Page - 1) * request.Limit
-	endIndex := request.Page * request.Limit
-	if startIndex > len(networks) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []any{},
-		})
-	}
-	if endIndex > len(networks) {
-		endIndex = len(networks)
-	}
-	paged := networks[startIndex:endIndex]
-	if paged == nil {
-		paged = []types.NetworkResource{}
-	}
+	paged, total := Paginate(ctx, networks)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -574,7 +535,7 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 	}
 
 	return Success(ctx, http.Json{
-		"total": len(networks),
+		"total": total,
 		"items": items,
 	})
 }
@@ -751,31 +712,12 @@ func (r *ContainerController) NetworkPrune(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/container/image/list [get]
 func (r *ContainerController) ImageList(ctx http.Context) http.Response {
-	var request commonrequests.Paginate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
-		return sanitize
-	}
-
 	images, err := r.container.ImageList()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	startIndex := (request.Page - 1) * request.Limit
-	endIndex := request.Page * request.Limit
-	if startIndex > len(images) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []any{},
-		})
-	}
-	if endIndex > len(images) {
-		endIndex = len(images)
-	}
-	paged := images[startIndex:endIndex]
-	if paged == nil {
-		paged = []image.Summary{}
-	}
+	paged, total := Paginate(ctx, images)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -791,7 +733,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 	}
 
 	return Success(ctx, http.Json{
-		"total": len(images),
+		"total": total,
 		"items": items,
 	})
 }
@@ -919,31 +861,12 @@ func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 //	@Router			/panel/container/volume/list [get]
 func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
-	var request commonrequests.Paginate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
-		return sanitize
-	}
-
 	volumes, err := r.container.VolumeList()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	startIndex := (request.Page - 1) * request.Limit
-	endIndex := request.Page * request.Limit
-	if startIndex > len(volumes) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []any{},
-		})
-	}
-	if endIndex > len(volumes) {
-		endIndex = len(volumes)
-	}
-	paged := volumes[startIndex:endIndex]
-	if paged == nil {
-		paged = []*volume.Volume{}
-	}
+	paged, total := Paginate(ctx, volumes)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -968,7 +891,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 	}
 
 	return Success(ctx, http.Json{
-		"total": len(volumes),
+		"total": total,
 		"items": items,
 	})
 }

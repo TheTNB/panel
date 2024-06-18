@@ -92,9 +92,6 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 
 // Processes 进程列表
 func (r *SupervisorController) Processes(ctx http.Context) http.Response {
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-
 	type process struct {
 		Name   string `json:"name"`
 		Status string `json:"status"`
@@ -107,7 +104,7 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	var processList []process
+	var processes []process
 	for _, line := range strings.Split(out, "\n") {
 		if len(line) == 0 {
 			continue
@@ -127,28 +124,14 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 			p.Pid = "-"
 			p.Uptime = "-"
 		}
-		processList = append(processList, p)
+		processes = append(processes, p)
 	}
 
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(processList) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []process{},
-		})
-	}
-	if endIndex > len(processList) {
-		endIndex = len(processList)
-	}
-	pagedProcessList := processList[startIndex:endIndex]
-	if pagedProcessList == nil {
-		pagedProcessList = []process{}
-	}
+	paged, total := controllers.Paginate(ctx, processes)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(processList),
-		"items": pagedProcessList,
+		"total": total,
+		"items": paged,
 	})
 }
 

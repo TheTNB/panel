@@ -4,7 +4,6 @@ import (
 	"regexp"
 	"strings"
 
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
@@ -77,12 +76,6 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 
 // GetFirewallRules 获取防火墙规则
 func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
-	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
-	if sanitize != nil {
-		return sanitize
-	}
-
 	if !r.firewallStatus() {
 		return Success(ctx, nil)
 	}
@@ -130,26 +123,11 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 		}
 	}
 
-	startIndex := (paginateRequest.Page - 1) * paginateRequest.Limit
-	endIndex := paginateRequest.Page * paginateRequest.Limit
-	if startIndex > len(rules) {
-		return Success(ctx, http.Json{
-			"total": 0,
-			"items": []map[string]string{},
-		})
-	}
-	if endIndex > len(rules) {
-		endIndex = len(rules)
-	}
-	pagedRules := rules[startIndex:endIndex]
-
-	if pagedRules == nil {
-		pagedRules = []map[string]string{}
-	}
+	paged, total := Paginate(ctx, rules)
 
 	return Success(ctx, http.Json{
-		"total": len(rules),
-		"items": pagedRules,
+		"total": total,
+		"items": paged,
 	})
 }
 

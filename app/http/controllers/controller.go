@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 )
@@ -36,6 +37,32 @@ func ErrorSystem(ctx http.Context) http.Response {
 	return ctx.Response().Json(http.StatusInternalServerError, &ErrorResponse{
 		Message: facades.Lang(ctx).Get("errors.internal"),
 	})
+}
+
+func Paginate[T any](ctx http.Context, allItems []T) (pagedItems []T, total int) {
+	var paginateRequest commonrequests.Paginate
+	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	if sanitize != nil {
+		return []T{}, 0
+	}
+
+	page := ctx.Request().QueryInt("page", 1)
+	limit := ctx.Request().QueryInt("limit", 10)
+	total = len(allItems)
+	startIndex := (page - 1) * limit
+	endIndex := page * limit
+
+	if total == 0 {
+		return []T{}, 0
+	}
+	if startIndex > total {
+		return []T{}, total
+	}
+	if endIndex > total {
+		endIndex = total
+	}
+
+	return allItems[startIndex:endIndex], total
 }
 
 // SanitizeRequest 消毒请求参数

@@ -189,28 +189,11 @@ func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(databases) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []database{},
-		})
-	}
-	if endIndex > len(databases) {
-		endIndex = len(databases)
-	}
-	pagedDatabases := databases[startIndex:endIndex]
-
-	if pagedDatabases == nil {
-		pagedDatabases = []database{}
-	}
+	paged, total := controllers.Paginate(ctx, databases)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(databases),
-		"items": pagedDatabases,
+		"total": total,
+		"items": paged,
 	})
 }
 
@@ -271,32 +254,16 @@ func (r *PostgreSQLController) DeleteDatabase(ctx http.Context) http.Response {
 
 // BackupList 获取备份列表
 func (r *PostgreSQLController) BackupList(ctx http.Context) http.Response {
-	backupList, err := r.backup.PostgresqlList()
+	backups, err := r.backup.PostgresqlList()
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取备份列表失败")
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(backupList) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []types.BackupFile{},
-		})
-	}
-	if endIndex > len(backupList) {
-		endIndex = len(backupList)
-	}
-	pagedBackupList := backupList[startIndex:endIndex]
-	if pagedBackupList == nil {
-		pagedBackupList = []types.BackupFile{}
-	}
+	paged, total := controllers.Paginate(ctx, backups)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(backupList),
-		"items": pagedBackupList,
+		"total": total,
+		"items": paged,
 	})
 }
 
@@ -440,28 +407,11 @@ func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	page := ctx.Request().QueryInt("page", 1)
-	limit := ctx.Request().QueryInt("limit", 10)
-	startIndex := (page - 1) * limit
-	endIndex := page * limit
-	if startIndex > len(roles) {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []role{},
-		})
-	}
-	if endIndex > len(roles) {
-		endIndex = len(roles)
-	}
-	pagedRoles := roles[startIndex:endIndex]
-
-	if pagedRoles == nil {
-		pagedRoles = []role{}
-	}
+	paged, total := controllers.Paginate(ctx, roles)
 
 	return controllers.Success(ctx, http.Json{
-		"total": len(roles),
-		"items": pagedRoles,
+		"total": total,
+		"items": paged,
 	})
 }
 
