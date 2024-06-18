@@ -19,7 +19,6 @@
     }
   ],
   "ignoreDeps": [
-    "github.com/goravel/framework",
-    "github.com/goravel/gin"
+    "github.com/goravel/framework"
   ]
 }
