@@ -106,9 +106,9 @@ if version_lt "$oldVersion" "2.2.4"; then
     fi
 fi
 
-if version_lt "$oldVersion" "2.2.9"; then
-    echo "更新面板到 v2.2.9 ..."
-    echo "Update panel to v2.2.9 ..."
+if version_lt "$oldVersion" "2.2.10"; then
+    echo "更新面板到 v2.2.10 ..."
+    echo "Update panel to v2.2.10 ..."
     if [ -f "/usr/bin/podman" ]; then
         panel writePlugin podman 4.0.0
         if [ "${OS}" == "debian" ]; then
