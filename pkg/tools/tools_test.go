@@ -44,6 +44,9 @@ func (s *HelperTestSuite) TestVersionCompare() {
 	s.True(VersionCompare("v1.0.0", "1.0.0", "=="))
 	s.True(VersionCompare("1.0.0", "v1.0.0", "=="))
 	s.True(VersionCompare("v1.0.0", "v1.0.0", "=="))
+	s.False(VersionCompare("v2.2.9", "v2.2.10", ">="))
+	s.True(VersionCompare("v2.2.10", "v2.2.9", ">="))
+
 }
 
 func (s *HelperTestSuite) TestGenerateVersions() {

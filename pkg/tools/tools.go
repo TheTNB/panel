@@ -80,9 +80,12 @@ func VersionCompare(ver1, ver2, operator string) bool {
 	}
 
 	for i := 0; i < len(v1s); i++ {
-		if v1s[i] > v2s[i] {
+		v1i := cast.ToInt(v1s[i])
+		v2i := cast.ToInt(v2s[i])
+
+		if v1i > v2i {
 			return operator == ">" || operator == ">=" || operator == "!="
-		} else if v1s[i] < v2s[i] {
+		} else if v1i < v2i {
 			return operator == "<" || operator == "<=" || operator == "!="
 		}
 	}
