@@ -1,8 +1,6 @@
 package config
 
 import (
-	"path/filepath"
-
 	"github.com/goravel/framework/auth"
 	"github.com/goravel/framework/cache"
 	"github.com/goravel/framework/console"
@@ -19,7 +17,6 @@ import (
 	"github.com/goravel/framework/queue"
 	"github.com/goravel/framework/route"
 	"github.com/goravel/framework/schedule"
-	"github.com/goravel/framework/support"
 	"github.com/goravel/framework/support/carbon"
 	"github.com/goravel/framework/testing"
 	"github.com/goravel/framework/translation"
@@ -33,7 +30,6 @@ import (
 func Boot() {}
 
 func init() {
-	support.RootPath = "/www/panel" // TODO remove this line
 	config := facades.Config()
 	config.Add("app", map[string]any{
 		// Application Name
@@ -78,7 +74,7 @@ func init() {
 		//
 		// The path to the language files for the application. You may change
 		// the path to a different directory if you would like to customize it.
-		"lang_path": filepath.Join(support.RootPath, "lang"),
+		"lang_path": facades.App().ExecutablePath("lang"),
 
 		// Encryption Key
 		//

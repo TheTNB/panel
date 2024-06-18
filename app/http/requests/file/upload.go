@@ -18,7 +18,7 @@ func (r *Upload) Authorize(ctx http.Context) error {
 
 func (r *Upload) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"path": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
+		"path": `regex:^/.*$`,
 		"file": "required",
 	}
 }

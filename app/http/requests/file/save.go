@@ -16,7 +16,7 @@ func (r *Save) Authorize(ctx http.Context) error {
 
 func (r *Save) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"path":    `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
+		"path":    `regex:^/.*$|path_exists`,
 		"content": "required|string",
 	}
 }

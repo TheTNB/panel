@@ -10,6 +10,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/types"
 )
 
 type OpenRestyController struct {
@@ -112,21 +113,17 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccess() {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
+		return controllers.Success(ctx, []types.NV{})
 	}
 
 	raw := resp.String()
-	type nginxStatus struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
-	}
-	var data []nginxStatus
+	var data []types.NV
 
 	workers, err := tools.Exec("ps aux | grep nginx | grep 'worker process' | wc -l")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
-	data = append(data, nginxStatus{
+	data = append(data, types.NV{
 		Name:  "工作进程",
 		Value: workers,
 	})
@@ -136,14 +133,14 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 	mem := tools.FormatBytes(cast.ToFloat64(out))
-	data = append(data, nginxStatus{
+	data = append(data, types.NV{
 		Name:  "内存占用",
 		Value: mem,
 	})
 
 	match := regexp.MustCompile(`Active connections:\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 2 {
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "活跃连接数",
 			Value: match[1],
 		})
@@ -151,15 +148,15 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	match = regexp.MustCompile(`server accepts handled requests\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 4 {
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "总连接次数",
 			Value: match[1],
 		})
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "总握手次数",
 			Value: match[2],
 		})
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "总请求次数",
 			Value: match[3],
 		})
@@ -167,15 +164,15 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	match = regexp.MustCompile(`Reading:\s+(\d+)\s+Writing:\s+(\d+)\s+Waiting:\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) == 4 {
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "请求数",
 			Value: match[1],
 		})
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "响应数",
 			Value: match[2],
 		})
-		data = append(data, nginxStatus{
+		data = append(data, types.NV{
 			Name:  "驻留进程",
 			Value: match[3],
 		})

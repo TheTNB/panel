@@ -7,9 +7,10 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.14.1-0.20240608091017-72e9e3621f24
+	github.com/goravel/framework v1.14.1-0.20240618022250-731b8d9930a3
 	github.com/goravel/gin v1.2.1
 	github.com/gorilla/websocket v1.5.3
+	github.com/lib/pq v1.10.9
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.1
 	github.com/libdns/dnspod v0.0.3
@@ -121,7 +122,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/lib/pq v1.10.9 // indirect
 	github.com/lithammer/fuzzysearch v1.1.8 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect

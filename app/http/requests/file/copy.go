@@ -16,8 +16,8 @@ func (r *Copy) Authorize(ctx http.Context) error {
 
 func (r *Copy) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
-		"source": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$|path_exists`,
-		"target": `regex:^/[a-zA-Z0-9_.@#$%\-\s\[\]()]+(/[a-zA-Z0-9_.@#$%\-\s\[\]()]+)*$`,
+		"source": `regex:^/.*$|path_exists`,
+		"target": `regex:^/.*$`,
 	}
 }
 

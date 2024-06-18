@@ -87,12 +87,9 @@ func (r *PostgreSQLController) SaveUserConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *PostgreSQLController) Load(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("postgresql")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL状态失败")
-	}
+	status, _ := tools.ServiceStatus("postgresql")
 	if !status {
-		return controllers.Error(ctx, http.StatusInternalServerError, "PostgreSQL已停止运行")
+		return controllers.Success(ctx, []types.NV{})
 	}
 
 	time, err := tools.Exec(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)
@@ -148,12 +145,25 @@ func (r *PostgreSQLController) ClearLog(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
+	type database struct {
+		Name     string `json:"name"`
+		Owner    string `json:"owner"`
+		Encoding string `json:"encoding"`
+	}
+
 	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
 	}
+
 	if err = db.Ping(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
 	}
 
 	query := `
@@ -166,12 +176,6 @@ func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer rows.Close()
-
-	type database struct {
-		Name     string `json:"name"`
-		Owner    string `json:"owner"`
-		Encoding string `json:"encoding"`
-	}
 
 	var databases []database
 	for rows.Next() {
@@ -370,12 +374,23 @@ func (r *PostgreSQLController) RestoreBackup(ctx http.Context) http.Response {
 
 // RoleList 角色列表
 func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
+	type role struct {
+		Role       string   `json:"role"`
+		Attributes []string `json:"attributes"`
+	}
+
 	db, err := sql.Open("postgres", "host=localhost port=5432 user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []role{},
+		})
 	}
 	if err = db.Ping(); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []role{},
+		})
 	}
 
 	query := `
@@ -393,11 +408,6 @@ func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer rows.Close()
-
-	type role struct {
-		Role       string   `json:"role"`
-		Attributes []string `json:"attributes"`
-	}
 
 	var roles []role
 	for rows.Next() {

@@ -63,12 +63,9 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
-	status, err := tools.ServiceStatus("mysqld")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-	}
+	status, _ := tools.ServiceStatus("mysqld")
 	if !status {
-		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
+		return controllers.Success(ctx, []types.NV{})
 	}
 
 	raw, err := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
@@ -220,9 +217,19 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
 	}
 	defer db.Close()
+
+	if err = db.Ping(); err != nil {
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []database{},
+		})
+	}
 
 	rows, err := db.Query("SHOW DATABASES")
 	if err != nil {
@@ -432,9 +439,19 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []user{},
+		})
 	}
 	defer db.Close()
+
+	if err = db.Ping(); err != nil {
+		return controllers.Success(ctx, http.Json{
+			"total": 0,
+			"items": []user{},
+		})
+	}
 
 	rows, err := db.Query("SELECT user, host FROM mysql.user")
 	if err != nil {

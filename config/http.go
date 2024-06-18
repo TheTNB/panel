@@ -1,11 +1,8 @@
 package config
 
 import (
-	"path/filepath"
-
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
-	"github.com/goravel/framework/support"
 	ginfacades "github.com/goravel/gin/facades"
 )
 
@@ -42,9 +39,9 @@ func init() {
 			// SSL Certificate
 			"ssl": map[string]any{
 				// ca.pem
-				"cert": config.Env("APP_SSL_CERT", filepath.Join(support.RootPath, "storage/ssl.crt")),
+				"cert": config.Env("APP_SSL_CERT", facades.App().ExecutablePath("storage/ssl.crt")),
 				// ca.key
-				"key": config.Env("APP_SSL_KEY", filepath.Join(support.RootPath, "storage/ssl.key")),
+				"key": config.Env("APP_SSL_KEY", facades.App().ExecutablePath("storage/ssl.key")),
 			},
 		},
 	})
