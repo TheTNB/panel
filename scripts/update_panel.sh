@@ -124,6 +124,15 @@ if version_lt "$oldVersion" "2.2.10"; then
     fi
 fi
 
+if version_lt "$oldVersion" "2.2.14"; then
+    echo "更新面板到 v2.2.14 ..."
+    echo "Update panel to v2.2.14 ..."
+    if [ -f "/www/server/openresty/bin/openresty" ]; then
+        mkdir -p /www/server/vhost/acme
+        chmod -R 644 /www/server/vhost/acme
+    fi
+fi
+
 echo $HR
 echo "更新结束"
 echo "Update finished"

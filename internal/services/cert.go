@@ -4,6 +4,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -255,7 +256,8 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 					return acme.Certificate{}, errors.New("通配符域名无法使用 HTTP 验证")
 				}
 			}
-			client.UseHTTP(cert.Website.Path)
+			conf := fmt.Sprintf("/www/server/vhost/acme/%s.conf", cert.Website.Name)
+			client.UseHTTP(conf, cert.Website.Path)
 		}
 	}
 
@@ -380,7 +382,8 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 					return acme.Certificate{}, errors.New("通配符域名无法使用 HTTP 验证")
 				}
 			}
-			client.UseHTTP(cert.Website.Path)
+			conf := fmt.Sprintf("/www/server/vhost/acme/%s.conf", cert.Website.Name)
+			client.UseHTTP(conf, cert.Website.Path)
 		}
 	}
 

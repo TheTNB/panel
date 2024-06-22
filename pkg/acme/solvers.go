@@ -13,9 +13,12 @@ import (
 	"github.com/libdns/libdns"
 	"github.com/mholt/acmez/v2/acme"
 	"golang.org/x/net/publicsuffix"
+
+	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
 type httpSolver struct {
+	conf string
 	path string
 }
 
@@ -26,12 +29,24 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 	}
 
 	challengeFilePath := filepath.Join(s.path, challenge.HTTP01ResourcePath())
-	if err = os.MkdirAll(filepath.Dir(challengeFilePath), 0o755); err != nil {
-		return fmt.Errorf("无法在网站目录创建 HTTP 挑战所需的目录: %w", err)
+	if err = os.MkdirAll(filepath.Dir(challengeFilePath), 0755); err != nil {
+		return fmt.Errorf("无法在网站目录创建HTTP挑战所需的目录: %w", err)
 	}
 
-	if err = os.WriteFile(challengeFilePath, []byte(challenge.KeyAuthorization), 0o644); err != nil {
-		return fmt.Errorf("无法在网站目录创建 HTTP 挑战所需的文件: %w", err)
+	if err = os.WriteFile(challengeFilePath, []byte(challenge.KeyAuthorization), 0644); err != nil {
+		return fmt.Errorf("无法在网站目录创建HTTP挑战所需的文件: %w", err)
+	}
+
+	conf := fmt.Sprintf(`location = /.well-known/acme-challenge/%s {
+    default_type text/plain;
+    return 200 %q;
+}
+`, challenge.Token, challenge.KeyAuthorization)
+	if err = os.WriteFile(s.conf, []byte(conf), 0644); err != nil {
+		return fmt.Errorf("无法写入OpenResty配置文件: %w", err)
+	}
+	if err = systemctl.Reload("openresty"); err != nil {
+		return fmt.Errorf("无法重载OpenResty: %w", err)
 	}
 
 	return nil
@@ -44,7 +59,13 @@ func (s httpSolver) CleanUp(_ context.Context, challenge acme.Challenge) error {
 	}
 
 	if err := os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath())); err != nil {
-		return fmt.Errorf("无法删除 HTTP 挑战文件: %w", err)
+		return fmt.Errorf("无法删除HTTP挑战文件: %w", err)
+	}
+	if err := os.WriteFile(s.conf, []byte{}, 0644); err != nil {
+		return fmt.Errorf("无法清空OpenResty配置文件: %w", err)
+	}
+	if err := systemctl.Reload("openresty"); err != nil {
+		return fmt.Errorf("无法重载OpenResty: %w", err)
 	}
 
 	return nil
@@ -61,11 +82,11 @@ func (s dnsSolver) Present(ctx context.Context, challenge acme.Challenge) error 
 	keyAuth := challenge.DNS01KeyAuthorization()
 	provider, err := s.getDNSProvider()
 	if err != nil {
-		return fmt.Errorf("获取 DNS 提供商失败: %w", err)
+		return fmt.Errorf("获取DNS提供商失败: %w", err)
 	}
 	zone, err := publicsuffix.EffectiveTLDPlusOne(dnsName)
 	if err != nil {
-		return fmt.Errorf("获取域名 %q 的顶级域失败: %w", dnsName, err)
+		return fmt.Errorf("获取域名%q的顶级域失败: %w", dnsName, err)
 	}
 
 	rec := libdns.Record{
@@ -76,10 +97,10 @@ func (s dnsSolver) Present(ctx context.Context, challenge acme.Challenge) error 
 
 	results, err := provider.AppendRecords(ctx, zone+".", []libdns.Record{rec})
 	if err != nil {
-		return fmt.Errorf("域名 %q 添加临时记录 %q 失败: %w", zone, dnsName, err)
+		return fmt.Errorf("域名%q添加临时记录%q失败: %w", zone, dnsName, err)
 	}
 	if len(results) != 1 {
-		return fmt.Errorf("预期添加 1 条记录，但实际添加了 %d 条记录", len(results))
+		return fmt.Errorf("预期添加1条记录，但实际添加了%d条记录", len(results))
 	}
 
 	s.records = &results
@@ -90,11 +111,11 @@ func (s dnsSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error 
 	dnsName := challenge.DNS01TXTRecordName()
 	provider, err := s.getDNSProvider()
 	if err != nil {
-		return fmt.Errorf("获取 DNS 提供商失败: %w", err)
+		return fmt.Errorf("获取DNS提供商失败: %w", err)
 	}
 	zone, err := publicsuffix.EffectiveTLDPlusOne(dnsName)
 	if err != nil {
-		return fmt.Errorf("获取域名 %q 的顶级域失败: %w", dnsName, err)
+		return fmt.Errorf("获取域名%q的顶级域失败: %w", dnsName, err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
@@ -102,7 +123,7 @@ func (s dnsSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error 
 
 	_, err = provider.DeleteRecords(ctx, zone+".", *s.records)
 	if err != nil {
-		return fmt.Errorf("域名 %q 删除临时记录 %q 失败: %w", zone, dnsName, err)
+		return fmt.Errorf("域名%q删除临时记录%q失败: %w", zone, dnsName, err)
 	}
 
 	return nil
@@ -126,7 +147,7 @@ func (s dnsSolver) getDNSProvider() (DNSProvider, error) {
 			APIToken: s.param.APIkey,
 		}
 	default:
-		return nil, fmt.Errorf("未知的 DNS 提供商 %q", s.dns)
+		return nil, fmt.Errorf("未知的DNS提供商 %q", s.dns)
 	}
 
 	return dns, nil

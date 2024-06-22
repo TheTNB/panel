@@ -240,6 +240,9 @@ server
     error_page 404 /404.html;
     #error_page 502 /502.html;
 
+    # acme证书签发配置，不可修改
+    include /www/server/vhost/acme/%s.conf;
+
     # 伪静态规则引入，修改后将导致面板设置的伪静态规则失效
     include /www/server/vhost/rewrite/%s.conf;
 
@@ -259,7 +262,7 @@ server
     access_log /www/wwwlogs/%s.log;
     error_log /www/wwwlogs/%s.log;
 }
-`, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
+`, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name, website.Name)
 
 	if err := io.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
 		return models.Website{}, err
@@ -543,21 +546,12 @@ func (r *WebsiteImpl) Delete(id uint) error {
 		return err
 	}
 
-	if err := io.Remove("/www/server/vhost/" + website.Name + ".conf"); err != nil {
-		return err
-	}
-	if err := io.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf"); err != nil {
-		return err
-	}
-	if err := io.Remove("/www/server/vhost/ssl/" + website.Name + ".pem"); err != nil {
-		return err
-	}
-	if err := io.Remove("/www/server/vhost/ssl/" + website.Name + ".key"); err != nil {
-		return err
-	}
-	if err := io.Remove(website.Path); err != nil {
-		return err
-	}
+	_ = io.Remove("/www/server/vhost/" + website.Name + ".conf")
+	_ = io.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	_ = io.Remove("/www/server/vhost/acme/" + website.Name + ".conf")
+	_ = io.Remove("/www/server/vhost/ssl/" + website.Name + ".pem")
+	_ = io.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
+	_ = io.Remove(website.Path)
 
 	return systemctl.Reload("openresty")
 }

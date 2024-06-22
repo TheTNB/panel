@@ -549,8 +549,11 @@ server
     # waf标记位结束
 
     # 错误页配置，可自行设置
-    #error_page 404 /404.html;
+    error_page 404 /404.html;
     #error_page 502 /502.html;
+
+    # acme证书签发配置，不可修改
+    include /www/server/vhost/acme/%s.conf;
 
     # 伪静态规则引入，修改后将导致面板设置的伪静态规则失效
     include /www/server/vhost/rewrite/%s.conf;
@@ -572,11 +575,14 @@ server
     error_log /www/wwwlogs/%s.log;
 }
 
-`, website.Path, website.Php, website.Name, website.Name, website.Name)
+`, website.Path, website.Php, website.Name, website.Name, website.Name, website.Name)
 	if err := io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return nil
 	}
-	if err := io.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
+	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
+		return nil
+	}
+	if err := io.Write("/www/server/vhost/acme/"+website.Name+".conf", "", 0644); err != nil {
 		return nil
 	}
 	if err := systemctl.Reload("openresty"); err != nil {

@@ -282,6 +282,7 @@ mkdir -p /www/server/vhost
 mkdir -p /www/server/vhost
 mkdir -p /www/server/vhost/rewrite
 mkdir -p /www/server/vhost/ssl
+mkdir -p /www/server/vhost/acme
 
 # 写入主配置文件
 cat > ${openrestyPath}/conf/nginx.conf << EOF
@@ -561,7 +562,7 @@ cat > ${openrestyPath}/html/block.html << EOF
     <div class="container">
         <h1>耗子面板</h1>
         <p>本次请求判断为危险的攻击请求，已被拦截！</p>
-        <p>当您看到此页面，说明您的请求被WAF拦截，可能是由于您的请求中包含了危险的攻击内容，或者您的请求被误判为攻击请求。</p>
+        <p>可能您的请求中包含了危险的攻击内容，或者您的请求被误判为攻击请求。</p>
         <p>如果您认为这是误判，请联系服务器管理员解决。</p>
     </div>
 </body>

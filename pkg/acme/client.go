@@ -49,9 +49,12 @@ func (c *Client) UseManualDns(total int, check ...bool) {
 }
 
 // UseHTTP 使用 HTTP 验证
-func (c *Client) UseHTTP(path string) {
+// conf openresty 配置文件路径
+// path 验证文件存放路径
+func (c *Client) UseHTTP(conf, path string) {
 	c.zClient.ChallengeSolvers = map[string]acmez.Solver{
 		acme.ChallengeTypeHTTP01: httpSolver{
+			conf: conf,
 			path: path,
 		},
 	}
