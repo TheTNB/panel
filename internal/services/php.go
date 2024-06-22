@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -82,15 +83,15 @@ func (r *PHPImpl) Load() ([]types.NV, error) {
 }
 
 func (r *PHPImpl) GetErrorLog() (string, error) {
-	return tools.Exec("tail -n 500 /www/server/php/" + r.version + "/var/log/php-fpm.log")
+	return shell.Execf("tail -n 500 /www/server/php/%s/var/log/php-fpm.log", r.version)
 }
 
 func (r *PHPImpl) GetSlowLog() (string, error) {
-	return tools.Exec("tail -n 500 /www/server/php/" + r.version + "/var/log/slow.log")
+	return shell.Execf("tail -n 500 /www/server/php/%s/var/log/slow.log", r.version)
 }
 
 func (r *PHPImpl) ClearErrorLog() error {
-	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/php-fpm.log"); err != nil {
+	if out, err := shell.Execf("echo '' > /www/server/php/%s/var/log/php-fpm.log", r.version); err != nil {
 		return errors.New(out)
 	}
 
@@ -98,7 +99,7 @@ func (r *PHPImpl) ClearErrorLog() error {
 }
 
 func (r *PHPImpl) ClearSlowLog() error {
-	if out, err := tools.Exec("echo '' > /www/server/php/" + r.version + "/var/log/slow.log"); err != nil {
+	if out, err := shell.Execf("echo '' > /www/server/php/%s/var/log/slow.log", r.version); err != nil {
 		return errors.New(out)
 	}
 
@@ -270,7 +271,7 @@ func (r *PHPImpl) GetExtensions() ([]types.PHPExtension, error) {
 		})
 	}
 
-	raw, err := tools.Exec("/www/server/php/" + r.version + "/bin/php -m")
+	raw, err := shell.Execf("/www/server/php/%s/bin/php -m", r.version)
 	if err != nil {
 		return extensions, err
 	}

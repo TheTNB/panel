@@ -6,6 +6,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -56,7 +57,7 @@ func (r *RedisController) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "Redis已停止运行")
 	}
 
-	raw, err := tools.Exec("redis-cli info")
+	raw, err := shell.Execf("redis-cli info")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis负载失败")
 	}

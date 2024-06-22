@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -77,7 +78,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 		return controllers.Success(ctx, "")
 	}
 
-	out, err := tools.Exec("tail -n 100 /www/wwwlogs/openresty_error.log")
+	out, err := shell.Execf("tail -n 100 /www/wwwlogs/openresty_error.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -94,7 +95,7 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 //	@Success	200	{object}	controllers.SuccessResponse
 //	@Router		/plugins/openresty/clearErrorLog [post]
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
-	if out, err := tools.Exec("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
+	if out, err := shell.Execf("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -119,7 +120,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	raw := resp.String()
 	var data []types.NV
 
-	workers, err := tools.Exec("ps aux | grep nginx | grep 'worker process' | wc -l")
+	workers, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | wc -l")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
@@ -128,7 +129,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 		Value: workers,
 	})
 
-	out, err := tools.Exec("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
+	out, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}

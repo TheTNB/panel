@@ -7,6 +7,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -42,7 +43,7 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 				err = tools.ServiceEnable("firewalld")
 			}
 		} else {
-			_, err = tools.Exec("echo y | ufw enable")
+			_, err = shell.Execf("echo y | ufw enable")
 			if err == nil {
 				err = tools.ServiceStart("ufw")
 			}
@@ -57,7 +58,7 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 				err = tools.ServiceDisable("firewalld")
 			}
 		} else {
-			_, err = tools.Exec("ufw disable")
+			_, err = shell.Execf("ufw disable")
 			if err == nil {
 				err = tools.ServiceStop("ufw")
 			}
@@ -82,7 +83,7 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 
 	var rules []map[string]string
 	if tools.IsRHEL() {
-		out, err := tools.Exec("firewall-cmd --list-all 2>&1")
+		out, err := shell.Execf("firewall-cmd --list-all")
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -103,7 +104,7 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 			})
 		}
 	} else {
-		out, err := tools.Exec("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
+		out, err := shell.Execf("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -158,13 +159,13 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 	}
 
 	if tools.IsRHEL() {
-		if out, err := tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --remove-port=%s/%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --add-port=%s/%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
@@ -172,13 +173,13 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 		if strings.Contains(port, "-") {
 			port = strings.ReplaceAll(port, "-", ":")
 		}
-		if out, err := tools.Exec("ufw delete allow " + cast.ToString(port) + "/" + protocol); err != nil {
+		if out, err := shell.Execf("ufw delete allow %s/%s", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("ufw allow " + cast.ToString(port) + "/" + protocol); err != nil {
+		if out, err := shell.Execf("ufw allow %s/%s", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("ufw reload"); err != nil {
+		if out, err := shell.Execf("ufw reload"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
@@ -192,24 +193,24 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "防火墙未启动")
 	}
 
-	port := ctx.Request().InputInt("port", 0)
-	protocol := ctx.Request().Input("protocol", "")
-	if port == 0 || protocol == "" {
+	port := ctx.Request().Input("port")
+	protocol := ctx.Request().Input("protocol")
+	if port == "" || protocol == "" {
 		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
 	if tools.IsRHEL() {
-		if out, err := tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/" + protocol + " --permanent 2>&1"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --remove-port=%s/%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if out, err := tools.Exec("ufw delete allow " + cast.ToString(port) + "/" + protocol); err != nil {
+		if out, err := shell.Execf("ufw delete allow %s/%s", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("ufw reload"); err != nil {
+		if out, err := shell.Execf("ufw reload"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
@@ -262,7 +263,7 @@ func (r *SafeController) SetSshStatus(ctx http.Context) http.Response {
 
 // GetSshPort 获取 SSH 端口
 func (r *SafeController) GetSshPort(ctx http.Context) http.Response {
-	out, err := tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
+	out, err := shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -277,12 +278,12 @@ func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
-	oldPort, err := tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
+	oldPort, err := shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, oldPort)
 	}
-	_, _ = tools.Exec("sed -i 's/#Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
-	_, _ = tools.Exec("sed -i 's/Port " + oldPort + "/Port " + cast.ToString(port) + "/g' /etc/ssh/sshd_config")
+	_, _ = shell.Execf("sed -i 's/#Port %s/Port %d/g' /etc/ssh/sshd_config", oldPort, port)
+	_, _ = shell.Execf("sed -i 's/Port %s/Port %d/g' /etc/ssh/sshd_config", oldPort, port)
 
 	status, _ := tools.ServiceStatus(r.ssh)
 	if status {
@@ -295,7 +296,7 @@ func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 // GetPingStatus 获取 Ping 状态
 func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
 	if tools.IsRHEL() {
-		out, err := tools.Exec(`firewall-cmd --list-all 2>&1`)
+		out, err := shell.Execf(`firewall-cmd --list-all`)
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -324,15 +325,15 @@ func (r *SafeController) SetPingStatus(ctx http.Context) http.Response {
 	var err error
 	if tools.IsRHEL() {
 		if ctx.Request().InputBool("status") {
-			out, err = tools.Exec(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
+			out, err = shell.Execf(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
 		} else {
-			out, err = tools.Exec(`firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'`)
+			out, err = shell.Execf(`firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'`)
 		}
 	} else {
 		if ctx.Request().InputBool("status") {
-			out, err = tools.Exec(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules`)
+			out, err = shell.Execf(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules`)
 		} else {
-			out, err = tools.Exec(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules`)
+			out, err = shell.Execf(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules`)
 		}
 	}
 
@@ -341,9 +342,9 @@ func (r *SafeController) SetPingStatus(ctx http.Context) http.Response {
 	}
 
 	if tools.IsRHEL() {
-		out, err = tools.Exec(`firewall-cmd --reload`)
+		out, err = shell.Execf(`firewall-cmd --reload`)
 	} else {
-		out, err = tools.Exec(`ufw reload`)
+		out, err = shell.Execf(`ufw reload`)
 	}
 
 	if err != nil {

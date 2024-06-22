@@ -1,10 +1,10 @@
 package jobs
 
 import (
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/shell"
 )
 
 // ProcessTask 处理面板任务
@@ -48,7 +48,7 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 		"task_id": taskID,
 	}).Infof("开始执行任务")
 
-	if _, err := tools.Exec(task.Shell); err != nil {
+	if _, err := shell.Execf(task.Shell); err != nil {
 		task.Status = models.TaskStatusFailed
 		if err := facades.Orm().Query().Save(&task); err != nil {
 			facades.Log().Tags("面板", "异步任务").With(map[string]any{

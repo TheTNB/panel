@@ -17,6 +17,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -143,7 +144,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		port, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.portFail"))
 			return nil
@@ -164,7 +165,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Green().Printfln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
 
 	case "getPort":
-		port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+		port, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.portFail"))
 			return nil
@@ -176,12 +177,12 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Green().Printfln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
 
 	case "deleteEntrance":
-		oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+		oldEntrance, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
-		if _, err = tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf"); err != nil {
+		if _, err = shell.Execf("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=/!g' /www/panel/panel.conf"); err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.deleteEntrance.fail"))
 			return nil
 		}
@@ -288,7 +289,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			}
 
 			backupFile := path + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
-			if _, err := tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
+			if _, err := shell.Execf(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.backupFail") + ": " + err.Error())
 				return nil
 			}
@@ -307,13 +308,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.targetMysql") + ": " + name)
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startExport"))
-			if _, err = tools.Exec(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`); err != nil {
+			if _, err = shell.Execf(`mysqldump -uroot ` + name + ` > /tmp/` + backupFile + ` 2>&1`); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.exportFail") + ": " + err.Error())
 				return nil
 			}
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.exportSuccess"))
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startCompress"))
-			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
+			if _, err = shell.Execf("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
@@ -333,7 +334,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 		case "postgresql":
 			backupFile := name + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-			check, err := tools.Exec(`su - postgres -c "psql -l" 2>&1`)
+			check, err := shell.Execf(`su - postgres -c "psql -l" 2>&1`)
 			if err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.databaseGetFail") + ": " + err.Error())
 				color.Green().Printfln(hr)
@@ -347,13 +348,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.targetPostgres") + ": " + name)
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startExport"))
-			if _, err = tools.Exec(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`); err != nil {
+			if _, err = shell.Execf(`su - postgres -c "pg_dump '` + name + `'" > /tmp/` + backupFile + ` 2>&1`); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.exportFail") + ": " + err.Error())
 				return nil
 			}
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.exportSuccess"))
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startCompress"))
-			if _, err = tools.Exec("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
+			if _, err = shell.Execf("cd /tmp && zip -r " + backupFile + ".zip " + backupFile); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
@@ -432,11 +433,11 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		backupPath := "/www/wwwlogs/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".log.zip"
-		if _, err := tools.Exec(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log"); err != nil {
+		if _, err := shell.Execf(`cd /www/wwwlogs && zip -r ` + backupPath + ` ` + website.Name + ".log"); err != nil {
 			color.Red().Printfln("|-" + translate.Get("commands.panel.cutoff.backupFail") + ": " + err.Error())
 			return nil
 		}
-		if _, err := tools.Exec(`echo "" > ` + logPath); err != nil {
+		if _, err := shell.Execf(`echo "" > ` + logPath); err != nil {
 			color.Red().Printfln("|-" + translate.Get("commands.panel.cutoff.clearFail") + ": " + err.Error())
 			return nil
 		}

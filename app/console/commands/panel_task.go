@@ -8,6 +8,7 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -58,7 +59,7 @@ func (receiver *PanelTask) Handle(console.Context) error {
 	}
 
 	// 清理 7 天前的备份
-	if _, err := tools.Exec(`find /www/backup/panel -mtime +7 -name "*.zip" -exec rm -rf {} \;`); err != nil {
+	if _, err := shell.Execf(`find /www/backup/panel -mtime +7 -name "*.zip" -exec rm -rf {} \;`); err != nil {
 		types.Status = types.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{

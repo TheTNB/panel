@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -50,7 +51,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	port, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	port, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -147,7 +148,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	oldPort, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
+	oldPort, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -157,33 +158,33 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 
 	port := cast.ToString(updateRequest.Port)
 	if oldPort != port {
-		if out, err := tools.Exec("sed -i 's/APP_PORT=" + oldPort + "/APP_PORT=" + port + "/g' /www/panel/panel.conf"); err != nil {
+		if out, err := shell.Execf("sed -i 's/APP_PORT=%s/APP_PORT=%s/g' /www/panel/panel.conf", oldPort, port); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 		if tools.IsRHEL() {
-			if out, err := tools.Exec("firewall-cmd --remove-port=" + cast.ToString(port) + "/tcp --permanent 2>&1"); err != nil {
+			if out, err := shell.Execf("firewall-cmd --remove-port=%s/tcp --permanent", oldPort); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
-			if out, err := tools.Exec("firewall-cmd --add-port=" + cast.ToString(port) + "/tcp --permanent 2>&1"); err != nil {
+			if out, err := shell.Execf("firewall-cmd --add-port=%s/tcp --permanent", port); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
-			if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+			if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
 		} else {
-			if out, err := tools.Exec("ufw delete allow " + cast.ToString(port) + "/tcp"); err != nil {
+			if out, err := shell.Execf("ufw delete allow %s/tcp", oldPort); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
-			if out, err := tools.Exec("ufw allow " + cast.ToString(port) + "/tcp"); err != nil {
+			if out, err := shell.Execf("ufw allow %s/tcp", port); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
-			if out, err := tools.Exec("ufw reload"); err != nil {
+			if out, err := shell.Execf("ufw reload"); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}
 		}
 	}
 
-	oldEntrance, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	oldEntrance, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -192,12 +193,12 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 	}
 	entrance := cast.ToString(updateRequest.Entrance)
 	if oldEntrance != entrance {
-		if out, err := tools.Exec("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf"); err != nil {
+		if out, err := shell.Execf("sed -i 's!APP_ENTRANCE=" + oldEntrance + "!APP_ENTRANCE=" + entrance + "!g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
 
-	oldLanguage, err := tools.Exec(`cat /www/panel/panel.conf | grep APP_LOCALE | awk -F '=' '{print $2}' | tr -d '\n'`)
+	oldLanguage, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_LOCALE | awk -F '=' '{print $2}' | tr -d '\n'`)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
 			"error": err.Error(),
@@ -205,17 +206,17 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 	if oldLanguage != updateRequest.Language {
-		if out, err := tools.Exec("sed -i 's/APP_LOCALE=" + oldLanguage + "/APP_LOCALE=" + updateRequest.Language + "/g' /www/panel/panel.conf"); err != nil {
+		if out, err := shell.Execf("sed -i 's/APP_LOCALE=" + oldLanguage + "/APP_LOCALE=" + updateRequest.Language + "/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
 
 	if updateRequest.SSL {
-		if out, err := tools.Exec("sed -i 's/APP_SSL=false/APP_SSL=true/g' /www/panel/panel.conf"); err != nil {
+		if out, err := shell.Execf("sed -i 's/APP_SSL=false/APP_SSL=true/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if out, err := tools.Exec("sed -i 's/APP_SSL=true/APP_SSL=false/g' /www/panel/panel.conf"); err != nil {
+		if out, err := shell.Execf("sed -i 's/APP_SSL=true/APP_SSL=false/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	}

@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -52,8 +53,8 @@ func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
 }
 
 func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
-	port := ctx.Request().Input("port")
-	if len(port) == 0 {
+	port := ctx.Request().InputInt("port")
+	if port == 0 {
 		return controllers.Error(ctx, http.StatusInternalServerError, "端口不能为空")
 	}
 
@@ -61,7 +62,7 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+port+";")
+	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+cast.ToString(port)+";")
 	if err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
 			"error": err.Error(),
@@ -70,17 +71,17 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 	}
 
 	if tools.IsRHEL() {
-		if out, err := tools.Exec("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --zone=public --add-port=%d/tcp --permanent", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if out, err := tools.Exec("ufw allow " + port + "/tcp"); err != nil {
+		if out, err := shell.Execf("ufw allow %d/tcp", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("ufw reload"); err != nil {
+		if out, err := shell.Execf("ufw reload"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -65,7 +66,7 @@ func (r *CronController) Add(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "时间格式错误")
 	}
 
-	shell := ctx.Request().Input("script")
+	script := ctx.Request().Input("script")
 	cronType := ctx.Request().Input("type")
 	if cronType == "backup" {
 		backupType := ctx.Request().Input("backup_type")
@@ -78,7 +79,7 @@ func (r *CronController) Add(ctx http.Context) http.Response {
 			backupPath = r.setting.Get(models.SettingKeyBackupPath) + "/" + backupType
 		}
 		backupSave := ctx.Request().InputInt("save", 10)
-		shell = `#!/bin/bash
+		script = `#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # 耗子面板 - 数据备份脚本
@@ -95,7 +96,7 @@ panel backup ${type} ${name} ${path} ${save} 2>&1
 	if cronType == "cutoff" {
 		website := ctx.Request().Input("website")
 		save := ctx.Request().InputInt("save", 180)
-		shell = `#!/bin/bash
+		script = `#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # 耗子面板 - 日志切割脚本
@@ -117,10 +118,10 @@ panel cutoff ${name} ${save} 2>&1
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if err := tools.Write(shellDir+shellFile+".sh", shell, 0700); err != nil {
+	if err := tools.Write(shellDir+shellFile+".sh", script, 0700); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec("dos2unix " + shellDir + shellFile + ".sh"); err != nil {
+	if out, err := shell.Execf("dos2unix " + shellDir + shellFile + ".sh"); err != nil {
 		return Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -156,12 +157,12 @@ func (r *CronController) Script(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
-	shell, err := tools.Read(cron.Shell)
+	script, err := tools.Read(cron.Shell)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, shell)
+	return Success(ctx, script)
 }
 
 // Update 更新计划任务
@@ -200,7 +201,7 @@ func (r *CronController) Update(ctx http.Context) http.Response {
 	if err := tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec("dos2unix " + cron.Shell); err != nil {
+	if out, err := shell.Execf("dos2unix " + cron.Shell); err != nil {
 		return Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -284,7 +285,7 @@ func (r *CronController) Log(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "日志文件不存在")
 	}
 
-	log, err := tools.Exec("tail -n 1000 " + cron.Log)
+	log, err := shell.Execf("tail -n 1000 " + cron.Log)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}

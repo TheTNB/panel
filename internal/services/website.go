@@ -16,6 +16,7 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -285,18 +286,18 @@ server
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
-		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
-		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
-		_, _ = tools.Exec(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
+		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
+		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
+		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
+		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
 	}
 	if website.Db && website.DbType == "postgresql" {
-		_, _ = tools.Exec(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
-		_, _ = tools.Exec(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
-		_, _ = tools.Exec(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
-		_, _ = tools.Exec(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		_, _ = shell.Execf(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
+		_, _ = shell.Execf(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
+		_, _ = shell.Execf(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
 		userConfig := "host    " + website.DbName + "    " + website.DbUser + "    127.0.0.1/32    scram-sha-256"
-		_, _ = tools.Exec(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
+		_, _ = shell.Execf(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
 		_ = tools.ServiceReload("postgresql")
 	}
 
@@ -659,7 +660,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 
 	rewrite, _ := tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
 	setting.Rewrite = rewrite
-	log, _ := tools.Exec(`tail -n 100 '/www/wwwlogs/` + website.Name + `.log'`)
+	log, _ := shell.Execf(`tail -n 100 '/www/wwwlogs/%s.log'`, website.Name)
 	setting.Log = log
 
 	return setting, err

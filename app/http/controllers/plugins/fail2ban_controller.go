@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -171,15 +172,15 @@ ignoreregex =
 				logPath = "/var/log/secure"
 			}
 			filter = "sshd"
-			port, err = tools.Exec("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
+			port, err = shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 		case "mysql":
 			logPath = "/www/server/mysql/mysql-error.log"
 			filter = "mysqld-auth"
-			port, err = tools.Exec("cat /www/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'")
+			port, err = shell.Execf("cat /www/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'")
 		case "pure-ftpd":
 			logPath = "/var/log/messages"
 			filter = "pure-ftpd"
-			port, err = tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
+			port, err = shell.Execf(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 		default:
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "未知服务")
 		}
@@ -206,7 +207,7 @@ logpath = ` + logPath + `
 		}
 	}
 
-	if _, err := tools.Exec("fail2ban-client reload"); err != nil {
+	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 
@@ -231,7 +232,7 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
-	if _, err := tools.Exec("fail2ban-client reload"); err != nil {
+	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 
@@ -245,15 +246,15 @@ func (r *Fail2banController) BanList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
-	currentlyBan, err := tools.Exec(`fail2ban-client status ` + name + ` | grep "Currently banned" | awk '{print $4}'`)
+	currentlyBan, err := shell.Execf(`fail2ban-client status %s | grep "Currently banned" | awk '{print $4}'`, name)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
-	totalBan, err := tools.Exec(`fail2ban-client status ` + name + ` | grep "Total banned" | awk '{print $4}'`)
+	totalBan, err := shell.Execf(`fail2ban-client status %s | grep "Total banned" | awk '{print $4}'`, name)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
-	bannedIp, err := tools.Exec(`fail2ban-client status ` + name + ` | grep "Banned IP list" | awk -F ":" '{print $2}'`)
+	bannedIp, err := shell.Execf(`fail2ban-client status %s | grep "Banned IP list" | awk -F ":" '{print $2}'`, name)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
@@ -287,7 +288,7 @@ func (r *Fail2banController) Unban(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
-	if _, err := tools.Exec("fail2ban-client set " + name + " unbanip " + ip); err != nil {
+	if _, err := shell.Execf("fail2ban-client set %s unbanip %s", name, ip); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "解封失败")
 	}
 
@@ -317,7 +318,7 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
-	if _, err := tools.Exec("fail2ban-client reload"); err != nil {
+	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 	return controllers.Success(ctx, nil)

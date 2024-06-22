@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/shell"
 )
 
 type TaskController struct {
@@ -63,7 +63,7 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	log, err := tools.Exec(`tail -n 500 '` + task.Log + `'`)
+	log, err := shell.Execf(`tail -n 500 '` + task.Log + `'`)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, "日志已被清理")
 	}

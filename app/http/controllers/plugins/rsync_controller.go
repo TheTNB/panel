@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -69,7 +70,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 					currentModule.ReadOnly = value == "yes" || value == "true"
 				case "auth users":
 					currentModule.AuthUser = value
-					currentModule.Secret, err = tools.Exec("grep -E '^" + currentModule.AuthUser + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
+					currentModule.Secret, err = shell.Execf("grep -E '^" + currentModule.AuthUser + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
 					if err != nil {
 						return controllers.Error(ctx, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
 					}
@@ -131,7 +132,7 @@ secrets file = /etc/rsyncd.secrets
 	if err := tools.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec("echo '" + createRequest.AuthUser + ":" + createRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
+	if out, err := shell.Execf("echo '" + createRequest.AuthUser + ":" + createRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -172,7 +173,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
 	if len(match) == 2 {
 		authUser := match[1]
-		if out, err := tools.Exec("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
@@ -230,7 +231,7 @@ secrets file = /etc/rsyncd.secrets
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
 	if len(match) == 2 {
 		authUser := match[1]
-		if out, err := tools.Exec("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
@@ -238,7 +239,7 @@ secrets file = /etc/rsyncd.secrets
 	if err = tools.Write("/etc/rsyncd.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := tools.Exec("echo '" + updateRequest.AuthUser + ":" + updateRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
+	if out, err := shell.Execf("echo '" + updateRequest.AuthUser + ":" + updateRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 

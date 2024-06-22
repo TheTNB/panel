@@ -11,6 +11,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -73,7 +74,7 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 	}
 
 	backupFile := backupPath + "/" + website.Name + "_" + carbon.Now().ToShortDateTimeString() + ".zip"
-	if _, err := tools.Exec(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
+	if _, err := shell.Execf(`cd '` + website.Path + `' && zip -r '` + backupFile + `' .`); err != nil {
 		return err
 	}
 
@@ -163,10 +164,10 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 		return err
 	}
 
-	if _, err := tools.Exec("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile); err != nil {
+	if _, err := shell.Execf("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile); err != nil {
 		return err
 	}
-	if _, err := tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
+	if _, err := shell.Execf("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
 		return err
 	}
 	if err := tools.Remove(backupPath + "/" + backupFile); err != nil {
@@ -217,7 +218,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return errors.New("无法找到备份文件")
 	}
 
-	if _, err = tools.Exec("/www/server/mysql/bin/mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
+	if _, err = shell.Execf("/www/server/mysql/bin/mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
 		return err
 	}
 
@@ -271,10 +272,10 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 		}
 	}
 
-	if _, err := tools.Exec(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile); err != nil {
+	if _, err := shell.Execf(`su - postgres -c "pg_dump ` + database + `" > ` + backupPath + "/" + backupFile); err != nil {
 		return err
 	}
-	if _, err := tools.Exec("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
+	if _, err := shell.Execf("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
 		return err
 	}
 
@@ -317,7 +318,7 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 		return errors.New("无法找到备份文件")
 	}
 
-	if _, err = tools.Exec(`su - postgres -c "psql ` + database + `" < ` + filepath.Join(tempDir, backupFile)); err != nil {
+	if _, err = shell.Execf(`su - postgres -c "psql ` + database + `" < ` + filepath.Join(tempDir, backupFile)); err != nil {
 		return err
 	}
 

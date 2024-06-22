@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -68,7 +69,7 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 		return controllers.Success(ctx, []types.NV{})
 	}
 
-	raw, err := tools.Exec("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	raw, err := shell.Execf("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
@@ -125,7 +126,7 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 
 // ErrorLog 获取错误日志
 func (r *MySQLController) ErrorLog(ctx http.Context) http.Response {
-	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-error.log")
+	log, err := shell.Execf("tail -n 100 /www/server/mysql/mysql-error.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
 	}
@@ -135,7 +136,7 @@ func (r *MySQLController) ErrorLog(ctx http.Context) http.Response {
 
 // ClearErrorLog 清空错误日志
 func (r *MySQLController) ClearErrorLog(ctx http.Context) http.Response {
-	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-error.log"); err != nil {
+	if out, err := shell.Execf("echo '' > /www/server/mysql/mysql-error.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -144,7 +145,7 @@ func (r *MySQLController) ClearErrorLog(ctx http.Context) http.Response {
 
 // SlowLog 获取慢查询日志
 func (r *MySQLController) SlowLog(ctx http.Context) http.Response {
-	log, err := tools.Exec("tail -n 100 /www/server/mysql/mysql-slow.log")
+	log, err := shell.Execf("tail -n 100 /www/server/mysql/mysql-slow.log")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
 	}
@@ -154,7 +155,7 @@ func (r *MySQLController) SlowLog(ctx http.Context) http.Response {
 
 // ClearSlowLog 清空慢查询日志
 func (r *MySQLController) ClearSlowLog(ctx http.Context) http.Response {
-	if out, err := tools.Exec("echo '' > /www/server/mysql/mysql-slow.log"); err != nil {
+	if out, err := shell.Execf("echo '' > /www/server/mysql/mysql-slow.log"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 	return controllers.Success(ctx, nil)
@@ -187,15 +188,15 @@ func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
 
 	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if oldRootPassword != rootPassword {
-		if _, err = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, oldRootPassword, rootPassword)); err != nil {
+		if _, err = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, oldRootPassword, rootPassword)); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置root密码失败: %v", err))
 		}
-		if _, err = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, rootPassword)); err != nil {
+		if _, err = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, rootPassword)); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
 		}
 		if err = r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword); err != nil {
-			_, _ = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, rootPassword, oldRootPassword))
-			_, _ = tools.Exec(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, oldRootPassword))
+			_, _ = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, rootPassword, oldRootPassword))
+			_, _ = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, oldRootPassword))
 			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
 		}
 	}
@@ -269,16 +270,16 @@ func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -295,7 +296,7 @@ func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -477,13 +478,13 @@ func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -500,7 +501,7 @@ func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -519,10 +520,10 @@ func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -541,13 +542,13 @@ func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
+	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 

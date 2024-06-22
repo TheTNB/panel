@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -74,7 +75,7 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 		total = "0.00 B"
 	}
 
-	raw, err := tools.Exec("free | grep Swap")
+	raw, err := shell.Execf("free | grep Swap")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
 	}
@@ -98,19 +99,19 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 	size := ctx.Request().InputInt("size")
 
 	if tools.Exists("/www/swap") {
-		if out, err := tools.Exec("swapoff /www/swap"); err != nil {
+		if out, err := shell.Execf("swapoff /www/swap"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
-		if out, err := tools.Exec("rm -f /www/swap"); err != nil {
+		if out, err := shell.Execf("rm -f /www/swap"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
-		if out, err := tools.Exec("sed -i '/www\\/swap/d' /etc/fstab"); err != nil {
+		if out, err := shell.Execf("sed -i '/www\\/swap/d' /etc/fstab"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
 	}
 
 	if size > 1 {
-		free, err := tools.Exec("df -k /www | awk '{print $4}' | tail -n 1")
+		free, err := shell.Execf("df -k /www | awk '{print $4}' | tail -n 1")
 		if err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取磁盘空间失败")
 		}
@@ -118,26 +119,26 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
 		}
 
-		btrfsCheck, _ := tools.Exec("df -T /www | awk '{print $2}' | tail -n 1")
+		btrfsCheck, _ := shell.Execf("df -T /www | awk '{print $2}' | tail -n 1")
 		if strings.Contains(btrfsCheck, "btrfs") {
-			if out, err := tools.Exec("btrfs filesystem mkswapfile --size " + cast.ToString(size) + "M --uuid clear /www/swap"); err != nil {
+			if out, err := shell.Execf("btrfs filesystem mkswapfile --size " + cast.ToString(size) + "M --uuid clear /www/swap"); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 			}
 		} else {
-			if out, err := tools.Exec("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size)); err != nil {
+			if out, err := shell.Execf("dd if=/dev/zero of=/www/swap bs=1M count=" + cast.ToString(size)); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 			}
-			if out, err := tools.Exec("mkswap -f /www/swap"); err != nil {
+			if out, err := shell.Execf("mkswap -f /www/swap"); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 			}
 			if err := tools.Chmod("/www/swap", 0600); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
 			}
 		}
-		if out, err := tools.Exec("swapon /www/swap"); err != nil {
+		if out, err := shell.Execf("swapon /www/swap"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
-		if out, err := tools.Exec("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab"); err != nil {
+		if out, err := shell.Execf("echo '/www/swap    swap    swap    defaults    0 0' >> /etc/fstab"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
 	}
@@ -147,7 +148,7 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 
 // GetTimezone 获取时区
 func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
-	raw, err := tools.Exec("timedatectl | grep zone")
+	raw, err := shell.Execf("timedatectl | grep zone")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取时区信息失败")
 	}
@@ -162,7 +163,7 @@ func (r *ToolBoxController) GetTimezone(ctx http.Context) http.Response {
 		Value string `json:"value"`
 	}
 
-	zonesRaw, err := tools.Exec("timedatectl list-timezones")
+	zonesRaw, err := shell.Execf("timedatectl list-timezones")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取时区列表失败")
 	}
@@ -189,7 +190,7 @@ func (r *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "时区不能为空")
 	}
 
-	if out, err := tools.Exec("timedatectl set-timezone " + timezone); err != nil {
+	if out, err := shell.Execf("timedatectl set-timezone %s", timezone); err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 	}
 
@@ -231,7 +232,7 @@ func (r *ToolBoxController) SetRootPassword(ctx http.Context) http.Response {
 	}
 
 	password = strings.ReplaceAll(password, `'`, `\'`)
-	if out, err := tools.Exec(`yes '` + password + `' | passwd root`); err != nil {
+	if out, err := shell.Execf(`yes '` + password + `' | passwd root`); err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 	}
 

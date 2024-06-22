@@ -1,7 +1,6 @@
 package tools
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -11,7 +10,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/goravel/framework/support"
 	"github.com/goravel/framework/support/env"
 	"github.com/mholt/archiver/v3"
 	"github.com/spf13/cast"
@@ -56,54 +54,6 @@ func Read(path string) (string, error) {
 // Remove 删除文件/目录
 func Remove(path string) error {
 	return os.RemoveAll(path)
-}
-
-// Exec 执行 shell 命令
-func Exec(shell string) (string, error) {
-	var cmd *exec.Cmd
-	if env.IsLinux() {
-		cmd = exec.Command("bash", "-c", "LC_ALL=C "+shell)
-	} else {
-		cmd = exec.Command("cmd", "/C", "chcp 65001 >nul && "+shell)
-	}
-
-	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd.Stdout = &stdoutBuf
-	cmd.Stderr = &stderrBuf
-
-	err := cmd.Run()
-	if err != nil {
-		return "", errors.New(strings.TrimSpace(stderrBuf.String()))
-	}
-
-	return strings.TrimSpace(stdoutBuf.String()), err
-}
-
-// ExecAsync 异步执行 shell 命令
-func ExecAsync(shell string) error {
-	var cmd *exec.Cmd
-	if env.IsLinux() {
-		cmd = exec.Command("bash", "-c", "LC_ALL=C "+shell)
-	} else {
-		cmd = exec.Command("cmd", "/C", "chcp 65001 >nul && "+shell)
-	}
-
-	err := cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	go func() {
-		err := cmd.Wait()
-		if err != nil {
-			if support.Env == support.EnvTest {
-				fmt.Println(err.Error())
-				panic(err)
-			}
-		}
-	}()
-
-	return nil
 }
 
 // Mkdir 创建目录

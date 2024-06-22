@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -21,7 +22,7 @@ func NewPureFtpdController() *PureFtpdController {
 
 // List 获取用户列表
 func (r *PureFtpdController) List(ctx http.Context) http.Response {
-	listRaw, err := tools.Exec("pure-pw list")
+	listRaw, err := shell.Execf("pure-pw list")
 	if err != nil {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
@@ -78,10 +79,10 @@ func (r *PureFtpdController) Add(ctx http.Context) http.Response {
 	if err := tools.Chown(path, "www", "www"); err != nil {
 		return nil
 	}
-	if out, err := tools.Exec(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path); err != nil {
+	if out, err := shell.Execf(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("pure-pw mkdb"); err != nil {
+	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -98,10 +99,10 @@ func (r *PureFtpdController) Delete(ctx http.Context) http.Response {
 
 	username := ctx.Request().Input("username")
 
-	if out, err := tools.Exec("pure-pw userdel " + username + " -m"); err != nil {
+	if out, err := shell.Execf("pure-pw userdel " + username + " -m"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("pure-pw mkdb"); err != nil {
+	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -120,10 +121,10 @@ func (r *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 	username := ctx.Request().Input("username")
 	password := ctx.Request().Input("password")
 
-	if out, err := tools.Exec(`yes '` + password + `' | pure-pw passwd ` + username + ` -m`); err != nil {
+	if out, err := shell.Execf(`yes '` + password + `' | pure-pw passwd ` + username + ` -m`); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if out, err := tools.Exec("pure-pw mkdb"); err != nil {
+	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -132,7 +133,7 @@ func (r *PureFtpdController) ChangePassword(ctx http.Context) http.Response {
 
 // GetPort 获取端口
 func (r *PureFtpdController) GetPort(ctx http.Context) http.Response {
-	port, err := tools.Exec(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
+	port, err := shell.Execf(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PureFtpd端口失败")
 	}
@@ -149,21 +150,21 @@ func (r *PureFtpdController) SetPort(ctx http.Context) http.Response {
 	}
 
 	port := ctx.Request().Input("port")
-	if out, err := tools.Exec(`sed -i "s/Bind.*/Bind 0.0.0.0,` + port + `/g" /www/server/pure-ftpd/etc/pure-ftpd.conf`); err != nil {
+	if out, err := shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%s/g" /www/server/pure-ftpd/etc/pure-ftpd.conf`, port); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 	if tools.IsRHEL() {
-		if out, err := tools.Exec("firewall-cmd --zone=public --add-port=" + port + "/tcp --permanent"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --zone=public --add-port=%s/tcp --permanent", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("firewall-cmd --reload"); err != nil {
+		if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if out, err := tools.Exec("ufw allow " + port + "/tcp"); err != nil {
+		if out, err := shell.Execf("ufw allow %s/tcp", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
-		if out, err := tools.Exec("ufw reload"); err != nil {
+		if out, err := shell.Execf("ufw reload"); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}

@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/contracts/http"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SupervisorController struct {
@@ -35,7 +36,7 @@ func (r *SupervisorController) Service(ctx http.Context) http.Response {
 
 // Log 日志
 func (r *SupervisorController) Log(ctx http.Context) http.Response {
-	log, err := tools.Exec(`tail -n 200 /var/log/supervisor/supervisord.log`)
+	log, err := shell.Execf(`tail -n 200 /var/log/supervisor/supervisord.log`)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
 	}
@@ -45,7 +46,7 @@ func (r *SupervisorController) Log(ctx http.Context) http.Response {
 
 // ClearLog 清空日志
 func (r *SupervisorController) ClearLog(ctx http.Context) http.Response {
-	if out, err := tools.Exec(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
+	if out, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -99,7 +100,7 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 		Uptime string `json:"uptime"`
 	}
 
-	out, err := tools.Exec(`supervisorctl status | awk '{print $1}'`)
+	out, err := shell.Execf(`supervisorctl status | awk '{print $1}'`)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
@@ -112,13 +113,13 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 
 		var p process
 		p.Name = line
-		if status, err := tools.Exec(`supervisorctl status ` + line + ` | awk '{print $2}'`); err == nil {
+		if status, err := shell.Execf(`supervisorctl status ` + line + ` | awk '{print $2}'`); err == nil {
 			p.Status = status
 		}
 		if p.Status == "RUNNING" {
-			pid, _ := tools.Exec(`supervisorctl status ` + line + ` | awk '{print $4}'`)
+			pid, _ := shell.Execf(`supervisorctl status ` + line + ` | awk '{print $4}'`)
 			p.Pid = strings.ReplaceAll(pid, ",", "")
-			uptime, _ := tools.Exec(`supervisorctl status ` + line + ` | awk '{print $6}'`)
+			uptime, _ := shell.Execf(`supervisorctl status ` + line + ` | awk '{print $6}'`)
 			p.Uptime = uptime
 		} else {
 			p.Pid = "-"
@@ -138,7 +139,7 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 // StartProcess 启动进程
 func (r *SupervisorController) StartProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
-	if out, err := tools.Exec(`supervisorctl start ` + process); err != nil {
+	if out, err := shell.Execf(`supervisorctl start %s`, process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -148,7 +149,7 @@ func (r *SupervisorController) StartProcess(ctx http.Context) http.Response {
 // StopProcess 停止进程
 func (r *SupervisorController) StopProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
-	if out, err := tools.Exec(`supervisorctl stop ` + process); err != nil {
+	if out, err := shell.Execf(`supervisorctl stop %s`, process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -158,7 +159,7 @@ func (r *SupervisorController) StopProcess(ctx http.Context) http.Response {
 // RestartProcess 重启进程
 func (r *SupervisorController) RestartProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
-	if out, err := tools.Exec(`supervisorctl restart ` + process); err != nil {
+	if out, err := shell.Execf(`supervisorctl restart %s`, process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -171,16 +172,16 @@ func (r *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 	var logPath string
 	var err error
 	if tools.IsRHEL() {
-		logPath, err = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	} else {
-		logPath, err = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	}
 
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
 	}
 
-	log, err := tools.Exec(`tail -n 200 ` + logPath)
+	log, err := shell.Execf(`tail -n 200 ` + logPath)
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, log)
 	}
@@ -194,16 +195,16 @@ func (r *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 	var logPath string
 	var err error
 	if tools.IsRHEL() {
-		logPath, err = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	} else {
-		logPath, err = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
+		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("无法从进程%s的配置文件中获取日志路径", process))
 	}
 
-	if out, err := tools.Exec(`echo "" > ` + logPath); err != nil {
+	if out, err := shell.Execf(`echo "" > ` + logPath); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
@@ -243,9 +244,9 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	_, _ = tools.Exec(`supervisorctl reread`)
-	_, _ = tools.Exec(`supervisorctl update`)
-	_, _ = tools.Exec(`supervisorctl restart ` + process)
+	_, _ = shell.Execf(`supervisorctl reread`)
+	_, _ = shell.Execf(`supervisorctl update`)
+	_, _ = shell.Execf(`supervisorctl restart %s`, process)
 
 	return controllers.Success(ctx, nil)
 }
@@ -291,9 +292,9 @@ stdout_logfile_maxbytes=2MB
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
-	_, _ = tools.Exec(`supervisorctl reread`)
-	_, _ = tools.Exec(`supervisorctl update`)
-	_, _ = tools.Exec(`supervisorctl start ` + name)
+	_, _ = shell.Execf(`supervisorctl reread`)
+	_, _ = shell.Execf(`supervisorctl update`)
+	_, _ = shell.Execf(`supervisorctl start %s`, name)
 
 	return controllers.Success(ctx, nil)
 }
@@ -301,19 +302,19 @@ stdout_logfile_maxbytes=2MB
 // DeleteProcess 删除进程
 func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
-	if out, err := tools.Exec(`supervisorctl stop ` + process); err != nil {
+	if out, err := shell.Execf(`supervisorctl stop %s`, process); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	var logPath string
 	var err error
 	if tools.IsRHEL() {
-		logPath, err = tools.Exec(`cat '/etc/supervisord.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 		if err := tools.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	} else {
-		logPath, err = tools.Exec(`cat '/etc/supervisor/conf.d/` + process + `.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`)
+		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 		if err := tools.Remove(`/etc/supervisor/conf.d/` + process + `.conf`); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
@@ -326,8 +327,8 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	if err := tools.Remove(logPath); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	_, _ = tools.Exec(`supervisorctl reread`)
-	_, _ = tools.Exec(`supervisorctl update`)
+	_, _ = shell.Execf(`supervisorctl reread`)
+	_, _ = shell.Execf(`supervisorctl update`)
 
 	return controllers.Success(ctx, nil)
 }

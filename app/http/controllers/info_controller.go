@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -152,7 +153,7 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 	if postgresqlInstalled {
 		status, err := tools.ServiceStatus("postgresql")
 		if status && err == nil {
-			raw, err := tools.Exec(`echo "\l" | su - postgres -c "psql"`)
+			raw, err := shell.Execf(`echo "\l" | su - postgres -c "psql"`)
 			if err == nil {
 				databases := strings.Split(raw, "\n")
 				if len(databases) >= 4 {
@@ -173,7 +174,7 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 	var ftpCount int64
 	var ftpPlugin = r.plugin.GetInstalledBySlug("pureftpd")
 	if ftpPlugin.ID != 0 {
-		listRaw, err := tools.Exec("pure-pw list")
+		listRaw, err := shell.Execf("pure-pw list")
 		if len(listRaw) != 0 && err == nil {
 			listArr := strings.Split(listRaw, "\n")
 			ftpCount = int64(len(listArr))

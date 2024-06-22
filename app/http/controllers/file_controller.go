@@ -12,6 +12,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	requests "github.com/TheTNB/panel/app/http/requests/file"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -42,7 +43,7 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 
 	isDir := ctx.Request().InputBool("dir")
 	if !isDir {
-		if out, err := tools.Exec("touch " + request.Path); err != nil {
+		if out, err := shell.Execf("touch " + request.Path); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
