@@ -10,8 +10,8 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -169,7 +169,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+name+" 不存在")
 	}
 
-	module := tools.Cut(config, "# "+name+"-START", "# "+name+"-END")
+	module := str.Cut(config, "# "+name+"-START", "# "+name+"-END")
 	config = strings.Replace(config, "\n# "+name+"-START"+module+"# "+name+"-END", "", -1)
 
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
@@ -227,7 +227,7 @@ hosts allow = ` + updateRequest.HostsAllow + `
 secrets file = /etc/rsyncd.secrets
 # ` + updateRequest.Name + `-END`
 
-	module := tools.Cut(config, "# "+updateRequest.Name+"-START", "# "+updateRequest.Name+"-END")
+	module := str.Cut(config, "# "+updateRequest.Name+"-START", "# "+updateRequest.Name+"-END")
 	config = strings.Replace(config, "# "+updateRequest.Name+"-START"+module+"# "+updateRequest.Name+"-END", newConf, -1)
 
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)

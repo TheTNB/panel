@@ -14,8 +14,8 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -619,7 +619,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	}
 
 	// 运行目录
-	rootConfig := tools.Cut(raw, "# root标记位开始\n", "# root标记位结束")
+	rootConfig := str.Cut(raw, "# root标记位开始\n", "# root标记位结束")
 	match := regexp.MustCompile(`root\s+(.+);`).FindStringSubmatch(rootConfig)
 	if len(match) == 2 {
 		if website.Status {
@@ -631,7 +631,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	}
 
 	// 默认文件
-	indexConfig := tools.Cut(raw, "# index标记位开始\n", "# index标记位结束")
+	indexConfig := str.Cut(raw, "# index标记位开始\n", "# index标记位结束")
 	match = regexp.MustCompile(`index\s+(.+);`).FindStringSubmatch(indexConfig)
 	if len(match) == 2 {
 		if website.Status {

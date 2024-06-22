@@ -18,8 +18,8 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -350,7 +350,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		domain += " " + v
 	}
 	domain += ";"
-	domainConfigOld := tools.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
+	domainConfigOld := str.Cut(raw, "# server_name标记位开始", "# server_name标记位结束")
 	if len(strings.TrimSpace(domainConfigOld)) == 0 {
 		return errors.New("配置文件中缺少server_name标记位")
 	}
@@ -380,14 +380,14 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 			port.WriteString("    listen [::]:" + vStr + ";")
 		}
 	}
-	portConfigOld := tools.Cut(raw, "# port标记位开始", "# port标记位结束")
+	portConfigOld := str.Cut(raw, "# port标记位开始", "# port标记位结束")
 	if len(strings.TrimSpace(portConfigOld)) == 0 {
 		return errors.New("配置文件中缺少port标记位")
 	}
 	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
 
 	// 运行目录
-	root := tools.Cut(raw, "# root标记位开始", "# root标记位结束")
+	root := str.Cut(raw, "# root标记位开始", "# root标记位结束")
 	if len(strings.TrimSpace(root)) == 0 {
 		return errors.New("配置文件中缺少root标记位")
 	}
@@ -399,7 +399,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	raw = strings.Replace(raw, root, rootNew, -1)
 
 	// 默认文件
-	index := tools.Cut(raw, "# index标记位开始", "# index标记位结束")
+	index := str.Cut(raw, "# index标记位开始", "# index标记位结束")
 	if len(strings.TrimSpace(index)) == 0 {
 		return errors.New("配置文件中缺少index标记位")
 	}
@@ -443,7 +443,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     waf_cc_deny ` + wafCcDeny + `;
     waf_cache ` + wafCache + `;
     `
-	wafConfigOld := tools.Cut(raw, "# waf标记位开始", "# waf标记位结束")
+	wafConfigOld := str.Cut(raw, "# waf标记位开始", "# waf标记位结束")
 	if len(strings.TrimSpace(wafConfigOld)) != 0 {
 		raw = strings.Replace(raw, wafConfigOld, "", -1)
 	}
@@ -484,13 +484,13 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     # hsts标记位结束
     `
 		}
-		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		sslConfigOld := str.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
 			raw = strings.Replace(raw, sslConfigOld, "", -1)
 		}
 		raw = strings.Replace(raw, "# ssl标记位开始", sslConfig, -1)
 	} else {
-		sslConfigOld := tools.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
+		sslConfigOld := str.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
 		if len(strings.TrimSpace(sslConfigOld)) != 0 {
 			raw = strings.Replace(raw, sslConfigOld, "\n    ", -1)
 		}
@@ -498,7 +498,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 
 	if website.Php != config.Php {
 		website.Php = config.Php
-		phpConfigOld := tools.Cut(raw, "# php标记位开始", "# php标记位结束")
+		phpConfigOld := str.Cut(raw, "# php标记位开始", "# php标记位结束")
 		phpConfig := `
     include enable-php-` + strconv.Itoa(website.Php) + `.conf;
     `
@@ -574,7 +574,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 	setting.Php = strconv.Itoa(website.Php)
 	setting.Raw = config
 
-	ports := tools.Cut(config, "# port标记位开始", "# port标记位结束")
+	ports := str.Cut(config, "# port标记位开始", "# port标记位结束")
 	matches := regexp.MustCompile(`listen\s+(.*);`).FindAllStringSubmatch(ports, -1)
 	for _, match := range matches {
 		if len(match) < 2 {
@@ -593,17 +593,17 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
 		}
 	}
-	serverName := tools.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
+	serverName := str.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
 	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)
 	if len(match) > 1 {
 		setting.Domains = strings.Split(match[1], " ")
 	}
-	root := tools.Cut(config, "# root标记位开始", "# root标记位结束")
+	root := str.Cut(config, "# root标记位开始", "# root标记位结束")
 	match = regexp.MustCompile(`root\s+(.*);`).FindStringSubmatch(root)
 	if len(match) > 1 {
 		setting.Root = match[1]
 	}
-	index := tools.Cut(config, "# index标记位开始", "# index标记位结束")
+	index := str.Cut(config, "# index标记位开始", "# index标记位结束")
 	match = regexp.MustCompile(`index\s+(.*);`).FindStringSubmatch(index)
 	if len(match) > 1 {
 		setting.Index = match[1]
@@ -625,7 +625,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 	key, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".key")
 	setting.SslCertificateKey = key
 	if setting.Ssl {
-		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
+		ssl := str.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
 
@@ -645,7 +645,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.Hsts = false
 	}
 
-	waf := tools.Cut(config, "# waf标记位开始", "# waf标记位结束")
+	waf := str.Cut(config, "# waf标记位开始", "# waf标记位结束")
 	setting.Waf = strings.Contains(waf, "waf on;")
 	match = regexp.MustCompile(`waf_mode\s+(.+);`).FindStringSubmatch(waf)
 	if len(match) > 1 {

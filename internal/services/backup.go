@@ -13,7 +13,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -53,7 +53,7 @@ func (s *BackupImpl) WebsiteList() ([]types.BackupFile, error) {
 		}
 		backupList = append(backupList, types.BackupFile{
 			Name: file.Name(),
-			Size: tools.FormatBytes(float64(info.Size())),
+			Size: str.FormatBytes(float64(info.Size())),
 		})
 	}
 
@@ -143,7 +143,7 @@ func (s *BackupImpl) MysqlList() ([]types.BackupFile, error) {
 		}
 		backupList = append(backupList, types.BackupFile{
 			Name: file.Name(),
-			Size: tools.FormatBytes(float64(info.Size())),
+			Size: str.FormatBytes(float64(info.Size())),
 		})
 	}
 
@@ -256,7 +256,7 @@ func (s *BackupImpl) PostgresqlList() ([]types.BackupFile, error) {
 		}
 		backupList = append(backupList, types.BackupFile{
 			Name: file.Name(),
-			Size: tools.FormatBytes(float64(info.Size())),
+			Size: str.FormatBytes(float64(info.Size())),
 		})
 	}
 

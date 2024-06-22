@@ -15,7 +15,7 @@ import (
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type FileController struct {
@@ -328,7 +328,7 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 
 	return Success(ctx, http.Json{
 		"name":     fileInfo.Name(),
-		"size":     tools.FormatBytes(float64(fileInfo.Size())),
+		"size":     str.FormatBytes(float64(fileInfo.Size())),
 		"mode_str": fileInfo.Mode().String(),
 		"mode":     fmt.Sprintf("%04o", fileInfo.Mode().Perm()),
 		"dir":      fileInfo.IsDir(),
@@ -481,7 +481,7 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
 			"full":     filepath.Join(request.Path, info.Name()),
-			"size":     tools.FormatBytes(float64(info.Size())),
+			"size":     str.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
 			"owner":    os.GetUser(stat.Uid),

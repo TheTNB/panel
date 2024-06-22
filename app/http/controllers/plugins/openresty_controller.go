@@ -11,8 +11,8 @@ import (
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -135,7 +135,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
-	mem := tools.FormatBytes(cast.ToFloat64(out))
+	mem := str.FormatBytes(cast.ToFloat64(out))
 	data = append(data, types.NV{
 		Name:  "内存占用",
 		Value: mem,

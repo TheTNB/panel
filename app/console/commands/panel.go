@@ -19,6 +19,7 @@ import (
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -73,7 +74,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		hash, err := facades.Hash().Make(tools.RandomString(32))
+		hash, err := facades.Hash().Make(str.RandomString(32))
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.init.fail"))
 			return nil
@@ -128,16 +129,16 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		password := tools.RandomString(16)
+		password := str.RandomString(16)
 		hash, err := facades.Hash().Make(password)
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.getInfo.passwordGenerationFail"))
 			return nil
 		}
-		user.Username = tools.RandomString(8)
+		user.Username = str.RandomString(8)
 		user.Password = hash
 		if user.Email == "" {
-			user.Email = tools.RandomString(8) + "@example.com"
+			user.Email = str.RandomString(8) + "@example.com"
 		}
 
 		err = facades.Orm().Query().Save(&user)

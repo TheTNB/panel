@@ -15,7 +15,7 @@ import (
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -48,7 +48,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 		}
 
 		jailName := jail[1]
-		jailRaw := tools.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
+		jailRaw := str.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 		if len(jailRaw) == 0 {
 			continue
 		}
@@ -227,7 +227,7 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则不存在")
 	}
 
-	rule := tools.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
+	rule := str.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 	raw = strings.Replace(raw, "\n# "+jailName+"-START"+rule+"# "+jailName+"-END", "", -1)
 	raw = strings.TrimSpace(raw)
 	if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {

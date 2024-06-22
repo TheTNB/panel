@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type SettingImpl struct {
@@ -19,11 +19,11 @@ func NewSettingImpl() *SettingImpl {
 func (r *SettingImpl) Get(key string, defaultValue ...string) string {
 	var setting models.Setting
 	if err := facades.Orm().Query().Where("key", key).FirstOrFail(&setting); err != nil {
-		return tools.FirstElement(defaultValue)
+		return str.FirstElement(defaultValue)
 	}
 
 	if len(setting.Value) == 0 {
-		return tools.FirstElement(defaultValue)
+		return str.FirstElement(defaultValue)
 	}
 
 	return setting.Value

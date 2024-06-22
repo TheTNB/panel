@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/go-connections/nat"
@@ -14,6 +13,7 @@ import (
 
 	requests "github.com/TheTNB/panel/app/http/requests/container"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type ContainerController struct {
@@ -725,7 +725,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 			"id":           item.ID,
 			"created":      carbon.FromTimestamp(item.Created).ToDateTimeString(),
 			"containers":   item.Containers,
-			"size":         tools.FormatBytes(float64(item.Size)),
+			"size":         str.FormatBytes(float64(item.Size)),
 			"labels":       item.Labels,
 			"repo_tags":    item.RepoTags,
 			"repo_digests": item.RepoDigests,
@@ -874,7 +874,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 		if item.UsageData != nil {
 			usage = map[string]any{
 				"ref_count": item.UsageData.RefCount,
-				"size":      tools.FormatBytes(float64(item.UsageData.Size)),
+				"size":      str.FormatBytes(float64(item.UsageData.Size)),
 			}
 		}
 		items = append(items, map[string]any{

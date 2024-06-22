@@ -14,7 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type CronController struct {
@@ -118,7 +118,7 @@ panel cutoff ${name} ${save} 2>&1
 	if !io.Exists(shellLogDir) {
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
-	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
+	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + str.RandomString(16)
 	if err := io.Write(shellDir+shellFile+".sh", script, 0700); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}

@@ -10,7 +10,7 @@ import (
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type ToolBoxController struct {
@@ -70,7 +70,7 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 		}
 
 		size = file.Size() / 1024 / 1024
-		total = tools.FormatBytes(float64(file.Size()))
+		total = str.FormatBytes(float64(file.Size()))
 	} else {
 		size = 0
 		total = "0.00 B"
@@ -83,8 +83,8 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 
 	match := regexp.MustCompile(`Swap:\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) > 0 {
-		used = tools.FormatBytes(cast.ToFloat64(match[2]) * 1024)
-		free = tools.FormatBytes(cast.ToFloat64(match[3]) * 1024)
+		used = str.FormatBytes(cast.ToFloat64(match[2]) * 1024)
+		free = str.FormatBytes(cast.ToFloat64(match[3]) * 1024)
 	}
 
 	return controllers.Success(ctx, http.Json{
@@ -117,7 +117,7 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取磁盘空间失败")
 		}
 		if cast.ToInt64(free)*1024 < int64(size)*1024*1024 {
-			return controllers.Error(ctx, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+tools.FormatBytes(cast.ToFloat64(free)))
+			return controllers.Error(ctx, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+str.FormatBytes(cast.ToFloat64(free)))
 		}
 
 		btrfsCheck, _ := shell.Execf("df -T /www | awk '{print $2}' | tail -n 1")
