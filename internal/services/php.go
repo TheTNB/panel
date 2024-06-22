@@ -13,9 +13,9 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -34,11 +34,11 @@ func (r *PHPImpl) Reload() error {
 }
 
 func (r *PHPImpl) GetConfig() (string, error) {
-	return tools.Read("/www/server/php/" + r.version + "/etc/php.ini")
+	return io.Read("/www/server/php/" + r.version + "/etc/php.ini")
 }
 
 func (r *PHPImpl) SaveConfig(config string) error {
-	if err := tools.Write("/www/server/php/"+r.version+"/etc/php.ini", config, 0644); err != nil {
+	if err := io.Write("/www/server/php/"+r.version+"/etc/php.ini", config, 0644); err != nil {
 		return err
 	}
 
@@ -46,11 +46,11 @@ func (r *PHPImpl) SaveConfig(config string) error {
 }
 
 func (r *PHPImpl) GetFPMConfig() (string, error) {
-	return tools.Read("/www/server/php/" + r.version + "/etc/php-fpm.conf")
+	return io.Read("/www/server/php/" + r.version + "/etc/php-fpm.conf")
 }
 
 func (r *PHPImpl) SaveFPMConfig(config string) error {
-	if err := tools.Write("/www/server/php/"+r.version+"/etc/php-fpm.conf", config, 0644); err != nil {
+	if err := io.Write("/www/server/php/"+r.version+"/etc/php-fpm.conf", config, 0644); err != nil {
 		return err
 	}
 

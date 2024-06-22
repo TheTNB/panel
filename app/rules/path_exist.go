@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/goravel/framework/contracts/validation"
 	"github.com/spf13/cast"
+
+	"github.com/TheTNB/panel/pkg/io"
 )
 
 type PathExists struct {
@@ -27,7 +28,7 @@ func (receiver *PathExists) Passes(_ validation.Data, val any, options ...any) b
 		return false
 	}
 
-	return tools.Exists(requestValue)
+	return io.Exists(requestValue)
 }
 
 // Message Get the validation error message.

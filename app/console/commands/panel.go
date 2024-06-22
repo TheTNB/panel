@@ -17,6 +17,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -272,8 +273,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Green().Printfln("★ " + translate.Get("commands.panel.backup.start") + " [" + carbon.Now().ToDateTimeString() + "]")
 		color.Green().Printfln(hr)
 
-		if !tools.Exists(path) {
-			if err := tools.Mkdir(path, 0644); err != nil {
+		if !io.Exists(path) {
+			if err := io.Mkdir(path, 0644); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.backupDirFail") + ": " + err.Error())
 				return nil
 			}
@@ -319,13 +320,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
-			if err := tools.Remove("/tmp/" + backupFile); err != nil {
+			if err := io.Remove("/tmp/" + backupFile); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.deleteFail") + ": " + err.Error())
 				return nil
 			}
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.compressSuccess"))
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startMove"))
-			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+			if err := io.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.moveFail") + ": " + err.Error())
 				return nil
 			}
@@ -359,13 +360,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.compressFail") + ": " + err.Error())
 				return nil
 			}
-			if err := tools.Remove("/tmp/" + backupFile); err != nil {
+			if err := io.Remove("/tmp/" + backupFile); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.deleteFail") + ": " + err.Error())
 				return nil
 			}
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.compressSuccess"))
 			color.Green().Printfln("|-" + translate.Get("commands.panel.backup.startMove"))
-			if err := tools.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
+			if err := io.Mv("/tmp/"+backupFile+".zip", path+"/"+backupFile+".zip"); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.moveFail") + ": " + err.Error())
 				return nil
 			}
@@ -395,7 +396,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join(path, filteredFiles[i].Name())
 			color.Yellow().Printfln("|-" + translate.Get("commands.panel.backup.cleanBackup") + ": " + fileToDelete)
-			if err := tools.Remove(fileToDelete); err != nil {
+			if err := io.Remove(fileToDelete); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.backup.cleanupFail") + ": " + err.Error())
 				return nil
 			}
@@ -427,7 +428,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		logPath := "/www/wwwlogs/" + website.Name + ".log"
-		if !tools.Exists(logPath) {
+		if !io.Exists(logPath) {
 			color.Red().Printfln("|-" + translate.Get("commands.panel.cutoff.logNotExist"))
 			color.Green().Printfln(hr)
 			return nil
@@ -466,7 +467,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		for i := cast.ToInt(save); i < len(filteredFiles); i++ {
 			fileToDelete := filepath.Join("/www/wwwlogs", filteredFiles[i].Name())
 			color.Yellow().Printfln("|-" + translate.Get("commands.panel.cutoff.clearLog") + ": " + fileToDelete)
-			if err := tools.Remove(fileToDelete); err != nil {
+			if err := io.Remove(fileToDelete); err != nil {
 				color.Red().Printfln("|-" + translate.Get("commands.panel.cutoff.cleanupFail") + ": " + err.Error())
 				return nil
 			}

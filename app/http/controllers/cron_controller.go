@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -111,14 +112,14 @@ panel cutoff ${name} ${save} 2>&1
 
 	shellDir := "/www/server/cron/"
 	shellLogDir := "/www/server/cron/logs/"
-	if !tools.Exists(shellDir) {
+	if !io.Exists(shellDir) {
 		return Error(ctx, http.StatusInternalServerError, "计划任务目录不存在")
 	}
-	if !tools.Exists(shellLogDir) {
+	if !io.Exists(shellLogDir) {
 		return Error(ctx, http.StatusInternalServerError, "计划任务日志目录不存在")
 	}
 	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + tools.RandomString(16)
-	if err := tools.Write(shellDir+shellFile+".sh", script, 0700); err != nil {
+	if err := io.Write(shellDir+shellFile+".sh", script, 0700); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("dos2unix " + shellDir + shellFile + ".sh"); err != nil {
@@ -157,7 +158,7 @@ func (r *CronController) Script(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
-	script, err := tools.Read(cron.Shell)
+	script, err := io.Read(cron.Shell)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -198,7 +199,7 @@ func (r *CronController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	if err := tools.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
+	if err := io.Write(cron.Shell, ctx.Request().Input("script"), 0644); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("dos2unix " + cron.Shell); err != nil {
@@ -227,7 +228,7 @@ func (r *CronController) Delete(ctx http.Context) http.Response {
 	if err := r.cron.DeleteFromSystem(cron); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err := tools.Remove(cron.Shell); err != nil {
+	if err := io.Remove(cron.Shell); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -281,7 +282,7 @@ func (r *CronController) Log(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "计划任务不存在")
 	}
 
-	if !tools.Exists(cron.Log) {
+	if !io.Exists(cron.Log) {
 		return Error(ctx, http.StatusUnprocessableEntity, "日志文件不存在")
 	}
 

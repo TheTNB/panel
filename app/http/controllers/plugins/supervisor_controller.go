@@ -8,6 +8,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -59,9 +60,9 @@ func (r *SupervisorController) Config(ctx http.Context) http.Response {
 	var config string
 	var err error
 	if tools.IsRHEL() {
-		config, err = tools.Read(`/etc/supervisord.conf`)
+		config, err = io.Read(`/etc/supervisord.conf`)
 	} else {
-		config, err = tools.Read(`/etc/supervisor/supervisord.conf`)
+		config, err = io.Read(`/etc/supervisor/supervisord.conf`)
 	}
 
 	if err != nil {
@@ -76,9 +77,9 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	var err error
 	if tools.IsRHEL() {
-		err = tools.Write(`/etc/supervisord.conf`, config, 0644)
+		err = io.Write(`/etc/supervisord.conf`, config, 0644)
 	} else {
-		err = tools.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
+		err = io.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
 	}
 
 	if err != nil {
@@ -218,9 +219,9 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 	var config string
 	var err error
 	if tools.IsRHEL() {
-		config, err = tools.Read(`/etc/supervisord.d/` + process + `.conf`)
+		config, err = io.Read(`/etc/supervisord.d/` + process + `.conf`)
 	} else {
-		config, err = tools.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
+		config, err = io.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
 	}
 
 	if err != nil {
@@ -236,9 +237,9 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 	config := ctx.Request().Input("config")
 	var err error
 	if tools.IsRHEL() {
-		err = tools.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
+		err = io.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
 	} else {
-		err = tools.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
+		err = io.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
 	}
 
 	if err != nil {
@@ -284,9 +285,9 @@ stdout_logfile_maxbytes=2MB
 
 	var err error
 	if tools.IsRHEL() {
-		err = tools.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
+		err = io.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
 	} else {
-		err = tools.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
+		err = io.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
 	}
 
 	if err != nil {
@@ -311,12 +312,12 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	var err error
 	if tools.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
-		if err := tools.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
+		if err := io.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
-		if err := tools.Remove(`/etc/supervisor/conf.d/` + process + `.conf`); err != nil {
+		if err := io.Remove(`/etc/supervisor/conf.d/` + process + `.conf`); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
@@ -325,7 +326,7 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
 	}
 
-	if err := tools.Remove(logPath); err != nil {
+	if err := io.Remove(logPath); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	_, _ = shell.Execf(`supervisorctl reread`)

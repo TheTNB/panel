@@ -11,9 +11,9 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -32,7 +32,7 @@ func NewPostgreSQLController() *PostgreSQLController {
 // GetConfig 获取配置
 func (r *PostgreSQLController) GetConfig(ctx http.Context) http.Response {
 	// 获取配置
-	config, err := tools.Read("/www/server/postgresql/data/postgresql.conf")
+	config, err := io.Read("/www/server/postgresql/data/postgresql.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 	}
@@ -43,7 +43,7 @@ func (r *PostgreSQLController) GetConfig(ctx http.Context) http.Response {
 // GetUserConfig 获取用户配置
 func (r *PostgreSQLController) GetUserConfig(ctx http.Context) http.Response {
 	// 获取配置
-	config, err := tools.Read("/www/server/postgresql/data/pg_hba.conf")
+	config, err := io.Read("/www/server/postgresql/data/pg_hba.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取PostgreSQL配置失败")
 	}
@@ -58,7 +58,7 @@ func (r *PostgreSQLController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if err := tools.Write("/www/server/postgresql/data/postgresql.conf", config, 0644); err != nil {
+	if err := io.Write("/www/server/postgresql/data/postgresql.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
@@ -76,7 +76,7 @@ func (r *PostgreSQLController) SaveUserConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if err := tools.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644); err != nil {
+	if err := io.Write("/www/server/postgresql/data/pg_hba.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
@@ -277,8 +277,8 @@ func (r *PostgreSQLController) UploadBackup(ctx http.Context) http.Response {
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
-	if !tools.Exists(backupPath) {
-		if err = tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err = io.Mkdir(backupPath, 0644); err != nil {
 			return nil
 		}
 	}
@@ -318,7 +318,7 @@ func (r *PostgreSQLController) DeleteBackup(ctx http.Context) http.Response {
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	fileName := ctx.Request().Input("name")
-	if err := tools.Remove(backupPath + "/" + fileName); err != nil {
+	if err := io.Remove(backupPath + "/" + fileName); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

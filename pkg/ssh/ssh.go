@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/io"
 )
 
 type AuthMethod int8
@@ -68,7 +68,7 @@ func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 }
 
 func getKey(keyPath string) (ssh.Signer, error) {
-	key, err := tools.Read(keyPath)
+	key, err := io.Read(keyPath)
 	if err != nil {
 		return nil, err
 	}

@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -147,11 +148,11 @@ func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 //	@Success	200	{object}	SuccessResponse{data=map[string]string}
 //	@Router		/panel/website/defaultConfig [get]
 func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
-	index, err := tools.Read("/www/server/openresty/html/index.html")
+	index, err := io.Read("/www/server/openresty/html/index.html")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	stop, err := tools.Read("/www/server/openresty/html/stop.html")
+	stop, err := io.Read("/www/server/openresty/html/stop.html")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -176,14 +177,14 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 	index := ctx.Request().Input("index")
 	stop := ctx.Request().Input("stop")
 
-	if err := tools.Write("/www/server/openresty/html/index.html", index, 0644); err != nil {
+	if err := io.Write("/www/server/openresty/html/index.html", index, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认首页配置失败")
 		return ErrorSystem(ctx)
 	}
 
-	if err := tools.Write("/www/server/openresty/html/stop.html", stop, 0644); err != nil {
+	if err := io.Write("/www/server/openresty/html/stop.html", stop, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认停止页配置失败")
@@ -271,7 +272,7 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	if err := tools.Remove("/www/wwwlogs/" + website.Name + ".log"); err != nil {
+	if err := io.Remove("/www/wwwlogs/" + website.Name + ".log"); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -399,8 +400,8 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/website"
-	if !tools.Exists(backupPath) {
-		if err = tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err = io.Mkdir(backupPath, 0644); err != nil {
 			return nil
 		}
 	}
@@ -469,13 +470,13 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/website"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return nil
 		}
 	}
 
-	if err := tools.Remove(backupPath + "/" + deleteBackupRequest.Name); err != nil {
+	if err := io.Remove(backupPath + "/" + deleteBackupRequest.Name); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -572,10 +573,10 @@ server
 }
 
 `, website.Path, website.Php, website.Name, website.Name, website.Name)
-	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+	if err := io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return nil
 	}
-	if err := tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
+	if err := io.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
 		return nil
 	}
 	if err := systemctl.Reload("openresty"); err != nil {
@@ -612,7 +613,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	raw, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	raw, err := io.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -641,7 +642,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 		}
 	}
 
-	if err = tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return ErrorSystem(ctx)
 	}
 	if err = systemctl.Reload("openresty"); err != nil {

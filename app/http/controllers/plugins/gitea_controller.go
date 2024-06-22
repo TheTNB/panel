@@ -5,8 +5,8 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/gitea"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type GiteaController struct {
@@ -26,7 +26,7 @@ func NewGiteaController() *GiteaController {
 //	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/gitea/config [get]
 func (r *GiteaController) GetConfig(ctx http.Context) http.Response {
-	config, err := tools.Read("/www/server/gitea/app.ini")
+	config, err := io.Read("/www/server/gitea/app.ini")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -51,7 +51,7 @@ func (r *GiteaController) UpdateConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Write("/www/server/gitea/app.ini", updateRequest.Config, 0644); err != nil {
+	if err := io.Write("/www/server/gitea/app.ini", updateRequest.Config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

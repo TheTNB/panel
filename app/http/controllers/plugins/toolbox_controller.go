@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -21,7 +22,7 @@ func NewToolBoxController() *ToolBoxController {
 
 // GetDNS 获取 DNS 信息
 func (r *ToolBoxController) GetDNS(ctx http.Context) http.Response {
-	raw, err := tools.Read("/etc/resolv.conf")
+	raw, err := io.Read("/etc/resolv.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -51,7 +52,7 @@ func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 	dns += "nameserver " + dns1 + "\n"
 	dns += "nameserver " + dns2 + "\n"
 
-	if err := tools.Write("/etc/resolv.conf", dns, 0644); err != nil {
+	if err := io.Write("/etc/resolv.conf", dns, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入 DNS 信息失败")
 	}
 
@@ -62,8 +63,8 @@ func (r *ToolBoxController) SetDNS(ctx http.Context) http.Response {
 func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 	var total, used, free string
 	var size int64
-	if tools.Exists("/www/swap") {
-		file, err := tools.FileInfo("/www/swap")
+	if io.Exists("/www/swap") {
+		file, err := io.FileInfo("/www/swap")
 		if err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
 		}
@@ -98,7 +99,7 @@ func (r *ToolBoxController) GetSWAP(ctx http.Context) http.Response {
 func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 	size := ctx.Request().InputInt("size")
 
-	if tools.Exists("/www/swap") {
+	if io.Exists("/www/swap") {
 		if out, err := shell.Execf("swapoff /www/swap"); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 		}
@@ -131,7 +132,7 @@ func (r *ToolBoxController) SetSWAP(ctx http.Context) http.Response {
 			if out, err := shell.Execf("mkswap -f /www/swap"); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, out)
 			}
-			if err := tools.Chmod("/www/swap", 0600); err != nil {
+			if err := io.Chmod("/www/swap", 0600); err != nil {
 				return controllers.Error(ctx, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
 			}
 		}
@@ -199,7 +200,7 @@ func (r *ToolBoxController) SetTimezone(ctx http.Context) http.Response {
 
 // GetHosts 获取 hosts 信息
 func (r *ToolBoxController) GetHosts(ctx http.Context) http.Response {
-	hosts, err := tools.Read("/etc/hosts")
+	hosts, err := io.Read("/etc/hosts")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -214,7 +215,7 @@ func (r *ToolBoxController) SetHosts(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "hosts 信息不能为空")
 	}
 
-	if err := tools.Write("/etc/hosts", hosts, 0644); err != nil {
+	if err := io.Write("/etc/hosts", hosts, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "写入 hosts 信息失败")
 	}
 

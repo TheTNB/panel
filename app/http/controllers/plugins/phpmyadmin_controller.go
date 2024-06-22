@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -38,7 +39,7 @@ func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 phpMyAdmin 目录")
 	}
 
-	conf, err := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	conf, err := io.Read("/www/server/vhost/phpmyadmin.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -59,12 +60,12 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "端口不能为空")
 	}
 
-	conf, err := tools.Read("/www/server/vhost/phpmyadmin.conf")
+	conf, err := io.Read("/www/server/vhost/phpmyadmin.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+cast.ToString(port)+";")
-	if err := tools.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644); err != nil {
+	if err := io.Write("/www/server/vhost/phpmyadmin.conf", conf, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
 			"error": err.Error(),
 		}).Info("修改 phpMyAdmin 端口失败")

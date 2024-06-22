@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"io"
+	stdio "io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +12,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	requests "github.com/TheTNB/panel/app/http/requests/file"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -47,7 +48,7 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if err := tools.Mkdir(request.Path, 0755); err != nil {
+		if err := io.Mkdir(request.Path, 0755); err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
@@ -74,7 +75,7 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	fileInfo, err := tools.FileInfo(request.Path)
+	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -85,7 +86,7 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, "文件大小超过 10 M，不支持在线编辑")
 	}
 
-	content, err := tools.Read(request.Path)
+	content, err := io.Read(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -111,11 +112,11 @@ func (r *FileController) Save(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	fileInfo, err := tools.FileInfo(request.Path)
+	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err = tools.Write(request.Path, request.Content, fileInfo.Mode()); err != nil {
+	if err = io.Write(request.Path, request.Content, fileInfo.Mode()); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -141,7 +142,7 @@ func (r *FileController) Delete(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Remove(request.Path); err != nil {
+	if err := io.Remove(request.Path); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -173,16 +174,16 @@ func (r *FileController) Upload(ctx http.Context) http.Response {
 	}
 	defer src.Close()
 
-	if tools.Exists(request.Path) && !ctx.Request().InputBool("force") {
+	if io.Exists(request.Path) && !ctx.Request().InputBool("force") {
 		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
-	data, err := io.ReadAll(src)
+	data, err := stdio.ReadAll(src)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err = tools.Write(request.Path, string(data), 0755); err != nil {
+	if err = io.Write(request.Path, string(data), 0755); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -208,11 +209,11 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if tools.Exists(request.Target) && !ctx.Request().InputBool("force") {
+	if io.Exists(request.Target) && !ctx.Request().InputBool("force") {
 		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
-	if err := tools.Mv(request.Source, request.Target); err != nil {
+	if err := io.Mv(request.Source, request.Target); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -238,11 +239,11 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if tools.Exists(request.Target) && !ctx.Request().InputBool("force") {
+	if io.Exists(request.Target) && !ctx.Request().InputBool("force") {
 		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
-	if err := tools.Cp(request.Source, request.Target); err != nil {
+	if err := io.Cp(request.Source, request.Target); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -268,7 +269,7 @@ func (r *FileController) Download(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	info, err := tools.FileInfo(request.Path)
+	info, err := io.FileInfo(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -319,7 +320,7 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	fileInfo, err := tools.FileInfo(request.Path)
+	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -352,10 +353,10 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Chmod(request.Path, os.FileMode(request.Mode)); err != nil {
+	if err := io.Chmod(request.Path, os.FileMode(request.Mode)); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err := tools.Chown(request.Path, request.Owner, request.Group); err != nil {
+	if err := io.Chown(request.Path, request.Owner, request.Group); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -380,7 +381,7 @@ func (r *FileController) Archive(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Archive(request.Paths, request.File); err != nil {
+	if err := io.Archive(request.Paths, request.File); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -406,7 +407,7 @@ func (r *FileController) UnArchive(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.UnArchive(request.File, request.Path); err != nil {
+	if err := io.UnArchive(request.File, request.Path); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -486,9 +487,9 @@ func (r *FileController) List(ctx http.Context) http.Response {
 			"group":    tools.GetGroup(stat.Gid),
 			"uid":      stat.Uid,
 			"gid":      stat.Gid,
-			"hidden":   tools.IsHidden(info.Name()),
-			"symlink":  tools.IsSymlink(info.Mode()),
-			"link":     tools.GetSymlink(filepath.Join(request.Path, info.Name())),
+			"hidden":   io.IsHidden(info.Name()),
+			"symlink":  io.IsSymlink(info.Mode()),
+			"link":     io.GetSymlink(filepath.Join(request.Path, info.Name())),
 			"dir":      info.IsDir(),
 			"modify":   carbon.FromStdTime(info.ModTime()).ToDateTimeString(),
 		})
@@ -504,6 +505,6 @@ func (r *FileController) List(ctx http.Context) http.Response {
 
 // setPermission
 func (r *FileController) setPermission(path string, mode uint, owner, group string) {
-	_ = tools.Chmod(path, os.FileMode(mode))
-	_ = tools.Chown(path, owner, group)
+	_ = io.Chmod(path, os.FileMode(mode))
+	_ = io.Chown(path, owner, group)
 }

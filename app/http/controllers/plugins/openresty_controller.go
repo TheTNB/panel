@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -32,7 +33,7 @@ func NewOpenrestyController() *OpenRestyController {
 //	@Success	200	{object}	controllers.SuccessResponse
 //	@Router		/plugins/openresty/config [get]
 func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
-	config, err := tools.Read("/www/server/openresty/conf/nginx.conf")
+	config, err := io.Read("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取配置失败")
 	}
@@ -55,7 +56,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
 	}
 
-	if err := tools.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
+	if err := io.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "保存配置失败")
 	}
 
@@ -75,7 +76,7 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 //	@Success	200	{object}	controllers.SuccessResponse
 //	@Router		/plugins/openresty/errorLog [get]
 func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
-	if !tools.Exists("/www/wwwlogs/nginx_error.log") {
+	if !io.Exists("/www/wwwlogs/nginx_error.log") {
 		return controllers.Success(ctx, "")
 	}
 

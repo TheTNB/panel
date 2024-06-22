@@ -16,6 +16,7 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -57,7 +58,7 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 		return models.Website{}, err
 	}
 
-	if err := tools.Mkdir(website.Path, 0755); err != nil {
+	if err := io.Mkdir(website.Path, 0755); err != nil {
 		return models.Website{}, err
 	}
 
@@ -115,7 +116,7 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 </html>
 
 `
-	if err := tools.Write(website.Path+"/index.html", index, 0644); err != nil {
+	if err := io.Write(website.Path+"/index.html", index, 0644); err != nil {
 		return models.Website{}, err
 	}
 
@@ -176,7 +177,7 @@ func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
 </html>
 
 `
-	if err := tools.Write(website.Path+"/404.html", notFound, 0644); err != nil {
+	if err := io.Write(website.Path+"/404.html", notFound, 0644); err != nil {
 		return models.Website{}, err
 	}
 
@@ -261,23 +262,23 @@ server
 }
 `, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name)
 
-	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
+	if err := io.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
+	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
+	if err := io.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := tools.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644); err != nil {
+	if err := io.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644); err != nil {
 		return models.Website{}, err
 	}
 
-	if err := tools.Chmod(website.Path, 0755); err != nil {
+	if err := io.Chmod(website.Path, 0755); err != nil {
 		return models.Website{}, err
 	}
-	if err := tools.Chown(website.Path, "www", "www"); err != nil {
+	if err := io.Chown(website.Path, "www", "www"); err != nil {
 		return models.Website{}, err
 	}
 
@@ -317,12 +318,12 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	}
 
 	// 原文
-	raw, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	raw, err := io.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
 		return err
 	}
 	if strings.TrimSpace(raw) != strings.TrimSpace(config.Raw) {
-		if err = tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
@@ -334,7 +335,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 
 	// 目录
 	path := config.Path
-	if !tools.Exists(path) {
+	if !io.Exists(path) {
 		return errors.New("网站目录不存在")
 	}
 	website.Path = path
@@ -415,12 +416,12 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		root += "/"
 	}
 	if config.OpenBasedir {
-		if err := tools.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644); err != nil {
+		if err := io.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644); err != nil {
 			return err
 		}
 	} else {
-		if tools.Exists(root + ".user.ini") {
-			if err := tools.Remove(root + ".user.ini"); err != nil {
+		if io.Exists(root + ".user.ini") {
+			if err := io.Remove(root + ".user.ini"); err != nil {
 				return err
 			}
 		}
@@ -451,10 +452,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	// SSL
 	ssl := config.Ssl
 	website.Ssl = ssl
-	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
 		return err
 	}
-	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
 		return err
 	}
 	if ssl {
@@ -510,10 +511,10 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 
-	if err := tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+	if err := io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return err
 	}
-	if err := tools.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
+	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
 		return err
 	}
 
@@ -535,19 +536,19 @@ func (r *WebsiteImpl) Delete(id uint) error {
 		return err
 	}
 
-	if err := tools.Remove("/www/server/vhost/" + website.Name + ".conf"); err != nil {
+	if err := io.Remove("/www/server/vhost/" + website.Name + ".conf"); err != nil {
 		return err
 	}
-	if err := tools.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf"); err != nil {
+	if err := io.Remove("/www/server/vhost/rewrite/" + website.Name + ".conf"); err != nil {
 		return err
 	}
-	if err := tools.Remove("/www/server/vhost/ssl/" + website.Name + ".pem"); err != nil {
+	if err := io.Remove("/www/server/vhost/ssl/" + website.Name + ".pem"); err != nil {
 		return err
 	}
-	if err := tools.Remove("/www/server/vhost/ssl/" + website.Name + ".key"); err != nil {
+	if err := io.Remove("/www/server/vhost/ssl/" + website.Name + ".key"); err != nil {
 		return err
 	}
-	if err := tools.Remove(website.Path); err != nil {
+	if err := io.Remove(website.Path); err != nil {
 		return err
 	}
 
@@ -561,7 +562,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		return types.WebsiteSetting{}, err
 	}
 
-	config, err := tools.Read("/www/server/vhost/" + website.Name + ".conf")
+	config, err := io.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
 		return types.WebsiteSetting{}, err
 	}
@@ -608,8 +609,8 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.Index = match[1]
 	}
 
-	if tools.Exists(setting.Root + "/.user.ini") {
-		userIni, _ := tools.Read(setting.Root + "/.user.ini")
+	if io.Exists(setting.Root + "/.user.ini") {
+		userIni, _ := io.Read(setting.Root + "/.user.ini")
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {
@@ -619,9 +620,9 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
-	cert, _ := tools.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+	cert, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
 	setting.SslCertificate = cert
-	key, _ := tools.Read("/www/server/vhost/ssl/" + website.Name + ".key")
+	key, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".key")
 	setting.SslCertificateKey = key
 	if setting.Ssl {
 		ssl := tools.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
@@ -659,7 +660,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	rewrite, _ := tools.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
+	rewrite, _ := io.Read("/www/server/vhost/rewrite/" + website.Name + ".conf")
 	setting.Rewrite = rewrite
 	log, _ := shell.Execf(`tail -n 100 '/www/wwwlogs/%s.log'`, website.Name)
 	setting.Log = log

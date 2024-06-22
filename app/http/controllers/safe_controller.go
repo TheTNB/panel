@@ -7,6 +7,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -308,7 +309,7 @@ func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
 			return Success(ctx, false)
 		}
 	} else {
-		config, err := tools.Read("/etc/ufw/before.rules")
+		config, err := io.Read("/etc/ufw/before.rules")
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}

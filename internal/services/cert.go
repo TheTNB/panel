@@ -12,8 +12,8 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/cert"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type CertImpl struct {
@@ -272,10 +272,10 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
@@ -312,10 +312,10 @@ func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
@@ -397,10 +397,10 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 	}
 
 	if cert.Website != nil {
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".pem", cert.Cert, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
+		if err = io.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
@@ -429,10 +429,10 @@ func (s *CertImpl) Deploy(ID, WebsiteID uint) error {
 		return err
 	}
 
-	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".pem", cert.Cert, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", cert.Cert, 0644); err != nil {
 		return err
 	}
-	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".key", cert.Key, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".key", cert.Key, 0644); err != nil {
 		return err
 	}
 	if err = systemctl.Reload("openresty"); err != nil {

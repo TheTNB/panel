@@ -8,8 +8,8 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
 
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -49,7 +49,7 @@ func (receiver *PanelTask) Handle(console.Context) error {
 	}
 
 	// 备份面板
-	if err := tools.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
+	if err := io.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
 		types.Status = types.StatusFailed
 		facades.Log().Tags("面板", "每日任务").
 			With(map[string]any{

@@ -11,8 +11,8 @@ import (
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -66,12 +66,12 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 	}
 
 	// 检查挂载目录是否存在且为空
-	if !tools.Exists(path) {
-		if err := tools.Mkdir(path, 0755); err != nil {
+	if !io.Exists(path) {
+		if err := io.Mkdir(path, 0755); err != nil {
 			return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录创建失败")
 		}
 	}
-	if !tools.Empty(path) {
+	if !io.Empty(path) {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "挂载目录必须为空")
 	}
 
@@ -88,7 +88,7 @@ func (r *S3fsController) Add(ctx http.Context) http.Response {
 
 	id := carbon.Now().TimestampMilli()
 	password := ak + ":" + sk
-	if err := tools.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
+	if err := io.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
 		return nil
 	}
 	out, err := shell.Execf(`echo 's3fs#` + bucket + ` ` + path + ` fuse _netdev,allow_other,nonempty,url=` + url + `,passwd_file=/etc/passwd-s3fs-` + cast.ToString(id) + ` 0 0' >> /etc/fstab`)
@@ -158,7 +158,7 @@ func (r *S3fsController) Delete(ctx http.Context) http.Response {
 	if mountCheck, err := shell.Execf("mount -a 2>&1"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "检测到/etc/fstab有误: "+mountCheck)
 	}
-	if err := tools.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID)); err != nil {
+	if err := io.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID)); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

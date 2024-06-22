@@ -8,6 +8,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -32,7 +33,7 @@ func NewRsyncController() *RsyncController {
 //	@Success		200		{object}	controllers.SuccessResponse
 //	@Router			/plugins/rsync/modules [get]
 func (r *RsyncController) List(ctx http.Context) http.Response {
-	config, err := tools.Read("/etc/rsyncd.conf")
+	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -111,7 +112,7 @@ func (r *RsyncController) Create(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	config, err := tools.Read("/etc/rsyncd.conf")
+	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -130,7 +131,7 @@ secrets file = /etc/rsyncd.secrets
 # ` + createRequest.Name + `-END
 `
 
-	if err := tools.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
+	if err := io.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("echo '" + createRequest.AuthUser + ":" + createRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
@@ -160,7 +161,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "name 不能为空")
 	}
 
-	config, err := tools.Read("/etc/rsyncd.conf")
+	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -179,7 +180,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 		}
 	}
 
-	if err = tools.Write("/etc/rsyncd.conf", config, 0644); err != nil {
+	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -208,7 +209,7 @@ func (r *RsyncController) Update(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	config, err := tools.Read("/etc/rsyncd.conf")
+	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -237,7 +238,7 @@ secrets file = /etc/rsyncd.secrets
 		}
 	}
 
-	if err = tools.Write("/etc/rsyncd.conf", config, 0644); err != nil {
+	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("echo '" + updateRequest.AuthUser + ":" + updateRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
@@ -261,7 +262,7 @@ secrets file = /etc/rsyncd.secrets
 //	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/rsync/config [get]
 func (r *RsyncController) GetConfig(ctx http.Context) http.Response {
-	config, err := tools.Read("/etc/rsyncd.conf")
+	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -286,7 +287,7 @@ func (r *RsyncController) UpdateConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Write("/etc/rsyncd.conf", updateRequest.Config, 0644); err != nil {
+	if err := io.Write("/etc/rsyncd.conf", updateRequest.Config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

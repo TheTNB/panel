@@ -11,6 +11,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -34,8 +35,8 @@ func (s *BackupImpl) WebsiteList() ([]types.BackupFile, error) {
 	}
 
 	backupPath += "/website"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return []types.BackupFile{}, err
 		}
 	}
@@ -67,8 +68,8 @@ func (s *BackupImpl) WebSiteBackup(website models.Website) error {
 	}
 
 	backupPath += "/website"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return err
 		}
 	}
@@ -89,27 +90,27 @@ func (s *BackupImpl) WebsiteRestore(website models.Website, backupFile string) e
 	}
 
 	backupPath += "/website"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return err
 		}
 	}
 
 	backupFile = backupPath + "/" + backupFile
-	if !tools.Exists(backupFile) {
+	if !io.Exists(backupFile) {
 		return errors.New("备份文件不存在")
 	}
 
-	if err := tools.Remove(website.Path); err != nil {
+	if err := io.Remove(website.Path); err != nil {
 		return err
 	}
-	if err := tools.UnArchive(backupFile, website.Path); err != nil {
+	if err := io.UnArchive(backupFile, website.Path); err != nil {
 		return err
 	}
-	if err := tools.Chmod(website.Path, 0755); err != nil {
+	if err := io.Chmod(website.Path, 0755); err != nil {
 		return err
 	}
-	if err := tools.Chown(website.Path, "www", "www"); err != nil {
+	if err := io.Chown(website.Path, "www", "www"); err != nil {
 		return err
 	}
 
@@ -124,8 +125,8 @@ func (s *BackupImpl) MysqlList() ([]types.BackupFile, error) {
 	}
 
 	backupPath += "/mysql"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return []types.BackupFile{}, err
 		}
 	}
@@ -154,8 +155,8 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	rootPassword := s.setting.Get(models.SettingKeyMysqlRootPassword)
 	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return err
 		}
 	}
@@ -170,7 +171,7 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 	if _, err := shell.Execf("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
 		return err
 	}
-	if err := tools.Remove(backupPath + "/" + backupFile); err != nil {
+	if err := io.Remove(backupPath + "/" + backupFile); err != nil {
 		return err
 	}
 
@@ -182,7 +183,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	rootPassword := s.setting.Get(models.SettingKeyMysqlRootPassword)
 	backupFullPath := filepath.Join(backupPath, backupFile)
-	if !tools.Exists(backupFullPath) {
+	if !io.Exists(backupFullPath) {
 		return errors.New("备份文件不存在")
 	}
 
@@ -190,14 +191,14 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return err
 	}
 
-	tempDir, err := tools.TempDir(backupFile)
+	tempDir, err := io.TempDir(backupFile)
 	if err != nil {
 		return err
 	}
 
 	if !strings.HasSuffix(backupFile, ".sql") {
 		backupFile = "" // 置空，防止干扰后续判断
-		if err = tools.UnArchive(backupFullPath, tempDir); err != nil {
+		if err = io.UnArchive(backupFullPath, tempDir); err != nil {
 			return err
 		}
 		if files, err := os.ReadDir(tempDir); err == nil {
@@ -209,7 +210,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 			}
 		}
 	} else {
-		if err = tools.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
+		if err = io.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
 			return err
 		}
 	}
@@ -222,7 +223,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return err
 	}
 
-	if err = tools.Remove(tempDir); err != nil {
+	if err = io.Remove(tempDir); err != nil {
 		return err
 	}
 
@@ -237,8 +238,8 @@ func (s *BackupImpl) PostgresqlList() ([]types.BackupFile, error) {
 	}
 
 	backupPath += "/postgresql"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return []types.BackupFile{}, err
 		}
 	}
@@ -266,8 +267,8 @@ func (s *BackupImpl) PostgresqlList() ([]types.BackupFile, error) {
 func (s *BackupImpl) PostgresqlBackup(database string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	backupFile := database + "_" + carbon.Now().ToShortDateTimeString() + ".sql"
-	if !tools.Exists(backupPath) {
-		if err := tools.Mkdir(backupPath, 0644); err != nil {
+	if !io.Exists(backupPath) {
+		if err := io.Mkdir(backupPath, 0644); err != nil {
 			return err
 		}
 	}
@@ -279,25 +280,25 @@ func (s *BackupImpl) PostgresqlBackup(database string) error {
 		return err
 	}
 
-	return tools.Remove(backupPath + "/" + backupFile)
+	return io.Remove(backupPath + "/" + backupFile)
 }
 
 // PostgresqlRestore PostgreSQL恢复
 func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error {
 	backupPath := s.setting.Get(models.SettingKeyBackupPath) + "/postgresql"
 	backupFullPath := filepath.Join(backupPath, backupFile)
-	if !tools.Exists(backupFullPath) {
+	if !io.Exists(backupFullPath) {
 		return errors.New("备份文件不存在")
 	}
 
-	tempDir, err := tools.TempDir(backupFile)
+	tempDir, err := io.TempDir(backupFile)
 	if err != nil {
 		return err
 	}
 
 	if !strings.HasSuffix(backupFile, ".sql") {
 		backupFile = "" // 置空，防止干扰后续判断
-		if err = tools.UnArchive(backupFullPath, tempDir); err != nil {
+		if err = io.UnArchive(backupFullPath, tempDir); err != nil {
 			return err
 		}
 		if files, err := os.ReadDir(tempDir); err == nil {
@@ -309,7 +310,7 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 			}
 		}
 	} else {
-		if err = tools.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
+		if err = io.Cp(backupFullPath, filepath.Join(tempDir, backupFile)); err != nil {
 			return err
 		}
 	}
@@ -322,7 +323,7 @@ func (s *BackupImpl) PostgresqlRestore(database string, backupFile string) error
 		return err
 	}
 
-	if err = tools.Remove(tempDir); err != nil {
+	if err = io.Remove(tempDir); err != nil {
 		return err
 	}
 

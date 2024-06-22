@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -29,7 +30,7 @@ func NewFail2banController() *Fail2banController {
 
 // List 所有 Fail2ban 规则
 func (r *Fail2banController) List(ctx http.Context) http.Response {
-	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -98,7 +99,7 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 	jailWebsiteMode := ctx.Request().Input("website_mode")
 	jailWebsitePath := ctx.Request().Input("website_path")
 
-	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -137,7 +138,7 @@ logpath = /www/wwwlogs/` + website.Name + `.log
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
-		if err = tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+		if err = io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 
@@ -155,7 +156,7 @@ failregex = ^<HOST>\s-.*\s` + jailWebsitePath + `.*HTTP/.*$
 ignoreregex =
 `
 		}
-		if err = tools.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644); err != nil {
+		if err = io.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 
@@ -202,7 +203,7 @@ logpath = ` + logPath + `
 # ` + jailName + `-END
 `
 		raw += rule
-		if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+		if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 	}
@@ -217,7 +218,7 @@ logpath = ` + logPath + `
 // Delete 删除规则
 func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 	jailName := ctx.Request().Input("name")
-	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -228,7 +229,7 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 	rule := tools.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 	raw = strings.Replace(raw, "\n# "+jailName+"-START"+rule+"# "+jailName+"-END", "", -1)
 	raw = strings.TrimSpace(raw)
-	if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+	if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
@@ -302,7 +303,7 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
-	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
@@ -314,7 +315,7 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
 	}
 
-	if err := tools.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
+	if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
@@ -326,7 +327,7 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 
 // GetWhiteList 获取白名单
 func (r *Fail2banController) GetWhiteList(ctx http.Context) http.Response {
-	raw, err := tools.Read("/etc/fail2ban/jail.local")
+	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}

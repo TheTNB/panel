@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -70,14 +71,14 @@ func (r *PureFtpdController) Add(ctx http.Context) http.Response {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
-	if !tools.Exists(path) {
+	if !io.Exists(path) {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "目录不存在")
 	}
 
-	if err := tools.Chmod(path, 0755); err != nil {
+	if err := io.Chmod(path, 0755); err != nil {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "修改目录权限失败")
 	}
-	if err := tools.Chown(path, "www", "www"); err != nil {
+	if err := io.Chown(path, "www", "www"); err != nil {
 		return nil
 	}
 	if out, err := shell.Execf(`yes '` + password + `' | pure-pw useradd ` + username + ` -u www -g www -d ` + path); err != nil {

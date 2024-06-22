@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -99,8 +100,8 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
-	if !tools.Exists(updateRequest.BackupPath) {
-		if err = tools.Mkdir(updateRequest.BackupPath, 0644); err != nil {
+	if !io.Exists(updateRequest.BackupPath) {
+		if err = io.Mkdir(updateRequest.BackupPath, 0644); err != nil {
 			return ErrorSystem(ctx)
 		}
 	}
@@ -111,11 +112,11 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}).Info("保存备份目录失败")
 		return ErrorSystem(ctx)
 	}
-	if !tools.Exists(updateRequest.WebsitePath) {
-		if err = tools.Mkdir(updateRequest.WebsitePath, 0755); err != nil {
+	if !io.Exists(updateRequest.WebsitePath) {
+		if err = io.Mkdir(updateRequest.WebsitePath, 0755); err != nil {
 			return ErrorSystem(ctx)
 		}
-		if err = tools.Chown(updateRequest.WebsitePath, "www", "www"); err != nil {
+		if err = io.Chown(updateRequest.WebsitePath, "www", "www"); err != nil {
 			return ErrorSystem(ctx)
 		}
 	}

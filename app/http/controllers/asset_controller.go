@@ -9,7 +9,7 @@ import (
 
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/io"
 )
 
 type AssetController struct {
@@ -43,7 +43,7 @@ func (r *AssetController) Index(ctx http.Context) http.Response {
 		path = "/index.html"
 	}
 
-	if !tools.Exists("public" + path) {
+	if !io.Exists("public" + path) {
 		return Error(ctx, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 	}
 

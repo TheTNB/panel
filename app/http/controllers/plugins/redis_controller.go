@@ -6,9 +6,9 @@ import (
 	"github.com/goravel/framework/contracts/http"
 
 	"github.com/TheTNB/panel/app/http/controllers"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -22,7 +22,7 @@ func NewRedisController() *RedisController {
 // GetConfig 获取配置
 func (r *RedisController) GetConfig(ctx http.Context) http.Response {
 	// 获取配置
-	config, err := tools.Read("/www/server/redis/redis.conf")
+	config, err := io.Read("/www/server/redis/redis.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
 	}
@@ -37,7 +37,7 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
-	if err := tools.Write("/www/server/redis/redis.conf", config, 0644); err != nil {
+	if err := io.Write("/www/server/redis/redis.conf", config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 

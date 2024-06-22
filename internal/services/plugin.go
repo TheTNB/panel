@@ -8,7 +8,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -122,7 +122,7 @@ func (r *PluginImpl) Install(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	_ = tools.Remove(task.Log)
+	_ = io.Remove(task.Log)
 	return r.task.Process(task.ID)
 }
 
@@ -168,7 +168,7 @@ func (r *PluginImpl) Uninstall(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	_ = tools.Remove(task.Log)
+	_ = io.Remove(task.Log)
 	return r.task.Process(task.ID)
 }
 
@@ -214,6 +214,6 @@ func (r *PluginImpl) Update(slug string) error {
 		return errors.New("创建任务失败")
 	}
 
-	_ = tools.Remove(task.Log)
+	_ = io.Remove(task.Log)
 	return r.task.Process(task.ID)
 }

@@ -5,8 +5,8 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/podman"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type PodmanController struct {
@@ -26,7 +26,7 @@ func NewPodmanController() *PodmanController {
 //	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/podman/registryConfig [get]
 func (r *PodmanController) GetRegistryConfig(ctx http.Context) http.Response {
-	config, err := tools.Read("/etc/containers/registries.conf")
+	config, err := io.Read("/etc/containers/registries.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -51,7 +51,7 @@ func (r *PodmanController) UpdateRegistryConfig(ctx http.Context) http.Response 
 		return sanitize
 	}
 
-	if err := tools.Write("/etc/containers/registries.conf", updateRequest.Config, 0644); err != nil {
+	if err := io.Write("/etc/containers/registries.conf", updateRequest.Config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -72,7 +72,7 @@ func (r *PodmanController) UpdateRegistryConfig(ctx http.Context) http.Response 
 //	@Success		200	{object}	controllers.SuccessResponse
 //	@Router			/plugins/podman/storageConfig [get]
 func (r *PodmanController) GetStorageConfig(ctx http.Context) http.Response {
-	config, err := tools.Read("/etc/containers/storage.conf")
+	config, err := io.Read("/etc/containers/storage.conf")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -97,7 +97,7 @@ func (r *PodmanController) UpdateStorageConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Write("/etc/containers/storage.conf", updateRequest.Config, 0644); err != nil {
+	if err := io.Write("/etc/containers/storage.conf", updateRequest.Config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

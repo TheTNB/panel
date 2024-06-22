@@ -7,8 +7,8 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/frp"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type FrpController struct {
@@ -35,7 +35,7 @@ func (r *FrpController) GetConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	config, err := tools.Read(fmt.Sprintf("/www/server/frp/%s.toml", serviceRequest.Service))
+	config, err := io.Read(fmt.Sprintf("/www/server/frp/%s.toml", serviceRequest.Service))
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -60,7 +60,7 @@ func (r *FrpController) UpdateConfig(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := tools.Write(fmt.Sprintf("/www/server/frp/%s.toml", updateRequest.Service), updateRequest.Config, 0644); err != nil {
+	if err := io.Write(fmt.Sprintf("/www/server/frp/%s.toml", updateRequest.Service), updateRequest.Config, 0644); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

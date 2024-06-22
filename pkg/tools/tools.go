@@ -20,6 +20,7 @@ import (
 	"github.com/shirou/gopsutil/net"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
@@ -393,13 +394,13 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Green().Printfln("下载链接: " + panelInfo.DownloadUrl)
 
 	color.Green().Printfln("前置检查...")
-	if Exists("/tmp/panel-storage.zip") || Exists("/tmp/panel.conf.bak") {
+	if io.Exists("/tmp/panel-storage.zip") || io.Exists("/tmp/panel.conf.bak") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
 	color.Green().Printfln("备份面板数据...")
 	// 备份面板
-	if err := Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
+	if err := io.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
 		color.Red().Printfln("备份面板失败")
 		return err
 	}
@@ -411,7 +412,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		color.Red().Printfln("备份面板配置失败")
 		return err
 	}
-	if !Exists("/tmp/panel-storage.zip") || !Exists("/tmp/panel.conf.bak") {
+	if !io.Exists("/tmp/panel-storage.zip") || !io.Exists("/tmp/panel.conf.bak") {
 		return errors.New("备份面板数据失败")
 	}
 	color.Green().Printfln("备份完成")
@@ -432,7 +433,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		color.Red().Printfln("下载失败")
 		return err
 	}
-	if !Exists("/www/panel/"+panelInfo.DownloadName) || !Exists("/www/panel/"+panelInfo.Checksums) {
+	if !io.Exists("/www/panel/"+panelInfo.DownloadName) || !io.Exists("/www/panel/"+panelInfo.Checksums) {
 		return errors.New("下载失败")
 	}
 	color.Green().Printfln("下载完成")
@@ -442,7 +443,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
-	if err = Remove("/www/panel/" + panelInfo.Checksums); err != nil {
+	if err = io.Remove("/www/panel/" + panelInfo.Checksums); err != nil {
 		color.Red().Printfln("清理临时文件失败")
 		return err
 	}
@@ -453,7 +454,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		color.Red().Printfln("更新失败")
 		return err
 	}
-	if !Exists("/www/panel/panel") {
+	if !io.Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
 	color.Green().Printfln("更新完成")
@@ -471,7 +472,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		color.Red().Printfln("恢复面板脚本失败")
 		return err
 	}
-	if !Exists("/www/panel/storage/panel.db") || !Exists("/www/panel/panel.conf") {
+	if !io.Exists("/www/panel/storage/panel.db") || !io.Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板数据失败")
 	}
 	color.Green().Printfln("恢复完成")
