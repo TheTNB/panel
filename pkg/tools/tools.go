@@ -281,7 +281,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	}
 
 	if isChina {
-		output, err = shell.Execf(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel/releases/` + version + `"`)
+		output, err = shell.Execf(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%%2Fpanel/releases/` + version + `"`)
 	} else {
 		output, err = shell.Execf(`curl -sSL "https://api.github.com/repos/TheTNB/panel/releases/tags/` + version + `"`)
 	}
