@@ -22,7 +22,7 @@ import (
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 // Panel 面板命令行

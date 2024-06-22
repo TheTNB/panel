@@ -1,6 +1,8 @@
 package internal
 
-import "github.com/TheTNB/panel/types"
+import (
+	"github.com/TheTNB/panel/pkg/types"
+)
 
 type PHP interface {
 	Status() (bool, error)

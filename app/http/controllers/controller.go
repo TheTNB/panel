@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+
+	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
 )
 
 // SuccessResponse 通用成功响应

@@ -51,8 +51,8 @@ func GetMonitoringInfo() MonitoringInfo {
 	res.Disk, _ = disk.Partitions(true)
 
 	ioCounters, _ := disk.IOCounters()
-	for _, io := range ioCounters {
-		res.DiskIO = append(res.DiskIO, io)
+	for _, info := range ioCounters {
+		res.DiskIO = append(res.DiskIO, info)
 	}
 
 	for _, partition := range res.Disk {

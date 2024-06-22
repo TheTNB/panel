@@ -10,7 +10,7 @@ import (
 
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 // PanelTask 面板每日任务

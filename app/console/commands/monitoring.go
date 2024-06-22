@@ -13,7 +13,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 // Monitoring 系统监控

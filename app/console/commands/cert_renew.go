@@ -12,7 +12,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 // CertRenew 证书续签

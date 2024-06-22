@@ -13,7 +13,7 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type OpenRestyController struct {

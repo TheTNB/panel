@@ -9,8 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TheTNB/panel/pkg/slice"
 	"github.com/goravel/framework/support"
+
+	"github.com/TheTNB/panel/pkg/slice"
 )
 
 // Execf 执行 shell 命令

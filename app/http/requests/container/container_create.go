@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
 
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type ContainerCreate struct {

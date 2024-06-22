@@ -3,7 +3,7 @@ package internal
 import (
 	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/types"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type Website interface {

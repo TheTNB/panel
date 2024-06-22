@@ -16,7 +16,7 @@ import (
 	"github.com/goravel/framework/support/json"
 
 	requests "github.com/TheTNB/panel/app/http/requests/container"
-	paneltypes "github.com/TheTNB/panel/types"
+	paneltypes "github.com/TheTNB/panel/pkg/types"
 )
 
 type Container struct {

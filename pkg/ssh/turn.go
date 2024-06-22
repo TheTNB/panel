@@ -63,6 +63,7 @@ func (t *Turn) Write(p []byte) (n int, err error) {
 
 	return writer.Write(p)
 }
+
 func (t *Turn) Close() error {
 	if t.Session != nil {
 		t.Session.Close()
