@@ -9,6 +9,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -169,7 +170,7 @@ func (r *PureFtpdController) SetPort(ctx http.Context) http.Response {
 		}
 	}
 
-	if err := tools.ServiceRestart("pure-ftpd"); err != nil {
+	if err := systemctl.Restart("pure-ftpd"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

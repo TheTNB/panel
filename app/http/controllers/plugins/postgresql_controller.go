@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -61,7 +62,7 @@ func (r *PostgreSQLController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
-	if err := tools.ServiceReload("postgresql"); err != nil {
+	if err := systemctl.Reload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
 	}
 
@@ -79,7 +80,7 @@ func (r *PostgreSQLController) SaveUserConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入PostgreSQL配置失败")
 	}
 
-	if err := tools.ServiceReload("postgresql"); err != nil {
+	if err := systemctl.Reload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
 	}
 
@@ -88,7 +89,7 @@ func (r *PostgreSQLController) SaveUserConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *PostgreSQLController) Load(ctx http.Context) http.Response {
-	status, _ := tools.ServiceStatus("postgresql")
+	status, _ := systemctl.Status("postgresql")
 	if !status {
 		return controllers.Success(ctx, []types.NV{})
 	}
@@ -230,7 +231,7 @@ func (r *PostgreSQLController) AddDatabase(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if err := tools.ServiceReload("postgresql"); err != nil {
+	if err := systemctl.Reload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
 	}
 
@@ -441,7 +442,7 @@ func (r *PostgreSQLController) AddRole(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if err := tools.ServiceReload("postgresql"); err != nil {
+	if err := systemctl.Reload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
 	}
 
@@ -464,7 +465,7 @@ func (r *PostgreSQLController) DeleteRole(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if err := tools.ServiceReload("postgresql"); err != nil {
+	if err := systemctl.Reload("postgresql"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载服务失败")
 	}
 

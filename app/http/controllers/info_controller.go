@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -109,7 +110,7 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 	}
 	var databaseCount int64
 	if mysqlInstalled {
-		status, err := tools.ServiceStatus("mysqld")
+		status, err := systemctl.Status("mysqld")
 		if status && err == nil {
 			rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 			type database struct {
@@ -151,7 +152,7 @@ func (r *InfoController) CountInfo(ctx http.Context) http.Response {
 		}
 	}
 	if postgresqlInstalled {
-		status, err := tools.ServiceStatus("postgresql")
+		status, err := systemctl.Status("postgresql")
 		if status && err == nil {
 			raw, err := shell.Execf(`echo "\l" | su - postgres -c "psql"`)
 			if err == nil {

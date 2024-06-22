@@ -14,6 +14,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -29,7 +30,7 @@ func NewPHPImpl(version uint) *PHPImpl {
 }
 
 func (r *PHPImpl) Reload() error {
-	return tools.ServiceReload("php-fpm-" + r.version)
+	return systemctl.Reload("php-fpm-" + r.version)
 }
 
 func (r *PHPImpl) GetConfig() (string, error) {

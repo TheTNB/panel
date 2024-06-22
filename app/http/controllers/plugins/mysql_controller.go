@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -50,7 +51,7 @@ func (r *MySQLController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 	}
 
-	if err := tools.ServiceReload("mysqld"); err != nil {
+	if err := systemctl.Reload("mysqld"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
 	}
 
@@ -64,7 +65,7 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
-	status, _ := tools.ServiceStatus("mysqld")
+	status, _ := systemctl.Status("mysqld")
 	if !status {
 		return controllers.Success(ctx, []types.NV{})
 	}
@@ -173,7 +174,7 @@ func (r *MySQLController) GetRootPassword(ctx http.Context) http.Response {
 
 // SetRootPassword 设置root密码
 func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("mysqld")
+	status, err := systemctl.Status("mysqld")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
 	}

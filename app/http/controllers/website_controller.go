@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -577,7 +578,7 @@ server
 	if err := tools.Write("/www/server/vhost/rewrite"+website.Name+".conf", "", 0644); err != nil {
 		return nil
 	}
-	if err := tools.ServiceReload("openresty"); err != nil {
+	if err := systemctl.Reload("openresty"); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -643,7 +644,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	if err = tools.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return ErrorSystem(ctx)
 	}
-	if err = tools.ServiceReload("openresty"); err != nil {
+	if err = systemctl.Reload("openresty"); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

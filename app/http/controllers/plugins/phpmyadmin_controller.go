@@ -11,6 +11,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -86,7 +87,7 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		}
 	}
 
-	if err := tools.ServiceReload("openresty"); err != nil {
+	if err := systemctl.Reload("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
 	}
 

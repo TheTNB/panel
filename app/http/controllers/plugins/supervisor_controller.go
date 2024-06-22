@@ -9,6 +9,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -84,7 +85,7 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err = tools.ServiceRestart(r.service); err != nil {
+	if err = systemctl.Restart(r.service); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", r.service))
 	}
 

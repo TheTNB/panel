@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -38,32 +39,32 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 	var err error
 	if ctx.Request().InputBool("status") {
 		if tools.IsRHEL() {
-			err = tools.ServiceStart("firewalld")
+			err = systemctl.Start("firewalld")
 			if err == nil {
-				err = tools.ServiceEnable("firewalld")
+				err = systemctl.Enable("firewalld")
 			}
 		} else {
 			_, err = shell.Execf("echo y | ufw enable")
 			if err == nil {
-				err = tools.ServiceStart("ufw")
+				err = systemctl.Start("ufw")
 			}
 			if err == nil {
-				err = tools.ServiceEnable("ufw")
+				err = systemctl.Enable("ufw")
 			}
 		}
 	} else {
 		if tools.IsRHEL() {
-			err = tools.ServiceStop("firewalld")
+			err = systemctl.Stop("firewalld")
 			if err == nil {
-				err = tools.ServiceDisable("firewalld")
+				err = systemctl.Disable("firewalld")
 			}
 		} else {
 			_, err = shell.Execf("ufw disable")
 			if err == nil {
-				err = tools.ServiceStop("ufw")
+				err = systemctl.Stop("ufw")
 			}
 			if err == nil {
-				err = tools.ServiceDisable("ufw")
+				err = systemctl.Disable("ufw")
 			}
 		}
 	}
@@ -222,9 +223,9 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 func (r *SafeController) firewallStatus() bool {
 	var running bool
 	if tools.IsRHEL() {
-		running, _ = tools.ServiceStatus("firewalld")
+		running, _ = systemctl.Status("firewalld")
 	} else {
-		running, _ = tools.ServiceStatus("ufw")
+		running, _ = systemctl.Status("ufw")
 	}
 
 	return running
@@ -232,7 +233,7 @@ func (r *SafeController) firewallStatus() bool {
 
 // GetSshStatus 获取 SSH 状态
 func (r *SafeController) GetSshStatus(ctx http.Context) http.Response {
-	running, err := tools.ServiceStatus(r.ssh)
+	running, err := systemctl.Status(r.ssh)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -243,17 +244,17 @@ func (r *SafeController) GetSshStatus(ctx http.Context) http.Response {
 // SetSshStatus 设置 SSH 状态
 func (r *SafeController) SetSshStatus(ctx http.Context) http.Response {
 	if ctx.Request().InputBool("status") {
-		if err := tools.ServiceEnable(r.ssh); err != nil {
+		if err := systemctl.Enable(r.ssh); err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}
-		if err := tools.ServiceStart(r.ssh); err != nil {
+		if err := systemctl.Start(r.ssh); err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	} else {
-		if err := tools.ServiceStop(r.ssh); err != nil {
+		if err := systemctl.Stop(r.ssh); err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}
-		if err := tools.ServiceDisable(r.ssh); err != nil {
+		if err := systemctl.Disable(r.ssh); err != nil {
 			return Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
@@ -285,9 +286,9 @@ func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 	_, _ = shell.Execf("sed -i 's/#Port %s/Port %d/g' /etc/ssh/sshd_config", oldPort, port)
 	_, _ = shell.Execf("sed -i 's/Port %s/Port %d/g' /etc/ssh/sshd_config", oldPort, port)
 
-	status, _ := tools.ServiceStatus(r.ssh)
+	status, _ := systemctl.Status(r.ssh)
 	if status {
-		_ = tools.ServiceRestart(r.ssh)
+		_ = systemctl.Restart(r.ssh)
 	}
 
 	return Success(ctx, nil)

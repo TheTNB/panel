@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -136,7 +137,7 @@ secrets file = /etc/rsyncd.secrets
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if err := tools.ServiceRestart("rsyncd"); err != nil {
+	if err := systemctl.Restart("rsyncd"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -182,7 +183,7 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err = tools.ServiceRestart("rsyncd"); err != nil {
+	if err = systemctl.Restart("rsyncd"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -243,7 +244,7 @@ secrets file = /etc/rsyncd.secrets
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if err = tools.ServiceRestart("rsyncd"); err != nil {
+	if err = systemctl.Restart("rsyncd"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -289,7 +290,7 @@ func (r *RsyncController) UpdateConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err := tools.ServiceRestart("rsyncd"); err != nil {
+	if err := systemctl.Restart("rsyncd"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

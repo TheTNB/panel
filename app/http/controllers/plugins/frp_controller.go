@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/frp"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -63,7 +64,7 @@ func (r *FrpController) UpdateConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err := tools.ServiceRestart(updateRequest.Service); err != nil {
+	if err := systemctl.Restart(updateRequest.Service); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

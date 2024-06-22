@@ -5,7 +5,7 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
 type SystemController struct {
@@ -32,7 +32,7 @@ func (r *SystemController) ServiceStatus(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Query("service")
-	status, err := tools.ServiceStatus(service)
+	status, err := systemctl.Status(service)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("获取 %s 服务运行状态失败", service))
 	}
@@ -57,7 +57,7 @@ func (r *SystemController) ServiceIsEnabled(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Query("service")
-	enabled, err := tools.ServiceIsEnabled(service)
+	enabled, err := systemctl.IsEnabled(service)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("获取 %s 服务启用状态失败", service))
 	}
@@ -82,7 +82,7 @@ func (r *SystemController) ServiceEnable(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceEnable(service); err != nil {
+	if err := systemctl.Enable(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("启用 %s 服务失败", service))
 	}
 
@@ -106,7 +106,7 @@ func (r *SystemController) ServiceDisable(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceDisable(service); err != nil {
+	if err := systemctl.Disable(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("禁用 %s 服务失败", service))
 	}
 
@@ -130,7 +130,7 @@ func (r *SystemController) ServiceRestart(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceRestart(service); err != nil {
+	if err := systemctl.Restart(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", service))
 	}
 
@@ -154,7 +154,7 @@ func (r *SystemController) ServiceReload(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceReload(service); err != nil {
+	if err := systemctl.Reload(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载 %s 服务失败", service))
 	}
 
@@ -178,7 +178,7 @@ func (r *SystemController) ServiceStart(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceStart(service); err != nil {
+	if err := systemctl.Start(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("启动 %s 服务失败", service))
 	}
 
@@ -202,7 +202,7 @@ func (r *SystemController) ServiceStop(ctx http.Context) http.Response {
 	}
 
 	service := ctx.Request().Input("service")
-	if err := tools.ServiceStop(service); err != nil {
+	if err := systemctl.Stop(service); err != nil {
 		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("停止 %s 服务失败", service))
 	}
 

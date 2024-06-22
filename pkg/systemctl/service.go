@@ -1,4 +1,4 @@
-package tools
+package systemctl
 
 import (
 	"errors"
@@ -8,14 +8,14 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
-// ServiceStatus 获取服务状态
-func ServiceStatus(name string) (bool, error) {
+// Status 获取服务状态
+func Status(name string) (bool, error) {
 	output, err := shell.Execf("systemctl status %s | grep Active | grep -v grep | awk '{print $2}'", name)
 	return output == "active", err
 }
 
-// ServiceIsEnabled 服务是否启用
-func ServiceIsEnabled(name string) (bool, error) {
+// IsEnabled 服务是否启用
+func IsEnabled(name string) (bool, error) {
 	cmd := exec.Command("systemctl", "is-enabled", name)
 	output, _ := cmd.CombinedOutput()
 	status := strings.TrimSpace(string(output))
@@ -36,38 +36,38 @@ func ServiceIsEnabled(name string) (bool, error) {
 	}
 }
 
-// ServiceStart 启动服务
-func ServiceStart(name string) error {
+// Start 启动服务
+func Start(name string) error {
 	_, err := shell.Execf("systemctl start %s", name)
 	return err
 }
 
-// ServiceStop 停止服务
-func ServiceStop(name string) error {
+// Stop 停止服务
+func Stop(name string) error {
 	_, err := shell.Execf("systemctl stop %s", name)
 	return err
 }
 
-// ServiceRestart 重启服务
-func ServiceRestart(name string) error {
+// Restart 重启服务
+func Restart(name string) error {
 	_, err := shell.Execf("systemctl restart %s", name)
 	return err
 }
 
-// ServiceReload 重载服务
-func ServiceReload(name string) error {
+// Reload 重载服务
+func Reload(name string) error {
 	_, err := shell.Execf("systemctl reload %s", name)
 	return err
 }
 
-// ServiceEnable 启用服务
-func ServiceEnable(name string) error {
+// Enable 启用服务
+func Enable(name string) error {
 	_, err := shell.Execf("systemctl enable %s", name)
 	return err
 }
 
-// ServiceDisable 禁用服务
-func ServiceDisable(name string) error {
+// Disable 禁用服务
+func Disable(name string) error {
 	_, err := shell.Execf("systemctl disable %s", name)
 	return err
 }

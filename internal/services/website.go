@@ -17,6 +17,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -280,7 +281,7 @@ server
 		return models.Website{}, err
 	}
 
-	if err := tools.ServiceReload("openresty"); err != nil {
+	if err := systemctl.Reload("openresty"); err != nil {
 		return models.Website{}, err
 	}
 
@@ -298,7 +299,7 @@ server
 		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
 		userConfig := "host    " + website.DbName + "    " + website.DbUser + "    127.0.0.1/32    scram-sha-256"
 		_, _ = shell.Execf(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
-		_ = tools.ServiceReload("postgresql")
+		_ = systemctl.Reload("postgresql")
 	}
 
 	return w, nil
@@ -324,7 +325,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		if err = tools.Write("/www/server/vhost/"+website.Name+".conf", config.Raw, 0644); err != nil {
 			return err
 		}
-		if err = tools.ServiceReload("openresty"); err != nil {
+		if err = systemctl.Reload("openresty"); err != nil {
 			return err
 		}
 
@@ -516,7 +517,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 
-	return tools.ServiceReload("openresty")
+	return systemctl.Reload("openresty")
 }
 
 // Delete 删除网站
@@ -550,7 +551,7 @@ func (r *WebsiteImpl) Delete(id uint) error {
 		return err
 	}
 
-	return tools.ServiceReload("openresty")
+	return systemctl.Reload("openresty")
 }
 
 // GetConfig 获取网站配置

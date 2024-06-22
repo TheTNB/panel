@@ -5,6 +5,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	requests "github.com/TheTNB/panel/app/http/requests/plugins/podman"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -54,7 +55,7 @@ func (r *PodmanController) UpdateRegistryConfig(ctx http.Context) http.Response 
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err := tools.ServiceRestart("podman"); err != nil {
+	if err := systemctl.Restart("podman"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -100,7 +101,7 @@ func (r *PodmanController) UpdateStorageConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	if err := tools.ServiceRestart("podman"); err != nil {
+	if err := systemctl.Restart("podman"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 

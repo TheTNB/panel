@@ -18,6 +18,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -105,7 +106,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		}
 
 		// 停止面板服务，因为在shell中运行的和systemd的不同
-		_ = tools.ServiceStop("panel")
+		_ = systemctl.Stop("panel")
 
 		types.Status = types.StatusUpgrade
 		if err = tools.UpdatePanel(panel); err != nil {

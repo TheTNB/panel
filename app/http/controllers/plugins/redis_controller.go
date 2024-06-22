@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
@@ -40,7 +41,7 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 
-	if err := tools.ServiceRestart("redis"); err != nil {
+	if err := systemctl.Restart("redis"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
 	}
 
@@ -49,7 +50,7 @@ func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 
 // Load 获取负载
 func (r *RedisController) Load(ctx http.Context) http.Response {
-	status, err := tools.ServiceStatus("redis")
+	status, err := systemctl.Status("redis")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}

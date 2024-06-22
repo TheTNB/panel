@@ -12,6 +12,7 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/cert"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -277,7 +278,7 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.ServiceReload("openresty"); err != nil {
+		if err = systemctl.Reload("openresty"); err != nil {
 			return acme.Certificate{}, err
 		}
 	}
@@ -317,7 +318,7 @@ func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.ServiceReload("openresty"); err != nil {
+		if err = systemctl.Reload("openresty"); err != nil {
 			return acme.Certificate{}, err
 		}
 	}
@@ -402,7 +403,7 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 		if err = tools.Write("/www/server/vhost/ssl/"+cert.Website.Name+".key", cert.Key, 0644); err != nil {
 			return acme.Certificate{}, err
 		}
-		if err = tools.ServiceReload("openresty"); err != nil {
+		if err = systemctl.Reload("openresty"); err != nil {
 			return acme.Certificate{}, err
 		}
 	}
@@ -434,7 +435,7 @@ func (s *CertImpl) Deploy(ID, WebsiteID uint) error {
 	if err = tools.Write("/www/server/vhost/ssl/"+website.Name+".key", cert.Key, 0644); err != nil {
 		return err
 	}
-	if err = tools.ServiceReload("openresty"); err != nil {
+	if err = systemctl.Reload("openresty"); err != nil {
 		return err
 	}
 

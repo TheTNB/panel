@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
@@ -23,14 +24,14 @@ func (r *CronImpl) AddToSystem(cron models.Cron) error {
 		if _, err := shell.Execf(fmt.Sprintf(`echo "%s %s >> %s 2>&1" >> /var/spool/cron/root`, cron.Time, cron.Shell, cron.Log)); err != nil {
 			return err
 		}
-		return tools.ServiceRestart("crond")
+		return systemctl.Restart("crond")
 	}
 
 	if tools.IsDebian() {
 		if _, err := shell.Execf(fmt.Sprintf(`echo "%s %s >> %s 2>&1" >> /var/spool/cron/crontabs/root`, cron.Time, cron.Shell, cron.Log)); err != nil {
 			return err
 		}
-		return tools.ServiceRestart("cron")
+		return systemctl.Restart("cron")
 	}
 
 	return errors.New("不支持的系统")
@@ -44,14 +45,14 @@ func (r *CronImpl) DeleteFromSystem(cron models.Cron) error {
 		if _, err := shell.Execf("sed -i '/" + cron.Shell + "/d' /var/spool/cron/root"); err != nil {
 			return err
 		}
-		return tools.ServiceRestart("crond")
+		return systemctl.Restart("crond")
 	}
 
 	if tools.IsDebian() {
 		if _, err := shell.Execf("sed -i '/" + cron.Shell + "/d' /var/spool/cron/crontabs/root"); err != nil {
 			return err
 		}
-		return tools.ServiceRestart("cron")
+		return systemctl.Restart("cron")
 	}
 
 	return errors.New("不支持的系统")
