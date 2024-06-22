@@ -1,7 +1,6 @@
 package plugins
 
 import (
-	"os"
 	"regexp"
 	"strings"
 
@@ -11,9 +10,9 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type PhpMyAdminController struct {
@@ -24,7 +23,7 @@ func NewPhpMyAdminController() *PhpMyAdminController {
 }
 
 func (r *PhpMyAdminController) Info(ctx http.Context) http.Response {
-	files, err := os.ReadDir("/www/server/phpmyadmin")
+	files, err := io.ReadDir("/www/server/phpmyadmin")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "找不到 phpMyAdmin 目录")
 	}
@@ -72,7 +71,7 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		return controllers.ErrorSystem(ctx)
 	}
 
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		if out, err := shell.Execf("firewall-cmd --zone=public --add-port=%d/tcp --permanent", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}

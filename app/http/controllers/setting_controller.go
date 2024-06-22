@@ -10,6 +10,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -162,7 +163,7 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		if out, err := shell.Execf("sed -i 's/APP_PORT=%s/APP_PORT=%s/g' /www/panel/panel.conf", oldPort, port); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
-		if tools.IsRHEL() {
+		if os.IsRHEL() {
 			if out, err := shell.Execf("firewall-cmd --remove-port=%s/tcp --permanent", oldPort); err != nil {
 				return Error(ctx, http.StatusInternalServerError, out)
 			}

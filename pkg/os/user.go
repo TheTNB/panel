@@ -1,8 +1,9 @@
-package tools
+package os
 
 import (
-	"github.com/spf13/cast"
 	"os/user"
+
+	"github.com/spf13/cast"
 )
 
 // GetUser 通过 uid 获取用户名

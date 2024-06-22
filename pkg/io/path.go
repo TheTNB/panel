@@ -1,14 +1,11 @@
 package io
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/goravel/framework/support/env"
 )
 
 // Remove 删除文件/目录
@@ -23,20 +20,12 @@ func Mkdir(path string, permission os.FileMode) error {
 
 // Chmod 修改文件/目录权限
 func Chmod(path string, permission os.FileMode) error {
-	if env.IsWindows() {
-		return errors.New("chmod is not supported on Windows")
-	}
-
 	cmd := exec.Command("chmod", "-R", fmt.Sprintf("%o", permission), path)
 	return cmd.Run()
 }
 
 // Chown 修改文件或目录所有者
 func Chown(path, user, group string) error {
-	if env.IsWindows() {
-		return errors.New("chown is not supported on Windows")
-	}
-
 	cmd := exec.Command("chown", "-R", user+":"+group, path)
 	return cmd.Run()
 }
@@ -154,4 +143,9 @@ func Size(path string) (int64, error) {
 // TempDir 创建临时目录
 func TempDir(prefix string) (string, error) {
 	return os.MkdirTemp("", prefix)
+}
+
+// ReadDir 读取目录
+func ReadDir(path string) ([]os.DirEntry, error) {
+	return os.ReadDir(path)
 }

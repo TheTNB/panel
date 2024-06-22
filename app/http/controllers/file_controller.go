@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	stdio "io"
-	"os"
+	stdos "os"
 	"path/filepath"
 	"strings"
 	"syscall"
@@ -13,6 +13,7 @@ import (
 
 	requests "github.com/TheTNB/panel/app/http/requests/file"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -353,7 +354,7 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := io.Chmod(request.Path, os.FileMode(request.Mode)); err != nil {
+	if err := io.Chmod(request.Path, stdos.FileMode(request.Mode)); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err := io.Chown(request.Path, request.Owner, request.Group); err != nil {
@@ -432,8 +433,8 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	paths := make(map[string]os.FileInfo)
-	err := filepath.Walk(request.Path, func(path string, info os.FileInfo, err error) error {
+	paths := make(map[string]stdos.FileInfo)
+	err := filepath.Walk(request.Path, func(path string, info stdos.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -467,7 +468,7 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	fileInfoList, err := os.ReadDir(request.Path)
+	fileInfoList, err := io.ReadDir(request.Path)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
@@ -483,8 +484,8 @@ func (r *FileController) List(ctx http.Context) http.Response {
 			"size":     tools.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
-			"owner":    tools.GetUser(stat.Uid),
-			"group":    tools.GetGroup(stat.Gid),
+			"owner":    os.GetUser(stat.Uid),
+			"group":    os.GetGroup(stat.Gid),
 			"uid":      stat.Uid,
 			"gid":      stat.Gid,
 			"hidden":   io.IsHidden(info.Name()),
@@ -505,6 +506,6 @@ func (r *FileController) List(ctx http.Context) http.Response {
 
 // setPermission
 func (r *FileController) setPermission(path string, mode uint, owner, group string) {
-	_ = io.Chmod(path, os.FileMode(mode))
+	_ = io.Chmod(path, stdos.FileMode(mode))
 	_ = io.Chown(path, owner, group)
 }

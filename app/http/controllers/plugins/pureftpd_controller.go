@@ -9,9 +9,9 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
 )
 
@@ -155,7 +155,7 @@ func (r *PureFtpdController) SetPort(ctx http.Context) http.Response {
 	if out, err := shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%s/g" /www/server/pure-ftpd/etc/pure-ftpd.conf`, port); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, out)
 	}
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		if out, err := shell.Execf("firewall-cmd --zone=public --add-port=%s/tcp --permanent", port); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, out)
 		}

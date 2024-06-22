@@ -9,9 +9,9 @@ import (
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SupervisorController struct {
@@ -20,7 +20,7 @@ type SupervisorController struct {
 
 func NewSupervisorController() *SupervisorController {
 	var service string
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		service = "supervisord"
 	} else {
 		service = "supervisor"
@@ -59,7 +59,7 @@ func (r *SupervisorController) ClearLog(ctx http.Context) http.Response {
 func (r *SupervisorController) Config(ctx http.Context) http.Response {
 	var config string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		config, err = io.Read(`/etc/supervisord.conf`)
 	} else {
 		config, err = io.Read(`/etc/supervisor/supervisord.conf`)
@@ -76,7 +76,7 @@ func (r *SupervisorController) Config(ctx http.Context) http.Response {
 func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		err = io.Write(`/etc/supervisord.conf`, config, 0644)
 	} else {
 		err = io.Write(`/etc/supervisor/supervisord.conf`, config, 0644)
@@ -173,7 +173,7 @@ func (r *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	var logPath string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
@@ -196,7 +196,7 @@ func (r *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	var logPath string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
@@ -218,7 +218,7 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 	process := ctx.Request().Query("process")
 	var config string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		config, err = io.Read(`/etc/supervisord.d/` + process + `.conf`)
 	} else {
 		config, err = io.Read(`/etc/supervisor/conf.d/` + process + `.conf`)
@@ -236,7 +236,7 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 	process := ctx.Request().Input("process")
 	config := ctx.Request().Input("config")
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		err = io.Write(`/etc/supervisord.d/`+process+`.conf`, config, 0644)
 	} else {
 		err = io.Write(`/etc/supervisor/conf.d/`+process+`.conf`, config, 0644)
@@ -284,7 +284,7 @@ stdout_logfile_maxbytes=2MB
 `
 
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		err = io.Write(`/etc/supervisord.d/`+name+`.conf`, config, 0644)
 	} else {
 		err = io.Write(`/etc/supervisor/conf.d/`+name+`.conf`, config, 0644)
@@ -310,7 +310,7 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 
 	var logPath string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 		if err := io.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
 			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())

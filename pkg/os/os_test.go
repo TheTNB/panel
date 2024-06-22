@@ -1,9 +1,8 @@
-package tools
+package os
 
 import (
 	"testing"
 
-	"github.com/goravel/framework/support/env"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,15 +15,9 @@ func TestOSHelperTestSuite(t *testing.T) {
 }
 
 func (s *OSHelperTestSuite) TestIsDebian() {
-	if env.IsWindows() {
-		return
-	}
 	s.True(IsDebian())
 }
 
 func (s *OSHelperTestSuite) TestIsRHEL() {
-	if env.IsWindows() {
-		return
-	}
 	s.False(IsRHEL())
 }

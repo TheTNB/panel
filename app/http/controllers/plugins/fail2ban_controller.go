@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/types"
@@ -167,7 +168,7 @@ ignoreregex =
 		var err error
 		switch jailName {
 		case "ssh":
-			if tools.IsDebian() {
+			if os.IsDebian() {
 				logPath = "/var/log/auth.log"
 			} else {
 				logPath = "/var/log/secure"

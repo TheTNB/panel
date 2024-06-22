@@ -8,9 +8,9 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SafeController struct {
@@ -19,7 +19,7 @@ type SafeController struct {
 
 func NewSafeController() *SafeController {
 	var ssh string
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		ssh = "sshd"
 	} else {
 		ssh = "ssh"
@@ -39,7 +39,7 @@ func (r *SafeController) GetFirewallStatus(ctx http.Context) http.Response {
 func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 	var err error
 	if ctx.Request().InputBool("status") {
-		if tools.IsRHEL() {
+		if os.IsRHEL() {
 			err = systemctl.Start("firewalld")
 			if err == nil {
 				err = systemctl.Enable("firewalld")
@@ -54,7 +54,7 @@ func (r *SafeController) SetFirewallStatus(ctx http.Context) http.Response {
 			}
 		}
 	} else {
-		if tools.IsRHEL() {
+		if os.IsRHEL() {
 			err = systemctl.Stop("firewalld")
 			if err == nil {
 				err = systemctl.Disable("firewalld")
@@ -84,7 +84,7 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 	}
 
 	var rules []map[string]string
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		out, err := shell.Execf("firewall-cmd --list-all")
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
@@ -160,7 +160,7 @@ func (r *SafeController) AddFirewallRule(ctx http.Context) http.Response {
 		}
 	}
 
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		if out, err := shell.Execf("firewall-cmd --remove-port=%s/%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -201,7 +201,7 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
 
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		if out, err := shell.Execf("firewall-cmd --remove-port=%s/%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -223,7 +223,7 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 // firewallStatus 获取防火墙状态
 func (r *SafeController) firewallStatus() bool {
 	var running bool
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		running, _ = systemctl.Status("firewalld")
 	} else {
 		running, _ = systemctl.Status("ufw")
@@ -297,7 +297,7 @@ func (r *SafeController) SetSshPort(ctx http.Context) http.Response {
 
 // GetPingStatus 获取 Ping 状态
 func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		out, err := shell.Execf(`firewall-cmd --list-all`)
 		if err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
@@ -325,7 +325,7 @@ func (r *SafeController) GetPingStatus(ctx http.Context) http.Response {
 func (r *SafeController) SetPingStatus(ctx http.Context) http.Response {
 	var out string
 	var err error
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		if ctx.Request().InputBool("status") {
 			out, err = shell.Execf(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
 		} else {
@@ -343,7 +343,7 @@ func (r *SafeController) SetPingStatus(ctx http.Context) http.Response {
 		return Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	if tools.IsRHEL() {
+	if os.IsRHEL() {
 		out, err = shell.Execf(`firewall-cmd --reload`)
 	} else {
 		out, err = shell.Execf(`ufw reload`)
