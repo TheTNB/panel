@@ -270,6 +270,9 @@ server
 	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
 		return models.Website{}, err
 	}
+	if err := io.Write("/www/server/vhost/acme/"+website.Name+".conf", "", 0644); err != nil {
+		return models.Website{}, err
+	}
 	if err := io.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
 		return models.Website{}, err
 	}
