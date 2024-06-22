@@ -84,8 +84,6 @@ definitions:
         type: string
       port:
         type: integer
-      ssl:
-        type: boolean
       username:
         type: string
       website_path:
@@ -387,6 +385,15 @@ definitions:
   requests.Exist:
     properties:
       path:
+        type: string
+    type: object
+  requests.Https:
+    properties:
+      cert:
+        type: string
+      https:
+        type: boolean
+      key:
         type: string
     type: object
   requests.ImagePull:
@@ -2384,9 +2391,44 @@ paths:
       summary: 更新插件首页显示状态
       tags:
       - 插件
+  /panel/setting/https:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 获取面板 HTTPS 设置
+      tags:
+      - 面板设置
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Https'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 更新面板 HTTPS 设置
+      tags:
+      - 面板设置
   /panel/setting/list:
     get:
-      description: 获取面板设置列表
       produces:
       - application/json
       responses:
@@ -2403,7 +2445,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: 更新面板设置
       parameters:
       - description: request
         in: body

@@ -4,20 +4,17 @@ import (
 	"context"
 	"crypto"
 	"crypto/ecdsa"
-	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"errors"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/mholt/acmez/v2"
 	"github.com/mholt/acmez/v2/acme"
 	"go.uber.org/zap"
+
+	"github.com/TheTNB/panel/pkg/cert"
 )
 
 const (
@@ -77,7 +74,7 @@ func NewPrivateKeyAccount(email string, privateKey string, CA string, eab *EAB) 
 		return nil, err
 	}
 
-	key, err := parsePrivateKey([]byte(privateKey))
+	key, err := cert.ParseKey(privateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -102,36 +99,6 @@ func NewPrivateKeyAccount(email string, privateKey string, CA string, eab *EAB) 
 	return &Client{Account: account, zClient: client}, nil
 }
 
-func parsePrivateKey(key []byte) (crypto.Signer, error) {
-	keyBlockDER, _ := pem.Decode(key)
-	if keyBlockDER == nil {
-		return nil, errors.New("invalid PEM block")
-	}
-
-	if keyBlockDER.Type != "PRIVATE KEY" && !strings.HasSuffix(keyBlockDER.Type, " PRIVATE KEY") {
-		return nil, fmt.Errorf("unknown PEM header %q", keyBlockDER.Type)
-	}
-
-	if parse, err := x509.ParsePKCS1PrivateKey(keyBlockDER.Bytes); err == nil {
-		return parse, nil
-	}
-
-	if parse, err := x509.ParsePKCS8PrivateKey(keyBlockDER.Bytes); err == nil {
-		switch parse.(type) {
-		case *rsa.PrivateKey, *ecdsa.PrivateKey, ed25519.PrivateKey:
-			return parse.(crypto.Signer), nil
-		default:
-			return nil, fmt.Errorf("found unknown private key type in PKCS#8 wrapping: %T", key)
-		}
-	}
-
-	if parse, err := x509.ParseECPrivateKey(keyBlockDER.Bytes); err == nil {
-		return parse, nil
-	}
-
-	return nil, errors.New("解析私钥失败")
-}
-
 func generatePrivateKey(keyType KeyType) (crypto.Signer, error) {
 	switch keyType {
 	case KeyEC256:
@@ -147,34 +114,6 @@ func generatePrivateKey(keyType KeyType) (crypto.Signer, error) {
 	}
 
 	return nil, errors.New("未知的密钥类型")
-}
-
-func EncodePrivateKey(key crypto.Signer) ([]byte, error) {
-	var pemType string
-	var keyBytes []byte
-	switch key := key.(type) {
-	case *ecdsa.PrivateKey:
-		var err error
-		pemType = "EC"
-		keyBytes, err = x509.MarshalECPrivateKey(key)
-		if err != nil {
-			return nil, err
-		}
-	case *rsa.PrivateKey:
-		pemType = "RSA"
-		keyBytes = x509.MarshalPKCS1PrivateKey(key)
-	case ed25519.PrivateKey:
-		var err error
-		pemType = "ED25519"
-		keyBytes, err = x509.MarshalPKCS8PrivateKey(key)
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("未知的密钥类型 %T", key)
-	}
-	pemKey := pem.Block{Type: pemType + " PRIVATE KEY", Bytes: keyBytes}
-	return pem.EncodeToMemory(&pemKey), nil
 }
 
 func getClient(CA string) (acmez.Client, error) {

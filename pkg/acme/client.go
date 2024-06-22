@@ -7,6 +7,8 @@ import (
 	"github.com/libdns/libdns"
 	"github.com/mholt/acmez/v2"
 	"github.com/mholt/acmez/v2/acme"
+
+	"github.com/TheTNB/panel/pkg/cert"
 )
 
 type Certificate struct {
@@ -61,7 +63,7 @@ func (c *Client) ObtainSSL(ctx context.Context, domains []string, keyType KeyTyp
 	if err != nil {
 		return Certificate{}, err
 	}
-	pemPrivateKey, err := EncodePrivateKey(certPrivateKey)
+	pemPrivateKey, err := cert.EncodeKey(certPrivateKey)
 	if err != nil {
 		return Certificate{}, err
 	}

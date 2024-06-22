@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -27,13 +28,12 @@ func NewSettingController() *SettingController {
 
 // List
 //
-//	@Summary		设置列表
-//	@Description	获取面板设置列表
-//	@Tags			面板设置
-//	@Produce		json
-//	@Security		BearerToken
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/panel/setting/list [get]
+//	@Summary	设置列表
+//	@Tags		面板设置
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/setting/list [get]
 func (r *SettingController) List(ctx http.Context) http.Response {
 	var settings []models.Setting
 	err := facades.Orm().Query().Get(&settings)
@@ -77,15 +77,14 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 
 // Update
 //
-//	@Summary		更新设置
-//	@Description	更新面板设置
-//	@Tags			面板设置
-//	@Accept			json
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.Update	true	"request"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/panel/setting/update [post]
+//	@Summary	更新设置
+//	@Tags		面板设置
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	body		requests.Update	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/setting/update [post]
 func (r *SettingController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
 	sanitize := SanitizeRequest(ctx, &updateRequest)
@@ -213,7 +212,70 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}
 	}
 
-	if updateRequest.SSL {
+	if oldPort != port || oldEntrance != entrance || oldLanguage != updateRequest.Language {
+		tools.RestartPanel()
+	}
+
+	return Success(ctx, nil)
+}
+
+// GetHttps
+//
+//	@Summary	获取面板 HTTPS 设置
+//	@Tags		面板设置
+//	@Produce	json
+//	@Security	BearerToken
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/setting/https [get]
+func (r *SettingController) GetHttps(ctx http.Context) http.Response {
+	certPath := facades.Config().GetString("http.tls.ssl.cert")
+	keyPath := facades.Config().GetString("http.tls.ssl.key")
+	crt, err := io.Read(certPath)
+	if err != nil {
+		return ErrorSystem(ctx)
+	}
+	key, err := io.Read(keyPath)
+	if err != nil {
+		return ErrorSystem(ctx)
+	}
+
+	return Success(ctx, http.Json{
+		"https": facades.Config().GetBool("panel.ssl"),
+		"cert":  crt,
+		"key":   key,
+	})
+}
+
+// UpdateHttps
+//
+//	@Summary	更新面板 HTTPS 设置
+//	@Tags		面板设置
+//	@Accept		json
+//	@Produce	json
+//	@Security	BearerToken
+//	@Param		data	body		requests.Https	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/setting/https [post]
+func (r *SettingController) UpdateHttps(ctx http.Context) http.Response {
+	var httpsRequest requests.Https
+	sanitize := SanitizeRequest(ctx, &httpsRequest)
+	if sanitize != nil {
+		return sanitize
+	}
+
+	if httpsRequest.Https {
+		if _, err := cert.ParseCert(httpsRequest.Cert); err != nil {
+			return Error(ctx, http.StatusBadRequest, "证书格式错误")
+		}
+		if _, err := cert.ParseKey(httpsRequest.Key); err != nil {
+			return Error(ctx, http.StatusBadRequest, "密钥格式错误")
+		}
+		if err := io.Write(facades.App().ExecutablePath("storage/ssl.crt"), httpsRequest.Cert, 0700); err != nil {
+			return ErrorSystem(ctx)
+		}
+		if err := io.Write(facades.App().ExecutablePath("storage/ssl.key"), httpsRequest.Key, 0700); err != nil {
+			return ErrorSystem(ctx)
+		}
 		if out, err := shell.Execf("sed -i 's/APP_SSL=false/APP_SSL=true/g' /www/panel/panel.conf"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
@@ -223,9 +285,6 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		}
 	}
 
-	if oldPort != port || oldEntrance != entrance || oldLanguage != updateRequest.Language || updateRequest.SSL != facades.Config().GetBool("panel.ssl") {
-		tools.RestartPanel()
-	}
-
+	tools.RestartPanel()
 	return Success(ctx, nil)
 }

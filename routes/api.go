@@ -199,6 +199,8 @@ func Api() {
 			settingController := controllers.NewSettingController()
 			r.Get("list", settingController.List)
 			r.Post("update", settingController.Update)
+			r.Get("https", settingController.GetHttps)
+			r.Post("https", settingController.UpdateHttps)
 		})
 		r.Prefix("system").Middleware(middleware.Jwt()).Group(func(r route.Router) {
 			controller := controllers.NewSystemController()

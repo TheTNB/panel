@@ -2830,6 +2830,66 @@ const docTemplate = `{
                 }
             }
         },
+        "/panel/setting/https": {
+            "get": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "面板设置"
+                ],
+                "summary": "获取面板 HTTPS 设置",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "面板设置"
+                ],
+                "summary": "更新面板 HTTPS 设置",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Https"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/panel/setting/list": {
             "get": {
                 "security": [
@@ -2837,7 +2897,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取面板设置列表",
                 "produces": [
                     "application/json"
                 ],
@@ -2862,7 +2921,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "更新面板设置",
                 "consumes": [
                     "application/json"
                 ],
@@ -5006,9 +5064,6 @@ const docTemplate = `{
                 "port": {
                     "type": "integer"
                 },
-                "ssl": {
-                    "type": "boolean"
-                },
                 "username": {
                     "type": "string"
                 },
@@ -5463,6 +5518,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "path": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.Https": {
+            "type": "object",
+            "properties": {
+                "cert": {
+                    "type": "string"
+                },
+                "https": {
+                    "type": "boolean"
+                },
+                "key": {
                     "type": "string"
                 }
             }

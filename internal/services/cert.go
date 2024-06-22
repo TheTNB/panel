@@ -12,6 +12,7 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/cert"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
@@ -54,7 +55,7 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
 	}
 
-	privateKey, err := acme.EncodePrivateKey(client.Account.PrivateKey)
+	privateKey, err := cert.EncodeKey(client.Account.PrivateKey)
 	if err != nil {
 		return errors.New("获取私钥失败")
 	}
@@ -97,7 +98,7 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
 	}
 
-	privateKey, err := acme.EncodePrivateKey(client.Account.PrivateKey)
+	privateKey, err := cert.EncodeKey(client.Account.PrivateKey)
 	if err != nil {
 		return errors.New("获取私钥失败")
 	}
