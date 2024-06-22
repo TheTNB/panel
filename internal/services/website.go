@@ -2,8 +2,6 @@
 package services
 
 import (
-	"crypto/x509"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"regexp"
@@ -16,6 +14,7 @@ import (
 	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
+	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
@@ -452,6 +451,14 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	// SSL
 	ssl := config.Ssl
 	website.Ssl = ssl
+	if ssl {
+		if _, err = cert.ParseCert(config.SslCertificate); err != nil {
+			return errors.New("TLS证书格式错误")
+		}
+		if _, err = cert.ParseKey(config.SslCertificateKey); err != nil {
+			return errors.New("TLS私钥格式错误")
+		}
+	}
 	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
 		return err
 	}
@@ -620,25 +627,20 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.OpenBasedir = false
 	}
 
-	cert, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
-	setting.SslCertificate = cert
+	crt, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
+	setting.SslCertificate = crt
 	key, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".key")
 	setting.SslCertificateKey = key
 	if setting.Ssl {
 		ssl := str.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
-
-		block, _ := pem.Decode([]byte(cert))
-		if block != nil {
-			cert, err := x509.ParseCertificate(block.Bytes)
-			if err == nil {
-				setting.SslNotBefore = cert.NotBefore.Format("2006-01-02 15:04:05")
-				setting.SslNotAfter = cert.NotAfter.Format("2006-01-02 15:04:05")
-				setting.SslIssuer = cert.Issuer.CommonName
-				setting.SslOCSPServer = cert.OCSPServer
-				setting.SSlDNSNames = cert.DNSNames
-			}
+		if decode, err := cert.ParseCert(crt); err == nil {
+			setting.SslNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
+			setting.SslNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
+			setting.SslIssuer = decode.Issuer.CommonName
+			setting.SslOCSPServer = decode.OCSPServer
+			setting.SSlDNSNames = decode.DNSNames
 		}
 	} else {
 		setting.HttpRedirect = false

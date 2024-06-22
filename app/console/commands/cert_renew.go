@@ -2,8 +2,6 @@ package commands
 
 import (
 	"context"
-	"crypto/x509"
-	"encoding/pem"
 
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
@@ -12,6 +10,7 @@ import (
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
+	panelcert "github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -54,18 +53,15 @@ func (receiver *CertRenew) Handle(console.Context) error {
 			continue
 		}
 
-		block, _ := pem.Decode([]byte(cert.Cert))
-		if block != nil {
-			data, err := x509.ParseCertificate(block.Bytes)
-			if err != nil {
-				continue
-			}
+		decode, err := panelcert.ParseCert(cert.Cert)
+		if err != nil {
+			continue
+		}
 
-			// 结束时间大于 7 天的证书不续签
-			endTime := carbon.FromStdTime(data.NotAfter)
-			if endTime.Gt(carbon.Now().AddDays(7)) {
-				continue
-			}
+		// 结束时间大于 7 天的证书不续签
+		endTime := carbon.FromStdTime(decode.NotAfter)
+		if endTime.Gt(carbon.Now().AddDays(7)) {
+			continue
 		}
 
 		certService := services.NewCertImpl()
