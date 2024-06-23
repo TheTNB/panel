@@ -41,7 +41,7 @@ func (receiver *RouteServiceProvider) configureRateLimiting() {
 			}),
 			limit.PerDay(1000).Response(func(ctx contractshttp.Context) {
 				ctx.Request().AbortWithStatusJson(contractshttp.StatusTooManyRequests, contractshttp.Json{
-					"message": "面板遭受登录爆破攻击过多，已暂时屏蔽登录，请立刻更换面板端口！",
+					"message": "面板遭受登录爆破攻击过多，已暂时屏蔽登录，请立刻更换面板端口",
 				})
 			}),
 		}
