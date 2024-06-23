@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
+	frameworkmiddleware "github.com/goravel/framework/http/middleware"
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/app/http/middleware"
@@ -25,7 +26,7 @@ func Api() {
 		})
 		r.Prefix("user").Group(func(r route.Router) {
 			userController := controllers.NewUserController()
-			r.Post("login", userController.Login)
+			r.Middleware(frameworkmiddleware.Throttle("login")).Post("login", userController.Login)
 			r.Middleware(middleware.Jwt()).Get("info", userController.Info)
 		})
 		r.Prefix("task").Middleware(middleware.Jwt()).Group(func(r route.Router) {

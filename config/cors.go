@@ -14,10 +14,10 @@ func init() {
 		// in web browsers. You are free to adjust these settings as needed.
 		//
 		// To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-		"paths":                []string{"*"},
+		"paths":                []string{"1145141919810"}, // 避免框架使用CORS中间件
 		"allowed_methods":      []string{"*"},
 		"allowed_origins":      []string{"*"},
-		"allowed_headers":      []string{"*"},
+		"allowed_headers":      []string{"“"},
 		"exposed_headers":      []string{""},
 		"max_age":              0,
 		"supports_credentials": false,
