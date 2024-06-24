@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/goravel/framework/facades"
 
 	requests "github.com/TheTNB/panel/app/http/requests/cert"
@@ -43,7 +44,11 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
+		eab, err := s.getZeroSSLEAB(user.Email)
+		if err != nil {
+			return err
+		}
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, eab, acme.KeyType(user.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
@@ -86,7 +91,11 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
+		eab, err := s.getZeroSSLEAB(user.Email)
+		if err != nil {
+			return err
+		}
+		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, eab, acme.KeyType(user.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CASSLcom, &acme.EAB{KeyID: user.Kid, MACKey: user.HmacEncoded}, acme.KeyType(user.KeyType))
 	case "google":
@@ -106,6 +115,31 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 	user.PrivateKey = string(privateKey)
 
 	return facades.Orm().Query().Save(&user)
+}
+
+// getZeroSSLEAB 获取 ZeroSSL EAB
+func (s *CertImpl) getZeroSSLEAB(email string) (*acme.EAB, error) {
+	type data struct {
+		Success    bool   `json:"success"`
+		EabKid     string `json:"eab_kid"`
+		EabHmacKey string `json:"eab_hmac_key"`
+	}
+	client := resty.New()
+	client.SetTimeout(5 * time.Second)
+	client.SetRetryCount(2)
+
+	resp, err := client.R().SetFormData(map[string]string{
+		"email": email,
+	}).SetResult(&data{}).Post("https://api.zerossl.com/acme/eab-credentials-email")
+	if err != nil || !resp.IsSuccess() {
+		return &acme.EAB{}, errors.New("获取ZeroSSL EAB失败")
+	}
+	eab := resp.Result().(*data)
+	if !eab.Success {
+		return &acme.EAB{}, errors.New("获取ZeroSSL EAB失败")
+	}
+
+	return &acme.EAB{KeyID: eab.EabKid, MACKey: eab.EabHmacKey}, nil
 }
 
 // UserShow 根据 ID 获取用户

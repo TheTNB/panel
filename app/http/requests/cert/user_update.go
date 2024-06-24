@@ -23,8 +23,8 @@ func (r *UserUpdate) Rules(ctx http.Context) map[string]string {
 		"id":           "required|uint|min:1|exists:cert_users,id",
 		"ca":           "required|in:letsencrypt,zerossl,sslcom,google,buypass",
 		"email":        "required|email",
-		"kid":          "required_unless:ca,letsencrypt,buypass",
-		"hmac_encoded": "required_unless:ca,letsencrypt,buypass",
+		"kid":          "required_if:ca,sslcom,google",
+		"hmac_encoded": "required_if:ca,sslcom,google",
 		"key_type":     "required|in:P256,P384,2048,4096",
 	}
 }
