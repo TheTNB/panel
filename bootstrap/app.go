@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"runtime/debug"
+
 	"github.com/gookit/validate/locales/zhcn"
 	"github.com/goravel/framework/foundation"
 
@@ -8,6 +10,8 @@ import (
 )
 
 func Boot() {
+	debug.SetGCPercent(20)
+
 	zhcn.RegisterGlobal()
 
 	app := foundation.NewApplication()

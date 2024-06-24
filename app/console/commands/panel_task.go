@@ -2,6 +2,8 @@ package commands
 
 import (
 	"context"
+	"runtime"
+	"runtime/debug"
 
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
@@ -67,6 +69,10 @@ func (receiver *PanelTask) Handle(console.Context) error {
 			}).Error("清理面板备份失败")
 		return err
 	}
+
+	// 回收内存
+	runtime.GC()
+	debug.FreeOSMemory()
 
 	types.Status = types.StatusNormal
 	return nil
