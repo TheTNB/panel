@@ -44,9 +44,9 @@ func (s *CertImpl) UserStore(request requests.UserStore) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		eab, err := s.getZeroSSLEAB(user.Email)
-		if err != nil {
-			return err
+		eab, eabErr := s.getZeroSSLEAB(user.Email)
+		if eabErr != nil {
+			return eabErr
 		}
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, eab, acme.KeyType(user.KeyType))
 	case "sslcom":
@@ -91,9 +91,9 @@ func (s *CertImpl) UserUpdate(request requests.UserUpdate) error {
 	case "buypass":
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CABuypass, nil, acme.KeyType(user.KeyType))
 	case "zerossl":
-		eab, err := s.getZeroSSLEAB(user.Email)
-		if err != nil {
-			return err
+		eab, eabErr := s.getZeroSSLEAB(user.Email)
+		if eabErr != nil {
+			return eabErr
 		}
 		client, err = acme.NewRegisterAccount(context.Background(), user.Email, acme.CAZeroSSL, eab, acme.KeyType(user.KeyType))
 	case "sslcom":
