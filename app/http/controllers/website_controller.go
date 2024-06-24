@@ -84,7 +84,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 		addRequest.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + addRequest.Name
 	}
 
-	website := types.Website{
+	website := types.WebsiteAdd{
 		Name:       addRequest.Name,
 		Status:     true,
 		Domains:    addRequest.Domains,
@@ -202,7 +202,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		id	path		int	true	"网站 ID"
-//	@Success	200	{object}	SuccessResponse{data=types.Website}
+//	@Success	200	{object}	SuccessResponse{data=types.WebsiteAdd}
 //	@Router		/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID

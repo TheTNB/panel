@@ -4,7 +4,9 @@ package services
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -44,7 +46,7 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 }
 
 // Add 添加网站
-func (r *WebsiteImpl) Add(website types.Website) (models.Website, error) {
+func (r *WebsiteImpl) Add(website types.WebsiteAdd) (models.Website, error) {
 	w := models.Website{
 		Name:   website.Name,
 		Status: website.Status,
@@ -362,34 +364,30 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	raw = strings.Replace(raw, domainConfigOld, "\n    "+domain+"\n    ", -1)
 
 	// 端口
-	var port strings.Builder
+	var portConf strings.Builder
 	ports := config.Ports
-	for i, v := range ports {
-		vStr := cast.ToString(v)
-		if v == 443 && config.Ssl {
-			vStr = `    listen 443 ssl;
-    listen [::]:443 ssl;
-    listen 443 quic;
-    listen [::]:443 quic;`
-			port.WriteString(vStr)
-			if i != len(ports)-1 {
-				port.WriteString("\n")
-			}
-			continue
+	for _, port := range ports {
+		https := ""
+		quic := false
+		if slices.Contains(config.TLSPorts, port) {
+			https = " ssl"
+			quic = true
 		}
-		if i != len(ports)-1 {
-			port.WriteString("    listen " + vStr + ";\n")
-			port.WriteString("    listen [::]:" + vStr + ";\n")
-		} else {
-			port.WriteString("    listen " + vStr + ";\n")
-			port.WriteString("    listen [::]:" + vStr + ";")
+
+		portConf.WriteString(fmt.Sprintf("    listen %d%s;\n", port, https))
+		portConf.WriteString(fmt.Sprintf("    listen [::]:%d%s;\n", port, https))
+		if quic {
+			portConf.WriteString(fmt.Sprintf("    listen %d%s;\n", port, " quic"))
+			portConf.WriteString(fmt.Sprintf("    listen [::]:%d%s;\n", port, " quic"))
 		}
 	}
-	portConfigOld := str.Cut(raw, "# port标记位开始", "# port标记位结束")
-	if len(strings.TrimSpace(portConfigOld)) == 0 {
+	portConf.WriteString("    ")
+	portConfNew := portConf.String()
+	portConfOld := str.Cut(raw, "# port标记位开始", "# port标记位结束")
+	if len(strings.TrimSpace(portConfOld)) == 0 {
 		return errors.New("配置文件中缺少port标记位")
 	}
-	raw = strings.Replace(raw, portConfigOld, "\n"+port.String()+"\n    ", -1)
+	raw = strings.Replace(raw, portConfOld, "\n"+portConfNew, -1)
 
 	// 运行目录
 	root := str.Cut(raw, "# root标记位开始", "# root标记位结束")
@@ -595,6 +593,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
 		} else if len(ports) > 1 && ports[1] == "ssl" {
 			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
+			setting.TLSPorts = append(setting.TLSPorts, cast.ToUint(ports[0]))
 		}
 	}
 	serverName := str.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
@@ -613,8 +612,8 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		setting.Index = match[1]
 	}
 
-	if io.Exists(setting.Root + "/.user.ini") {
-		userIni, _ := io.Read(setting.Root + "/.user.ini")
+	if io.Exists(filepath.Join(setting.Root, ".user.ini")) {
+		userIni, _ := io.Read(filepath.Join(setting.Root, ".user.ini"))
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
 		} else {

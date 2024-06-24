@@ -3648,7 +3648,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/types.Website"
+                                            "$ref": "#/definitions/types.WebsiteAdd"
                                         }
                                     }
                                 }
@@ -5638,7 +5638,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "mode": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "owner": {
                     "type": "string"
@@ -5720,6 +5720,12 @@ const docTemplate = `{
                 },
                 "ssl_certificate_key": {
                     "type": "string"
+                },
+                "tls_ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "waf": {
                     "type": "boolean"
@@ -5915,7 +5921,7 @@ const docTemplate = `{
                 }
             }
         },
-        "types.Website": {
+        "types.WebsiteAdd": {
             "type": "object",
             "properties": {
                 "db": {

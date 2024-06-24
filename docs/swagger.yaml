@@ -462,7 +462,7 @@ definitions:
       group:
         type: string
       mode:
-        type: integer
+        type: string
       owner:
         type: string
       path:
@@ -516,6 +516,10 @@ definitions:
         type: string
       ssl_certificate_key:
         type: string
+      tls_ports:
+        items:
+          type: integer
+        type: array
       waf:
         type: boolean
       waf_cache:
@@ -641,7 +645,7 @@ definitions:
       value:
         type: string
     type: object
-  types.Website:
+  types.WebsiteAdd:
     properties:
       db:
         type: boolean
@@ -2878,7 +2882,7 @@ paths:
             - $ref: '#/definitions/controllers.SuccessResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/types.Website'
+                  $ref: '#/definitions/types.WebsiteAdd'
               type: object
       security:
       - BearerToken: []

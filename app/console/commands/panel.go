@@ -614,7 +614,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		_, err = website.Add(types.Website{
+		_, err = website.Add(types.WebsiteAdd{
 			Name:    name,
 			Status:  true,
 			Domains: domains,

@@ -1,6 +1,6 @@
 package types
 
-type Website struct {
+type WebsiteAdd struct {
 	Name       string   `json:"name"`
 	Status     bool     `json:"status"`
 	Domains    []string `json:"domains"`
@@ -21,6 +21,7 @@ type WebsiteSetting struct {
 	Name              string   `json:"name"`
 	Domains           []string `json:"domains"`
 	Ports             []uint   `json:"ports"`
+	TLSPorts          []uint   `json:"tls_ports"`
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`

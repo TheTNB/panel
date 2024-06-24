@@ -3641,7 +3641,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/types.Website"
+                                            "$ref": "#/definitions/types.WebsiteAdd"
                                         }
                                     }
                                 }
@@ -5631,7 +5631,7 @@
                     "type": "string"
                 },
                 "mode": {
-                    "type": "integer"
+                    "type": "string"
                 },
                 "owner": {
                     "type": "string"
@@ -5713,6 +5713,12 @@
                 },
                 "ssl_certificate_key": {
                     "type": "string"
+                },
+                "tls_ports": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "waf": {
                     "type": "boolean"
@@ -5908,7 +5914,7 @@
                 }
             }
         },
-        "types.Website": {
+        "types.WebsiteAdd": {
             "type": "object",
             "properties": {
                 "db": {

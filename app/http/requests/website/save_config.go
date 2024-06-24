@@ -9,6 +9,7 @@ type SaveConfig struct {
 	ID                uint     `form:"id" json:"id" filter:"uint"`
 	Domains           []string `form:"domains" json:"domains"`
 	Ports             []uint   `form:"ports" json:"ports"`
+	TLSPorts          []uint   `form:"tls_ports" json:"tls_ports"`
 	Hsts              bool     `form:"hsts" json:"hsts"`
 	Ssl               bool     `form:"ssl" json:"ssl"`
 	HttpRedirect      bool     `form:"http_redirect" json:"http_redirect"`
@@ -36,6 +37,7 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"id":                  "required|exists:websites,id",
 		"domains":             "required|slice",
 		"ports":               "required|slice",
+		"tls_ports":           "required_if:ssl,true|slice",
 		"hsts":                "bool",
 		"ssl":                 "bool",
 		"http_redirect":       "bool",
