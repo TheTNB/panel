@@ -37,6 +37,13 @@ func init() {
 				"days":   7,
 				"print":  true,
 			},
+			"http": map[string]any{
+				"driver": "daily",
+				"path":   "storage/logs/http.log",
+				"level":  "info",
+				"days":   7,
+				"print":  false,
+			},
 		},
 	})
 }
