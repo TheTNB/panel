@@ -58,16 +58,9 @@ func (s httpSolver) CleanUp(_ context.Context, challenge acme.Challenge) error {
 		return nil
 	}
 
-	if err := os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath())); err != nil {
-		return fmt.Errorf("无法删除HTTP挑战文件: %w", err)
-	}
-	if err := os.WriteFile(s.conf, []byte{}, 0644); err != nil {
-		return fmt.Errorf("无法清空OpenResty配置文件: %w", err)
-	}
-	if err := systemctl.Reload("openresty"); err != nil {
-		return fmt.Errorf("无法重载OpenResty: %w", err)
-	}
-
+	_ = os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath()))
+	_ = os.WriteFile(s.conf, []byte{}, 0644)
+	_ = systemctl.Reload("openresty")
 	return nil
 }
 
@@ -113,19 +106,12 @@ func (s dnsSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error 
 	if err != nil {
 		return fmt.Errorf("获取DNS提供商失败: %w", err)
 	}
-	zone, err := publicsuffix.EffectiveTLDPlusOne(dnsName)
-	if err != nil {
-		return fmt.Errorf("获取域名%q的顶级域失败: %w", dnsName, err)
-	}
+	zone, _ := publicsuffix.EffectiveTLDPlusOne(dnsName)
 
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
-	_, err = provider.DeleteRecords(ctx, zone+".", *s.records)
-	if err != nil {
-		return fmt.Errorf("域名%q删除临时记录%q失败: %w", zone, dnsName, err)
-	}
-
+	_, _ = provider.DeleteRecords(ctx, zone+".", *s.records)
 	return nil
 }
 
