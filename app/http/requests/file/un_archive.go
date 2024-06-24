@@ -17,7 +17,7 @@ func (r *UnArchive) Authorize(ctx http.Context) error {
 func (r *UnArchive) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"file": `regex:^/.*$|path_exists`,
-		"path": `regex:^/.*$|path_not_exists`,
+		"path": `regex:^/.*$`,
 	}
 }
 
