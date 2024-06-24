@@ -88,8 +88,9 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 		}
 	}
 
-	if err := systemctl.Reload("openresty"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
+	if err = systemctl.Reload("openresty"); err != nil {
+		_, err = shell.Execf("openresty -t")
+		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
 	return controllers.Success(ctx, nil)

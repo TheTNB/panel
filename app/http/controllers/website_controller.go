@@ -14,6 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/types"
@@ -586,7 +587,8 @@ server
 		return nil
 	}
 	if err := systemctl.Reload("openresty"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		_, err = shell.Execf("openresty -t")
+		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
 	return Success(ctx, nil)
@@ -652,7 +654,8 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 	if err = systemctl.Reload("openresty"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		_, err = shell.Execf("openresty -t")
+		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
 	return Success(ctx, nil)

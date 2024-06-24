@@ -16,6 +16,7 @@ import (
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
@@ -316,6 +317,7 @@ func (s *CertImpl) ObtainAuto(ID uint) (acme.Certificate, error) {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
+			_, err = shell.Execf("openresty -t")
 			return acme.Certificate{}, err
 		}
 	}
@@ -356,6 +358,7 @@ func (s *CertImpl) ObtainManual(ID uint) (acme.Certificate, error) {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
+			_, err = shell.Execf("openresty -t")
 			return acme.Certificate{}, err
 		}
 	}
@@ -442,6 +445,7 @@ func (s *CertImpl) Renew(ID uint) (acme.Certificate, error) {
 			return acme.Certificate{}, err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
+			_, err = shell.Execf("openresty -t")
 			return acme.Certificate{}, err
 		}
 	}
@@ -474,6 +478,7 @@ func (s *CertImpl) Deploy(ID, WebsiteID uint) error {
 		return err
 	}
 	if err = systemctl.Reload("openresty"); err != nil {
+		_, err = shell.Execf("openresty -t")
 		return err
 	}
 

@@ -290,6 +290,7 @@ server
 	}
 
 	if err := systemctl.Reload("openresty"); err != nil {
+		_, err = shell.Execf("openresty -t")
 		return models.Website{}, err
 	}
 
@@ -334,6 +335,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 			return err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
+			_, err = shell.Execf("openresty -t")
 			return err
 		}
 
@@ -529,7 +531,12 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		return err
 	}
 
-	return systemctl.Reload("openresty")
+	err = systemctl.Reload("openresty")
+	if err != nil {
+		_, err = shell.Execf("openresty -t")
+	}
+
+	return err
 }
 
 // Delete 删除网站
@@ -554,7 +561,12 @@ func (r *WebsiteImpl) Delete(id uint) error {
 	_ = io.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
 	_ = io.Remove(website.Path)
 
-	return systemctl.Reload("openresty")
+	err := systemctl.Reload("openresty")
+	if err != nil {
+		_, err = shell.Execf("openresty -t")
+	}
+
+	return err
 }
 
 // GetConfig 获取网站配置
@@ -577,7 +589,7 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 	setting.Raw = config
 
 	ports := str.Cut(config, "# port标记位开始", "# port标记位结束")
-	matches := regexp.MustCompile(`listen\s+(.*);`).FindAllStringSubmatch(ports, -1)
+	matches := regexp.MustCompile(`listen\s+([^;]*);?`).FindAllStringSubmatch(ports, -1)
 	for _, match := range matches {
 		if len(match) < 2 {
 			continue
@@ -597,17 +609,17 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		}
 	}
 	serverName := str.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
-	match := regexp.MustCompile(`server_name\s+(.*);`).FindStringSubmatch(serverName)
+	match := regexp.MustCompile(`server_name\s+([^;]*);?`).FindStringSubmatch(serverName)
 	if len(match) > 1 {
 		setting.Domains = strings.Split(match[1], " ")
 	}
 	root := str.Cut(config, "# root标记位开始", "# root标记位结束")
-	match = regexp.MustCompile(`root\s+(.*);`).FindStringSubmatch(root)
+	match = regexp.MustCompile(`root\s+([^;]*);?`).FindStringSubmatch(root)
 	if len(match) > 1 {
 		setting.Root = match[1]
 	}
 	index := str.Cut(config, "# index标记位开始", "# index标记位结束")
-	match = regexp.MustCompile(`index\s+(.*);`).FindStringSubmatch(index)
+	match = regexp.MustCompile(`index\s+([^;]*);?`).FindStringSubmatch(index)
 	if len(match) > 1 {
 		setting.Index = match[1]
 	}
@@ -631,29 +643,31 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		ssl := str.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
 		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
 		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
-		if decode, err := cert.ParseCert(crt); err == nil {
-			setting.SslNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
-			setting.SslNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
-			setting.SslIssuer = decode.Issuer.CommonName
-			setting.SslOCSPServer = decode.OCSPServer
-			setting.SSlDNSNames = decode.DNSNames
-		}
 	} else {
 		setting.HttpRedirect = false
 		setting.Hsts = false
 	}
 
+	// 解析证书信息
+	if decode, err := cert.ParseCert(crt); err == nil {
+		setting.SslNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
+		setting.SslNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
+		setting.SslIssuer = decode.Issuer.CommonName
+		setting.SslOCSPServer = decode.OCSPServer
+		setting.SSlDNSNames = decode.DNSNames
+	}
+
 	waf := str.Cut(config, "# waf标记位开始", "# waf标记位结束")
 	setting.Waf = strings.Contains(waf, "waf on;")
-	match = regexp.MustCompile(`waf_mode\s+(.+);`).FindStringSubmatch(waf)
+	match = regexp.MustCompile(`waf_mode\s+([^;]*);?`).FindStringSubmatch(waf)
 	if len(match) > 1 {
 		setting.WafMode = match[1]
 	}
-	match = regexp.MustCompile(`waf_cc_deny\s+(.+);`).FindStringSubmatch(waf)
+	match = regexp.MustCompile(`waf_cc_deny\s+([^;]*);?`).FindStringSubmatch(waf)
 	if len(match) > 1 {
 		setting.WafCcDeny = match[1]
 	}
-	match = regexp.MustCompile(`waf_cache\s+(.+);`).FindStringSubmatch(waf)
+	match = regexp.MustCompile(`waf_cache\s+([^;]*);?`).FindStringSubmatch(waf)
 	if len(match) > 1 {
 		setting.WafCache = match[1]
 	}

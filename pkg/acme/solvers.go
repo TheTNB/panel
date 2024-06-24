@@ -14,6 +14,7 @@ import (
 	"github.com/mholt/acmez/v2/acme"
 	"golang.org/x/net/publicsuffix"
 
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
@@ -46,6 +47,7 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 		return fmt.Errorf("无法写入OpenResty配置文件: %w", err)
 	}
 	if err = systemctl.Reload("openresty"); err != nil {
+		_, err = shell.Execf("openresty -t")
 		return fmt.Errorf("无法重载OpenResty: %w", err)
 	}
 
