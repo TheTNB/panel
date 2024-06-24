@@ -1,7 +1,6 @@
 package plugins
 
 import (
-	"database/sql"
 	"fmt"
 	"regexp"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
@@ -71,7 +71,7 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 		return controllers.Success(ctx, []types.NV{})
 	}
 
-	raw, err := shell.Execf("/www/server/mysql/bin/mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
+	raw, err := shell.Execf("mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
@@ -175,32 +175,25 @@ func (r *MySQLController) GetRootPassword(ctx http.Context) http.Response {
 
 // SetRootPassword 设置root密码
 func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
-	status, err := systemctl.Status("mysqld")
-	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL状态失败")
-	}
-	if !status {
-		return controllers.Error(ctx, http.StatusInternalServerError, "MySQL 未运行")
-	}
-
 	rootPassword := ctx.Request().Input("password")
 	if len(rootPassword) == 0 {
 		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码不能为空")
 	}
 
 	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
-	if oldRootPassword != rootPassword {
-		if _, err = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, oldRootPassword, rootPassword)); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置root密码失败: %v", err))
+	mysql, err := db.NewMySQL("root", oldRootPassword, r.getSock(), "unix")
+	if err != nil {
+		// 尝试安全模式直接改密
+		if err = db.MySQLResetRootPassword(rootPassword); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
-		if _, err = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, rootPassword)); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, "设置root密码失败")
+	} else {
+		if err = mysql.UserPassword("root", rootPassword); err != nil {
+			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
-		if err = r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword); err != nil {
-			_, _ = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s';"`, rootPassword, oldRootPassword))
-			_, _ = shell.Execf(fmt.Sprintf(`/www/server/mysql/bin/mysql -uroot -p%s -e "FLUSH PRIVILEGES;"`, oldRootPassword))
-			return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
-		}
+	}
+	if err = r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
 	}
 
 	return controllers.Success(ctx, nil)
@@ -208,47 +201,19 @@ func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
 
 // DatabaseList 获取数据库列表
 func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
-	type database struct {
-		Name string `json:"name"`
-	}
-
-	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+	password := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	mysql, err := db.NewMySQL("root", password, r.getSock(), "unix")
 	if err != nil {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []database{},
-		})
-	}
-	defer db.Close()
-
-	if err = db.Ping(); err != nil {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []database{},
+			"items": []types.MySQLDatabase{},
 		})
 	}
 
-	rows, err := db.Query("SHOW DATABASES")
+	databases, err := mysql.Databases()
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-	defer rows.Close()
-
-	var databases []database
-	for rows.Next() {
-		var d database
-		if err = rows.Scan(&d.Name); err != nil {
-			continue
-		}
-
-		databases = append(databases, d)
-	}
-
-	if err = rows.Err(); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
-
 	paged, total := controllers.Paginate(ctx, databases)
 
 	return controllers.Success(ctx, http.Json{
@@ -272,17 +237,18 @@ func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE DATABASE IF NOT EXISTS " + database + " DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.DatabaseCreate(database); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.UserCreate(user, password); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.PrivilegesGrant(user, database); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -298,8 +264,12 @@ func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	database := ctx.Request().Input("database")
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP DATABASE IF EXISTS " + database + ";\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if err = mysql.DatabaseDrop(database); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -394,71 +364,20 @@ func (r *MySQLController) RestoreBackup(ctx http.Context) http.Response {
 
 // UserList 用户列表
 func (r *MySQLController) UserList(ctx http.Context) http.Response {
-	type user struct {
-		User   string   `json:"user"`
-		Host   string   `json:"host"`
-		Grants []string `json:"grants"`
-	}
-
-	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
-	db, err := sql.Open("mysql", "root:"+rootPassword+"@unix(/tmp/mysql.sock)/")
+	password := r.setting.Get(models.SettingKeyMysqlRootPassword)
+	mysql, err := db.NewMySQL("root", password, r.getSock(), "unix")
 	if err != nil {
 		return controllers.Success(ctx, http.Json{
 			"total": 0,
-			"items": []user{},
-		})
-	}
-	defer db.Close()
-
-	if err = db.Ping(); err != nil {
-		return controllers.Success(ctx, http.Json{
-			"total": 0,
-			"items": []user{},
+			"items": []types.MySQLUser{},
 		})
 	}
 
-	rows, err := db.Query("SELECT user, host FROM mysql.user")
+	users, err := mysql.Users()
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
-	}
-	defer rows.Close()
-
-	var userGrants []user
-
-	for rows.Next() {
-		var u user
-		if err = rows.Scan(&u.User, &u.Host); err != nil {
-			continue
-		}
-
-		// 查询用户权限
-		grantsRows, err := db.Query(fmt.Sprintf("SHOW GRANTS FOR '%s'@'%s'", u.User, u.Host))
-		if err != nil {
-			continue
-		}
-		defer grantsRows.Close()
-
-		for grantsRows.Next() {
-			var grant string
-			if err = grantsRows.Scan(&grant); err != nil {
-				continue
-			}
-
-			u.Grants = append(u.Grants, grant)
-		}
-
-		if err = grantsRows.Err(); err != nil {
-			continue
-		}
-
-		userGrants = append(userGrants, u)
-	}
-
-	if err = rows.Err(); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
 	}
-
-	paged, total := controllers.Paginate(ctx, userGrants)
+	paged, total := controllers.Paginate(ctx, users)
 
 	return controllers.Success(ctx, http.Json{
 		"total": total,
@@ -480,14 +399,15 @@ func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	database := ctx.Request().Input("database")
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"CREATE USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + ";'\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.UserCreate(user, password); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.PrivilegesGrant(user, database); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -503,8 +423,12 @@ func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"DROP USER '" + user + "'@'localhost';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if err = mysql.UserDrop(user); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -522,11 +446,12 @@ func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"ALTER USER '" + user + "'@'localhost' IDENTIFIED BY '" + password + "';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.UserPassword(user, password); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
@@ -544,15 +469,38 @@ func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	user := ctx.Request().Input("user")
 	database := ctx.Request().Input("database")
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"REVOKE ALL PRIVILEGES ON *.* FROM '" + user + "'@'localhost';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"GRANT ALL PRIVILEGES ON " + database + ".* TO '" + user + "'@'localhost';\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
-	}
-	if out, err := shell.Execf("/www/server/mysql/bin/mysql -uroot -p" + rootPassword + " -e \"FLUSH PRIVILEGES;\""); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+	if err = mysql.PrivilegesGrant(user, database); err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return controllers.Success(ctx, nil)
+}
+
+// getSock 获取sock文件位置
+func (r *MySQLController) getSock() string {
+	if io.Exists("/tmp/mysql.sock") {
+		return "/tmp/mysql.sock"
+	}
+	if io.Exists("/www/server/mysql/config/my.cnf") {
+		config, _ := io.Read("/www/server/mysql/config/my.cnf")
+		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)\1`)
+		matches := re.FindStringSubmatch(config)
+		if len(matches) > 2 {
+			return matches[2]
+		}
+	}
+	if io.Exists("/etc/my.cnf") {
+		config, _ := io.Read("/etc/my.cnf")
+		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)\1`)
+		matches := re.FindStringSubmatch(config)
+		if len(matches) > 2 {
+			return matches[2]
+		}
+	}
+
+	return "/tmp/mysql.sock"
 }

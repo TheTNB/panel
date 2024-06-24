@@ -133,6 +133,16 @@ if version_lt "$oldVersion" "2.2.14"; then
     fi
 fi
 
+if version_lt "$oldVersion" "2.2.16"; then
+    echo "更新面板到 v2.2.16 ..."
+    echo "Update panel to v2.2.16 ..."
+    if [ -f "/www/server/mysql/bin/mysql" ]; then
+        ln -sf /www/server/mysql/bin/* /usr/bin/
+        rm -f /etc/profile.d/mysql.sh
+        source /etc/profile
+    fi
+fi
+
 echo $HR
 echo "更新结束"
 echo "Update finished"

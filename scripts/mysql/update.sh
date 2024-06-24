@@ -120,6 +120,9 @@ chown -R mysql:mysql ${mysqlPath}
 chmod -R 755 ${mysqlPath}
 chmod 644 ${mysqlPath}/conf/my.cnf
 
+# 软链接
+ln -sf ${mysqlPath}/bin/* /usr/bin/
+
 # 启动服务
 systemctl start mysqld
 

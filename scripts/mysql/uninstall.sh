@@ -34,9 +34,6 @@ rm -f /usr/lib64/libmysql*
 userdel -r mysql
 groupdel mysql
 
-rm -f /etc/profile.d/mysql.sh
-source /etc/profile
-
 panel deletePlugin mysql${1}
 
 echo -e "${HR}\nMySQL-${1} 卸载完成\n${HR}"

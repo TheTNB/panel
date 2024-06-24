@@ -287,8 +287,8 @@ chmod 644 ${mysqlPath}/conf/my.cnf
 
 ${mysqlPath}/bin/mysqld --initialize-insecure --user=mysql --basedir=${mysqlPath} --datadir=${mysqlPath}/data
 
-echo "export PATH=${mysqlPath}/bin:\$PATH" >> /etc/profile.d/mysql.sh
-source /etc/profile
+# 软链接
+ln -sf ${mysqlPath}/bin/* /usr/bin/
 
 # 写入 systemd 配置
 cat > /etc/systemd/system/mysqld.service << EOF
