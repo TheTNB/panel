@@ -85,6 +85,8 @@ func Plugin() {
 			phpMyAdminController := plugins.NewPhpMyAdminController()
 			route.Get("info", phpMyAdminController.Info)
 			route.Post("port", phpMyAdminController.SetPort)
+			route.Get("config", phpMyAdminController.GetConfig)
+			route.Post("config", phpMyAdminController.SaveConfig)
 		})
 		r.Prefix("pureftpd").Group(func(route route.Router) {
 			pureFtpdController := plugins.NewPureFtpdController()

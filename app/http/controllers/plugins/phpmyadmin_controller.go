@@ -1,6 +1,7 @@
 package plugins
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -89,6 +90,36 @@ func (r *PhpMyAdminController) SetPort(ctx http.Context) http.Response {
 
 	if err := systemctl.Reload("openresty"); err != nil {
 		return controllers.Error(ctx, http.StatusInternalServerError, "重载OpenResty失败")
+	}
+
+	return controllers.Success(ctx, nil)
+}
+
+func (r *PhpMyAdminController) GetConfig(ctx http.Context) http.Response {
+	config, err := io.Read("/www/server/vhost/phpmyadmin.conf")
+	if err != nil {
+		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+
+	return controllers.Success(ctx, config)
+}
+
+func (r *PhpMyAdminController) SaveConfig(ctx http.Context) http.Response {
+	config := ctx.Request().Input("config")
+	if len(config) == 0 {
+		return controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
+	}
+
+	if err := io.Write("/www/server/vhost/phpmyadmin.conf", config, 0644); err != nil {
+		facades.Log().Request(ctx.Request()).Tags("插件", "phpMyAdmin").With(map[string]any{
+			"error": err.Error(),
+		}).Info("修改 phpMyAdmin 配置失败")
+		return controllers.ErrorSystem(ctx)
+	}
+
+	if err := systemctl.Reload("openresty"); err != nil {
+		_, err = shell.Execf("openresty -t")
+		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
 	return controllers.Success(ctx, nil)

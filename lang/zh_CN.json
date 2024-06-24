@@ -194,9 +194,6 @@
       "incompatible": "插件 :slug 不兼容 :exclude 插件"
     }
   },
-  "messages": {
-    "mistake": "错误"
-  },
   "status": {
     "upgrade": "面板升级中，请稍后",
     "maintain": "面板正在运行维护，请稍后",

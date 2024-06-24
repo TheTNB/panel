@@ -194,9 +194,6 @@
       "incompatible": "plugin :slug is incompatible with :exclude plugin"
     }
   },
-  "messages": {
-    "mistake": "mistake"
-  },
   "status": {
     "upgrade": "Panel is currently undergoing an upgrade. Please try again later.",
     "maintain": "Panel is currently undergoing maintenance. Please try again later.",

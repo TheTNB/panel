@@ -28,6 +28,12 @@ systemctl disable php-fpm-${phpVersion}
 rm -rf /lib/systemd/system/php-fpm-${phpVersion}.service
 systemctl daemon-reload
 
+# 检查是否存在phpMyAdmin
+if [ -d "${setupPath}/server/phpmyadmin" ]; then
+    sed -i "s/enable-php-${phpVersion}/enable-php-0/g" ${setupPath}/server/vhost/phpmyadmin.conf
+    systemctl reload openresty
+fi
+
 rm -rf ${phpPath}
 rm -f /usr/bin/php-${phpVersion}
 
