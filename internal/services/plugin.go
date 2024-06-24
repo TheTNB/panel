@@ -113,6 +113,19 @@ func (r *PluginImpl) Install(slug string) error {
 		}
 	}
 
+	var count int64
+	if err = facades.Orm().Query().
+		Model(&models.Task{}).
+		Where("log LIKE ?", "%"+plugin.Slug+"%").
+		Where("status", models.TaskStatusWaiting).
+		OrWhere("status", models.TaskStatusRunning).
+		Count(&count); err != nil {
+		return errors.New("查询任务失败")
+	}
+	if count > 0 {
+		return errors.New("任务已添加，请勿重复添加")
+	}
+
 	var task models.Task
 	task.Name = "安装插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
@@ -159,6 +172,19 @@ func (r *PluginImpl) Uninstall(slug string) error {
 		}
 	}
 
+	var count int64
+	if err = facades.Orm().Query().
+		Model(&models.Task{}).
+		Where("log LIKE ?", "%"+plugin.Slug+"%").
+		Where("status", models.TaskStatusWaiting).
+		OrWhere("status", models.TaskStatusRunning).
+		Count(&count); err != nil {
+		return errors.New("查询任务失败")
+	}
+	if count > 0 {
+		return errors.New("任务已添加，请勿重复添加")
+	}
+
 	var task models.Task
 	task.Name = "卸载插件 " + plugin.Name
 	task.Status = models.TaskStatusWaiting
@@ -203,6 +229,19 @@ func (r *PluginImpl) Update(slug string) error {
 		if excludeFound {
 			return errors.New("插件 " + slug + " 不兼容 " + exclude + " 插件")
 		}
+	}
+
+	var count int64
+	if err = facades.Orm().Query().
+		Model(&models.Task{}).
+		Where("log LIKE ?", "%"+plugin.Slug+"%").
+		Where("status", models.TaskStatusWaiting).
+		OrWhere("status", models.TaskStatusRunning).
+		Count(&count); err != nil {
+		return errors.New("查询任务失败")
+	}
+	if count > 0 {
+		return errors.New("任务已添加，请勿重复添加")
 	}
 
 	var task models.Task
