@@ -10,7 +10,8 @@ import (
 )
 
 func Boot() {
-	debug.SetGCPercent(20)
+	debug.SetGCPercent(10)
+	debug.SetMemoryLimit(512 << 20)
 
 	zhcn.RegisterGlobal()
 
