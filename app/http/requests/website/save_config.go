@@ -37,7 +37,7 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"id":                  "required|exists:websites,id",
 		"domains":             "required|slice",
 		"ports":               "required|slice",
-		"tls_ports":           "required_if:ssl,true|slice",
+		"tls_ports":           "required_if:ssl,true|slice|not_in:80",
 		"hsts":                "bool",
 		"ssl":                 "bool",
 		"http_redirect":       "bool",
