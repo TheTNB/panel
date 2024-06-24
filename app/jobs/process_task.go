@@ -27,20 +27,11 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 	}
 
 	var task models.Task
-	if err := facades.Orm().Query().Where("id = ?", taskID).Get(&task); err != nil {
+	_ = facades.Orm().Query().Where("id = ?", taskID).Get(&task)
+	if task.ID == 0 {
 		facades.Log().Tags("面板", "异步任务").With(map[string]any{
 			"task_id": taskID,
-			"error":   err.Error(),
-		}).Infof("获取任务失败")
-		return nil
-	}
-
-	task.Status = models.TaskStatusRunning
-	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Tags("面板", "异步任务").With(map[string]any{
-			"task_id": taskID,
-			"error":   err.Error(),
-		}).Infof("更新任务失败")
+		}).Infof("任务不存在")
 		return nil
 	}
 
@@ -50,13 +41,7 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 
 	if _, err := shell.Execf(task.Shell); err != nil {
 		task.Status = models.TaskStatusFailed
-		if err := facades.Orm().Query().Save(&task); err != nil {
-			facades.Log().Tags("面板", "异步任务").With(map[string]any{
-				"task_id": taskID,
-				"error":   err.Error(),
-			}).Infof("更新任务失败")
-			return nil
-		}
+		_ = facades.Orm().Query().Save(&task)
 		facades.Log().Tags("面板", "异步任务").With(map[string]any{
 			"task_id": taskID,
 			"error":   err.Error(),
@@ -65,13 +50,7 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 	}
 
 	task.Status = models.TaskStatusSuccess
-	if err := facades.Orm().Query().Save(&task); err != nil {
-		facades.Log().Tags("面板", "异步任务").With(map[string]any{
-			"task_id": taskID,
-			"error":   err.Error(),
-		}).Infof("更新任务失败")
-		return nil
-	}
+	_ = facades.Orm().Query().Save(&task)
 
 	facades.Log().Tags("面板", "异步任务").With(map[string]any{
 		"task_id": taskID,
