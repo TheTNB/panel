@@ -5,7 +5,9 @@ go 1.22
 require (
 	github.com/docker/docker v26.1.4+incompatible
 	github.com/docker/go-connections v0.5.0
+	github.com/go-gormigrate/gormigrate/v2 v2.1.2
 	github.com/go-resty/resty/v2 v2.13.1
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.14.1-0.20240618022250-731b8d9930a3
 	github.com/goravel/gin v1.2.1
@@ -26,6 +28,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.24.0
 	golang.org/x/net v0.26.0
+	gorm.io/gorm v1.25.10
 )
 
 require (
@@ -87,7 +90,6 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.20.0 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
@@ -203,7 +205,6 @@ require (
 	gorm.io/driver/mysql v1.5.7 // indirect
 	gorm.io/driver/postgres v1.5.9 // indirect
 	gorm.io/driver/sqlserver v1.5.3 // indirect
-	gorm.io/gorm v1.25.10 // indirect
 	gorm.io/plugin/dbresolver v1.5.2 // indirect
 	gotest.tools/v3 v3.5.0 // indirect
 	modernc.org/libc v1.37.6 // indirect
