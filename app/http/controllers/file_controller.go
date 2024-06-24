@@ -5,6 +5,7 @@ import (
 	stdio "io"
 	stdos "os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -354,10 +355,16 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 		return sanitize
 	}
 
-	if err := io.Chmod(request.Path, stdos.FileMode(request.Mode)); err != nil {
+	// 解析成8进制
+	mode, err := strconv.ParseUint(request.Mode, 8, 64)
+	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
-	if err := io.Chown(request.Path, request.Owner, request.Group); err != nil {
+
+	if err = io.Chmod(request.Path, stdos.FileMode(mode)); err != nil {
+		return Error(ctx, http.StatusInternalServerError, err.Error())
+	}
+	if err = io.Chown(request.Path, request.Owner, request.Group); err != nil {
 		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
@@ -505,7 +512,7 @@ func (r *FileController) List(ctx http.Context) http.Response {
 }
 
 // setPermission
-func (r *FileController) setPermission(path string, mode uint, owner, group string) {
-	_ = io.Chmod(path, stdos.FileMode(mode))
+func (r *FileController) setPermission(path string, mode stdos.FileMode, owner, group string) {
+	_ = io.Chmod(path, mode)
 	_ = io.Chown(path, owner, group)
 }

@@ -7,7 +7,7 @@ import (
 
 type Permission struct {
 	Path  string `form:"path" json:"path"`
-	Mode  uint   `form:"mode" json:"mode" filter:"uint"`
+	Mode  string `form:"mode" json:"mode"`
 	Owner string `form:"owner" json:"owner"`
 	Group string `form:"group" json:"group"`
 }
@@ -19,7 +19,7 @@ func (r *Permission) Authorize(ctx http.Context) error {
 func (r *Permission) Rules(ctx http.Context) map[string]string {
 	return map[string]string{
 		"path":  `regex:^/.*$|path_exists`,
-		"mode":  "regex:^[0-7]{3}$|uint",
+		"mode":  "regex:^0[0-7]{3}$",
 		"owner": "regex:^[a-zA-Z0-9_-]+$",
 		"group": "regex:^[a-zA-Z0-9_-]+$",
 	}

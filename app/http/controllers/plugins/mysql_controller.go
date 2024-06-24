@@ -487,7 +487,7 @@ func (r *MySQLController) getSock() string {
 	}
 	if io.Exists("/www/server/mysql/config/my.cnf") {
 		config, _ := io.Read("/www/server/mysql/config/my.cnf")
-		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)\1`)
+		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)`)
 		matches := re.FindStringSubmatch(config)
 		if len(matches) > 2 {
 			return matches[2]
@@ -495,7 +495,7 @@ func (r *MySQLController) getSock() string {
 	}
 	if io.Exists("/etc/my.cnf") {
 		config, _ := io.Read("/etc/my.cnf")
-		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)\1`)
+		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)`)
 		matches := re.FindStringSubmatch(config)
 		if len(matches) > 2 {
 			return matches[2]
