@@ -113,17 +113,8 @@ func (r *PluginImpl) Install(slug string) error {
 		}
 	}
 
-	var count int64
-	if err = facades.Orm().Query().
-		Model(&models.Task{}).
-		Where("log LIKE ?", "%"+plugin.Slug+"%").
-		Where("status", models.TaskStatusWaiting).
-		OrWhere("status", models.TaskStatusRunning).
-		Count(&count); err != nil {
-		return errors.New("查询任务失败")
-	}
-	if count > 0 {
-		return errors.New("任务已添加，请勿重复添加")
+	if err = r.checkTaskExists(slug); err != nil {
+		return err
 	}
 
 	var task models.Task
@@ -172,17 +163,8 @@ func (r *PluginImpl) Uninstall(slug string) error {
 		}
 	}
 
-	var count int64
-	if err = facades.Orm().Query().
-		Model(&models.Task{}).
-		Where("log LIKE ?", "%"+plugin.Slug+"%").
-		Where("status", models.TaskStatusWaiting).
-		OrWhere("status", models.TaskStatusRunning).
-		Count(&count); err != nil {
-		return errors.New("查询任务失败")
-	}
-	if count > 0 {
-		return errors.New("任务已添加，请勿重复添加")
+	if err = r.checkTaskExists(slug); err != nil {
+		return err
 	}
 
 	var task models.Task
@@ -231,17 +213,8 @@ func (r *PluginImpl) Update(slug string) error {
 		}
 	}
 
-	var count int64
-	if err = facades.Orm().Query().
-		Model(&models.Task{}).
-		Where("log LIKE ?", "%"+plugin.Slug+"%").
-		Where("status", models.TaskStatusWaiting).
-		OrWhere("status", models.TaskStatusRunning).
-		Count(&count); err != nil {
-		return errors.New("查询任务失败")
-	}
-	if count > 0 {
-		return errors.New("任务已添加，请勿重复添加")
+	if err = r.checkTaskExists(slug); err != nil {
+		return err
 	}
 
 	var task models.Task
@@ -255,4 +228,19 @@ func (r *PluginImpl) Update(slug string) error {
 
 	_ = io.Remove(task.Log)
 	return r.task.Process(task.ID)
+}
+
+func (r *PluginImpl) checkTaskExists(slug string) error {
+	var count int64
+	if err := facades.Orm().Query().
+		Model(&models.Task{}).
+		Where("log LIKE ? AND (status = ? OR status = ?)", "%"+slug+"%", models.TaskStatusWaiting, models.TaskStatusRunning).
+		Count(&count); err != nil {
+		return errors.New("查询任务失败")
+	}
+	if count > 0 {
+		return errors.New("任务已添加，请勿重复添加")
+	}
+
+	return nil
 }
