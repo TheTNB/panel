@@ -326,7 +326,6 @@ Restart=always
 RestartSec=5
 LimitNOFILE=1048576
 LimitNPROC=1048576
-LimitCORE=1048576
 Delegate=yes
 
 [Install]
