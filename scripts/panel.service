@@ -1,0 +1,21 @@
+[Unit]
+Description=HaoZi Panel
+After=syslog.target network.target
+Wants=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/www/panel/
+ExecStart=/www/panel/panel --env="/www/panel/panel.conf"
+ExecReload=kill -s HUP \$MAINPID
+ExecStop=kill -s QUIT \$MAINPID
+User=root
+Restart=always
+RestartSec=5
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=1048576
+Delegate=yes
+
+[Install]
+WantedBy=multi-user.target

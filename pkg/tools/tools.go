@@ -482,14 +482,21 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	_, _ = shell.Execf("chmod -R 700 /usr/bin/panel")
 	color.Green().Printfln("设置完成")
 
+	color.Green().Printfln("运行升级后脚本...")
 	if _, err = shell.Execf("bash /www/panel/scripts/update_panel.sh"); err != nil {
-		color.Red().Printfln("执行面板升级后脚本失败")
+		color.Red().Printfln("运行面板升级后脚本失败")
 		return err
 	}
+	if _, err = shell.Execf("cp -f /www/panel/scripts/panel.service /etc/systemd/system/panel.service"); err != nil {
+		color.Red().Printfln("写入面板服务文件失败")
+		return err
+	}
+	_, _ = shell.Execf("systemctl daemon-reload")
 	if _, err = shell.Execf("panel writeSetting version " + panelInfo.Version); err != nil {
 		color.Red().Printfln("写入面板版本号失败")
 		return err
 	}
+	color.Green().Printfln("升级完成")
 
 	_, _ = shell.Execf("rm -rf /tmp/panel-storage.zip")
 	_, _ = shell.Execf("rm -rf /tmp/panel.conf.bak")

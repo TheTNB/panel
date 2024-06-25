@@ -88,31 +88,31 @@ Prepare_System() {
     [ -s /etc/selinux/config ] && sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
     setenforce 0 > /dev/null 2>&1
 
-    ulimit -n 204800
-    echo 6553560 > /proc/sys/fs/file-max
+    ulimit -n 1048576
+    echo 2147483584 > /proc/sys/fs/file-max
     checkSoftNofile=$(cat /etc/security/limits.conf | grep '^* soft nofile .*$')
     checkHardNofile=$(cat /etc/security/limits.conf | grep '^* hard nofile .*$')
     checkSoftNproc=$(cat /etc/security/limits.conf | grep '^* soft nproc .*$')
     checkHardNproc=$(cat /etc/security/limits.conf | grep '^* hard nproc .*$')
     checkFsFileMax=$(cat /etc/sysctl.conf | grep '^fs.file-max.*$')
     if [ "${checkSoftNofile}" == "" ]; then
-        echo "* soft nofile 204800" >> /etc/security/limits.conf
+        echo "* soft nofile 1048576" >> /etc/security/limits.conf
     fi
     if [ "${checkHardNofile}" == "" ]; then
-        echo "* hard nofile 204800" >> /etc/security/limits.conf
+        echo "* hard nofile 1048576" >> /etc/security/limits.conf
     fi
     if [ "${checkSoftNproc}" == "" ]; then
-        echo "* soft nproc 204800" >> /etc/security/limits.conf
+        echo "* soft nproc 1048576" >> /etc/security/limits.conf
     fi
     if [ "${checkHardNproc}" == "" ]; then
-        echo "* hard nproc 204800 " >> /etc/security/limits.conf
+        echo "* hard nproc 1048576" >> /etc/security/limits.conf
     fi
     if [ "${checkFsFileMax}" == "" ]; then
-        echo fs.file-max = 6553560 >> /etc/sysctl.conf
+        echo fs.file-max = 2147483584 >> /etc/sysctl.conf
     fi
 
     # 自动开启 BBR
-    isBBRSupported=$(ls -l /lib/modules/*/kernel/net/ipv4/tcp_bbr.ko.xz | grep -c bbr)
+    isBBRSupported=$(ls -l /lib/modules/*/kernel/net/ipv4 | grep -c tcp_bbr)
     if [ "${isBBRSupported}" != "0" ]; then
         qdisc=$(sysctl net.core.default_qdisc | awk '{print $3}')
         echo "net.core.default_qdisc=${qdisc}" >> /etc/sysctl.conf
@@ -323,6 +323,11 @@ ExecReload=kill -s HUP \$MAINPID
 ExecStop=kill -s QUIT \$MAINPID
 User=root
 Restart=always
+RestartSec=5
+LimitNOFILE=1048576
+LimitNPROC=1048576
+LimitCORE=1048576
+Delegate=yes
 
 [Install]
 WantedBy=multi-user.target
