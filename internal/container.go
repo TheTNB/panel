@@ -24,16 +24,16 @@ type Container interface {
 	ContainerInspect(id string) (types.ContainerJSON, error)
 	ContainerKill(id string) error
 	ContainerRename(id string, newName string) error
-	ContainerStats(id string) (types.ContainerStats, error)
+	ContainerStats(id string) (container.StatsResponseReader, error)
 	ContainerExist(name string) (bool, error)
 	ContainerUpdate(id string, config container.UpdateConfig) error
 	ContainerLogs(id string) (string, error)
 	ContainerPrune() error
-	NetworkList() ([]types.NetworkResource, error)
+	NetworkList() ([]network.Inspect, error)
 	NetworkCreate(config requests.NetworkCreate) (string, error)
 	NetworkRemove(id string) error
 	NetworkExist(name string) (bool, error)
-	NetworkInspect(id string) (types.NetworkResource, error)
+	NetworkInspect(id string) (network.Inspect, error)
 	NetworkConnect(networkID string, containerID string) error
 	NetworkDisconnect(networkID string, containerID string) error
 	NetworkPrune() error
