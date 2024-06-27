@@ -9,7 +9,7 @@ require (
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.14.1-0.20240618022250-731b8d9930a3
+	github.com/goravel/framework v1.14.1-0.20240627172353-91c3c46cf333
 	github.com/goravel/gin v1.2.1
 	github.com/gorilla/websocket v1.5.3
 	github.com/lib/pq v1.10.9
@@ -19,7 +19,6 @@ require (
 	github.com/libdns/libdns v0.2.2
 	github.com/mholt/acmez/v2 v2.0.1
 	github.com/mholt/archiver/v3 v3.5.1
-	github.com/mojocn/base64Captcha v1.3.6
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cast v1.6.0
 	github.com/stretchr/testify v1.9.0
@@ -98,7 +97,6 @@ require (
 	github.com/golang-module/carbon/v2 v2.3.12 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/pprof v0.0.0-20240227163752-401108e1b7e7 // indirect
@@ -190,7 +188,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/image v0.13.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect

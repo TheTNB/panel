@@ -118,7 +118,7 @@ func (r *Container) ContainerRename(id string, newName string) error {
 }
 
 // ContainerStats 查看容器状态
-func (r *Container) ContainerStats(id string) (types.ContainerStats, error) {
+func (r *Container) ContainerStats(id string) (container.StatsResponseReader, error) {
 	return r.client.ContainerStats(context.Background(), id, false)
 }
 
@@ -167,8 +167,8 @@ func (r *Container) ContainerPrune() error {
 }
 
 // NetworkList 列出网络
-func (r *Container) NetworkList() ([]types.NetworkResource, error) {
-	return r.client.NetworkList(context.Background(), types.NetworkListOptions{})
+func (r *Container) NetworkList() ([]network.Inspect, error) {
+	return r.client.NetworkList(context.Background(), network.ListOptions{})
 }
 
 // NetworkCreate 创建网络
@@ -189,8 +189,8 @@ func (r *Container) NetworkCreate(config requests.NetworkCreate) (string, error)
 		})
 	}
 
-	options := types.NetworkCreate{
-		EnableIPv6: config.Ipv6.Enabled,
+	options := network.CreateOptions{
+		EnableIPv6: &config.Ipv6.Enabled,
 		Driver:     config.Driver,
 		Options:    r.KVToMap(config.Options),
 		Labels:     r.KVToMap(config.Labels),
@@ -212,7 +212,7 @@ func (r *Container) NetworkRemove(id string) error {
 
 // NetworkExist 判断网络是否存在
 func (r *Container) NetworkExist(name string) (bool, error) {
-	var options types.NetworkListOptions
+	var options network.ListOptions
 	options.Filters = filters.NewArgs(filters.Arg("name", name))
 	networks, err := r.client.NetworkList(context.Background(), options)
 	if err != nil {
@@ -223,8 +223,8 @@ func (r *Container) NetworkExist(name string) (bool, error) {
 }
 
 // NetworkInspect 查看网络
-func (r *Container) NetworkInspect(id string) (types.NetworkResource, error) {
-	return r.client.NetworkInspect(context.Background(), id, types.NetworkInspectOptions{})
+func (r *Container) NetworkInspect(id string) (network.Inspect, error) {
+	return r.client.NetworkInspect(context.Background(), id, network.InspectOptions{})
 }
 
 // NetworkConnect 连接网络
