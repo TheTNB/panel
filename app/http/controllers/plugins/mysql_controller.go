@@ -225,9 +225,9 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 // AddDatabase 添加数据库
 func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
+		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:32",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -257,7 +257,7 @@ func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 // DeleteDatabase 删除数据库
 func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -316,7 +316,7 @@ func (r *MySQLController) UploadBackup(ctx http.Context) http.Response {
 // CreateBackup 创建备份
 func (r *MySQLController) CreateBackup(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -350,7 +350,7 @@ func (r *MySQLController) DeleteBackup(ctx http.Context) http.Response {
 func (r *MySQLController) RestoreBackup(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -388,9 +388,9 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 // AddUser 添加用户
 func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
+		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:32",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -416,7 +416,7 @@ func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 // DeleteUser 删除用户
 func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
+		"user": "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -437,8 +437,8 @@ func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 // SetUserPassword 设置用户密码
 func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:32",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -460,8 +460,8 @@ func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 // SetUserPrivileges 设置用户权限
 func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"database": "required|min_len:1|max_len:255",
+		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
+		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
 	}); sanitize != nil {
 		return sanitize
 	}

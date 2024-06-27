@@ -202,9 +202,9 @@ func (r *PostgreSQLController) DatabaseList(ctx http.Context) http.Response {
 // AddDatabase 添加数据库
 func (r *PostgreSQLController) AddDatabase(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"database": "required|min_len:1|max_len:63|regex:^[a-zA-Z0-9_]+$",
+		"user":     "required|min_len:1|max_len:30|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:40",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -241,7 +241,7 @@ func (r *PostgreSQLController) AddDatabase(ctx http.Context) http.Response {
 // DeleteDatabase 删除数据库
 func (r *PostgreSQLController) DeleteDatabase(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
+		"database": "required|min_len:1|max_len:63|regex:^[a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -295,7 +295,7 @@ func (r *PostgreSQLController) UploadBackup(ctx http.Context) http.Response {
 // CreateBackup 创建备份
 func (r *PostgreSQLController) CreateBackup(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
+		"database": "required|min_len:1|max_len:63|regex:^[a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -329,7 +329,7 @@ func (r *PostgreSQLController) DeleteBackup(ctx http.Context) http.Response {
 func (r *PostgreSQLController) RestoreBackup(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
+		"database": "required|min_len:1|max_len:63|regex:^[a-zA-Z0-9_]+$|not_in:postgres,template0,template1",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -420,9 +420,9 @@ func (r *PostgreSQLController) RoleList(ctx http.Context) http.Response {
 // AddRole 添加角色
 func (r *PostgreSQLController) AddRole(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"database": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"database": "required|min_len:1|max_len:63|regex:^[a-zA-Z0-9_]+$",
+		"user":     "required|min_len:1|max_len:30|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:40",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -452,7 +452,7 @@ func (r *PostgreSQLController) AddRole(ctx http.Context) http.Response {
 // DeleteRole 删除角色
 func (r *PostgreSQLController) DeleteRole(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"user": "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
+		"user": "required|min_len:1|max_len:30|regex:^[a-zA-Z0-9_]+$",
 	}); sanitize != nil {
 		return sanitize
 	}
@@ -475,8 +475,8 @@ func (r *PostgreSQLController) DeleteRole(ctx http.Context) http.Response {
 // SetRolePassword 设置用户密码
 func (r *PostgreSQLController) SetRolePassword(ctx http.Context) http.Response {
 	if sanitize := controllers.Sanitize(ctx, map[string]string{
-		"user":     "required|min_len:1|max_len:255|regex:^[a-zA-Z][a-zA-Z0-9_]+$",
-		"password": "required|min_len:8|max_len:255",
+		"user":     "required|min_len:1|max_len:30|regex:^[a-zA-Z0-9_]+$",
+		"password": "required|min_len:8|max_len:40",
 	}); sanitize != nil {
 		return sanitize
 	}
