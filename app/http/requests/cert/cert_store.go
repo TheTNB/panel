@@ -29,6 +29,10 @@ func (r *CertStore) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *CertStore) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *CertStore) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

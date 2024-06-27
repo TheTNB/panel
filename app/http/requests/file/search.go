@@ -21,6 +21,10 @@ func (r *Search) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Search) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Search) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

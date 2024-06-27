@@ -22,6 +22,10 @@ func (r *Archive) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Archive) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Archive) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

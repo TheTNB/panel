@@ -19,6 +19,10 @@ func (r *DNSShowAndDestroy) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *DNSShowAndDestroy) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *DNSShowAndDestroy) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

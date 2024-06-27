@@ -57,6 +57,10 @@ func (r *ContainerUpdate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *ContainerUpdate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *ContainerUpdate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

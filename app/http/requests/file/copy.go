@@ -21,6 +21,10 @@ func (r *Copy) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Copy) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Copy) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

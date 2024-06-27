@@ -21,6 +21,10 @@ func (r *RestoreBackup) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *RestoreBackup) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *RestoreBackup) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

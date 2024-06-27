@@ -27,6 +27,10 @@ func (r *VolumeCreate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *VolumeCreate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *VolumeCreate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -21,6 +21,10 @@ func (r *UnArchive) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *UnArchive) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *UnArchive) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

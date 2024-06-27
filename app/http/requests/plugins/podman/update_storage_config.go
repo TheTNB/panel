@@ -19,6 +19,10 @@ func (r *UpdateStorageConfig) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *UpdateStorageConfig) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *UpdateStorageConfig) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

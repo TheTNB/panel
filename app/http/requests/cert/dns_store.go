@@ -30,6 +30,10 @@ func (r *DNSStore) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *DNSStore) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *DNSStore) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

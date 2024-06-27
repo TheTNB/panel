@@ -37,6 +37,10 @@ func (r *Add) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Add) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Add) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -23,6 +23,10 @@ func (r *Https) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Https) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Https) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

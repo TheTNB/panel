@@ -19,6 +19,10 @@ func (r *CertShowAndDestroy) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *CertShowAndDestroy) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *CertShowAndDestroy) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

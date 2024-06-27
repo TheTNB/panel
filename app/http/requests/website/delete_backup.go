@@ -19,6 +19,10 @@ func (r *DeleteBackup) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *DeleteBackup) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *DeleteBackup) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -31,6 +31,10 @@ func (r *CertUpdate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *CertUpdate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *CertUpdate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -21,6 +21,10 @@ func (r *Paginate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Paginate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Paginate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

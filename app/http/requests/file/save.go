@@ -21,6 +21,10 @@ func (r *Save) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Save) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Save) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -25,6 +25,10 @@ func (r *ImagePull) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *ImagePull) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *ImagePull) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -21,6 +21,10 @@ func (r *CertDeploy) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *CertDeploy) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *CertDeploy) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

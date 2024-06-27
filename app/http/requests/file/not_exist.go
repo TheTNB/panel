@@ -19,6 +19,10 @@ func (r *NotExist) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *NotExist) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *NotExist) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

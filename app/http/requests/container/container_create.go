@@ -64,6 +64,10 @@ func (r *ContainerCreate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *ContainerCreate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *ContainerCreate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -21,6 +21,10 @@ func (r *NetworkConnectDisConnect) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *NetworkConnectDisConnect) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *NetworkConnectDisConnect) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

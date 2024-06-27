@@ -23,6 +23,10 @@ func (r *Upload) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Upload) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Upload) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

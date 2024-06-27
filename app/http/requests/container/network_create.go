@@ -31,6 +31,10 @@ func (r *NetworkCreate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *NetworkCreate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *NetworkCreate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

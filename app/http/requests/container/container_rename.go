@@ -21,6 +21,10 @@ func (r *ContainerRename) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *ContainerRename) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *ContainerRename) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

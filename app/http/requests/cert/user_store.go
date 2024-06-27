@@ -27,6 +27,10 @@ func (r *UserStore) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *UserStore) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *UserStore) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

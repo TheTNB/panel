@@ -19,6 +19,10 @@ func (r *Renew) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Renew) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Renew) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

@@ -35,6 +35,10 @@ func (r *Update) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Update) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Update) Messages(ctx http.Context) map[string]string {
 	return map[string]string{
 		"port.int":        "port 值必须是一个整数且在 1000 - 65535 之间",

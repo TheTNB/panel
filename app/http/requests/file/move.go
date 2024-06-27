@@ -21,6 +21,10 @@ func (r *Move) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Move) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Move) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

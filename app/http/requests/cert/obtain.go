@@ -19,6 +19,10 @@ func (r *Obtain) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *Obtain) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *Obtain) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

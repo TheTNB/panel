@@ -33,6 +33,10 @@ func (r *DNSUpdate) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *DNSUpdate) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *DNSUpdate) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }

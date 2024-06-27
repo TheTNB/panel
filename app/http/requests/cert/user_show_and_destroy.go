@@ -19,6 +19,10 @@ func (r *UserShowAndDestroy) Rules(ctx http.Context) map[string]string {
 	}
 }
 
+func (r *UserShowAndDestroy) Filters(ctx http.Context) map[string]string {
+	return map[string]string{}
+}
+
 func (r *UserShowAndDestroy) Messages(ctx http.Context) map[string]string {
 	return map[string]string{}
 }
