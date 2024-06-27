@@ -165,7 +165,7 @@ func (s *BackupImpl) MysqlBackup(database string) error {
 		return err
 	}
 
-	if _, err := shell.Execf("/www/server/mysql/bin/mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile); err != nil {
+	if _, err := shell.Execf("mysqldump -uroot " + database + " > " + backupPath + "/" + backupFile); err != nil {
 		return err
 	}
 	if _, err := shell.Execf("cd " + backupPath + " && zip -r " + backupPath + "/" + backupFile + ".zip " + backupFile); err != nil {
@@ -219,7 +219,7 @@ func (s *BackupImpl) MysqlRestore(database string, backupFile string) error {
 		return errors.New("无法找到备份文件")
 	}
 
-	if _, err = shell.Execf("/www/server/mysql/bin/mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
+	if _, err = shell.Execf("mysql -uroot " + database + " < " + filepath.Join(tempDir, backupFile)); err != nil {
 		return err
 	}
 
