@@ -79,7 +79,7 @@ func (m *MySQL) UserCreate(user, password string) error {
 }
 
 func (m *MySQL) UserDrop(user string) error {
-	_, err := m.Exec(fmt.Sprintf("DROP USER IF EXISTS '%s'@'localhost'", user))
+	_, err := m.Exec(fmt.Sprintf("DROP USER IF EXISTS '%s'", user))
 	m.flushPrivileges()
 	return err
 }
