@@ -2,7 +2,11 @@
 [简体中文] | [<a href="README_EN.md">English</a>]
 </p>
 
-<h1 align="center">耗子面板</h1>
+<h1 align="center" style="font-size: 40px">耗子面板</h1>
+
+<p align="center">
+  <a href="https://trendshift.io/repositories/10950" target="_blank"><img src="https://trendshift.io/api/badge/repositories/10950" alt="TheTNB%2Fpanel | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</p>
 
 <p align="center">
   <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
