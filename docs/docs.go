@@ -3574,8 +3574,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/panel/websites/{id}": {
-            "delete": {
+        "/panel/websites/delete": {
+            "post": {
                 "security": [
                     {
                         "BearerToken": []
@@ -3593,11 +3593,13 @@ const docTemplate = `{
                 "summary": "删除网站",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "网站 ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
+                        "description": "request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.Delete"
+                        }
                     }
                 ],
                 "responses": {
@@ -5503,6 +5505,20 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "string"
+                }
+            }
+        },
+        "requests.Delete": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "boolean"
                 }
             }
         },

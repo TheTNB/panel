@@ -118,23 +118,22 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Accept		json
 //	@Produce	json
 //	@Security	BearerToken
-//	@Param		id	path		int	true	"网站 ID"
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/panel/websites/{id} [delete]
+//	@Param		data	body		requests.Delete	true	"request"
+//	@Success	200		{object}	SuccessResponse
+//	@Router		/panel/websites/delete [post]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
-	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	var deleteRequest requests.Delete
+	sanitize := SanitizeRequest(ctx, &deleteRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
-	err := r.website.Delete(idRequest.ID)
-	if err != nil {
+	if err := r.website.Delete(deleteRequest); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
-			"id":    idRequest.ID,
+			"id":    deleteRequest.ID,
 			"error": err.Error(),
 		}).Info("删除网站失败")
-		return Error(ctx, http.StatusInternalServerError, "删除网站失败: "+err.Error())
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)

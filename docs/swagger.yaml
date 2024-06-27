@@ -377,6 +377,15 @@ definitions:
       type:
         type: string
     type: object
+  requests.Delete:
+    properties:
+      db:
+        type: boolean
+      id:
+        type: integer
+      path:
+        type: boolean
+    type: object
   requests.DeleteBackup:
     properties:
       name:
@@ -2840,28 +2849,6 @@ paths:
       summary: 添加网站
       tags:
       - 网站
-  /panel/websites/{id}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: 网站 ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/controllers.SuccessResponse'
-      security:
-      - BearerToken: []
-      summary: 删除网站
-      tags:
-      - 网站
   /panel/websites/{id}/config:
     get:
       consumes:
@@ -3046,6 +3033,29 @@ paths:
       security:
       - BearerToken: []
       summary: 更新网站备注
+      tags:
+      - 网站
+  /panel/websites/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/requests.Delete'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 删除网站
       tags:
       - 网站
   /plugins/frp/config:

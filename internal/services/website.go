@@ -17,6 +17,7 @@ import (
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
 	"github.com/TheTNB/panel/pkg/cert"
+	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
@@ -296,16 +297,25 @@ server
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if website.Db && website.DbType == "mysql" {
-		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE DATABASE IF NOT EXISTS ` + website.DbName + ` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;"`)
-		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "CREATE USER '` + website.DbUser + `'@'localhost' IDENTIFIED BY '` + website.DbPassword + `';"`)
-		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "GRANT ALL PRIVILEGES ON ` + website.DbName + `.* TO '` + website.DbUser + `'@'localhost';"`)
-		_, _ = shell.Execf(`/www/server/mysql/bin/mysql -uroot -p` + rootPassword + ` -e "FLUSH PRIVILEGES;"`)
+		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
+		if err != nil {
+			return models.Website{}, err
+		}
+		if err = mysql.DatabaseCreate(website.DbName); err != nil {
+			return models.Website{}, err
+		}
+		if err = mysql.UserCreate(website.DbUser, website.DbPassword); err != nil {
+			return models.Website{}, err
+		}
+		if err = mysql.PrivilegesGrant(website.DbUser, website.DbName); err != nil {
+			return models.Website{}, err
+		}
 	}
 	if website.Db && website.DbType == "postgresql" {
-		_, _ = shell.Execf(`echo "CREATE DATABASE ` + website.DbName + `;" | su - postgres -c "psql"`)
-		_, _ = shell.Execf(`echo "CREATE USER ` + website.DbUser + ` WITH PASSWORD '` + website.DbPassword + `';" | su - postgres -c "psql"`)
-		_, _ = shell.Execf(`echo "ALTER DATABASE ` + website.DbName + ` OWNER TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
-		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE ` + website.DbName + ` TO ` + website.DbUser + `;" | su - postgres -c "psql"`)
+		_, _ = shell.Execf(`echo "CREATE DATABASE '%s';" | su - postgres -c "psql"`, website.DbName)
+		_, _ = shell.Execf(`echo "CREATE USER '%s' WITH PASSWORD '%s';" | su - postgres -c "psql"`, website.DbUser, website.DbPassword)
+		_, _ = shell.Execf(`echo "ALTER DATABASE '%s' OWNER TO '%s';" | su - postgres -c "psql"`, website.DbName, website.DbUser)
+		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE '%s' TO '%s';" | su - postgres -c "psql"`, website.DbName, website.DbUser)
 		userConfig := "host    " + website.DbName + "    " + website.DbUser + "    127.0.0.1/32    scram-sha-256"
 		_, _ = shell.Execf(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
 		_ = systemctl.Reload("postgresql")
@@ -540,9 +550,9 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 }
 
 // Delete 删除网站
-func (r *WebsiteImpl) Delete(id uint) error {
+func (r *WebsiteImpl) Delete(request requests.Delete) error {
 	var website models.Website
-	if err := facades.Orm().Query().With("Cert").Where("id", id).FirstOrFail(&website); err != nil {
+	if err := facades.Orm().Query().With("Cert").Where("id", request.ID).FirstOrFail(&website); err != nil {
 		return err
 	}
 
@@ -559,7 +569,21 @@ func (r *WebsiteImpl) Delete(id uint) error {
 	_ = io.Remove("/www/server/vhost/acme/" + website.Name + ".conf")
 	_ = io.Remove("/www/server/vhost/ssl/" + website.Name + ".pem")
 	_ = io.Remove("/www/server/vhost/ssl/" + website.Name + ".key")
-	_ = io.Remove(website.Path)
+
+	if request.Path {
+		_ = io.Remove(website.Path)
+	}
+	if request.DB {
+		rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
+		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
+		if err != nil {
+			return err
+		}
+		_ = mysql.DatabaseDrop(website.Name)
+		_ = mysql.UserDrop(website.Name)
+		_, _ = shell.Execf(`echo "DROP DATABASE IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
+		_, _ = shell.Execf(`echo "DROP USER IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
+	}
 
 	err := systemctl.Reload("openresty")
 	if err != nil {

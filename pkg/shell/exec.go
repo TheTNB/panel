@@ -17,7 +17,7 @@ import (
 // Execf 执行 shell 命令
 func Execf(shell string, args ...any) (string, error) {
 	if !CheckArgs(slice.ToString(args)...) {
-		return "", errors.New("你想干什么？")
+		return "", errors.New("发现危险的命令参数，中止执行")
 	}
 
 	var cmd *exec.Cmd
@@ -39,7 +39,7 @@ func Execf(shell string, args ...any) (string, error) {
 // ExecfAsync 异步执行 shell 命令
 func ExecfAsync(shell string, args ...any) error {
 	if !CheckArgs(slice.ToString(args)...) {
-		return errors.New("你想干什么？")
+		return errors.New("发现危险的命令参数，中止执行")
 	}
 
 	var cmd *exec.Cmd
@@ -67,7 +67,7 @@ func ExecfAsync(shell string, args ...any) error {
 // ExecfWithTimeout 执行 shell 命令并设置超时时间
 func ExecfWithTimeout(timeout time.Duration, shell string, args ...any) (string, error) {
 	if !CheckArgs(slice.ToString(args)...) {
-		return "", errors.New("你想干什么？")
+		return "", errors.New("发现危险的命令参数，中止执行")
 	}
 
 	var cmd *exec.Cmd

@@ -48,7 +48,7 @@ func Api() {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("/", websiteController.List)
 			r.Post("/", websiteController.Add)
-			r.Delete("{id}", websiteController.Delete)
+			r.Post("delete", websiteController.Delete)
 			r.Get("{id}/config", websiteController.GetConfig)
 			r.Post("{id}/config", websiteController.SaveConfig)
 			r.Delete("{id}/log", websiteController.ClearLog)

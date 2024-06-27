@@ -15,6 +15,7 @@ import (
 	"github.com/goravel/framework/support/color"
 	"github.com/spf13/cast"
 
+	requests "github.com/TheTNB/panel/app/http/requests/website"
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal/services"
 	"github.com/TheTNB/panel/pkg/io"
@@ -649,7 +650,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		if err = website.Delete(id); err != nil {
+		if err = website.Delete(requests.Delete{ID: id}); err != nil {
 			color.Red().Printfln(err.Error())
 			return nil
 		}
