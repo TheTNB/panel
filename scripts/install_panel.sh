@@ -151,14 +151,14 @@ Prepare_System() {
         # Rocky Linux
         /usr/bin/crb enable
         dnf makecache -y
-        dnf install -y curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix rsyslog
+        dnf install -y bash curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix rsyslog
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
         fi
         apt-get update -y
-        apt-get install -y curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix rsyslog
+        apt-get install -y bash curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix rsyslog
     fi
     if [ "$?" != "0" ]; then
         echo -e $HR
@@ -309,28 +309,7 @@ Init_Panel() {
         exit 1
     fi
     # 写入服务文件
-    cat > /etc/systemd/system/panel.service << EOF
-[Unit]
-Description=HaoZi Panel
-After=syslog.target network.target
-Wants=network.target
-
-[Service]
-Type=simple
-WorkingDirectory=${setup_Path}/panel/
-ExecStart=/www/panel/panel --env="/www/panel/panel.conf"
-ExecReload=kill -s HUP \$MAINPID
-ExecStop=kill -s QUIT \$MAINPID
-User=root
-Restart=always
-RestartSec=5
-LimitNOFILE=1048576
-LimitNPROC=1048576
-Delegate=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
+    cp -f ${setup_Path}/panel/scripts/panel.service /etc/systemd/system/panel.service
     systemctl daemon-reload
     systemctl enable panel.service
     systemctl start panel.service
