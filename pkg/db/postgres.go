@@ -37,6 +37,7 @@ func NewPostgres(username, password, address string, port uint) (*Postgres, erro
 		username: username,
 		password: password,
 		address:  address,
+		port:     port,
 	}, nil
 }
 
