@@ -35,5 +35,10 @@ else
     echo "错误：不支持的操作系统"
     exit 1
 fi
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：安装软件失败，请截图错误信息寻求帮助。"
+    exit 1
+fi
 
 panel writePlugin supervisor 4.2.5

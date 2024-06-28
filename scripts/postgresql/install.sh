@@ -53,6 +53,11 @@ else
     echo "错误：耗子面板不支持该系统"
     exit 1
 fi
+if [ "$?" != "0" ]; then
+    echo -e $HR
+    echo "错误：安装依赖软件失败，请截图错误信息寻求帮助。"
+    exit 1
+fi
 
 postgresqlUserCheck=$(cat /etc/passwd | grep postgres)
 if [ "${postgresqlUserCheck}" == "" ]; then

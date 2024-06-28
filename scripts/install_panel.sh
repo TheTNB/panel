@@ -151,14 +151,14 @@ Prepare_System() {
         # Rocky Linux
         /usr/bin/crb enable
         dnf makecache -y
-        dnf install -y bash curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix rsyslog
+        dnf install -y bash curl wget zip unzip tar p7zip p7zip-plugins git jq git-core dos2unix rsyslog make
     elif [ "${OS}" == "debian" ]; then
         if ${inChina}; then
             sed -i 's/deb.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
             sed -i 's/security.debian.org/mirrors.tencent.com/g' /etc/apt/sources.list
         fi
         apt-get update -y
-        apt-get install -y bash curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix rsyslog
+        apt-get install -y bash curl wget zip unzip tar p7zip p7zip-full git jq git dos2unix rsyslog make
     fi
     if [ "$?" != "0" ]; then
         echo -e $HR
