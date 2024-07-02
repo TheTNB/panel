@@ -148,7 +148,7 @@ definitions:
         description: 备注名称
         type: string
       type:
-        description: DNS 提供商 (dnspod, aliyun, cloudflare)
+        description: DNS 提供商 (dnspod, tencent, aliyun, cloudflare)
         type: string
       updated_at:
         $ref: '#/definitions/github_com_goravel_framework_support_carbon.DateTime'

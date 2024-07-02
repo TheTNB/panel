@@ -5158,7 +5158,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "description": "DNS 提供商 (dnspod, aliyun, cloudflare)",
+                    "description": "DNS 提供商 (dnspod, tencent, aliyun, cloudflare)",
                     "type": "string"
                 },
                 "updated_at": {

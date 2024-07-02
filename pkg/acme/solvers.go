@@ -3,6 +3,7 @@ package acme
 import (
 	"context"
 	"fmt"
+	"github.com/libdns/tencentcloud"
 	"os"
 	"path/filepath"
 	"time"
@@ -125,6 +126,11 @@ func (s dnsSolver) getDNSProvider() (DNSProvider, error) {
 		dns = &dnspod.Provider{
 			APIToken: s.param.ID + "," + s.param.Token,
 		}
+	case Tencent:
+		dns = &tencentcloud.Provider{
+			SecretId:  s.param.AccessKey,
+			SecretKey: s.param.SecretKey,
+		}
 	case AliYun:
 		dns = &alidns.Provider{
 			AccKeyID:     s.param.AccessKey,
@@ -145,6 +151,7 @@ type DnsType string
 
 const (
 	DnsPod     DnsType = "dnspod"
+	Tencent    DnsType = "tencent"
 	AliYun     DnsType = "aliyun"
 	CloudFlare DnsType = "cloudflare"
 )

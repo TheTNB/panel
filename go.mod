@@ -17,6 +17,7 @@ require (
 	github.com/libdns/cloudflare v0.1.1
 	github.com/libdns/dnspod v0.0.3
 	github.com/libdns/libdns v0.2.2
+	github.com/libdns/tencentcloud v1.0.0
 	github.com/mholt/acmez/v2 v2.0.1
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
@@ -167,6 +168,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.597 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect

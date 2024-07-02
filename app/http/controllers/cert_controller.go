@@ -74,6 +74,10 @@ func (r *CertController) DNSProviders(ctx http.Context) http.Response {
 			"dns":  acme.DnsPod,
 		},
 		{
+			"name": "腾讯云",
+			"dns":  acme.Tencent,
+		},
+		{
 			"name": "阿里云",
 			"dns":  acme.AliYun,
 		},
