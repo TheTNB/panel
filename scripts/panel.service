@@ -7,8 +7,8 @@ Wants=network.target
 Type=simple
 WorkingDirectory=/www/panel/
 ExecStart=/www/panel/panel --env="/www/panel/panel.conf"
-ExecReload=kill -s HUP \$MAINPID
-ExecStop=kill -s QUIT \$MAINPID
+ExecReload=kill -s HUP $MAINPID
+ExecStop=kill -s QUIT $MAINPID
 User=root
 Restart=always
 RestartSec=5
