@@ -3,7 +3,6 @@ package acme
 import (
 	"context"
 	"fmt"
-	"github.com/libdns/tencentcloud"
 	"os"
 	"path/filepath"
 	"time"
@@ -12,6 +11,7 @@ import (
 	"github.com/libdns/cloudflare"
 	"github.com/libdns/dnspod"
 	"github.com/libdns/libdns"
+	"github.com/libdns/tencentcloud"
 	"github.com/mholt/acmez/v2/acme"
 	"golang.org/x/net/publicsuffix"
 
