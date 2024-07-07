@@ -211,3 +211,5 @@ require (
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
 )
+
+replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
