@@ -8,6 +8,7 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/hashicorp/go-version"
 
 	"github.com/TheTNB/panel/app/models"
 	"github.com/TheTNB/panel/internal"
@@ -250,13 +251,21 @@ func (r *InfoController) InstalledDbAndPhp(ctx http.Context) http.Response {
 
 // CheckUpdate 检查面板更新
 func (r *InfoController) CheckUpdate(ctx http.Context) http.Response {
-	version := facades.Config().GetString("panel.version")
-	remote, err := tools.GetLatestPanelVersion()
+	current := facades.Config().GetString("panel.version")
+	latest, err := tools.GetLatestPanelVersion()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
-	if tools.VersionCompare(version, remote.Version, ">=") {
+	v1, err := version.NewVersion(current)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "版本号解析失败")
+	}
+	v2, err := version.NewVersion(latest.Version)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "版本号解析失败")
+	}
+	if v1.GreaterThanOrEqual(v2) {
 		return Success(ctx, http.Json{
 			"update": false,
 		})
@@ -269,17 +278,25 @@ func (r *InfoController) CheckUpdate(ctx http.Context) http.Response {
 
 // UpdateInfo 获取更新信息
 func (r *InfoController) UpdateInfo(ctx http.Context) http.Response {
-	version := facades.Config().GetString("panel.version")
-	current, err := tools.GetLatestPanelVersion()
+	current := facades.Config().GetString("panel.version")
+	latest, err := tools.GetLatestPanelVersion()
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, "获取最新版本失败")
 	}
 
-	if tools.VersionCompare(version, current.Version, ">=") {
+	v1, err := version.NewVersion(current)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "版本号解析失败")
+	}
+	v2, err := version.NewVersion(latest.Version)
+	if err != nil {
+		return Error(ctx, http.StatusInternalServerError, "版本号解析失败")
+	}
+	if v1.GreaterThanOrEqual(v2) {
 		return Error(ctx, http.StatusInternalServerError, "当前版本已是最新版本")
 	}
 
-	versions, err := tools.GenerateVersions(version, current.Version)
+	versions, err := tools.GenerateVersions(current, latest.Version)
 	if err != nil {
 		return Error(ctx, http.StatusInternalServerError, "获取更新信息失败")
 	}

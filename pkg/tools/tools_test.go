@@ -18,36 +18,6 @@ func (s *HelperTestSuite) TestGetMonitoringInfo() {
 	s.NotNil(GetMonitoringInfo())
 }
 
-func (s *HelperTestSuite) TestVersionCompare() {
-	s.True(VersionCompare("1.0.0", "1.0.0", "=="))
-	s.True(VersionCompare("1.0.0", "1.0.0", ">="))
-	s.True(VersionCompare("1.0.0", "1.0.0", "<="))
-	s.False(VersionCompare("1.0.0", "1.0.0", ">"))
-	s.False(VersionCompare("1.0.0", "1.0.0", "<"))
-	s.False(VersionCompare("1.0.0", "1.0.0", "!="))
-
-	s.True(VersionCompare("1.0.0", "1.0.1", "<"))
-	s.True(VersionCompare("1.0.0", "1.0.1", "<="))
-	s.True(VersionCompare("1.0.0", "1.0.1", "!="))
-	s.False(VersionCompare("1.0.0", "1.0.1", "=="))
-	s.False(VersionCompare("1.0.0", "1.0.1", ">="))
-	s.False(VersionCompare("1.0.0", "1.0.1", ">"))
-
-	s.True(VersionCompare("1.0.1", "1.0.0", ">"))
-	s.True(VersionCompare("1.0.1", "1.0.0", ">="))
-	s.True(VersionCompare("1.0.1", "1.0.0", "!="))
-	s.False(VersionCompare("1.0.1", "1.0.0", "=="))
-	s.False(VersionCompare("1.0.1", "1.0.0", "<="))
-	s.False(VersionCompare("1.0.1", "1.0.0", "<"))
-
-	s.True(VersionCompare("v1.0.0", "1.0.0", "=="))
-	s.True(VersionCompare("1.0.0", "v1.0.0", "=="))
-	s.True(VersionCompare("v1.0.0", "v1.0.0", "=="))
-	s.False(VersionCompare("v2.2.9", "v2.2.10", ">="))
-	s.True(VersionCompare("v2.2.10", "v2.2.9", ">="))
-
-}
-
 func (s *HelperTestSuite) TestGenerateVersions() {
 	versions, err := GenerateVersions("1.0.0", "1.0.3")
 	s.NoError(err)

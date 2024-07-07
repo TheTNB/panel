@@ -12,6 +12,7 @@ require (
 	github.com/goravel/framework v1.14.1-0.20240627172353-91c3c46cf333
 	github.com/goravel/gin v1.2.1
 	github.com/gorilla/websocket v1.5.3
+	github.com/hashicorp/go-version v1.7.0
 	github.com/lib/pq v1.10.9
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.1

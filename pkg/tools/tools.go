@@ -66,35 +66,6 @@ func GetMonitoringInfo() MonitoringInfo {
 	return res
 }
 
-// VersionCompare 版本比较
-func VersionCompare(ver1, ver2, operator string) bool {
-	v1 := strings.TrimPrefix(ver1, "v")
-	v2 := strings.TrimPrefix(ver2, "v")
-
-	v1s := strings.Split(v1, ".")
-	v2s := strings.Split(v2, ".")
-
-	for len(v1s) < len(v2s) {
-		v1s = append(v1s, "0")
-	}
-
-	for len(v2s) < len(v1s) {
-		v2s = append(v2s, "0")
-	}
-
-	for i := 0; i < len(v1s); i++ {
-		v1i := cast.ToInt(v1s[i])
-		v2i := cast.ToInt(v2s[i])
-
-		if v1i > v2i {
-			return operator == ">" || operator == ">=" || operator == "!="
-		} else if v1i < v2i {
-			return operator == "<" || operator == "<=" || operator == "!="
-		}
-	}
-	return operator == "==" || operator == ">=" || operator == "<="
-}
-
 // GenerateVersions 获取版本列表
 func GenerateVersions(start, end string) ([]string, error) {
 	var versions []string
