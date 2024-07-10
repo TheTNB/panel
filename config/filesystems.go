@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/support/path"
 )
 
 func init() {
@@ -24,7 +25,7 @@ func init() {
 		"disks": map[string]any{
 			"local": map[string]any{
 				"driver": "local",
-				"root":   facades.App().ExecutablePath("storage"),
+				"root":   path.Executable("storage"),
 			},
 		},
 	})

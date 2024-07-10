@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/support/path"
 	"github.com/spf13/cast"
 
 	requests "github.com/TheTNB/panel/app/http/requests/setting"
@@ -270,10 +271,10 @@ func (r *SettingController) UpdateHttps(ctx http.Context) http.Response {
 		if _, err := cert.ParseKey(httpsRequest.Key); err != nil {
 			return Error(ctx, http.StatusBadRequest, "密钥格式错误")
 		}
-		if err := io.Write(facades.App().ExecutablePath("storage/ssl.crt"), httpsRequest.Cert, 0700); err != nil {
+		if err := io.Write(path.Executable("storage/ssl.crt"), httpsRequest.Cert, 0700); err != nil {
 			return ErrorSystem(ctx)
 		}
-		if err := io.Write(facades.App().ExecutablePath("storage/ssl.key"), httpsRequest.Key, 0700); err != nil {
+		if err := io.Write(path.Executable("storage/ssl.key"), httpsRequest.Key, 0700); err != nil {
 			return ErrorSystem(ctx)
 		}
 		if out, err := shell.Execf("sed -i 's/APP_SSL=false/APP_SSL=true/g' /www/panel/panel.conf"); err != nil {

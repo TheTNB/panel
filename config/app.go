@@ -17,7 +17,9 @@ import (
 	"github.com/goravel/framework/queue"
 	"github.com/goravel/framework/route"
 	"github.com/goravel/framework/schedule"
+	"github.com/goravel/framework/session"
 	"github.com/goravel/framework/support/carbon"
+	"github.com/goravel/framework/support/path"
 	"github.com/goravel/framework/testing"
 	"github.com/goravel/framework/translation"
 	"github.com/goravel/framework/validation"
@@ -37,7 +39,7 @@ func init() {
 		// This value is the name of your application. This value is used when the
 		// framework needs to place the application's name in a notification or
 		// any other location as required by the application or its pkg.
-		"name": "Panel",
+		"name": "耗子面板",
 
 		// Application Environment
 		//
@@ -74,7 +76,7 @@ func init() {
 		//
 		// The path to the language files for the application. You may change
 		// the path to a different directory if you would like to customize it.
-		"lang_path": facades.App().ExecutablePath("lang"),
+		"lang_path": path.Executable("lang"),
 
 		// Encryption Key
 		//
@@ -103,6 +105,7 @@ func init() {
 			&crypt.ServiceProvider{},
 			&filesystem.ServiceProvider{},
 			&validation.ServiceProvider{},
+			&session.ServiceProvider{},
 			&translation.ServiceProvider{},
 			&testing.ServiceProvider{},
 			&providers.AppServiceProvider{},

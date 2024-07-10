@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/goravel/framework/facades"
+	"github.com/goravel/framework/support/path"
 )
 
 func init() {
@@ -26,20 +27,20 @@ func init() {
 			},
 			"single": map[string]any{
 				"driver": "single",
-				"path":   "storage/logs/panel.log",
+				"path":   path.Executable("storage/logs/panel.log"),
 				"level":  "info",
 				"print":  true,
 			},
 			"daily": map[string]any{
 				"driver": "daily",
-				"path":   "storage/logs/panel.log",
+				"path":   path.Executable("storage/logs/panel.log"),
 				"level":  "info",
 				"days":   7,
 				"print":  true,
 			},
 			"http": map[string]any{
 				"driver": "daily",
-				"path":   "storage/logs/http.log",
+				"path":   path.Executable("storage/logs/http.log"),
 				"level":  "info",
 				"days":   7,
 				"print":  false,
