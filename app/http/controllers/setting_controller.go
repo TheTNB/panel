@@ -45,13 +45,10 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
+	userID := cast.ToUint(ctx.Value("user_id"))
 	var user models.User
-	err = facades.Auth(ctx).User(&user)
-	if err != nil {
-		facades.Log().Request(ctx.Request()).Tags("面板", "面板设置").With(map[string]any{
-			"error": err.Error(),
-		}).Info("获取用户信息失败")
-		return ErrorSystem(ctx)
+	if err = facades.Orm().Query().Where("id", userID).Get(&user); err != nil {
+		return Error(ctx, http.StatusInternalServerError, "获取用户信息失败")
 	}
 
 	port, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
@@ -129,11 +126,12 @@ func (r *SettingController) Update(ctx http.Context) http.Response {
 		return ErrorSystem(ctx)
 	}
 
+	userID := cast.ToUint(ctx.Value("user_id"))
 	var user models.User
-	err = facades.Auth(ctx).User(&user)
-	if err != nil {
-		return ErrorSystem(ctx)
+	if err = facades.Orm().Query().Where("id", userID).Get(&user); err != nil {
+		return Error(ctx, http.StatusInternalServerError, "获取用户信息失败")
 	}
+
 	user.Username = updateRequest.UserName
 	user.Email = updateRequest.Email
 	if len(updateRequest.Password) > 0 {
