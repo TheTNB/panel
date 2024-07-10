@@ -2645,7 +2645,6 @@ paths:
       - 系统
   /panel/user/info:
     get:
-      description: 获取当前登录用户信息
       produces:
       - application/json
       responses:
@@ -2662,7 +2661,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: 通过用户名和密码获取访问令牌
       parameters:
       - description: request
         in: body
@@ -2686,6 +2684,20 @@ paths:
           schema:
             $ref: '#/definitions/controllers.ErrorResponse'
       summary: 登录
+      tags:
+      - 用户鉴权
+  /panel/user/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SuccessResponse'
+      security:
+      - BearerToken: []
+      summary: 登出
       tags:
       - 用户鉴权
   /panel/website/backupList:

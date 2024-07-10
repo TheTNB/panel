@@ -3235,7 +3235,6 @@ const docTemplate = `{
                         "BearerToken": []
                     }
                 ],
-                "description": "获取当前登录用户信息",
                 "produces": [
                     "application/json"
                 ],
@@ -3255,7 +3254,6 @@ const docTemplate = `{
         },
         "/panel/user/login": {
             "post": {
-                "description": "通过用户名和密码获取访问令牌",
                 "consumes": [
                     "application/json"
                 ],
@@ -3294,6 +3292,30 @@ const docTemplate = `{
                         "description": "系统内部错误",
                         "schema": {
                             "$ref": "#/definitions/controllers.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/panel/user/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户鉴权"
+                ],
+                "summary": "登出",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.SuccessResponse"
                         }
                     }
                 }

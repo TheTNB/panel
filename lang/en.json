@@ -1,8 +1,9 @@
 {
   "auth": {
-    "token": {
-      "expired": "login has expired",
-      "missing": "not logged in"
+    "session": {
+      "expired": "session has expired",
+      "missing": "Please enable cookies and try again",
+      "invalid": "invalid session"
     }
   },
   "commands": {

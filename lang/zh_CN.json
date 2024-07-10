@@ -1,8 +1,9 @@
 {
   "auth": {
-    "token": {
-      "expired": "登录已过期",
-      "missing": "未登录"
+    "session": {
+      "expired": "会话已过期",
+      "missing": "请启用 Cookie 后再试",
+      "invalid": "会话无效"
     }
   },
   "commands": {

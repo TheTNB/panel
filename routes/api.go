@@ -14,29 +14,30 @@ func Api() {
 		r.Prefix("info").Group(func(r route.Router) {
 			infoController := controllers.NewInfoController()
 			r.Get("panel", infoController.Panel)
-			r.Middleware(middleware.Jwt()).Get("homePlugins", infoController.HomePlugins)
-			r.Middleware(middleware.Jwt()).Get("nowMonitor", infoController.NowMonitor)
-			r.Middleware(middleware.Jwt()).Get("systemInfo", infoController.SystemInfo)
-			r.Middleware(middleware.Jwt()).Get("countInfo", infoController.CountInfo)
-			r.Middleware(middleware.Jwt()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
-			r.Middleware(middleware.Jwt()).Get("checkUpdate", infoController.CheckUpdate)
-			r.Middleware(middleware.Jwt()).Get("updateInfo", infoController.UpdateInfo)
-			r.Middleware(middleware.Jwt()).Post("update", infoController.Update)
-			r.Middleware(middleware.Jwt()).Post("restart", infoController.Restart)
+			r.Middleware(middleware.Session()).Get("homePlugins", infoController.HomePlugins)
+			r.Middleware(middleware.Session()).Get("nowMonitor", infoController.NowMonitor)
+			r.Middleware(middleware.Session()).Get("systemInfo", infoController.SystemInfo)
+			r.Middleware(middleware.Session()).Get("countInfo", infoController.CountInfo)
+			r.Middleware(middleware.Session()).Get("installedDbAndPhp", infoController.InstalledDbAndPhp)
+			r.Middleware(middleware.Session()).Get("checkUpdate", infoController.CheckUpdate)
+			r.Middleware(middleware.Session()).Get("updateInfo", infoController.UpdateInfo)
+			r.Middleware(middleware.Session()).Post("update", infoController.Update)
+			r.Middleware(middleware.Session()).Post("restart", infoController.Restart)
 		})
 		r.Prefix("user").Group(func(r route.Router) {
 			userController := controllers.NewUserController()
 			r.Middleware(frameworkmiddleware.Throttle("login")).Post("login", userController.Login)
-			r.Middleware(middleware.Jwt()).Get("info", userController.Info)
+			r.Post("logout", userController.Logout)
+			r.Middleware(middleware.Session()).Get("info", userController.Info)
 		})
-		r.Prefix("task").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("task").Middleware(middleware.Session()).Group(func(r route.Router) {
 			taskController := controllers.NewTaskController()
 			r.Get("status", taskController.Status)
 			r.Get("list", taskController.List)
 			r.Get("log", taskController.Log)
 			r.Post("delete", taskController.Delete)
 		})
-		r.Prefix("website").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
+		r.Prefix("website").Middleware(middleware.Session(), middleware.MustInstall()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("defaultConfig", websiteController.GetDefaultConfig)
 			r.Post("defaultConfig", websiteController.SaveDefaultConfig)
@@ -44,7 +45,7 @@ func Api() {
 			r.Put("uploadBackup", websiteController.UploadBackup)
 			r.Delete("deleteBackup", websiteController.DeleteBackup)
 		})
-		r.Prefix("websites").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
+		r.Prefix("websites").Middleware(middleware.Session(), middleware.MustInstall()).Group(func(r route.Router) {
 			websiteController := controllers.NewWebsiteController()
 			r.Get("/", websiteController.List)
 			r.Post("/", websiteController.Add)
@@ -58,7 +59,7 @@ func Api() {
 			r.Post("{id}/resetConfig", websiteController.ResetConfig)
 			r.Post("{id}/status", websiteController.Status)
 		})
-		r.Prefix("cert").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("cert").Middleware(middleware.Session()).Group(func(r route.Router) {
 			certController := controllers.NewCertController()
 			r.Get("caProviders", certController.CAProviders)
 			r.Get("dnsProviders", certController.DNSProviders)
@@ -83,7 +84,7 @@ func Api() {
 			r.Post("manualDNS", certController.ManualDNS)
 			r.Post("deploy", certController.Deploy)
 		})
-		r.Prefix("plugin").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("plugin").Middleware(middleware.Session()).Group(func(r route.Router) {
 			pluginController := controllers.NewPluginController()
 			r.Get("list", pluginController.List)
 			r.Post("install", pluginController.Install)
@@ -92,7 +93,7 @@ func Api() {
 			r.Post("updateShow", pluginController.UpdateShow)
 			r.Get("isInstalled", pluginController.IsInstalled)
 		})
-		r.Prefix("cron").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("cron").Middleware(middleware.Session()).Group(func(r route.Router) {
 			cronController := controllers.NewCronController()
 			r.Get("list", cronController.List)
 			r.Get("{id}", cronController.Script)
@@ -102,7 +103,7 @@ func Api() {
 			r.Post("status", cronController.Status)
 			r.Get("log/{id}", cronController.Log)
 		})
-		r.Prefix("safe").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("safe").Middleware(middleware.Session()).Group(func(r route.Router) {
 			safeController := controllers.NewSafeController()
 			r.Get("firewallStatus", safeController.GetFirewallStatus)
 			r.Post("firewallStatus", safeController.SetFirewallStatus)
@@ -116,7 +117,7 @@ func Api() {
 			r.Get("pingStatus", safeController.GetPingStatus)
 			r.Post("pingStatus", safeController.SetPingStatus)
 		})
-		r.Prefix("container").Middleware(middleware.Jwt(), middleware.MustInstall()).Group(func(r route.Router) {
+		r.Prefix("container").Middleware(middleware.Session(), middleware.MustInstall()).Group(func(r route.Router) {
 			containerController := controllers.NewContainerController()
 			r.Get("list", containerController.ContainerList)
 			r.Get("search", containerController.ContainerSearch)
@@ -164,7 +165,7 @@ func Api() {
 				r.Post("prune", containerController.VolumePrune)
 			})
 		})
-		r.Prefix("file").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("file").Middleware(middleware.Session()).Group(func(r route.Router) {
 			fileController := controllers.NewFileController()
 			r.Post("create", fileController.Create)
 			r.Get("content", fileController.Content)
@@ -182,7 +183,7 @@ func Api() {
 			r.Post("search", fileController.Search)
 			r.Get("list", fileController.List)
 		})
-		r.Prefix("monitor").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("monitor").Middleware(middleware.Session()).Group(func(r route.Router) {
 			monitorController := controllers.NewMonitorController()
 			r.Post("switch", monitorController.Switch)
 			r.Post("saveDays", monitorController.SaveDays)
@@ -190,20 +191,20 @@ func Api() {
 			r.Get("list", monitorController.List)
 			r.Get("switchAndDays", monitorController.SwitchAndDays)
 		})
-		r.Prefix("ssh").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("ssh").Middleware(middleware.Session()).Group(func(r route.Router) {
 			sshController := controllers.NewSshController()
 			r.Get("info", sshController.GetInfo)
 			r.Post("info", sshController.UpdateInfo)
 			r.Get("session", sshController.Session)
 		})
-		r.Prefix("setting").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("setting").Middleware(middleware.Session()).Group(func(r route.Router) {
 			settingController := controllers.NewSettingController()
 			r.Get("list", settingController.List)
 			r.Post("update", settingController.Update)
 			r.Get("https", settingController.GetHttps)
 			r.Post("https", settingController.UpdateHttps)
 		})
-		r.Prefix("system").Middleware(middleware.Jwt()).Group(func(r route.Router) {
+		r.Prefix("system").Middleware(middleware.Session()).Group(func(r route.Router) {
 			controller := controllers.NewSystemController()
 			r.Get("service/status", controller.ServiceStatus)
 			r.Get("service/isEnabled", controller.ServiceIsEnabled)
@@ -218,7 +219,7 @@ func Api() {
 
 	// 文档
 	swaggerController := controllers.NewSwaggerController()
-	facades.Route().Get("swagger/*any", swaggerController.Index)
+	facades.Route().Middleware(middleware.Session()).Get("swagger/*any", swaggerController.Index)
 
 	// 静态文件
 	entrance := facades.Config().GetString("http.entrance")
