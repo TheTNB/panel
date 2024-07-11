@@ -6,8 +6,8 @@ import (
 )
 
 type CertDeploy struct {
-	ID        uint `form:"id" json:"id" filter:"uint"`
-	WebsiteID uint `form:"website_id" json:"website_id" filter:"uint"`
+	ID        uint `form:"id" json:"id"`
+	WebsiteID uint `form:"website_id" json:"website_id"`
 }
 
 func (r *CertDeploy) Authorize(ctx http.Context) error {
@@ -22,7 +22,10 @@ func (r *CertDeploy) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *CertDeploy) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"id":         "uint",
+		"website_id": "uint",
+	}
 }
 
 func (r *CertDeploy) Messages(ctx http.Context) map[string]string {

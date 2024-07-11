@@ -6,7 +6,7 @@ import (
 )
 
 type Delete struct {
-	ID   uint `form:"id" json:"id" filter:"uint"`
+	ID   uint `form:"id" json:"id"`
 	Path bool `form:"path" json:"path"`
 	DB   bool `form:"db" json:"db"`
 }
@@ -24,7 +24,9 @@ func (r *Delete) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *Delete) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"id": "uint",
+	}
 }
 
 func (r *Delete) Messages(ctx http.Context) map[string]string {

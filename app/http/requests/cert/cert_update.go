@@ -10,9 +10,9 @@ type CertUpdate struct {
 	Type      string   `form:"type" json:"type"`
 	Domains   []string `form:"domains" json:"domains"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
-	UserID    uint     `form:"user_id" json:"user_id" filter:"uint"`
-	DNSID     uint     `form:"dns_id" json:"dns_id" filter:"uint"`
-	WebsiteID uint     `form:"website_id" json:"website_id" filter:"uint"`
+	UserID    uint     `form:"user_id" json:"user_id"`
+	DNSID     uint     `form:"dns_id" json:"dns_id"`
+	WebsiteID uint     `form:"website_id" json:"website_id"`
 }
 
 func (r *CertUpdate) Authorize(ctx http.Context) error {
@@ -32,7 +32,11 @@ func (r *CertUpdate) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *CertUpdate) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"user_id":    "uint",
+		"dns_id":     "uint",
+		"website_id": "uint",
+	}
 }
 
 func (r *CertUpdate) Messages(ctx http.Context) map[string]string {

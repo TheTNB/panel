@@ -6,7 +6,7 @@ import (
 )
 
 type RestoreBackup struct {
-	ID   uint   `form:"id" json:"id" filter:"uint"`
+	ID   uint   `form:"id" json:"id"`
 	Name string `form:"name" json:"name"`
 }
 
@@ -22,7 +22,9 @@ func (r *RestoreBackup) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *RestoreBackup) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"id": "uint",
+	}
 }
 
 func (r *RestoreBackup) Messages(ctx http.Context) map[string]string {

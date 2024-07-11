@@ -6,7 +6,7 @@ import (
 )
 
 type SaveConfig struct {
-	ID                uint     `form:"id" json:"id" filter:"uint"`
+	ID                uint     `form:"id" json:"id"`
 	Domains           []string `form:"domains" json:"domains"`
 	Ports             []uint   `form:"ports" json:"ports"`
 	TLSPorts          []uint   `form:"tls_ports" json:"tls_ports"`
@@ -23,7 +23,7 @@ type SaveConfig struct {
 	Root              string   `form:"root" json:"root"`
 	Raw               string   `form:"raw" json:"raw"`
 	Rewrite           string   `form:"rewrite" json:"rewrite"`
-	Php               int      `form:"php" json:"php" filter:"int"`
+	Php               int      `form:"php" json:"php"`
 	SslCertificate    string   `form:"ssl_certificate" json:"ssl_certificate"`
 	SslCertificateKey string   `form:"ssl_certificate_key" json:"ssl_certificate_key"`
 }
@@ -58,7 +58,10 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *SaveConfig) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"id":  "uint",
+		"php": "int",
+	}
 }
 
 func (r *SaveConfig) Messages(ctx http.Context) map[string]string {

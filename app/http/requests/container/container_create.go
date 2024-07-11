@@ -23,9 +23,9 @@ type ContainerCreate struct {
 	OpenStdin       bool                    `form:"openStdin" json:"open_stdin"`
 	PublishAllPorts bool                    `form:"publish_all_ports" json:"publish_all_ports"`
 	Tty             bool                    `form:"tty" json:"tty"`
-	CPUShares       int64                   `form:"cpu_shares" json:"cpu_shares" filter:"int"`
-	CPUs            int64                   `form:"cpus" json:"cpus" filter:"int"`
-	Memory          int64                   `form:"memory" json:"memory" filter:"int"`
+	CPUShares       int64                   `form:"cpu_shares" json:"cpu_shares"`
+	CPUs            int64                   `form:"cpus" json:"cpus"`
+	Memory          int64                   `form:"memory" json:"memory"`
 }
 
 func (r *ContainerCreate) Authorize(ctx http.Context) error {
@@ -65,7 +65,11 @@ func (r *ContainerCreate) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *ContainerCreate) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"cpu_shares": "int",
+		"cpus":       "int",
+		"memory":     "int",
+	}
 }
 
 func (r *ContainerCreate) Messages(ctx http.Context) map[string]string {

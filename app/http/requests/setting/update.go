@@ -8,7 +8,7 @@ import (
 type Update struct {
 	Name        string `form:"name" json:"name"`
 	Language    string `form:"language" json:"language"`
-	Port        uint   `form:"port" json:"port" filter:"uint"`
+	Port        uint   `form:"port" json:"port"`
 	BackupPath  string `form:"backup_path" json:"backup_path"`
 	WebsitePath string `form:"website_path" json:"website_path"`
 	Entrance    string `form:"entrance" json:"entrance"`
@@ -36,7 +36,9 @@ func (r *Update) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *Update) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"port": "uint",
+	}
 }
 
 func (r *Update) Messages(ctx http.Context) map[string]string {

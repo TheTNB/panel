@@ -6,7 +6,7 @@ import (
 )
 
 type ID struct {
-	ID uint `form:"id" json:"id" filter:"uint"`
+	ID uint `form:"id" json:"id"`
 }
 
 func (r *ID) Authorize(ctx http.Context) error {
@@ -20,7 +20,9 @@ func (r *ID) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *ID) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"id": "uint",
+	}
 }
 
 func (r *ID) Messages(ctx http.Context) map[string]string {

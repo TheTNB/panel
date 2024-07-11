@@ -6,8 +6,8 @@ import (
 )
 
 type Paginate struct {
-	Page  int `form:"page" json:"page" filter:"int"`
-	Limit int `form:"limit" json:"limit" filter:"int"`
+	Page  int `form:"page" json:"page"`
+	Limit int `form:"limit" json:"limit"`
 }
 
 func (r *Paginate) Authorize(ctx http.Context) error {
@@ -22,7 +22,10 @@ func (r *Paginate) Rules(ctx http.Context) map[string]string {
 }
 
 func (r *Paginate) Filters(ctx http.Context) map[string]string {
-	return map[string]string{}
+	return map[string]string{
+		"page":  "int",
+		"limit": "int",
+	}
 }
 
 func (r *Paginate) Messages(ctx http.Context) map[string]string {
