@@ -33,6 +33,20 @@ func Session() http.Middleware {
 			return
 		}
 
+		// 刷新会话
+		if err := ctx.Request().Session().Regenerate(); err == nil {
+			ctx.Response().Cookie(http.Cookie{
+				Name:     ctx.Request().Session().GetName(),
+				Value:    ctx.Request().Session().GetID(),
+				MaxAge:   facades.Config().GetInt("session.lifetime") * 60,
+				Path:     facades.Config().GetString("session.path"),
+				Domain:   facades.Config().GetString("session.domain"),
+				Secure:   facades.Config().GetBool("session.secure"),
+				HttpOnly: facades.Config().GetBool("session.http_only"),
+				SameSite: facades.Config().GetString("session.same_site"),
+			})
+		}
+
 		ctx.WithValue("user_id", userID)
 		ctx.Request().Next()
 	}
