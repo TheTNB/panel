@@ -29,7 +29,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/net v0.27.0
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.11
 )
 
 require (
