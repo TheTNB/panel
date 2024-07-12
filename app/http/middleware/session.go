@@ -34,7 +34,7 @@ func Session() http.Middleware {
 		}
 
 		// 刷新会话
-		if err := ctx.Request().Session().Regenerate(); err == nil {
+		/*if err := ctx.Request().Session().Regenerate(); err == nil {
 			ctx.Response().Cookie(http.Cookie{
 				Name:     ctx.Request().Session().GetName(),
 				Value:    ctx.Request().Session().GetID(),
@@ -45,7 +45,7 @@ func Session() http.Middleware {
 				HttpOnly: facades.Config().GetBool("session.http_only"),
 				SameSite: facades.Config().GetString("session.same_site"),
 			})
-		}
+		}*/
 
 		ctx.WithValue("user_id", userID)
 		ctx.Request().Next()
