@@ -439,6 +439,11 @@ cat > ${openrestyPath}/html/index.html << EOF
         p {
             color: #555;
             line-height: 1.8;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
         }
         @media screen and (max-width: 768px) {
             .container {
@@ -456,6 +461,7 @@ cat > ${openrestyPath}/html/index.html << EOF
         <h1>耗子面板</h1>
         <p>这是耗子面板的 OpenResty 默认页面！</p>
         <p>当您看到此页面，说明无法在服务器上找到该域名对应的站点。</p>
+        <p>由 <a target="_blank" href="https://panel.haozi.net">耗子面板</a> 强力驱动</p>
     </div>
 </body>
 </html>
@@ -495,6 +501,11 @@ cat > ${openrestyPath}/html/stop.html << EOF
         p {
             color: #555;
             line-height: 1.8;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
         }
         @media screen and (max-width: 768px) {
             .container {
@@ -512,6 +523,7 @@ cat > ${openrestyPath}/html/stop.html << EOF
         <h1>耗子面板</h1>
         <p>该网站已被管理员停止访问！</p>
         <p>当您看到此页面，说明该网站已被服务器管理员停止对外访问。</p>
+        <p>由 <a target="_blank" href="https://panel.haozi.net">耗子面板</a> 强力驱动</p>
     </div>
 </body>
 </html>
@@ -551,6 +563,11 @@ cat > ${openrestyPath}/html/block.html << EOF
         p {
             color: #555;
             line-height: 1.8;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
         }
         @media screen and (max-width: 768px) {
             .container {
@@ -569,6 +586,7 @@ cat > ${openrestyPath}/html/block.html << EOF
         <p>本次请求判断为危险的攻击请求，已被拦截！</p>
         <p>可能您的请求中包含了危险的攻击内容，或者您的请求被误判为攻击请求。</p>
         <p>如果您认为这是误判，请联系服务器管理员解决。</p>
+        <p>由 <a target="_blank" href="https://panel.haozi.net">耗子面板</a> 强力驱动</p>
     </div>
 </body>
 </html>

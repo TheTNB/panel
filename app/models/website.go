@@ -7,8 +7,8 @@ type Website struct {
 	Name   string `gorm:"not null;unique" json:"name"`
 	Status bool   `gorm:"not null;default:true" json:"status"`
 	Path   string `gorm:"not null" json:"path"`
-	Php    int    `gorm:"not null" json:"php"`
-	Ssl    bool   `gorm:"not null" json:"ssl"`
+	PHP    int    `gorm:"not null" json:"php"`
+	SSL    bool   `gorm:"not null" json:"ssl"`
 	Remark string `gorm:"not null" json:"remark"`
 
 	Cert *Cert `gorm:"foreignKey:WebsiteID" json:"cert"`

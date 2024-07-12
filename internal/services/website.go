@@ -4,6 +4,7 @@ package services
 import (
 	"errors"
 	"fmt"
+	"github.com/TheTNB/panel/embed"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -47,14 +48,13 @@ func (r *WebsiteImpl) List(page, limit int) (int64, []models.Website, error) {
 }
 
 // Add 添加网站
-func (r *WebsiteImpl) Add(website types.WebsiteAdd) (models.Website, error) {
+func (r *WebsiteImpl) Add(website requests.Add) (models.Website, error) {
 	w := models.Website{
 		Name:   website.Name,
-		Status: website.Status,
+		Status: true,
 		Path:   website.Path,
-		Php:    cast.ToInt(website.Php),
-		Ssl:    website.Ssl,
-		Remark: website.Remark,
+		PHP:    cast.ToInt(website.PHP),
+		SSL:    false,
 	}
 	if err := facades.Orm().Query().Create(&w); err != nil {
 		return models.Website{}, err
@@ -64,122 +64,19 @@ func (r *WebsiteImpl) Add(website types.WebsiteAdd) (models.Website, error) {
 		return models.Website{}, err
 	}
 
-	index := `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>耗子面板</title>
-    <style>
-        body {
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 2em auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 0.5em;
-        }
-        p {
-            color: #555;
-            line-height: 1.8;
-        }
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 15px;
-                margin: 2em 15px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>耗子面板</h1>
-        <p>这是耗子面板的网站默认页面！</p>
-        <p>当您看到此页面，说明您的网站已创建成功。</p>
-    </div>
-</body>
-</html>
-
-`
-	if err := io.Write(website.Path+"/index.html", index, 0644); err != nil {
+	index, err := embed.WebsiteFS.ReadFile(filepath.Join("website", "index.html"))
+	if err != nil {
+		return models.Website{}, fmt.Errorf("获取index模板文件失败: %w", err)
+	}
+	if err = io.Write(website.Path+"/index.html", string(index), 0644); err != nil {
 		return models.Website{}, err
 	}
 
-	notFound := `<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 Not Found</title>
-    <style>
-        body {
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 800px;
-            margin: 2em auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-size: 2.5em;
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 0.5em;
-        }
-        p {
-            color: #555;
-            line-height: 1.8;
-            text-align: center;
-        }
-        a {
-            text-decoration: none;
-            color: #007bff;
-        }
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 15px;
-                margin: 2em 15px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>404 Not Found</h1>
-        <p>由 <a target="_blank" href="https://github.com/TheTNB/panel">耗子面板</a> 强力驱动</p>
-    </div>
-</body>
-</html>
-
-`
-	if err := io.Write(website.Path+"/404.html", notFound, 0644); err != nil {
+	notFound, err := embed.WebsiteFS.ReadFile(filepath.Join("website", "404.html"))
+	if err != nil {
+		return models.Website{}, fmt.Errorf("获取404模板文件失败: %w", err)
+	}
+	if err = io.Write(website.Path+"/404.html", string(notFound), 0644); err != nil {
 		return models.Website{}, err
 	}
 
@@ -265,58 +162,58 @@ server
     access_log /www/wwwlogs/%s.log;
     error_log /www/wwwlogs/%s.log;
 }
-`, portList, domainList, website.Path, website.Php, website.Name, website.Name, website.Name, website.Name)
+`, portList, domainList, website.Path, website.PHP, website.Name, website.Name, website.Name, website.Name)
 
-	if err := io.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/"+website.Name+".conf", nginxConf, 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
+	if err = io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", "", 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := io.Write("/www/server/vhost/acme/"+website.Name+".conf", "", 0644); err != nil {
+	if err = io.Write("/www/server/vhost/acme/"+website.Name+".conf", "", 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := io.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", "", 0644); err != nil {
 		return models.Website{}, err
 	}
-	if err := io.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644); err != nil {
-		return models.Website{}, err
-	}
-
-	if err := io.Chmod(website.Path, 0755); err != nil {
-		return models.Website{}, err
-	}
-	if err := io.Chown(website.Path, "www", "www"); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".key", "", 0644); err != nil {
 		return models.Website{}, err
 	}
 
-	if err := systemctl.Reload("openresty"); err != nil {
+	if err = io.Chmod(website.Path, 0755); err != nil {
+		return models.Website{}, err
+	}
+	if err = io.Chown(website.Path, "www", "www"); err != nil {
+		return models.Website{}, err
+	}
+
+	if err = systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")
 		return models.Website{}, err
 	}
 
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
-	if website.Db && website.DbType == "mysql" {
+	if website.DB && website.DBType == "mysql" {
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
 		if err != nil {
 			return models.Website{}, err
 		}
-		if err = mysql.DatabaseCreate(website.DbName); err != nil {
+		if err = mysql.DatabaseCreate(website.DBName); err != nil {
 			return models.Website{}, err
 		}
-		if err = mysql.UserCreate(website.DbUser, website.DbPassword); err != nil {
+		if err = mysql.UserCreate(website.DBUser, website.DBPassword); err != nil {
 			return models.Website{}, err
 		}
-		if err = mysql.PrivilegesGrant(website.DbUser, website.DbName); err != nil {
+		if err = mysql.PrivilegesGrant(website.DBUser, website.DBName); err != nil {
 			return models.Website{}, err
 		}
 	}
-	if website.Db && website.DbType == "postgresql" {
-		_, _ = shell.Execf(`echo "CREATE DATABASE '%s';" | su - postgres -c "psql"`, website.DbName)
-		_, _ = shell.Execf(`echo "CREATE USER '%s' WITH PASSWORD '%s';" | su - postgres -c "psql"`, website.DbUser, website.DbPassword)
-		_, _ = shell.Execf(`echo "ALTER DATABASE '%s' OWNER TO '%s';" | su - postgres -c "psql"`, website.DbName, website.DbUser)
-		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE '%s' TO '%s';" | su - postgres -c "psql"`, website.DbName, website.DbUser)
-		userConfig := "host    " + website.DbName + "    " + website.DbUser + "    127.0.0.1/32    scram-sha-256"
+	if website.DB && website.DBType == "postgresql" {
+		_, _ = shell.Execf(`echo "CREATE DATABASE '%s';" | su - postgres -c "psql"`, website.DBName)
+		_, _ = shell.Execf(`echo "CREATE USER '%s' WITH PASSWORD '%s';" | su - postgres -c "psql"`, website.DBUser, website.DBPassword)
+		_, _ = shell.Execf(`echo "ALTER DATABASE '%s' OWNER TO '%s';" | su - postgres -c "psql"`, website.DBName, website.DBUser)
+		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE '%s' TO '%s';" | su - postgres -c "psql"`, website.DBName, website.DBUser)
+		userConfig := "host    " + website.DBName + "    " + website.DBUser + "    127.0.0.1/32    scram-sha-256"
 		_, _ = shell.Execf(`echo "` + userConfig + `" >> /www/server/postgresql/data/pg_hba.conf`)
 		_ = systemctl.Reload("postgresql")
 	}
@@ -381,9 +278,11 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	for _, port := range ports {
 		https := ""
 		quic := false
-		if slices.Contains(config.TLSPorts, port) {
+		if slices.Contains(config.SSLPorts, port) {
 			https = " ssl"
-			quic = true
+			if slices.Contains(config.QUICPorts, port) {
+				quic = true
+			}
 		}
 
 		portConf.WriteString(fmt.Sprintf("    listen %d%s;\n", port, https))
@@ -431,12 +330,12 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		root += "/"
 	}
 	if config.OpenBasedir {
-		if err := io.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644); err != nil {
+		if err = io.Write(root+".user.ini", "open_basedir="+path+":/tmp/", 0644); err != nil {
 			return err
 		}
 	} else {
 		if io.Exists(root + ".user.ini") {
-			if err := io.Remove(root + ".user.ini"); err != nil {
+			if err = io.Remove(root + ".user.ini"); err != nil {
 				return err
 			}
 		}
@@ -465,20 +364,20 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 	raw = strings.Replace(raw, "# waf标记位开始", wafConfig, -1)
 
 	// SSL
-	ssl := config.Ssl
-	website.Ssl = ssl
+	ssl := config.SSL
+	website.SSL = ssl
 	if ssl {
-		if _, err = cert.ParseCert(config.SslCertificate); err != nil {
+		if _, err = cert.ParseCert(config.SSLCertificate); err != nil {
 			return errors.New("TLS证书格式错误")
 		}
-		if _, err = cert.ParseKey(config.SslCertificateKey); err != nil {
+		if _, err = cert.ParseKey(config.SSLCertificateKey); err != nil {
 			return errors.New("TLS私钥格式错误")
 		}
 	}
-	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SslCertificate, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".pem", config.SSLCertificate, 0644); err != nil {
 		return err
 	}
-	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SslCertificateKey, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/ssl/"+website.Name+".key", config.SSLCertificateKey, 0644); err != nil {
 		return err
 	}
 	if ssl {
@@ -492,7 +391,7 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     ssl_prefer_server_ciphers off;
     ssl_early_data on;
     `
-		if config.HttpRedirect {
+		if config.HTTPRedirect {
 			sslConfig += `# http重定向标记位开始
     if ($server_port !~ 443){
         return 301 https://$host$request_uri;
@@ -501,10 +400,17 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
     # http重定向标记位结束
     `
 		}
-		if config.Hsts {
+		if config.HSTS {
 			sslConfig += `# hsts标记位开始
     add_header Strict-Transport-Security "max-age=63072000" always;
     # hsts标记位结束
+    `
+		}
+		if config.OCSP {
+			sslConfig += `# ocsp标记位开始
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    # ocsp标记位结束
     `
 		}
 		sslConfigOld := str.Cut(raw, "# ssl标记位开始", "# ssl标记位结束")
@@ -519,25 +425,25 @@ func (r *WebsiteImpl) SaveConfig(config requests.SaveConfig) error {
 		}
 	}
 
-	if website.Php != config.Php {
-		website.Php = config.Php
+	if website.PHP != config.PHP {
+		website.PHP = config.PHP
 		phpConfigOld := str.Cut(raw, "# php标记位开始", "# php标记位结束")
 		phpConfig := `
-    include enable-php-` + strconv.Itoa(website.Php) + `.conf;
+    include enable-php-` + strconv.Itoa(website.PHP) + `.conf;
     `
 		if len(strings.TrimSpace(phpConfigOld)) != 0 {
 			raw = strings.Replace(raw, phpConfigOld, phpConfig, -1)
 		}
 	}
 
-	if err := facades.Orm().Query().Save(&website); err != nil {
+	if err = facades.Orm().Query().Save(&website); err != nil {
 		return err
 	}
 
-	if err := io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return err
 	}
-	if err := io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
+	if err = io.Write("/www/server/vhost/rewrite/"+website.Name+".conf", config.Rewrite, 0644); err != nil {
 		return err
 	}
 
@@ -608,12 +514,12 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 	var setting types.WebsiteSetting
 	setting.Name = website.Name
 	setting.Path = website.Path
-	setting.Ssl = website.Ssl
-	setting.Php = strconv.Itoa(website.Php)
+	setting.SSL = website.SSL
+	setting.PHP = strconv.Itoa(website.PHP)
 	setting.Raw = config
 
-	ports := str.Cut(config, "# port标记位开始", "# port标记位结束")
-	matches := regexp.MustCompile(`listen\s+([^;]*);?`).FindAllStringSubmatch(ports, -1)
+	portStr := str.Cut(config, "# port标记位开始", "# port标记位结束")
+	matches := regexp.MustCompile(`listen\s+([^;]*);?`).FindAllStringSubmatch(portStr, -1)
 	for _, match := range matches {
 		if len(match) < 2 {
 			continue
@@ -625,11 +531,16 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 
 		// 处理 443 ssl 之类的情况
 		ports := strings.Fields(match[1])
-		if len(ports) == 1 {
-			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
-		} else if len(ports) > 1 && ports[1] == "ssl" {
-			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
-			setting.TLSPorts = append(setting.TLSPorts, cast.ToUint(ports[0]))
+		if len(ports) == 0 {
+			continue
+		}
+		if !slices.Contains(setting.Ports, ports[0]) {
+			setting.Ports = append(setting.Ports, ports[0])
+		}
+		if len(ports) > 1 && ports[1] == "ssl" {
+			setting.SSLPorts = append(setting.SSLPorts, ports[0])
+		} else if len(ports) > 1 && ports[1] == "quic" {
+			setting.QUICPorts = append(setting.QUICPorts, ports[0])
 		}
 	}
 	serverName := str.Cut(config, "# server_name标记位开始", "# server_name标记位结束")
@@ -652,33 +563,27 @@ func (r *WebsiteImpl) GetConfig(id uint) (types.WebsiteSetting, error) {
 		userIni, _ := io.Read(filepath.Join(setting.Root, ".user.ini"))
 		if strings.Contains(userIni, "open_basedir") {
 			setting.OpenBasedir = true
-		} else {
-			setting.OpenBasedir = false
 		}
-	} else {
-		setting.OpenBasedir = false
 	}
 
 	crt, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".pem")
-	setting.SslCertificate = crt
+	setting.SSLCertificate = crt
 	key, _ := io.Read("/www/server/vhost/ssl/" + website.Name + ".key")
-	setting.SslCertificateKey = key
-	if setting.Ssl {
+	setting.SSLCertificateKey = key
+	if setting.SSL {
 		ssl := str.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
-		setting.HttpRedirect = strings.Contains(ssl, "# http重定向标记位")
-		setting.Hsts = strings.Contains(ssl, "# hsts标记位")
-	} else {
-		setting.HttpRedirect = false
-		setting.Hsts = false
+		setting.HTTPRedirect = strings.Contains(ssl, "# http重定向标记位")
+		setting.HSTS = strings.Contains(ssl, "# hsts标记位")
+		setting.OCSP = strings.Contains(ssl, "# ocsp标记位")
 	}
 
 	// 解析证书信息
 	if decode, err := cert.ParseCert(crt); err == nil {
-		setting.SslNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
-		setting.SslNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
-		setting.SslIssuer = decode.Issuer.CommonName
-		setting.SslOCSPServer = decode.OCSPServer
-		setting.SSlDNSNames = decode.DNSNames
+		setting.SSLNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
+		setting.SSLNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
+		setting.SSLIssuer = decode.Issuer.CommonName
+		setting.SSLOCSPServer = decode.OCSPServer
+		setting.SSLDNSNames = decode.DNSNames
 	}
 
 	waf := str.Cut(config, "# waf标记位开始", "# waf标记位结束")

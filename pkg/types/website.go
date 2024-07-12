@@ -1,42 +1,28 @@
 package types
 
-type WebsiteAdd struct {
-	Name       string   `json:"name"`
-	Status     bool     `json:"status"`
-	Domains    []string `json:"domains"`
-	Ports      []uint   `json:"ports"`
-	Path       string   `json:"path"`
-	Php        string   `json:"php"`
-	Ssl        bool     `json:"ssl"`
-	Remark     string   `json:"remark"`
-	Db         bool     `json:"db"`
-	DbType     string   `json:"db_type"`
-	DbName     string   `json:"db_name"`
-	DbUser     string   `json:"db_user"`
-	DbPassword string   `json:"db_password"`
-}
-
 // WebsiteSetting 网站设置
 type WebsiteSetting struct {
 	Name              string   `json:"name"`
 	Domains           []string `json:"domains"`
-	Ports             []uint   `json:"ports"`
-	TLSPorts          []uint   `json:"tls_ports"`
+	Ports             []string `json:"ports"`
+	SSLPorts          []string `json:"ssl_ports"`
+	QUICPorts         []string `json:"quic_ports"`
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
-	Php               string   `json:"php"`
+	PHP               string   `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
-	Ssl               bool     `json:"ssl"`
-	SslCertificate    string   `json:"ssl_certificate"`
-	SslCertificateKey string   `json:"ssl_certificate_key"`
-	SslNotBefore      string   `json:"ssl_not_before"`
-	SslNotAfter       string   `json:"ssl_not_after"`
-	SSlDNSNames       []string `json:"ssl_dns_names"`
-	SslIssuer         string   `json:"ssl_issuer"`
-	SslOCSPServer     []string `json:"ssl_ocsp_server"`
-	HttpRedirect      bool     `json:"http_redirect"`
-	Hsts              bool     `json:"hsts"`
+	SSL               bool     `json:"ssl"`
+	SSLCertificate    string   `json:"ssl_certificate"`
+	SSLCertificateKey string   `json:"ssl_certificate_key"`
+	SSLNotBefore      string   `json:"ssl_not_before"`
+	SSLNotAfter       string   `json:"ssl_not_after"`
+	SSLDNSNames       []string `json:"ssl_dns_names"`
+	SSLIssuer         string   `json:"ssl_issuer"`
+	SSLOCSPServer     []string `json:"ssl_ocsp_server"`
+	HTTPRedirect      bool     `json:"http_redirect"`
+	HSTS              bool     `json:"hsts"`
+	OCSP              bool     `json:"ocsp"`
 	Waf               bool     `json:"waf"`
 	WafMode           string   `json:"waf_mode"`
 	WafCcDeny         string   `json:"waf_cc_deny"`

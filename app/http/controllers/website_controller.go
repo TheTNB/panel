@@ -17,7 +17,6 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 type WebsiteController struct {
@@ -55,7 +54,7 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取网站列表失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, http.Json{
@@ -85,27 +84,12 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 		addRequest.Path = r.setting.Get(models.SettingKeyWebsitePath) + "/" + addRequest.Name
 	}
 
-	website := types.WebsiteAdd{
-		Name:       addRequest.Name,
-		Status:     true,
-		Domains:    addRequest.Domains,
-		Ports:      addRequest.Ports,
-		Path:       addRequest.Path,
-		Php:        addRequest.Php,
-		Ssl:        false,
-		Db:         addRequest.Db,
-		DbType:     addRequest.DbType,
-		DbName:     addRequest.DbName,
-		DbUser:     addRequest.DbUser,
-		DbPassword: addRequest.DbPassword,
-	}
-
-	_, err := r.website.Add(website)
+	_, err := r.website.Add(addRequest)
 	if err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("添加网站失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -181,14 +165,14 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认首页配置失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := io.Write("/www/server/openresty/html/stop.html", stop, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认停止页配置失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -217,7 +201,7 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("获取网站配置失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, config)
@@ -335,7 +319,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取备份列表失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	paged, total := Paginate(ctx, backups)
@@ -412,7 +396,7 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("上传备份失败")
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	return Success(ctx, nil)
@@ -506,7 +490,7 @@ func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	}
 
 	website.Status = true
-	website.Ssl = false
+	website.SSL = false
 	if err := facades.Orm().Query().Save(&website); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"id":    idRequest.ID,
@@ -575,7 +559,7 @@ server
     error_log /www/wwwlogs/%s.log;
 }
 
-`, website.Path, website.Php, website.Name, website.Name, website.Name, website.Name)
+`, website.Path, website.PHP, website.Name, website.Name, website.Name, website.Name)
 	if err := io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
 		return nil
 	}
@@ -650,7 +634,7 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	}
 
 	if err = io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
-		return ErrorSystem(ctx)
+		return Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")

@@ -9,10 +9,12 @@ type SaveConfig struct {
 	ID                uint     `form:"id" json:"id"`
 	Domains           []string `form:"domains" json:"domains"`
 	Ports             []uint   `form:"ports" json:"ports"`
-	TLSPorts          []uint   `form:"tls_ports" json:"tls_ports"`
-	Hsts              bool     `form:"hsts" json:"hsts"`
-	Ssl               bool     `form:"ssl" json:"ssl"`
-	HttpRedirect      bool     `form:"http_redirect" json:"http_redirect"`
+	SSLPorts          []uint   `form:"ssl_ports" json:"ssl_ports"`
+	QUICPorts         []uint   `form:"quic_ports" json:"quic_ports"`
+	OCSP              bool     `form:"ocsp" json:"ocsp"`
+	HSTS              bool     `form:"hsts" json:"hsts"`
+	SSL               bool     `form:"ssl" json:"ssl"`
+	HTTPRedirect      bool     `form:"http_redirect" json:"http_redirect"`
 	OpenBasedir       bool     `form:"open_basedir" json:"open_basedir"`
 	Waf               bool     `form:"waf" json:"waf"`
 	WafCache          string   `form:"waf_cache" json:"waf_cache"`
@@ -23,9 +25,9 @@ type SaveConfig struct {
 	Root              string   `form:"root" json:"root"`
 	Raw               string   `form:"raw" json:"raw"`
 	Rewrite           string   `form:"rewrite" json:"rewrite"`
-	Php               int      `form:"php" json:"php"`
-	SslCertificate    string   `form:"ssl_certificate" json:"ssl_certificate"`
-	SslCertificateKey string   `form:"ssl_certificate_key" json:"ssl_certificate_key"`
+	PHP               int      `form:"php" json:"php"`
+	SSLCertificate    string   `form:"ssl_certificate" json:"ssl_certificate"`
+	SSLCertificateKey string   `form:"ssl_certificate_key" json:"ssl_certificate_key"`
 }
 
 func (r *SaveConfig) Authorize(ctx http.Context) error {
@@ -37,7 +39,9 @@ func (r *SaveConfig) Rules(ctx http.Context) map[string]string {
 		"id":                  "required|exists:websites,id",
 		"domains":             "required|slice",
 		"ports":               "required|slice",
-		"tls_ports":           "required_if:ssl,true|slice|not_in:80",
+		"ssl_ports":           "slice|not_in:80",
+		"quic_ports":          "slice|not_in:80",
+		"ocsp":                "bool",
 		"hsts":                "bool",
 		"ssl":                 "bool",
 		"http_redirect":       "bool",

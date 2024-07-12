@@ -506,8 +506,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			Name:   name,
 			Status: status,
 			Path:   path,
-			Php:    php,
-			Ssl:    ssl,
+			PHP:    php,
+			SSL:    ssl,
 		})
 		if err != nil {
 			color.Red().Printfln(translate.Get("commands.panel.writeSite.fail"))
@@ -615,15 +615,13 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 			return nil
 		}
 
-		_, err = website.Add(types.WebsiteAdd{
+		_, err = website.Add(requests.Add{
 			Name:    name,
-			Status:  true,
 			Domains: domains,
 			Ports:   uintPorts,
 			Path:    path,
-			Php:     php,
-			Ssl:     false,
-			Db:      false,
+			PHP:     php,
+			DB:      false,
 		})
 		if err != nil {
 			color.Red().Printfln(err.Error())
