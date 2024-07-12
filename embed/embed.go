@@ -2,5 +2,5 @@ package embed
 
 import "embed"
 
-//go:embed public/*
+//go:embed frontend/*
 var PublicFS embed.FS
