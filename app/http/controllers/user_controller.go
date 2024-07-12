@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
@@ -75,10 +73,7 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/panel/user/logout [post]
 func (r *UserController) Logout(ctx http.Context) http.Response {
-	if err := ctx.Request().Session().Invalidate(); err != nil {
-		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("登出失败: %s", err.Error()))
-	}
-
+	ctx.Request().Session().Forget("user_id")
 	return Success(ctx, nil)
 }
 

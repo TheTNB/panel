@@ -1,12 +1,16 @@
 package routes
 
 import (
+	"path/filepath"
+
+	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/route"
 	"github.com/goravel/framework/facades"
 	frameworkmiddleware "github.com/goravel/framework/http/middleware"
 
 	"github.com/TheTNB/panel/app/http/controllers"
 	"github.com/TheTNB/panel/app/http/middleware"
+	"github.com/TheTNB/panel/embed"
 )
 
 func Api() {
@@ -221,17 +225,9 @@ func Api() {
 	swaggerController := controllers.NewSwaggerController()
 	facades.Route().Middleware(middleware.Session()).Get("swagger/*any", swaggerController.Index)
 
-	// 静态文件
-	entrance := facades.Config().GetString("http.entrance")
-	if entrance == "/" {
-		entrance = ""
-	}
-	assetController := controllers.NewAssetController()
-	facades.Route().Get("favicon.png", assetController.Favicon)
-	facades.Route().Get("robots.txt", assetController.Robots)
-	facades.Route().Get(entrance+"/assets/{any}", assetController.Index)
-	facades.Route().Get(entrance+"/loading/{any}", assetController.Index)
-	facades.Route().Get(entrance+"/{any}", assetController.Index)
-	facades.Route().Get(entrance+"/", assetController.Index)
-	facades.Route().Fallback(assetController.NotFound)
+	// 404
+	facades.Route().Fallback(func(ctx http.Context) http.Response {
+		index, _ := embed.PublicFS.ReadFile(filepath.Join("public", "index.html"))
+		return ctx.Response().Data(http.StatusOK, "text/html; charset=utf-8", index)
+	})
 }

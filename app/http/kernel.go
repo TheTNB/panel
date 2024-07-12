@@ -17,5 +17,7 @@ func (kernel Kernel) Middleware() []http.Middleware {
 		sessionmiddleware.StartSession(),
 		middleware.Log(),
 		middleware.Status(),
+		middleware.Entrance(),
+		middleware.Static(),
 	}
 }

@@ -62,13 +62,12 @@ fetch:
     - apk add --no-cache curl jq unzip zip
   script:
     - curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
-    - rm -rf public
     - unzip frontend.zip
-    - mv dist public
+    - mv dist embed/frontend
   artifacts:
     name: "frontend"
     paths:
-      - public
+      - embed/frontend
     expire_in: 3 days
 
 release:

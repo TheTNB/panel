@@ -68,7 +68,6 @@ out/
 __debug_bin
 .project
 
-# 前端工具链 #
-.sass-cache/*
-node_modules/
-/public
+# 嵌入文件 #
+embed/*
+!embed/embed.go

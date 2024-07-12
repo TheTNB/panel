@@ -5,6 +5,7 @@ go 1.22
 require (
 	github.com/docker/docker v27.0.3+incompatible
 	github.com/docker/go-connections v0.5.0
+	github.com/gin-contrib/static v1.1.2
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-sql-driver/mysql v1.8.1

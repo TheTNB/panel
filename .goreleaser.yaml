@@ -40,7 +40,6 @@ archives:
     files:
       - LICENSE
       - docs/*
-      - public/*
       - storage/*
       - lang/*
       - scripts/*
