@@ -63,8 +63,7 @@ fetch:
   script:
     - curl -sSL "https://git.haozi.net/api/v4/projects/opensource%2Fpanel-frontend/releases" | jq -r '.[0].assets.links[] | select(.name | contains("dist")) | .direct_asset_url' | xargs curl -L -o frontend.zip
     - unzip frontend.zip
-    - rm -rf embed/frontend
-    - mv dist embed/frontend
+    - mv dist/* embed/frontend/
   artifacts:
     name: "frontend"
     paths:
