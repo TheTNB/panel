@@ -227,7 +227,7 @@ func Api() {
 
 	// 404
 	facades.Route().Fallback(func(ctx http.Context) http.Response {
-		index, _ := embed.PublicFS.ReadFile(filepath.Join("public", "index.html"))
+		index, _ := embed.PublicFS.ReadFile(filepath.Join("frontend", "index.html"))
 		return ctx.Response().Data(http.StatusOK, "text/html; charset=utf-8", index)
 	})
 }
