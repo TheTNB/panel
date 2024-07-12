@@ -9,7 +9,7 @@ require (
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.14.1-0.20240712082750-8fee27562ae0
+	github.com/goravel/framework v1.14.1-0.20240712145335-f1b118b0ca43
 	github.com/goravel/gin v1.2.3-0.20240712065957-fe9e02c7125d
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0

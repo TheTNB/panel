@@ -274,8 +274,8 @@ github.com/gookit/validate v1.5.2 h1:i5I2OQ7WYHFRPRATGu9QarR9snnNHydvwSuHXaRWAV0
 github.com/gookit/validate v1.5.2/go.mod h1:yuPy2WwDlwGRa06fFJ5XIO8QEwhRnTC2LmxmBa5SE14=
 github.com/goravel/file-rotatelogs/v2 v2.4.2 h1:g68AzbePXcm0V2CpUMc9j4qVzcDn7+7aoWSjZ51C0m4=
 github.com/goravel/file-rotatelogs/v2 v2.4.2/go.mod h1:23VuSW8cBS4ax5cmbV+5AaiLpq25b8UJ96IhbAkdo8I=
-github.com/goravel/framework v1.14.1-0.20240712082750-8fee27562ae0 h1:tRc/mKaP3yRi9PoLR8OgcqixSDGTVWYKZHBoBib7lFo=
-github.com/goravel/framework v1.14.1-0.20240712082750-8fee27562ae0/go.mod h1:BcxOXs3HZAdEQha+aPYsl1XneSqLgjHGmlAhITlZd9c=
+github.com/goravel/framework v1.14.1-0.20240712145335-f1b118b0ca43 h1:v59SXxwRQdZo1ebLE7zrThesp8CY3prA7eka9msJZY4=
+github.com/goravel/framework v1.14.1-0.20240712145335-f1b118b0ca43/go.mod h1:jN5WkMgoGLHaC3yl9MRnzxnyfCsA0OJV3giBjzYRnkk=
 github.com/goravel/gin v1.2.3-0.20240712065957-fe9e02c7125d h1:ABY2IKc+t28SWkvGVbXriG+HiFa5o5wvBn4jTxhGpD8=
 github.com/goravel/gin v1.2.3-0.20240712065957-fe9e02c7125d/go.mod h1:QaA/LN6JTinQzYQaF0KJMZs71Max3CquGQZp0yxm+Bc=
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
