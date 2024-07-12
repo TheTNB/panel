@@ -73,8 +73,26 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/panel/user/logout [post]
 func (r *UserController) Logout(ctx http.Context) http.Response {
-	ctx.Request().Session().Forget("user_id")
+	if ctx.Request().HasSession() {
+		ctx.Request().Session().Forget("user_id")
+	}
+
 	return Success(ctx, nil)
+}
+
+// IsLogin
+//
+//	@Summary	是否登录
+//	@Tags		用户鉴权
+//	@Produce	json
+//	@Success	200	{object}	SuccessResponse
+//	@Router		/panel/user/isLogin [get]
+func (r *UserController) IsLogin(ctx http.Context) http.Response {
+	if !ctx.Request().HasSession() {
+		return Success(ctx, false)
+	}
+
+	return Success(ctx, ctx.Request().Session().Has("user_id"))
 }
 
 // Info

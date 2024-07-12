@@ -32,6 +32,7 @@ func Api() {
 			userController := controllers.NewUserController()
 			r.Middleware(frameworkmiddleware.Throttle("login")).Post("login", userController.Login)
 			r.Post("logout", userController.Logout)
+			r.Get("isLogin", userController.IsLogin)
 			r.Middleware(middleware.Session()).Get("info", userController.Info)
 		})
 		r.Prefix("task").Middleware(middleware.Session()).Group(func(r route.Router) {
