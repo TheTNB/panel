@@ -20,7 +20,7 @@ func Entrance() http.Middleware {
 		entrance := facades.Config().GetString("http.entrance")
 		if ctx.Request().Path() == entrance {
 			ctx.Request().Session().Put("verify_entrance", true)
-			_ = ctx.Response().Redirect(http.StatusFound, "/").Render()
+			_ = ctx.Response().Redirect(http.StatusFound, "/login").Render()
 			ctx.Request().AbortWithStatus(http.StatusFound)
 			return
 		}
