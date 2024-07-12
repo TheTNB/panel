@@ -62,7 +62,7 @@ func (r *SettingController) List(ctx http.Context) http.Response {
 	return Success(ctx, http.Json{
 		"name":         r.setting.Get(models.SettingKeyName),
 		"language":     facades.Config().GetString("app.locale"),
-		"entrance":     facades.Config().GetString("http.entrance"),
+		"entrance":     facades.Config().GetString("panel.entrance"),
 		"ssl":          facades.Config().GetBool("panel.ssl"),
 		"website_path": r.setting.Get(models.SettingKeyWebsitePath),
 		"backup_path":  r.setting.Get(models.SettingKeyBackupPath),

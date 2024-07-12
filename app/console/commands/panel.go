@@ -165,8 +165,8 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Green().Printfln(translate.Get("commands.panel.getInfo.username") + ": " + user.Username)
 		color.Green().Printfln(translate.Get("commands.panel.getInfo.password") + ": " + password)
 		color.Green().Printfln(translate.Get("commands.panel.port") + ": " + port)
-		color.Green().Printfln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
-		color.Green().Printfln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("http.entrance"))
+		color.Green().Printfln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("panel.entrance"))
+		color.Green().Printfln(translate.Get("commands.panel.getInfo.address") + ": " + protocol + "://" + ip + ":" + port + facades.Config().GetString("panel.entrance"))
 
 	case "getPort":
 		port, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_PORT | awk -F '=' '{print $2}' | tr -d '\n'`)
@@ -178,7 +178,7 @@ func (receiver *Panel) Handle(ctx console.Context) error {
 		color.Green().Printfln(translate.Get("commands.panel.port") + ": " + port)
 
 	case "getEntrance":
-		color.Green().Printfln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("http.entrance"))
+		color.Green().Printfln(translate.Get("commands.panel.entrance") + ": " + facades.Config().GetString("panel.entrance"))
 
 	case "deleteEntrance":
 		oldEntrance, err := shell.Execf(`cat /www/panel/panel.conf | grep APP_ENTRANCE | awk -F '=' '{print $2}' | tr -d '\n'`)
