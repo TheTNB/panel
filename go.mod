@@ -9,8 +9,8 @@ require (
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.14.3
-	github.com/goravel/gin v1.2.2
+	github.com/goravel/framework v1.14.1-0.20240712082750-8fee27562ae0
+	github.com/goravel/gin v1.2.3-0.20240712065957-fe9e02c7125d
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0
 	github.com/lib/pq v1.10.9
@@ -29,7 +29,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.25.0
 	golang.org/x/net v0.27.0
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.25.11
 )
 
 require (
@@ -56,8 +56,8 @@ require (
 	github.com/charmbracelet/bubbles v0.18.0 // indirect
 	github.com/charmbracelet/bubbletea v0.26.4 // indirect
 	github.com/charmbracelet/huh v0.5.1 // indirect
-	github.com/charmbracelet/huh/spinner v0.0.0-20240709222038-80fcf53648bd // indirect
-	github.com/charmbracelet/lipgloss v0.11.1 // indirect
+	github.com/charmbracelet/huh/spinner v0.0.0-20240711191530-dbf5a5ac0510 // indirect
+	github.com/charmbracelet/lipgloss v0.12.0 // indirect
 	github.com/charmbracelet/x/ansi v0.1.3 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20240617190524-788ec55faed1 // indirect
 	github.com/charmbracelet/x/input v0.1.2 // indirect
@@ -211,7 +211,5 @@ require (
 	modernc.org/memory v1.7.2 // indirect
 	modernc.org/sqlite v1.28.0 // indirect
 )
-
-replace github.com/goravel/framework => github.com/goravel/framework v1.14.1-0.20240710163908-d704469a624f
 
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
