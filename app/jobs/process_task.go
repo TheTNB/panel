@@ -39,6 +39,15 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 		"task_id": taskID,
 	}).Infof("开始执行任务")
 
+	task.Status = models.TaskStatusRunning
+	if err := facades.Orm().Query().Save(&task); err != nil {
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("更新任务状态失败")
+		return nil
+	}
+
 	if _, err := shell.Execf(task.Shell); err != nil {
 		task.Status = models.TaskStatusFailed
 		_ = facades.Orm().Query().Save(&task)
@@ -50,7 +59,13 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 	}
 
 	task.Status = models.TaskStatusSuccess
-	_ = facades.Orm().Query().Save(&task)
+	if err := facades.Orm().Query().Save(&task); err != nil {
+		facades.Log().Tags("面板", "异步任务").With(map[string]any{
+			"task_id": taskID,
+			"error":   err.Error(),
+		}).Infof("更新任务状态失败")
+		return nil
+	}
 
 	facades.Log().Tags("面板", "异步任务").With(map[string]any{
 		"task_id": taskID,

@@ -3,7 +3,6 @@ package services
 import (
 	"sync"
 
-	"github.com/goravel/framework/database/orm"
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/app/jobs"
@@ -20,9 +19,7 @@ func NewTaskImpl() *TaskImpl {
 }
 
 func (r *TaskImpl) Process(taskID uint) error {
-	if err := r.markAsRunning(taskID); err != nil {
-		return err
-	}
+	taskMap.Store(taskID, true)
 	return facades.Queue().Job(&jobs.ProcessTask{}, []any{taskID}).Dispatch()
 }
 
@@ -41,18 +38,5 @@ func (r *TaskImpl) DispatchWaiting() error {
 		}
 	}
 
-	return nil
-}
-
-func (r *TaskImpl) markAsRunning(taskID uint) error {
-	task := models.Task{
-		Model:  orm.Model{ID: taskID},
-		Status: models.TaskStatusRunning,
-	}
-	if _, err := facades.Orm().Query().Where("id", taskID).Update(&task); err != nil {
-		return err
-	}
-
-	taskMap.Store(taskID, true)
 	return nil
 }

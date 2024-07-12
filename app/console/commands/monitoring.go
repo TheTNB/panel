@@ -45,7 +45,6 @@ func (receiver *Monitoring) Handle(console.Context) error {
 	}
 
 	// 将等待中的任务分发
-	// TODO 有bug，需要设计一个锁机制防止重复分发
 	task := services.NewTaskImpl()
 	_ = task.DispatchWaiting()
 
