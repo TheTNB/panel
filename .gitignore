@@ -67,7 +67,3 @@ out/
 *.sublime*
 __debug_bin
 .project
-
-# 嵌入文件 #
-embed/*
-!embed/embed.go
