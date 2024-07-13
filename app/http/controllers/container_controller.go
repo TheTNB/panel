@@ -11,9 +11,9 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
 
-	requests "github.com/TheTNB/panel/app/http/requests/container"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/str"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/container"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/str"
 )
 
 type ContainerController struct {

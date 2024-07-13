@@ -7,8 +7,8 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 
-	requests "github.com/TheTNB/panel/app/http/requests/container"
-	paneltypes "github.com/TheTNB/panel/pkg/types"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/container"
+	paneltypes "github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type Container interface {

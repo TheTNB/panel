@@ -6,7 +6,7 @@ import (
 	"github.com/goravel/framework/database/gorm"
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/pkg/migrate"
+	"github.com/TheTNB/panel/v2/pkg/migrate"
 )
 
 type DatabaseServiceProvider struct {

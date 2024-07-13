@@ -6,15 +6,15 @@ import (
 	"github.com/goravel/framework/support/path"
 	"github.com/spf13/cast"
 
-	requests "github.com/TheTNB/panel/app/http/requests/setting"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/cert"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/setting"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/cert"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/os"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/tools"
 )
 
 type SettingController struct {

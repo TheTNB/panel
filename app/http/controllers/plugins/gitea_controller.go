@@ -3,10 +3,10 @@ package plugins
 import (
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	requests "github.com/TheTNB/panel/app/http/requests/plugins/gitea"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/plugins/gitea"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
 
 type GiteaController struct {

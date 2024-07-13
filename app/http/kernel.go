@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	sessionmiddleware "github.com/goravel/framework/session/middleware"
 
-	"github.com/TheTNB/panel/app/http/middleware"
+	"github.com/TheTNB/panel/v2/app/http/middleware"
 )
 
 type Kernel struct {

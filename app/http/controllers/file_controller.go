@@ -12,11 +12,11 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/support/carbon"
 
-	requests "github.com/TheTNB/panel/app/http/requests/file"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/file"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/os"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/str"
 )
 
 type FileController struct {

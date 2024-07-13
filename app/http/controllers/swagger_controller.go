@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/swaggo/http-swagger/v2"
 
-	_ "github.com/TheTNB/panel/docs"
+	_ "github.com/TheTNB/panel/v2/docs"
 )
 
 type SwaggerController struct {

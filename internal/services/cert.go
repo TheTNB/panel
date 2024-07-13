@@ -11,13 +11,13 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/goravel/framework/facades"
 
-	requests "github.com/TheTNB/panel/app/http/requests/cert"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/acme"
-	"github.com/TheTNB/panel/pkg/cert"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/cert"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/acme"
+	"github.com/TheTNB/panel/v2/pkg/cert"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
 
 type CertImpl struct {

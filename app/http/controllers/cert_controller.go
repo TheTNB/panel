@@ -4,12 +4,12 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	requests "github.com/TheTNB/panel/app/http/requests/cert"
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/acme"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/cert"
+	commonrequests "github.com/TheTNB/panel/v2/app/http/requests/common"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/acme"
 )
 
 type CertController struct {

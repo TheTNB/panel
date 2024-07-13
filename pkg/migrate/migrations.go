@@ -4,7 +4,7 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/v2/app/models"
 )
 
 var Init = &gormigrate.Migration{

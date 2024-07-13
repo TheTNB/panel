@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/schedule"
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/app/console/commands"
+	"github.com/TheTNB/panel/v2/app/console/commands"
 )
 
 type Kernel struct {

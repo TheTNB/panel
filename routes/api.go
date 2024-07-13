@@ -8,9 +8,9 @@ import (
 	"github.com/goravel/framework/facades"
 	frameworkmiddleware "github.com/goravel/framework/http/middleware"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	"github.com/TheTNB/panel/app/http/middleware"
-	"github.com/TheTNB/panel/embed"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/app/http/middleware"
+	"github.com/TheTNB/panel/v2/embed"
 )
 
 func Api() {

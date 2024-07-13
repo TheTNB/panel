@@ -8,9 +8,9 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/internal/services"
 )
 
 type MonitorController struct {

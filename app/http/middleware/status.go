@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 // Status 检查程序状态

@@ -6,13 +6,13 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	requests "github.com/TheTNB/panel/app/http/requests/plugins/rsync"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
-	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/plugins/rsync"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/str"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type RsyncController struct {

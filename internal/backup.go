@@ -1,8 +1,8 @@
 package internal
 
 import (
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type Backup interface {

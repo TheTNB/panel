@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/goravel/framework/database/orm"
 
-	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/v2/pkg/acme"
 )
 
 type CertDNS struct {

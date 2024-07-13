@@ -3,8 +3,8 @@ package jobs
 import (
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/shell"
 )
 
 // ProcessTask 处理面板任务

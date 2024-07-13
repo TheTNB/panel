@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/validation"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/io"
 )
 
 type PathNotExists struct {

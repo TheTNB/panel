@@ -15,8 +15,8 @@ import (
 	"github.com/mholt/acmez/v2/acme"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
 
 type httpSolver struct {

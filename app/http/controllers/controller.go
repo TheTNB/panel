@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	commonrequests "github.com/TheTNB/panel/app/http/requests/common"
+	commonrequests "github.com/TheTNB/panel/v2/app/http/requests/common"
 )
 
 // SuccessResponse 通用成功响应

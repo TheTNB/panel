@@ -5,8 +5,8 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/app/http/requests/user"
-	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/v2/app/http/requests/user"
+	"github.com/TheTNB/panel/v2/app/models"
 )
 
 type UserController struct {

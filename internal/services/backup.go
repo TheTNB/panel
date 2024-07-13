@@ -9,12 +9,12 @@ import (
 
 	"github.com/goravel/framework/support/carbon"
 
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/str"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type BackupImpl struct {

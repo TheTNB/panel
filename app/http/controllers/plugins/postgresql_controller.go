@@ -7,14 +7,14 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	_ "github.com/lib/pq"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type PostgreSQLController struct {

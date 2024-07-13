@@ -3,8 +3,8 @@ package plugins
 import (
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/internal/services"
 )
 
 type PHPController struct{}

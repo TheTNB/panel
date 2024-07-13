@@ -5,7 +5,7 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
 
 type SystemController struct {

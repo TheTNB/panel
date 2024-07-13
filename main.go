@@ -19,7 +19,7 @@ package main
 import (
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/bootstrap"
+	"github.com/TheTNB/panel/v2/bootstrap"
 )
 
 //	@title			耗子面板 API

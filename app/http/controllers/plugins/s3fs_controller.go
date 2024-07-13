@@ -8,12 +8,12 @@ import (
 	"github.com/goravel/framework/support/json"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/app/http/controllers"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type S3fsController struct {

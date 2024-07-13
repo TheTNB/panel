@@ -6,7 +6,7 @@ import (
 	"github.com/gookit/validate/locales/zhcn"
 	"github.com/goravel/framework/foundation"
 
-	"github.com/TheTNB/panel/config"
+	"github.com/TheTNB/panel/v2/config"
 )
 
 func Boot() {

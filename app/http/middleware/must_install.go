@@ -7,7 +7,7 @@ import (
 	"github.com/goravel/framework/contracts/translation"
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/internal/services"
+	"github.com/TheTNB/panel/v2/internal/services"
 )
 
 // MustInstall 确保已安装插件

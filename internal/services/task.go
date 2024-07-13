@@ -5,8 +5,8 @@ import (
 
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/app/jobs"
-	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/v2/app/jobs"
+	"github.com/TheTNB/panel/v2/app/models"
 )
 
 var taskMap sync.Map

@@ -20,8 +20,8 @@ import (
 	"github.com/shirou/gopsutil/net"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
 )
 
 // MonitoringInfo 监控信息

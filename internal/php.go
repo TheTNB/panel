@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type PHP interface {

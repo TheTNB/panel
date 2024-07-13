@@ -15,15 +15,15 @@ import (
 	"github.com/goravel/framework/support/color"
 	"github.com/spf13/cast"
 
-	requests "github.com/TheTNB/panel/app/http/requests/website"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
-	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/pkg/types"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/website"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/str"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/tools"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 // Panel 面板命令行

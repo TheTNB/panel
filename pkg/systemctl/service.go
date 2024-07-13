@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/shell"
 )
 
 // Status 获取服务状态

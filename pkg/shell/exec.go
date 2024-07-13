@@ -11,7 +11,7 @@ import (
 
 	"github.com/goravel/framework/support"
 
-	"github.com/TheTNB/panel/pkg/slice"
+	"github.com/TheTNB/panel/v2/pkg/slice"
 )
 
 // Execf 执行 shell 命令

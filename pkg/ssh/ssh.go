@@ -5,7 +5,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/io"
 )
 
 type AuthMethod int8

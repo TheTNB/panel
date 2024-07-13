@@ -4,7 +4,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/contracts/validation"
 
-	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/v2/pkg/acme"
 )
 
 type DNSStore struct {

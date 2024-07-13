@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/pkg/os"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/os"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
 
 type CronImpl struct {

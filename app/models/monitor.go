@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/goravel/framework/database/orm"
 
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/v2/pkg/tools"
 )
 
 type Monitor struct {

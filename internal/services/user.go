@@ -4,7 +4,7 @@ package services
 import (
 	"github.com/goravel/framework/facades"
 
-	"github.com/TheTNB/panel/app/models"
+	"github.com/TheTNB/panel/v2/app/models"
 )
 
 type UserImpl struct {

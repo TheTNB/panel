@@ -5,7 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/gin"
 
-	"github.com/TheTNB/panel/embed"
+	"github.com/TheTNB/panel/v2/embed"
 )
 
 func Static() http.Middleware {

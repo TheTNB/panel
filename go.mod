@@ -1,4 +1,4 @@
-module github.com/TheTNB/panel
+module github.com/TheTNB/panel/v2
 
 go 1.22
 

@@ -4,7 +4,7 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/TheTNB/panel/embed"
+	"github.com/TheTNB/panel/v2/embed"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -14,16 +14,16 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
-	requests "github.com/TheTNB/panel/app/http/requests/website"
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal"
-	"github.com/TheTNB/panel/pkg/cert"
-	"github.com/TheTNB/panel/pkg/db"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
-	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/types"
+	requests "github.com/TheTNB/panel/v2/app/http/requests/website"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal"
+	"github.com/TheTNB/panel/v2/pkg/cert"
+	"github.com/TheTNB/panel/v2/pkg/db"
+	"github.com/TheTNB/panel/v2/pkg/io"
+	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/v2/pkg/str"
+	"github.com/TheTNB/panel/v2/pkg/systemctl"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 type WebsiteImpl struct {

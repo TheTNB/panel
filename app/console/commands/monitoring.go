@@ -10,10 +10,10 @@ import (
 	"github.com/goravel/framework/support/color"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/app/models"
-	"github.com/TheTNB/panel/internal/services"
-	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/tools"
+	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
 // Monitoring 系统监控

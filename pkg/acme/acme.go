@@ -14,7 +14,7 @@ import (
 	"github.com/mholt/acmez/v2/acme"
 	"go.uber.org/zap"
 
-	"github.com/TheTNB/panel/pkg/cert"
+	"github.com/TheTNB/panel/v2/pkg/cert"
 )
 
 const (
