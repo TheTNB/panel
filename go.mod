@@ -10,8 +10,8 @@ require (
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
-	github.com/goravel/framework v1.14.1-0.20240712145335-f1b118b0ca43
-	github.com/goravel/gin v1.2.3-0.20240712065957-fe9e02c7125d
+	github.com/goravel/framework v1.14.1-0.20240728082300-b71cfeb464af
+	github.com/goravel/gin v1.2.3-0.20240714200024-34029bdef5d1
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0
 	github.com/lib/pq v1.10.9
@@ -55,13 +55,13 @@ require (
 	github.com/catppuccin/go v0.2.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/charmbracelet/bubbles v0.18.0 // indirect
-	github.com/charmbracelet/bubbletea v0.26.4 // indirect
-	github.com/charmbracelet/huh v0.5.1 // indirect
-	github.com/charmbracelet/huh/spinner v0.0.0-20240711191530-dbf5a5ac0510 // indirect
-	github.com/charmbracelet/lipgloss v0.12.0 // indirect
-	github.com/charmbracelet/x/ansi v0.1.3 // indirect
-	github.com/charmbracelet/x/exp/strings v0.0.0-20240617190524-788ec55faed1 // indirect
-	github.com/charmbracelet/x/input v0.1.2 // indirect
+	github.com/charmbracelet/bubbletea v0.26.6 // indirect
+	github.com/charmbracelet/huh v0.5.2 // indirect
+	github.com/charmbracelet/huh/spinner v0.0.0-20240725212135-67d4a4354ed1 // indirect
+	github.com/charmbracelet/lipgloss v0.12.1 // indirect
+	github.com/charmbracelet/x/ansi v0.1.4 // indirect
+	github.com/charmbracelet/x/exp/strings v0.0.0-20240722160745-212f7b056ed0 // indirect
+	github.com/charmbracelet/x/input v0.1.3 // indirect
 	github.com/charmbracelet/x/term v0.1.1 // indirect
 	github.com/charmbracelet/x/windows v0.1.2 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -77,7 +77,7 @@ require (
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.4 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.5 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.10.0 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
@@ -130,7 +130,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -176,10 +176,10 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/unrolled/secure v1.15.0 // indirect
-	github.com/urfave/cli/v2 v2.27.2 // indirect
+	github.com/urfave/cli/v2 v2.27.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
+	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
 	go.opentelemetry.io/otel v1.24.0 // indirect
@@ -190,7 +190,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/exp v0.0.0-20240707233637-46b078467d37 // indirect
+	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/mod v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
@@ -213,4 +213,15 @@ require (
 	modernc.org/sqlite v1.28.0 // indirect
 )
 
+// The current latest version of github.com/mholt/archiver/v3 (v3.5.1) suffers from CVE-2024-0406.
+// There is currently a PR in place to resolve it (https://github.com/mholt/archiver/pull/396),
+// but it has not had much attention recently.
+// Just replace our usage of github.com/mholt/archiver/v3 with github.com/anchore/archiver/v3 (v3.5.2)
+// so static vulnerability scanners will be happy.
+// This version (probably) fixes CVE-2024-0406, but we are also unaffected by that vulnerability anyway,
+// as we do not use [(*archiver.Tar).Unarchive()], so it doesn't really matter.
+// What is important, though, is the code changes between github.com/mholt/archiver/v3 v3.5.1
+// and github.com/anchore/archiver/v3 v3.5.2 only touch the [(*archiver.Tar).Unarchive()] path,
+// and nothing we use. See https://github.com/mholt/archiver/compare/v3.5.1...anchore:archiver:v3.5.2
+// for more details of the exact difference.
 replace github.com/mholt/archiver/v3 => github.com/anchore/archiver/v3 v3.5.2
