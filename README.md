@@ -18,7 +18,7 @@
 
 耗子面板是使用 Golang + Vue 开发的开源轻量 Linux 服务器运维管理面板。
 
-交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 论坛：[tom.moe](https://tom.moe) | 赞助：[爱发电](https://afdian.net/a/TheTNB)
+交流QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 论坛：[tom.moe](https://tom.moe) | 赞助：[爱发电](https://afdian.com/a/TheTNB)
 
 ## 优势
 
@@ -92,7 +92,7 @@ panel
 
 ## 赞助商
 
-如果耗子面板对你有帮助，欢迎[赞助我们](https://afdian.net/a/TheTNB)，感谢以下支持者/赞助商的支持：
+如果耗子面板对你有帮助，欢迎[赞助我们](https://afdian.com/a/TheTNB)，感谢以下支持者/赞助商的支持：
 
 **同时接受云资源赞助，可通过QQ群咨询联系**
 
@@ -106,7 +106,7 @@ panel
 - [盾云CDN](http://cdn.ddunyun.com/)
 
 <p align="center">
-  <a target="_blank" href="https://afdian.net/a/TheTNB">
+  <a target="_blank" href="https://afdian.com/a/TheTNB">
     <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
   </a>
 </p>
