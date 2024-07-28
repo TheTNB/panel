@@ -7,6 +7,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/app/plugins/loader"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/types"
@@ -33,8 +34,8 @@ func (r *PluginImpl) AllInstalled() ([]models.Plugin, error) {
 }
 
 // All 获取所有插件
-func (r *PluginImpl) All() []types.Plugin {
-	var plugins = []types.Plugin{
+func (r *PluginImpl) All() []*types.Plugin {
+	var _ = []types.Plugin{
 		types.PluginOpenResty,
 		types.PluginMySQL57,
 		types.PluginMySQL80,
@@ -59,18 +60,18 @@ func (r *PluginImpl) All() []types.Plugin {
 		types.PluginToolBox,
 	}
 
-	return plugins
+	return loader.All()
 }
 
 // GetBySlug 根据 slug 获取插件
-func (r *PluginImpl) GetBySlug(slug string) types.Plugin {
+func (r *PluginImpl) GetBySlug(slug string) *types.Plugin {
 	for _, item := range r.All() {
 		if item.Slug == slug {
 			return item
 		}
 	}
 
-	return types.Plugin{}
+	return &types.Plugin{}
 }
 
 // GetInstalledBySlug 根据 slug 获取已安装的插件

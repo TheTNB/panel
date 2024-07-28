@@ -111,6 +111,7 @@ func init() {
 			&providers.AppServiceProvider{},
 			&providers.AuthServiceProvider{},
 			&providers.RouteServiceProvider{},
+			&providers.PluginServiceProvider{},
 			&providers.ConsoleServiceProvider{},
 			&providers.QueueServiceProvider{},
 			&providers.EventServiceProvider{},

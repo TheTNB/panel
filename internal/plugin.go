@@ -7,8 +7,8 @@ import (
 
 type Plugin interface {
 	AllInstalled() ([]models.Plugin, error)
-	All() []types.Plugin
-	GetBySlug(slug string) types.Plugin
+	All() []*types.Plugin
+	GetBySlug(slug string) *types.Plugin
 	GetInstalledBySlug(slug string) models.Plugin
 	Install(slug string) error
 	Uninstall(slug string) error

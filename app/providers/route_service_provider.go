@@ -10,8 +10,7 @@ import (
 	"github.com/TheTNB/panel/v2/routes"
 )
 
-type RouteServiceProvider struct {
-}
+type RouteServiceProvider struct{}
 
 func (receiver *RouteServiceProvider) Register(app foundation.Application) {
 }

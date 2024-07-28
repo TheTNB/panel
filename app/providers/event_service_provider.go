@@ -6,8 +6,7 @@ import (
 	"github.com/goravel/framework/facades"
 )
 
-type EventServiceProvider struct {
-}
+type EventServiceProvider struct{}
 
 func (receiver *EventServiceProvider) Register(app foundation.Application) {
 	facades.Event().Register(receiver.listen())
