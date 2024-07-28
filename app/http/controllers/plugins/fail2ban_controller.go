@@ -168,7 +168,7 @@ ignoreregex =
 		var err error
 		switch jailName {
 		case "ssh":
-			if os.IsDebian() {
+			if os.IsDebian() || os.IsUbuntu() {
 				logPath = "/var/log/auth.log"
 			} else {
 				logPath = "/var/log/secure"
