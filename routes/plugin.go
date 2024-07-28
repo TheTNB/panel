@@ -11,14 +11,6 @@ import (
 // Plugin 加载插件路由
 func Plugin() {
 	facades.Route().Prefix("api/plugins").Middleware(middleware.Session(), middleware.MustInstall()).Group(func(r route.Router) {
-		r.Prefix("openresty").Group(func(route route.Router) {
-			openRestyController := plugins.NewOpenrestyController()
-			route.Get("load", openRestyController.Load)
-			route.Get("config", openRestyController.GetConfig)
-			route.Post("config", openRestyController.SaveConfig)
-			route.Get("errorLog", openRestyController.ErrorLog)
-			route.Post("clearErrorLog", openRestyController.ClearErrorLog)
-		})
 		r.Prefix("mysql").Group(func(route route.Router) {
 			mySQLController := plugins.NewMySQLController()
 			route.Get("load", mySQLController.Load)

@@ -7,7 +7,7 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/os"
 	"github.com/TheTNB/panel/v2/pkg/shell"
@@ -33,26 +33,26 @@ func NewSupervisorController() *SupervisorController {
 
 // Service 获取服务名称
 func (r *SupervisorController) Service(ctx http.Context) http.Response {
-	return controllers.Success(ctx, r.service)
+	return h.Success(ctx, r.service)
 }
 
 // Log 日志
 func (r *SupervisorController) Log(ctx http.Context) http.Response {
 	log, err := shell.Execf(`tail -n 200 /var/log/supervisor/supervisord.log`)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
+		return h.Error(ctx, http.StatusInternalServerError, log)
 	}
 
-	return controllers.Success(ctx, log)
+	return h.Success(ctx, log)
 }
 
 // ClearLog 清空日志
 func (r *SupervisorController) ClearLog(ctx http.Context) http.Response {
 	if out, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Config 获取配置
@@ -66,10 +66,10 @@ func (r *SupervisorController) Config(ctx http.Context) http.Response {
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
@@ -83,14 +83,14 @@ func (r *SupervisorController) SaveConfig(ctx http.Context) http.Response {
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = systemctl.Restart(r.service); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", r.service))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", r.service))
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Processes 进程列表
@@ -104,7 +104,7 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 
 	out, err := shell.Execf(`supervisorctl status | awk '{print $1}'`)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	var processes []process
@@ -130,9 +130,9 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 		processes = append(processes, p)
 	}
 
-	paged, total := controllers.Paginate(ctx, processes)
+	paged, total := h.Paginate(ctx, processes)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -142,30 +142,30 @@ func (r *SupervisorController) Processes(ctx http.Context) http.Response {
 func (r *SupervisorController) StartProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	if out, err := shell.Execf(`supervisorctl start %s`, process); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // StopProcess 停止进程
 func (r *SupervisorController) StopProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	if out, err := shell.Execf(`supervisorctl stop %s`, process); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // RestartProcess 重启进程
 func (r *SupervisorController) RestartProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	if out, err := shell.Execf(`supervisorctl restart %s`, process); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ProcessLog 进程日志
@@ -180,15 +180,15 @@ func (r *SupervisorController) ProcessLog(ctx http.Context) http.Response {
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
+		return h.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
 	}
 
 	log, err := shell.Execf(`tail -n 200 ` + logPath)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
+		return h.Error(ctx, http.StatusInternalServerError, log)
 	}
 
-	return controllers.Success(ctx, log)
+	return h.Success(ctx, log)
 }
 
 // ClearProcessLog 清空进程日志
@@ -203,14 +203,14 @@ func (r *SupervisorController) ClearProcessLog(ctx http.Context) http.Response {
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("无法从进程%s的配置文件中获取日志路径", process))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("无法从进程%s的配置文件中获取日志路径", process))
 	}
 
 	if out, err := shell.Execf(`echo "" > ` + logPath); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ProcessConfig 获取进程配置
@@ -225,10 +225,10 @@ func (r *SupervisorController) ProcessConfig(ctx http.Context) http.Response {
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveProcessConfig 保存进程配置
@@ -243,19 +243,19 @@ func (r *SupervisorController) SaveProcessConfig(ctx http.Context) http.Response
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	_, _ = shell.Execf(`supervisorctl reread`)
 	_, _ = shell.Execf(`supervisorctl update`)
 	_, _ = shell.Execf(`supervisorctl restart %s`, process)
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // AddProcess 添加进程
 func (r *SupervisorController) AddProcess(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"name":    "required|alpha_dash",
 		"user":    "required|alpha_dash",
 		"path":    "required",
@@ -291,21 +291,21 @@ stdout_logfile_maxbytes=2MB
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	_, _ = shell.Execf(`supervisorctl reread`)
 	_, _ = shell.Execf(`supervisorctl update`)
 	_, _ = shell.Execf(`supervisorctl start %s`, name)
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DeleteProcess 删除进程
 func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	process := ctx.Request().Input("process")
 	if out, err := shell.Execf(`supervisorctl stop %s`, process); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	var logPath string
@@ -313,24 +313,24 @@ func (r *SupervisorController) DeleteProcess(ctx http.Context) http.Response {
 	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 		if err := io.Remove(`/etc/supervisord.d/` + process + `.conf`); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+			return h.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, process)
 		if err := io.Remove(`/etc/supervisor/conf.d/` + process + `.conf`); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+			return h.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
 
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
+		return h.Error(ctx, http.StatusInternalServerError, "无法从进程"+process+"的配置文件中获取日志路径")
 	}
 
 	if err := io.Remove(logPath); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	_, _ = shell.Execf(`supervisorctl reread`)
 	_, _ = shell.Execf(`supervisorctl update`)
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

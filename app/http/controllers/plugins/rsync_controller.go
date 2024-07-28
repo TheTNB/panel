@@ -6,8 +6,8 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
 	requests "github.com/TheTNB/panel/v2/app/http/requests/plugins/rsync"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 	"github.com/TheTNB/panel/v2/pkg/str"
@@ -35,7 +35,7 @@ func NewRsyncController() *RsyncController {
 func (r *RsyncController) List(ctx http.Context) http.Response {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	var modules []types.RsyncModule
@@ -74,7 +74,7 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 					currentModule.AuthUser = value
 					currentModule.Secret, err = shell.Execf("grep -E '^" + currentModule.AuthUser + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
 					if err != nil {
-						return controllers.Error(ctx, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
+						return h.Error(ctx, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
 					}
 				case "hosts allow":
 					currentModule.HostsAllow = value
@@ -87,9 +87,9 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 		modules = append(modules, *currentModule)
 	}
 
-	paged, total := controllers.Paginate(ctx, modules)
+	paged, total := h.Paginate(ctx, modules)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -107,17 +107,17 @@ func (r *RsyncController) List(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/modules [post]
 func (r *RsyncController) Create(ctx http.Context) http.Response {
 	var createRequest requests.Create
-	sanitize := controllers.SanitizeRequest(ctx, &createRequest)
+	sanitize := h.SanitizeRequest(ctx, &createRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if strings.Contains(config, "["+createRequest.Name+"]") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+createRequest.Name+" 已存在")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "模块 "+createRequest.Name+" 已存在")
 	}
 
 	conf := `# ` + createRequest.Name + `-START
@@ -132,17 +132,17 @@ secrets file = /etc/rsyncd.secrets
 `
 
 	if err := io.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("echo '" + createRequest.AuthUser + ":" + createRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	if err := systemctl.Restart("rsyncd"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Destroy
@@ -158,15 +158,15 @@ secrets file = /etc/rsyncd.secrets
 func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	if len(name) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "name 不能为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "name 不能为空")
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if !strings.Contains(config, "["+name+"]") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+name+" 不存在")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "模块 "+name+" 不存在")
 	}
 
 	module := str.Cut(config, "# "+name+"-START", "# "+name+"-END")
@@ -176,19 +176,19 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 	if len(match) == 2 {
 		authUser := match[1]
 		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, out)
+			return h.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
 
 	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Update
@@ -204,17 +204,17 @@ func (r *RsyncController) Destroy(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/modules/{name} [post]
 func (r *RsyncController) Update(ctx http.Context) http.Response {
 	var updateRequest requests.Update
-	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if !strings.Contains(config, "["+updateRequest.Name+"]") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "模块 "+updateRequest.Name+" 不存在")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "模块 "+updateRequest.Name+" 不存在")
 	}
 
 	newConf := `# ` + updateRequest.Name + `-START
@@ -234,22 +234,22 @@ secrets file = /etc/rsyncd.secrets
 	if len(match) == 2 {
 		authUser := match[1]
 		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, out)
+			return h.Error(ctx, http.StatusInternalServerError, out)
 		}
 	}
 
 	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if out, err := shell.Execf("echo '" + updateRequest.AuthUser + ":" + updateRequest.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetConfig
@@ -264,10 +264,10 @@ secrets file = /etc/rsyncd.secrets
 func (r *RsyncController) GetConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // UpdateConfig
@@ -282,18 +282,18 @@ func (r *RsyncController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/rsync/config [post]
 func (r *RsyncController) UpdateConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateConfig
-	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Write("/etc/rsyncd.conf", updateRequest.Config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := systemctl.Restart("rsyncd"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

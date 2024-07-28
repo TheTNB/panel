@@ -13,6 +13,7 @@ import (
 
 	requests "github.com/TheTNB/panel/v2/app/http/requests/container"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/str"
 )
 
@@ -39,10 +40,10 @@ func NewContainerController() *ContainerController {
 func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 	containers, err := r.container.ContainerListAll()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := Paginate(ctx, containers)
+	paged, total := h.Paginate(ctx, containers)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -64,7 +65,7 @@ func (r *ContainerController) ContainerList(ctx http.Context) http.Response {
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": items,
 	})
@@ -84,10 +85,10 @@ func (r *ContainerController) ContainerSearch(ctx http.Context) http.Response {
 	fields := strings.Fields(ctx.Request().Query("name"))
 	containers, err := r.container.ContainerListByNames(fields)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, containers)
+	return h.Success(ctx, containers)
 }
 
 // ContainerCreate
@@ -103,7 +104,7 @@ func (r *ContainerController) ContainerSearch(ctx http.Context) http.Response {
 //	@Router			/panel/container/create [post]
 func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	var request requests.ContainerCreate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
@@ -113,10 +114,10 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 	portMap := make(nat.PortMap)
 	for _, port := range request.Ports {
 		if port.ContainerStart-port.ContainerEnd != port.HostStart-port.HostEnd {
-			return Error(ctx, http.StatusUnprocessableEntity, fmt.Sprintf("容器端口和主机端口数量不匹配（容器: %d 主机: %d）", port.ContainerStart-port.ContainerEnd, port.HostStart-port.HostEnd))
+			return h.Error(ctx, http.StatusUnprocessableEntity, fmt.Sprintf("容器端口和主机端口数量不匹配（容器: %d 主机: %d）", port.ContainerStart-port.ContainerEnd, port.HostStart-port.HostEnd))
 		}
 		if port.ContainerStart > port.ContainerEnd || port.HostStart > port.HostEnd || port.ContainerStart < 1 || port.HostStart < 1 {
-			return Error(ctx, http.StatusUnprocessableEntity, "端口范围不正确")
+			return h.Error(ctx, http.StatusUnprocessableEntity, "端口范围不正确")
 		}
 
 		count := 0
@@ -178,14 +179,14 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 		networkConf,
 	)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = r.container.ContainerStart(id); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, id)
+	return h.Success(ctx, id)
 }
 
 // ContainerRemove
@@ -200,15 +201,15 @@ func (r *ContainerController) ContainerCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/remove [post]
 func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerRemove(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerStart
@@ -223,15 +224,15 @@ func (r *ContainerController) ContainerRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/start [post]
 func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerStart(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerStop
@@ -246,15 +247,15 @@ func (r *ContainerController) ContainerStart(ctx http.Context) http.Response {
 //	@Router			/panel/container/stop [post]
 func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerStop(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerRestart
@@ -269,15 +270,15 @@ func (r *ContainerController) ContainerStop(ctx http.Context) http.Response {
 //	@Router			/panel/container/restart [post]
 func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerRestart(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerPause
@@ -291,15 +292,15 @@ func (r *ContainerController) ContainerRestart(ctx http.Context) http.Response {
 //	@Success		200		{object}	SuccessResponse
 func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerPause(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerUnpause
@@ -315,15 +316,15 @@ func (r *ContainerController) ContainerPause(ctx http.Context) http.Response {
 //	@Router			/panel/container/unpause [post]
 func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerUnpause(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerInspect
@@ -338,16 +339,16 @@ func (r *ContainerController) ContainerUnpause(ctx http.Context) http.Response {
 //	@Router			/panel/container/inspect [get]
 func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.ContainerInspect(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // ContainerKill
@@ -362,15 +363,15 @@ func (r *ContainerController) ContainerInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/kill [post]
 func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerKill(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerRename
@@ -385,15 +386,15 @@ func (r *ContainerController) ContainerKill(ctx http.Context) http.Response {
 //	@Router			/panel/container/rename [post]
 func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 	var request requests.ContainerRename
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ContainerRename(request.ID, request.Name); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ContainerStats
@@ -408,16 +409,16 @@ func (r *ContainerController) ContainerRename(ctx http.Context) http.Response {
 //	@Router			/panel/container/stats [get]
 func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.ContainerStats(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // ContainerExist
@@ -432,16 +433,16 @@ func (r *ContainerController) ContainerStats(ctx http.Context) http.Response {
 //	@Router			/panel/container/exist [get]
 func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	exist, err := r.container.ContainerExist(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, exist)
+	return h.Success(ctx, exist)
 }
 
 // ContainerLogs
@@ -456,16 +457,16 @@ func (r *ContainerController) ContainerExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/logs [get]
 func (r *ContainerController) ContainerLogs(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.ContainerLogs(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // ContainerPrune
@@ -479,10 +480,10 @@ func (r *ContainerController) ContainerLogs(ctx http.Context) http.Response {
 //	@Router			/panel/container/prune [post]
 func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 	if err := r.container.ContainerPrune(); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // NetworkList
@@ -498,10 +499,10 @@ func (r *ContainerController) ContainerPrune(ctx http.Context) http.Response {
 func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 	networks, err := r.container.NetworkList()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := Paginate(ctx, networks)
+	paged, total := h.Paginate(ctx, networks)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -534,7 +535,7 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": items,
 	})
@@ -553,16 +554,16 @@ func (r *ContainerController) NetworkList(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/create [post]
 func (r *ContainerController) NetworkCreate(ctx http.Context) http.Response {
 	var request requests.NetworkCreate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	id, err := r.container.NetworkCreate(request)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, id)
+	return h.Success(ctx, id)
 }
 
 // NetworkRemove
@@ -577,15 +578,15 @@ func (r *ContainerController) NetworkCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/remove [post]
 func (r *ContainerController) NetworkRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.NetworkRemove(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // NetworkExist
@@ -600,16 +601,16 @@ func (r *ContainerController) NetworkRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/exist [get]
 func (r *ContainerController) NetworkExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	exist, err := r.container.NetworkExist(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, exist)
+	return h.Success(ctx, exist)
 }
 
 // NetworkInspect
@@ -624,16 +625,16 @@ func (r *ContainerController) NetworkExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/inspect [get]
 func (r *ContainerController) NetworkInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.NetworkInspect(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // NetworkConnect
@@ -649,15 +650,15 @@ func (r *ContainerController) NetworkInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/connect [post]
 func (r *ContainerController) NetworkConnect(ctx http.Context) http.Response {
 	var request requests.NetworkConnectDisConnect
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.NetworkConnect(request.Network, request.Container); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // NetworkDisconnect
@@ -673,15 +674,15 @@ func (r *ContainerController) NetworkConnect(ctx http.Context) http.Response {
 //	@Router			/panel/container/network/disconnect [post]
 func (r *ContainerController) NetworkDisconnect(ctx http.Context) http.Response {
 	var request requests.NetworkConnectDisConnect
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.NetworkDisconnect(request.Network, request.Container); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // NetworkPrune
@@ -695,10 +696,10 @@ func (r *ContainerController) NetworkDisconnect(ctx http.Context) http.Response 
 //	@Router			/panel/container/network/prune [post]
 func (r *ContainerController) NetworkPrune(ctx http.Context) http.Response {
 	if err := r.container.NetworkPrune(); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ImageList
@@ -714,10 +715,10 @@ func (r *ContainerController) NetworkPrune(ctx http.Context) http.Response {
 func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 	images, err := r.container.ImageList()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := Paginate(ctx, images)
+	paged, total := h.Paginate(ctx, images)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -732,7 +733,7 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": items,
 	})
@@ -750,16 +751,16 @@ func (r *ContainerController) ImageList(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/exist [get]
 func (r *ContainerController) ImageExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	exist, err := r.container.ImageExist(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, exist)
+	return h.Success(ctx, exist)
 }
 
 // ImagePull
@@ -775,15 +776,15 @@ func (r *ContainerController) ImageExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/pull [post]
 func (r *ContainerController) ImagePull(ctx http.Context) http.Response {
 	var request requests.ImagePull
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ImagePull(request); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ImageRemove
@@ -798,15 +799,15 @@ func (r *ContainerController) ImagePull(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/remove [post]
 func (r *ContainerController) ImageRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.ImageRemove(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ImagePrune
@@ -820,10 +821,10 @@ func (r *ContainerController) ImageRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/prune [post]
 func (r *ContainerController) ImagePrune(ctx http.Context) http.Response {
 	if err := r.container.ImagePrune(); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ImageInspect
@@ -838,16 +839,16 @@ func (r *ContainerController) ImagePrune(ctx http.Context) http.Response {
 //	@Router			/panel/container/image/inspect [get]
 func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.ImageInspect(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // VolumeList
@@ -863,10 +864,10 @@ func (r *ContainerController) ImageInspect(ctx http.Context) http.Response {
 func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 	volumes, err := r.container.VolumeList()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := Paginate(ctx, volumes)
+	paged, total := h.Paginate(ctx, volumes)
 
 	items := make([]any, 0)
 	for _, item := range paged {
@@ -890,7 +891,7 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": items,
 	})
@@ -909,16 +910,16 @@ func (r *ContainerController) VolumeList(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/create [post]
 func (r *ContainerController) VolumeCreate(ctx http.Context) http.Response {
 	var request requests.VolumeCreate
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.VolumeCreate(request)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data.Name)
+	return h.Success(ctx, data.Name)
 }
 
 // VolumeExist
@@ -933,16 +934,16 @@ func (r *ContainerController) VolumeCreate(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/exist [get]
 func (r *ContainerController) VolumeExist(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	exist, err := r.container.VolumeExist(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, exist)
+	return h.Success(ctx, exist)
 }
 
 // VolumeInspect
@@ -957,16 +958,16 @@ func (r *ContainerController) VolumeExist(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/inspect [get]
 func (r *ContainerController) VolumeInspect(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	data, err := r.container.VolumeInspect(request.ID)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // VolumeRemove
@@ -981,15 +982,15 @@ func (r *ContainerController) VolumeInspect(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/remove [post]
 func (r *ContainerController) VolumeRemove(ctx http.Context) http.Response {
 	var request requests.ID
-	if sanitize := SanitizeRequest(ctx, &request); sanitize != nil {
+	if sanitize := h.SanitizeRequest(ctx, &request); sanitize != nil {
 		return sanitize
 	}
 
 	if err := r.container.VolumeRemove(request.ID); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // VolumePrune
@@ -1003,8 +1004,8 @@ func (r *ContainerController) VolumeRemove(ctx http.Context) http.Response {
 //	@Router			/panel/container/volume/prune [post]
 func (r *ContainerController) VolumePrune(ctx http.Context) http.Response {
 	if err := r.container.VolumePrune(); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

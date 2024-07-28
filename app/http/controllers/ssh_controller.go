@@ -15,6 +15,7 @@ import (
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/ssh"
 )
 
@@ -37,10 +38,10 @@ func (r *SshController) GetInfo(ctx http.Context) http.Response {
 	user := r.setting.Get(models.SettingKeySshUser)
 	password := r.setting.Get(models.SettingKeySshPassword)
 	if len(host) == 0 || len(user) == 0 || len(password) == 0 {
-		return Error(ctx, http.StatusInternalServerError, "SSH 配置不完整")
+		return h.Error(ctx, http.StatusInternalServerError, "SSH 配置不完整")
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"host":     host,
 		"port":     cast.ToInt(port),
 		"user":     user,
@@ -50,7 +51,7 @@ func (r *SshController) GetInfo(ctx http.Context) http.Response {
 
 // UpdateInfo 更新 SSH 配置
 func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
-	if sanitize := Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"host":     "required",
 		"port":     "required",
 		"user":     "required",
@@ -64,19 +65,19 @@ func (r *SshController) UpdateInfo(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	password := ctx.Request().Input("password")
 	if err := r.setting.Set(models.SettingKeySshHost, host); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err := r.setting.Set(models.SettingKeySshPort, port); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err := r.setting.Set(models.SettingKeySshUser, user); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err := r.setting.Set(models.SettingKeySshPassword, password); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Session SSH 会话
@@ -95,7 +96,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 		facades.Log().Tags("面板", "SSH").With(map[string]any{
 			"error": err.Error(),
 		}).Infof("建立连接失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 	defer ws.Close()
 
@@ -109,7 +110,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 	defer client.Close()
 
@@ -117,7 +118,7 @@ func (r *SshController) Session(ctx http.Context) http.Response {
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 	defer turn.Close()
 

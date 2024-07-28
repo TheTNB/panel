@@ -4,7 +4,6 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/TheTNB/panel/v2/embed"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -16,6 +15,7 @@ import (
 
 	requests "github.com/TheTNB/panel/v2/app/http/requests/website"
 	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/embed"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/pkg/cert"
 	"github.com/TheTNB/panel/v2/pkg/db"

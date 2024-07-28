@@ -9,7 +9,7 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 	"github.com/TheTNB/panel/v2/pkg/str"
@@ -36,10 +36,10 @@ func NewOpenrestyController() *OpenRestyController {
 func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/www/server/openresty/conf/nginx.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取配置失败")
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveConfig
@@ -54,19 +54,19 @@ func (r *OpenRestyController) GetConfig(ctx http.Context) http.Response {
 func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusInternalServerError, "配置不能为空")
+		return h.Error(ctx, http.StatusInternalServerError, "配置不能为空")
 	}
 
 	if err := io.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "保存配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "保存配置失败")
 	}
 
 	if err := systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")
-		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载服务失败: %v", err))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载服务失败: %v", err))
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ErrorLog
@@ -79,15 +79,15 @@ func (r *OpenRestyController) SaveConfig(ctx http.Context) http.Response {
 //	@Router		/plugins/openresty/errorLog [get]
 func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 	if !io.Exists("/www/wwwlogs/nginx_error.log") {
-		return controllers.Success(ctx, "")
+		return h.Success(ctx, "")
 	}
 
 	out, err := shell.Execf("tail -n 100 /www/wwwlogs/openresty_error.log")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, out)
+	return h.Success(ctx, out)
 }
 
 // ClearErrorLog
@@ -100,10 +100,10 @@ func (r *OpenRestyController) ErrorLog(ctx http.Context) http.Response {
 //	@Router		/plugins/openresty/clearErrorLog [post]
 func (r *OpenRestyController) ClearErrorLog(ctx http.Context) http.Response {
 	if out, err := shell.Execf("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Load
@@ -118,7 +118,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccess() {
-		return controllers.Success(ctx, []types.NV{})
+		return h.Success(ctx, []types.NV{})
 	}
 
 	raw := resp.String()
@@ -126,7 +126,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	workers, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | wc -l")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 	data = append(data, types.NV{
 		Name:  "工作进程",
@@ -135,7 +135,7 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 
 	out, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取负载失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取负载失败")
 	}
 	mem := str.FormatBytes(cast.ToFloat64(out))
 	data = append(data, types.NV{
@@ -183,5 +183,5 @@ func (r *OpenRestyController) Load(ctx http.Context) http.Response {
 		})
 	}
 
-	return controllers.Success(ctx, data)
+	return h.Success(ctx, data)
 }

@@ -8,10 +8,10 @@ import (
 	"github.com/goravel/framework/facades"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/os"
 	"github.com/TheTNB/panel/v2/pkg/shell"
@@ -33,12 +33,12 @@ func NewFail2banController() *Fail2banController {
 func (r *Fail2banController) List(ctx http.Context) http.Response {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 
 	jailList := regexp.MustCompile(`\[(.*?)]`).FindAllStringSubmatch(raw, -1)
 	if len(jailList) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "Fail2ban 规则为空")
 	}
 
 	var jails []types.Fail2banJail
@@ -68,9 +68,9 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	paged, total := controllers.Paginate(ctx, jails)
+	paged, total := h.Paginate(ctx, jails)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -78,7 +78,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 
 // Add 添加 Fail2ban 规则
 func (r *Fail2banController) Add(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"name":         "required",
 		"type":         "required|in:website,service",
 		"maxretry":     "required",
@@ -102,10 +102,10 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if (strings.Contains(raw, "["+jailName+"]") && jailType == "service") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailType == "website" && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailType == "website" && jailWebsiteMode == "path") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "规则已存在")
 	}
 
 	switch jailType {
@@ -113,11 +113,11 @@ func (r *Fail2banController) Add(ctx http.Context) http.Response {
 		var website models.Website
 		err := facades.Orm().Query().Where("name", jailWebsiteName).FirstOrFail(&website)
 		if err != nil {
-			return controllers.Error(ctx, http.StatusUnprocessableEntity, "网站不存在")
+			return h.Error(ctx, http.StatusUnprocessableEntity, "网站不存在")
 		}
 		config, err := r.website.GetConfig(website.ID)
 		if err != nil {
-			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取网站配置失败")
+			return h.Error(ctx, http.StatusUnprocessableEntity, "获取网站配置失败")
 		}
 		var ports string
 		for _, port := range config.Ports {
@@ -140,7 +140,7 @@ logpath = /www/wwwlogs/` + website.Name + `.log
 `
 		raw += rule
 		if err = io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+			return h.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 
 		var filter string
@@ -158,7 +158,7 @@ ignoreregex =
 `
 		}
 		if err = io.Write("/etc/fail2ban/filter.d/haozi-"+jailWebsiteName+"-"+jailWebsiteMode+".conf", filter, 0644); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+			return h.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 
 	case "service":
@@ -184,10 +184,10 @@ ignoreregex =
 			filter = "pure-ftpd"
 			port, err = shell.Execf(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
 		default:
-			return controllers.Error(ctx, http.StatusUnprocessableEntity, "未知服务")
+			return h.Error(ctx, http.StatusUnprocessableEntity, "未知服务")
 		}
 		if len(port) == 0 || err != nil {
-			return controllers.Error(ctx, http.StatusUnprocessableEntity, "获取服务端口失败，请检查是否安装")
+			return h.Error(ctx, http.StatusUnprocessableEntity, "获取服务端口失败，请检查是否安装")
 		}
 
 		rule := `
@@ -205,15 +205,15 @@ logpath = ` + logPath + `
 `
 		raw += rule
 		if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+			return h.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 		}
 	}
 
 	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Delete 删除规则
@@ -221,44 +221,44 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 	jailName := ctx.Request().Input("name")
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	if !strings.Contains(raw, "["+jailName+"]") {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "规则不存在")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "规则不存在")
 	}
 
 	rule := str.Cut(raw, "# "+jailName+"-START", "# "+jailName+"-END")
 	raw = strings.Replace(raw, "\n# "+jailName+"-START"+rule+"# "+jailName+"-END", "", -1)
 	raw = strings.TrimSpace(raw)
 	if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+		return h.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
 	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // BanList 获取封禁列表
 func (r *Fail2banController) BanList(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	if len(name) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
 	currentlyBan, err := shell.Execf(`fail2ban-client status %s | grep "Currently banned" | awk '{print $4}'`, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
 	totalBan, err := shell.Execf(`fail2ban-client status %s | grep "Total banned" | awk '{print $4}'`, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
 	bannedIp, err := shell.Execf(`fail2ban-client status %s | grep "Banned IP list" | awk -F ":" '{print $2}'`, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取封禁列表失败")
 	}
 	bannedIpList := strings.Split(bannedIp, " ")
 
@@ -275,7 +275,7 @@ func (r *Fail2banController) BanList(ctx http.Context) http.Response {
 		list = []map[string]string{}
 	}
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"currently_ban": currentlyBan,
 		"total_ban":     totalBan,
 		"baned_list":    list,
@@ -287,56 +287,56 @@ func (r *Fail2banController) Unban(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	ip := ctx.Request().Input("ip")
 	if len(name) == 0 || len(ip) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
 	if _, err := shell.Execf("fail2ban-client set %s unbanip %s", name, ip); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "解封失败")
+		return h.Error(ctx, http.StatusInternalServerError, "解封失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SetWhiteList 设置白名单
 func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 	ip := ctx.Request().Input("ip")
 	if len(ip) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
 	}
 
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	// 正则替换
 	reg := regexp.MustCompile(`ignoreip\s*=\s*.*\n`)
 	if reg.MatchString(raw) {
 		raw = reg.ReplaceAllString(raw, "ignoreip = "+ip+"\n")
 	} else {
-		return controllers.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
+		return h.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
 	}
 
 	if err := io.Write("/etc/fail2ban/jail.local", raw, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
+		return h.Error(ctx, http.StatusInternalServerError, "写入Fail2ban规则失败")
 	}
 
 	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "重载配置失败")
 	}
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetWhiteList 获取白名单
 func (r *Fail2banController) GetWhiteList(ctx http.Context) http.Response {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, err.Error())
+		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
 	}
 	reg := regexp.MustCompile(`ignoreip\s*=\s*(.*)\n`)
 	if reg.MatchString(raw) {
 		ignoreIp := reg.FindStringSubmatch(raw)[1]
-		return controllers.Success(ctx, ignoreIp)
+		return h.Success(ctx, ignoreIp)
 	} else {
-		return controllers.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
+		return h.Error(ctx, http.StatusInternalServerError, "解析Fail2ban规则失败，Fail2ban可能已损坏")
 	}
 }

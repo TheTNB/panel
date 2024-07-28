@@ -5,6 +5,7 @@ import (
 	"github.com/goravel/framework/facades"
 
 	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 )
 
@@ -23,12 +24,12 @@ func (r *TaskController) Status(ctx http.Context) http.Response {
 	var task models.Task
 	err := facades.Orm().Query().Where("status", models.TaskStatusWaiting).OrWhere("status", models.TaskStatusRunning).FirstOrFail(&task)
 	if err == nil {
-		return Success(ctx, http.Json{
+		return h.Success(ctx, http.Json{
 			"task": true,
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"task": false,
 	})
 }
@@ -42,10 +43,10 @@ func (r *TaskController) List(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "任务中心").With(map[string]any{
 			"error": err.Error(),
 		}).Info("查询任务列表失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": tasks,
 	})
@@ -60,15 +61,15 @@ func (r *TaskController) Log(ctx http.Context) http.Response {
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
 		}).Info("查询任务失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	log, err := shell.Execf(`tail -n 500 '` + task.Log + `'`)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, "日志已被清理")
+		return h.Error(ctx, http.StatusInternalServerError, "日志已被清理")
 	}
 
-	return Success(ctx, log)
+	return h.Success(ctx, log)
 }
 
 // Delete 删除任务
@@ -80,8 +81,8 @@ func (r *TaskController) Delete(ctx http.Context) http.Response {
 			"id":    ctx.Request().QueryInt("id"),
 			"error": err.Error(),
 		}).Info("删除任务失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

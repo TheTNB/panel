@@ -10,6 +10,7 @@ import (
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
 	"github.com/TheTNB/panel/v2/pkg/acme"
+	"github.com/TheTNB/panel/v2/pkg/h"
 )
 
 type CertController struct {
@@ -34,7 +35,7 @@ func NewCertController() *CertController {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/cert/caProviders [get]
 func (r *CertController) CAProviders(ctx http.Context) http.Response {
-	return Success(ctx, []map[string]string{
+	return h.Success(ctx, []map[string]string{
 		{
 			"name": "Let's Encrypt",
 			"ca":   "letsencrypt",
@@ -68,7 +69,7 @@ func (r *CertController) CAProviders(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/cert/dnsProviders [get]
 func (r *CertController) DNSProviders(ctx http.Context) http.Response {
-	return Success(ctx, []map[string]any{
+	return h.Success(ctx, []map[string]any{
 		{
 			"name": "DNSPod",
 			"dns":  acme.DnsPod,
@@ -98,7 +99,7 @@ func (r *CertController) DNSProviders(ctx http.Context) http.Response {
 //	@Success		200	{object}	SuccessResponse
 //	@Router			/panel/cert/algorithms [get]
 func (r *CertController) Algorithms(ctx http.Context) http.Response {
-	return Success(ctx, []map[string]any{
+	return h.Success(ctx, []map[string]any{
 		{
 			"name": "EC256",
 			"key":  acme.KeyEC256,
@@ -130,7 +131,7 @@ func (r *CertController) Algorithms(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users [get]
 func (r *CertController) UserList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	sanitize := h.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -142,10 +143,10 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取ACME用户列表失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": users,
 	})
@@ -164,7 +165,7 @@ func (r *CertController) UserList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users [post]
 func (r *CertController) UserStore(ctx http.Context) http.Response {
 	var storeRequest requests.UserStore
-	sanitize := SanitizeRequest(ctx, &storeRequest)
+	sanitize := h.SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -174,10 +175,10 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("添加ACME用户失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UserUpdate
@@ -194,7 +195,7 @@ func (r *CertController) UserStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [put]
 func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.UserUpdate
-	sanitize := SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -205,10 +206,10 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 			"userID": updateRequest.ID,
 			"error":  err.Error(),
 		}).Info("更新ACME用户失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UserShow
@@ -223,7 +224,7 @@ func (r *CertController) UserUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [get]
 func (r *CertController) UserShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -234,10 +235,10 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Info("获取ACME用户失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, user)
+	return h.Success(ctx, user)
 }
 
 // UserDestroy
@@ -253,7 +254,7 @@ func (r *CertController) UserShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/users/{id} [delete]
 func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.UserShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -264,10 +265,10 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 			"userID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Info("删除ACME用户失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DNSList
@@ -282,7 +283,7 @@ func (r *CertController) UserDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns [get]
 func (r *CertController) DNSList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	sanitize := h.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -294,10 +295,10 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取DNS接口列表失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": dns,
 	})
@@ -316,7 +317,7 @@ func (r *CertController) DNSList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns [post]
 func (r *CertController) DNSStore(ctx http.Context) http.Response {
 	var storeRequest requests.DNSStore
-	sanitize := SanitizeRequest(ctx, &storeRequest)
+	sanitize := h.SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -326,10 +327,10 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("添加DNS接口失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DNSShow
@@ -344,7 +345,7 @@ func (r *CertController) DNSStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [get]
 func (r *CertController) DNSShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -355,10 +356,10 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
 		}).Info("获取DNS接口失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, dns)
+	return h.Success(ctx, dns)
 }
 
 // DNSUpdate
@@ -375,7 +376,7 @@ func (r *CertController) DNSShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [put]
 func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.DNSUpdate
-	sanitize := SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -386,10 +387,10 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 			"dnsID": updateRequest.ID,
 			"error": err.Error(),
 		}).Info("更新DNS接口失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DNSDestroy
@@ -405,7 +406,7 @@ func (r *CertController) DNSUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/dns/{id} [delete]
 func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.DNSShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -416,10 +417,10 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 			"dnsID": showAndDestroyRequest.ID,
 			"error": err.Error(),
 		}).Info("删除DNS接口失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // CertList
@@ -434,7 +435,7 @@ func (r *CertController) DNSDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs [get]
 func (r *CertController) CertList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	sanitize := h.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -446,10 +447,10 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取证书列表失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": certs,
 	})
@@ -468,7 +469,7 @@ func (r *CertController) CertList(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs [post]
 func (r *CertController) CertStore(ctx http.Context) http.Response {
 	var storeRequest requests.CertStore
-	sanitize := SanitizeRequest(ctx, &storeRequest)
+	sanitize := h.SanitizeRequest(ctx, &storeRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -478,10 +479,10 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("添加证书失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // CertUpdate
@@ -498,7 +499,7 @@ func (r *CertController) CertStore(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [put]
 func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 	var updateRequest requests.CertUpdate
-	sanitize := SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -509,10 +510,10 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 			"certID": updateRequest.ID,
 			"error":  err.Error(),
 		}).Info("更新证书失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // CertShow
@@ -527,7 +528,7 @@ func (r *CertController) CertUpdate(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [get]
 func (r *CertController) CertShow(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -538,10 +539,10 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 			"certID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Info("获取证书失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, cert)
+	return h.Success(ctx, cert)
 }
 
 // CertDestroy
@@ -557,7 +558,7 @@ func (r *CertController) CertShow(ctx http.Context) http.Response {
 //	@Router			/panel/cert/certs/{id} [delete]
 func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 	var showAndDestroyRequest requests.CertShowAndDestroy
-	sanitize := SanitizeRequest(ctx, &showAndDestroyRequest)
+	sanitize := h.SanitizeRequest(ctx, &showAndDestroyRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -568,10 +569,10 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 			"certID": showAndDestroyRequest.ID,
 			"error":  err.Error(),
 		}).Info("删除证书失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Obtain
@@ -587,7 +588,7 @@ func (r *CertController) CertDestroy(ctx http.Context) http.Response {
 //	@Router			/panel/cert/obtain [post]
 func (r *CertController) Obtain(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
-	sanitize := SanitizeRequest(ctx, &obtainRequest)
+	sanitize := h.SanitizeRequest(ctx, &obtainRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -598,7 +599,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 			"certID": obtainRequest.ID,
 			"error":  err.Error(),
 		}).Info("获取证书失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if cert.DNS != nil || cert.Website != nil {
@@ -610,10 +611,10 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("签发证书失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Renew
@@ -629,7 +630,7 @@ func (r *CertController) Obtain(ctx http.Context) http.Response {
 //	@Router			/panel/cert/renew [post]
 func (r *CertController) Renew(ctx http.Context) http.Response {
 	var renewRequest requests.Renew
-	sanitize := SanitizeRequest(ctx, &renewRequest)
+	sanitize := h.SanitizeRequest(ctx, &renewRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -639,10 +640,10 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("续签证书失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ManualDNS
@@ -658,7 +659,7 @@ func (r *CertController) Renew(ctx http.Context) http.Response {
 //	@Router			/panel/cert/manualDNS [post]
 func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 	var obtainRequest requests.Obtain
-	sanitize := SanitizeRequest(ctx, &obtainRequest)
+	sanitize := h.SanitizeRequest(ctx, &obtainRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -668,10 +669,10 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "证书管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取手动DNS记录失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, resolves)
+	return h.Success(ctx, resolves)
 }
 
 // Deploy
@@ -687,7 +688,7 @@ func (r *CertController) ManualDNS(ctx http.Context) http.Response {
 //	@Router			/panel/cert/deploy [post]
 func (r *CertController) Deploy(ctx http.Context) http.Response {
 	var deployRequest requests.CertDeploy
-	sanitize := SanitizeRequest(ctx, &deployRequest)
+	sanitize := h.SanitizeRequest(ctx, &deployRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -698,8 +699,8 @@ func (r *CertController) Deploy(ctx http.Context) http.Response {
 			"certID": deployRequest.ID,
 			"error":  err.Error(),
 		}).Info("部署证书失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

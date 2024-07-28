@@ -11,6 +11,7 @@ import (
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 )
 
 type MonitorController struct {
@@ -32,10 +33,10 @@ func (r *MonitorController) Switch(ctx http.Context) http.Response {
 			"monitor": value,
 			"error":   err.Error(),
 		}).Info("更新监控开关失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SaveDays 保存监控天数
@@ -47,10 +48,10 @@ func (r *MonitorController) SaveDays(ctx http.Context) http.Response {
 			"days":  days,
 			"error": err.Error(),
 		}).Info("更新监控开关失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SwitchAndDays 监控开关和监控天数
@@ -58,7 +59,7 @@ func (r *MonitorController) SwitchAndDays(ctx http.Context) http.Response {
 	monitor := r.setting.Get(models.SettingKeyMonitor)
 	monitorDays := r.setting.Get(models.SettingKeyMonitorDays)
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"switch": cast.ToBool(monitor),
 		"days":   cast.ToInt(monitorDays),
 	})
@@ -71,10 +72,10 @@ func (r *MonitorController) Clear(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "资源监控").With(map[string]any{
 			"error": err.Error(),
 		}).Info("清空监控数据失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // List 监控数据列表
@@ -92,11 +93,11 @@ func (r *MonitorController) List(ctx http.Context) http.Response {
 			"end":   endTime.ToDateTimeString(),
 			"error": err.Error(),
 		}).Info("获取监控数据失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if len(monitors) == 0 {
-		return Error(ctx, http.StatusNotFound, "监控数据为空")
+		return h.Error(ctx, http.StatusNotFound, "监控数据为空")
 	}
 
 	type load struct {
@@ -181,5 +182,5 @@ func (r *MonitorController) List(ctx http.Context) http.Response {
 		bytesRecv2 = 0
 	}
 
-	return Success(ctx, data)
+	return h.Success(ctx, data)
 }

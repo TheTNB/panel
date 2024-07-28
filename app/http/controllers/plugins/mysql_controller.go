@@ -7,11 +7,11 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
 	"github.com/TheTNB/panel/v2/pkg/db"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 	"github.com/TheTNB/panel/v2/pkg/str"
@@ -35,45 +35,45 @@ func NewMySQLController() *MySQLController {
 func (r *MySQLController) GetConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/www/server/mysql/conf/my.cnf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取MySQL配置失败")
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
 func (r *MySQLController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if err := io.Write("/www/server/mysql/conf/my.cnf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "写入MySQL配置失败")
 	}
 
 	if err := systemctl.Reload("mysqld"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
+		return h.Error(ctx, http.StatusInternalServerError, "重载MySQL失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Load 获取负载
 func (r *MySQLController) Load(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
 	status, _ := systemctl.Status("mysqld")
 	if !status {
-		return controllers.Success(ctx, []types.NV{})
+		return h.Success(ctx, []types.NV{})
 	}
 
 	raw, err := shell.Execf("mysqladmin -uroot -p" + rootPassword + " extended-status 2>&1")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取MySQL负载失败")
 	}
 
 	var data []map[string]string
@@ -123,61 +123,61 @@ func (r *MySQLController) Load(ctx http.Context) http.Response {
 	bufferPoolReadRequests := cast.ToFloat64(data[12]["value"])
 	data[10]["value"] = fmt.Sprintf("%.2f%%", bufferPoolReadRequests/(bufferPoolReads+bufferPoolReadRequests)*100)
 
-	return controllers.Success(ctx, data)
+	return h.Success(ctx, data)
 }
 
 // ErrorLog 获取错误日志
 func (r *MySQLController) ErrorLog(ctx http.Context) http.Response {
 	log, err := shell.Execf("tail -n 100 /www/server/mysql/mysql-error.log")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
+		return h.Error(ctx, http.StatusInternalServerError, log)
 	}
 
-	return controllers.Success(ctx, log)
+	return h.Success(ctx, log)
 }
 
 // ClearErrorLog 清空错误日志
 func (r *MySQLController) ClearErrorLog(ctx http.Context) http.Response {
 	if out, err := shell.Execf("echo '' > /www/server/mysql/mysql-error.log"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SlowLog 获取慢查询日志
 func (r *MySQLController) SlowLog(ctx http.Context) http.Response {
 	log, err := shell.Execf("tail -n 100 /www/server/mysql/mysql-slow.log")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, log)
+		return h.Error(ctx, http.StatusInternalServerError, log)
 	}
 
-	return controllers.Success(ctx, log)
+	return h.Success(ctx, log)
 }
 
 // ClearSlowLog 清空慢查询日志
 func (r *MySQLController) ClearSlowLog(ctx http.Context) http.Response {
 	if out, err := shell.Execf("echo '' > /www/server/mysql/mysql-slow.log"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, out)
+		return h.Error(ctx, http.StatusInternalServerError, out)
 	}
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetRootPassword 获取root密码
 func (r *MySQLController) GetRootPassword(ctx http.Context) http.Response {
 	rootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码为空")
 	}
 
-	return controllers.Success(ctx, rootPassword)
+	return h.Success(ctx, rootPassword)
 }
 
 // SetRootPassword 设置root密码
 func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
 	rootPassword := ctx.Request().Input("password")
 	if len(rootPassword) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码不能为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "MySQL root密码不能为空")
 	}
 
 	oldRootPassword := r.setting.Get(models.SettingKeyMysqlRootPassword)
@@ -185,18 +185,18 @@ func (r *MySQLController) SetRootPassword(ctx http.Context) http.Response {
 	if err != nil {
 		// 尝试安全模式直接改密
 		if err = db.MySQLResetRootPassword(rootPassword); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+			return h.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	} else {
 		if err = mysql.UserPassword("root", rootPassword); err != nil {
-			return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+			return h.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
 	if err = r.setting.Set(models.SettingKeyMysqlRootPassword, rootPassword); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DatabaseList 获取数据库列表
@@ -204,7 +204,7 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 	password := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	mysql, err := db.NewMySQL("root", password, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Success(ctx, http.Json{
+		return h.Success(ctx, http.Json{
 			"total": 0,
 			"items": []types.MySQLDatabase{},
 		})
@@ -212,11 +212,11 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 
 	databases, err := mysql.Databases()
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取数据库列表失败")
 	}
-	paged, total := controllers.Paginate(ctx, databases)
+	paged, total := h.Paginate(ctx, databases)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -224,7 +224,7 @@ func (r *MySQLController) DatabaseList(ctx http.Context) http.Response {
 
 // AddDatabase 添加数据库
 func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:32",
@@ -239,24 +239,24 @@ func (r *MySQLController) AddDatabase(ctx http.Context) http.Response {
 
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.DatabaseCreate(database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.UserCreate(user, password); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.PrivilegesGrant(user, database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DeleteDatabase 删除数据库
 func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
 		return sanitize
@@ -266,25 +266,25 @@ func (r *MySQLController) DeleteDatabase(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.DatabaseDrop(database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // BackupList 获取备份列表
 func (r *MySQLController) BackupList(ctx http.Context) http.Response {
 	backups, err := r.backup.MysqlList()
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := controllers.Paginate(ctx, backups)
+	paged, total := h.Paginate(ctx, backups)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -294,7 +294,7 @@ func (r *MySQLController) BackupList(ctx http.Context) http.Response {
 func (r *MySQLController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/mysql"
@@ -307,15 +307,15 @@ func (r *MySQLController) UploadBackup(ctx http.Context) http.Response {
 	name := file.GetClientOriginalName()
 	_, err = file.StoreAs(backupPath, name)
 	if err != nil {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "上传文件失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // CreateBackup 创建备份
 func (r *MySQLController) CreateBackup(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
 		return sanitize
@@ -323,15 +323,15 @@ func (r *MySQLController) CreateBackup(ctx http.Context) http.Response {
 
 	database := ctx.Request().Input("database")
 	if err := r.backup.MysqlBackup(database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DeleteBackup 删除备份
 func (r *MySQLController) DeleteBackup(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"name": "required|min_len:1|max_len:255",
 	}); sanitize != nil {
 		return sanitize
@@ -340,15 +340,15 @@ func (r *MySQLController) DeleteBackup(ctx http.Context) http.Response {
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/mysql"
 	fileName := ctx.Request().Input("name")
 	if err := io.Remove(backupPath + "/" + fileName); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // RestoreBackup 还原备份
 func (r *MySQLController) RestoreBackup(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"backup":   "required|min_len:1|max_len:255",
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$|not_in:information_schema,mysql,performance_schema,sys",
 	}); sanitize != nil {
@@ -356,10 +356,10 @@ func (r *MySQLController) RestoreBackup(ctx http.Context) http.Response {
 	}
 
 	if err := r.backup.MysqlRestore(ctx.Request().Input("database"), ctx.Request().Input("backup")); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UserList 用户列表
@@ -367,7 +367,7 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 	password := r.setting.Get(models.SettingKeyMysqlRootPassword)
 	mysql, err := db.NewMySQL("root", password, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Success(ctx, http.Json{
+		return h.Success(ctx, http.Json{
 			"total": 0,
 			"items": []types.MySQLUser{},
 		})
@@ -375,11 +375,11 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 
 	users, err := mysql.Users()
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取用户列表失败")
 	}
-	paged, total := controllers.Paginate(ctx, users)
+	paged, total := h.Paginate(ctx, users)
 
-	return controllers.Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -387,7 +387,7 @@ func (r *MySQLController) UserList(ctx http.Context) http.Response {
 
 // AddUser 添加用户
 func (r *MySQLController) AddUser(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
 		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:32",
@@ -401,21 +401,21 @@ func (r *MySQLController) AddUser(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.UserCreate(user, password); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.PrivilegesGrant(user, database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DeleteUser 删除用户
 func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"user": "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 	}); sanitize != nil {
 		return sanitize
@@ -425,18 +425,18 @@ func (r *MySQLController) DeleteUser(ctx http.Context) http.Response {
 	user := ctx.Request().Input("user")
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.UserDrop(user); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SetUserPassword 设置用户密码
 func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 		"password": "required|min_len:8|max_len:32",
 	}); sanitize != nil {
@@ -448,18 +448,18 @@ func (r *MySQLController) SetUserPassword(ctx http.Context) http.Response {
 	password := ctx.Request().Input("password")
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.UserPassword(user, password); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // SetUserPrivileges 设置用户权限
 func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
-	if sanitize := controllers.Sanitize(ctx, map[string]string{
+	if sanitize := h.Sanitize(ctx, map[string]string{
 		"user":     "required|min_len:1|max_len:32|regex:^[a-zA-Z0-9_]+$",
 		"database": "required|min_len:1|max_len:64|regex:^[a-zA-Z0-9_]+$",
 	}); sanitize != nil {
@@ -471,13 +471,13 @@ func (r *MySQLController) SetUserPrivileges(ctx http.Context) http.Response {
 	database := ctx.Request().Input("database")
 	mysql, err := db.NewMySQL("root", rootPassword, r.getSock(), "unix")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = mysql.PrivilegesGrant(user, database); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // getSock 获取sock文件位置

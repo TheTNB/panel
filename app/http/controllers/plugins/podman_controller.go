@@ -3,8 +3,8 @@ package plugins
 import (
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
 	requests "github.com/TheTNB/panel/v2/app/http/requests/plugins/podman"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
@@ -28,10 +28,10 @@ func NewPodmanController() *PodmanController {
 func (r *PodmanController) GetRegistryConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/etc/containers/registries.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // UpdateRegistryConfig
@@ -46,20 +46,20 @@ func (r *PodmanController) GetRegistryConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/podman/registryConfig [post]
 func (r *PodmanController) UpdateRegistryConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateRegistryConfig
-	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Write("/etc/containers/registries.conf", updateRequest.Config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := systemctl.Restart("podman"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetStorageConfig
@@ -74,10 +74,10 @@ func (r *PodmanController) UpdateRegistryConfig(ctx http.Context) http.Response 
 func (r *PodmanController) GetStorageConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/etc/containers/storage.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // UpdateStorageConfig
@@ -92,18 +92,18 @@ func (r *PodmanController) GetStorageConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/podman/storageConfig [post]
 func (r *PodmanController) UpdateStorageConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateStorageConfig
-	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Write("/etc/containers/storage.conf", updateRequest.Config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := systemctl.Restart("podman"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 
 	requests "github.com/TheTNB/panel/v2/app/http/requests/file"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/os"
 	"github.com/TheTNB/panel/v2/pkg/shell"
@@ -39,7 +40,7 @@ func NewFileController() *FileController {
 //	@Router			/panel/file/create [post]
 func (r *FileController) Create(ctx http.Context) http.Response {
 	var request requests.NotExist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -47,16 +48,16 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 	isDir := ctx.Request().InputBool("dir")
 	if !isDir {
 		if out, err := shell.Execf("touch " + request.Path); err != nil {
-			return Error(ctx, http.StatusInternalServerError, out)
+			return h.Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
 		if err := io.Mkdir(request.Path, 0755); err != nil {
-			return Error(ctx, http.StatusInternalServerError, err.Error())
+			return h.Error(ctx, http.StatusInternalServerError, err.Error())
 		}
 	}
 
 	r.setPermission(request.Path, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Content
@@ -72,28 +73,28 @@ func (r *FileController) Create(ctx http.Context) http.Response {
 //	@Router			/panel/file/content [get]
 func (r *FileController) Content(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if fileInfo.IsDir() {
-		return Error(ctx, http.StatusInternalServerError, "目标路径不是文件")
+		return h.Error(ctx, http.StatusInternalServerError, "目标路径不是文件")
 	}
 	if fileInfo.Size() > 10*1024*1024 {
-		return Error(ctx, http.StatusInternalServerError, "文件大小超过 10 M，不支持在线编辑")
+		return h.Error(ctx, http.StatusInternalServerError, "文件大小超过 10 M，不支持在线编辑")
 	}
 
 	content, err := io.Read(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, content)
+	return h.Success(ctx, content)
 }
 
 // Save
@@ -109,21 +110,21 @@ func (r *FileController) Content(ctx http.Context) http.Response {
 //	@Router			/panel/file/save [post]
 func (r *FileController) Save(ctx http.Context) http.Response {
 	var request requests.Save
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = io.Write(request.Path, request.Content, fileInfo.Mode()); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.Path, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Delete
@@ -139,16 +140,16 @@ func (r *FileController) Save(ctx http.Context) http.Response {
 //	@Router			/panel/file/delete [post]
 func (r *FileController) Delete(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Remove(request.Path); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Upload
@@ -165,32 +166,32 @@ func (r *FileController) Delete(ctx http.Context) http.Response {
 //	@Router			/panel/file/upload [post]
 func (r *FileController) Upload(ctx http.Context) http.Response {
 	var request requests.Upload
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	src, err := request.File.Open()
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	defer src.Close()
 
 	if io.Exists(request.Path) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
+		return h.Error(ctx, http.StatusForbidden, "目标路径已存在，是否覆盖？")
 	}
 
 	data, err := stdio.ReadAll(src)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = io.Write(request.Path, string(data), 0755); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.Path, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Move
@@ -206,21 +207,21 @@ func (r *FileController) Upload(ctx http.Context) http.Response {
 //	@Router			/panel/file/move [post]
 func (r *FileController) Move(ctx http.Context) http.Response {
 	var request requests.Move
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if io.Exists(request.Target) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
+		return h.Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
 	if err := io.Mv(request.Source, request.Target); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.Target, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Copy
@@ -236,21 +237,21 @@ func (r *FileController) Move(ctx http.Context) http.Response {
 //	@Router			/panel/file/copy [post]
 func (r *FileController) Copy(ctx http.Context) http.Response {
 	var request requests.Copy
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if io.Exists(request.Target) && !ctx.Request().InputBool("force") {
-		return Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
+		return h.Error(ctx, http.StatusForbidden, "目标路径"+request.Target+"已存在")
 	}
 
 	if err := io.Cp(request.Source, request.Target); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.Source, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Download
@@ -266,17 +267,17 @@ func (r *FileController) Copy(ctx http.Context) http.Response {
 //	@Router			/panel/file/download [get]
 func (r *FileController) Download(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	info, err := io.FileInfo(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if info.IsDir() {
-		return Error(ctx, http.StatusInternalServerError, "不能下载目录")
+		return h.Error(ctx, http.StatusInternalServerError, "不能下载目录")
 	}
 
 	return ctx.Response().Download(request.Path, info.Name())
@@ -295,7 +296,7 @@ func (r *FileController) Download(ctx http.Context) http.Response {
 //	@Router			/panel/file/remoteDownload [post]
 func (r *FileController) RemoteDownload(ctx http.Context) http.Response {
 	var request requests.NotExist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -317,17 +318,17 @@ func (r *FileController) RemoteDownload(ctx http.Context) http.Response {
 //	@Router			/panel/file/info [get]
 func (r *FileController) Info(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	fileInfo, err := io.FileInfo(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"name":     fileInfo.Name(),
 		"size":     str.FormatBytes(float64(fileInfo.Size())),
 		"mode_str": fileInfo.Mode().String(),
@@ -350,7 +351,7 @@ func (r *FileController) Info(ctx http.Context) http.Response {
 //	@Router			/panel/file/permission [post]
 func (r *FileController) Permission(ctx http.Context) http.Response {
 	var request requests.Permission
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -358,17 +359,17 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 	// 解析成8进制
 	mode, err := strconv.ParseUint(request.Mode, 8, 64)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err = io.Chmod(request.Path, stdos.FileMode(mode)); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = io.Chown(request.Path, request.Owner, request.Group); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Archive
@@ -384,17 +385,17 @@ func (r *FileController) Permission(ctx http.Context) http.Response {
 //	@Router			/panel/file/archive [post]
 func (r *FileController) Archive(ctx http.Context) http.Response {
 	var request requests.Archive
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Archive(request.Paths, request.File); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.File, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UnArchive
@@ -410,17 +411,17 @@ func (r *FileController) Archive(ctx http.Context) http.Response {
 //	@Router			/panel/file/unArchive [post]
 func (r *FileController) UnArchive(ctx http.Context) http.Response {
 	var request requests.UnArchive
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.UnArchive(request.File, request.Path); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	r.setPermission(request.Path, 0755, "www", "www")
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Search
@@ -435,7 +436,7 @@ func (r *FileController) UnArchive(ctx http.Context) http.Response {
 //	@Router			/panel/file/search [post]
 func (r *FileController) Search(ctx http.Context) http.Response {
 	var request requests.Search
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -451,10 +452,10 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 		return nil
 	})
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, paths)
+	return h.Success(ctx, paths)
 }
 
 // List
@@ -470,14 +471,14 @@ func (r *FileController) Search(ctx http.Context) http.Response {
 //	@Router			/panel/file/list [get]
 func (r *FileController) List(ctx http.Context) http.Response {
 	var request requests.Exist
-	sanitize := SanitizeRequest(ctx, &request)
+	sanitize := h.SanitizeRequest(ctx, &request)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	fileInfoList, err := io.ReadDir(request.Path)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	var paths []any
@@ -503,9 +504,9 @@ func (r *FileController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	paged, total := Paginate(ctx, paths)
+	paged, total := h.Paginate(ctx, paths)
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})

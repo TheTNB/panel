@@ -7,6 +7,7 @@ import (
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 )
 
 type PluginController struct {
@@ -33,7 +34,7 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 	plugins := r.plugin.All()
 	installedPlugins, err := r.plugin.AllInstalled()
 	if err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	installedPluginsMap := make(map[string]models.Plugin)
@@ -75,9 +76,9 @@ func (r *PluginController) List(ctx http.Context) http.Response {
 		})
 	}
 
-	paged, total := Paginate(ctx, pluginArr)
+	paged, total := h.Paginate(ctx, pluginArr)
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -96,10 +97,10 @@ func (r *PluginController) Install(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Install(slug); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, "任务已提交")
+	return h.Success(ctx, "任务已提交")
 }
 
 // Uninstall
@@ -115,10 +116,10 @@ func (r *PluginController) Uninstall(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Uninstall(slug); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, "任务已提交")
+	return h.Success(ctx, "任务已提交")
 }
 
 // Update
@@ -134,10 +135,10 @@ func (r *PluginController) Update(ctx http.Context) http.Response {
 	slug := ctx.Request().Input("slug")
 
 	if err := r.plugin.Update(slug); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, "任务已提交")
+	return h.Success(ctx, "任务已提交")
 }
 
 // UpdateShow
@@ -160,10 +161,10 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 			"slug": slug,
 			"err":  err.Error(),
 		}).Info("获取插件失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 	if plugin.ID == 0 {
-		return Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "插件未安装")
 	}
 
 	plugin.Show = show
@@ -172,10 +173,10 @@ func (r *PluginController) UpdateShow(ctx http.Context) http.Response {
 			"slug": slug,
 			"err":  err.Error(),
 		}).Info("更新插件失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, "操作成功")
+	return h.Success(ctx, "操作成功")
 }
 
 // IsInstalled
@@ -193,13 +194,13 @@ func (r *PluginController) IsInstalled(ctx http.Context) http.Response {
 	plugin := r.plugin.GetInstalledBySlug(slug)
 	info := r.plugin.GetBySlug(slug)
 	if plugin.Slug != slug {
-		return Success(ctx, http.Json{
+		return h.Success(ctx, http.Json{
 			"name":      info.Name,
 			"installed": false,
 		})
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"name":      info.Name,
 		"installed": true,
 	})

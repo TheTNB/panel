@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheTNB/panel/v2/app/http/requests/user"
 	"github.com/TheTNB/panel/v2/app/models"
+	"github.com/TheTNB/panel/v2/pkg/h"
 )
 
 type UserController struct {
@@ -32,7 +33,7 @@ func NewUserController() *UserController {
 //	@Router		/panel/user/login [post]
 func (r *UserController) Login(ctx http.Context) http.Response {
 	var loginRequest requests.Login
-	sanitize := SanitizeRequest(ctx, &loginRequest)
+	sanitize := h.SanitizeRequest(ctx, &loginRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -43,11 +44,11 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
 		}).Info("查询用户失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if user.ID == 0 || !facades.Hash().Check(loginRequest.Password, user.Password) {
-		return Error(ctx, http.StatusForbidden, "用户名或密码错误")
+		return h.Error(ctx, http.StatusForbidden, "用户名或密码错误")
 	}
 
 	if facades.Hash().NeedsRehash(user.Password) {
@@ -56,12 +57,12 @@ func (r *UserController) Login(ctx http.Context) http.Response {
 			facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 				"error": err.Error(),
 			}).Info("更新密码失败")
-			return ErrorSystem(ctx)
+			return h.ErrorSystem(ctx)
 		}
 	}
 
 	ctx.Request().Session().Put("user_id", user.ID)
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Logout
@@ -77,7 +78,7 @@ func (r *UserController) Logout(ctx http.Context) http.Response {
 		ctx.Request().Session().Forget("user_id")
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // IsLogin
@@ -89,10 +90,10 @@ func (r *UserController) Logout(ctx http.Context) http.Response {
 //	@Router		/panel/user/isLogin [get]
 func (r *UserController) IsLogin(ctx http.Context) http.Response {
 	if !ctx.Request().HasSession() {
-		return Success(ctx, false)
+		return h.Success(ctx, false)
 	}
 
-	return Success(ctx, ctx.Request().Session().Has("user_id"))
+	return h.Success(ctx, ctx.Request().Session().Has("user_id"))
 }
 
 // Info
@@ -110,10 +111,10 @@ func (r *UserController) Info(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "用户").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取用户信息失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"id":       user.ID,
 		"role":     []string{"admin"},
 		"username": user.Username,

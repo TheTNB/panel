@@ -13,6 +13,7 @@ import (
 	"github.com/TheTNB/panel/v2/app/models"
 	"github.com/TheTNB/panel/v2/internal"
 	"github.com/TheTNB/panel/v2/internal/services"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 	"github.com/TheTNB/panel/v2/pkg/str"
@@ -44,7 +45,7 @@ func NewWebsiteController() *WebsiteController {
 //	@Router		/panel/websites [get]
 func (r *WebsiteController) List(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	sanitize := h.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -54,10 +55,10 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取网站列表失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": websites,
 	})
@@ -75,7 +76,7 @@ func (r *WebsiteController) List(ctx http.Context) http.Response {
 //	@Router		/panel/websites [post]
 func (r *WebsiteController) Add(ctx http.Context) http.Response {
 	var addRequest requests.Add
-	sanitize := SanitizeRequest(ctx, &addRequest)
+	sanitize := h.SanitizeRequest(ctx, &addRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -89,10 +90,10 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("添加网站失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Delete
@@ -107,7 +108,7 @@ func (r *WebsiteController) Add(ctx http.Context) http.Response {
 //	@Router		/panel/websites/delete [post]
 func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 	var deleteRequest requests.Delete
-	sanitize := SanitizeRequest(ctx, &deleteRequest)
+	sanitize := h.SanitizeRequest(ctx, &deleteRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -117,10 +118,10 @@ func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 			"id":    deleteRequest.ID,
 			"error": err.Error(),
 		}).Info("删除网站失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetDefaultConfig
@@ -134,14 +135,14 @@ func (r *WebsiteController) Delete(ctx http.Context) http.Response {
 func (r *WebsiteController) GetDefaultConfig(ctx http.Context) http.Response {
 	index, err := io.Read("/www/server/openresty/html/index.html")
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	stop, err := io.Read("/www/server/openresty/html/stop.html")
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"index": index,
 		"stop":  stop,
 	})
@@ -165,17 +166,17 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认首页配置失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := io.Write("/www/server/openresty/html/stop.html", stop, 0644); err != nil {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("保存默认停止页配置失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // GetConfig
@@ -190,7 +191,7 @@ func (r *WebsiteController) SaveDefaultConfig(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/config [get]
 func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -201,10 +202,10 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("获取网站配置失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveConfig
@@ -220,17 +221,17 @@ func (r *WebsiteController) GetConfig(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/config [post]
 func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 	var saveConfigRequest requests.SaveConfig
-	sanitize := SanitizeRequest(ctx, &saveConfigRequest)
+	sanitize := h.SanitizeRequest(ctx, &saveConfigRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	err := r.website.SaveConfig(saveConfigRequest)
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ClearLog
@@ -245,7 +246,7 @@ func (r *WebsiteController) SaveConfig(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/log [delete]
 func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -253,14 +254,14 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", idRequest.ID).Get(&website)
 	if err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if err := io.Remove("/www/wwwlogs/" + website.Name + ".log"); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UpdateRemark
@@ -275,7 +276,7 @@ func (r *WebsiteController) ClearLog(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/updateRemark [post]
 func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -283,7 +284,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 	website := models.Website{}
 	err := facades.Orm().Query().Where("id", idRequest.ID).Get(&website)
 	if err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	website.Remark = ctx.Request().Input("remark")
@@ -292,10 +293,10 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("更新网站备注失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // BackupList
@@ -309,7 +310,7 @@ func (r *WebsiteController) UpdateRemark(ctx http.Context) http.Response {
 //	@Router		/panel/website/backupList [get]
 func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 	var paginateRequest commonrequests.Paginate
-	sanitize := SanitizeRequest(ctx, &paginateRequest)
+	sanitize := h.SanitizeRequest(ctx, &paginateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -319,12 +320,12 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("获取备份列表失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	paged, total := Paginate(ctx, backups)
+	paged, total := h.Paginate(ctx, backups)
 
-	return Success(ctx, http.Json{
+	return h.Success(ctx, http.Json{
 		"total": total,
 		"items": paged,
 	})
@@ -342,7 +343,7 @@ func (r *WebsiteController) BackupList(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/createBackup [post]
 func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -353,7 +354,7 @@ func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("获取网站信息失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if err := r.backup.WebSiteBackup(website); err != nil {
@@ -361,10 +362,10 @@ func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("备份网站失败")
-		return Error(ctx, http.StatusInternalServerError, "备份网站失败: "+err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, "备份网站失败: "+err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // UploadBackup
@@ -380,7 +381,7 @@ func (r *WebsiteController) CreateBackup(ctx http.Context) http.Response {
 func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 	file, err := ctx.Request().File("file")
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, "上传文件失败")
+		return h.Error(ctx, http.StatusInternalServerError, "上传文件失败")
 	}
 
 	backupPath := r.setting.Get(models.SettingKeyBackupPath) + "/website"
@@ -396,10 +397,10 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 		facades.Log().Request(ctx.Request()).Tags("面板", "网站管理").With(map[string]any{
 			"error": err.Error(),
 		}).Info("上传备份失败")
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // RestoreBackup
@@ -414,14 +415,14 @@ func (r *WebsiteController) UploadBackup(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/restoreBackup [post]
 func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 	var restoreBackupRequest requests.RestoreBackup
-	sanitize := SanitizeRequest(ctx, &restoreBackupRequest)
+	sanitize := h.SanitizeRequest(ctx, &restoreBackupRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", restoreBackupRequest.ID).Get(&website); err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	if err := r.backup.WebsiteRestore(website, restoreBackupRequest.Name); err != nil {
@@ -430,10 +431,10 @@ func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 			"file":  restoreBackupRequest.Name,
 			"error": err.Error(),
 		}).Info("还原网站失败")
-		return Error(ctx, http.StatusInternalServerError, "还原网站失败: "+err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, "还原网站失败: "+err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // DeleteBackup
@@ -448,7 +449,7 @@ func (r *WebsiteController) RestoreBackup(ctx http.Context) http.Response {
 //	@Router		/panel/website/deleteBackup [delete]
 func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	var deleteBackupRequest requests.DeleteBackup
-	sanitize := SanitizeRequest(ctx, &deleteBackupRequest)
+	sanitize := h.SanitizeRequest(ctx, &deleteBackupRequest)
 	if sanitize != nil {
 		return sanitize
 	}
@@ -461,10 +462,10 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 	}
 
 	if err := io.Remove(backupPath + "/" + deleteBackupRequest.Name); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // ResetConfig
@@ -479,14 +480,14 @@ func (r *WebsiteController) DeleteBackup(ctx http.Context) http.Response {
 //	@Router		/panel/websites/{id}/resetConfig [post]
 func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", idRequest.ID).Get(&website); err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	website.Status = true
@@ -496,7 +497,7 @@ func (r *WebsiteController) ResetConfig(ctx http.Context) http.Response {
 			"id":    idRequest.ID,
 			"error": err.Error(),
 		}).Info("保存网站配置失败")
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	raw := fmt.Sprintf(`
@@ -571,10 +572,10 @@ server
 	}
 	if err := systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")
-		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Status
@@ -589,24 +590,24 @@ server
 //	@Router		/panel/websites/{id}/status [post]
 func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	var idRequest requests.ID
-	sanitize := SanitizeRequest(ctx, &idRequest)
+	sanitize := h.SanitizeRequest(ctx, &idRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	website := models.Website{}
 	if err := facades.Orm().Query().Where("id", idRequest.ID).Get(&website); err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	website.Status = ctx.Request().InputBool("status")
 	if err := facades.Orm().Query().Save(&website); err != nil {
-		return ErrorSystem(ctx)
+		return h.ErrorSystem(ctx)
 	}
 
 	raw, err := io.Read("/www/server/vhost/" + website.Name + ".conf")
 	if err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	// 运行目录
@@ -634,12 +635,12 @@ func (r *WebsiteController) Status(ctx http.Context) http.Response {
 	}
 
 	if err = io.Write("/www/server/vhost/"+website.Name+".conf", raw, 0644); err != nil {
-		return Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 	if err = systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")
-		return Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
+		return h.Error(ctx, http.StatusInternalServerError, fmt.Sprintf("重载OpenResty失败: %v", err))
 	}
 
-	return Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

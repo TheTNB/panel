@@ -3,8 +3,8 @@ package plugins
 import (
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
 	requests "github.com/TheTNB/panel/v2/app/http/requests/plugins/gitea"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/systemctl"
 )
@@ -28,10 +28,10 @@ func NewGiteaController() *GiteaController {
 func (r *GiteaController) GetConfig(ctx http.Context) http.Response {
 	config, err := io.Read("/www/server/gitea/app.ini")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // UpdateConfig
@@ -46,18 +46,18 @@ func (r *GiteaController) GetConfig(ctx http.Context) http.Response {
 //	@Router			/plugins/gitea/config [post]
 func (r *GiteaController) UpdateConfig(ctx http.Context) http.Response {
 	var updateRequest requests.UpdateConfig
-	sanitize := controllers.SanitizeRequest(ctx, &updateRequest)
+	sanitize := h.SanitizeRequest(ctx, &updateRequest)
 	if sanitize != nil {
 		return sanitize
 	}
 
 	if err := io.Write("/www/server/gitea/app.ini", updateRequest.Config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
 	if err := systemctl.Restart("gitea"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, err.Error())
+		return h.Error(ctx, http.StatusInternalServerError, err.Error())
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }

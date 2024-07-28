@@ -1,10 +1,10 @@
-package controllers
+package h
 
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 
-	commonrequests "github.com/TheTNB/panel/v2/app/http/requests/common"
+	"github.com/TheTNB/panel/v2/app/http/requests/common"
 )
 
 // SuccessResponse 通用成功响应
@@ -40,6 +40,7 @@ func ErrorSystem(ctx http.Context) http.Response {
 	})
 }
 
+// Paginate 取分页条目
 func Paginate[T any](ctx http.Context, allItems []T) (pagedItems []T, total int) {
 	var paginateRequest commonrequests.Paginate
 	sanitize := SanitizeRequest(ctx, &paginateRequest)
@@ -64,30 +65,4 @@ func Paginate[T any](ctx http.Context, allItems []T) (pagedItems []T, total int)
 	}
 
 	return allItems[startIndex:endIndex], total
-}
-
-// SanitizeRequest 消毒请求参数
-func SanitizeRequest(ctx http.Context, request http.FormRequest) http.Response {
-	errors, err := ctx.Request().ValidateRequest(request)
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if errors != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, errors.One())
-	}
-
-	return nil
-}
-
-// Sanitize 消毒参数
-func Sanitize(ctx http.Context, rules map[string]string) http.Response {
-	validator, err := ctx.Request().Validate(rules)
-	if err != nil {
-		return Error(ctx, http.StatusUnprocessableEntity, err.Error())
-	}
-	if validator.Fails() {
-		return Error(ctx, http.StatusUnprocessableEntity, validator.Errors().One())
-	}
-
-	return nil
 }

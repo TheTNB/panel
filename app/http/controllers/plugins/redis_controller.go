@@ -5,7 +5,7 @@ import (
 
 	"github.com/goravel/framework/contracts/http"
 
-	"github.com/TheTNB/panel/v2/app/http/controllers"
+	"github.com/TheTNB/panel/v2/pkg/h"
 	"github.com/TheTNB/panel/v2/pkg/io"
 	"github.com/TheTNB/panel/v2/pkg/shell"
 	"github.com/TheTNB/panel/v2/pkg/systemctl"
@@ -24,43 +24,43 @@ func (r *RedisController) GetConfig(ctx http.Context) http.Response {
 	// 获取配置
 	config, err := io.Read("/www/server/redis/redis.conf")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取Redis配置失败")
 	}
 
-	return controllers.Success(ctx, config)
+	return h.Success(ctx, config)
 }
 
 // SaveConfig 保存配置
 func (r *RedisController) SaveConfig(ctx http.Context) http.Response {
 	config := ctx.Request().Input("config")
 	if len(config) == 0 {
-		return controllers.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
+		return h.Error(ctx, http.StatusUnprocessableEntity, "配置不能为空")
 	}
 
 	if err := io.Write("/www/server/redis/redis.conf", config, 0644); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
+		return h.Error(ctx, http.StatusInternalServerError, "写入Redis配置失败")
 	}
 
 	if err := systemctl.Restart("redis"); err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
+		return h.Error(ctx, http.StatusInternalServerError, "重启Redis失败")
 	}
 
-	return controllers.Success(ctx, nil)
+	return h.Success(ctx, nil)
 }
 
 // Load 获取负载
 func (r *RedisController) Load(ctx http.Context) http.Response {
 	status, err := systemctl.Status("redis")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取Redis状态失败")
 	}
 	if !status {
-		return controllers.Error(ctx, http.StatusInternalServerError, "Redis已停止运行")
+		return h.Error(ctx, http.StatusInternalServerError, "Redis已停止运行")
 	}
 
 	raw, err := shell.Execf("redis-cli info")
 	if err != nil {
-		return controllers.Error(ctx, http.StatusInternalServerError, "获取Redis负载失败")
+		return h.Error(ctx, http.StatusInternalServerError, "获取Redis负载失败")
 	}
 
 	infoLines := strings.Split(raw, "\n")
@@ -89,5 +89,5 @@ func (r *RedisController) Load(ctx http.Context) http.Response {
 		{Name: "最近一次 fork() 操作耗费的毫秒数", Value: dataRaw["latest_fork_usec"]},
 	}
 
-	return controllers.Success(ctx, data)
+	return h.Success(ctx, data)
 }
