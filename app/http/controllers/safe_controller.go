@@ -100,10 +100,17 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 		ports := strings.Split(match[1], " ")
 		for _, port := range ports {
 			rule := strings.Split(port, "/")
-			rules = append(rules, map[string]string{
-				"port":     rule[0],
-				"protocol": rule[1],
-			})
+			if len(rule) < 2 {
+				rules = append(rules, map[string]string{
+					"port":     rule[0],
+					"protocol": "all",
+				})
+			} else {
+				rules = append(rules, map[string]string{
+					"port":     rule[0],
+					"protocol": rule[1],
+				})
+			}
 		}
 	} else {
 		out, err := shell.Execf("ufw status | grep -v '(v6)' | grep ALLOW | awk '{print $1}'")
@@ -119,10 +126,17 @@ func (r *SafeController) GetFirewallRules(ctx http.Context) http.Response {
 		}
 		for _, port := range strings.Split(out, "\n") {
 			rule := strings.Split(port, "/")
-			rules = append(rules, map[string]string{
-				"port":     rule[0],
-				"protocol": rule[1],
-			})
+			if len(rule) < 2 {
+				rules = append(rules, map[string]string{
+					"port":     rule[0],
+					"protocol": "all",
+				})
+			} else {
+				rules = append(rules, map[string]string{
+					"port":     rule[0],
+					"protocol": rule[1],
+				})
+			}
 		}
 	}
 
@@ -200,16 +214,21 @@ func (r *SafeController) DeleteFirewallRule(ctx http.Context) http.Response {
 	if port == "" || protocol == "" {
 		return Error(ctx, http.StatusUnprocessableEntity, "参数错误")
 	}
+	if protocol == "all" {
+		protocol = ""
+	} else {
+		protocol = "/" + protocol
+	}
 
 	if os.IsRHEL() {
-		if out, err := shell.Execf("firewall-cmd --remove-port=%s/%s --permanent", port, protocol); err != nil {
+		if out, err := shell.Execf("firewall-cmd --remove-port=%s%s --permanent", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 		if out, err := shell.Execf("firewall-cmd --reload"); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 	} else {
-		if out, err := shell.Execf("ufw delete allow %s/%s", port, protocol); err != nil {
+		if out, err := shell.Execf("ufw delete allow %s%s", port, protocol); err != nil {
 			return Error(ctx, http.StatusInternalServerError, out)
 		}
 		if out, err := shell.Execf("ufw reload"); err != nil {
