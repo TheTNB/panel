@@ -7,7 +7,7 @@ require (
 	github.com/docker/go-connections v0.5.0
 	github.com/gin-contrib/static v1.1.2
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
-	github.com/go-resty/resty/v2 v2.13.1
+	github.com/go-resty/resty/v2 v2.14.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.14.1-0.20240728082300-b71cfeb464af
