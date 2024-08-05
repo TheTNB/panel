@@ -34,6 +34,7 @@ Install() {
     fi
 
     mkdir /usr/local/ioncube
+    cd /usr/local/ioncube
     wget -T 60 -t 3 -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so
     wget -T 20 -t 3 -O /usr/local/ioncube/ioncube_loader_lin_${phpVersion}.so.checksum.txt ${downloadUrl}/ioncube_loader_lin_${phpVersion}.so.checksum.txt
 
