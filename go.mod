@@ -29,7 +29,7 @@ require (
 	github.com/swaggo/swag v1.16.3
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.26.0
-	golang.org/x/net v0.27.0
+	golang.org/x/net v0.28.0
 	gorm.io/gorm v1.25.11
 )
 
