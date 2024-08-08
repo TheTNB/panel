@@ -20,7 +20,7 @@ require (
 	github.com/libdns/dnspod v0.0.3
 	github.com/libdns/libdns v0.2.2
 	github.com/libdns/tencentcloud v1.0.0
-	github.com/mholt/acmez/v2 v2.0.1
+	github.com/mholt/acmez/v2 v2.0.2
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/spf13/cast v1.7.0
