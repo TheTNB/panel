@@ -1,4 +1,4 @@
-package plugins
+package openresty
 
 import (
 	"regexp"
@@ -19,18 +19,18 @@ import (
 	"github.com/TheTNB/panel/v2/pkg/types"
 )
 
-type Fail2banController struct {
+type Controller struct {
 	website internal.Website
 }
 
-func NewFail2banController() *Fail2banController {
-	return &Fail2banController{
+func NewController() *Controller {
+	return &Controller{
 		website: services.NewWebsiteImpl(),
 	}
 }
 
 // List 所有 Fail2ban 规则
-func (r *Fail2banController) List(ctx http.Context) http.Response {
+func (r *Controller) List(ctx http.Context) http.Response {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -77,7 +77,7 @@ func (r *Fail2banController) List(ctx http.Context) http.Response {
 }
 
 // Add 添加 Fail2ban 规则
-func (r *Fail2banController) Add(ctx http.Context) http.Response {
+func (r *Controller) Add(ctx http.Context) http.Response {
 	if sanitize := h.Sanitize(ctx, map[string]string{
 		"name":         "required",
 		"type":         "required|in:website,service",
@@ -217,7 +217,7 @@ logpath = ` + logPath + `
 }
 
 // Delete 删除规则
-func (r *Fail2banController) Delete(ctx http.Context) http.Response {
+func (r *Controller) Delete(ctx http.Context) http.Response {
 	jailName := ctx.Request().Input("name")
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
@@ -242,7 +242,7 @@ func (r *Fail2banController) Delete(ctx http.Context) http.Response {
 }
 
 // BanList 获取封禁列表
-func (r *Fail2banController) BanList(ctx http.Context) http.Response {
+func (r *Controller) BanList(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	if len(name) == 0 {
 		return h.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
@@ -283,7 +283,7 @@ func (r *Fail2banController) BanList(ctx http.Context) http.Response {
 }
 
 // Unban 解封
-func (r *Fail2banController) Unban(ctx http.Context) http.Response {
+func (r *Controller) Unban(ctx http.Context) http.Response {
 	name := ctx.Request().Input("name")
 	ip := ctx.Request().Input("ip")
 	if len(name) == 0 || len(ip) == 0 {
@@ -298,7 +298,7 @@ func (r *Fail2banController) Unban(ctx http.Context) http.Response {
 }
 
 // SetWhiteList 设置白名单
-func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
+func (r *Controller) SetWhiteList(ctx http.Context) http.Response {
 	ip := ctx.Request().Input("ip")
 	if len(ip) == 0 {
 		return h.Error(ctx, http.StatusUnprocessableEntity, "缺少参数")
@@ -327,7 +327,7 @@ func (r *Fail2banController) SetWhiteList(ctx http.Context) http.Response {
 }
 
 // GetWhiteList 获取白名单
-func (r *Fail2banController) GetWhiteList(ctx http.Context) http.Response {
+func (r *Controller) GetWhiteList(ctx http.Context) http.Response {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		return h.Error(ctx, http.StatusUnprocessableEntity, err.Error())

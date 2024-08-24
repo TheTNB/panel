@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	loader.New(&types.Plugin{
+	loader.Register(&types.Plugin{
 		Name:        "OpenResty",
 		Description: "OpenResty® 是一款基于 NGINX 和 LuaJIT 的 Web 平台",
 		Slug:        "openresty",

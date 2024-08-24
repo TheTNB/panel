@@ -11,7 +11,7 @@ func All() []*types.Plugin {
 	return data
 }
 
-// New 新注册插件
-func New(plugin *types.Plugin) {
+// Register 注册插件
+func Register(plugin *types.Plugin) {
 	data = append(data, plugin)
 }
