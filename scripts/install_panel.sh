@@ -112,8 +112,9 @@ Prepare_System() {
     fi
 
     # 自动开启 BBR
-    isBBRSupported=$(ls -l /lib/modules/*/kernel/net/ipv4 | grep -c tcp_bbr)
-    if [ "${isBBRSupported}" != "0" ]; then
+    bbrSupported=$(ls -l /lib/modules/*/kernel/net/ipv4 | grep -c tcp_bbr)
+    bbrEnabled=$(sysctl net.ipv4.tcp_congestion_control | grep -c bbr)
+    if [ "${bbrSupported}" != "0" ] && [ "${bbrEnabled}" == "0" ]; then
         qdisc=$(sysctl net.core.default_qdisc | awk '{print $3}')
         echo "net.core.default_qdisc=${qdisc}" >> /etc/sysctl.conf
         echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf

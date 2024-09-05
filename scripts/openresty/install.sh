@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 HR="+----------------------------------------------------"
 ARCH=$(uname -m)
 OS=$(source /etc/os-release && { [[ "$ID" == "debian" ]] && echo "debian"; } || { [[ "$ID" == "centos" ]] || [[ "$ID" == "rhel" ]] || [[ "$ID" == "rocky" ]] || [[ "$ID" == "almalinux" ]] && echo "centos"; } || echo "unknown")
-downloadUrl="https://dl.cdn.haozi.net/panel/openresty"
+downloadUrl="https://dl.cdn.haozi.net/panel"
 setupPath="/www"
 openrestyPath="${setupPath}/server/openresty"
 openrestyVersion="1.25.3.1"
@@ -54,8 +54,8 @@ mkdir -p ${openrestyPath}
 cd ${openrestyPath}
 
 # 下载源码
-wget -T 120 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty-${openrestyVersion}.tar.gz
-wget -T 20 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz.checksum.txt ${downloadUrl}/openresty-${openrestyVersion}.tar.gz.checksum.txt
+wget -T 120 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz ${downloadUrl}/openresty/openresty-${openrestyVersion}.tar.gz
+wget -T 20 -t 3 -O ${openrestyPath}/openresty-${openrestyVersion}.tar.gz.checksum.txt ${downloadUrl}/openresty/openresty-${openrestyVersion}.tar.gz.checksum.txt
 
 if ! sha256sum --status -c openresty-${openrestyVersion}.tar.gz.checksum.txt; then
     echo -e $HR
@@ -70,43 +70,43 @@ rm -f openresty-${openrestyVersion}.tar.gz.checksum.txt
 mv openresty-${openrestyVersion} src
 cd src
 
-# openssl
-wget -T 120 -t 3 -O openssl-3.0.12.7z ${downloadUrl}/openssl/openssl-3.0.12.7z
-wget -T 20 -t 3 -O openssl-3.0.12.7z.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12.7z.checksum.txt
+# tls library
+wget -T 120 -t 3 -O quictls-1.1.1w.7z ${downloadUrl}/tls/quictls-1.1.1w.7z
+wget -T 20 -t 3 -O quictls-1.1.1w.7z.checksum.txt ${downloadUrl}/tls/quictls-1.1.1w.7z.checksum.txt
 
-if ! sha256sum --status -c openssl-3.0.12.7z.checksum.txt; then
+if ! sha256sum --status -c quictls-1.1.1w.7z.checksum.txt; then
     echo -e $HR
-    echo "错误：OpenSSL 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
+    echo "错误：quictls 源码 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-7z x openssl-3.0.12.7z
-rm -f openssl-3.0.12.7z
-rm -f openssl-3.0.12.7z.checksum.txt
-mv openssl-3.0.12 openssl
-chmod -R 755 openssl
+7z x quictls-1.1.1w.7z
+rm -f quictls-1.1.1w.7z
+rm -f quictls-1.1.1w.7z.checksum.txt
+mv quictls-1.1.1w quictls
+chmod -R 755 quictls
 
-# patch openssl
-cd openssl
-wget -T 20 -t 3 -O openssl-3.0.12-sess_set_get_cb_yield.patch ${downloadUrl}/openssl/openssl-3.0.12-sess_set_get_cb_yield.patch
-wget -T 20 -t 3 -O openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt ${downloadUrl}/openssl/openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
+# patch tls library
+cd quictls
+wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch ${downloadUrl}/openresty/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch
+wget -T 20 -t 3 -O openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt ${downloadUrl}/openresty/openssl/openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
 
-if ! sha256sum --status -c openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt; then
+if ! sha256sum --status -c openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt; then
     echo -e $HR
     echo "错误：OpenSSL 补丁文件 checksum 校验失败，文件可能被篡改或不完整，已终止操作"
     rm -rf ${openrestyPath}
     exit 1
 fi
 
-patch -p1 < openssl-3.0.12-sess_set_get_cb_yield.patch
-rm -f openssl-3.0.12-sess_set_get_cb_yield.patch
-rm -f openssl-3.0.12-sess_set_get_cb_yield.patch.checksum.txt
+patch -p1 < openssl-1.1.1f-sess_set_get_cb_yield.patch
+rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch
+rm -f openssl-1.1.1f-sess_set_get_cb_yield.patch.checksum.txt
 cd ../
 
 # pcre2
-wget -T 60 -t 3 -O pcre2-10.43.7z ${downloadUrl}/pcre/pcre2-10.43.7z
-wget -T 20 -t 3 -O pcre2-10.43.7z.checksum.txt ${downloadUrl}/pcre/pcre2-10.43.7z.checksum.txt
+wget -T 60 -t 3 -O pcre2-10.43.7z ${downloadUrl}/openresty/pcre/pcre2-10.43.7z
+wget -T 20 -t 3 -O pcre2-10.43.7z.checksum.txt ${downloadUrl}/openresty/pcre/pcre2-10.43.7z.checksum.txt
 
 if ! sha256sum --status -c pcre2-10.43.7z.checksum.txt; then
     echo -e $HR
@@ -122,8 +122,8 @@ mv pcre2-10.43 pcre2
 chmod -R 755 pcre2
 
 # ngx_cache_purge
-wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz
-wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz.checksum.txt ${downloadUrl}/modules/ngx_cache_purge-2.3.tar.gz.checksum.txt
+wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz ${downloadUrl}/openresty/modules/ngx_cache_purge-2.3.tar.gz
+wget -T 20 -t 3 -O ngx_cache_purge-2.3.tar.gz.checksum.txt ${downloadUrl}/openresty/modules/ngx_cache_purge-2.3.tar.gz.checksum.txt
 
 if ! sha256sum --status -c ngx_cache_purge-2.3.tar.gz.checksum.txt; then
     echo -e $HR
@@ -138,8 +138,8 @@ rm -f ngx_cache_purge-2.3.tar.gz.checksum.txt
 mv ngx_cache_purge-2.3 ngx_cache_purge
 
 # nginx-sticky-module
-wget -T 20 -t 3 -O nginx-sticky-module.zip ${downloadUrl}/modules/nginx-sticky-module.zip
-wget -T 20 -t 3 -O nginx-sticky-module.zip.checksum.txt ${downloadUrl}/modules/nginx-sticky-module.zip.checksum.txt
+wget -T 20 -t 3 -O nginx-sticky-module.zip ${downloadUrl}/openresty/modules/nginx-sticky-module.zip
+wget -T 20 -t 3 -O nginx-sticky-module.zip.checksum.txt ${downloadUrl}/openresty/modules/nginx-sticky-module.zip.checksum.txt
 
 if ! sha256sum --status -c nginx-sticky-module.zip.checksum.txt; then
     echo -e $HR
@@ -153,8 +153,8 @@ rm -f nginx-sticky-module.zip
 rm -f nginx-sticky-module.zip.checksum.txt
 
 # nginx-dav-ext-module
-wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz
-wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt ${downloadUrl}/modules/nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt
+wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz ${downloadUrl}/openresty/modules/nginx-dav-ext-module-3.0.0.tar.gz
+wget -T 20 -t 3 -O nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt ${downloadUrl}/openresty/modules/nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt
 
 if ! sha256sum --status -c nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt; then
     echo -e $HR
@@ -169,8 +169,8 @@ rm -f nginx-dav-ext-module-3.0.0.tar.gz.checksum.txt
 mv nginx-dav-ext-module-3.0.0 nginx-dav-ext-module
 
 # waf
-wget -T 60 -t 3 -O uthash-2.3.0.zip ${downloadUrl}/modules/uthash-2.3.0.zip
-wget -T 20 -t 3 -O uthash-2.3.0.zip.checksum.txt ${downloadUrl}/modules/uthash-2.3.0.zip.checksum.txt
+wget -T 60 -t 3 -O uthash-2.3.0.zip ${downloadUrl}/openresty/modules/uthash-2.3.0.zip
+wget -T 20 -t 3 -O uthash-2.3.0.zip.checksum.txt ${downloadUrl}/openresty/modules/uthash-2.3.0.zip.checksum.txt
 
 if ! sha256sum --status -c uthash-2.3.0.zip.checksum.txt; then
     echo -e $HR
@@ -185,8 +185,8 @@ rm -f uthash-2.3.0.zip
 rm -f uthash-2.3.0.zip.checksum.txt
 cd ../
 
-wget -T 20 -t 3 -O ngx_waf-6.1.9.zip ${downloadUrl}/modules/ngx_waf-6.1.9.zip
-wget -T 20 -t 3 -O ngx_waf-6.1.9.zip.checksum.txt ${downloadUrl}/modules/ngx_waf-6.1.9.zip.checksum.txt
+wget -T 20 -t 3 -O ngx_waf-6.1.9.zip ${downloadUrl}/openresty/modules/ngx_waf-6.1.9.zip
+wget -T 20 -t 3 -O ngx_waf-6.1.9.zip.checksum.txt ${downloadUrl}/openresty/modules/ngx_waf-6.1.9.zip.checksum.txt
 
 if ! sha256sum --status -c ngx_waf-6.1.9.zip.checksum.txt; then
     echo -e $HR
@@ -201,8 +201,8 @@ rm -f ngx_waf-6.1.9.zip
 rm -f ngx_waf-6.1.9.zip.checksum.txt
 
 cd ngx_waf/inc
-wget -T 60 -t 3 -O libinjection-3.10.0.zip ${downloadUrl}/modules/libinjection-3.10.0.zip
-wget -T 20 -t 3 -O libinjection-3.10.0.zip.checksum.txt ${downloadUrl}/modules/libinjection-3.10.0.zip.checksum.txt
+wget -T 60 -t 3 -O libinjection-3.10.0.zip ${downloadUrl}/openresty/modules/libinjection-3.10.0.zip
+wget -T 20 -t 3 -O libinjection-3.10.0.zip.checksum.txt ${downloadUrl}/openresty/modules/libinjection-3.10.0.zip.checksum.txt
 
 if ! sha256sum --status -c libinjection-3.10.0.zip.checksum.txt; then
     echo -e $HR
@@ -227,8 +227,8 @@ fi
 cd ${openrestyPath}/src
 
 # brotli
-wget -T 20 -t 3 -O ngx_brotli-a71f931.zip ${downloadUrl}/modules/ngx_brotli-a71f931.zip
-wget -T 20 -t 3 -O ngx_brotli-a71f931.zip.checksum.txt ${downloadUrl}/modules/ngx_brotli-a71f931.zip.checksum.txt
+wget -T 20 -t 3 -O ngx_brotli-a71f931.zip ${downloadUrl}/openresty/modules/ngx_brotli-a71f931.zip
+wget -T 20 -t 3 -O ngx_brotli-a71f931.zip.checksum.txt ${downloadUrl}/openresty/modules/ngx_brotli-a71f931.zip.checksum.txt
 
 if ! sha256sum --status -c ngx_brotli-a71f931.zip.checksum.txt; then
     echo -e $HR
@@ -253,7 +253,7 @@ export LIB_UTHASH=${openrestyPath}/src/uthash
 # 临时 patch，去除 --without-pcre2
 sed -i '/# disable pcre2 by default/,/push @ngx_opts, '\''--without-pcre2'\'';/d' configure
 
-./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/openssl --with-pcre=${openrestyPath}/src/pcre2 --with-pcre-jit --with-http_v2_module --with-http_v3_module --with-http_slice_module --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-s -Wl,-Bsymbolic -Wl,--gc-sections" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -march=native -mtune=native -Ofast -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-file-aio --with-threads --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
+./configure --user=www --group=www --prefix=${openrestyPath} --with-luajit --add-module=${openrestyPath}/src/ngx_cache_purge --add-module=${openrestyPath}/src/nginx-sticky-module --with-openssl=${openrestyPath}/src/quictls --with-pcre=${openrestyPath}/src/pcre2 --with-pcre-jit --with-http_v2_module --with-http_v3_module --with-http_slice_module --with-stream --with-stream_ssl_module --with-stream_realip_module --with-stream_ssl_preread_module --with-http_stub_status_module --with-http_ssl_module --with-http_image_filter_module --with-http_gzip_static_module --with-http_gunzip_module --with-ipv6 --with-http_sub_module --with-http_flv_module --with-http_addition_module --with-http_realip_module --with-http_mp4_module --with-http_auth_request_module --with-http_secure_link_module --with-http_random_index_module --with-ld-opt="-Wl,-s -Wl,-Bsymbolic -Wl,--gc-sections" --with-cc-opt="-DNGX_LUA_ABORT_AT_PANIC -march=native -mtune=native -Ofast -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" --with-luajit-xcflags="-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT" --with-file-aio --with-threads --with-compat --with-http_dav_module --add-module=${openrestyPath}/src/nginx-dav-ext-module --add-module=${openrestyPath}/src/ngx_brotli --add-module=${openrestyPath}/ngx_waf
 make "-j${j}"
 if [ "$?" != "0" ]; then
     echo -e $HR
