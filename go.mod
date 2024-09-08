@@ -11,7 +11,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/gookit/validate v1.5.2
 	github.com/goravel/framework v1.14.1-0.20240728082300-b71cfeb464af
-	github.com/goravel/gin v1.2.3-0.20240714200024-34029bdef5d1
+	github.com/goravel/gin v1.2.4
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0
 	github.com/lib/pq v1.10.9
