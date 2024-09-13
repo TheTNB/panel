@@ -8,7 +8,7 @@ require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator/v10 v10.22.0
+	github.com/go-playground/validator/v10 v10.22.1
 	github.com/go-rat/chix v1.1.3
 	github.com/go-rat/gormstore v1.0.5
 	github.com/go-rat/sessions v1.0.8
