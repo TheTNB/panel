@@ -193,7 +193,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 			}
 		}
 	} else {
-		if name, err = shell.Execf("jq -r '.name' %s" + fileName); err != nil {
+		if name, err = shell.Execf("jq -r '.name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
 		if version, err = shell.Execf("jq -r '.tag_name' %s", fileName); err != nil {
@@ -252,9 +252,9 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 	}
 
 	if isChina {
-		output, err = shell.Execf(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%%2Fpanel/releases/` + version + `"`)
+		output, err = shell.Execf(`curl -sSL "https://git.haozi.net/api/v4/projects/opensource%%2Fpanel/releases/%s"`, version)
 	} else {
-		output, err = shell.Execf(`curl -sSL "https://api.github.com/repos/TheTNB/panel/releases/tags/` + version + `"`)
+		output, err = shell.Execf(`curl -sSL "https://api.github.com/repos/TheTNB/panel/releases/tags/%s"`, version)
 	}
 
 	if len(output) == 0 || err != nil {
@@ -278,70 +278,70 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 
 	var name, version2, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
-		if name, err = shell.Execf("jq -r '.name' " + fileName); err != nil {
+		if name, err = shell.Execf("jq -r '.name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if version2, err = shell.Execf("jq -r '.tag_name' " + fileName); err != nil {
+		if version2, err = shell.Execf("jq -r '.tag_name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if body, err = shell.Execf("jq -r '.description' " + fileName); err != nil {
+		if body, err = shell.Execf("jq -r '.description' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if date, err = shell.Execf("jq -r '.created_at' " + fileName); err != nil {
+		if date, err = shell.Execf("jq -r '.created_at' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if checksums, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+		if checksums, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
+		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
 		if arch.IsArm() {
-			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
 		} else {
-			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
 		}
 	} else {
-		if name, err = shell.Execf("jq -r '.name' " + fileName); err != nil {
+		if name, err = shell.Execf("jq -r '.name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if version2, err = shell.Execf("jq -r '.tag_name' " + fileName); err != nil {
+		if version2, err = shell.Execf("jq -r '.tag_name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if body, err = shell.Execf("jq -r '.body' " + fileName); err != nil {
+		if body, err = shell.Execf("jq -r '.body' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if date, err = shell.Execf("jq -r '.published_at' " + fileName); err != nil {
+		if date, err = shell.Execf("jq -r '.published_at' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if checksums, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+		if checksums, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
+		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' %s", fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
 		if arch.IsArm() {
-			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
 		} else {
-			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' %s", fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
 		}
@@ -361,8 +361,8 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 
 // UpdatePanel 更新面板
 func UpdatePanel(panelInfo PanelInfo) error {
-	color.Greenln("目标版本: " + panelInfo.Version)
-	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
+	color.Greenln("目标版本: %s", panelInfo.Version)
+	color.Greenln("下载链接: %s", panelInfo.DownloadUrl)
 
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") || io.Exists("/tmp/panel.conf.bak") {
@@ -396,11 +396,11 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
-	if _, err := shell.Execf("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl); err != nil {
+	if _, err := shell.Execf("wget -T 120 -t 3 -O /www/panel/%s %s", panelInfo.DownloadName, panelInfo.DownloadUrl); err != nil {
 		color.Redln("下载失败")
 		return err
 	}
-	if _, err := shell.Execf("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl); err != nil {
+	if _, err := shell.Execf("wget -T 20 -t 3 -O /www/panel/%s %s", panelInfo.Checksums, panelInfo.ChecksumsUrl); err != nil {
 		color.Redln("下载失败")
 		return err
 	}
@@ -410,7 +410,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("下载完成")
 
 	color.Greenln("校验下载文件...")
-	check, err := shell.Execf("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
+	check, err := shell.Execf("cd /www/panel && sha256sum -c %s", panelInfo.Checksums+" --ignore-missing")
 	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
@@ -421,7 +421,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
-	if _, err = shell.Execf("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName); err != nil {
+	if _, err = shell.Execf("cd /www/panel && unzip -o %s && rm -rf %s", panelInfo.DownloadName, panelInfo.DownloadName); err != nil {
 		color.Redln("更新失败")
 		return err
 	}
@@ -463,7 +463,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 		return err
 	}
 	_, _ = shell.Execf("systemctl daemon-reload")
-	if _, err = shell.Execf("panel writeSetting version " + panelInfo.Version); err != nil {
+	if _, err = shell.Execf("panel writeSetting version %s", panelInfo.Version); err != nil {
 		color.Redln("写入面板版本号失败")
 		return err
 	}
