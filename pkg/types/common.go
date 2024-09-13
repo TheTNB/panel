@@ -9,3 +9,8 @@ type KV struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
+
+type LV struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
+}

@@ -9,9 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/goravel/framework/support"
-
-	"github.com/TheTNB/panel/v2/pkg/slice"
+	"github.com/TheTNB/panel/pkg/slice"
 )
 
 // Execf 执行 shell 命令
@@ -54,10 +52,11 @@ func ExecfAsync(shell string, args ...any) error {
 	go func() {
 		err := cmd.Wait()
 		if err != nil {
-			if support.Env == support.EnvTest {
+			// TODO fix
+			/*if support.Env == support.EnvTest {
 				fmt.Println(err.Error())
 				panic(err)
-			}
+			}*/
 		}
 	}()
 

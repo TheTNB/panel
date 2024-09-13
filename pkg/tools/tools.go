@@ -9,9 +9,8 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/goravel/framework/support/carbon"
-	"github.com/goravel/framework/support/color"
-	"github.com/goravel/framework/support/env"
+	"github.com/golang-module/carbon/v2"
+	"github.com/gookit/color"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -20,8 +19,9 @@ import (
 	"github.com/shirou/gopsutil/net"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/v2/pkg/io"
-	"github.com/TheTNB/panel/v2/pkg/shell"
+	"github.com/TheTNB/panel/pkg/arch"
+	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/shell"
 )
 
 // MonitoringInfo 监控信息
@@ -177,7 +177,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if env.IsArm() {
+		if arch.IsArm() {
 			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
@@ -211,7 +211,7 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if env.IsArm() {
+		if arch.IsArm() {
 			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
@@ -296,7 +296,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if env.IsArm() {
+		if arch.IsArm() {
 			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
@@ -330,7 +330,7 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
 			return info, errors.New("获取面板版本失败")
 		}
-		if env.IsArm() {
+		if arch.IsArm() {
 			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
 				return info, errors.New("获取面板版本失败")
 			}
@@ -361,113 +361,113 @@ func GetPanelVersion(version string) (PanelInfo, error) {
 
 // UpdatePanel 更新面板
 func UpdatePanel(panelInfo PanelInfo) error {
-	color.Green().Printfln("目标版本: " + panelInfo.Version)
-	color.Green().Printfln("下载链接: " + panelInfo.DownloadUrl)
+	color.Greenln("目标版本: " + panelInfo.Version)
+	color.Greenln("下载链接: " + panelInfo.DownloadUrl)
 
-	color.Green().Printfln("前置检查...")
+	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") || io.Exists("/tmp/panel.conf.bak") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
 	}
 
-	color.Green().Printfln("备份面板数据...")
+	color.Greenln("备份面板数据...")
 	// 备份面板
 	if err := io.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
-		color.Red().Printfln("备份面板失败")
+		color.Redln("备份面板失败")
 		return err
 	}
 	if _, err := shell.Execf("cd /www/panel/storage && zip -r /tmp/panel-storage.zip *"); err != nil {
-		color.Red().Printfln("备份面板数据失败")
+		color.Redln("备份面板数据失败")
 		return err
 	}
 	if _, err := shell.Execf("cp -f /www/panel/panel.conf /tmp/panel.conf.bak"); err != nil {
-		color.Red().Printfln("备份面板配置失败")
+		color.Redln("备份面板配置失败")
 		return err
 	}
 	if !io.Exists("/tmp/panel-storage.zip") || !io.Exists("/tmp/panel.conf.bak") {
 		return errors.New("备份面板数据失败")
 	}
-	color.Green().Printfln("备份完成")
+	color.Greenln("备份完成")
 
-	color.Green().Printfln("清理旧版本...")
+	color.Greenln("清理旧版本...")
 	if _, err := shell.Execf("rm -rf /www/panel/*"); err != nil {
-		color.Red().Printfln("清理旧版本失败")
+		color.Redln("清理旧版本失败")
 		return err
 	}
-	color.Green().Printfln("清理完成")
+	color.Greenln("清理完成")
 
-	color.Green().Printfln("正在下载...")
+	color.Greenln("正在下载...")
 	if _, err := shell.Execf("wget -T 120 -t 3 -O /www/panel/" + panelInfo.DownloadName + " " + panelInfo.DownloadUrl); err != nil {
-		color.Red().Printfln("下载失败")
+		color.Redln("下载失败")
 		return err
 	}
 	if _, err := shell.Execf("wget -T 20 -t 3 -O /www/panel/" + panelInfo.Checksums + " " + panelInfo.ChecksumsUrl); err != nil {
-		color.Red().Printfln("下载失败")
+		color.Redln("下载失败")
 		return err
 	}
 	if !io.Exists("/www/panel/"+panelInfo.DownloadName) || !io.Exists("/www/panel/"+panelInfo.Checksums) {
 		return errors.New("下载失败")
 	}
-	color.Green().Printfln("下载完成")
+	color.Greenln("下载完成")
 
-	color.Green().Printfln("校验下载文件...")
+	color.Greenln("校验下载文件...")
 	check, err := shell.Execf("cd /www/panel && sha256sum -c " + panelInfo.Checksums + " --ignore-missing")
 	if check != panelInfo.DownloadName+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
 	if err = io.Remove("/www/panel/" + panelInfo.Checksums); err != nil {
-		color.Red().Printfln("清理临时文件失败")
+		color.Redln("清理临时文件失败")
 		return err
 	}
-	color.Green().Printfln("文件校验完成")
+	color.Greenln("文件校验完成")
 
-	color.Green().Printfln("更新新版本...")
+	color.Greenln("更新新版本...")
 	if _, err = shell.Execf("cd /www/panel && unzip -o " + panelInfo.DownloadName + " && rm -rf " + panelInfo.DownloadName); err != nil {
-		color.Red().Printfln("更新失败")
+		color.Redln("更新失败")
 		return err
 	}
 	if !io.Exists("/www/panel/panel") {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
-	color.Green().Printfln("更新完成")
+	color.Greenln("更新完成")
 
-	color.Green().Printfln("恢复面板数据...")
+	color.Greenln("恢复面板数据...")
 	if _, err = shell.Execf("cp -f /tmp/panel-storage.zip /www/panel/storage/panel-storage.zip && cd /www/panel/storage && unzip -o panel-storage.zip && rm -rf panel-storage.zip"); err != nil {
-		color.Red().Printfln("恢复面板数据失败")
+		color.Redln("恢复面板数据失败")
 		return err
 	}
 	if _, err = shell.Execf("cp -f /tmp/panel.conf.bak /www/panel/panel.conf"); err != nil {
-		color.Red().Printfln("恢复面板配置失败")
+		color.Redln("恢复面板配置失败")
 		return err
 	}
 	if _, err = shell.Execf("cp -f /www/panel/scripts/panel.sh /usr/bin/panel"); err != nil {
-		color.Red().Printfln("恢复面板脚本失败")
+		color.Redln("恢复面板脚本失败")
 		return err
 	}
 	if !io.Exists("/www/panel/storage/panel.db") || !io.Exists("/www/panel/panel.conf") {
 		return errors.New("恢复面板数据失败")
 	}
-	color.Green().Printfln("恢复完成")
+	color.Greenln("恢复完成")
 
-	color.Green().Printfln("设置面板文件权限...")
+	color.Greenln("设置面板文件权限...")
 	_, _ = shell.Execf("chmod -R 700 /www/panel")
 	_, _ = shell.Execf("chmod -R 700 /usr/bin/panel")
-	color.Green().Printfln("设置完成")
+	color.Greenln("设置完成")
 
-	color.Green().Printfln("运行升级后脚本...")
+	color.Greenln("运行升级后脚本...")
 	if _, err = shell.Execf("bash /www/panel/scripts/update_panel.sh"); err != nil {
-		color.Red().Printfln("运行面板升级后脚本失败")
+		color.Redln("运行面板升级后脚本失败")
 		return err
 	}
 	if _, err = shell.Execf("cp -f /www/panel/scripts/panel.service /etc/systemd/system/panel.service"); err != nil {
-		color.Red().Printfln("写入面板服务文件失败")
+		color.Redln("写入面板服务文件失败")
 		return err
 	}
 	_, _ = shell.Execf("systemctl daemon-reload")
 	if _, err = shell.Execf("panel writeSetting version " + panelInfo.Version); err != nil {
-		color.Red().Printfln("写入面板版本号失败")
+		color.Redln("写入面板版本号失败")
 		return err
 	}
-	color.Green().Printfln("升级完成")
+	color.Greenln("升级完成")
 
 	_, _ = shell.Execf("rm -rf /tmp/panel-storage.zip")
 	_, _ = shell.Execf("rm -rf /tmp/panel.conf.bak")
@@ -476,14 +476,14 @@ func UpdatePanel(panelInfo PanelInfo) error {
 }
 
 func RestartPanel() {
-	color.Green().Printfln("重启面板...")
+	color.Greenln("重启面板...")
 	err := shell.ExecfAsync("sleep 2 && systemctl restart panel")
 	if err != nil {
-		color.Red().Printfln("重启失败")
+		color.Redln("重启失败")
 		return
 	}
 
-	color.Green().Printfln("重启完成")
+	color.Greenln("重启完成")
 }
 
 // IsChina 是否中国大陆

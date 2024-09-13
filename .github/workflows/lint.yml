@@ -7,17 +7,16 @@ on:
 permissions:
   contents: read
 jobs:
-  lint:
-    name: lint
+  golangci:
+    name: golanci-lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: 'stable'
           cache: false
-      - name: Lint
-        uses: golangci/golangci-lint-action@v6
+      - uses: golangci/golangci-lint-action@v6
         with:
           skip-cache: true
           version: latest

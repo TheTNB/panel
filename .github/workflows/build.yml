@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           cache: true
-          go-version: '1.22'
+          go-version: 'stable'
       - name: Install dependencies
         run: go mod tidy
       - name: Build ${{ matrix.goarch }}
@@ -24,7 +24,7 @@ jobs:
           CGO_ENABLED: 0
           GOOS: linux
           GOARCH: ${{ matrix.goarch }}
-        run: go build -ldflags '-s -w --extldflags "-static"' -tags='nomsgpack' -o panel-${{ matrix.goarch }}
+        run: go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }} ./cmd/app
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

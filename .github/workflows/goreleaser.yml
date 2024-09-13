@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: 'stable'
       - name: Fetch Frontend
         run: |
           curl -sSL https://api.github.com/repos/TheTNB/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"dist\")) | .browser_download_url" | xargs curl -L -o frontend.zip
