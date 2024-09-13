@@ -50,13 +50,8 @@ func ExecfAsync(shell string, args ...any) error {
 	}
 
 	go func() {
-		err := cmd.Wait()
-		if err != nil {
-			// TODO fix
-			/*if support.Env == support.EnvTest {
-				fmt.Println(err.Error())
-				panic(err)
-			}*/
+		if err = cmd.Wait(); err != nil {
+			fmt.Println(err.Error())
 		}
 	}()
 

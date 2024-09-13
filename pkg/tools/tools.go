@@ -159,70 +159,70 @@ func GetLatestPanelVersion() (PanelInfo, error) {
 
 	var name, version, body, date, downloadName, downloadUrl, checksums, checksumsUrl string
 	if isChina {
-		if name, err = shell.Execf("jq -r '.name' " + fileName); err != nil {
+		if name, err = shell.Execf("jq -r '.name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if version, err = shell.Execf("jq -r '.tag_name' " + fileName); err != nil {
+		if version, err = shell.Execf("jq -r '.tag_name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if body, err = shell.Execf("jq -r '.description' " + fileName); err != nil {
+		if body, err = shell.Execf("jq -r '.description' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if date, err = shell.Execf("jq -r '.created_at' " + fileName); err != nil {
+		if date, err = shell.Execf("jq -r '.created_at' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if checksums, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+		if checksums, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' " + fileName); err != nil {
+		if checksumsUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"checksums\")) | .direct_asset_url' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
 		if arch.IsArm() {
-			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"arm64\")) | .direct_asset_url' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
 		} else {
-			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets.links[] | select(.name | contains(\"amd64v2\")) | .direct_asset_url' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
 		}
 	} else {
-		if name, err = shell.Execf("jq -r '.name' " + fileName); err != nil {
+		if name, err = shell.Execf("jq -r '.name' %s" + fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if version, err = shell.Execf("jq -r '.tag_name' " + fileName); err != nil {
+		if version, err = shell.Execf("jq -r '.tag_name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if body, err = shell.Execf("jq -r '.body' " + fileName); err != nil {
+		if body, err = shell.Execf("jq -r '.body' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if date, err = shell.Execf("jq -r '.published_at' " + fileName); err != nil {
+		if date, err = shell.Execf("jq -r '.published_at' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if checksums, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' " + fileName); err != nil {
+		if checksums, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .name' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
-		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' " + fileName); err != nil {
+		if checksumsUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"checksums\")) | .browser_download_url' %s", fileName); err != nil {
 			return info, errors.New("获取最新版本失败")
 		}
 		if arch.IsArm() {
-			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"arm64\")) | .browser_download_url' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
 		} else {
-			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' " + fileName); err != nil {
+			if downloadName, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .name' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
-			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' " + fileName); err != nil {
+			if downloadUrl, err = shell.Execf("jq -r '.assets[] | select(.name | contains(\"amd64v2\")) | .browser_download_url' %s", fileName); err != nil {
 				return info, errors.New("获取最新版本失败")
 			}
 		}

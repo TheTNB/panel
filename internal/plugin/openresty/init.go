@@ -15,7 +15,7 @@ func init() {
 		Name: "OpenResty",
 		Route: func(r chi.Router) {
 			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("Hello, World!"))
+				_, _ = w.Write([]byte("Hello, World!"))
 			})
 		},
 	})

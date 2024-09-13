@@ -90,7 +90,7 @@ func (m *Postgres) UserDrop(user string) error {
 		return err
 	}
 
-	_, _ = shell.Execf(`sed -i '/` + user + `/d' /www/server/postgresql/data/pg_hba.conf`)
+	_, _ = shell.Execf(`sed -i '/%s/d' /www/server/postgresql/data/pg_hba.conf`, user)
 	return systemctl.Reload("postgresql")
 }
 
@@ -126,7 +126,7 @@ func (m *Postgres) HostAdd(database, user, host string) error {
 
 func (m *Postgres) HostRemove(database, user, host string) error {
 	regex := fmt.Sprintf(`host\s+%s\s+%s\s+%s`, database, user, host)
-	if _, err := shell.Execf(`sed -i '/` + regex + `/d' /www/server/postgresql/data/pg_hba.conf`); err != nil {
+	if _, err := shell.Execf(`sed -i '/%s/d' /www/server/postgresql/data/pg_hba.conf`, regex); err != nil {
 		return err
 	}
 

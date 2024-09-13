@@ -41,7 +41,7 @@ func MustLogin(next http.Handler) http.Handler {
 			return
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "user_id", userID))
+		r = r.WithContext(context.WithValue(r.Context(), "user_id", userID)) // nolint:staticcheck
 		next.ServeHTTP(w, r)
 	})
 }

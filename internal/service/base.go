@@ -106,7 +106,7 @@ func Bind[T any](r *http.Request) (*T, error) {
 					return nil, errors.New(msg)
 				}
 			}
-			return nil, errors.New(e.Translate(*app.Translator))
+			return nil, errors.New(e.Translate(*app.Translator)) // nolint:staticcheck
 		}
 	}
 
@@ -135,13 +135,4 @@ func Paginate[T any](r *http.Request, allItems []T) (pagedItems []T, total uint)
 	}
 
 	return allItems[startIndex:endIndex], total
-}
-
-// removeTopStruct 移除验证器返回中的顶层结构
-func removeTopStruct(fields map[string]string) map[string]string {
-	res := map[string]string{}
-	for field, err := range fields {
-		res[field[strings.Index(field, ".")+1:]] = err
-	}
-	return res
 }
