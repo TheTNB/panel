@@ -120,7 +120,7 @@ func (s *IOTestSuite) TestChownChangesOwner() {
 	path := "testdata/chown_test.txt"
 	s.NoError(Write(path, "test", 0644))
 
-	s.NoError(Chown(path, "root", "root"))
+	s.NoError(Chown(path, "runner", "runner"))
 }
 
 func (s *IOTestSuite) TestExistsReturnsTrueForExistingPath() {
