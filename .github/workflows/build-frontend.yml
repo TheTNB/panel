@@ -37,7 +37,6 @@ jobs:
           pnpm build
       - name: Upload artifact
         uses: actions/upload-artifact@v4
-        run: ls
         with:
           name: frontend
           path: dist/*
