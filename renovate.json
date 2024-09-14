@@ -7,13 +7,19 @@
     "🤖 Dependencies"
   ],
   "commitMessagePrefix": "chore(deps): ",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
   "postUpdateOptions": [
-    "gomodTidy"
+    "gomodTidy",
+    "pnpmDedupe"
   ],
   "packageRules": [
     {
       "description": "Automerge non-major updates",
       "matchUpdateTypes": [
+        "major",
         "minor",
         "patch"
       ],
@@ -22,6 +28,6 @@
     }
   ],
   "ignoreDeps": [
-    "github.com/goravel/framework"
+    "eslint"
   ]
 }
