@@ -32,9 +32,11 @@ jobs:
           cp .env.production .env
           cp settings/proxy-config.ts.example settings/proxy-config.ts
           pnpm dev &
-          sleep 10
+          sleep 5
           kill %1
           pnpm build
+          ls
+          ll -a
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
