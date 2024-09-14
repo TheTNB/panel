@@ -102,7 +102,7 @@ func (s *IOTestSuite) TestMkdirCreatesDirectory() {
 
 func (s *IOTestSuite) TestChmodChangesPermissions() {
 	if env.IsWindows() {
-		s.T().Skip("Skip on Windows")
+		s.T().Skip("Skipping on Windows")
 	}
 	path := "testdata/chmod_test.txt"
 	s.NoError(Write(path, "test", 0644))
@@ -115,7 +115,7 @@ func (s *IOTestSuite) TestChmodChangesPermissions() {
 
 func (s *IOTestSuite) TestChownChangesOwner() {
 	if env.IsWindows() {
-		s.T().Skip("Skip on Windows")
+		s.T().Skip("Skipping on Windows")
 	}
 	path := "testdata/chown_test.txt"
 	s.NoError(Write(path, "test", 0644))
