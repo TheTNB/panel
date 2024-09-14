@@ -9,7 +9,7 @@ permissions:
 jobs:
   golangci:
     name: golanci-lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,15 +20,6 @@ jobs:
         with:
           cache: true
           go-version: 'stable'
-      - name: Go mod cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
@@ -36,7 +27,7 @@ jobs:
           version: latest
           args: --timeout=30m ./...
   nilaway:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,15 +38,6 @@ jobs:
         with:
           cache: true
           go-version: 'stable'
-      - name: Go mod cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Install dependencies
         run: go mod tidy
       - name: Install NilAway

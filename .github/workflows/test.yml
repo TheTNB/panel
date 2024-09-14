@@ -6,7 +6,7 @@ on:
   pull_request:
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,15 +17,6 @@ jobs:
         with:
           cache: true
           go-version: 'stable'
-      - name: Go mod cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Install dependencies
         run: sudo apt-get install -y curl jq
       - name: Set up environment
