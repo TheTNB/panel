@@ -1,9 +1,9 @@
 name: Build Backend
 on:
-  workflow_run:
-    workflows: [ "Build Frontend" ]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+  pull_request:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,13 +32,19 @@ jobs:
             ${{ runner.os }}-go-
       - name: Install dependencies
         run: go mod tidy
-      - name: Download frontend
-        uses: actions/download-artifact@v4
+      - name: Wait for frontend build
+        uses: lewagon/wait-on-check-action@v1.3.4
         with:
+          ref: ${{ github.ref }}
+          check-name: 'Upload frontend'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download frontend
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build-frontend.yml
           name: frontend
           path: internal/embed/frontend
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          check_artifacts: true
       - run: ls internal/embed/frontend
       - name: Build ${{ matrix.goarch }}
         env:
