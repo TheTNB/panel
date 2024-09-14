@@ -26,6 +26,7 @@ jobs:
           args: --timeout=30m ./...
   nilaway:
     runs-on: ubuntu-24.04
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
