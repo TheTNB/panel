@@ -35,9 +35,9 @@ jobs:
           sleep 5
           kill %1
           pnpm build
-          ls
       - name: Upload artifact
         uses: actions/upload-artifact@v4
+        run: ls
         with:
           name: frontend
-          path: dist/
+          path: dist/*
