@@ -118,7 +118,7 @@ importers:
         specifier: ^1.78.0
         version: 1.78.0
       typescript:
-        specifier: ^5.6.2
+        specifier: ^5.6.0
         version: 5.6.2
       unocss:
         specifier: ^0.62.3
