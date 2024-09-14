@@ -32,6 +32,14 @@ jobs:
             ${{ runner.os }}-go-
       - name: Install dependencies
         run: go mod tidy
+      - name: Download frontend
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build-frontend.yml
+          name: dist
+          path: internal/embed/frontend
+          check_artifacts: true
+      - run: ls internal/embed/frontend
       - name: Build ${{ matrix.goarch }}
         env:
           CGO_ENABLED: 0
