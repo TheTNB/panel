@@ -1,0 +1,40 @@
+name: Build Frontend
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Enter frontend directory
+        run: cd web || exit
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Build frontend
+        run: |
+          cp .env.production .env
+          cp settings/proxy-config.ts.example settings/proxy-config.ts
+          pnpm dev &
+          sleep 10
+          kill %1
+          pnpm build
+          zip -r dist.zip dist
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist.zip
