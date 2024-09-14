@@ -149,3 +149,12 @@ func TempDir(prefix string) (string, error) {
 func ReadDir(path string) ([]os.DirEntry, error) {
 	return os.ReadDir(path)
 }
+
+// IsDir 判断是否为目录
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.IsDir()
+}

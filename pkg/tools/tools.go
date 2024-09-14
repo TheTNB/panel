@@ -371,7 +371,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 	color.Greenln("备份面板数据...")
 	// 备份面板
-	if err := io.Archive([]string{"/www/panel"}, "/www/backup/panel/panel-"+carbon.Now().ToShortDateTimeString()+".zip"); err != nil {
+	if err := io.Compress([]string{"/www/panel"}, fmt.Sprintf("/www/backup/panel/panel-%s.zip", carbon.Now().ToShortDateTimeString()), io.Zip); err != nil {
 		color.Redln("备份面板失败")
 		return err
 	}

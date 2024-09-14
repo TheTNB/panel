@@ -3,18 +3,19 @@ package data
 import (
 	"errors"
 
+	"github.com/go-rat/utils/hash"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/pkg/argon2id"
 )
 
 type userRepo struct {
-	hasher *argon2id.Argon2id
+	hasher hash.Hasher
 }
 
 func NewUserRepo() biz.UserRepo {
 	return &userRepo{
-		hasher: argon2id.NewArgon2id(4, 65536, 1),
+		hasher: hash.NewArgon2id(),
 	}
 }
 
