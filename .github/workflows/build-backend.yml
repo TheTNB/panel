@@ -39,6 +39,7 @@ jobs:
           name: frontend
           path: internal/embed/frontend
           search_artifacts: true
+          workflow_conclusion: ''
       - run: ls internal/embed/frontend
       - name: Build ${{ matrix.goarch }}
         env:
