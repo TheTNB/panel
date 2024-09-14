@@ -36,9 +36,8 @@ jobs:
           kill %1
           pnpm build
           ls
-          ll -a
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend
-          path: dist
+          path: dist/
