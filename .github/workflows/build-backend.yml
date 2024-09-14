@@ -1,9 +1,11 @@
 name: Build Backend
 on:
-  push:
+  workflow_run:
+    workflows: [ "Build Frontend" ]
+    types:
+      - completed
     branches:
       - main
-  pull_request:
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,13 +35,12 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
       - name: Download frontend
-        uses: dawidd6/action-download-artifact@v6
+        uses: actions/download-artifact@v4
         with:
-          workflow: build-frontend.yml
           name: frontend
           path: internal/embed/frontend
-          search_artifacts: true
-          workflow_conclusion: ''
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - run: ls internal/embed/frontend
       - name: Build ${{ matrix.goarch }}
         env:
