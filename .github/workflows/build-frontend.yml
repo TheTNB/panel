@@ -32,9 +32,8 @@ jobs:
           sleep 10
           kill %1
           pnpm build
-          zip -r dist.zip dist
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist.zip
+          name: frontend
+          path: dist

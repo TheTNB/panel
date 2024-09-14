@@ -1,0 +1,25 @@
+{
+  "isMobile": false,
+  "darkMode": false,
+  "sider": {
+    "width": 220,
+    "collapsedWidth": 64,
+    "collapsed": false
+  },
+  "tab": {
+    "visible": true,
+    "height": 50
+  },
+  "header": {
+    "visible": true,
+    "height": 60
+  },
+  "primaryColor": "#66CCFF",
+  "otherColor": {
+    "info": "#2080F0",
+    "success": "#18A058",
+    "warning": "#F0A020",
+    "error": "#D03050"
+  },
+  "language": "zh_CN"
+}

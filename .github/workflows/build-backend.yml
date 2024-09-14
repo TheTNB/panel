@@ -36,7 +36,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v6
         with:
           workflow: build-frontend.yml
-          name: dist
+          name: frontend
           path: internal/embed/frontend
           check_artifacts: true
       - run: ls internal/embed/frontend
