@@ -1,12 +1,15 @@
 package route
 
 import (
+	"io/fs"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
+	_ "github.com/TheTNB/panel/docs"
+	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/service"
 )
@@ -263,11 +266,11 @@ func Http(r chi.Router) {
 			r.Post("/stop", systemctl.Stop)
 		})
 
-		r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
-		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
-			// TODO serve index.html
-		})
-
 	})
 
+	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
+	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
+		frontend, _ := fs.Sub(embed.PublicFS, "frontend")
+		http.FileServer(http.FS(frontend)).ServeHTTP(writer, request)
+	})
 }
