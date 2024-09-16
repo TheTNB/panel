@@ -40,8 +40,8 @@ func Http(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			task := service.NewTaskService()
 			r.Get("/status", task.Status)
-			r.Get("/", task.Index)
-			r.Get("/{id}", task.Show)      // TODO 修改前端
+			r.Get("/", task.List)
+			r.Get("/{id}", task.Get)       // TODO 修改前端
 			r.Delete("/{id}", task.Delete) // TODO 修改前端
 		})
 
@@ -63,6 +63,7 @@ func Http(r chi.Router) {
 			r.Post("/{id}/status", website.UpdateStatus)
 		})
 
+		// TODO
 		r.Route("/backup", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			backup := service.NewBackupService()

@@ -1,6 +1,11 @@
 package biz
 
-import "github.com/golang-module/carbon/v2"
+import (
+	"github.com/golang-module/carbon/v2"
+
+	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/acme"
+)
 
 type Cert struct {
 	ID        uint            `gorm:"primaryKey" json:"id"`
@@ -19,4 +24,17 @@ type Cert struct {
 	Website *Website  `gorm:"foreignKey:WebsiteID" json:"website"`
 	User    *CertUser `gorm:"foreignKey:UserID" json:"user"`
 	DNS     *CertDNS  `gorm:"foreignKey:DNSID" json:"dns"`
+}
+
+type CertRepo interface {
+	List(page, limit uint) ([]*Cert, int64, error)
+	Get(id uint) (*Cert, error)
+	Create(req *request.CertCreate) (*Cert, error)
+	Update(req *request.CertUpdate) error
+	Delete(id uint) error
+	ObtainAuto(id uint) (*acme.Certificate, error)
+	ObtainManual(id uint) (*acme.Certificate, error)
+	Renew(id uint) (*acme.Certificate, error)
+	ManualDNS(id uint) ([]acme.DNSRecord, error)
+	Deploy(ID, WebsiteID uint) error
 }
