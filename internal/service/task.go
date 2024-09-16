@@ -83,7 +83,7 @@ func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log, err := shell.Execf(`tail -n 500 '` + task.Log + `'`)
+	log, err := shell.Execf(`tail -n 500 '%s'`, task.Log)
 	if err == nil {
 		task.Log = log
 	}
