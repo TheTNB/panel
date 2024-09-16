@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/pkg/acme"
@@ -15,4 +16,12 @@ type CertDNS struct {
 	UpdatedAt carbon.DateTime `json:"updated_at"`
 
 	Certs []*Cert `gorm:"foreignKey:DNSID" json:"-"`
+}
+
+type CertDNSRepo interface {
+	List(page, limit uint) ([]*CertDNS, int64, error)
+	Get(id uint) (*CertDNS, error)
+	Create(req *request.CertDNSCreate) (*CertDNS, error)
+	Update(req *request.CertDNSUpdate) error
+	Delete(id uint) error
 }
