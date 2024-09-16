@@ -17,12 +17,11 @@ var ErrNoAvailableServer = errors.New("无可用的 NTP 服务器")
 
 var defaultAddresses = []string{
 	//"ntp.ntsc.ac.cn",      // 中科院国家授时中心的服务器很快，但是多刷几次就会被封
-	"ntp.aliyun.com",      // 阿里云
-	"ntp1.aliyun.com",     // 阿里云2
-	"ntp.tencent.com",     // 腾讯云
-	"time.windows.com",    // Windows
-	"time.apple.com",      // Apple
-	"time.cloudflare.com", // Cloudflare
+	"ntp.aliyun.com",   // 阿里云
+	"ntp1.aliyun.com",  // 阿里云2
+	"ntp.tencent.com",  // 腾讯云
+	"time.windows.com", // Windows
+	"time.apple.com",   // Apple
 }
 
 func Now(address ...string) (time.Time, error) {
