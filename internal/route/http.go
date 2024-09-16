@@ -2,6 +2,7 @@ package route
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -14,7 +15,7 @@ func Http(r chi.Router) {
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/user", func(r chi.Router) {
 			user := service.NewUserService()
-			r.Post("/login", user.Login) // TODO 限流
+			r.With(middleware.Throttle(10, time.Minute)).Post("/login", user.Login)
 			r.Post("/logout", user.Logout)
 			r.Get("/isLogin", user.IsLogin)
 			r.With(middleware.MustLogin).Get("/info", user.Info)

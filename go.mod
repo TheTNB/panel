@@ -3,6 +3,7 @@ module github.com/TheTNB/panel
 go 1.23
 
 require (
+	github.com/beevik/ntp v1.4.3
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
@@ -30,6 +31,7 @@ require (
 	github.com/libdns/tencentcloud v1.0.0
 	github.com/mholt/acmez/v2 v2.0.2
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
+	github.com/sethvargo/go-limiter v1.0.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
 	github.com/spf13/cast v1.7.0
 	github.com/stretchr/testify v1.9.0
@@ -45,7 +47,6 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/beevik/ntp v1.4.3 // indirect
 	github.com/bodgit/plumbing v1.2.0 // indirect
 	github.com/bodgit/sevenzip v1.3.0 // indirect
 	github.com/bodgit/windows v1.0.0 // indirect
