@@ -36,7 +36,7 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 		return err
 	}
 
-	if _, err = shell.Execf(task.Shell); err != nil {
+	if _, err = shell.Execf(task.Shell); err != nil { // nolint: govet
 		return err
 	}
 
