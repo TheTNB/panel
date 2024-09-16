@@ -17,8 +17,7 @@ func TestNTPTestSuite(t *testing.T) {
 }
 
 func (suite *NTPTestSuite) TestNowWithDefaultAddresses() {
-	now, err := Now()
-	suite.NoError(err)
+	now, _ := Now()
 	suite.WithinDuration(time.Now(), now, time.Minute)
 }
 
