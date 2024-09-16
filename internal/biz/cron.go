@@ -1,6 +1,10 @@
 package biz
 
-import "github.com/golang-module/carbon/v2"
+import (
+	"github.com/golang-module/carbon/v2"
+
+	"github.com/TheTNB/panel/internal/http/request"
+)
 
 type Cron struct {
 	ID        uint            `gorm:"primaryKey" json:"id"`
@@ -16,4 +20,11 @@ type Cron struct {
 
 type CronRepo interface {
 	Count() (int64, error)
+	List(page, limit uint) ([]*Cron, int64, error)
+	Get(id uint) (*Cron, error)
+	Create(req *request.CronCreate) error
+	Update(req *request.CronUpdate) error
+	Delete(id uint) error
+	Status(id uint, status bool) error
+	Log(id uint) (string, error)
 }
