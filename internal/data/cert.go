@@ -42,7 +42,7 @@ func (r *certRepo) Get(id uint) (*biz.Cert, error) {
 
 func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 	cert := &biz.Cert{
-		UserID:    req.UserID,
+		AccountID: req.AccountID,
 		WebsiteID: req.WebsiteID,
 		DNSID:     req.DNSID,
 		Type:      req.Type,
@@ -57,7 +57,7 @@ func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 
 func (r *certRepo) Update(req *request.CertUpdate) error {
 	return app.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Updates(&biz.Cert{
-		UserID:    req.UserID,
+		AccountID: req.AccountID,
 		WebsiteID: req.WebsiteID,
 		DNSID:     req.DNSID,
 		Type:      req.Type,
@@ -253,21 +253,21 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 func (r *certRepo) getClient(cert *biz.Cert) (*acme.Client, error) {
 	var ca string
 	var eab *acme.EAB
-	switch cert.User.CA {
+	switch cert.Account.CA {
 	case "letsencrypt":
 		ca = acme.CALetsEncrypt
 	case "buypass":
 		ca = acme.CABuypass
 	case "zerossl":
 		ca = acme.CAZeroSSL
-		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	case "sslcom":
 		ca = acme.CASSLcom
-		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	case "google":
 		ca = acme.CAGoogle
-		eab = &acme.EAB{KeyID: cert.User.Kid, MACKey: cert.User.HmacEncoded}
+		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	}
 
-	return acme.NewPrivateKeyAccount(cert.User.Email, cert.User.PrivateKey, ca, eab)
+	return acme.NewPrivateKeyAccount(cert.Account.Email, cert.Account.PrivateKey, ca, eab)
 }

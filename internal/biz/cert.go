@@ -9,7 +9,7 @@ import (
 
 type Cert struct {
 	ID        uint            `gorm:"primaryKey" json:"id"`
-	UserID    uint            `gorm:"not null" json:"user_id"`    // 关联的 ACME 用户 ID
+	AccountID uint            `gorm:"not null" json:"account_id"` // 关联的 ACME 账户 ID
 	WebsiteID uint            `gorm:"not null" json:"website_id"` // 关联的网站 ID
 	DNSID     uint            `gorm:"not null" json:"dns_id"`     // 关联的 DNS ID
 	Type      string          `gorm:"not null" json:"type"`       // 证书类型 (P256, P384, 2048, 4096)
@@ -21,9 +21,9 @@ type Cert struct {
 	CreatedAt carbon.DateTime `json:"created_at"`
 	UpdatedAt carbon.DateTime `json:"updated_at"`
 
-	Website *Website  `gorm:"foreignKey:WebsiteID" json:"website"`
-	User    *CertUser `gorm:"foreignKey:UserID" json:"user"`
-	DNS     *CertDNS  `gorm:"foreignKey:DNSID" json:"dns"`
+	Website *Website     `gorm:"foreignKey:WebsiteID" json:"website"`
+	Account *CertAccount `gorm:"foreignKey:AccountID" json:"account"`
+	DNS     *CertDNS     `gorm:"foreignKey:DNSID" json:"dns"`
 }
 
 type CertRepo interface {
