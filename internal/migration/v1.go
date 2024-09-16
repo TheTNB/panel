@@ -13,11 +13,13 @@ func init() {
 		Migrate: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(
 				&biz.User{},
+				&biz.Plugin{},
 			)
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable(
 				&biz.User{},
+				&biz.Plugin{},
 			)
 		},
 	})

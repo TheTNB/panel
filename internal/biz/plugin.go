@@ -23,4 +23,7 @@ type PluginRepo interface {
 	GetInstalled(slug string) (*Plugin, error)
 	GetInstalledAll(cond ...string) ([]*Plugin, error)
 	IsInstalled(cond ...string) (bool, error)
+	Install(slug string) error
+	Uninstall(slug string) error
+	Update(slug string) error
 }
