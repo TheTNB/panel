@@ -1,11 +1,13 @@
 package service
 
 import (
+	"net/http"
+
+	"github.com/go-rat/chix"
+
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/go-rat/chix"
-	"net/http"
 )
 
 type CertDNSService struct {
@@ -91,8 +93,7 @@ func (s *CertDNSService) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.certDNSRepo.Delete(req.ID)
-	if err != nil {
+	if err = s.certDNSRepo.Delete(req.ID); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

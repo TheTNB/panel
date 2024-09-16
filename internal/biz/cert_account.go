@@ -1,8 +1,12 @@
 package biz
 
-import "github.com/golang-module/carbon/v2"
+import (
+	"github.com/golang-module/carbon/v2"
 
-type CertUser struct {
+	"github.com/TheTNB/panel/internal/http/request"
+)
+
+type CertAccount struct {
 	ID          uint            `gorm:"primaryKey" json:"id"`
 	Email       string          `gorm:"not null" json:"email"`
 	CA          string          `gorm:"not null" json:"ca"` // CA 提供商 (letsencrypt, zerossl, sslcom, google, buypass)
@@ -14,4 +18,12 @@ type CertUser struct {
 	UpdatedAt   carbon.DateTime `json:"updated_at"`
 
 	Certs []*Cert `gorm:"foreignKey:UserID" json:"-"`
+}
+
+type CertAccountRepo interface {
+	List(page, limit uint) ([]*CertAccount, int64, error)
+	Get(id uint) (*CertAccount, error)
+	Create(req *request.CertAccountCreate) (*CertAccount, error)
+	Update(req *request.CertAccountUpdate) error
+	Delete(id uint) error
 }
