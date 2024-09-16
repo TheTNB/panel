@@ -7,6 +7,7 @@ import (
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/http/request"
 )
 
 type PluginService struct {
@@ -74,21 +75,86 @@ func (s *PluginService) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *PluginService) Install(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.PluginSlug](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
 
+	if err = s.pluginRepo.Install(req.Slug); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *PluginService) Uninstall(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.PluginSlug](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
 
+	if err = s.pluginRepo.Uninstall(req.Slug); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *PluginService) Update(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.PluginSlug](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
 
+	if err = s.pluginRepo.Update(req.Slug); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *PluginService) UpdateShow(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.PluginUpdateShow](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
 
+	if err = s.pluginRepo.UpdateShow(req.Slug, req.Show); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *PluginService) IsInstalled(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.PluginSlug](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
 
+	plugin, err := s.pluginRepo.Get(req.Slug)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	installed, err := s.pluginRepo.IsInstalled(req.Slug)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, chix.M{
+		"name":      plugin.Name,
+		"installed": installed,
+	})
 }

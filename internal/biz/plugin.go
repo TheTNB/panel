@@ -26,4 +26,5 @@ type PluginRepo interface {
 	Install(slug string) error
 	Uninstall(slug string) error
 	Update(slug string) error
+	UpdateShow(slug string, show bool) error
 }

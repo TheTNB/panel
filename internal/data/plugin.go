@@ -213,3 +213,14 @@ func (r *pluginRepo) Update(slug string) error {
 
 	return err
 }
+
+func (r *pluginRepo) UpdateShow(slug string, show bool) error {
+	plugin, err := r.GetInstalled(slug)
+	if err != nil {
+		return err
+	}
+
+	plugin.Show = show
+
+	return app.Orm.Save(plugin).Error
+}
