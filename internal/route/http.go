@@ -139,8 +139,8 @@ func Http(r chi.Router) {
 		r.Route("/safe", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			safe := service.NewSafeService()
-			r.Get("/ssh", safe.GetSSHStatus)
-			r.Post("/ssh", safe.UpdateSSHStatus)
+			r.Get("/ssh", safe.GetSSH)
+			r.Post("/ssh", safe.UpdateSSH)
 			r.Get("/ping", safe.GetPingStatus)
 			r.Post("/ping", safe.UpdatePingStatus)
 		})
