@@ -7,6 +7,8 @@ import (
 	"github.com/go-rat/sessions"
 	"github.com/knadh/koanf/v2"
 	"gorm.io/gorm"
+
+	"github.com/TheTNB/panel/pkg/queue"
 )
 
 var (
@@ -16,6 +18,7 @@ var (
 	Validator  *validator.Validate
 	Translator *ut.Translator
 	Session    *sessions.Manager
+	Queue      *queue.Queue
 )
 
 // 面板全局变量

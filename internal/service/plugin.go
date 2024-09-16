@@ -1,10 +1,12 @@
 package service
 
 import (
+	"net/http"
+
+	"github.com/go-rat/chix"
+
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
-	"github.com/go-rat/chix"
-	"net/http"
 )
 
 type PluginService struct {

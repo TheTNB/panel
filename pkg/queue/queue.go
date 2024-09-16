@@ -11,12 +11,9 @@ type Queue struct {
 	done       chan struct{}
 }
 
-func NewQueue(bufferSize ...int) *Queue {
-	if len(bufferSize) == 0 {
-		bufferSize = append(bufferSize, 100)
-	}
+func New() *Queue {
 	return &Queue{
-		jobs:       make(chan Jobs, bufferSize[0]),
+		jobs:       make(chan Jobs, 10),
 		isShutdown: make(chan struct{}),
 		done:       make(chan struct{}),
 	}

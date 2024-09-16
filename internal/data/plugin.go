@@ -6,15 +6,19 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/pkg/pluginloader"
-	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type pluginRepo struct{}
+type pluginRepo struct {
+	taskRepo biz.TaskRepo
+}
 
 func NewPluginRepo() biz.PluginRepo {
-	return &pluginRepo{}
+	return &pluginRepo{
+		taskRepo: NewTaskRepo(),
+	}
 }
 
 func (r *pluginRepo) All() []*types.Plugin {
@@ -102,11 +106,14 @@ func (r *pluginRepo) Install(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Install, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = shell.ExecfAsync(task.Shell); err != nil {
+	if err = app.Orm.Create(task).Error; err != nil {
 		return err
 	}
+	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+		task.ID,
+	})
 
-	return app.Orm.Create(task).Error
+	return err
 }
 
 func (r *pluginRepo) Uninstall(slug string) error {
@@ -148,11 +155,14 @@ func (r *pluginRepo) Uninstall(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Uninstall, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = shell.ExecfAsync(task.Shell); err != nil {
+	if err = app.Orm.Create(task).Error; err != nil {
 		return err
 	}
+	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+		task.ID,
+	})
 
-	return app.Orm.Create(task).Error
+	return err
 }
 
 func (r *pluginRepo) Update(slug string) error {
@@ -194,9 +204,12 @@ func (r *pluginRepo) Update(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Update, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = shell.ExecfAsync(task.Shell); err != nil {
+	if err = app.Orm.Create(task).Error; err != nil {
 		return err
 	}
+	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+		task.ID,
+	})
 
-	return app.Orm.Create(task).Error
+	return err
 }

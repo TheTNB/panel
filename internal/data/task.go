@@ -33,3 +33,7 @@ func (r *taskRepo) Get(id uint) (*biz.Task, error) {
 func (r *taskRepo) Delete(id uint) error {
 	return app.Orm.Model(&biz.Task{}).Where("id = ?", id).Delete(&biz.Task{}).Error
 }
+
+func (r *taskRepo) UpdateStatus(id uint, status biz.TaskStatus) error {
+	return app.Orm.Model(&biz.Task{}).Where("id = ?", id).Update("status", status).Error
+}

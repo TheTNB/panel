@@ -2,9 +2,10 @@ package queue
 
 import (
 	"errors"
-	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/suite"
 )
 
 type QueueTestSuite struct {
@@ -16,7 +17,7 @@ func TestQueueTestSuite(t *testing.T) {
 }
 
 func (suite *QueueTestSuite) TestQueueInitialization() {
-	queue := NewQueue()
+	queue := New()
 	suite.NotNil(queue)
 	suite.NotNil(queue.jobs)
 	suite.NotNil(queue.isShutdown)
@@ -24,14 +25,14 @@ func (suite *QueueTestSuite) TestQueueInitialization() {
 }
 
 func (suite *QueueTestSuite) TestPushJobToQueue() {
-	queue := NewQueue()
+	queue := New()
 	job := &MockJob{}
 	err := queue.Push(job, []any{"arg1", "arg2"})
 	suite.NoError(err)
 }
 
 func (suite *QueueTestSuite) TestPushJobToShutdownQueue() {
-	queue := NewQueue()
+	queue := New()
 	queue.Run()
 	suite.NoError(queue.Shutdown())
 	job := &MockJob{}
@@ -41,7 +42,7 @@ func (suite *QueueTestSuite) TestPushJobToShutdownQueue() {
 }
 
 func (suite *QueueTestSuite) TestBulkJobsToQueue() {
-	queue := NewQueue()
+	queue := New()
 	jobs := []Jobs{
 		{Job: &MockJob{}, Args: []any{"arg1"}},
 		{Job: &MockJob{}, Args: []any{"arg2"}},
@@ -51,7 +52,7 @@ func (suite *QueueTestSuite) TestBulkJobsToQueue() {
 }
 
 func (suite *QueueTestSuite) TestBulkJobsToShutdownQueue() {
-	queue := NewQueue()
+	queue := New()
 	queue.Run()
 	suite.NoError(queue.Shutdown())
 	jobs := []Jobs{
@@ -64,14 +65,14 @@ func (suite *QueueTestSuite) TestBulkJobsToShutdownQueue() {
 }
 
 func (suite *QueueTestSuite) TestLaterJobExecution() {
-	queue := NewQueue()
+	queue := New()
 	job := &MockJob{}
 	err := queue.Later(1, job, []any{"arg1"})
 	suite.NoError(err)
 }
 
 func (suite *QueueTestSuite) TestLaterJobExecutionOnShutdownQueue() {
-	queue := NewQueue()
+	queue := New()
 	queue.Run()
 	suite.NoError(queue.Shutdown())
 	job := &MockJob{}
@@ -80,7 +81,7 @@ func (suite *QueueTestSuite) TestLaterJobExecutionOnShutdownQueue() {
 }
 
 func (suite *QueueTestSuite) TestRunQueue() {
-	queue := NewQueue()
+	queue := New()
 	job := &MockJob{}
 	suite.NoError(queue.Push(job, []any{"arg1"}))
 	queue.Run()
@@ -89,7 +90,7 @@ func (suite *QueueTestSuite) TestRunQueue() {
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithLaterJob() {
-	queue := NewQueue()
+	queue := New()
 	job := &MockJob{}
 	suite.NoError(queue.Later(1, job, []any{"arg1"}))
 	queue.Run()
@@ -98,7 +99,7 @@ func (suite *QueueTestSuite) TestRunQueueWithLaterJob() {
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithBulkJobs() {
-	queue := NewQueue()
+	queue := New()
 	jobs := []Jobs{
 		{Job: &MockJob{}, Args: []any{"arg1"}},
 		{Job: &MockJob{}, Args: []any{"arg2"}},
@@ -109,7 +110,7 @@ func (suite *QueueTestSuite) TestRunQueueWithBulkJobs() {
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithErrHandle() {
-	queue := NewQueue()
+	queue := New()
 	job := &MockJob{}
 	suite.NoError(queue.Push(job, []any{"arg1"}))
 	queue.Run()
@@ -118,7 +119,7 @@ func (suite *QueueTestSuite) TestRunQueueWithErrHandle() {
 }
 
 func (suite *QueueTestSuite) TestShutdownQueue() {
-	queue := NewQueue()
+	queue := New()
 	queue.Run()
 	err := queue.Shutdown()
 	suite.NoError(err)

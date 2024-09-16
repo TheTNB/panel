@@ -14,6 +14,7 @@ func Boot() {
 	runMigrate()
 	initValidator()
 	initSession()
+	initQueue()
 	go initHttp()
 
 	select {}
