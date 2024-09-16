@@ -3,6 +3,7 @@ module github.com/TheTNB/panel
 go 1.23
 
 require (
+	github.com/beevik/ntp v1.4.3
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-gormigrate/gormigrate/v2 v2.1.2
@@ -13,7 +14,7 @@ require (
 	github.com/go-rat/gormstore v1.0.5
 	github.com/go-rat/sessions v1.0.8
 	github.com/go-rat/utils v1.0.3
-	github.com/go-resty/resty/v2 v2.14.0
+	github.com/go-resty/resty/v2 v2.15.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-module/carbon/v2 v2.3.12
 	github.com/gookit/color v1.5.4
@@ -45,7 +46,6 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/beevik/ntp v1.4.3 // indirect
 	github.com/bodgit/plumbing v1.2.0 // indirect
 	github.com/bodgit/sevenzip v1.3.0 // indirect
 	github.com/bodgit/windows v1.0.0 // indirect
