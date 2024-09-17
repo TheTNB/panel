@@ -18,28 +18,24 @@ type Firewall struct {
 	richRuleRegex    *regexp.Regexp
 }
 
-func NewFirewall() (*Firewall, error) {
-	if running, err := systemctl.Status("firewalld"); err != nil || !running {
-		return nil, errors.New("firewalld is not running")
-	}
-
+func NewFirewall() *Firewall {
 	firewall := &Firewall{
 		forwardListRegex: regexp.MustCompile(`^port=(\d{1,5}):proto=(.+?):toport=(\d{1,5}):toaddr=(.*)$`),
 		richRuleRegex:    regexp.MustCompile(`^rule family="([^"]+)" (?:source address="([^"]+)" )?(?:port port="([^"]+)" )?(?:protocol="([^"]+)" )?(accept|drop|reject)$`),
 	}
 
-	if err := firewall.enableForward(); err != nil {
-		return nil, err
-	}
+	return firewall
+}
 
-	return firewall, nil
+func (r *Firewall) Status() (bool, error) {
+	return systemctl.Status("firewalld")
 }
 
 func (r *Firewall) Version() (string, error) {
 	return shell.Execf("firewall-cmd --version")
 }
 
-func (r *Firewall) ListPort() ([]FireInfo, error) {
+func (r *Firewall) ListRule() ([]FireInfo, error) {
 	var wg sync.WaitGroup
 	var data []FireInfo
 	wg.Add(2)
@@ -164,6 +160,10 @@ func (r *Firewall) RichRules(rule FireInfo, operation string) error {
 }
 
 func (r *Firewall) PortForward(info Forward, operation string) error {
+	if err := r.enableForward(); err != nil {
+		return err
+	}
+
 	var ruleStr strings.Builder
 	ruleStr.WriteString(fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%d:proto=%s:", operation, info.Port, info.Protocol))
 	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
