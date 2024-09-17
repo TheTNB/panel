@@ -7,18 +7,73 @@ on:
 permissions:
   contents: read
 jobs:
-  lint:
-    name: lint
-    runs-on: ubuntu-latest
+  golangci:
+    name: golanci-lint
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
-          cache: false
-      - name: Lint
+          cache: true
+          go-version: 'stable'
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           skip-cache: true
           version: latest
           args: --timeout=30m ./...
+  nilaway:
+    runs-on: ubuntu-24.04
+    if: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache: true
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Install NilAway
+        run: go install go.uber.org/nilaway/cmd/nilaway@latest
+      - name: Run NilAway
+        run: nilaway -include-pkgs="github.com/TheTNB/panel" ./...
+  govulncheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache: true
+          go-version: 'stable'
+      - name: Install Govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - name: Run Govulncheck
+        run: govulncheck ./...
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+          package_json_file: web/package.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Run pnpm lint
+        run: pnpm lint

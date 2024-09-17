@@ -5,19 +5,20 @@ on:
       - main
   pull_request:
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  unit:
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          cache: true
+          go-version: 'stable'
       - name: Install dependencies
         run: sudo apt-get install -y curl jq
       - name: Set up environment
         run: |
-          cp panel-example.conf .env
-          echo "DB_FILE=$(pwd)/storage/panel.db" >> .env
-          go run . artisan key:generate
+          cp config/config.example.yml config/config.yml
       - name: Run tests
         run: go test ./...

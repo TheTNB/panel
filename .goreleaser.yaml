@@ -2,21 +2,29 @@ project_name: panel
 
 builds:
   - id: panel
+    main: ./cmd/app
     binary: panel
     env:
       - CGO_ENABLED=0
-      - GOPROXY=https://goproxy.cn,direct
     goos:
       - linux
     goarch:
       - amd64
       - arm64
-    goamd64:
-      - v2
     ldflags:
       - -s -w --extldflags "-static"
-    tags:
-      - nomsgpack
+  - id: cli
+    main: ./cmd/cli
+    binary: cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w --extldflags "-static"
 
 upx:
   - enabled: true

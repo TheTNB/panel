@@ -20,13 +20,13 @@ func Mkdir(path string, permission os.FileMode) error {
 
 // Chmod 修改文件/目录权限
 func Chmod(path string, permission os.FileMode) error {
-	cmd := exec.Command("chmod", "-R", fmt.Sprintf("%o", permission), path)
+	cmd := exec.Command("sudo", "chmod", "-R", fmt.Sprintf("%o", permission), path)
 	return cmd.Run()
 }
 
 // Chown 修改文件或目录所有者
 func Chown(path, user, group string) error {
-	cmd := exec.Command("chown", "-R", user+":"+group, path)
+	cmd := exec.Command("sudo", "chown", "-R", user+":"+group, path)
 	return cmd.Run()
 }
 
@@ -148,4 +148,13 @@ func TempDir(prefix string) (string, error) {
 // ReadDir 读取目录
 func ReadDir(path string) ([]os.DirEntry, error) {
 	return os.ReadDir(path)
+}
+
+// IsDir 判断是否为目录
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.IsDir()
 }

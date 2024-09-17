@@ -1,0 +1,402 @@
+{
+  "name": "Rat Panel",
+  "certIndex": {
+    "title": "Certificates"
+  },
+  "containerIndex": {
+    "title": "Containers"
+  },
+  "cronIndex": {
+    "title": "Crond"
+  },
+  "fileIndex": {
+    "title": "Files"
+  },
+  "homeIndex": {
+    "title": "Dashboard",
+    "website": "Website",
+    "database": "Database",
+    "cron": "Scheduled Tasks",
+    "sponsor": "Sponsor",
+    "git": "Open Source",
+    "resources": {
+      "title": "Resource Usage",
+      "cpu": {
+        "used": "{used} CPU / {total} threads"
+      },
+      "memory": {
+        "title": "Memory",
+        "physical": {
+          "used": "Physical used {used} / {total} total"
+        },
+        "swap": {
+          "used": "Swap used  {used} / {total} total"
+        }
+      }
+    },
+    "loads": {
+      "title": "System Load",
+      "load": "{load} minute load",
+      "time": "nearly {time} minutes"
+    },
+    "traffic": {
+      "title": "Real-Time Traffic",
+      "network": {
+        "title": "Network",
+        "current": "Current uplink { sent } / current downlink { received }",
+        "total": "Total uplink { sent } / total downlink { received }"
+      },
+      "disk": {
+        "title": "Disk",
+        "current": "Current read { read } / current write { write }",
+        "total": "Total read { read } / total write { write }"
+      }
+    },
+    "store": {
+      "title": "Storage",
+      "columns": {
+        "path": "Path",
+        "type": "Type",
+        "usageRate": "Usage Rate",
+        "total": "Total",
+        "used": "Used",
+        "free": "Free"
+      }
+    },
+    "system": {
+      "title": "System Information",
+      "columns": {
+        "os": "OS",
+        "panel": "Panel",
+        "uptime": "Uptime",
+        "operate": "Operate",
+        "loading": "loading..."
+      },
+      "restart": {
+        "label": "Restart",
+        "confirm": "Are you sure you want to restart the panel?",
+        "success": "Restart successful",
+        "loading": "Restarting..."
+      },
+      "update": {
+        "label": "Update",
+        "success": "Update successful"
+      }
+    },
+    "eggs": {
+      "count": {
+        "gt10": "What are you doing, ouch!",
+        "gt4": "Are you awesome, Brother Kun?",
+        "gt0": "If you look at it one more time, it will explode."
+      }
+    },
+    "about": {
+      "title": "About the panel",
+      "tnb": "The TNB development team wishes everyone a happy Dragon Boat Festival in 2024! Never downtime!",
+      "specialThanks": "Special thanks to the following supporters and {supporter}!",
+      "links": {
+        "group": "group",
+        "channel": "channel",
+        "supporter": ""
+      }
+    },
+    "plugins": {
+      "title": "Quick Plugin"
+    }
+  },
+  "homeUpdate": {
+    "title": "Update panel",
+    "loading": "Loading update information, please wait a moment",
+    "alerts": {
+      "success": "Panel update successful",
+      "info": "The panel is already the latest version"
+    },
+    "button": {
+      "update": "Update"
+    },
+    "confirm": {
+      "update": {
+        "title": "Update panel",
+        "content": "Are you sure you want to update the panel?",
+        "positiveText": "Update",
+        "negativeText": "Cancel",
+        "loading": "Panel is being updated..."
+      }
+    }
+  },
+  "monitorIndex": {
+    "title": "Monitoring"
+  },
+  "pluginIndex": {
+    "title": "Plugins",
+    "alerts": {
+      "info": "Click the button once, please do not click it repeatedly to avoid repeated execution!",
+      "warning": "It is strongly recommended to take a backup/snapshot before upgrading the plug-in to avoid being unable to roll back if problems arise!",
+      "setup": "Setup successful",
+      "install": "The task has been submitted, please check the task progress later",
+      "update": "The task has been submitted, please go to the task center to check the task progress",
+      "uninstall": "The task has been submitted, please go to the task center to check the task progress"
+    },
+    "buttons": {
+      "install": "Install",
+      "manage": "Manage",
+      "update": "Upgrade",
+      "uninstall": "Uninstall"
+    },
+    "confirm": {
+      "install": "Are you sure you want to install the plugin {plugin}?",
+      "update": "Upgrading the {plugin} plug-in may reset related configurations to the default state. Are you sure you want to continue?",
+      "uninstall": "Are you sure you want to uninstall the plugin {plugin}?"
+    },
+    "columns": {
+      "name": "Name",
+      "description": "Description",
+      "installedVersion": "Installed Version",
+      "version": "Latest Version",
+      "show": "Homepage Display",
+      "actions": "Actions"
+    }
+  },
+  "safeIndex": {
+    "title": "Security",
+    "buttons": {
+      "delete": "Delete",
+      "add": "Add",
+      "batchDelete": "Batch Delete"
+    },
+    "columns": {
+      "port": "Port",
+      "protocol": "Protocol",
+      "actions": "Actions"
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete the rule?",
+      "batchDelete": "High-risk operation! Are you sure you want to delete the selected rules?"
+    },
+    "alerts": {
+      "undelete": "undelete",
+      "delete": "successfully deleted",
+      "add": "added successfully",
+      "setup": "setup successful",
+      "select": "Please select the rule to delete",
+      "ruleDelete": "Rule {rule} deleted successfully"
+    },
+    "filter": {
+      "fields": {
+        "firewall": {
+          "label": "Firewall status",
+          "checked": "open",
+          "unchecked": "close"
+        },
+        "ssh": {
+          "label": "SSH status",
+          "checked": "open",
+          "unchecked": "close"
+        },
+        "ping": {
+          "label": "Ping status",
+          "checked": "open",
+          "unchecked": "close"
+        },
+        "port": {
+          "label": "SSH port"
+        }
+      }
+    },
+    "portControl": {
+      "title": "Port control",
+      "fields": {
+        "port": {
+          "placeholder": "Example：3306, 1000-2000"
+        },
+        "protocol": {
+          "placeholder": "protocol"
+        }
+      }
+    }
+  },
+  "settingIndex": {
+    "title": "Settings",
+    "info": "Update panel settings / entry, adjust browser address accordingly to access panel!",
+    "edit": {
+      "toasts": {
+        "success": "saved successfully"
+      },
+      "fields": {
+        "name": {
+          "label": "Panel name",
+          "placeholder": "Rat Panel"
+        },
+        "language": {
+          "label": "Language",
+          "placeholder": "Select language"
+        },
+        "username": {
+          "label": "Username",
+          "placeholder": "admin"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "admin"
+        },
+        "email": {
+          "label": "Email (may be useful later)",
+          "placeholder": "admin{'@'}example.com"
+        },
+        "port": {
+          "label": "Port (After saving, restart the panel and modify the browser address bar's port to the new port to access the panel)",
+          "placeholder": "8888"
+        },
+        "entrance": {
+          "label": "Security entrance (After saving, restart the panel and clear the browser Cookies to take effect)",
+          "placeholder": "admin"
+        },
+        "https": {
+          "label": "Panel HTTPS"
+        },
+        "cert": {
+          "label": "Certificate"
+        },
+        "key": {
+          "label": "Key"
+        },
+        "path": {
+          "label": "Default website directory",
+          "placeholder": "/www/wwwroot"
+        },
+        "backup": {
+          "label": "Default backup directory",
+          "placeholder": "/www/backup"
+        }
+      },
+      "actions": {
+        "submit": "save"
+      }
+    }
+  },
+  "sshIndex": {
+    "title": "SSH",
+    "alerts": {
+      "save": "saved successfully"
+    },
+    "save": {
+      "fields": {
+        "host": {
+          "label": "Host",
+          "placeholder": "Host"
+        },
+        "port": {
+          "label": "Port",
+          "placeholder": "Port"
+        },
+        "username": {
+          "label": "User name",
+          "placeholder": "User name"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "Password"
+        }
+      },
+      "actions": {
+        "submit": "save"
+      }
+    }
+  },
+  "taskIndex": {
+    "title": "Tasks",
+    "alerts": {
+      "delete": "Task has been deleted"
+    },
+    "buttons": {
+      "delete": "delete",
+      "log": "log",
+      "undelete": "undelete"
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete the task?"
+    },
+    "columns": {
+      "name": "task name",
+      "status": "status",
+      "createdAt": "created at",
+      "updatedAt": "updated at",
+      "actions": "actions"
+    },
+    "options": {
+      "status": {
+        "finished": "finished",
+        "waiting": "waiting",
+        "failed": "failed",
+        "running": "running"
+      }
+    },
+    "logModal": {
+      "title": "Task log",
+      "autoRefresh": {
+        "on": "Auto refresh on",
+        "off": "Auto refresh off"
+      }
+    }
+  },
+  "websiteIndex": {
+    "title": "Websites",
+    "columns": {
+      "name": "Website Name",
+      "status": "Status",
+      "path": "Path",
+      "remark": "Remark",
+      "actions": "Actions"
+    },
+    "create": {
+      "trigger": "add website",
+      "title": "Create a new website",
+      "fields": {
+        "name": {
+          "label": "Website Name",
+          "placeholder": "Please use English for the website name. Once set, it cannot be changed."
+        },
+        "domains": {
+          "label": "Domains"
+        },
+        "port": {
+          "label": "Port"
+        },
+        "phpVersion": {
+          "label": "PHP Version",
+          "placeholder": "Select PHP version"
+        },
+        "db": {
+          "label": "Database",
+          "placeholder": "Select database"
+        },
+        "dbName": {
+          "label": "Database Name",
+          "placeholder": "Please enter the database name"
+        },
+        "dbUser": {
+          "label": "Database User",
+          "placeholder": "Please enter the database user"
+        },
+        "dbPassword": {
+          "label": "Database Password",
+          "placeholder": "Please enter the database password"
+        },
+        "path": {
+          "label": "Directory",
+          "placeholder": "Website root directory (leave blank for default site directory/site name)"
+        },
+        "remark": {
+          "label": "Remark",
+          "placeholder": "Please enter a remark"
+        }
+      },
+      "actions": {
+        "submit": "Submit"
+      }
+    },
+    "edit": {
+      "trigger": "edit default page"
+    }
+  }
+}

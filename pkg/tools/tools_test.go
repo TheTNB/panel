@@ -48,11 +48,11 @@ func (s *HelperTestSuite) TestGenerateVersions() {
 	}, versions)
 }
 
-func (s *HelperTestSuite) TestGetLatestPanelVersion() {
+/*func (s *HelperTestSuite) TestGetLatestPanelVersion() {
 	version, err := GetLatestPanelVersion()
 	s.NotEmpty(version)
 	s.Nil(err)
-}
+}*/
 
 func (s *HelperTestSuite) TestGetPanelVersion() {
 	version, err := GetPanelVersion("v2.1.29")

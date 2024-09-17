@@ -1,0 +1,55 @@
+name: Backend
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        goarch: [ amd64, arm64 ]
+      fail-fast: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          cache: true
+          go-version: 'stable'
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Wait for frontend build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: 'build (frontend)'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download frontend
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build-frontend.yml
+          name: frontend
+          path: internal/embed/frontend
+          check_artifacts: true
+      - name: Build ${{ matrix.goarch }}
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+          GOARCH: ${{ matrix.goarch }}
+        run: |
+          go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }} ./cmd/app
+          go build -ldflags '-s -w --extldflags "-static"' -o cli-${{ matrix.goarch }} ./cmd/cli
+      - name: Compress ${{ matrix.goarch }}
+        run: |
+          upx --best --lzma panel-${{ matrix.goarch }}
+          upx --best --lzma cli-${{ matrix.goarch }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: panel-${{ matrix.goarch }}
+          path: |
+            panel-${{ matrix.goarch }}
+            cli-${{ matrix.goarch }}

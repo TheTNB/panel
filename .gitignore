@@ -1,10 +1,6 @@
-tmp
-/.air.toml
-/panel.conf
-
-# Golang #
 # `go test -c` 生成的二进制文件
 *.test
+
 # go coverage 工具
 *.out
 *.prof
@@ -14,16 +10,16 @@ _cgo_defun.c
 _cgo_gotypes.go
 _cgo_export.*
 
-# 编译文件 #
+# 编译文件
 *.com
 *.class
 *.dll
 *.exe
 *.o
 *.so
-/panel
+# 在此添加你的项目名（如果需要）
 
-# 压缩包 #
+# 压缩包
 # Git 自带压缩,如果这些压缩包里有代码,建议解压后 commit
 *.7z
 *.dmg
@@ -34,16 +30,17 @@ _cgo_export.*
 *.tar
 *.zip
 
-# 日志文件和数据库 #
+# 日志文件和数据库及配置
 *.log
 *.sqlite
 *.db
+config/config.yml
 
-# 临时文件 #
+# 临时文件
 tmp/
 .tmp/
 
-# 系统生成文件 #
+# 系统生成文件
 .DS_Store
 .DS_Store?
 .AppleDouble
@@ -58,7 +55,7 @@ Thumbs.db
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-# IDE 和编辑器 #
+# IDE 和编辑器
 .idea/
 /go_build_*
 out/

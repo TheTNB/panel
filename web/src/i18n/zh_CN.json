@@ -1,0 +1,402 @@
+{
+  "name": "耗子面板",
+  "certIndex": {
+    "title": "TLS 证书"
+  },
+  "containerIndex": {
+    "title": "容器管理"
+  },
+  "cronIndex": {
+    "title": "计划任务"
+  },
+  "fileIndex": {
+    "title": "文件管理"
+  },
+  "homeIndex": {
+    "title": "仪表盘",
+    "website": "网站",
+    "database": "数据库",
+    "cron": "计划任务",
+    "sponsor": "赞助支持",
+    "git": "开源地址",
+    "resources": {
+      "title": "资源使用",
+      "cpu": {
+        "used": "{used} CPU / 共 {total} 线程"
+      },
+      "memory": {
+        "title": "内存",
+        "physical": {
+          "used": "物理内存 使用 {used} / 总共 {total}"
+        },
+        "swap": {
+          "used": "交换分区 使用 {used} / 总共 {total}"
+        }
+      }
+    },
+    "loads": {
+      "title": "系统负载",
+      "load": "{load} 分钟负载",
+      "time": "近 {time} 分钟"
+    },
+    "traffic": {
+      "title": "实时流量",
+      "network": {
+        "title": "网络",
+        "current": "实时上行 { sent }/s / 实时下行 { received }/s",
+        "total": "累计上行 { sent } / 累计下行 { received }"
+      },
+      "disk": {
+        "title": "磁盘",
+        "current": "实时读取 { read }/s / 实时写入 { write }/s",
+        "total": "累计读取 { read } / 累计写入 { write }"
+      }
+    },
+    "store": {
+      "title": "存储信息",
+      "columns": {
+        "path": "挂载点",
+        "type": "文件系统",
+        "usageRate": "使用率",
+        "total": "总共",
+        "used": "已用",
+        "free": "可用"
+      }
+    },
+    "system": {
+      "title": "系统信息",
+      "columns": {
+        "os": "操作系统",
+        "panel": "面板版本",
+        "uptime": "运行时间",
+        "operate": "操作",
+        "loading": "加载中..."
+      },
+      "restart": {
+        "label": "重启面板",
+        "confirm": "确定重启面板吗？",
+        "success": "面板重启成功",
+        "loading": "面板重启中..."
+      },
+      "update": {
+        "label": "检查更新",
+        "success": "当前已是最新版本"
+      }
+    },
+    "eggs": {
+      "count": {
+        "gt10": "你干嘛，哎呦！",
+        "gt4": "厉不厉害你坤哥",
+        "gt0": "在多一眼看一眼就会爆炸"
+      }
+    },
+    "about": {
+      "title": "关于面板",
+      "tnb": "树新蜂开发组祝大家 2024 端午安康！永不宕机！",
+      "specialThanks": "特别感谢以下支持者和 {supporter}！",
+      "links": {
+        "group": "群",
+        "channel": "频道",
+        "supporter": ""
+      }
+    },
+    "plugins": {
+      "title": "快捷插件"
+    }
+  },
+  "homeUpdate": {
+    "title": "更新面板",
+    "loading": "正在加载更新信息，稍等片刻",
+    "alerts": {
+      "success": "面板更新成功",
+      "info": "取消更新"
+    },
+    "button": {
+      "update": "立即更新"
+    },
+    "confirm": {
+      "update": {
+        "title": "更新面板",
+        "content": "确定更新面板吗？",
+        "positiveText": "确定",
+        "negativeText": "取消",
+        "loading": "面板更新中..."
+      }
+    }
+  },
+  "monitorIndex": {
+    "title": "资源监控"
+  },
+  "pluginIndex": {
+    "title": "插件市场",
+    "alerts": {
+      "info": "按钮点击一次即可，请勿重复点击以免重复执行！",
+      "warning": "升级插件前强烈建议先备份/快照，以免出现问题时无法回滚！",
+      "setup": "设置成功",
+      "install": "任务已提交，请稍后查看任务进度",
+      "update": "任务已提交，请前往任务中心查看任务进度",
+      "uninstall": "任务已提交，请前往任务中心查看任务进度"
+    },
+    "buttons": {
+      "install": "安装",
+      "manage": "管理",
+      "update": "升级",
+      "uninstall": "卸载"
+    },
+    "confirm": {
+      "install": "确定安装插件 {plugin} 吗？",
+      "update": "升级 {plugin} 插件可能会重置相关配置到默认状态，确定继续吗？",
+      "uninstall": "确定卸载插件 {plugin} 吗？"
+    },
+    "columns": {
+      "name": "插件名",
+      "description": "描述",
+      "installedVersion": "已装版本",
+      "version": "最新版本",
+      "show": "首页显示",
+      "actions": "操作"
+    }
+  },
+  "safeIndex": {
+    "title": "系统安全",
+    "buttons": {
+      "delete": "删除",
+      "add": "添加",
+      "batchDelete": "批量删除"
+    },
+    "columns": {
+      "port": "端口",
+      "protocol": "协议",
+      "actions": "操作"
+    },
+    "confirm": {
+      "delete": "确定删除规则吗？",
+      "batchDelete": " 高危操作！确定删除选中的规则吗？"
+    },
+    "alerts": {
+      "undelete": "取消删除",
+      "delete": "删除成功",
+      "add": "添加成功",
+      "setup": "设置成功",
+      "select": "请选择要删除的规则",
+      "ruleDelete": "规则 {rule} 删除成功"
+    },
+    "filter": {
+      "fields": {
+        "firewall": {
+          "label": "防火墙状态",
+          "checked": "开启",
+          "unchecked": "关闭"
+        },
+        "ssh": {
+          "label": "SSH状态",
+          "checked": "开启",
+          "unchecked": "关闭"
+        },
+        "ping": {
+          "label": "Ping状态",
+          "checked": "开启",
+          "unchecked": "关闭"
+        },
+        "port": {
+          "label": "SSH端口"
+        }
+      }
+    },
+    "portControl": {
+      "title": "端口控制",
+      "fields": {
+        "port": {
+          "placeholder": "例如：3306, 1000-2000"
+        },
+        "protocol": {
+          "placeholder": "协议"
+        }
+      }
+    }
+  },
+  "settingIndex": {
+    "title": "面板设置",
+    "info": "修改面板端口 / 入口后，需要在浏览器地址栏做相应修改方可打开面板！",
+    "edit": {
+      "toasts": {
+        "success": "保存成功"
+      },
+      "fields": {
+        "name": {
+          "label": "面板名称",
+          "placeholder": "耗子面板"
+        },
+        "language": {
+          "label": "语言",
+          "placeholder": "选择语言"
+        },
+        "username": {
+          "label": "用户名",
+          "placeholder": "admin"
+        },
+        "password": {
+          "label": "密码",
+          "placeholder": "admin"
+        },
+        "email": {
+          "label": "邮箱（以后可能会有用）",
+          "placeholder": "admin{'@'}example.com"
+        },
+        "port": {
+          "label": "端口（保存后需重启面板并修改浏览器地址栏的端口为新端口以访问面板）",
+          "placeholder": "8888"
+        },
+        "entrance": {
+          "label": "安全入口（保存后需重启面板并清除浏览器 Cookies 方可生效）",
+          "placeholder": "admin"
+        },
+        "https": {
+          "label": "面板 HTTPS"
+        },
+        "cert": {
+          "label": "证书"
+        },
+        "key": {
+          "label": "密钥"
+        },
+        "path": {
+          "label": "默认建站目录",
+          "placeholder": "/www/wwwroot"
+        },
+        "backup": {
+          "label": "默认备份目录",
+          "placeholder": "/www/backup"
+        }
+      },
+      "actions": {
+        "submit": "保存"
+      }
+    }
+  },
+  "sshIndex": {
+    "title": "SSH 终端",
+    "alerts": {
+      "save": "保存成功"
+    },
+    "save": {
+      "fields": {
+        "host": {
+          "label": "主机",
+          "placeholder": "主机"
+        },
+        "port": {
+          "label": "端口",
+          "placeholder": "端口"
+        },
+        "username": {
+          "label": "用户名",
+          "placeholder": "用户名"
+        },
+        "password": {
+          "label": "密码",
+          "placeholder": "密码"
+        }
+      },
+      "actions": {
+        "submit": "保存"
+      }
+    }
+  },
+  "taskIndex": {
+    "title": "任务中心",
+    "alerts": {
+      "delete": "任务已删除"
+    },
+    "buttons": {
+      "delete": "删除",
+      "log": "日志",
+      "undelete": "取消删除"
+    },
+    "confirm": {
+      "delete": "确定删除此任务记录吗？"
+    },
+    "columns": {
+      "name": "任务名",
+      "status": "状态",
+      "createdAt": "创建时间",
+      "updatedAt": "更新时间",
+      "actions": "操作"
+    },
+    "options": {
+      "status": {
+        "finished": "已完成",
+        "waiting": "等待中",
+        "failed": "已失败",
+        "running": "运行中"
+      }
+    },
+    "logModal": {
+      "title": "任务日志",
+      "autoRefresh": {
+        "on": "自动刷新开启",
+        "off": "自动刷新关闭"
+      }
+    }
+  },
+  "websiteIndex": {
+    "title": "网站管理",
+    "columns": {
+      "name": "网站名",
+      "status": "运行",
+      "path": "目录",
+      "remark": "备注",
+      "actions": "操作"
+    },
+    "create": {
+      "trigger": "新建网站",
+      "title": "新建网站",
+      "fields": {
+        "name": {
+          "label": "网站名",
+          "placeholder": "网站名建议使用英文，设置后不可修改"
+        },
+        "domains": {
+          "label": "域名"
+        },
+        "port": {
+          "label": "端口"
+        },
+        "phpVersion": {
+          "label": "PHP版本",
+          "placeholder": "选择PHP版本"
+        },
+        "db": {
+          "label": "数据库",
+          "placeholder": "选择数据库"
+        },
+        "dbName": {
+          "label": "数据库名",
+          "placeholder": "数据库名"
+        },
+        "dbUser": {
+          "label": "数据库用户",
+          "placeholder": "数据库用户"
+        },
+        "dbPassword": {
+          "label": "数据库密码",
+          "placeholder": "数据库密码"
+        },
+        "path": {
+          "label": "目录",
+          "placeholder": "网站根目录（不填默认为建站目录/网站名）"
+        },
+        "remark": {
+          "label": "备注",
+          "placeholder": "备注"
+        }
+      },
+      "actions": {
+        "submit": "创建"
+      }
+    },
+    "edit": {
+      "trigger": "修改默认页"
+    }
+  }
+}

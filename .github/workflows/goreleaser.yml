@@ -7,21 +7,30 @@ permissions:
   contents: write
 jobs:
   goreleaser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Go
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
-      - name: Fetch Frontend
-        run: |
-          curl -sSL https://api.github.com/repos/TheTNB/panel-frontend/releases/latest | jq -r ".assets[] | select(.name | contains(\"dist\")) | .browser_download_url" | xargs curl -L -o frontend.zip
-          unzip frontend.zip
-          mv dist/* embed/frontend/
+          cache: true
+          go-version: 'stable'
+      - name: Wait for frontend build
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          check-name: 'build (frontend)'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Download frontend
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: build-frontend.yml
+          name: frontend
+          path: internal/embed/frontend
+          check_artifacts: true
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:

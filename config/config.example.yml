@@ -1,0 +1,12 @@
+app:
+  key: "a-long-string-with-32-characters"
+  locale: "zh_CN"
+
+http:
+  debug: true
+  address: ":3000"
+  entrance: "/"
+  ssl: false
+
+database:
+  debug: true

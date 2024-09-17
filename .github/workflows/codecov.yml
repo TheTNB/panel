@@ -6,12 +6,15 @@ on:
   pull_request:
 jobs:
   codecov:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          cache: true
+          go-version: 'stable'
       - name: Install dependencies
         run: go mod tidy
       - name: Run tests with coverage
