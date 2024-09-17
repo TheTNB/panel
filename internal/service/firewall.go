@@ -34,7 +34,7 @@ func (s *FirewallService) GetStatus(w http.ResponseWriter, r *http.Request) {
 func (s *FirewallService) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FirewallStatus](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -76,19 +76,29 @@ func (s *FirewallService) GetRules(w http.ResponseWriter, r *http.Request) {
 func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FirewallCreateRule](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	err = s.firewall.Port(firewall.FireInfo{Port: req.Port, Protocol: req.Protocol}, "add")
+	if err = s.firewall.Port(firewall.FireInfo{Port: req.Port, Protocol: req.Protocol}, "add"); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *FirewallService) DeleteRule(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FirewallCreateRule](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	err = s.firewall.Port(firewall.FireInfo{Port: req.Port, Protocol: req.Protocol}, "remove")
+	if err = s.firewall.Port(firewall.FireInfo{Port: req.Port, Protocol: req.Protocol}, "remove"); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }

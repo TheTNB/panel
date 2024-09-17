@@ -35,7 +35,7 @@ func (s *SafeService) GetSSH(w http.ResponseWriter, r *http.Request) {
 func (s *SafeService) UpdateSSH(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SafeUpdateSSH](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -60,7 +60,7 @@ func (s *SafeService) GetPingStatus(w http.ResponseWriter, r *http.Request) {
 func (s *SafeService) UpdatePingStatus(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SafeUpdatePingStatus](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 

@@ -39,7 +39,7 @@ func (s *SSHService) GetInfo(w http.ResponseWriter, r *http.Request) {
 func (s *SSHService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SSHUpdateInfo](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
