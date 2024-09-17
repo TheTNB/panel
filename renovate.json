@@ -17,13 +17,12 @@
   ],
   "packageRules": [
     {
-      "description": "Automerge non-major updates",
+      "description": "Automerge updates",
       "matchUpdateTypes": [
         "major",
         "minor",
         "patch"
       ],
-      "matchCurrentVersion": "!/^0/",
       "automerge": true
     }
   ],
