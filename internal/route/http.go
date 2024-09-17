@@ -269,6 +269,32 @@ func Http(r chi.Router) {
 	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		frontend, _ := fs.Sub(embed.PublicFS, "frontend")
-		http.FileServer(http.FS(frontend)).ServeHTTP(writer, request)
+		spaHandler := func(fs http.FileSystem) http.HandlerFunc {
+			fileServer := http.FileServer(fs)
+			return func(w http.ResponseWriter, r *http.Request) {
+				path := r.URL.Path
+				f, err := fs.Open(path)
+				if err != nil {
+					indexFile, err := fs.Open("index.html")
+					if err != nil {
+						http.NotFound(w, r)
+						return
+					}
+					defer indexFile.Close()
+
+					fi, err := indexFile.Stat()
+					if err != nil {
+						http.NotFound(w, r)
+						return
+					}
+
+					http.ServeContent(w, r, "index.html", fi.ModTime(), indexFile)
+					return
+				}
+				defer f.Close()
+				fileServer.ServeHTTP(w, r)
+			}
+		}
+		spaHandler(http.FS(frontend)).ServeHTTP(writer, request)
 	})
 }
