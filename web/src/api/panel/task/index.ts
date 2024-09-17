@@ -3,13 +3,13 @@ import type { AxiosResponse } from 'axios'
 
 export default {
   // 获取状态
-  status: (): Promise<AxiosResponse<any>> => request.get('/panel/task/status'),
+  status: (): Promise<AxiosResponse<any>> => request.get('/task/status'),
   // 获取任务列表
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/panel/task/list', { params: { page, limit } }),
+    request.get('/task/list', { params: { page, limit } }),
   // 获取任务日志
   log: (id: number): Promise<AxiosResponse<any>> =>
-    request.get('/panel/task/log', { params: { id } }),
+    request.get('/task/log', { params: { id } }),
   // 删除任务
-  delete: (id: number): Promise<AxiosResponse<any>> => request.post('/panel/task/delete', { id })
+  delete: (id: number): Promise<AxiosResponse<any>> => request.post('/task/delete', { id })
 }

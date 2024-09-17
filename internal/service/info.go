@@ -45,8 +45,13 @@ func NewInfoService() *InfoService {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/panel [get]
 func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
+	name, _ := s.settingRepo.Get(biz.SettingKeyName)
+	if name == "" {
+		name = "耗子面板"
+	}
+
 	Success(w, chix.M{
-		"name":     "r.setting.Get(models.SettingKeyName)",
+		"name":     name,
 		"language": app.Conf.MustString("app.locale"),
 	})
 }
@@ -89,7 +94,7 @@ func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 	Success(w, chix.M{
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
 		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
-		"panel_version": "app.Conf.MustString(\"panel.version\")",
+		"panel_version": app.Conf.MustString("app.version"),
 	})
 }
 

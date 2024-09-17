@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-rat/chix"
@@ -98,7 +97,6 @@ func (s *UserService) IsLogin(w http.ResponseWriter, r *http.Request) {
 //	@Router		/user/info/{id} [get]
 func (s *UserService) Info(w http.ResponseWriter, r *http.Request) {
 	userID := cast.ToUint(r.Context().Value("user_id"))
-	fmt.Println(userID)
 	if userID == 0 {
 		ErrorSystem(w)
 		return
