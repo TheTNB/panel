@@ -164,12 +164,16 @@ func (r *Firewall) RichRules(rule FireInfo, operation string) error {
 }
 
 func (r *Firewall) PortForward(info Forward, operation string) error {
-	ruleStr := fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetPort)
+	var ruleStr strings.Builder
+	ruleStr.WriteString(fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%d:proto=%s:", operation, info.Port, info.Protocol))
 	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
-		ruleStr = fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.TargetIP, info.TargetPort)
+		ruleStr.WriteString(fmt.Sprintf("toaddr=%s:toport=%d", info.TargetIP, info.TargetPort))
+	} else {
+		ruleStr.WriteString(fmt.Sprintf("toport=%d", info.TargetPort))
 	}
+	ruleStr.WriteString(" --permanent")
 
-	out, err := shell.Execf(ruleStr)
+	out, err := shell.Execf(ruleStr.String())
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, out)
 	}

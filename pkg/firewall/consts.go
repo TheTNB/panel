@@ -18,7 +18,7 @@ type FireInfo struct {
 type Forward struct {
 	Num        string `json:"num"`
 	Protocol   string `json:"protocol"`
-	Port       string `json:"port"` // 1-65535
+	Port       uint   `json:"port"` // 1-65535
 	TargetIP   string `json:"targetIP"`
-	TargetPort string `json:"targetPort"` // 1-65535
+	TargetPort uint   `json:"targetPort"` // 1-65535
 }

@@ -153,7 +153,7 @@ func (r *cronRepo) Update(req *request.CronUpdate) error {
 	if err = io.Write(cron.Shell, req.Script, 0700); err != nil {
 		return err
 	}
-	if out, err := shell.Execf("dos2unix " + cron.Shell); err != nil {
+	if out, err := shell.Execf("dos2unix %s", cron.Shell); err != nil {
 		return errors.New(out)
 	}
 
