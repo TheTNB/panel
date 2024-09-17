@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/go-rat/chix v1.1.3
-	github.com/go-rat/gormstore v1.0.5
+	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.9
 	github.com/go-rat/utils v1.0.3
 	github.com/go-resty/resty/v2 v2.15.0
