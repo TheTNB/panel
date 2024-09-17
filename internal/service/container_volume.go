@@ -62,7 +62,7 @@ func (s *ContainerVolumeService) List(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerVolumeService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerVolumeCreate](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -79,7 +79,7 @@ func (s *ContainerVolumeService) Create(w http.ResponseWriter, r *http.Request) 
 func (s *ContainerVolumeService) Exist(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerVolumeID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -95,7 +95,7 @@ func (s *ContainerVolumeService) Exist(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerVolumeService) Remove(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerVolumeID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -110,7 +110,7 @@ func (s *ContainerVolumeService) Remove(w http.ResponseWriter, r *http.Request) 
 func (s *ContainerVolumeService) Inspect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerVolumeID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 

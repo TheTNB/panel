@@ -249,8 +249,6 @@ func Http(r chi.Router) {
 			setting := service.NewSettingService()
 			r.Get("/", setting.Get)
 			r.Post("/", setting.Update)
-			r.Get("/https", setting.GetHttps)
-			r.Post("/https", setting.UpdateHttps)
 		})
 
 		r.Route("/systemctl", func(r chi.Router) {

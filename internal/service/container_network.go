@@ -70,7 +70,7 @@ func (s *ContainerNetworkService) List(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerNetworkService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkCreate](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -86,7 +86,7 @@ func (s *ContainerNetworkService) Create(w http.ResponseWriter, r *http.Request)
 func (s *ContainerNetworkService) Remove(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -101,7 +101,7 @@ func (s *ContainerNetworkService) Remove(w http.ResponseWriter, r *http.Request)
 func (s *ContainerNetworkService) Exist(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -117,7 +117,7 @@ func (s *ContainerNetworkService) Exist(w http.ResponseWriter, r *http.Request) 
 func (s *ContainerNetworkService) Inspect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -133,7 +133,7 @@ func (s *ContainerNetworkService) Inspect(w http.ResponseWriter, r *http.Request
 func (s *ContainerNetworkService) Connect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkConnect](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -148,7 +148,7 @@ func (s *ContainerNetworkService) Connect(w http.ResponseWriter, r *http.Request
 func (s *ContainerNetworkService) Disconnect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerNetworkConnect](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 

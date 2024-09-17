@@ -1,6 +1,10 @@
 package biz
 
-import "github.com/golang-module/carbon/v2"
+import (
+	"github.com/golang-module/carbon/v2"
+
+	"github.com/TheTNB/panel/internal/http/request"
+)
 
 type SettingKey string
 
@@ -30,4 +34,6 @@ type SettingRepo interface {
 	Get(key SettingKey, defaultValue ...string) (string, error)
 	Set(key SettingKey, value string) error
 	Delete(key SettingKey) error
+	GetPanelSetting() (*request.PanelSetting, error)
+	UpdatePanelSetting(setting *request.PanelSetting) error
 }

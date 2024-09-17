@@ -3,6 +3,7 @@ package data
 import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/http/request"
 )
 
 type settingRepo struct{}
@@ -39,6 +40,29 @@ func (r *settingRepo) Delete(key biz.SettingKey) error {
 	if err := app.Orm.Where("key = ?", key).Delete(setting).Error; err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (r *settingRepo) GetPanelSetting() (*request.PanelSetting, error) {
+	setting := new(biz.Setting)
+	if err := app.Orm.Where("key = ?", biz.SettingKeyName).First(setting).Error; err != nil {
+		return nil, err
+	}
+
+	// TODO fix
+
+	return &request.PanelSetting{
+		Name: setting.Value,
+	}, nil
+}
+
+func (r *settingRepo) UpdatePanelSetting(setting *request.PanelSetting) error {
+	if err := r.Set(biz.SettingKeyName, setting.Name); err != nil {
+		return err
+	}
+
+	// TODO fix
 
 	return nil
 }

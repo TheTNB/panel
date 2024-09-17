@@ -53,7 +53,7 @@ func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Exist(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -69,7 +69,7 @@ func (s *ContainerImageService) Exist(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Pull(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImagePull](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -84,7 +84,7 @@ func (s *ContainerImageService) Pull(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Remove(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -99,7 +99,7 @@ func (s *ContainerImageService) Remove(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Inspect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusBadRequest, err.Error())
+		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
