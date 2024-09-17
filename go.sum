@@ -112,8 +112,8 @@ github.com/go-playground/validator/v10 v10.22.1 h1:40JcKH+bBNGFczGuoBYgX4I6m/i27
 github.com/go-playground/validator/v10 v10.22.1/go.mod h1:dbuPbCMFw/DrkbEynArYaCwl3amGuJotoKCe95atGMM=
 github.com/go-rat/chix v1.1.3 h1:NeDbmA3OTfhEeizn528dz8z8/lBcsziftgtSarYn7Vo=
 github.com/go-rat/chix v1.1.3/go.mod h1:XeC0hmaAXlPB/V8g0QZiIAgnAJO70ZeT+k1Q4Zh9qeI=
-github.com/go-rat/gormstore v1.0.5 h1:76umSO6n+zoLnxVryX+6aUu6rIQLveGO8fCu9d5GzTA=
-github.com/go-rat/gormstore v1.0.5/go.mod h1:xG/n+Du8baWf7ptiafiHLWBZWVXrYIPC42CsoEbfr4M=
+github.com/go-rat/gormstore v1.0.6 h1:YxmaY6n3JoTk6o9RXoZ1+cQ6HQL+ayf/6d8D76ydCAc=
+github.com/go-rat/gormstore v1.0.6/go.mod h1:xG/n+Du8baWf7ptiafiHLWBZWVXrYIPC42CsoEbfr4M=
 github.com/go-rat/securecookie v1.0.1 h1:HW0fpKmB+FjJzXTw8ABOwBJ+XrPmRBSZqHhmrv86lBo=
 github.com/go-rat/securecookie v1.0.1/go.mod h1:tP/ObWYyjmcpabQ7WTon/i2lBSip/Aolliw2llXuPDU=
 github.com/go-rat/sessions v1.0.9 h1:zysrHceTFqyc0qUWn5giLGdbfr/DYHXvFECDBSyv9Gk=
