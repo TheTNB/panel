@@ -1,4 +1,4 @@
-//go:build linux
+//go:build !linux
 
 package service
 
@@ -9,14 +9,12 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"syscall"
 
 	"github.com/go-rat/chix"
 	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 )
@@ -320,7 +318,6 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 	var paths []any
 	for _, fileInfo := range fileInfoList {
 		info, _ := fileInfo.Info()
-		stat := info.Sys().(*syscall.Stat_t)
 
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
@@ -328,10 +325,10 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 			"size":     str.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
-			"owner":    os.GetUser(stat.Uid),
-			"group":    os.GetGroup(stat.Gid),
-			"uid":      stat.Uid,
-			"gid":      stat.Gid,
+			"owner":    "",
+			"group":    "",
+			"uid":      0,
+			"gid":      0,
 			"hidden":   io.IsHidden(info.Name()),
 			"symlink":  io.IsSymlink(info.Mode()),
 			"link":     io.GetSymlink(filepath.Join(req.Path, info.Name())),
