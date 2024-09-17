@@ -32,7 +32,7 @@ func (r *containerNetworkRepo) List() ([]network.Inspect, error) {
 }
 
 // Create 创建网络
-func (r *containerNetworkRepo) Create(req request.ContainerNetworkCreate) (string, error) {
+func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (string, error) {
 	var ipamConfigs []network.IPAMConfig
 	if req.Ipv4.Enabled {
 		ipamConfigs = append(ipamConfigs, network.IPAMConfig{

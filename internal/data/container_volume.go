@@ -29,11 +29,14 @@ func NewContainerVolumeRepo(sock ...string) biz.ContainerVolumeRepo {
 // List 列出存储卷
 func (r *containerVolumeRepo) List() ([]*volume.Volume, error) {
 	volumes, err := r.client.VolumeList(context.Background(), volume.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
 	return volumes.Volumes, err
 }
 
 // Create 创建存储卷
-func (r *containerVolumeRepo) Create(req request.ContainerVolumeCreate) (volume.Volume, error) {
+func (r *containerVolumeRepo) Create(req *request.ContainerVolumeCreate) (volume.Volume, error) {
 	return r.client.VolumeCreate(context.Background(), volume.CreateOptions{
 		Name:       req.Name,
 		Driver:     req.Driver,

@@ -50,7 +50,7 @@ func (r *containerImageRepo) Exist(id string) (bool, error) {
 }
 
 // Pull 拉取镜像
-func (r *containerImageRepo) Pull(req request.ContainerImagePull) error {
+func (r *containerImageRepo) Pull(req *request.ContainerImagePull) error {
 	options := image.PullOptions{}
 	if req.Auth {
 		authConfig := registry.AuthConfig{
