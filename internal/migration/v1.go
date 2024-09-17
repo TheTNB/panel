@@ -12,14 +12,32 @@ func init() {
 		ID: "20240812-init",
 		Migrate: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(
-				&biz.User{},
+				&biz.Cert{},
+				&biz.CertDNS{},
+				&biz.CertAccount{},
+				&biz.Cron{},
+				&biz.Database{},
+				&biz.Monitor{},
 				&biz.Plugin{},
+				&biz.Setting{},
+				&biz.Task{},
+				&biz.User{},
+				&biz.Website{},
 			)
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable(
-				&biz.User{},
+				&biz.Cert{},
+				&biz.CertDNS{},
+				&biz.CertAccount{},
+				&biz.Cron{},
+				&biz.Database{},
+				&biz.Monitor{},
 				&biz.Plugin{},
+				&biz.Setting{},
+				&biz.Task{},
+				&biz.User{},
+				&biz.Website{},
 			)
 		},
 	})

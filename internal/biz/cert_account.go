@@ -17,7 +17,7 @@ type CertAccount struct {
 	CreatedAt   carbon.DateTime `json:"created_at"`
 	UpdatedAt   carbon.DateTime `json:"updated_at"`
 
-	Certs []*Cert `gorm:"foreignKey:UserID" json:"-"`
+	Certs []*Cert `gorm:"foreignKey:AccountID" json:"-"`
 }
 
 type CertAccountRepo interface {
