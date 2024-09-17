@@ -13,6 +13,18 @@ builds:
       - arm64
     ldflags:
       - -s -w --extldflags "-static"
+  - id: cli
+    main: ./cmd/cli
+    binary: cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w --extldflags "-static"
 
 upx:
   - enabled: true
