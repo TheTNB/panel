@@ -11,7 +11,7 @@ func NewSettingRepo() biz.SettingRepo {
 	return &settingRepo{}
 }
 
-func (r *settingRepo) Get(key string, defaultValue ...string) (string, error) {
+func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, error) {
 	setting := new(biz.Setting)
 	if err := app.Orm.Where("key = ?", key).First(setting).Error; err != nil {
 		return "", err
@@ -24,7 +24,7 @@ func (r *settingRepo) Get(key string, defaultValue ...string) (string, error) {
 	return setting.Value, nil
 }
 
-func (r *settingRepo) Set(key, value string) error {
+func (r *settingRepo) Set(key biz.SettingKey, value string) error {
 	setting := new(biz.Setting)
 	if err := app.Orm.Where("key = ?", key).First(setting).Error; err != nil {
 		return err
@@ -34,7 +34,7 @@ func (r *settingRepo) Set(key, value string) error {
 	return app.Orm.Save(setting).Error
 }
 
-func (r *settingRepo) Delete(key string) error {
+func (r *settingRepo) Delete(key biz.SettingKey) error {
 	setting := new(biz.Setting)
 	if err := app.Orm.Where("key = ?", key).Delete(setting).Error; err != nil {
 		return err

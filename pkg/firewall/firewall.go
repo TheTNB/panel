@@ -173,7 +173,7 @@ func (r *Firewall) PortForward(info Forward, operation string) error {
 	}
 	ruleStr.WriteString(" --permanent")
 
-	out, err := shell.Execf(ruleStr.String())
+	out, err := shell.Execf(ruleStr.String()) // nolint: govet
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, out)
 	}
