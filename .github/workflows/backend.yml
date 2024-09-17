@@ -49,7 +49,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: panel-${{ matrix.goarch }}
+          name: ${{ matrix.goarch }}
           path: |
             panel-${{ matrix.goarch }}
             cli-${{ matrix.goarch }}
