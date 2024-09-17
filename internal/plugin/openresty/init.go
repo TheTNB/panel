@@ -1,8 +1,6 @@
 package openresty
 
 import (
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 
 	"github.com/TheTNB/panel/pkg/pluginloader"
@@ -11,12 +9,23 @@ import (
 
 func init() {
 	pluginloader.Register(&types.Plugin{
-		Slug: "openresty",
-		Name: "OpenResty",
+		Order:       -100,
+		Slug:        "openresty",
+		Name:        "OpenResty",
+		Description: "OpenResty® 是一款基于 NGINX 和 LuaJIT 的 Web 平台",
+		Version:     "1.25.3.1",
+		Requires:    []string{},
+		Excludes:    []string{},
+		Install:     "bash /www/panel/scripts/openresty/install.sh",
+		Uninstall:   "bash /www/panel/scripts/openresty/uninstall.sh",
+		Update:      "bash /www/panel/scripts/openresty/install.sh",
 		Route: func(r chi.Router) {
-			r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-				_, _ = w.Write([]byte("Hello, World!"))
-			})
+			service := NewService()
+			r.Get("/load", service.Load)
+			r.Get("/config", service.GetConfig)
+			r.Post("/config", service.SaveConfig)
+			r.Get("/errorLog", service.ErrorLog)
+			r.Post("/clearErrorLog", service.ClearErrorLog)
 		},
 	})
 }

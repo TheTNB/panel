@@ -163,6 +163,16 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	return setting, err
 }
 
+func (r *websiteRepo) GetByName(name string) (*types.WebsiteSetting, error) {
+	website := new(biz.Website)
+	if err := app.Orm.Where("name", name).First(website).Error; err != nil {
+		return nil, err
+	}
+
+	return r.Get(website.ID)
+
+}
+
 func (r *websiteRepo) List(page, limit uint) ([]*biz.Website, int64, error) {
 	var websites []*biz.Website
 	var total int64

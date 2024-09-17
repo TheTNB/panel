@@ -25,6 +25,7 @@ type WebsiteRepo interface {
 	UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error
 	Count() (int64, error)
 	Get(id uint) (*types.WebsiteSetting, error)
+	GetByName(name string) (*types.WebsiteSetting, error)
 	List(page, limit uint) ([]*Website, int64, error)
 	Create(req *request.WebsiteCreate) (*Website, error)
 	Update(req *request.WebsiteUpdate) error

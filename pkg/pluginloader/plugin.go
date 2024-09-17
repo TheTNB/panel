@@ -2,7 +2,9 @@
 package pluginloader
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
@@ -31,6 +33,12 @@ func All() []*types.Plugin {
 		}
 		return true
 	})
+
+	// 排序
+	slices.SortFunc(list, func(a, b *types.Plugin) int {
+		return cmp.Compare(a.Order, b.Order)
+	})
+
 	return list
 }
 
