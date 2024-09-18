@@ -3,12 +3,12 @@ package openresty
 import (
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TheTNB/panel/pkg/pluginloader"
+	"github.com/TheTNB/panel/pkg/apploader"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
 func init() {
-	pluginloader.Register(&types.Plugin{
+	apploader.Register(&types.Plugin{
 		Order:       -100,
 		Slug:        "openresty",
 		Name:        "OpenResty",

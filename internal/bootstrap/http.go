@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/TheTNB/panel/internal/apps"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/panel"
-	"github.com/TheTNB/panel/internal/plugin"
 	"github.com/TheTNB/panel/internal/route"
 )
 
@@ -20,7 +20,7 @@ func initHttp() {
 
 	// add route
 	route.Http(panel.Http)
-	plugin.Boot(panel.Http)
+	apps.Boot(panel.Http)
 
 	server := &http.Server{
 		Addr:           panel.Conf.MustString("http.address"),

@@ -1,5 +1,5 @@
-// Package pluginloader 面板插件加载器
-package pluginloader
+// Package apploader 面板应用加载器
+package apploader
 
 import (
 	"cmp"

@@ -7,7 +7,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/panel"
-	"github.com/TheTNB/panel/pkg/pluginloader"
+	"github.com/TheTNB/panel/pkg/apploader"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -22,7 +22,7 @@ func NewPluginRepo() biz.PluginRepo {
 }
 
 func (r *pluginRepo) All() []*types.Plugin {
-	return pluginloader.All()
+	return apploader.All()
 }
 
 func (r *pluginRepo) Installed() ([]*biz.Plugin, error) {
@@ -36,7 +36,7 @@ func (r *pluginRepo) Installed() ([]*biz.Plugin, error) {
 }
 
 func (r *pluginRepo) Get(slug string) (*types.Plugin, error) {
-	return pluginloader.Get(slug)
+	return apploader.Get(slug)
 }
 
 func (r *pluginRepo) GetInstalled(slug string) (*biz.Plugin, error) {
