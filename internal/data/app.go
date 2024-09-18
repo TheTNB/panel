@@ -67,19 +67,49 @@ func (r *appRepo) GetInstalled(slug string) (*biz.App, error) {
 	return app, nil
 }
 
-func (r *appRepo) GetInstalledAll(cond ...string) ([]*biz.App, error) {
+func (r *appRepo) GetInstalledAll(query string, cond ...string) ([]*biz.App, error) {
 	var apps []*biz.App
-	if err := panel.Orm.Where(cond).Find(&apps).Error; err != nil {
+	if err := panel.Orm.Where(query, cond).Find(&apps).Error; err != nil {
 		return nil, err
 	}
 
 	return apps, nil
 }
 
-func (r *appRepo) IsInstalled(cond ...string) (bool, error) {
+func (r *appRepo) GetHomeShow() ([]map[string]string, error) {
+	var apps []*biz.App
+	if err := panel.Orm.Where("show = ?", true).Order("show_order").Find(&apps).Error; err != nil {
+		return nil, err
+	}
+
+	var filtered []map[string]string
+	for app := range slices.Values(apps) {
+		loaded, err := r.Get(app.Slug)
+		if err != nil {
+			continue
+		}
+		filtered = append(filtered, map[string]string{
+			"name":        loaded.Name,
+			"description": loaded.Description,
+			"slug":        loaded.Slug,
+			"icon":        loaded.Icon,
+			"version":     app.Version,
+		})
+	}
+
+	return filtered, nil
+}
+
+func (r *appRepo) IsInstalled(query string, cond ...string) (bool, error) {
 	var count int64
-	if err := panel.Orm.Model(&biz.App{}).Where(cond).Count(&count).Error; err != nil {
-		return false, err
+	if len(cond) == 0 {
+		if err := panel.Orm.Model(&biz.App{}).Where("slug = ?", query).Count(&count).Error; err != nil {
+			return false, err
+		}
+	} else {
+		if err := panel.Orm.Model(&biz.App{}).Where(query, cond).Count(&count).Error; err != nil {
+			return false, err
+		}
 	}
 
 	return count > 0, nil
@@ -91,7 +121,7 @@ func (r *appRepo) Install(slug string) error {
 		return err
 	}
 
-	if installed, _ := r.IsInstalled("slug = ?", slug); installed {
+	if installed, _ := r.IsInstalled(slug); installed {
 		return errors.New("应用已安装")
 	}
 
@@ -132,7 +162,7 @@ func (r *appRepo) Uninstall(slug string) error {
 		return err
 	}
 
-	if installed, _ := r.IsInstalled("slug = ?", slug); !installed {
+	if installed, _ := r.IsInstalled(slug); !installed {
 		return errors.New("应用未安装")
 	}
 
@@ -176,7 +206,7 @@ func (r *appRepo) Update(slug string) error {
 		return err
 	}
 
-	if installed, _ := r.IsInstalled("slug = ?", slug); !installed {
+	if installed, _ := r.IsInstalled(slug); !installed {
 		return errors.New("应用未安装")
 	}
 

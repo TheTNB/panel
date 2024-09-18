@@ -65,7 +65,13 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/homePlugins [get]
 func (s *InfoService) HomePlugins(w http.ResponseWriter, r *http.Request) {
-	Success(w, nil)
+	apps, err := s.appRepo.GetHomeShow()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "获取首页插件失败")
+		return
+	}
+
+	Success(w, apps)
 }
 
 // NowMonitor

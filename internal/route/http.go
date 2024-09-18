@@ -264,11 +264,16 @@ func Http(r chi.Router) {
 			r.Post("/start", systemctl.Start)
 			r.Post("/stop", systemctl.Stop)
 		})
-
 	})
 
 	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
+		// /api 开头的返回 404
+		if request.URL.Path[:4] == "/api" {
+			http.NotFound(writer, request)
+			return
+		}
+		// 其他返回前端页面
 		frontend, _ := fs.Sub(embed.PublicFS, "frontend")
 		spaHandler := func(fs http.FileSystem) http.HandlerFunc {
 			fileServer := http.FileServer(fs)

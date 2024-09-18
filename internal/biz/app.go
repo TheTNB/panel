@@ -21,8 +21,9 @@ type AppRepo interface {
 	Get(slug string) (*api.App, error)
 	Installed() ([]*App, error)
 	GetInstalled(slug string) (*App, error)
-	GetInstalledAll(cond ...string) ([]*App, error)
-	IsInstalled(cond ...string) (bool, error)
+	GetInstalledAll(query string, cond ...string) ([]*App, error)
+	GetHomeShow() ([]map[string]string, error)
+	IsInstalled(query string, cond ...string) (bool, error)
 	Install(slug string) error
 	Uninstall(slug string) error
 	Update(slug string) error

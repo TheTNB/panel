@@ -2,6 +2,7 @@ package data
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/biz"
