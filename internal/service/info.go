@@ -9,9 +9,9 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/hashicorp/go-version"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -52,7 +52,7 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, chix.M{
 		"name":     name,
-		"language": app.Conf.MustString("app.locale"),
+		"language": panel.Conf.MustString("app.locale"),
 	})
 }
 
@@ -94,7 +94,7 @@ func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 	Success(w, chix.M{
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
 		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
-		"panel_version": app.Conf.MustString("app.version"),
+		"panel_version": panel.Conf.MustString("app.version"),
 	})
 }
 
@@ -252,7 +252,7 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/checkUpdate [get]
 func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
-	current := app.Conf.MustString("app.version")
+	current := panel.Conf.MustString("app.version")
 	latest, err := tools.GetLatestPanelVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
@@ -290,7 +290,7 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/updateInfo [get]
 func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
-	current := app.Conf.MustString("app.version")
+	current := panel.Conf.MustString("app.version")
 	latest, err := tools.GetLatestPanelVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
@@ -344,7 +344,7 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
 		return
 	}
-	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE)").Error; err != nil {
+	if err := panel.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE)").Error; err != nil {
 		types.Status = types.StatusFailed
 		Error(w, http.StatusInternalServerError, fmt.Sprintf("面板数据库异常，已终止操作：%s", err.Error()))
 		return

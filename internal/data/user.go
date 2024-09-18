@@ -6,8 +6,8 @@ import (
 	"github.com/go-rat/utils/hash"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 type userRepo struct {
@@ -22,7 +22,7 @@ func NewUserRepo() biz.UserRepo {
 
 func (r *userRepo) CheckPassword(username, password string) (*biz.User, error) {
 	user := new(biz.User)
-	if err := app.Orm.Where("username = ?", username).First(user).Error; err != nil {
+	if err := panel.Orm.Where("username = ?", username).First(user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("用户名或密码错误")
 		} else {
@@ -39,7 +39,7 @@ func (r *userRepo) CheckPassword(username, password string) (*biz.User, error) {
 
 func (r *userRepo) Get(id uint) (*biz.User, error) {
 	user := new(biz.User)
-	if err := app.Orm.First(user, id).Error; err != nil {
+	if err := panel.Orm.First(user, id).Error; err != nil {
 		return nil, err
 	}
 
@@ -47,5 +47,5 @@ func (r *userRepo) Get(id uint) (*biz.User, error) {
 }
 
 func (r *userRepo) Save(user *biz.User) error {
-	return app.Orm.Save(user).Error
+	return panel.Orm.Save(user).Error
 }

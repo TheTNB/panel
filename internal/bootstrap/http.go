@@ -6,25 +6,25 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/middleware"
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/plugin"
 	"github.com/TheTNB/panel/internal/route"
 )
 
 func initHttp() {
-	app.Http = chi.NewRouter()
+	panel.Http = chi.NewRouter()
 
 	// add middleware
-	app.Http.Use(middleware.GlobalMiddleware()...)
+	panel.Http.Use(middleware.GlobalMiddleware()...)
 
 	// add route
-	route.Http(app.Http)
-	plugin.Boot(app.Http)
+	route.Http(panel.Http)
+	plugin.Boot(panel.Http)
 
 	server := &http.Server{
-		Addr:           app.Conf.MustString("http.address"),
-		Handler:        http.AllowQuerySemicolons(app.Http),
+		Addr:           panel.Conf.MustString("http.address"),
+		Handler:        http.AllowQuerySemicolons(panel.Http),
 		MaxHeaderBytes: 2048 << 20,
 	}
 	if err := server.ListenAndServe(); err != nil {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 type APITestSuite struct {
@@ -14,7 +14,7 @@ type APITestSuite struct {
 }
 
 func TestAPITestSuite(t *testing.T) {
-	app.Version = "2.3.0"
+	panel.Version = "2.3.0"
 	suite.Run(t, &APITestSuite{
 		api: NewAPI(),
 	})

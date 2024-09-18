@@ -7,18 +7,18 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 func initConf() {
-	app.Conf = koanf.New(".")
-	if err := app.Conf.Load(file.Provider("config/config.yml"), yaml.Parser()); err != nil {
+	panel.Conf = koanf.New(".")
+	if err := panel.Conf.Load(file.Provider("config/config.yml"), yaml.Parser()); err != nil {
 		panic(fmt.Sprintf("failed to load config: %v", err))
 	}
 }
 
 func initGlobal() {
-	app.Root = app.Conf.MustString("app.root")
-	app.Version = app.Conf.MustString("app.version")
-	app.Locale = app.Conf.MustString("app.locale")
+	panel.Root = panel.Conf.MustString("app.root")
+	panel.Version = panel.Conf.MustString("app.version")
+	panel.Locale = panel.Conf.MustString("app.locale")
 }

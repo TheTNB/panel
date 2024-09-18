@@ -7,13 +7,13 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 // MustLogin 确保已登录
 func MustLogin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, err := app.Session.GetSession(r)
+		session, err := panel.Session.GetSession(r)
 		if err != nil {
 			render := chix.NewRender(w)
 			render.Status(http.StatusInternalServerError)

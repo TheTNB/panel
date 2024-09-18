@@ -6,10 +6,10 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 type UserService struct {
@@ -32,7 +32,7 @@ func NewUserService() *UserService {
 //	@Success	200		{object}	SuccessResponse
 //	@Router		/user/login [post]
 func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := panel.Session.GetSession(r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -63,7 +63,7 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 //	@Success	200		{object}	SuccessResponse
 //	@Router		/user/logout [post]
 func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := panel.Session.GetSession(r)
 	if err == nil {
 		sess.Forget("user_id")
 	}
@@ -79,7 +79,7 @@ func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
 //	@Success	200		{object}	SuccessResponse
 //	@Router		/user/isLogin [get]
 func (s *UserService) IsLogin(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := panel.Session.GetSession(r)
 	if err != nil {
 		Success(w, false)
 		return

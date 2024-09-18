@@ -7,7 +7,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/shirou/gopsutil/host"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/copier"
 )
 
@@ -33,7 +33,7 @@ func NewAPI(url ...string) *API {
 	client := resty.New()
 	client.SetTimeout(10 * time.Second)
 	client.SetBaseURL(url[0])
-	client.SetHeader("User-Agent", fmt.Sprintf("rat-panel/%s %s/%s", app.Version, hostInfo.Platform, hostInfo.PlatformVersion))
+	client.SetHeader("User-Agent", fmt.Sprintf("rat-panel/%s %s/%s", panel.Version, hostInfo.Platform, hostInfo.PlatformVersion))
 
 	return &API{
 		client: client,

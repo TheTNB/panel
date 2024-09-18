@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/job"
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/pluginloader"
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -27,7 +27,7 @@ func (r *pluginRepo) All() []*types.Plugin {
 
 func (r *pluginRepo) Installed() ([]*biz.Plugin, error) {
 	var plugins []*biz.Plugin
-	if err := app.Orm.Find(&plugins).Error; err != nil {
+	if err := panel.Orm.Find(&plugins).Error; err != nil {
 		return nil, err
 	}
 
@@ -41,7 +41,7 @@ func (r *pluginRepo) Get(slug string) (*types.Plugin, error) {
 
 func (r *pluginRepo) GetInstalled(slug string) (*biz.Plugin, error) {
 	plugin := new(biz.Plugin)
-	if err := app.Orm.Where("slug = ?", slug).First(plugin).Error; err != nil {
+	if err := panel.Orm.Where("slug = ?", slug).First(plugin).Error; err != nil {
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (r *pluginRepo) GetInstalled(slug string) (*biz.Plugin, error) {
 
 func (r *pluginRepo) GetInstalledAll(cond ...string) ([]*biz.Plugin, error) {
 	var plugins []*biz.Plugin
-	if err := app.Orm.Where(cond).Find(&plugins).Error; err != nil {
+	if err := panel.Orm.Where(cond).Find(&plugins).Error; err != nil {
 		return nil, err
 	}
 
@@ -59,7 +59,7 @@ func (r *pluginRepo) GetInstalledAll(cond ...string) ([]*biz.Plugin, error) {
 
 func (r *pluginRepo) IsInstalled(cond ...string) (bool, error) {
 	var count int64
-	if err := app.Orm.Model(&biz.Plugin{}).Where(cond).Count(&count).Error; err != nil {
+	if err := panel.Orm.Model(&biz.Plugin{}).Where(cond).Count(&count).Error; err != nil {
 		return false, err
 	}
 
@@ -106,10 +106,10 @@ func (r *pluginRepo) Install(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Install, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = app.Orm.Create(task).Error; err != nil {
+	if err = panel.Orm.Create(task).Error; err != nil {
 		return err
 	}
-	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
 		task.ID,
 	})
 
@@ -155,10 +155,10 @@ func (r *pluginRepo) Uninstall(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Uninstall, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = app.Orm.Create(task).Error; err != nil {
+	if err = panel.Orm.Create(task).Error; err != nil {
 		return err
 	}
-	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
 		task.ID,
 	})
 
@@ -204,10 +204,10 @@ func (r *pluginRepo) Update(slug string) error {
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", plugin.Update, plugin.Slug)
 	task.Log = "/tmp/" + plugin.Slug + ".log"
 
-	if err = app.Orm.Create(task).Error; err != nil {
+	if err = panel.Orm.Create(task).Error; err != nil {
 		return err
 	}
-	err = app.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
+	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
 		task.ID,
 	})
 
@@ -222,5 +222,5 @@ func (r *pluginRepo) UpdateShow(slug string, show bool) error {
 
 	plugin.Show = show
 
-	return app.Orm.Save(plugin).Error
+	return panel.Orm.Save(plugin).Error
 }

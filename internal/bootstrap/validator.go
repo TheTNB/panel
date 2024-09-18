@@ -8,7 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/translations/zh"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 func initValidator() {
@@ -21,6 +21,6 @@ func initValidator() {
 		panic(fmt.Sprintf("failed to register validator translations: %v", err))
 	}
 
-	app.Translator = &trans
-	app.Validator = validate
+	panel.Translator = &trans
+	panel.Validator = validate
 }

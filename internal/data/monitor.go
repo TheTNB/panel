@@ -6,9 +6,9 @@ import (
 	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/internal/panel"
 )
 
 type monitorRepo struct {
@@ -50,12 +50,12 @@ func (r monitorRepo) UpdateSetting(setting *request.MonitorSetting) error {
 }
 
 func (r monitorRepo) Clear() error {
-	return app.Orm.Delete(&biz.Monitor{}).Error
+	return panel.Orm.Delete(&biz.Monitor{}).Error
 }
 
 func (r monitorRepo) List(start, end carbon.Carbon) ([]*biz.Monitor, error) {
 	var monitors []*biz.Monitor
-	if err := app.Orm.Where("created_at BETWEEN ? AND ?", start, end).Find(&monitors).Error; err != nil {
+	if err := panel.Orm.Where("created_at BETWEEN ? AND ?", start, end).Find(&monitors).Error; err != nil {
 		return nil, err
 	}
 
