@@ -3,10 +3,10 @@ package biz
 import (
 	"github.com/golang-module/carbon/v2"
 
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/api"
 )
 
-type Plugin struct {
+type App struct {
 	ID        uint            `gorm:"primaryKey" json:"id"`
 	Slug      string          `gorm:"not null;unique" json:"slug"`
 	Version   string          `gorm:"not null" json:"version"`
@@ -16,15 +16,17 @@ type Plugin struct {
 	UpdatedAt carbon.DateTime `json:"updated_at"`
 }
 
-type PluginRepo interface {
-	All() []*types.Plugin
-	Installed() ([]*Plugin, error)
-	Get(slug string) (*types.Plugin, error)
-	GetInstalled(slug string) (*Plugin, error)
-	GetInstalledAll(cond ...string) ([]*Plugin, error)
-	IsInstalled(cond ...string) (bool, error)
+type AppRepo interface {
+	All() api.Apps
+	Get(slug string) (*api.App, error)
+	Installed() ([]*App, error)
+	GetInstalled(slug string) (*App, error)
+	GetInstalledAll(query string, cond ...string) ([]*App, error)
+	GetHomeShow() ([]map[string]string, error)
+	IsInstalled(query string, cond ...string) (bool, error)
 	Install(slug string) error
 	Uninstall(slug string) error
 	Update(slug string) error
 	UpdateShow(slug string, show bool) error
+	UpdateCache() error
 }

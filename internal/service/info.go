@@ -21,7 +21,7 @@ import (
 type InfoService struct {
 	taskRepo    biz.TaskRepo
 	websiteRepo biz.WebsiteRepo
-	pluginRepo  biz.PluginRepo
+	appRepo     biz.AppRepo
 	settingRepo biz.SettingRepo
 	cronRepo    biz.CronRepo
 }
@@ -30,7 +30,7 @@ func NewInfoService() *InfoService {
 	return &InfoService{
 		taskRepo:    data.NewTaskRepo(),
 		websiteRepo: data.NewWebsiteRepo(),
-		pluginRepo:  data.NewPluginRepo(),
+		appRepo:     data.NewAppRepo(),
 		settingRepo: data.NewSettingRepo(),
 		cronRepo:    data.NewCronRepo(),
 	}
@@ -65,7 +65,13 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/homePlugins [get]
 func (s *InfoService) HomePlugins(w http.ResponseWriter, r *http.Request) {
-	Success(w, nil)
+	apps, err := s.appRepo.GetHomeShow()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "获取首页插件失败")
+		return
+	}
+
+	Success(w, apps)
 }
 
 // NowMonitor
@@ -113,8 +119,8 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mysqlInstalled, _ := s.pluginRepo.IsInstalled("slug like ?", "mysql%")
-	postgresqlInstalled, _ := s.pluginRepo.IsInstalled("slug like ?", "postgresql%")
+	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
+	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
 
 	type database struct {
 		Name string `json:"name"`
@@ -180,7 +186,7 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var ftpCount int64
-	ftpInstalled, _ := s.pluginRepo.IsInstalled("slug = ?", "pureftpd")
+	ftpInstalled, _ := s.appRepo.IsInstalled("slug = ?", "pureftpd")
 	if ftpInstalled {
 		listRaw, err := shell.Execf("pure-pw list")
 		if len(listRaw) != 0 && err == nil {
@@ -211,9 +217,9 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	SuccessResponse
 //	@Router		/info/installedDbAndPhp [get]
 func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) {
-	mysqlInstalled, _ := s.pluginRepo.IsInstalled("slug like ?", "mysql%")
-	postgresqlInstalled, _ := s.pluginRepo.IsInstalled("slug like ?", "postgresql%")
-	php, _ := s.pluginRepo.GetInstalledAll("slug like ?", "php%")
+	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
+	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
+	php, _ := s.appRepo.GetInstalledAll("slug like ?", "php%")
 
 	var phpData []types.LV
 	var dbData []types.LV
@@ -226,7 +232,7 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		plugin, _ := s.pluginRepo.Get(p.Slug)
+		plugin, _ := s.appRepo.Get(p.Slug)
 		phpData = append(phpData, types.LV{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: plugin.Name})
 	}
 

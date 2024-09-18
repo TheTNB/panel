@@ -3,6 +3,7 @@ package bootstrap
 import (
 	"fmt"
 
+	"github.com/golang-module/carbon/v2"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -21,4 +22,10 @@ func initGlobal() {
 	panel.Root = panel.Conf.MustString("app.root")
 	panel.Version = panel.Conf.MustString("app.version")
 	panel.Locale = panel.Conf.MustString("app.locale")
+	carbon.SetDefault(carbon.Default{
+		Layout:       carbon.DateTimeLayout,
+		Timezone:     carbon.PRC,
+		WeekStartsAt: carbon.Sunday,
+		Locale:       "zh-CN",
+	})
 }

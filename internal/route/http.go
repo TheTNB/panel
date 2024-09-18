@@ -113,15 +113,16 @@ func Http(r chi.Router) {
 			})
 		})
 
-		r.Route("/plugin", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
-			plugin := service.NewPluginService()
-			r.Get("/list", plugin.List)
-			r.Post("/install", plugin.Install)
-			r.Post("/uninstall", plugin.Uninstall)
-			r.Post("/update", plugin.Update)
-			r.Post("/updateShow", plugin.UpdateShow)
-			r.Get("/isInstalled", plugin.IsInstalled)
+		r.Route("/app", func(r chi.Router) {
+			//r.Use(middleware.MustLogin)
+			app := service.NewAppService()
+			r.Get("/list", app.List)
+			r.Post("/install", app.Install)
+			r.Post("/uninstall", app.Uninstall)
+			r.Post("/update", app.Update)
+			r.Post("/updateShow", app.UpdateShow)
+			r.Get("/isInstalled", app.IsInstalled)
+			r.Get("/updateCache", app.UpdateCache)
 		})
 
 		r.Route("/cron", func(r chi.Router) {
@@ -263,11 +264,16 @@ func Http(r chi.Router) {
 			r.Post("/start", systemctl.Start)
 			r.Post("/stop", systemctl.Stop)
 		})
-
 	})
 
 	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
+		// /api 开头的返回 404
+		if request.URL.Path[:4] == "/api" {
+			http.NotFound(writer, request)
+			return
+		}
+		// 其他返回前端页面
 		frontend, _ := fs.Sub(embed.PublicFS, "frontend")
 		spaHandler := func(fs http.FileSystem) http.HandlerFunc {
 			fileServer := http.FileServer(fs)

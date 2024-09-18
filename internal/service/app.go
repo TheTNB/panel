@@ -8,26 +8,27 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
-type PluginService struct {
-	pluginRepo biz.PluginRepo
+type AppService struct {
+	appRepo biz.AppRepo
 }
 
-func NewPluginService() *PluginService {
-	return &PluginService{
-		pluginRepo: data.NewPluginRepo(),
+func NewAppService() *AppService {
+	return &AppService{
+		appRepo: data.NewAppRepo(),
 	}
 }
 
-func (s *PluginService) List(w http.ResponseWriter, r *http.Request) {
-	plugins := s.pluginRepo.All()
-	installedPlugins, err := s.pluginRepo.Installed()
+func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
+	plugins := s.appRepo.All()
+	installedPlugins, err := s.appRepo.Installed()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	installedPluginsMap := make(map[string]*biz.Plugin)
+	installedPluginsMap := make(map[string]*biz.App)
 
 	for _, p := range installedPlugins {
 		installedPluginsMap[p.Slug] = p
@@ -47,7 +48,10 @@ func (s *PluginService) List(w http.ResponseWriter, r *http.Request) {
 
 	var pluginArr []plugin
 	for _, item := range plugins {
-		installed, installedVersion, show := false, "", false
+		installed, installedVersion, currentVersion, show := false, "", "", false
+		if str.FirstElement(item.Versions) != nil {
+			currentVersion = str.FirstElement(item.Versions).Version
+		}
 		if _, ok := installedPluginsMap[item.Slug]; ok {
 			installed = true
 			installedVersion = installedPluginsMap[item.Slug].Version
@@ -57,7 +61,7 @@ func (s *PluginService) List(w http.ResponseWriter, r *http.Request) {
 			Name:             item.Name,
 			Description:      item.Description,
 			Slug:             item.Slug,
-			Version:          item.Version,
+			Version:          currentVersion,
 			Requires:         item.Requires,
 			Excludes:         item.Excludes,
 			Installed:        installed,
@@ -74,14 +78,14 @@ func (s *PluginService) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *PluginService) Install(w http.ResponseWriter, r *http.Request) {
+func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PluginSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.pluginRepo.Install(req.Slug); err != nil {
+	if err = s.appRepo.Install(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -89,14 +93,14 @@ func (s *PluginService) Install(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *PluginService) Uninstall(w http.ResponseWriter, r *http.Request) {
+func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PluginSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.pluginRepo.Uninstall(req.Slug); err != nil {
+	if err = s.appRepo.Uninstall(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -104,14 +108,14 @@ func (s *PluginService) Uninstall(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *PluginService) Update(w http.ResponseWriter, r *http.Request) {
+func (s *AppService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PluginSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.pluginRepo.Update(req.Slug); err != nil {
+	if err = s.appRepo.Update(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -119,14 +123,14 @@ func (s *PluginService) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *PluginService) UpdateShow(w http.ResponseWriter, r *http.Request) {
+func (s *AppService) UpdateShow(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PluginUpdateShow](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.pluginRepo.UpdateShow(req.Slug, req.Show); err != nil {
+	if err = s.appRepo.UpdateShow(req.Slug, req.Show); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -134,20 +138,20 @@ func (s *PluginService) UpdateShow(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *PluginService) IsInstalled(w http.ResponseWriter, r *http.Request) {
+func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PluginSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	plugin, err := s.pluginRepo.Get(req.Slug)
+	plugin, err := s.appRepo.Get(req.Slug)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	installed, err := s.pluginRepo.IsInstalled(req.Slug)
+	installed, err := s.appRepo.IsInstalled(req.Slug)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -157,4 +161,13 @@ func (s *PluginService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 		"name":      plugin.Name,
 		"installed": installed,
 	})
+}
+
+func (s *AppService) UpdateCache(w http.ResponseWriter, r *http.Request) {
+	if err := s.appRepo.UpdateCache(); err != nil {
+		Error(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	Success(w, nil)
 }
