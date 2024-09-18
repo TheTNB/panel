@@ -24,7 +24,7 @@ func RandomNumber(length int) string {
 	b := make([]byte, length)
 	n, err := io.ReadAtLeast(rand.Reader, b, length)
 	if n != length {
-		panic(err)
+		panic(fmt.Sprintf("failed to generate random number: %v", err))
 	}
 	for i := 0; i < len(b); i++ {
 		b[i] = table[int(b[i])%len(table)]
@@ -37,7 +37,7 @@ func RandomString(length int) string {
 	b := make([]byte, length)
 	_, err := rand.Read(b)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("failed to generate random string: %v", err))
 	}
 	letters := "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	for i, v := range b {
