@@ -3,7 +3,7 @@ package biz
 import (
 	"github.com/golang-module/carbon/v2"
 
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/api"
 )
 
 type App struct {
@@ -17,9 +17,9 @@ type App struct {
 }
 
 type AppRepo interface {
-	All() []*types.App
+	All() api.Apps
+	Get(slug string) (*api.App, error)
 	Installed() ([]*App, error)
-	Get(slug string) (*types.App, error)
 	GetInstalled(slug string) (*App, error)
 	GetInstalledAll(cond ...string) ([]*App, error)
 	IsInstalled(cond ...string) (bool, error)
@@ -27,4 +27,5 @@ type AppRepo interface {
 	Uninstall(slug string) error
 	Update(slug string) error
 	UpdateShow(slug string, show bool) error
+	UpdateCache() error
 }

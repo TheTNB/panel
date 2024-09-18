@@ -2,9 +2,10 @@ package data
 
 import (
 	"errors"
+	"gorm.io/gorm"
+
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/panel"
-	"gorm.io/gorm"
 )
 
 type cacheRepo struct{}
@@ -30,7 +31,7 @@ func (r *cacheRepo) Get(key biz.CacheKey, defaultValue ...string) (string, error
 
 func (r *cacheRepo) Set(key biz.CacheKey, value string) error {
 	cache := new(biz.Cache)
-	if err := panel.Orm.Where("key = ?", key).FirstOrInit(cache).Error; err != nil {
+	if err := panel.Orm.Where(biz.Cache{Key: key}).FirstOrInit(cache).Error; err != nil {
 		return err
 	}
 

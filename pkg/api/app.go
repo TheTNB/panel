@@ -16,14 +16,16 @@ type App struct {
 	Requires    []string  `json:"requires"`
 	Excludes    []string  `json:"excludes"`
 	Versions    []struct {
-		Url          string `json:"url"`
-		Checksum     string `json:"checksum"`
+		Version      string `json:"version"`
+		Install      string `json:"install"`
+		Uninstall    string `json:"uninstall"`
+		Update       string `json:"update"`
 		PanelVersion string `json:"panel_version"`
 	} `json:"versions"`
 	Order int `json:"order"`
 }
 
-type Apps []App
+type Apps []*App
 
 // Apps 返回所有应用
 func (r *API) Apps() (*Apps, error) {

@@ -10,12 +10,12 @@ import (
 	"unicode/utf8"
 )
 
-// FirstElement 安全地获取 args[0]，避免 panic: runtime error: index out of range
-func FirstElement(args []string) string {
+// FirstElement 返回切片的第一个元素
+func FirstElement[T any](args []T) *T {
 	if len(args) > 0 {
-		return args[0]
+		return &args[0]
 	}
-	return ""
+	return nil
 }
 
 // RandomNumber 生成长度为 length 随机数字字符串

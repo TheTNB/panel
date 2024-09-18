@@ -2,9 +2,7 @@
 package apploader
 
 import (
-	"cmp"
 	"fmt"
-	"slices"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
@@ -35,9 +33,9 @@ func All() []*types.App {
 	})
 
 	// 排序
-	slices.SortFunc(list, func(a, b *types.App) int {
+	/*slices.SortFunc(list, func(a, b *types.App) int {
 		return cmp.Compare(a.Order, b.Order)
-	})
+	})*/
 
 	return list
 }

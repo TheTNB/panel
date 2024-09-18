@@ -114,7 +114,7 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/app", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
+			//r.Use(middleware.MustLogin)
 			app := service.NewAppService()
 			r.Get("/list", app.List)
 			r.Post("/install", app.Install)
@@ -122,6 +122,7 @@ func Http(r chi.Router) {
 			r.Post("/update", app.Update)
 			r.Post("/updateShow", app.UpdateShow)
 			r.Get("/isInstalled", app.IsInstalled)
+			r.Get("/updateCache", app.UpdateCache)
 		})
 
 		r.Route("/cron", func(r chi.Router) {

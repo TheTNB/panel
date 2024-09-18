@@ -12,6 +12,7 @@ func init() {
 		ID: "20240812-init",
 		Migrate: func(tx *gorm.DB) error {
 			return tx.AutoMigrate(
+				&biz.Cache{},
 				&biz.Cert{},
 				&biz.CertDNS{},
 				&biz.CertAccount{},

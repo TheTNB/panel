@@ -2,10 +2,12 @@ package data
 
 import (
 	"errors"
+
+	"gorm.io/gorm"
+
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/internal/panel"
-	"gorm.io/gorm"
 )
 
 type settingRepo struct{}

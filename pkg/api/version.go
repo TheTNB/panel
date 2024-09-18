@@ -3,8 +3,6 @@ package api
 import (
 	"fmt"
 	"time"
-
-	"github.com/TheTNB/panel/internal/panel"
 )
 
 type Version struct {
@@ -37,7 +35,7 @@ func (r *API) LatestVersion() (*Version, error) {
 // IntermediateVersions 返回当前版本之后的所有版本
 func (r *API) IntermediateVersions() (*Versions, error) {
 	resp, err := r.client.R().
-		SetQueryParam("start", panel.Version).
+		SetQueryParam("start", r.panelVersion).
 		SetResult(&Response{}).Get("/versions/intermediate")
 	if err != nil {
 		return nil, err
