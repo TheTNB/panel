@@ -14,28 +14,28 @@ import (
 
 var plugins sync.Map
 
-func Register(plugin *types.Plugin) {
+func Register(plugin *types.App) {
 	plugins.Store(plugin.Slug, plugin)
 }
 
-func Get(slug string) (*types.Plugin, error) {
+func Get(slug string) (*types.App, error) {
 	if plugin, ok := plugins.Load(slug); ok {
-		return plugin.(*types.Plugin), nil
+		return plugin.(*types.App), nil
 	}
 	return nil, fmt.Errorf("plugin %s not found", slug)
 }
 
-func All() []*types.Plugin {
-	var list []*types.Plugin
+func All() []*types.App {
+	var list []*types.App
 	plugins.Range(func(_, plugin any) bool {
-		if p, ok := plugin.(*types.Plugin); ok {
+		if p, ok := plugin.(*types.App); ok {
 			list = append(list, p)
 		}
 		return true
 	})
 
 	// 排序
-	slices.SortFunc(list, func(a, b *types.Plugin) int {
+	slices.SortFunc(list, func(a, b *types.App) int {
 		return cmp.Compare(a.Order, b.Order)
 	})
 
@@ -44,7 +44,7 @@ func All() []*types.Plugin {
 
 func Boot(r chi.Router) {
 	plugins.Range(func(_, plugin any) bool {
-		if p, ok := plugin.(*types.Plugin); ok {
+		if p, ok := plugin.(*types.App); ok {
 			r.Route(fmt.Sprintf("/api/plugins/%s", p.Slug), p.Route)
 		}
 		return true

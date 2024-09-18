@@ -1,32 +1,49 @@
 package data
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/apploader"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type pluginRepo struct {
-	taskRepo biz.TaskRepo
+type appRepo struct {
+	cacheRepo biz.CacheRepo
+	taskRepo  biz.TaskRepo
+	api       *api.API
 }
 
-func NewPluginRepo() biz.PluginRepo {
-	return &pluginRepo{
-		taskRepo: NewTaskRepo(),
+func NewAppRepo() biz.AppRepo {
+	return &appRepo{
+		cacheRepo: NewCacheRepo(),
+		taskRepo:  NewTaskRepo(),
 	}
 }
 
-func (r *pluginRepo) All() []*types.Plugin {
+func (r *appRepo) getCached() ([]*types.App, error) {
+	cached, err := r.cacheRepo.Get(biz.CacheKeyApps)
+	if err != nil {
+		return nil, err
+	}
+	var apps []*types.App
+	if err = json.Unmarshal([]byte(cached), &apps); err != nil {
+		return nil, err
+	}
+	return apps, nil
+}
+
+func (r *appRepo) All() []*types.App {
 	return apploader.All()
 }
 
-func (r *pluginRepo) Installed() ([]*biz.Plugin, error) {
-	var plugins []*biz.Plugin
+func (r *appRepo) Installed() ([]*biz.App, error) {
+	var plugins []*biz.App
 	if err := panel.Orm.Find(&plugins).Error; err != nil {
 		return nil, err
 	}
@@ -35,12 +52,12 @@ func (r *pluginRepo) Installed() ([]*biz.Plugin, error) {
 
 }
 
-func (r *pluginRepo) Get(slug string) (*types.Plugin, error) {
+func (r *appRepo) Get(slug string) (*types.App, error) {
 	return apploader.Get(slug)
 }
 
-func (r *pluginRepo) GetInstalled(slug string) (*biz.Plugin, error) {
-	plugin := new(biz.Plugin)
+func (r *appRepo) GetInstalled(slug string) (*biz.App, error) {
+	plugin := new(biz.App)
 	if err := panel.Orm.Where("slug = ?", slug).First(plugin).Error; err != nil {
 		return nil, err
 	}
@@ -48,8 +65,8 @@ func (r *pluginRepo) GetInstalled(slug string) (*biz.Plugin, error) {
 	return plugin, nil
 }
 
-func (r *pluginRepo) GetInstalledAll(cond ...string) ([]*biz.Plugin, error) {
-	var plugins []*biz.Plugin
+func (r *appRepo) GetInstalledAll(cond ...string) ([]*biz.App, error) {
+	var plugins []*biz.App
 	if err := panel.Orm.Where(cond).Find(&plugins).Error; err != nil {
 		return nil, err
 	}
@@ -57,16 +74,16 @@ func (r *pluginRepo) GetInstalledAll(cond ...string) ([]*biz.Plugin, error) {
 	return plugins, nil
 }
 
-func (r *pluginRepo) IsInstalled(cond ...string) (bool, error) {
+func (r *appRepo) IsInstalled(cond ...string) (bool, error) {
 	var count int64
-	if err := panel.Orm.Model(&biz.Plugin{}).Where(cond).Count(&count).Error; err != nil {
+	if err := panel.Orm.Model(&biz.App{}).Where(cond).Count(&count).Error; err != nil {
 		return false, err
 	}
 
 	return count > 0, nil
 }
 
-func (r *pluginRepo) Install(slug string) error {
+func (r *appRepo) Install(slug string) error {
 	plugin, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -116,7 +133,7 @@ func (r *pluginRepo) Install(slug string) error {
 	return err
 }
 
-func (r *pluginRepo) Uninstall(slug string) error {
+func (r *appRepo) Uninstall(slug string) error {
 	plugin, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -165,7 +182,7 @@ func (r *pluginRepo) Uninstall(slug string) error {
 	return err
 }
 
-func (r *pluginRepo) Update(slug string) error {
+func (r *appRepo) Update(slug string) error {
 	plugin, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -214,7 +231,7 @@ func (r *pluginRepo) Update(slug string) error {
 	return err
 }
 
-func (r *pluginRepo) UpdateShow(slug string, show bool) error {
+func (r *appRepo) UpdateShow(slug string, show bool) error {
 	plugin, err := r.GetInstalled(slug)
 	if err != nil {
 		return err

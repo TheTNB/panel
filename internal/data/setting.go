@@ -1,9 +1,11 @@
 package data
 
 import (
+	"errors"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/internal/panel"
+	"gorm.io/gorm"
 )
 
 type settingRepo struct{}
@@ -15,7 +17,9 @@ func NewSettingRepo() biz.SettingRepo {
 func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, error) {
 	setting := new(biz.Setting)
 	if err := panel.Orm.Where("key = ?", key).First(setting).Error; err != nil {
-		return "", err
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", err
+		}
 	}
 
 	if setting.Value == "" && len(defaultValue) > 0 {
@@ -27,7 +31,7 @@ func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, e
 
 func (r *settingRepo) Set(key biz.SettingKey, value string) error {
 	setting := new(biz.Setting)
-	if err := panel.Orm.Where("key = ?", key).First(setting).Error; err != nil {
+	if err := panel.Orm.Where("key = ?", key).FirstOrInit(setting).Error; err != nil {
 		return err
 	}
 

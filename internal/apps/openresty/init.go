@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	apploader.Register(&types.Plugin{
+	apploader.Register(&types.App{
 		Order:       -100,
 		Slug:        "openresty",
 		Name:        "OpenResty",

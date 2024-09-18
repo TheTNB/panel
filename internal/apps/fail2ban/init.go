@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	apploader.Register(&types.Plugin{
+	apploader.Register(&types.App{
 		Slug:        "fail2ban",
 		Name:        "Fail2ban",
 		Description: "Fail2ban 扫描系统日志文件并从中找出多次尝试失败的IP地址，将该IP地址加入防火墙的拒绝访问列表中",

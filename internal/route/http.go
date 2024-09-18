@@ -113,15 +113,15 @@ func Http(r chi.Router) {
 			})
 		})
 
-		r.Route("/plugin", func(r chi.Router) {
+		r.Route("/app", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
-			plugin := service.NewPluginService()
-			r.Get("/list", plugin.List)
-			r.Post("/install", plugin.Install)
-			r.Post("/uninstall", plugin.Uninstall)
-			r.Post("/update", plugin.Update)
-			r.Post("/updateShow", plugin.UpdateShow)
-			r.Get("/isInstalled", plugin.IsInstalled)
+			app := service.NewAppService()
+			r.Get("/list", app.List)
+			r.Post("/install", app.Install)
+			r.Post("/uninstall", app.Uninstall)
+			r.Post("/update", app.Update)
+			r.Post("/updateShow", app.UpdateShow)
+			r.Get("/isInstalled", app.IsInstalled)
 		})
 
 		r.Route("/cron", func(r chi.Router) {

@@ -2,8 +2,8 @@ package types
 
 import "github.com/go-chi/chi/v5"
 
-// Plugin 插件元数据结构
-type Plugin struct {
+// App 应用元数据结构
+type App struct {
 	Order       int                `json:"-"`           // 排序
 	Slug        string             `json:"slug"`        // 插件标识
 	Name        string             `json:"name"`        // 插件名称

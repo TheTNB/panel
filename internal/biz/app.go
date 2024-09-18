@@ -6,7 +6,7 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Plugin struct {
+type App struct {
 	ID        uint            `gorm:"primaryKey" json:"id"`
 	Slug      string          `gorm:"not null;unique" json:"slug"`
 	Version   string          `gorm:"not null" json:"version"`
@@ -16,12 +16,12 @@ type Plugin struct {
 	UpdatedAt carbon.DateTime `json:"updated_at"`
 }
 
-type PluginRepo interface {
-	All() []*types.Plugin
-	Installed() ([]*Plugin, error)
-	Get(slug string) (*types.Plugin, error)
-	GetInstalled(slug string) (*Plugin, error)
-	GetInstalledAll(cond ...string) ([]*Plugin, error)
+type AppRepo interface {
+	All() []*types.App
+	Installed() ([]*App, error)
+	Get(slug string) (*types.App, error)
+	GetInstalled(slug string) (*App, error)
+	GetInstalledAll(cond ...string) ([]*App, error)
 	IsInstalled(cond ...string) (bool, error)
 	Install(slug string) error
 	Uninstall(slug string) error
