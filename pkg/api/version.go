@@ -16,8 +16,8 @@ type Version struct {
 
 type Versions []Version
 
-// GetLatestVersion 返回最新版本
-func (r *API) GetLatestVersion() (*Version, error) {
+// LatestVersion 返回最新版本
+func (r *API) LatestVersion() (*Version, error) {
 	resp, err := r.client.R().SetResult(&Response{}).Get("/versions/latest")
 	if err != nil {
 		return nil, err
@@ -34,16 +34,16 @@ func (r *API) GetLatestVersion() (*Version, error) {
 	return version, nil
 }
 
-// GetIntermediateVersions 返回当前版本之后的所有版本
-func (r *API) GetIntermediateVersions() (*Versions, error) {
+// IntermediateVersions 返回当前版本之后的所有版本
+func (r *API) IntermediateVersions() (*Versions, error) {
 	resp, err := r.client.R().
 		SetQueryParam("start", panel.Version).
-		SetResult(&Response{}).Get("/versions/log")
+		SetResult(&Response{}).Get("/versions/intermediate")
 	if err != nil {
 		return nil, err
 	}
 	if !resp.IsSuccess() {
-		return nil, fmt.Errorf("failed to get latest version: %s", resp.String())
+		return nil, fmt.Errorf("failed to get intermediate versions: %s", resp.String())
 	}
 
 	versions, err := getResponseData[Versions](resp)

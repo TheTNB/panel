@@ -25,8 +25,8 @@ type App struct {
 
 type Apps []App
 
-// GetApps 返回所有应用
-func (r *API) GetApps() (*Apps, error) {
+// Apps 返回所有应用
+func (r *API) Apps() (*Apps, error) {
 	resp, err := r.client.R().SetResult(&Response{}).Get("/apps")
 	if err != nil {
 		return nil, err
@@ -41,4 +41,22 @@ func (r *API) GetApps() (*Apps, error) {
 	}
 
 	return apps, nil
+}
+
+// AppBySlug 根据slug返回应用
+func (r *API) AppBySlug(slug string) (*App, error) {
+	resp, err := r.client.R().SetResult(&Response{}).Get(fmt.Sprintf("/apps/%s", slug))
+	if err != nil {
+		return nil, err
+	}
+	if !resp.IsSuccess() {
+		return nil, fmt.Errorf("failed to get app: %s", resp.String())
+	}
+
+	app, err := getResponseData[App](resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
 }
