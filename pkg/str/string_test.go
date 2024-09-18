@@ -15,7 +15,7 @@ func TestStringHelperTestSuite(t *testing.T) {
 }
 
 func (s *StringHelperTestSuite) TestFirstElement() {
-	s.Equal("HaoZi", FirstElement([]string{"HaoZi"}))
+	s.Equal("HaoZi", *FirstElement([]string{"HaoZi"}))
 }
 
 func (s *StringHelperTestSuite) TestRandomNumber() {
