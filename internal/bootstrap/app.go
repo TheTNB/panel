@@ -4,7 +4,7 @@ import (
 	"runtime/debug"
 )
 
-func Boot() {
+func boot() {
 	debug.SetGCPercent(10)
 	debug.SetMemoryLimit(64 << 20)
 
@@ -12,10 +12,19 @@ func Boot() {
 	initGlobal()
 	initOrm()
 	runMigrate()
+}
+
+func BootWeb() {
+	boot()
 	initValidator()
 	initSession()
 	initQueue()
 	go initHttp()
 
 	select {}
+}
+
+func BootCli() {
+	boot()
+	initCli()
 }

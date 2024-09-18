@@ -30,5 +30,5 @@ import "github.com/TheTNB/panel/internal/bootstrap"
 
 // @BasePath	/api
 func main() {
-	bootstrap.Boot()
+	bootstrap.BootWeb()
 }

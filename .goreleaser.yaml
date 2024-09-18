@@ -1,9 +1,9 @@
 project_name: panel
 
 builds:
-  - id: panel
+  - id: web
     main: ./cmd/web
-    binary: panel
+    binary: web
     env:
       - CGO_ENABLED=0
     goos:
@@ -47,11 +47,8 @@ archives:
     strip_binary_directory: true
     files:
       - LICENSE
-      - docs/*
       - storage/*
-      - lang/*
-      - scripts/*
-      - panel-example.conf
+      - config/*
 
 gitlab_urls:
   api: https://git.haozi.net/api/v4/

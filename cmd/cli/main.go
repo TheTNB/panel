@@ -17,34 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-
-	"github.com/urfave/cli/v2"
+	"github.com/TheTNB/panel/internal/bootstrap"
 )
 
 func main() {
-	app := &cli.App{
-		Name:        "panel",
-		HelpName:    "耗子面板",
-		Usage:       "命令行工具",
-		UsageText:   "panel [global options] command [command options] [arguments...]",
-		HideVersion: true,
-		Commands: []*cli.Command{
-			{
-				Name:    "test",
-				Aliases: []string{"t"},
-				Usage:   "print a test message",
-				Action: func(c *cli.Context) error {
-					fmt.Println("Hello, World!")
-					return nil
-				},
-			},
-		},
-	}
-
-	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
-	}
+	bootstrap.BootCli()
 }
