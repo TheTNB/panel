@@ -40,7 +40,7 @@ jobs:
           GOOS: linux
           GOARCH: ${{ matrix.goarch }}
         run: |
-          go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }} ./cmd/app
+          go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }} ./cmd/web
           go build -ldflags '-s -w --extldflags "-static"' -o cli-${{ matrix.goarch }} ./cmd/cli
       - name: Compress ${{ matrix.goarch }}
         run: |

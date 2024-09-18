@@ -9,7 +9,7 @@ tmp_dir = "storage/temp"
 # Array of commands to run before each build
 pre_cmd = []
 # Just plain old shell command. You could use `make` as well.
-cmd = "go build -o storage/temp/main.exe ./cmd/app"
+cmd = "go build -o storage/temp/main.exe ./cmd/web"
 # Array of commands to run after ^C
 post_cmd = []
 # Binary file yields from `cmd`.

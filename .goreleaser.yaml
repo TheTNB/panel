@@ -2,7 +2,7 @@ project_name: panel
 
 builds:
   - id: panel
-    main: ./cmd/app
+    main: ./cmd/web
     binary: panel
     env:
       - CGO_ENABLED=0
