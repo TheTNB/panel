@@ -16,7 +16,7 @@ require (
 	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.9
 	github.com/go-rat/utils v1.0.3
-	github.com/go-resty/resty/v2 v2.15.0
+	github.com/go-resty/resty/v2 v2.15.1
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-module/carbon/v2 v2.3.12
 	github.com/gookit/color v1.5.4
