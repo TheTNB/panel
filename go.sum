@@ -120,8 +120,8 @@ github.com/go-rat/sessions v1.0.9 h1:zysrHceTFqyc0qUWn5giLGdbfr/DYHXvFECDBSyv9Gk
 github.com/go-rat/sessions v1.0.9/go.mod h1:Ray/GCbuhm4U9xpjFFSCfOTCEn91puEhAXX5creHE9g=
 github.com/go-rat/utils v1.0.3 h1:SqH/O0KYq4SBv8naSAjJA4hC45/d8NLNrTCONfqjbFM=
 github.com/go-rat/utils v1.0.3/go.mod h1:4WNPlrF57KmeGZN3HOeBgdBVLJL3xgba4QRP/t6pKrE=
-github.com/go-resty/resty/v2 v2.15.1 h1:vuna8FM2EaQ6IYbtjh+Gjh00uu7xEWuuGyTKeIaYkvE=
-github.com/go-resty/resty/v2 v2.15.1/go.mod h1:0fHAoK7JoBy/Ch36N8VFeMsK7xQOHhvWaC3iOktwmIU=
+github.com/go-resty/resty/v2 v2.15.2 h1:wLGqKU9l9tOIa2RyePoyu4ZUnDkUWfp2LZ0u6fMXExc=
+github.com/go-resty/resty/v2 v2.15.2/go.mod h1:0fHAoK7JoBy/Ch36N8VFeMsK7xQOHhvWaC3iOktwmIU=
 github.com/go-sql-driver/mysql v1.8.1 h1:LedoTUt/eveggdHS9qUFC1EFSa8bU2+1pZjSRpvNJ1Y=
 github.com/go-sql-driver/mysql v1.8.1/go.mod h1:wEBSXgmK//2ZFJyE+qWnIsVGmvmEKlqwuVSjsCm7DZg=
 github.com/go-viper/mapstructure/v2 v2.0.0 h1:dhn8MZ1gZ0mzeodTG3jt5Vj/o87xZKuNAprG2mQfMfc=
