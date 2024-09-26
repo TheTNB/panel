@@ -104,7 +104,7 @@ importers:
         version: 9.28.0(eslint@8.57.1)
       naive-ui:
         specifier: ^2.39.0
-        version: 2.40.0(vue@3.5.8(typescript@5.6.2))
+        version: 2.40.1(vue@3.5.8(typescript@5.6.2))
       npm-run-all2:
         specifier: ^6.2.3
         version: 6.2.3
@@ -1731,8 +1731,8 @@ packages:
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
 
-  naive-ui@2.40.0:
-    resolution: {integrity: sha512-ym/1+HBL1oU4DR2JLKH3KQpfslt2jrKI6uqEkIdEcgz88F2Ec2xXew8RR/Fd9Gx7Cj4jTAvipnOElEgyrPf3bQ==}
+  naive-ui@2.40.1:
+    resolution: {integrity: sha512-3NkL+vLRQZKQxCHXa+7xiD6oM74OrQELaehDkGYRYpr6kjT+JJB+Z7h+5LC70gn8VkbgCAETv0+uRWF+6MLlgQ==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -3966,7 +3966,7 @@ snapshots:
 
   muggle-string@0.4.1: {}
 
-  naive-ui@2.40.0(vue@3.5.8(typescript@5.6.2)):
+  naive-ui@2.40.1(vue@3.5.8(typescript@5.6.2)):
     dependencies:
       '@css-render/plugin-bem': 0.15.14(css-render@0.15.14)
       '@css-render/vue3-ssr': 0.15.14(vue@3.5.8(typescript@5.6.2))
