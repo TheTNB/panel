@@ -130,7 +130,9 @@ func (r *Firewall) Port(port FireInfo, operation string) error {
 	if err != nil {
 		return fmt.Errorf("%s port %d/%s failed, err: %s", operation, port.Port, port.Protocol, stdout)
 	}
-	return systemctl.Reload("firewalld")
+
+	_, err = shell.Execf("firewall-cmd --reload")
+	return err
 }
 
 func (r *Firewall) RichRules(rule FireInfo, operation string) error {
@@ -156,7 +158,8 @@ func (r *Firewall) RichRules(rule FireInfo, operation string) error {
 		}
 	}
 
-	return systemctl.Reload("firewalld")
+	_, err := shell.Execf("firewall-cmd --reload")
+	return err
 }
 
 func (r *Firewall) PortForward(info Forward, operation string) error {
@@ -178,7 +181,8 @@ func (r *Firewall) PortForward(info Forward, operation string) error {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, out)
 	}
 
-	return systemctl.Reload("firewalld")
+	_, err = shell.Execf("firewall-cmd --reload")
+	return err
 }
 
 func (r *Firewall) parseRichRule(line string) (*FireInfo, error) {
@@ -208,10 +212,11 @@ func (r *Firewall) enableForward() error {
 				return fmt.Errorf("%s: %s", err, out)
 			}
 
-			return systemctl.Reload("firewalld")
+			_, err = shell.Execf("firewall-cmd --reload")
+			return err
 		}
 
-		return fmt.Errorf("%s: %s", err, out)
+		return fmt.Errorf("%v: %s", err, out)
 	}
 
 	return nil
