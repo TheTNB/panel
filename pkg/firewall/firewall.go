@@ -13,6 +13,13 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
+type Operation string
+
+var (
+	OperationAdd Operation = "add"
+	OperationDel Operation = "remove"
+)
+
 type Firewall struct {
 	forwardListRegex *regexp.Regexp
 	richRuleRegex    *regexp.Regexp
@@ -125,7 +132,7 @@ func (r *Firewall) ListRichRule() ([]FireInfo, error) {
 	return data, nil
 }
 
-func (r *Firewall) Port(port FireInfo, operation string) error {
+func (r *Firewall) Port(port FireInfo, operation Operation) error {
 	stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d/%s --permanent", operation, port.Port, port.Protocol)
 	if err != nil {
 		return fmt.Errorf("%s port %d/%s failed, err: %s", operation, port.Port, port.Protocol, stdout)
@@ -135,7 +142,7 @@ func (r *Firewall) Port(port FireInfo, operation string) error {
 	return err
 }
 
-func (r *Firewall) RichRules(rule FireInfo, operation string) error {
+func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 	families := strings.Split(rule.Family, "/") // ipv4 ipv6
 
 	for _, family := range families {
@@ -162,7 +169,7 @@ func (r *Firewall) RichRules(rule FireInfo, operation string) error {
 	return err
 }
 
-func (r *Firewall) PortForward(info Forward, operation string) error {
+func (r *Firewall) PortForward(info Forward, operation Operation) error {
 	if err := r.enableForward(); err != nil {
 		return err
 	}

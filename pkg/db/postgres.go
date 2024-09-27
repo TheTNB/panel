@@ -17,10 +17,11 @@ type Postgres struct {
 	username string
 	password string
 	address  string
+	hbaFile  string
 	port     uint
 }
 
-func NewPostgres(username, password, address string, port uint) (*Postgres, error) {
+func NewPostgres(username, password, address, hbaFile string, port uint) (*Postgres, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable", address, port, username, password)
 	if password == "" {
 		dsn = fmt.Sprintf("host=%s port=%d user=%s dbname=postgres sslmode=disable", address, port, username)
@@ -37,6 +38,7 @@ func NewPostgres(username, password, address string, port uint) (*Postgres, erro
 		username: username,
 		password: password,
 		address:  address,
+		hbaFile:  hbaFile,
 		port:     port,
 	}, nil
 }
@@ -90,7 +92,7 @@ func (m *Postgres) UserDrop(user string) error {
 		return err
 	}
 
-	_, _ = shell.Execf(`sed -i '/%s/d' /www/server/postgresql/data/pg_hba.conf`, user)
+	_, _ = shell.Execf(`sed -i '/%s/d' %s`, user, m.hbaFile)
 	return systemctl.Reload("postgresql")
 }
 
@@ -117,7 +119,7 @@ func (m *Postgres) PrivilegesRevoke(user, database string) error {
 
 func (m *Postgres) HostAdd(database, user, host string) error {
 	config := fmt.Sprintf("host    %s    %s    %s    scram-sha-256", database, user, host)
-	if err := io.WriteAppend("/www/server/postgresql/data/pg_hba.conf", config); err != nil {
+	if err := io.WriteAppend(m.hbaFile, config); err != nil {
 		return err
 	}
 
@@ -126,7 +128,7 @@ func (m *Postgres) HostAdd(database, user, host string) error {
 
 func (m *Postgres) HostRemove(database, user, host string) error {
 	regex := fmt.Sprintf(`host\s+%s\s+%s\s+%s`, database, user, host)
-	if _, err := shell.Execf(`sed -i '/%s/d' /www/server/postgresql/data/pg_hba.conf`, regex); err != nil {
+	if _, err := shell.Execf(`sed -i '/%s/d' %s`, regex, m.hbaFile); err != nil {
 		return err
 	}
 

@@ -127,7 +127,7 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	var databaseCount int64
 	if mysqlInstalled {
-		rootPassword, _ := s.settingRepo.Get(biz.SettingKeyMysqlRootPassword)
+		rootPassword, _ := s.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock")
 		if err == nil {
 			defer mysql.Close()
@@ -157,7 +157,7 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if postgresqlInstalled {
-		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
+		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", panel.Root), 5432)
 		if err == nil {
 			defer postgres.Close()
 			if err = postgres.Ping(); err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -34,7 +35,7 @@ func NewService() *Service {
 //	@Success	200	{object}	h.SuccessResponse
 //	@Router		/plugins/openresty/config [get]
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read("/www/server/openresty/conf/nginx.conf")
+	config, err := io.Read(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", panel.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取配置失败")
 		return
@@ -58,7 +59,7 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusInternalServerError, "配置不能为空")
 	}
 
-	if err := io.Write("/www/server/openresty/conf/nginx.conf", config, 0644); err != nil {
+	if err := io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", panel.Root), config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, "保存配置失败")
 	}
 
@@ -79,11 +80,11 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	h.SuccessResponse
 //	@Router		/plugins/openresty/errorLog [get]
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	if !io.Exists("/www/wwwlogs/nginx_error.log") {
+	if !io.Exists(fmt.Sprintf("%s/wwwlogs/nginx_error.log", panel.Root)) {
 		service.Success(w, "")
 	}
 
-	out, err := shell.Execf("tail -n 100 /www/wwwlogs/openresty_error.log")
+	out, err := shell.Execf("tail -n 100 %s/%s", panel.Root, "/wwwlogs/openresty_error.log")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, out)
 	}
@@ -100,7 +101,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	h.SuccessResponse
 //	@Router		/plugins/openresty/clearErrorLog [post]
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > /www/wwwlogs/openresty_error.log"); err != nil {
+	if out, err := shell.Execf("echo '' > %s/%s", panel.Root, "/wwwlogs/openresty_error.log"); err != nil {
 		service.Error(w, http.StatusInternalServerError, out)
 	}
 

@@ -11,6 +11,7 @@ import (
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
@@ -127,7 +128,7 @@ maxretry = ` + jailMaxRetry + `
 findtime = ` + jailFindTime + `
 bantime = ` + jailBanTime + `
 action = %(action_mwl)s
-logpath = /www/wwwlogs/` + website.Name + `.log
+logpath = ` + panel.Root + `/wwwlogs/` + website.Name + `.log
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
@@ -170,13 +171,13 @@ ignoreregex =
 			filter = "sshd"
 			port, err = shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 		case "mysql":
-			logPath = "/www/server/mysql/mysql-error.log"
+			logPath = panel.Root + "/server/mysql/mysql-error.log"
 			filter = "mysqld-auth"
-			port, err = shell.Execf("cat /www/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'")
+			port, err = shell.Execf("cat %s/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'", panel.Root)
 		case "pure-ftpd":
 			logPath = "/var/log/messages"
 			filter = "pure-ftpd"
-			port, err = shell.Execf(`cat /www/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`)
+			port, err = shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, panel.Root)
 		default:
 			service.Error(w, http.StatusUnprocessableEntity, "未知服务")
 			return

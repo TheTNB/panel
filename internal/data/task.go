@@ -2,6 +2,7 @@ package data
 
 import (
 	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/panel"
 )
 
@@ -36,4 +37,13 @@ func (r *taskRepo) Delete(id uint) error {
 
 func (r *taskRepo) UpdateStatus(id uint, status biz.TaskStatus) error {
 	return panel.Orm.Model(&biz.Task{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (r *taskRepo) Push(task *biz.Task) error {
+	if err := panel.Orm.Create(task).Error; err != nil {
+		return err
+	}
+	return panel.Queue.Push(job.NewProcessTask(r), []any{
+		task.ID,
+	})
 }

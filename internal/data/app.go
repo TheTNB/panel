@@ -7,7 +7,6 @@ import (
 	"slices"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/apploader"
@@ -145,13 +144,9 @@ func (r *appRepo) Install(slug string) error {
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, app.Slug)
 	task.Log = "/tmp/" + app.Slug + ".log"
-
-	if err = panel.Orm.Create(task).Error; err != nil {
+	if err = r.taskRepo.Push(task); err != nil {
 		return err
 	}
-	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
-		task.ID,
-	})
 
 	return err
 }
@@ -189,13 +184,9 @@ func (r *appRepo) Uninstall(slug string) error {
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, app.Slug)
 	task.Log = "/tmp/" + app.Slug + ".log"
-
-	if err = panel.Orm.Create(task).Error; err != nil {
+	if err = r.taskRepo.Push(task); err != nil {
 		return err
 	}
-	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
-		task.ID,
-	})
 
 	return err
 }
@@ -230,13 +221,9 @@ func (r *appRepo) Update(slug string) error {
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, app.Slug)
 	task.Log = "/tmp/" + app.Slug + ".log"
-
-	if err = panel.Orm.Create(task).Error; err != nil {
+	if err = r.taskRepo.Push(task); err != nil {
 		return err
 	}
-	err = panel.Queue.Push(job.NewProcessTask(r.taskRepo), []any{
-		task.ID,
-	})
 
 	return err
 }

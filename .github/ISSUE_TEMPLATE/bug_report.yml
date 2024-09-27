@@ -104,8 +104,8 @@ body:
         Please copy and paste any relevant log output.
         可以把文件拖入这个区域以添加日志文件。
         Files can be dragged into this area to add log files.
-        面板日志文件可在 `/www/panel/storage/logs` 中找到。
-        Panel log files can be found in `/www/panel/storage/logs`.
+        面板日志文件可在安装目录 `panel/storage/logs` 中找到。
+        Panel log files can be found in the installation directory `panel/storage/logs`.
     validations:
       required: false
   - type: textarea

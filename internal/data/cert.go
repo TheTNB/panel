@@ -171,7 +171,7 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 					return nil, errors.New("通配符域名无法使用 HTTP 验证")
 				}
 			}
-			conf := fmt.Sprintf("/www/server/vhost/acme/%s.conf", cert.Website.Name)
+			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", panel.Root, cert.Website.Name)
 			client.UseHTTP(conf, cert.Website.Path)
 		}
 	}
