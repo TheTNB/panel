@@ -1,6 +1,6 @@
-package types
+package rsync
 
-type RsyncModule struct {
+type Module struct {
 	Name       string `json:"name"`
 	Path       string `json:"path"`
 	Comment    string `json:"comment"`

@@ -17,7 +17,6 @@ import (
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 type Service struct {
@@ -44,7 +43,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var jails []types.Fail2banJail
+	var jails []Jail
 	for i, jail := range jailList {
 		if i == 0 {
 			continue
@@ -61,7 +60,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 		jailFindTime := regexp.MustCompile(`findtime = (.*)`).FindStringSubmatch(jailRaw)
 		jailBanTime := regexp.MustCompile(`bantime = (.*)`).FindStringSubmatch(jailRaw)
 
-		jails = append(jails, types.Fail2banJail{
+		jails = append(jails, Jail{
 			Name:     jailName,
 			Enabled:  jailEnabled,
 			LogPath:  jailLogPath[1],

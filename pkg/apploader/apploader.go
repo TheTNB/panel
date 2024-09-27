@@ -13,6 +13,9 @@ import (
 var plugins sync.Map
 
 func Register(plugin *types.App) {
+	if _, ok := plugins.Load(plugin.Slug); ok {
+		panic(fmt.Sprintf("plugin %s already exists", plugin.Slug))
+	}
 	plugins.Store(plugin.Slug, plugin)
 }
 

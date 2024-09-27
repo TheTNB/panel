@@ -234,7 +234,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 
 	// ionCube 只支持 PHP 8.3 以下版本
 	if cast.ToUint(s.version) < 83 {
-		extensions = append(extensions, types.PHPExtension{
+		extensions = append(extensions, Extension{
 			Name:        "ionCube",
 			Slug:        "ionCube Loader",
 			Description: "ionCube 是一个专业级的 PHP 加密解密工具。",
@@ -248,7 +248,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	extensionMap := make(map[string]*types.PHPExtension)
+	extensionMap := make(map[string]*Extension)
 	for i := range extensions {
 		extensionMap[extensions[i].Slug] = &extensions[i]
 	}
@@ -345,8 +345,8 @@ func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) getExtensions() []types.PHPExtension {
-	extensions := []types.PHPExtension{
+func (s *Service) getExtensions() []Extension {
+	extensions := []Extension{
 		{
 			Name:        "fileinfo",
 			Slug:        "fileinfo",
@@ -476,7 +476,7 @@ func (s *Service) getExtensions() []types.PHPExtension {
 
 	// ionCube 只支持 PHP 8.3 以下版本
 	if cast.ToUint(s.version) < 83 {
-		extensions = append(extensions, types.PHPExtension{
+		extensions = append(extensions, Extension{
 			Name:        "ionCube",
 			Slug:        "ionCube Loader",
 			Description: "ionCube 是一个专业级的 PHP 加密解密工具。",
@@ -485,7 +485,7 @@ func (s *Service) getExtensions() []types.PHPExtension {
 	}
 
 	raw, _ := shell.Execf("%s/server/php/%d/bin/php -m", panel.Root, s.version)
-	extensionMap := make(map[string]*types.PHPExtension)
+	extensionMap := make(map[string]*Extension)
 	for i := range extensions {
 		extensionMap[extensions[i].Slug] = &extensions[i]
 	}

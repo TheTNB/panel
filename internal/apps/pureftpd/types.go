@@ -1,6 +1,6 @@
-package types
+package pureftpd
 
-type PureFtpdUser struct {
+type User struct {
 	Username string `json:"username"`
 	Path     string `json:"path"`
 }

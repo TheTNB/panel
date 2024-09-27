@@ -1,6 +1,6 @@
-package types
+package php
 
-type PHPExtension struct {
+type Extension struct {
 	Name        string `json:"name"`
 	Slug        string `json:"slug"`
 	Description string `json:"description"`

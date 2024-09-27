@@ -1,6 +1,6 @@
-package types
+package fail2ban
 
-type Fail2banJail struct {
+type Jail struct {
 	Name     string `json:"name"`
 	Enabled  bool   `json:"enabled"`
 	LogPath  string `json:"log_path"`
