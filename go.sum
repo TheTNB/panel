@@ -116,8 +116,8 @@ github.com/go-rat/gormstore v1.0.6 h1:YxmaY6n3JoTk6o9RXoZ1+cQ6HQL+ayf/6d8D76ydCA
 github.com/go-rat/gormstore v1.0.6/go.mod h1:xG/n+Du8baWf7ptiafiHLWBZWVXrYIPC42CsoEbfr4M=
 github.com/go-rat/securecookie v1.0.1 h1:HW0fpKmB+FjJzXTw8ABOwBJ+XrPmRBSZqHhmrv86lBo=
 github.com/go-rat/securecookie v1.0.1/go.mod h1:tP/ObWYyjmcpabQ7WTon/i2lBSip/Aolliw2llXuPDU=
-github.com/go-rat/sessions v1.0.9 h1:zysrHceTFqyc0qUWn5giLGdbfr/DYHXvFECDBSyv9Gk=
-github.com/go-rat/sessions v1.0.9/go.mod h1:Ray/GCbuhm4U9xpjFFSCfOTCEn91puEhAXX5creHE9g=
+github.com/go-rat/sessions v1.0.11 h1:2eTUvhEBtymrAtwv71LlGHNylz+Ad2SgY3jg/sSUboA=
+github.com/go-rat/sessions v1.0.11/go.mod h1:Ray/GCbuhm4U9xpjFFSCfOTCEn91puEhAXX5creHE9g=
 github.com/go-rat/utils v1.0.3 h1:SqH/O0KYq4SBv8naSAjJA4hC45/d8NLNrTCONfqjbFM=
 github.com/go-rat/utils v1.0.3/go.mod h1:4WNPlrF57KmeGZN3HOeBgdBVLJL3xgba4QRP/t6pKrE=
 github.com/go-resty/resty/v2 v2.15.3 h1:bqff+hcqAflpiF591hhJzNdkRsFhlB96CYfBwSFvql8=

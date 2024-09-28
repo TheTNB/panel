@@ -18,6 +18,7 @@ package main
 
 import (
 	"github.com/TheTNB/panel/internal/bootstrap"
+	_ "time/tzdata"
 )
 
 func main() {

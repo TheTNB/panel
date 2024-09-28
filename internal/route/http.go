@@ -3,6 +3,7 @@ package route
 import (
 	"io/fs"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -269,7 +270,7 @@ func Http(r chi.Router) {
 	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		// /api 开头的返回 404
-		if request.URL.Path[:4] == "/api" {
+		if strings.HasPrefix(request.URL.Path, "/api") {
 			http.NotFound(writer, request)
 			return
 		}

@@ -16,7 +16,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 package main
 
-import "github.com/TheTNB/panel/internal/bootstrap"
+import (
+	"github.com/TheTNB/panel/internal/bootstrap"
+	_ "time/tzdata"
+)
 
 //	@title			耗子面板 API
 //	@version		2

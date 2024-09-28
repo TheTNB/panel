@@ -30,7 +30,6 @@
     "echarts": "^5.5.1",
     "install": "^0.13.0",
     "lodash-es": "^4.17.21",
-    "monaco-editor-nginx": "^2.0.2",
     "pinia": "^2.2.2",
     "vue": "^3.5.5",
     "vue-echarts": "^7.0.3",
