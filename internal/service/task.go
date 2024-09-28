@@ -21,28 +21,12 @@ func NewTaskService() *TaskService {
 	}
 }
 
-// Status
-//
-//	@Summary	是否有任务正在运行
-//	@Tags		任务服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/tasks/status [get]
 func (s *TaskService) Status(w http.ResponseWriter, r *http.Request) {
 	Success(w, chix.M{
 		"task": s.taskRepo.HasRunningTask(),
 	})
 }
 
-// List
-//
-//	@Summary	任务列表
-//	@Tags		任务服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/tasks [get]
 func (s *TaskService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
@@ -62,14 +46,6 @@ func (s *TaskService) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Get
-//
-//	@Summary	任务详情
-//	@Tags		任务服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/task/log [get]
 func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -91,14 +67,6 @@ func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 	Success(w, task)
 }
 
-// Delete
-//
-//	@Summary	删除任务
-//	@Tags		任务服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/task/delete [post]
 func (s *TaskService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {

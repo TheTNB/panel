@@ -12,7 +12,6 @@ import (
 
 	"github.com/mholt/acmez/v2"
 	"github.com/mholt/acmez/v2/acme"
-	"go.uber.org/zap"
 
 	"github.com/TheTNB/panel/pkg/cert"
 )
@@ -117,16 +116,10 @@ func generatePrivateKey(keyType KeyType) (crypto.Signer, error) {
 }
 
 func getClient(CA string) (acmez.Client, error) {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		return acmez.Client{}, err
-	}
-
 	client := acmez.Client{
 		Client: &acme.Client{
 			Directory:  CA,
 			HTTPClient: http.DefaultClient,
-			Logger:     logger,
 		},
 	}
 

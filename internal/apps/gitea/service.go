@@ -16,14 +16,6 @@ func NewService() *Service {
 	return &Service{}
 }
 
-// GetConfig
-//
-//	@Summary		获取配置
-//	@Tags			应用-Gitea
-//	@Produce		json
-//	@Security		BearerToken
-//	@Success		200	{object}	controllers.SuccessResponse
-//	@Router			/plugins/gitea/config [get]
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/gitea/app.ini", panel.Root))
 	if err != nil {
@@ -34,15 +26,6 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-// UpdateConfig
-//
-//	@Summary		更新配置
-//	@Tags			应用-Gitea
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.UpdateConfig	true	"request"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/gitea/config [post]
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {

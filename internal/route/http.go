@@ -6,13 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5"
-	httpSwagger "github.com/swaggo/http-swagger/v2"
-
-	_ "github.com/TheTNB/panel/docs"
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/service"
+	"github.com/go-chi/chi/v5"
 )
 
 func Http(r chi.Router) {
@@ -267,7 +264,6 @@ func Http(r chi.Router) {
 		})
 	})
 
-	r.With(middleware.MustLogin).Mount("/swagger", httpSwagger.Handler())
 	r.NotFound(func(writer http.ResponseWriter, request *http.Request) {
 		// /api 开头的返回 404
 		if strings.HasPrefix(request.URL.Path, "/api") {

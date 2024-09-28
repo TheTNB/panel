@@ -22,15 +22,6 @@ func NewUserService() *UserService {
 	}
 }
 
-// Login
-//
-//	@Summary	登录
-//	@Tags		用户服务
-//	@Accept		json
-//	@Produce	json
-//	@Param		data	body		request.UserLogin	true	"request"
-//	@Success	200		{object}	SuccessResponse
-//	@Router		/user/login [post]
 func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 	sess, err := panel.Session.GetSession(r)
 	if err != nil {
@@ -54,14 +45,6 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// Logout
-//
-//	@Summary	登出
-//	@Tags		用户服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200		{object}	SuccessResponse
-//	@Router		/user/logout [post]
 func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
 	sess, err := panel.Session.GetSession(r)
 	if err == nil {
@@ -70,14 +53,6 @@ func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// IsLogin
-//
-//	@Summary	是否登录
-//	@Tags		用户服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200		{object}	SuccessResponse
-//	@Router		/user/isLogin [get]
 func (s *UserService) IsLogin(w http.ResponseWriter, r *http.Request) {
 	sess, err := panel.Session.GetSession(r)
 	if err != nil {
@@ -87,14 +62,6 @@ func (s *UserService) IsLogin(w http.ResponseWriter, r *http.Request) {
 	Success(w, sess.Has("user_id"))
 }
 
-// Info
-//
-//	@Summary	用户信息
-//	@Tags		用户服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200		{object}	SuccessResponse
-//	@Router		/user/info/{id} [get]
 func (s *UserService) Info(w http.ResponseWriter, r *http.Request) {
 	userID := cast.ToUint(r.Context().Value("user_id"))
 	if userID == 0 {

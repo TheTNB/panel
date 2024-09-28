@@ -21,13 +21,6 @@ func NewCertService() *CertService {
 	}
 }
 
-// CAProviders
-//
-//	@Summary		获取 CA 提供商
-//	@Tags			证书服务
-//	@Produce		json
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/cert/caProviders	[get]
 func (s *CertService) CAProviders(w http.ResponseWriter, r *http.Request) {
 	Success(w, []map[string]string{
 		{
@@ -54,13 +47,6 @@ func (s *CertService) CAProviders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// DNSProviders
-//
-//	@Summary		获取 DNS 提供商
-//	@Tags			证书服务
-//	@Produce		json
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/cert/dnsProviders	[get]
 func (s *CertService) DNSProviders(w http.ResponseWriter, r *http.Request) {
 	Success(w, []map[string]any{
 		{
@@ -83,13 +69,6 @@ func (s *CertService) DNSProviders(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Algorithms
-//
-//	@Summary		获取算法列表
-//	@Tags			证书服务
-//	@Produce		json
-//	@Success		200	{object}	SuccessResponse
-//	@Router			/cert/algorithms	[get]
 func (s *CertService) Algorithms(w http.ResponseWriter, r *http.Request) {
 	Success(w, []map[string]any{
 		{
@@ -112,13 +91,6 @@ func (s *CertService) Algorithms(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// List
-//
-//	@Summary		证书列表
-//	@Tags			证书服务
-//	@Produce		json
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/cert [get]
 func (s *CertService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
@@ -138,13 +110,6 @@ func (s *CertService) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Create
-//
-//	@Summary		创建证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/cert [post]
 func (s *CertService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertCreate](r)
 	if err != nil {
@@ -161,14 +126,6 @@ func (s *CertService) Create(w http.ResponseWriter, r *http.Request) {
 	Success(w, cert)
 }
 
-// Update
-//
-//	@Summary		更新证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/cert/{id} [post]
 func (s *CertService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertUpdate](r)
 	if err != nil {
@@ -184,14 +141,6 @@ func (s *CertService) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// Get
-//
-//	@Summary		获取证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/cert/{id} [get]
 func (s *CertService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -208,14 +157,6 @@ func (s *CertService) Get(w http.ResponseWriter, r *http.Request) {
 	Success(w, cert)
 }
 
-// Delete
-//
-//	@Summary		删除证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/cert/{id} [delete]
 func (s *CertService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -232,14 +173,6 @@ func (s *CertService) Delete(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// Obtain
-//
-//	@Summary		签发证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/{id}/obtain [post]
 func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -267,14 +200,6 @@ func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// Renew
-//
-//	@Summary		续签证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/{id}/renew [post]
 func (s *CertService) Renew(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -291,14 +216,6 @@ func (s *CertService) Renew(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// ManualDNS
-//
-//	@Summary		手动 DNS
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id		path		int					true	"证书 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/{id}/manualDNS [post]
 func (s *CertService) ManualDNS(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
@@ -315,15 +232,6 @@ func (s *CertService) ManualDNS(w http.ResponseWriter, r *http.Request) {
 	Success(w, dns)
 }
 
-// Deploy
-//
-//	@Summary		部署证书
-//	@Tags			证书服务
-//	@Produce		json
-//	@Param			id			path		int					true	"证书 ID"
-//	@Param			websiteID	query		int					true	"网站 ID"
-//	@Success		200		{object}	SuccessResponse
-//	@Router			/cert/{id}/deploy [post]
 func (s *CertService) Deploy(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertDeploy](r)
 	if err != nil {

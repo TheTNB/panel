@@ -36,14 +36,6 @@ func NewInfoService() *InfoService {
 	}
 }
 
-// Panel
-//
-//	@Summary	面板信息
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/panel [get]
 func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 	name, _ := s.settingRepo.Get(biz.SettingKeyName)
 	if name == "" {
@@ -56,14 +48,6 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HomeApps
-//
-//	@Summary	首页应用
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/homeApps [get]
 func (s *InfoService) HomeApps(w http.ResponseWriter, r *http.Request) {
 	apps, err := s.appRepo.GetHomeShow()
 	if err != nil {
@@ -74,26 +58,10 @@ func (s *InfoService) HomeApps(w http.ResponseWriter, r *http.Request) {
 	Success(w, apps)
 }
 
-// Realtime
-//
-//	@Summary	实时监控
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/realtime [get]
 func (s *InfoService) Realtime(w http.ResponseWriter, r *http.Request) {
 	Success(w, tools.GetMonitoringInfo())
 }
 
-// SystemInfo
-//
-//	@Summary	系统信息
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/systemInfo [get]
 func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 	monitorInfo := tools.GetMonitoringInfo()
 
@@ -104,14 +72,6 @@ func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// CountInfo
-//
-//	@Summary	统计信息
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/countInfo [get]
 func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	websiteCount, err := s.websiteRepo.Count()
 	if err != nil {
@@ -208,14 +168,6 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// InstalledDbAndPhp
-//
-//	@Summary	已安装的数据库和PHP
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/installedDbAndPhp [get]
 func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) {
 	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
 	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
@@ -249,14 +201,6 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-// CheckUpdate
-//
-//	@Summary	检查更新
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/checkUpdate [get]
 func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 	current := panel.Conf.MustString("app.version")
 	latest, err := tools.GetLatestPanelVersion()
@@ -287,14 +231,6 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// UpdateInfo
-//
-//	@Summary	版本更新信息
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/updateInfo [get]
 func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	current := panel.Conf.MustString("app.version")
 	latest, err := tools.GetLatestPanelVersion()
@@ -337,14 +273,6 @@ func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	Success(w, versionInfo)
 }
 
-// Update
-//
-//	@Summary	更新面板
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/update [post]
 func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	if s.taskRepo.HasRunningTask() {
 		Error(w, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
@@ -374,14 +302,6 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-// Restart
-//
-//	@Summary	重启面板
-//	@Tags		信息服务
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	SuccessResponse
-//	@Router		/info/restart [post]
 func (s *InfoService) Restart(w http.ResponseWriter, r *http.Request) {
 	if s.taskRepo.HasRunningTask() {
 		Error(w, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")

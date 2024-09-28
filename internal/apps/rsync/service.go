@@ -21,16 +21,6 @@ func NewService() *Service {
 	return &Service{}
 }
 
-// List
-//
-//	@Summary		列出模块
-//	@Description	列出所有 Rsync 模块
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	query		commonrequests.Paginate	true	"request"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules [get]
 func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
@@ -96,16 +86,6 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Create
-//
-//	@Summary		添加模块
-//	@Description	添加 Rsync 模块
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.Create	true	"request"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules [post]
 func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
@@ -151,16 +131,6 @@ secrets file = /etc/rsyncd.secrets
 	service.Success(w, nil)
 }
 
-// Delete
-//
-//	@Summary		删除模块
-//	@Description	删除 Rsync 模块
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			name	path		string	true	"模块名称"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules/{name} [delete]
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
@@ -203,17 +173,6 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// Update
-//
-//	@Summary		更新模块
-//	@Description	更新 Rsync 模块
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			name	path		string			true	"模块名称"
-//	@Param			data	body		requests.Update	true	"request"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/modules/{name} [post]
 func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Update](r)
 	if err != nil {
@@ -270,15 +229,6 @@ secrets file = /etc/rsyncd.secrets
 	service.Success(w, nil)
 }
 
-// GetConfig
-//
-//	@Summary		获取配置
-//	@Description	获取 Rsync 配置
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Success		200	{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/config [get]
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
@@ -289,16 +239,6 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-// UpdateConfig
-//
-//	@Summary		更新配置
-//	@Description	更新 Rsync 配置
-//	@Tags			应用-Rsync
-//	@Produce		json
-//	@Security		BearerToken
-//	@Param			data	body		requests.UpdateConfig	true	"request"
-//	@Success		200		{object}	controllers.SuccessResponse
-//	@Router			/plugins/rsync/config [post]
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {

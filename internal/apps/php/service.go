@@ -32,15 +32,6 @@ func NewService(version uint) *Service {
 	}
 }
 
-// GetConfig
-//
-//	@Summary	获取配置
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/config [get]
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php.ini", panel.Root, s.version))
 	if err != nil {
@@ -51,16 +42,6 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-// UpdateConfig
-//
-//	@Summary	保存配置
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int		true	"PHP 版本"
-//	@Param		config	body		string	true	"配置"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/config [post]
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
@@ -76,15 +57,6 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// GetFPMConfig
-//
-//	@Summary	获取 FPM 配置
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/fpmConfig [get]
 func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", panel.Root, s.version))
 	if err != nil {
@@ -95,16 +67,6 @@ func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-// UpdateFPMConfig
-//
-//	@Summary	保存 FPM 配置
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int		true	"PHP 版本"
-//	@Param		config	body		string	true	"配置"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/fpmConfig [post]
 func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
@@ -120,15 +82,6 @@ func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// Load
-//
-//	@Summary	获取负载状态
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/load [get]
 func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get(fmt.Sprintf("http://127.0.0.1/phpfpm_status/%d", s.version))
@@ -156,43 +109,16 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, data)
 }
 
-// ErrorLog
-//
-//	@Summary	获取错误日志
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/errorLog [get]
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version)
 	service.Success(w, log)
 }
 
-// SlowLog
-//
-//	@Summary	获取慢日志
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/slowLog [get]
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/slow.log", panel.Root, s.version)
 	service.Success(w, log)
 }
 
-// ClearErrorLog
-//
-//	@Summary	清空错误日志
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/clearErrorLog [post]
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
@@ -202,15 +128,6 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// ClearSlowLog
-//
-//	@Summary	清空慢日志
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/clearSlowLog [post]
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", panel.Root, s.version); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
@@ -220,15 +137,6 @@ func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// ExtensionList
-//
-//	@Summary	获取扩展列表
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int	true	"PHP 版本"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/extensions [get]
 func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 	extensions := s.getExtensions()
 
@@ -263,16 +171,6 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, extensions)
 }
 
-// InstallExtension
-//
-//	@Summary	安装扩展
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int		true	"PHP 版本"
-//	@Param		slug	query		string	true	"slug"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/extensions [post]
 func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ExtensionSlug](r)
 	if err != nil {
@@ -304,16 +202,6 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-// UninstallExtension
-//
-//	@Summary	卸载扩展
-//	@Tags		应用-PHP
-//	@Produce	json
-//	@Security	BearerToken
-//	@Param		version	path		int		true	"PHP 版本"
-//	@Param		slug	query		string	true	"slug"
-//	@Success	200		{object}	controllers.SuccessResponse
-//	@Router		/plugins/php/{version}/extensions [delete]
 func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ExtensionSlug](r)
 	if err != nil {
