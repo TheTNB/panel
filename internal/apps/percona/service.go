@@ -149,8 +149,8 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 
 // ClearErrorLog 清空错误日志
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", panel.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", panel.Root); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -170,8 +170,8 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 
 // ClearSlowLog 清空慢查询日志
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", panel.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", panel.Root); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

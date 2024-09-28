@@ -50,8 +50,8 @@ func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
 
 // ClearLog 清空日志
 func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -107,7 +107,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Processes(w http.ResponseWriter, r *http.Request) {
 	out, err := shell.Execf(`supervisorctl status | awk '{print $1}'`)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -150,8 +150,8 @@ func (s *Service) StartProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`supervisorctl start %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`supervisorctl start %s`, req.Process); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -166,8 +166,8 @@ func (s *Service) StopProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`supervisorctl stop %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`supervisorctl stop %s`, req.Process); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -182,8 +182,8 @@ func (s *Service) RestartProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`supervisorctl restart %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`supervisorctl restart %s`, req.Process); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -239,8 +239,8 @@ func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`echo "" > '%s'`, logPath); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`echo "" > '%s'`, logPath); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -343,29 +343,32 @@ func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`supervisorctl stop '%s'`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`supervisorctl stop '%s'`, req.Process); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	var logPath string
 	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, req.Process)
-		if err := io.Remove(`/etc/supervisord.d/` + req.Process + `.conf`); err != nil {
+		if err != nil {
+			service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+			return
+		}
+		if err = io.Remove(`/etc/supervisord.d/` + req.Process + `.conf`); err != nil {
 			service.Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, req.Process)
-		if err := io.Remove(`/etc/supervisor/conf.d/` + req.Process + `.conf`); err != nil {
+		if err != nil {
+			service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+			return
+		}
+		if err = io.Remove(`/etc/supervisor/conf.d/` + req.Process + `.conf`); err != nil {
 			service.Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-	}
-
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
-		return
 	}
 
 	if err = io.Remove(logPath); err != nil {

@@ -98,9 +98,8 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusInternalServerError, "添加 S3fs 挂载失败")
 		return
 	}
-	out, err := shell.Execf(`echo 's3fs#%s %s fuse _netdev,allow_other,nonempty,url=%s,passwd_file=/etc/passwd-s3fs-%s 0 0' >> /etc/fstab`, req.Bucket, req.Path, req.URL, cast.ToString(id))
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`echo 's3fs#%s %s fuse _netdev,allow_other,nonempty,url=%s,passwd_file=/etc/passwd-s3fs-%s 0 0' >> /etc/fstab`, req.Bucket, req.Path, req.URL, cast.ToString(id)); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if mountCheck, err := shell.Execf("mount -a 2>&1"); err != nil {
@@ -165,16 +164,16 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`fusermount -u '` + mount.Path + `' 2>&1`); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`fusermount -u '` + mount.Path + `' 2>&1`); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf(`umount '` + mount.Path + `' 2>&1`); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`umount '` + mount.Path + `' 2>&1`); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if mountCheck, err := shell.Execf("mount -a 2>&1"); err != nil {

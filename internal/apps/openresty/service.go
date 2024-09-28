@@ -86,7 +86,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 
 	out, err := shell.Execf("tail -n 100 %s/%s", panel.Root, "/wwwlogs/openresty_error.log")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+		service.Error(w, http.StatusInternalServerError, err.Error())
 	}
 
 	service.Success(w, out)
@@ -101,8 +101,8 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 //	@Success	200	{object}	h.SuccessResponse
 //	@Router		/plugins/openresty/clearErrorLog [post]
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > %s/%s", panel.Root, "/wwwlogs/openresty_error.log"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("echo '' > %s/%s", panel.Root, "/wwwlogs/openresty_error.log"); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 	}
 
 	service.Success(w, nil)

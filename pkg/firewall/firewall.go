@@ -159,9 +159,9 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 		}
 
 		ruleStr.WriteString(rule.Strategy)
-		out, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr.String())
+		_, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr.String())
 		if err != nil {
-			return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, ruleStr.String(), out)
+			return fmt.Errorf("%s rich rules (%s) failed, err: %s", operation, ruleStr.String(), err.Error())
 		}
 	}
 
@@ -183,9 +183,9 @@ func (r *Firewall) PortForward(info Forward, operation Operation) error {
 	}
 	ruleStr.WriteString(" --permanent")
 
-	out, err := shell.Execf(ruleStr.String()) // nolint: govet
+	_, err := shell.Execf(ruleStr.String()) // nolint: govet
 	if err != nil {
-		return fmt.Errorf("%s port forward failed, err: %s", operation, out)
+		return fmt.Errorf("%s port forward failed, err: %s", operation, err.Error())
 	}
 
 	_, err = shell.Execf("firewall-cmd --reload")

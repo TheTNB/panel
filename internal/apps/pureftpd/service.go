@@ -78,12 +78,12 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusUnprocessableEntity, "修改目录权限失败")
 		return
 	}
-	if out, err := shell.Execf(`yes '%s' | pure-pw useradd '%s' -u www -g www -d '%s'`, req.Password, req.Username, req.Path); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`yes '%s' | pure-pw useradd '%s' -u www -g www -d '%s'`, req.Password, req.Username, req.Path); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -98,12 +98,12 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf("pure-pw userdel '%s' -m", req.Username); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf("pure-pw userdel '%s' -m", req.Username); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -118,12 +118,12 @@ func (s *Service) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`yes '%s' | pure-pw passwd '%s' -m`, req.Password, req.Username); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`yes '%s' | pure-pw passwd '%s' -m`, req.Password, req.Username); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -149,8 +149,8 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%d/g" %s/server/pure-ftpd/etc/pure-ftpd.conf`, req.Port, panel.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%d/g" %s/server/pure-ftpd/etc/pure-ftpd.conf`, req.Port, panel.Root); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

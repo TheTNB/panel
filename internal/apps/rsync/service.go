@@ -1,6 +1,7 @@
 package rsync
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -71,7 +72,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 					currentModule.ReadOnly = value == "yes" || value == "true"
 				case "auth users":
 					currentModule.AuthUser = value
-					currentModule.Secret, err = shell.Execf("grep -E '^" + currentModule.AuthUser + ":.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'")
+					currentModule.Secret, err = shell.Execf(`grep -E '^%s:.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'`, currentModule.AuthUser)
 					if err != nil {
 						service.Error(w, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
 						return
@@ -137,8 +138,8 @@ secrets file = /etc/rsyncd.secrets
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf("echo '" + req.AuthUser + ":" + req.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if err = io.WriteAppend("/etc/rsyncd.secrets", fmt.Sprintf(`%s:%s\n`, req.AuthUser, req.Secret)); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -183,8 +184,8 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
 	if len(match) == 2 {
 		authUser := match[1]
-		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
-			service.Error(w, http.StatusInternalServerError, out)
+		if _, err = shell.Execf(`sed -i '/^%s:.*$/d' /etc/rsyncd.secrets`, authUser); err != nil {
+			service.Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
@@ -246,8 +247,8 @@ secrets file = /etc/rsyncd.secrets
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
 	if len(match) == 2 {
 		authUser := match[1]
-		if out, err := shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
-			service.Error(w, http.StatusInternalServerError, out)
+		if _, err = shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+			service.Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	}
@@ -256,8 +257,8 @@ secrets file = /etc/rsyncd.secrets
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if out, err := shell.Execf("echo '" + req.AuthUser + ":" + req.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err = shell.Execf("echo '" + req.AuthUser + ":" + req.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

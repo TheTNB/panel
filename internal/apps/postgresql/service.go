@@ -144,8 +144,8 @@ func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
 
 // ClearLog 清空日志
 func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("rm -rf %s/server/postgresql/logs/postgresql-*.log", panel.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("rm -rf %s/server/postgresql/logs/postgresql-*.log", panel.Root); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

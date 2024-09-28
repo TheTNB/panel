@@ -194,8 +194,8 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/plugins/php/{version}/clearErrorLog [post]
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -212,8 +212,8 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 //	@Success	200		{object}	controllers.SuccessResponse
 //	@Router		/plugins/php/{version}/clearSlowLog [post]
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
-	if out, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", panel.Root, s.version); err != nil {
-		service.Error(w, http.StatusInternalServerError, out)
+	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", panel.Root, s.version); err != nil {
+		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -36,8 +36,8 @@ func (s *FileService) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !req.Dir {
-		if out, err := shell.Execf("touch %s", req.Path); err != nil {
-			Error(w, http.StatusInternalServerError, out)
+		if _, err = shell.Execf("touch %s", req.Path); err != nil {
+			Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 	} else {

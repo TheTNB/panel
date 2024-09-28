@@ -116,22 +116,23 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(filepath.Join(panel.Root, "swap")) {
-		if out, err := shell.Execf("swapoff '%s'", filepath.Join(panel.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, out)
+		if _, err = shell.Execf("swapoff '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if out, err := shell.Execf("rm -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, out)
+		if _, err = shell.Execf("rm -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if out, err := shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(panel.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, out)
+		if _, err = shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(panel.Root, "swap")); err != nil {
+			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
 	}
 
 	if req.Size > 1 {
-		free, err := shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", panel.Root)
+		var free string
+		free, err = shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", panel.Root)
 		if err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, "获取磁盘空间失败")
 			return
@@ -143,30 +144,30 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 
 		btrfsCheck, _ := shell.Execf("df -T %s | awk '{print $2}' | tail -n 1", panel.Root)
 		if strings.Contains(btrfsCheck, "btrfs") {
-			if out, err := shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(panel.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, out)
+			if _, err = shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(panel.Root, "swap")); err != nil {
+				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
 		} else {
-			if out, err := shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(panel.Root, "swap"), req.Size); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, out)
+			if _, err = shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(panel.Root, "swap"), req.Size); err != nil {
+				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
-			if out, err := shell.Execf("mkswap -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, out)
+			if _, err = shell.Execf("mkswap -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
-			if err := io.Chmod(filepath.Join(panel.Root, "swap"), 0600); err != nil {
+			if err = io.Chmod(filepath.Join(panel.Root, "swap"), 0600); err != nil {
 				service.Error(w, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
 				return
 			}
 		}
-		if out, err := shell.Execf("swapon '%s'", filepath.Join(panel.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, out)
+		if _, err = shell.Execf("swapon '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if out, err := shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(panel.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, out)
+		if _, err = shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(panel.Root, "swap")); err != nil {
+			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
 	}
@@ -217,8 +218,8 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if out, err := shell.Execf("timedatectl set-timezone '%s'", req.Timezone); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, out)
+	if _, err = shell.Execf("timedatectl set-timezone '%s'", req.Timezone); err != nil {
+		service.Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -266,8 +267,8 @@ func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.Password = strings.ReplaceAll(req.Password, `'`, `\'`)
-	if out, err := shell.Execf(`yes '%s' | passwd root`, req.Password); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, out)
+	if _, err = shell.Execf(`yes '%s' | passwd root`, req.Password); err != nil {
+		service.Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
