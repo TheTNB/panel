@@ -2,8 +2,8 @@ package data
 
 import (
 	"errors"
+	"time"
 
-	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
@@ -53,7 +53,7 @@ func (r monitorRepo) Clear() error {
 	return panel.Orm.Delete(&biz.Monitor{}).Error
 }
 
-func (r monitorRepo) List(start, end carbon.Carbon) ([]*biz.Monitor, error) {
+func (r monitorRepo) List(start, end time.Time) ([]*biz.Monitor, error) {
 	var monitors []*biz.Monitor
 	if err := panel.Orm.Where("created_at BETWEEN ? AND ?", start, end).Find(&monitors).Error; err != nil {
 		return nil, err

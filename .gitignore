@@ -17,7 +17,8 @@ _cgo_export.*
 *.exe
 *.o
 *.so
-# 在此添加你的项目名（如果需要）
+panel
+panel.exe
 
 # 压缩包
 # Git 自带压缩,如果这些压缩包里有代码,建议解压后 commit

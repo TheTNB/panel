@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-module/carbon/v2"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
@@ -30,10 +29,4 @@ func initGlobal() {
 		panic(fmt.Sprintf("failed to load timezone: %v", err))
 	}
 	time.Local = loc
-	carbon.SetDefault(carbon.Default{
-		Layout:       carbon.DateTimeLayout,
-		Timezone:     carbon.PRC,
-		WeekStartsAt: carbon.Sunday,
-		Locale:       "zh-CN",
-	})
 }

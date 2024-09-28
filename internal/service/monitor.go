@@ -3,8 +3,7 @@ package service
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/golang-module/carbon/v2"
+	"time"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
@@ -65,7 +64,7 @@ func (s *MonitorService) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	monitors, err := s.monitorRepo.List(carbon.CreateFromTimestampMilli(req.Start), carbon.CreateFromTimestampMilli(req.End))
+	monitors, err := s.monitorRepo.List(time.UnixMilli(req.Start), time.UnixMilli(req.End))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -98,7 +97,7 @@ func (s *MonitorService) List(w http.ResponseWriter, r *http.Request) {
 			bytesSent2 += net.BytesSent
 			bytesRecv2 += net.BytesRecv
 		}
-		list.Times = append(list.Times, monitor.CreatedAt.ToDateTimeString())
+		list.Times = append(list.Times, monitor.CreatedAt.Format(time.DateTime))
 		list.Load.Load1 = append(list.Load.Load1, monitor.Info.Load.Load1)
 		list.Load.Load5 = append(list.Load.Load5, monitor.Info.Load.Load5)
 		list.Load.Load15 = append(list.Load.Load15, monitor.Info.Load.Load15)

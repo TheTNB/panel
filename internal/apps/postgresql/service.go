@@ -3,8 +3,7 @@ package postgresql
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/golang-module/carbon/v2"
+	"time"
 
 	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
@@ -94,7 +93,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	time, err := shell.Execf(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)
+	start, err := shell.Execf(`echo "select pg_postmaster_start_time();" | su - postgres -c "psql" | sed -n 3p | cut -d'.' -f1`)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取PostgreSQL启动时间失败")
 		return
@@ -121,7 +120,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := []types.NV{
-		{Name: "启动时间", Value: carbon.Parse(time).ToDateTimeString()},
+		{Name: "启动时间", Value: start},
 		{Name: "进程 PID", Value: pid},
 		{Name: "进程数", Value: process},
 		{Name: "总连接数", Value: connections},
@@ -133,7 +132,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 
 // Log 获取日志
 func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
-	log, err := shell.Execf("tail -n 100 %s/server/postgresql/logs/postgresql-%s.log", panel.Root, carbon.Now().ToDateString())
+	log, err := shell.Execf("tail -n 100 %s/server/postgresql/logs/postgresql-%s.log", panel.Root, time.Now().Format(time.DateOnly))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, log)
 		return

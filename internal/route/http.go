@@ -6,10 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/service"
-	"github.com/go-chi/chi/v5"
 )
 
 func Http(r chi.Router) {

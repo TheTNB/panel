@@ -1,7 +1,7 @@
 package biz
 
 import (
-	"github.com/golang-module/carbon/v2"
+	"time"
 
 	"github.com/TheTNB/panel/internal/http/request"
 )
@@ -23,11 +23,11 @@ const (
 )
 
 type Setting struct {
-	ID        uint            `gorm:"primaryKey" json:"id"`
-	Key       SettingKey      `gorm:"not null;unique" json:"key"`
-	Value     string          `gorm:"not null" json:"value"`
-	CreatedAt carbon.DateTime `json:"created_at"`
-	UpdatedAt carbon.DateTime `json:"updated_at"`
+	ID        uint       `gorm:"primaryKey" json:"id"`
+	Key       SettingKey `gorm:"not null;unique" json:"key"`
+	Value     string     `gorm:"not null" json:"value"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 }
 
 type SettingRepo interface {

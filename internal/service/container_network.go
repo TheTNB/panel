@@ -2,9 +2,9 @@ package service
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-rat/chix"
-	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
@@ -57,7 +57,7 @@ func (s *ContainerNetworkService) List(w http.ResponseWriter, r *http.Request) {
 				"driver":  item.IPAM.Driver,
 				"options": item.IPAM.Options,
 			},
-			"created": carbon.CreateFromStdTime(item.Created).ToDateTimeString(),
+			"created": item.Created.Format(time.DateTime),
 		})
 	}
 

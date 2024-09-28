@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-rat/chix"
-	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
@@ -92,7 +92,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	id := carbon.Now().TimestampMilli()
+	id := time.Now().UnixMicro()
 	password := req.Ak + ":" + req.Sk
 	if err = io.Write("/etc/passwd-s3fs-"+cast.ToString(id), password, 0600); err != nil {
 		service.Error(w, http.StatusInternalServerError, "添加 S3fs 挂载失败")

@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/golang-module/carbon/v2"
 	"github.com/gookit/color"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -371,7 +370,7 @@ func UpdatePanel(panelInfo PanelInfo) error {
 
 	color.Greenln("备份面板数据...")
 	// 备份面板
-	if err := io.Compress([]string{"/www/panel"}, fmt.Sprintf("/www/backup/panel/panel-%s.zip", carbon.Now().ToShortDateTimeString()), io.Zip); err != nil {
+	if err := io.Compress([]string{"/www/panel"}, fmt.Sprintf("/www/backup/panel/panel-%s.zip", time.Now().Format("20060102150405")), io.Zip); err != nil {
 		color.Redln("备份面板失败")
 		return err
 	}

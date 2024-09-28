@@ -3,9 +3,9 @@ package service
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-rat/chix"
-	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
@@ -41,7 +41,7 @@ func (s *ContainerService) List(w http.ResponseWriter, r *http.Request) {
 			"image":    item.Image,
 			"image_id": item.ImageID,
 			"command":  item.Command,
-			"created":  carbon.CreateFromTimestamp(item.Created).ToDateTimeString(),
+			"created":  time.Unix(item.Created, 0).Format(time.DateTime),
 			"ports":    item.Ports,
 			"labels":   item.Labels,
 			"state":    item.State,

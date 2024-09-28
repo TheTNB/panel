@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/go-rat/chix"
-	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
@@ -42,7 +41,7 @@ func (s *ContainerVolumeService) List(w http.ResponseWriter, r *http.Request) {
 		}
 		items = append(items, map[string]any{
 			"id":      item.Name,
-			"created": carbon.Parse(item.CreatedAt).ToDateTimeString(),
+			"created": item.CreatedAt,
 			"driver":  item.Driver,
 			"mount":   item.Mountpoint,
 			"labels":  item.Labels,

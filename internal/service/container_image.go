@@ -2,9 +2,9 @@ package service
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/go-rat/chix"
-	"github.com/golang-module/carbon/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
@@ -35,7 +35,7 @@ func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 	for _, item := range paged {
 		items = append(items, map[string]any{
 			"id":           item.ID,
-			"created":      carbon.CreateFromTimestamp(item.Created).ToDateTimeString(),
+			"created":      time.Unix(item.Created, 0).Format(time.DateTime),
 			"containers":   item.Containers,
 			"size":         str.FormatBytes(float64(item.Size)),
 			"labels":       item.Labels,

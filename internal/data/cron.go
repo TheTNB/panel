@@ -6,8 +6,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
-
-	"github.com/golang-module/carbon/v2"
+	"time"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -104,7 +103,7 @@ panel cutoff ${name} ${save}
 	if !io.Exists(shellLogDir) {
 		return errors.New("计划任务日志目录不存在")
 	}
-	shellFile := strconv.Itoa(int(carbon.Now().Timestamp())) + str.RandomString(16)
+	shellFile := strconv.Itoa(int(time.Now().Unix())) + str.RandomString(16)
 	if err := io.Write(filepath.Join(shellDir, shellFile+".sh"), script, 0700); err != nil {
 		return errors.New(err.Error())
 	}

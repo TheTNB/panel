@@ -1,22 +1,22 @@
 package biz
 
 import (
-	"github.com/golang-module/carbon/v2"
+	"time"
 
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
 type Website struct {
-	ID        uint            `gorm:"primaryKey" json:"id"`
-	Name      string          `gorm:"not null;unique" json:"name"`
-	Status    bool            `gorm:"not null;default:true" json:"status"`
-	Path      string          `gorm:"not null" json:"path"`
-	PHP       int             `gorm:"not null" json:"php"`
-	SSL       bool            `gorm:"not null" json:"ssl"`
-	Remark    string          `gorm:"not null" json:"remark"`
-	CreatedAt carbon.DateTime `json:"created_at"`
-	UpdatedAt carbon.DateTime `json:"updated_at"`
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	Name      string    `gorm:"not null;unique" json:"name"`
+	Status    bool      `gorm:"not null;default:true" json:"status"`
+	Path      string    `gorm:"not null" json:"path"`
+	PHP       int       `gorm:"not null" json:"php"`
+	SSL       bool      `gorm:"not null" json:"ssl"`
+	Remark    string    `gorm:"not null" json:"remark"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 
 	Cert *Cert `gorm:"foreignKey:WebsiteID" json:"cert"`
 }
