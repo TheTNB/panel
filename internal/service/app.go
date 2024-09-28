@@ -35,15 +35,13 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type plugin struct {
-		Name             string   `json:"name"`
-		Description      string   `json:"description"`
-		Slug             string   `json:"slug"`
-		Version          string   `json:"version"`
-		Requires         []string `json:"requires"`
-		Excludes         []string `json:"excludes"`
-		Installed        bool     `json:"installed"`
-		InstalledVersion string   `json:"installed_version"`
-		Show             bool     `json:"show"`
+		Name             string `json:"name"`
+		Description      string `json:"description"`
+		Slug             string `json:"slug"`
+		Version          string `json:"version"`
+		Installed        bool   `json:"installed"`
+		InstalledVersion string `json:"installed_version"`
+		Show             bool   `json:"show"`
 	}
 
 	var pluginArr []plugin
@@ -62,8 +60,6 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 			Description:      item.Description,
 			Slug:             item.Slug,
 			Version:          currentVersion,
-			Requires:         item.Requires,
-			Excludes:         item.Excludes,
 			Installed:        installed,
 			InstalledVersion: installedVersion,
 			Show:             show,
