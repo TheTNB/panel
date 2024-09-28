@@ -10,26 +10,26 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-var plugins sync.Map
+var apps sync.Map
 
-func Register(plugin *types.App) {
-	if _, ok := plugins.Load(plugin.Slug); ok {
-		panic(fmt.Sprintf("plugin %s already exists", plugin.Slug))
+func Register(app *types.App) {
+	if _, ok := apps.Load(app.Slug); ok {
+		panic(fmt.Sprintf("app %s already exists", app.Slug))
 	}
-	plugins.Store(plugin.Slug, plugin)
+	apps.Store(app.Slug, app)
 }
 
 func Get(slug string) (*types.App, error) {
-	if plugin, ok := plugins.Load(slug); ok {
-		return plugin.(*types.App), nil
+	if app, ok := apps.Load(slug); ok {
+		return app.(*types.App), nil
 	}
-	return nil, fmt.Errorf("plugin %s not found", slug)
+	return nil, fmt.Errorf("app %s not found", slug)
 }
 
 func All() []*types.App {
 	var list []*types.App
-	plugins.Range(func(_, plugin any) bool {
-		if p, ok := plugin.(*types.App); ok {
+	apps.Range(func(_, app any) bool {
+		if p, ok := app.(*types.App); ok {
 			list = append(list, p)
 		}
 		return true
@@ -44,9 +44,9 @@ func All() []*types.App {
 }
 
 func Boot(r chi.Router) {
-	plugins.Range(func(_, plugin any) bool {
-		if p, ok := plugin.(*types.App); ok {
-			r.Route(fmt.Sprintf("/api/plugins/%s", p.Slug), p.Route)
+	apps.Range(func(_, app any) bool {
+		if p, ok := app.(*types.App); ok {
+			r.Route(fmt.Sprintf("/api/app/%s", p.Slug), p.Route)
 		}
 		return true
 	})

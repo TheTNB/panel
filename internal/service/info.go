@@ -232,8 +232,8 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		plugin, _ := s.appRepo.Get(p.Slug)
-		phpData = append(phpData, types.LV{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: plugin.Name})
+		app, _ := s.appRepo.Get(p.Slug)
+		phpData = append(phpData, types.LV{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: app.Name})
 	}
 
 	if mysqlInstalled {

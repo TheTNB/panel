@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type AppService struct {
@@ -22,40 +23,30 @@ func NewAppService() *AppService {
 }
 
 func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
-	plugins := s.appRepo.All()
-	installedPlugins, err := s.appRepo.Installed()
+	all := s.appRepo.All()
+	installedApps, err := s.appRepo.Installed()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	installedPluginsMap := make(map[string]*biz.App)
+	installedAppMap := make(map[string]*biz.App)
 
-	for _, p := range installedPlugins {
-		installedPluginsMap[p.Slug] = p
+	for _, p := range installedApps {
+		installedAppMap[p.Slug] = p
 	}
 
-	type plugin struct {
-		Name             string `json:"name"`
-		Description      string `json:"description"`
-		Slug             string `json:"slug"`
-		Version          string `json:"version"`
-		Installed        bool   `json:"installed"`
-		InstalledVersion string `json:"installed_version"`
-		Show             bool   `json:"show"`
-	}
-
-	var pluginArr []plugin
-	for _, item := range plugins {
+	var apps []types.StoreApp
+	for _, item := range all {
 		installed, installedVersion, currentVersion, show := false, "", "", false
 		if str.FirstElement(item.Versions) != nil {
 			currentVersion = str.FirstElement(item.Versions).Version
 		}
-		if _, ok := installedPluginsMap[item.Slug]; ok {
+		if _, ok := installedAppMap[item.Slug]; ok {
 			installed = true
-			installedVersion = installedPluginsMap[item.Slug].Version
-			show = installedPluginsMap[item.Slug].Show
+			installedVersion = installedAppMap[item.Slug].Version
+			show = installedAppMap[item.Slug].Show
 		}
-		pluginArr = append(pluginArr, plugin{
+		apps = append(apps, types.StoreApp{
 			Name:             item.Name,
 			Description:      item.Description,
 			Slug:             item.Slug,
@@ -66,7 +57,7 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	paged, total := Paginate(r, pluginArr)
+	paged, total := Paginate(r, apps)
 
 	Success(w, chix.M{
 		"total": total,
@@ -141,7 +132,7 @@ func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	plugin, err := s.appRepo.Get(req.Slug)
+	app, err := s.appRepo.Get(req.Slug)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -154,7 +145,7 @@ func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Success(w, chix.M{
-		"name":      plugin.Name,
+		"name":      app.Name,
 		"installed": installed,
 	})
 }
