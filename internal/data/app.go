@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/spf13/cast"
 	"slices"
+
+	"github.com/expr-lang/expr"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/panel"
@@ -260,28 +263,33 @@ func (r *appRepo) UpdateCache() error {
 }
 
 func (r *appRepo) preCheck(app *api.App) error {
+	var apps []string
+	var installed []string
+
+	allPlugins := r.All()
+	for _, p := range allPlugins {
+		apps = append(apps, p.Slug)
+	}
 	installedPlugins, err := r.Installed()
 	if err != nil {
 		return err
 	}
-
-	appsMap := make(map[string]bool)
 	for _, p := range installedPlugins {
-		appsMap[p.Slug] = true
+		installed = append(installed, p.Slug)
 	}
 
-	for _, require := range app.Requires {
-		_, requireFound := appsMap[require]
-		if !requireFound {
-			return fmt.Errorf("应用 %s 需要依赖 %s 应用", app.Name, require)
-		}
+	env := map[string]any{
+		"apps":      apps,
+		"installed": installed,
+	}
+	output, err := expr.Eval(app.Depends, env)
+	if err != nil {
+
 	}
 
-	for _, exclude := range app.Excludes {
-		_, excludeFound := appsMap[exclude]
-		if excludeFound {
-			return fmt.Errorf("应用 %s 不兼容 %s 应用", app.Name, exclude)
-		}
+	result := cast.ToString(output)
+	if result != "ok" {
+		return fmt.Errorf("应用 %s %s", app.Name, result)
 	}
 
 	return nil

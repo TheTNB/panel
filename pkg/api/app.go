@@ -13,8 +13,7 @@ type App struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Categories  []string  `json:"categories"`
-	Requires    []string  `json:"requires"`
-	Excludes    []string  `json:"excludes"`
+	Depends     string    `json:"depends"`
 	Versions    []struct {
 		Version      string `json:"version"`
 		Install      string `json:"install"`

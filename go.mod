@@ -6,6 +6,7 @@ require (
 	github.com/beevik/ntp v1.4.3
 	github.com/docker/docker v27.3.1+incompatible
 	github.com/docker/go-connections v0.5.0
+	github.com/expr-lang/expr v1.16.9
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-gormigrate/gormigrate/v2 v2.1.3
