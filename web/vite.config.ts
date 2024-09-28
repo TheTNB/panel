@@ -8,7 +8,6 @@ import { setupVitePlugins } from './build/plugins'
 export default defineConfig((configEnv: ConfigEnv) => {
   const srcPath = getSrcPath()
   const rootPath = getRootPath()
-  const isBuild = configEnv.command === 'build'
 
   const viteEnv = convertEnv(loadEnv(configEnv.mode, process.cwd()))
 
@@ -22,7 +21,7 @@ export default defineConfig((configEnv: ConfigEnv) => {
       }
     },
     define: viteDefine,
-    plugins: setupVitePlugins(viteEnv, isBuild),
+    plugins: setupVitePlugins(viteEnv),
     server: {
       host: '0.0.0.0',
       port: VITE_PORT,

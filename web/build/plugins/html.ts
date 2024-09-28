@@ -2,8 +2,7 @@ import { createHtmlPlugin } from 'vite-plugin-html'
 
 export function setupHtmlPlugin(viteEnv: ViteEnv) {
   const { VITE_APP_TITLE } = viteEnv
-
-  const htmlPlugin = createHtmlPlugin({
+  return createHtmlPlugin({
     minify: true,
     inject: {
       data: {
@@ -12,5 +11,4 @@ export function setupHtmlPlugin(viteEnv: ViteEnv) {
     },
     viteNext: true
   })
-  return htmlPlugin
 }
