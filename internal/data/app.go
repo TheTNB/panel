@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/spf13/cast"
 	"slices"
 
 	"github.com/expr-lang/expr"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/panel"
@@ -284,7 +284,7 @@ func (r *appRepo) preCheck(app *api.App) error {
 	}
 	output, err := expr.Eval(app.Depends, env)
 	if err != nil {
-
+		return err
 	}
 
 	result := cast.ToString(output)
