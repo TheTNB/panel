@@ -80,9 +80,9 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	raw, err := shell.Execf(`mysqladmin -u root -p "%s" extended-status 2>&1`, rootPassword)
+	raw, err := shell.Execf(`mysqladmin -u root -p "%s" extended-status`, rootPassword)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "获取MySQL负载失败")
+		service.Error(w, http.StatusInternalServerError, "获取 Percona 负载失败")
 		return
 	}
 

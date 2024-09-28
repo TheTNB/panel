@@ -102,12 +102,12 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if mountCheck, err := shell.Execf("mount -a 2>&1"); err != nil {
+	if mountCheck, err := shell.Execf("mount -a"); err != nil {
 		_, _ = shell.Execf(`sed -i 's@^s3fs#%s\s%s.*$@@g' /etc/fstab`, req.Bucket, req.Path)
 		service.Error(w, http.StatusInternalServerError, "/etc/fstab 有误: "+mountCheck)
 		return
 	}
-	if _, err := shell.Execf("df -h | grep " + req.Path + " 2>&1"); err != nil {
+	if _, err := shell.Execf(`df -h | grep '%s'`, req.Path); err != nil {
 		_, _ = shell.Execf(`sed -i 's@^s3fs#%s\s%s.*$@@g' /etc/fstab`, req.Bucket, req.Path)
 		service.Error(w, http.StatusInternalServerError, "挂载失败，请检查配置是否正确")
 		return
@@ -164,19 +164,19 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = shell.Execf(`fusermount -u '` + mount.Path + `' 2>&1`); err != nil {
+	if _, err = shell.Execf(`fusermount -u '%s'`, mount.Path); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if _, err = shell.Execf(`umount '` + mount.Path + `' 2>&1`); err != nil {
+	if _, err = shell.Execf(`umount '%s'`, mount.Path); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if _, err = shell.Execf(`sed -i 's@^s3fs#` + mount.Bucket + `\s` + mount.Path + `.*$@@g' /etc/fstab`); err != nil {
+	if _, err = shell.Execf(`sed -i 's@^s3fs#%s\s%s.*$@@g' /etc/fstab`, mount.Bucket, mount.Path); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if mountCheck, err := shell.Execf("mount -a 2>&1"); err != nil {
+	if mountCheck, err := shell.Execf("mount -a"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "/etc/fstab 有误: "+mountCheck)
 		return
 	}

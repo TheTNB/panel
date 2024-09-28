@@ -247,7 +247,7 @@ secrets file = /etc/rsyncd.secrets
 	match := regexp.MustCompile(`auth users = ([^\n]+)`).FindStringSubmatch(module)
 	if len(match) == 2 {
 		authUser := match[1]
-		if _, err = shell.Execf("sed -i '/^" + authUser + ":.*$/d' /etc/rsyncd.secrets"); err != nil {
+		if _, err = shell.Execf(`sed -i '/^%s:.*$/d' /etc/rsyncd.secrets`, authUser); err != nil {
 			service.Error(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -257,7 +257,7 @@ secrets file = /etc/rsyncd.secrets
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if _, err = shell.Execf("echo '" + req.AuthUser + ":" + req.Secret + "' >> /etc/rsyncd.secrets"); err != nil {
+	if err = io.WriteAppend("/etc/rsyncd.secrets", fmt.Sprintf(`%s:%s\n`, req.AuthUser, req.Secret)); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

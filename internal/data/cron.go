@@ -79,7 +79,7 @@ name=%s
 save=%d
 
 # 执行备份
-panel backup ${type} ${name} ${path} ${save} 2>&1
+panel backup ${type} ${name} ${path} ${save}
 `, req.BackupType, req.BackupPath, req.Target, req.Save)
 	}
 	if req.Type == "cutoff" {
@@ -92,7 +92,7 @@ name=%s
 save=%d
 
 # 执行切割
-panel cutoff ${name} ${save} 2>&1
+panel cutoff ${name} ${save}
 `, req.Target, req.Save)
 	}
 
