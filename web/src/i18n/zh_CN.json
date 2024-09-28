@@ -100,8 +100,8 @@
         "supporter": ""
       }
     },
-    "plugins": {
-      "title": "快捷插件"
+    "apps": {
+      "title": "快捷应用"
     }
   },
   "homeUpdate": {
@@ -127,11 +127,11 @@
   "monitorIndex": {
     "title": "资源监控"
   },
-  "pluginIndex": {
-    "title": "插件市场",
+  "appIndex": {
+    "title": "应用市场",
     "alerts": {
       "info": "按钮点击一次即可，请勿重复点击以免重复执行！",
-      "warning": "升级插件前强烈建议先备份/快照，以免出现问题时无法回滚！",
+      "warning": "升级应用前强烈建议先备份/快照，以免出现问题时无法回滚！",
       "setup": "设置成功",
       "install": "任务已提交，请稍后查看任务进度",
       "update": "任务已提交，请前往任务中心查看任务进度",
@@ -144,12 +144,12 @@
       "uninstall": "卸载"
     },
     "confirm": {
-      "install": "确定安装插件 {plugin} 吗？",
-      "update": "升级 {plugin} 插件可能会重置相关配置到默认状态，确定继续吗？",
-      "uninstall": "确定卸载插件 {plugin} 吗？"
+      "install": "确定安装应用 {app} 吗？",
+      "update": "升级 {app} 应用可能会重置相关配置到默认状态，确定继续吗？",
+      "uninstall": "确定卸载应用 {app} 吗？"
     },
     "columns": {
-      "name": "插件名",
+      "name": "应用名",
       "description": "描述",
       "installedVersion": "已装版本",
       "version": "最新版本",

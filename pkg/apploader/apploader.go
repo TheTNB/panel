@@ -46,7 +46,7 @@ func All() []*types.App {
 func Boot(r chi.Router) {
 	apps.Range(func(_, app any) bool {
 		if p, ok := app.(*types.App); ok {
-			r.Route(fmt.Sprintf("/api/app/%s", p.Slug), p.Route)
+			r.Route(fmt.Sprintf("/api/apps/%s", p.Slug), p.Route)
 		}
 		return true
 	})

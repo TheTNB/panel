@@ -25,7 +25,7 @@ func NewService() *Service {
 //
 //	@Summary		列出模块
 //	@Description	列出所有 Rsync 模块
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	query		commonrequests.Paginate	true	"request"
@@ -100,7 +100,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		添加模块
 //	@Description	添加 Rsync 模块
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.Create	true	"request"
@@ -155,7 +155,7 @@ secrets file = /etc/rsyncd.secrets
 //
 //	@Summary		删除模块
 //	@Description	删除 Rsync 模块
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			name	path		string	true	"模块名称"
@@ -207,7 +207,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		更新模块
 //	@Description	更新 Rsync 模块
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			name	path		string			true	"模块名称"
@@ -274,7 +274,7 @@ secrets file = /etc/rsyncd.secrets
 //
 //	@Summary		获取配置
 //	@Description	获取 Rsync 配置
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Success		200	{object}	controllers.SuccessResponse
@@ -293,7 +293,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		更新配置
 //	@Description	更新 Rsync 配置
-//	@Tags			插件-Rsync
+//	@Tags			应用-Rsync
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.UpdateConfig	true	"request"

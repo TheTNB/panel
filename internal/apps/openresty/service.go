@@ -29,7 +29,7 @@ func NewService() *Service {
 // GetConfig
 //
 //	@Summary	获取配置
-//	@Tags		插件-OpenResty
+//	@Tags		应用-OpenResty
 //	@Produce	json
 //	@Security	BearerToken
 //	@Success	200	{object}	h.SuccessResponse
@@ -47,7 +47,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 // SaveConfig
 //
 //	@Summary	保存配置
-//	@Tags		插件-OpenResty
+//	@Tags		应用-OpenResty
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		config	body		string	true	"配置"
@@ -74,7 +74,7 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 // ErrorLog
 //
 //	@Summary	获取错误日志
-//	@Tags		插件-OpenResty
+//	@Tags		应用-OpenResty
 //	@Produce	json
 //	@Security	BearerToken
 //	@Success	200	{object}	h.SuccessResponse
@@ -95,7 +95,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 // ClearErrorLog
 //
 //	@Summary	清空错误日志
-//	@Tags		插件-OpenResty
+//	@Tags		应用-OpenResty
 //	@Produce	json
 //	@Security	BearerToken
 //	@Success	200	{object}	h.SuccessResponse
@@ -111,7 +111,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 // Load
 //
 //	@Summary	获取负载状态
-//	@Tags		插件-OpenResty
+//	@Tags		应用-OpenResty
 //	@Produce	json
 //	@Security	BearerToken
 //	@Success	200	{object}	h.SuccessResponse

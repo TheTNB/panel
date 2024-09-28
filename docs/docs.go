@@ -76,7 +76,7 @@ const docTemplate = `{
                 "tags": [
                     "信息服务"
                 ],
-                "summary": "首页插件",
+                "summary": "首页应用",
                 "responses": {
                     "200": {
                         "description": "OK",

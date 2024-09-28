@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import info from '@/api/panel/info'
-import type { CountInfo, HomePlugin, NowMonitor, SystemInfo } from './types'
+import type { CountInfo, HomeApp, Realtime, SystemInfo } from './types'
 import { router } from '@/router'
 import { NButton, NPopconfirm } from 'naive-ui'
 import { useAppStore } from '@/store'
@@ -9,9 +9,9 @@ import { formatBytes, formatPercent } from '@/utils/file'
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
-const nowMonitor = ref<NowMonitor | null>(null)
+const realtime = ref<Realtime | null>(null)
 const systemInfo = ref<SystemInfo | null>(null)
-const homePlugins = ref<HomePlugin[] | null>(null)
+const homeApps = ref<HomeApp[] | null>(null)
 const countInfo = ref<CountInfo>({
   website: 0,
   database: 0,
@@ -29,8 +29,8 @@ const diskTotalWrite = ref(0)
 const diskCurrentRead = ref(0)
 const diskCurrentWrite = ref(0)
 
-const getNowMonitor = async () => {
-  info.nowMonitor().then((res) => {
+const getRealtime = async () => {
+  info.realtime().then((res) => {
     res.data.percent[0] = formatPercent(res.data.percent[0])
     res.data.mem.usedPercent = formatPercent(res.data.mem.usedPercent)
     // 计算 CPU 核心数
@@ -69,7 +69,7 @@ const getNowMonitor = async () => {
     diskCurrentRead.value = (diskTotalRead.value - diskTotalReadOld) / 3
     diskCurrentWrite.value = (diskTotalWrite.value - diskTotalWriteOld) / 3
 
-    nowMonitor.value = res.data
+    realtime.value = res.data
   })
 }
 
@@ -84,9 +84,9 @@ const getCountInfo = async () => {
   })
 }
 
-const getHomePlugins = async () => {
-  info.homePlugins().then((res) => {
-    homePlugins.value = res.data
+const getHomeApps = async () => {
+  info.homeApps().then((res) => {
+    homeApps.value = res.data
   })
 }
 
@@ -135,8 +135,8 @@ const toGit = () => {
   window.open('https://github.com/TheTNB/panel')
 }
 
-const handleManagePlugin = (slug: string) => {
-  router.push({ name: 'plugins-' + slug + '-index' })
+const handleManageApp = (slug: string) => {
+  router.push({ name: 'apps-' + slug + '-index' })
 }
 
 const quantifier = computed(() => {
@@ -146,12 +146,12 @@ const quantifier = computed(() => {
 let homeInterval: any = null
 
 onMounted(() => {
-  getNowMonitor()
+  getRealtime()
   getSystemInfo()
   getCountInfo()
-  getHomePlugins()
+  getHomeApps()
   homeInterval = setInterval(() => {
-    getNowMonitor()
+    getRealtime()
   }, 3000)
 })
 
@@ -213,7 +213,7 @@ onUnmounted(() => {
               size="small"
               :title="$t('homeIndex.resources.title')"
             >
-              <n-space v-if="nowMonitor" vertical :size="30">
+              <n-space v-if="realtime" vertical :size="30">
                 <n-thing>
                   <template #avatar>
                     <n-avatar>
@@ -226,21 +226,21 @@ onUnmounted(() => {
                   <template #description>
                     <n-progress
                       type="line"
-                      :percentage="nowMonitor.percent[0]"
+                      :percentage="realtime.percent[0]"
                       :indicator-placement="'inside'"
                     />
                   </template>
                   <p>
                     {{
                       $t('homeIndex.resources.cpu.used', {
-                        used: nowMonitor.cpus.length,
+                        used: realtime.cpus.length,
                         total: cores
                       })
                     }}
                   </p>
-                  <p>{{ nowMonitor.cpus[0].modelName }}</p>
+                  <p>{{ realtime.cpus[0].modelName }}</p>
                 </n-thing>
-                <n-thing v-if="nowMonitor">
+                <n-thing v-if="realtime">
                   <template #avatar>
                     <n-avatar>
                       <n-icon>
@@ -253,23 +253,23 @@ onUnmounted(() => {
                     <n-progress
                       type="line"
                       status="info"
-                      :percentage="nowMonitor.mem.usedPercent"
+                      :percentage="realtime.mem.usedPercent"
                       :indicator-placement="'inside'"
                     />
                   </template>
                   <p>
                     {{
                       $t('homeIndex.resources.memory.physical.used', {
-                        used: formatBytes(nowMonitor.mem.used),
-                        total: formatBytes(nowMonitor.mem.total)
+                        used: formatBytes(realtime.mem.used),
+                        total: formatBytes(realtime.mem.total)
                       })
                     }}
                   </p>
                   <p>
                     {{
                       $t('homeIndex.resources.memory.swap.used', {
-                        used: formatBytes(nowMonitor.swap.used),
-                        total: formatBytes(nowMonitor.swap.total)
+                        used: formatBytes(realtime.swap.used),
+                        total: formatBytes(realtime.swap.total)
                       })
                     }}
                   </p>
@@ -280,7 +280,7 @@ onUnmounted(() => {
           </n-gi>
           <n-gi>
             <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.loads.title')">
-              <n-space v-if="nowMonitor" vertical size="large">
+              <n-space v-if="realtime" vertical size="large">
                 <n-thing>
                   <template #avatar>
                     <n-avatar>
@@ -296,13 +296,13 @@ onUnmounted(() => {
                     <template #trigger>
                       <n-progress
                         type="line"
-                        :percentage="formatPercent((nowMonitor.load.load1 / cores) * 100)"
+                        :percentage="formatPercent((realtime.load.load1 / cores) * 100)"
                         :indicator-placement="'inside'"
                       />
                     </template>
                     <span>
                       {{ $t('homeIndex.loads.load', { load: '1' }) }}
-                      <n-tag type="primary">{{ nowMonitor.load.load1 }}</n-tag>
+                      <n-tag type="primary">{{ realtime.load.load1 }}</n-tag>
                     </span>
                   </n-popover>
                 </n-thing>
@@ -322,13 +322,13 @@ onUnmounted(() => {
                     <template #trigger>
                       <n-progress
                         type="line"
-                        :percentage="formatPercent((nowMonitor.load.load5 / cores) * 100)"
+                        :percentage="formatPercent((realtime.load.load5 / cores) * 100)"
                         :indicator-placement="'inside'"
                       />
                     </template>
                     <span>
                       {{ $t('homeIndex.loads.load', { load: '5' }) }}
-                      <n-tag type="primary">{{ nowMonitor.load.load5 }}</n-tag>
+                      <n-tag type="primary">{{ realtime.load.load5 }}</n-tag>
                     </span>
                   </n-popover>
                 </n-thing>
@@ -347,13 +347,13 @@ onUnmounted(() => {
                     <template #trigger>
                       <n-progress
                         type="line"
-                        :percentage="formatPercent((nowMonitor.load.load15 / cores) * 100)"
+                        :percentage="formatPercent((realtime.load.load15 / cores) * 100)"
                         :indicator-placement="'inside'"
                       />
                     </template>
                     <span>
                       {{ $t('homeIndex.loads.load', { load: '15' }) }}
-                      <n-tag type="primary">{{ nowMonitor.load.load15 }}</n-tag>
+                      <n-tag type="primary">{{ realtime.load.load15 }}</n-tag>
                     </span>
                   </n-popover>
                 </n-thing>
@@ -368,7 +368,7 @@ onUnmounted(() => {
               size="small"
               :title="$t('homeIndex.traffic.title')"
             >
-              <n-space v-if="nowMonitor" vertical :size="36">
+              <n-space v-if="realtime" vertical :size="36">
                 <n-thing>
                   <template #avatar>
                     <n-avatar>
@@ -441,8 +441,8 @@ onUnmounted(() => {
                 size="small"
                 :title="$t('homeIndex.store.title')"
               >
-                <n-space v-if="nowMonitor" class="pb-10 pt-10">
-                  <div v-for="item in nowMonitor?.disk_usage" :key="item.path">
+                <n-space v-if="realtime" class="pb-10 pt-10">
+                  <div v-for="item in realtime?.disk_usage" :key="item.path">
                     <n-popover trigger="hover">
                       <template #trigger>
                         <n-space vertical class="flex items-center">
@@ -548,28 +548,23 @@ onUnmounted(() => {
         >
           <n-gi span="2 s:1 m:1 l:2">
             <div min-w-375 flex-1>
-              <n-card
-                :segmented="true"
-                rounded-10
-                size="small"
-                :title="$t('homeIndex.plugins.title')"
-              >
+              <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.apps.title')">
                 <n-grid
-                  v-if="homePlugins"
+                  v-if="homeApps"
                   x-gap="12"
                   y-gap="12"
                   cols="3 s:1 m:2 l:3"
                   item-responsive
                   responsive="screen"
                 >
-                  <n-gi v-for="item in homePlugins" :key="item.name">
+                  <n-gi v-for="item in homeApps" :key="item.name">
                     <n-card
                       :segmented="true"
                       size="small"
                       cursor-pointer
                       rounded-10
                       hover:card-shadow
-                      @click="handleManagePlugin(item.slug)"
+                      @click="handleManageApp(item.slug)"
                     >
                       <n-space>
                         <n-thing>

@@ -3,7 +3,7 @@ import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 /**
- * * unplugin-icons插件，自动引入iconify图标
+ * * unplugin-icons应用，自动引入iconify图标
  * usage: https://github.com/antfu/unplugin-icons
  * 图标库: https://icones.js.org/
  */

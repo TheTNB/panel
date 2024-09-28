@@ -69,7 +69,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/service.SuccessResponse'
-      summary: 首页插件
+      summary: 首页应用
       tags:
       - 信息服务
   /info/installedDbAndPhp:

@@ -197,7 +197,7 @@ onUnmounted(() => {
 <template>
   <common-page show-footer>
     <n-flex vertical>
-      <n-alert type="info">若日志无法加载，请关闭广告拦截插件！</n-alert>
+      <n-alert type="info">若日志无法加载，请关闭广告拦截应用！</n-alert>
       <n-data-table
         striped
         remote

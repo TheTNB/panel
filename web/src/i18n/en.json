@@ -100,8 +100,8 @@
         "supporter": ""
       }
     },
-    "plugins": {
-      "title": "Quick Plugin"
+    "apps": {
+      "title": "Quick App"
     }
   },
   "homeUpdate": {
@@ -127,8 +127,8 @@
   "monitorIndex": {
     "title": "Monitoring"
   },
-  "pluginIndex": {
-    "title": "Plugins",
+  "appIndex": {
+    "title": "Apps",
     "alerts": {
       "info": "Click the button once, please do not click it repeatedly to avoid repeated execution!",
       "warning": "It is strongly recommended to take a backup/snapshot before upgrading the plug-in to avoid being unable to roll back if problems arise!",
@@ -144,9 +144,9 @@
       "uninstall": "Uninstall"
     },
     "confirm": {
-      "install": "Are you sure you want to install the plugin {plugin}?",
-      "update": "Upgrading the {plugin} plug-in may reset related configurations to the default state. Are you sure you want to continue?",
-      "uninstall": "Are you sure you want to uninstall the plugin {plugin}?"
+      "install": "Are you sure you want to install the app {app}?",
+      "update": "Upgrading the {app} plug-in may reset related configurations to the default state. Are you sure you want to continue?",
+      "uninstall": "Are you sure you want to uninstall the app {app}?"
     },
     "columns": {
       "name": "Name",

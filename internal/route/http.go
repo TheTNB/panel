@@ -27,8 +27,8 @@ func Http(r chi.Router) {
 		r.Route("/info", func(r chi.Router) {
 			info := service.NewInfoService()
 			r.Get("/panel", info.Panel)
-			r.With(middleware.MustLogin).Get("/homePlugins", info.HomePlugins)
-			r.With(middleware.MustLogin).Get("/nowMonitor", info.NowMonitor)
+			r.With(middleware.MustLogin).Get("/homeApps", info.HomeApps)
+			r.With(middleware.MustLogin).Get("/realtime", info.Realtime)
 			r.With(middleware.MustLogin).Get("/systemInfo", info.SystemInfo)
 			r.With(middleware.MustLogin).Get("/countInfo", info.CountInfo)
 			r.With(middleware.MustLogin).Get("/installedDbAndPhp", info.InstalledDbAndPhp)

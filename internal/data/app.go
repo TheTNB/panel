@@ -266,16 +266,16 @@ func (r *appRepo) preCheck(app *api.App) error {
 	var apps []string
 	var installed []string
 
-	allPlugins := r.All()
-	for _, p := range allPlugins {
-		apps = append(apps, p.Slug)
+	all := r.All()
+	for _, item := range all {
+		apps = append(apps, item.Slug)
 	}
-	installedPlugins, err := r.Installed()
+	installedApps, err := r.Installed()
 	if err != nil {
 		return err
 	}
-	for _, p := range installedPlugins {
-		installed = append(installed, p.Slug)
+	for _, item := range installedApps {
+		installed = append(installed, item.Slug)
 	}
 
 	env := map[string]any{

@@ -19,7 +19,7 @@ func NewService() *Service {
 // GetConfig
 //
 //	@Summary		获取配置
-//	@Tags			插件-Gitea
+//	@Tags			应用-Gitea
 //	@Produce		json
 //	@Security		BearerToken
 //	@Success		200	{object}	controllers.SuccessResponse
@@ -37,7 +37,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 // UpdateConfig
 //
 //	@Summary		更新配置
-//	@Tags			插件-Gitea
+//	@Tags			应用-Gitea
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.UpdateConfig	true	"request"

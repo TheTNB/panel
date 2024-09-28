@@ -35,7 +35,7 @@ func NewService(version uint) *Service {
 // GetConfig
 //
 //	@Summary	获取配置
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -54,7 +54,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 // UpdateConfig
 //
 //	@Summary	保存配置
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int		true	"PHP 版本"
@@ -79,7 +79,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 // GetFPMConfig
 //
 //	@Summary	获取 FPM 配置
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -98,7 +98,7 @@ func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
 // UpdateFPMConfig
 //
 //	@Summary	保存 FPM 配置
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int		true	"PHP 版本"
@@ -123,7 +123,7 @@ func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 // Load
 //
 //	@Summary	获取负载状态
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -159,7 +159,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 // ErrorLog
 //
 //	@Summary	获取错误日志
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -173,7 +173,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 // SlowLog
 //
 //	@Summary	获取慢日志
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -187,7 +187,7 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 // ClearErrorLog
 //
 //	@Summary	清空错误日志
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -205,7 +205,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 // ClearSlowLog
 //
 //	@Summary	清空慢日志
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -223,7 +223,7 @@ func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 // ExtensionList
 //
 //	@Summary	获取扩展列表
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int	true	"PHP 版本"
@@ -266,7 +266,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 // InstallExtension
 //
 //	@Summary	安装扩展
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int		true	"PHP 版本"
@@ -307,7 +307,7 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 // UninstallExtension
 //
 //	@Summary	卸载扩展
-//	@Tags		插件-PHP
+//	@Tags		应用-PHP
 //	@Produce	json
 //	@Security	BearerToken
 //	@Param		version	path		int		true	"PHP 版本"

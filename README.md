@@ -76,7 +76,7 @@ HAOZI_DL_URL="https://dl.cdn.haozi.net/panel"; curl -sSL -O ${HAOZI_DL_URL}/inst
 HAOZI_DL_URL="https://dl.cdn.haozi.net/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum 验证失败，文件可能被篡改，已终止操作"
 ```
 
-卸载面板前请务必备份好所有数据，提前卸载面板全部插件。卸载后数据将**无法恢复**！
+卸载面板前请务必备份好所有数据，提前卸载面板全部应用。卸载后数据将**无法恢复**！
 
 ## 日常维护
 

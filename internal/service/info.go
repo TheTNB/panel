@@ -56,33 +56,33 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// HomePlugins
+// HomeApps
 //
-//	@Summary	首页插件
+//	@Summary	首页应用
 //	@Tags		信息服务
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	SuccessResponse
-//	@Router		/info/homePlugins [get]
-func (s *InfoService) HomePlugins(w http.ResponseWriter, r *http.Request) {
+//	@Router		/info/homeApps [get]
+func (s *InfoService) HomeApps(w http.ResponseWriter, r *http.Request) {
 	apps, err := s.appRepo.GetHomeShow()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取首页插件失败")
+		Error(w, http.StatusInternalServerError, "获取首页应用失败")
 		return
 	}
 
 	Success(w, apps)
 }
 
-// NowMonitor
+// Realtime
 //
 //	@Summary	实时监控
 //	@Tags		信息服务
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	SuccessResponse
-//	@Router		/info/nowMonitor [get]
-func (s *InfoService) NowMonitor(w http.ResponseWriter, r *http.Request) {
+//	@Router		/info/realtime [get]
+func (s *InfoService) Realtime(w http.ResponseWriter, r *http.Request) {
 	Success(w, tools.GetMonitoringInfo())
 }
 

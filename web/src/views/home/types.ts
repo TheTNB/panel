@@ -138,7 +138,7 @@ interface DiskUsageStat {
   inodesUsedPercent: number
 }
 
-export interface NowMonitor {
+export interface Realtime {
   cpus: CpuInfoStat[]
   percent: number[]
   load: LoadAvgStat
@@ -164,7 +164,7 @@ export interface CountInfo {
   cron: number
 }
 
-export interface HomePlugin {
+export interface HomeApp {
   id: number
   slug: string
   version: string

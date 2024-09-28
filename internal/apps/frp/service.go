@@ -20,7 +20,7 @@ func NewService() *Service {
 //
 //	@Summary		获取配置
 //	@Description	获取 Frp 配置
-//	@Tags			插件-Frp
+//	@Tags			应用-Frp
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			service	query		string	false	"服务"
@@ -46,7 +46,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		更新配置
 //	@Description	更新 Frp 配置
-//	@Tags			插件-Frp
+//	@Tags			应用-Frp
 //	@Produce		json
 //	@Security		BearerToken
 //	@Param			data	body		requests.UpdateConfig	true	"request"
