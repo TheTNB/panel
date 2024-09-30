@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { kebabCase } from 'lodash-es'
 import { useCssVar } from '@vueuse/core'
+import { kebabCase } from 'lodash-es'
 import type { GlobalThemeOverrides } from 'naive-ui'
+
 import { useThemeStore } from '@/store'
 
 type ThemeVars = Exclude<GlobalThemeOverrides['common'], undefined>

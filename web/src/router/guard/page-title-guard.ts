@@ -1,7 +1,7 @@
 import type { Router } from 'vue-router'
 
-import { title } from '@/main'
 import { trans } from '@/i18n/i18n'
+import { title } from '@/main'
 
 export function createPageTitleGuard(router: Router) {
   router.afterEach((to) => {

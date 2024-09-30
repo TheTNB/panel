@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { NButton } from 'naive-ui'
-import phpmyadmin from '@/api/apps/phpmyadmin'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton } from 'naive-ui'
+
+import phpmyadmin from '@/api/apps/phpmyadmin'
 
 const currentTab = ref('status')
 const hostname = ref(window.location.hostname)

@@ -315,15 +315,15 @@ const lastDirectory = (path: string) => {
 }
 
 export {
-  getExt,
-  getBase,
-  getIconByExt,
-  languageByPath,
   checkName,
   checkPath,
-  getFilename,
-  isArchive,
-  formatPercent,
   formatBytes,
+  formatPercent,
+  getBase,
+  getExt,
+  getFilename,
+  getIconByExt,
+  isArchive,
+  languageByPath,
   lastDirectory
 }

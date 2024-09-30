@@ -1,4 +1,5 @@
 import * as NaiveUI from 'naive-ui'
+
 import { useThemeStore } from '@/store'
 
 export async function setupNaiveDiscreteApi() {

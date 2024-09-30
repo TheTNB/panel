@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import type { MenuInst, MenuOption } from 'naive-ui'
-import type { Meta, RouteType } from '~/types/router'
-import { useAppStore, usePermissionStore, useThemeStore } from '@/store'
-import { isUrl, renderIcon } from '@/utils'
 import type { VNodeChild } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { useAppStore, usePermissionStore, useThemeStore } from '@/store'
+import { isUrl, renderIcon } from '@/utils'
+import type { Meta, RouteType } from '~/types/router'
 
 const { t } = useI18n()
 const router = useRouter()

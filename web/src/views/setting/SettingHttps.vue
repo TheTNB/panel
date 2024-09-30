@@ -1,31 +1,45 @@
 <script setup lang="ts">
-import setting from '@/api/panel/setting'
 import { useI18n } from 'vue-i18n'
 
+import setting from '@/api/panel/setting'
+import type { Setting } from '@/views/setting/types'
+
 const { t } = useI18n()
-const model = ref({
+const model = ref<Setting>({
+  name: '',
+  locale: '',
+  username: '',
+  password: '',
+  email: '',
+  port: 8888,
+  entrance: '',
+  website_path: '',
+  backup_path: '',
   https: false,
   cert: '',
   key: ''
 })
 
+const getSetting = () => {
+  setting.list().then((res) => {
+    model.value = res.data
+  })
+}
+
 const handleSave = () => {
-  setting.updateHttps(model.value).then(() => {
+  setting.update(model.value).then(() => {
     window.$message.success(t('settingIndex.edit.toasts.success'))
-    setTimeout(() => {}, 1000)
   })
 }
 
 onMounted(() => {
-  setting.getHttps().then((res) => {
-    model.value = res.data
-  })
+  getSetting()
 })
 </script>
 
 <template>
   <n-space vertical>
-    <n-alert type="warning"> 错误的证书会导致面板无法访问，请谨慎操作！ </n-alert>
+    <n-alert type="warning"> 错误的证书会导致面板无法访问，请谨慎操作！</n-alert>
     <n-form>
       <n-form-item :label="$t('settingIndex.edit.fields.https.label')">
         <n-switch v-model:value="model.https" />

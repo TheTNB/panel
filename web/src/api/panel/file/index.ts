@@ -1,5 +1,6 @@
-import { request } from '@/utils'
 import type { AxiosResponse } from 'axios'
+
+import { request } from '@/utils'
 
 export default {
   // 创建文件/文件夹
@@ -12,8 +13,7 @@ export default {
   save: (path: string, content: string): Promise<AxiosResponse<any>> =>
     request.post('/file/save', { path, content }),
   // 删除文件
-  delete: (path: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/delete', { path }),
+  delete: (path: string): Promise<AxiosResponse<any>> => request.post('/file/delete', { path }),
   // 上传文件
   upload: (path: string, formData: FormData, onProgress: any): Promise<AxiosResponse<any>> => {
     formData.append('path', path)
@@ -42,8 +42,7 @@ export default {
     mode: string,
     owner: string,
     group: string
-  ): Promise<AxiosResponse<any>> =>
-    request.post('/file/permission', { path, mode, owner, group }),
+  ): Promise<AxiosResponse<any>> => request.post('/file/permission', { path, mode, owner, group }),
   // 压缩文件
   archive: (paths: string[], file: string): Promise<AxiosResponse<any>> =>
     request.post('/file/archive', { paths, file }),

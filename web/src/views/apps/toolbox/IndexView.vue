@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { NButton } from 'naive-ui'
-import toolbox from '@/api/apps/toolbox'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton } from 'naive-ui'
+
+import toolbox from '@/api/apps/toolbox'
 
 const currentTab = ref('dns')
 const dns1 = ref('')

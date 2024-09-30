@@ -1,24 +1,29 @@
 <script setup lang="ts">
-import setting from '@/api/panel/setting'
 import { useI18n } from 'vue-i18n'
+
+import setting from '@/api/panel/setting'
 import { useThemeStore } from '@/store'
+import type { Setting } from '@/views/setting/types'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
 
-const model = ref({
+const model = ref<Setting>({
   name: '',
-  language: '',
+  locale: '',
   username: '',
   password: '',
   email: '',
-  port: '',
+  port: 8888,
   entrance: '',
   website_path: '',
-  backup_path: ''
+  backup_path: '',
+  https: false,
+  cert: '',
+  key: ''
 })
 
-const languages = [
+const locales = [
   { label: '简体中文', value: 'zh_CN' },
   { label: 'English', value: 'en' }
 ]
@@ -39,7 +44,7 @@ const handleSave = () => {
 }
 
 const maybeHardReload = () => {
-  if (model.value.language !== themeStore.language) {
+  if (model.value.locale !== themeStore.locale) {
     window.location.reload()
   }
 }
@@ -61,8 +66,8 @@ onMounted(() => {
           :placeholder="$t('settingIndex.edit.fields.name.placeholder')"
         />
       </n-form-item>
-      <n-form-item :label="$t('settingIndex.edit.fields.language.label')">
-        <n-select v-model:value="model.language" :options="languages"> </n-select>
+      <n-form-item :label="$t('settingIndex.edit.fields.locale.label')">
+        <n-select v-model:value="model.locale" :options="locales"> </n-select>
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.username.label')">
         <n-input
@@ -83,7 +88,7 @@ onMounted(() => {
         />
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.port.label')">
-        <n-input
+        <n-input-number
           v-model:value="model.port"
           :placeholder="$t('settingIndex.edit.fields.port.placeholder')"
         />

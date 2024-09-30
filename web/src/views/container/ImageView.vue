@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NTag } from 'naive-ui'
-import type { ImageList } from '@/views/container/types'
+
 import container from '@/api/panel/container'
+import type { ImageList } from '@/views/container/types'
 
 const pullModel = ref({
   name: '',

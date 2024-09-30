@@ -1,6 +1,7 @@
 import type { AxiosError, AxiosResponse } from 'axios'
-import { AxiosRejectError, resolveResError } from './helpers'
+
 import type { RequestConfig } from '~/types/axios'
+import { AxiosRejectError, resolveResError } from './helpers'
 
 /** 请求拦截 */
 export function reqResolve(config: RequestConfig) {

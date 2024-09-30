@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { NButton, NPopconfirm } from 'naive-ui'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NPopconfirm } from 'naive-ui'
+
 import gitea from '@/api/apps/gitea'
 import service from '@/api/panel/system/service'
 

@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import info from '@/api/panel/info'
-import type { CountInfo, HomeApp, Realtime, SystemInfo } from './types'
-import { router } from '@/router'
 import { NButton, NPopconfirm } from 'naive-ui'
-import { useAppStore } from '@/store'
 import { useI18n } from 'vue-i18n'
+
+import info from '@/api/panel/info'
+import { router } from '@/router'
+import { useAppStore } from '@/store'
 import { formatBytes, formatPercent } from '@/utils/file'
+import type { CountInfo, HomeApp, Realtime, SystemInfo } from './types'
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()

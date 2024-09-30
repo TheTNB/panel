@@ -1,15 +1,16 @@
-import '@/styles/reset.css'
 import '@/styles/index.scss'
+import '@/styles/reset.css'
 import 'uno.css'
 
-import { createApp } from 'vue'
-import App from './App.vue'
-import { setupStore, useThemeStore } from './store'
-import { setupRouter } from './router'
-import { setupI18n } from '@/i18n/i18n'
-import { setupNaiveDiscreteApi } from './utils'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
+import { createApp } from 'vue'
+
 import info from '@/api/panel/info'
+import { setupI18n } from '@/i18n/i18n'
+import App from './App.vue'
+import { setupRouter } from './router'
+import { setupStore, useThemeStore } from './store'
+import { setupNaiveDiscreteApi } from './utils'
 
 async function setupApp() {
   const app = createApp(App)
@@ -39,7 +40,7 @@ const setupPanel = async () => {
     .then((response) => response.json())
     .then((data) => {
       title.value = data.data.name || import.meta.env.VITE_APP_TITLE
-      themeStore.setLanguage(data.data.language || 'zh_CN')
+      themeStore.setLocale(data.data.locale || 'zh_CN')
     })
     .catch((err) => {
       console.error(err)

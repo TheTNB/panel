@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
-import { generateRandomString, renderIcon } from '@/utils'
-import type { User } from '@/views/apps/pureftpd/types'
+
 import pureftpd from '@/api/apps/pureftpd'
 import service from '@/api/panel/system/service'
+import { generateRandomString, renderIcon } from '@/utils'
+import type { User } from '@/views/apps/pureftpd/types'
 
 const currentTab = ref('status')
 const status = ref(false)

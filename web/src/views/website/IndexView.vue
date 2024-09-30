@@ -1,20 +1,21 @@
 <script lang="ts" setup>
+import Editor from '@guolao/vue-monaco-editor'
 import {
   NButton,
+  NCheckbox,
   NDataTable,
-  NSpace,
-  NSwitch,
-  NPopconfirm,
-  NInput,
   NFlex,
-  NCheckbox
+  NInput,
+  NPopconfirm,
+  NSpace,
+  NSwitch
 } from 'naive-ui'
-import website from '@/api/panel/website'
+import { useI18n } from 'vue-i18n'
+
 import info from '@/api/panel/info'
+import website from '@/api/panel/website'
 import { generateRandomString, isNullOrUndef, renderIcon } from '@/utils'
 import type { Website } from './types'
-import Editor from '@guolao/vue-monaco-editor'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const router = useRouter()

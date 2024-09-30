@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useThemeStore } from '@/store'
 import logo from '@/assets/images/logo.png'
 import { title } from '@/main'
+import { useThemeStore } from '@/store'
 
 const themeStore = useThemeStore()
 </script>

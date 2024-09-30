@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
+
 import s3fs from '@/api/apps/s3fs'
 import { renderIcon } from '@/utils'
 import type { S3fs } from '@/views/apps/s3fs/types'

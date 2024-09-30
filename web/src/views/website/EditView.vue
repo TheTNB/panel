@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { WebsiteSetting } from '@/views/website/types'
-import website from '@/api/panel/website'
-import { NButton } from 'naive-ui'
-import info from '@/api/panel/info'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton } from 'naive-ui'
+
+import info from '@/api/panel/info'
+import website from '@/api/panel/website'
+import type { WebsiteSetting } from '@/views/website/types'
 
 const route = useRoute()
 const { id } = route.params

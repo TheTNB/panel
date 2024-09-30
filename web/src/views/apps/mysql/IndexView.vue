@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import Editor from '@guolao/vue-monaco-editor'
+import type { MessageReactive, UploadFileInfo } from 'naive-ui'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
+
 import mysql from '@/api/apps/mysql'
 import service from '@/api/panel/system/service'
 import { generateRandomString, renderIcon } from '@/utils'
 import type { Backup, Database, User } from '@/views/apps/mysql/types'
-import type { UploadFileInfo, MessageReactive } from 'naive-ui'
-import Editor from '@guolao/vue-monaco-editor'
 
 let messageReactive: MessageReactive | null = null
 

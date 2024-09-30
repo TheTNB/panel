@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import '@xterm/xterm/css/xterm.css'
-import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
+import { Terminal } from '@xterm/xterm'
+import '@xterm/xterm/css/xterm.css'
 import CryptoJS from 'crypto-js'
-import ssh from '@/api/panel/ssh'
 import { useI18n } from 'vue-i18n'
+
+import ssh from '@/api/panel/ssh'
 
 const { t } = useI18n()
 

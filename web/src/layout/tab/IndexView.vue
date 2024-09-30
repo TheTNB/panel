@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import ContextMenu from './components/ContextMenu.vue'
 import type { TabItem } from '@/store'
 import { useTabStore } from '@/store'
+import ContextMenu from './components/ContextMenu.vue'
 
 const route = useRoute()
 const router = useRouter()

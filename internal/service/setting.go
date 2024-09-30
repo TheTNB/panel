@@ -19,7 +19,7 @@ func NewSettingService() *SettingService {
 }
 
 func (s *SettingService) Get(w http.ResponseWriter, r *http.Request) {
-	setting, err := s.settingRepo.GetPanelSetting()
+	setting, err := s.settingRepo.GetPanelSetting(r.Context())
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return

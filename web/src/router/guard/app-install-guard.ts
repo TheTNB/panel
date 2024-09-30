@@ -1,4 +1,5 @@
 import type { Router } from 'vue-router'
+
 import app from '@/api/panel/app'
 
 export function createAppInstallGuard(router: Router) {

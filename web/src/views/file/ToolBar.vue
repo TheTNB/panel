@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NButton, NSpace } from 'naive-ui'
+
 import file from '@/api/panel/file'
 import EventBus from '@/utils/event'
 import { checkName, lastDirectory } from '@/utils/file'

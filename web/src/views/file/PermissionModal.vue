@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NButton, NInput } from 'naive-ui'
+
 import file from '@/api/panel/file'
 import EventBus from '@/utils/event'
 

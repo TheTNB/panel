@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { UploadCustomRequestOptions } from 'naive-ui'
+
 import * as api from '@/api/panel/file'
 import EventBus from '@/utils/event'
 

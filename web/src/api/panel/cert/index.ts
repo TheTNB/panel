@@ -1,5 +1,6 @@
-import { request } from '@/utils'
 import type { AxiosResponse } from 'axios'
+
+import { request } from '@/utils'
 
 export default {
   // CA 供应商列表
@@ -19,8 +20,7 @@ export default {
   userUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
     request.put(`/cert/users/${id}`, data),
   // ACME 用户删除
-  userDelete: (id: number): Promise<AxiosResponse<any>> =>
-    request.delete(`/cert/users/${id}`),
+  userDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/users/${id}`),
   // DNS 记录列表
   dns: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/cert/dns', { params: { page, limit } }),
@@ -44,15 +44,13 @@ export default {
   certUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
     request.put(`/cert/certs/${id}`, data),
   // 证书删除
-  certDelete: (id: number): Promise<AxiosResponse<any>> =>
-    request.delete(`/cert/certs/${id}`),
+  certDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/certs/${id}`),
   // 签发
   obtain: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/obtain`, { id }),
   // 续签
   renew: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/renew`, { id }),
   // 获取 DNS 记录
-  manualDNS: (id: number): Promise<AxiosResponse<any>> =>
-    request.post(`/cert/manualDNS`, { id }),
+  manualDNS: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/manualDNS`, { id }),
   // 部署
   deploy: (id: number, website_id: number): Promise<AxiosResponse<any>> =>
     request.post(`/cert/deploy`, { id, website_id })

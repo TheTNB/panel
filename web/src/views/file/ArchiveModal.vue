@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { NButton, NInput } from 'naive-ui'
-import { generateRandomString, getBase } from '@/utils'
+
 import * as api from '@/api/panel/file'
+import { generateRandomString, getBase } from '@/utils'
 import EventBus from '@/utils/event'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })

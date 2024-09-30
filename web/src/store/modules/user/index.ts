@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
-import { toLogin } from '@/utils'
-import { usePermissionStore, useTabStore } from '@/store'
-import { resetRouter } from '@/router'
+
 import user from '@/api/panel/user'
+import { resetRouter } from '@/router'
+import { usePermissionStore, useTabStore } from '@/store'
+import { toLogin } from '@/utils'
 
 interface UserInfo {
   id?: string

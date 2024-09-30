@@ -2,11 +2,12 @@
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, NInput, NPopconfirm, NPopselect, NSpace } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
+
 import file from '@/api/panel/file'
 import TheIcon from '@/components/custom/TheIcon.vue'
+import EventBus from '@/utils/event'
 import { checkName, checkPath, getExt, getFilename, getIconByExt, isArchive } from '@/utils/file'
 import EditModal from '@/views/file/EditModal.vue'
-import EventBus from '@/utils/event'
 import type { Marked } from '@/views/file/types'
 
 const loading = ref(false)

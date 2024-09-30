@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
+
+import cron from '@/api/panel/cron'
 import info from '@/api/panel/info'
 import website from '@/api/panel/website'
-import cron from '@/api/panel/cron'
-import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
-import type { CronTask } from '@/views/cron/types'
 import { renderIcon } from '@/utils'
-import Editor from '@guolao/vue-monaco-editor'
+import type { CronTask } from '@/views/cron/types'
 
 const addModel = ref({
   name: '',

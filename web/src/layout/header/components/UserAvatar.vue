@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import { router } from '@/router'
 import { useUserStore } from '@/store'
 import { renderIcon } from '@/utils'
-import { router } from '@/router'
 
 const userStore = useUserStore()
 

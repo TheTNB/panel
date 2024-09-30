@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import info from '@/api/panel/info'
-import { NButton } from 'naive-ui'
 import type { MessageReactive } from 'naive-ui'
-import type { PanelInfo } from '@/views/home/types'
-import { formatDateTime } from '@/utils'
-import { router } from '@/router'
+import { NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+
+import info from '@/api/panel/info'
+import { router } from '@/router'
+import { formatDateTime } from '@/utils'
+import type { PanelInfo } from '@/views/home/types'
 
 const { t } = useI18n()
 const versions = ref<PanelInfo[] | null>(null)

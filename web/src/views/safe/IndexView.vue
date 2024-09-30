@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NPopconfirm, NSpace } from 'naive-ui'
-import type { FirewallRule } from '@/views/safe/types'
+import { useI18n } from 'vue-i18n'
+
 import safe from '@/api/panel/safe'
 import { renderIcon } from '@/utils'
-import { useI18n } from 'vue-i18n'
+import type { FirewallRule } from '@/views/safe/types'
 
 const { t } = useI18n()
 

@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import VChart from 'vue-echarts'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart } from 'echarts/charts'
 import {
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent,
+  DataZoomComponent,
   GridComponent,
-  DataZoomComponent
+  LegendComponent,
+  TitleComponent,
+  TooltipComponent
 } from 'echarts/components'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { NButton } from 'naive-ui'
+import VChart from 'vue-echarts'
+
 import monitor from '@/api/panel/monitor'
 import type { MonitorData } from '@/views/monitor/types'
-import { NButton } from 'naive-ui'
 
 use([
   CanvasRenderer,

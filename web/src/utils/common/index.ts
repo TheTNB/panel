@@ -1,5 +1,5 @@
-export * from './common'
 export * from './color'
+export * from './common'
 export * from './crypto'
 export * from './icon'
 export * from './is'

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import PathInput from '@/views/file/PathInput.vue'
-import ToolBar from '@/views/file/ToolBar.vue'
-import ListTable from '@/views/file/ListTable.vue'
-import type { Marked } from '@/views/file/types'
 import ArchiveModal from '@/views/file/ArchiveModal.vue'
+import ListTable from '@/views/file/ListTable.vue'
+import PathInput from '@/views/file/PathInput.vue'
 import PermissionModal from '@/views/file/PermissionModal.vue'
+import ToolBar from '@/views/file/ToolBar.vue'
+import type { Marked } from '@/views/file/types'
 
 const path = ref('/www')
 const selected = ref<string[]>([])

@@ -1,4 +1,5 @@
 import {
+  darkTheme,
   dateEnUS,
   dateZhCN,
   enUS,
@@ -7,9 +8,9 @@ import {
   type NLocale,
   zhCN
 } from 'naive-ui'
-import { darkTheme } from 'naive-ui'
 import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 import { defineStore } from 'pinia'
+
 import { getNaiveThemeOverrides, initThemeSettings } from './helpers'
 
 type ThemeState = Theme.Setting
@@ -32,10 +33,10 @@ export const useThemeStore = defineStore('theme-store', {
       return this.darkMode ? darkTheme : undefined
     },
     naiveLocale(): NLocale {
-      return locales[this.language].locale
+      return locales[this.locale].locale
     },
     naiveDateLocale(): NDateLocale {
-      return locales[this.language].dateLocale
+      return locales[this.locale].dateLocale
     }
   },
   actions: {
@@ -63,8 +64,8 @@ export const useThemeStore = defineStore('theme-store', {
       this.primaryColor = color
     },
     /** 设置语言 */
-    setLanguage(language: string) {
-      this.language = language
+    setLocale(language: string) {
+      this.locale = language
     }
   }
 })

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
+
 import fail2ban from '@/api/apps/fail2ban'
 import service from '@/api/panel/system/service'
+import website from '@/api/panel/website'
 import { renderIcon } from '@/utils'
 import type { Jail } from '@/views/apps/fail2ban/types'
-import website from '@/api/panel/website'
 
 const currentTab = ref('status')
 const status = ref(false)

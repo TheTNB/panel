@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import BreadCrumb from './components/BreadCrumb.vue'
-import MenuCollapse from './components/MenuCollapse.vue'
-import FullScreen from './components/FullScreen.vue'
-import UserAvatar from './components/UserAvatar.vue'
-import ThemeMode from './components/ThemeMode.vue'
 import ReloadPage from '@/layout/header/components/ReloadPage.vue'
+import BreadCrumb from './components/BreadCrumb.vue'
+import FullScreen from './components/FullScreen.vue'
+import MenuCollapse from './components/MenuCollapse.vue'
+import ThemeMode from './components/ThemeMode.vue'
+import UserAvatar from './components/UserAvatar.vue'
 </script>
 
 <template>

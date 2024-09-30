@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NInput, NPopconfirm, NSpace, NTag } from 'naive-ui'
+
 import cert from '@/api/panel/cert'
 import type { DNS } from '@/views/cert/types'
 

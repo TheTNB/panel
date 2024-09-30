@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { NButton, NDataTable, NSwitch, NDropdown, NInput } from 'naive-ui'
-import type { ContainerList } from '@/views/container/types'
-import container from '@/api/panel/container'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NDataTable, NDropdown, NInput, NSwitch } from 'naive-ui'
+
+import container from '@/api/panel/container'
 import ContainerCreate from '@/views/container/ContainerCreate.vue'
+import type { ContainerList } from '@/views/container/types'
 
 const data = ref<ContainerList[]>([] as ContainerList[])
 

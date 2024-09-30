@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { Task } from '@/views/task/types'
-import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
-import { renderIcon } from '@/utils'
-import task from '@/api/panel/task'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
+
+import task from '@/api/panel/task'
+import { renderIcon } from '@/utils'
+import type { Task } from '@/views/task/types'
 
 const { t } = useI18n()
 const taskLogModal = ref(false)

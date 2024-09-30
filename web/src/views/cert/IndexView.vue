@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CertView from '@/views/cert/CertView.vue'
-import UserView from '@/views/cert/UserView.vue'
 import DNSView from '@/views/cert/DNSView.vue'
+import UserView from '@/views/cert/UserView.vue'
 
 const currentTab = ref('cert')
 </script>

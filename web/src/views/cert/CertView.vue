@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { NButton, NDataTable, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
-import cert from '@/api/panel/cert'
-import type { Cert } from '@/views/cert/types'
-import website from '@/api/panel/website'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NDataTable, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
+
+import cert from '@/api/panel/cert'
+import website from '@/api/panel/website'
+import type { Cert } from '@/views/cert/types'
 
 let messageReactive: any
 const addCertModel = ref<any>({

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 import Editor from '@guolao/vue-monaco-editor'
+import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
+
 import redis from '@/api/apps/redis'
 import service from '@/api/panel/system/service'
 

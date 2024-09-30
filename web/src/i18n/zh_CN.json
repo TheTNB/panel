@@ -227,7 +227,7 @@
           "label": "面板名称",
           "placeholder": "耗子面板"
         },
-        "language": {
+        "locale": {
           "label": "语言",
           "placeholder": "选择语言"
         },

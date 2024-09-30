@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import SettingHttps from '@/views/setting/SettingHttps.vue'
 import SettingBase from '@/views/setting/SettingBase.vue'
+import SettingHttps from '@/views/setting/SettingHttps.vue'
 
 const currentTab = ref('base')
 </script>

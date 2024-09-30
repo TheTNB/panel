@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
-import { generateRandomString, renderIcon } from '@/utils'
 import Editor from '@guolao/vue-monaco-editor'
-import type { Module } from '@/views/apps/rsync/types'
+import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
+
 import rsync from '@/api/apps/rsync'
 import service from '@/api/panel/system/service'
+import { generateRandomString, renderIcon } from '@/utils'
+import type { Module } from '@/views/apps/rsync/types'
 
 const currentTab = ref('status')
 const status = ref(false)

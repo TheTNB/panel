@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"context"
 	"time"
 
 	"github.com/TheTNB/panel/internal/http/request"
@@ -34,6 +35,6 @@ type SettingRepo interface {
 	Get(key SettingKey, defaultValue ...string) (string, error)
 	Set(key SettingKey, value string) error
 	Delete(key SettingKey) error
-	GetPanelSetting() (*request.PanelSetting, error)
+	GetPanelSetting(ctx context.Context) (*request.PanelSetting, error)
 	UpdatePanelSetting(setting *request.PanelSetting) error
 }

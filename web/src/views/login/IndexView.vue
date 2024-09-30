@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { useStorage } from '@vueuse/core'
+
+import user from '@/api/panel/user'
+import bgImg from '@/assets/images/login_bg.webp'
+import { title } from '@/main'
+import { addDynamicRoutes } from '@/router'
 import { useUserStore } from '@/store'
 import { getLocal, removeLocal, setLocal } from '@/utils'
-import bgImg from '@/assets/images/login_bg.webp'
-import { addDynamicRoutes } from '@/router'
-import user from '@/api/panel/user'
-import { title } from '@/main'
 
 const router = useRouter()
 const route = useRoute()

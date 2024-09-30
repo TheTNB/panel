@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
+
 import php from '@/api/apps/php'
 import service from '@/api/panel/system/service'
 import { renderIcon } from '@/utils'
-import Editor from '@guolao/vue-monaco-editor'
 
 const route = useRoute()
 const currentTab = ref('status')

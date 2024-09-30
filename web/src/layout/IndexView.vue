@@ -1,10 +1,9 @@
 <script lang="ts" setup>
-import SideBar from './sidebar/IndexView.vue'
-import AppHeader from './header/IndexView.vue'
-import AppTab from './tab/IndexView.vue'
-import AppMain from './AppMain.vue'
-
 import { useThemeStore } from '@/store'
+import AppMain from './AppMain.vue'
+import AppHeader from './header/IndexView.vue'
+import SideBar from './sidebar/IndexView.vue'
+import AppTab from './tab/IndexView.vue'
 
 const themeStore = useThemeStore()
 </script>

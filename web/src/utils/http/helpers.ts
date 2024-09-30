@@ -1,5 +1,5 @@
-import type { ErrorResolveResponse } from '~/types/axios'
 import { useUserStore } from '@/store'
+import type { ErrorResolveResponse } from '~/types/axios'
 
 /** 自定义错误 */
 export class AxiosRejectError extends Error {

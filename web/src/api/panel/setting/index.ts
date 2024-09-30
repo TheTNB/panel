@@ -1,5 +1,6 @@
-import { request } from '@/utils'
 import type { AxiosResponse } from 'axios'
+
+import { request } from '@/utils'
 
 export default {
   // 获取设置

@@ -1,6 +1,6 @@
-import { h } from 'vue'
 import { Icon } from '@iconify/vue'
 import { NIcon } from 'naive-ui'
+import { h } from 'vue'
 
 interface Props {
   size?: number

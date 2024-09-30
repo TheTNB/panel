@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { App } from '@/views/app/types'
 import { NButton, NDataTable, NPopconfirm, NSwitch } from 'naive-ui'
-import app from '../../api/panel/app'
-import { renderIcon } from '@/utils'
-import { router } from '@/router'
 import { useI18n } from 'vue-i18n'
+
+import { router } from '@/router'
+import { renderIcon } from '@/utils'
+import type { App } from '@/views/app/types'
+import app from '../../api/panel/app'
 
 const { t } = useI18n()
 

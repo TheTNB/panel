@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
-import type { VolumeList } from '@/views/container/types'
+
 import container from '@/api/panel/container'
+import type { VolumeList } from '@/views/container/types'
 
 const createModel = ref({
   name: '',

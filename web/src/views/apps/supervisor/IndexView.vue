@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
+
 import supervisor from '@/api/apps/supervisor'
 import service from '@/api/panel/system/service'
 import { renderIcon } from '@/utils'
 import type { Process } from '@/views/apps/supervisor/types'
-import Editor from '@guolao/vue-monaco-editor'
 
 const currentTab = ref('status')
 const serviceName = ref('supervisor')
