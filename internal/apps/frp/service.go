@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
@@ -23,7 +23,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	config, err := io.Read(fmt.Sprintf("%s/server/frp/%s.toml", panel.Root, req.Name))
+	config, err := io.Read(fmt.Sprintf("%s/server/frp/%s.toml", app.Root, req.Name))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -39,7 +39,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/frp/%s.toml", panel.Root, req.Name), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/frp/%s.toml", app.Root, req.Name), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

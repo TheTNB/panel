@@ -7,9 +7,9 @@ import (
 
 	"github.com/go-resty/resty/v2"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/cert"
 )
@@ -23,13 +23,13 @@ func NewCertAccountRepo() biz.CertAccountRepo {
 func (r certAccountRepo) List(page, limit uint) ([]*biz.CertAccount, int64, error) {
 	var accounts []*biz.CertAccount
 	var total int64
-	err := panel.Orm.Model(&biz.CertAccount{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&accounts).Error
+	err := app.Orm.Model(&biz.CertAccount{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&accounts).Error
 	return accounts, total, err
 }
 
 func (r certAccountRepo) Get(id uint) (*biz.CertAccount, error) {
 	account := new(biz.CertAccount)
-	err := panel.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).First(account).Error
+	err := app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).First(account).Error
 	return account, err
 }
 
@@ -72,7 +72,7 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 	}
 	account.PrivateKey = string(privateKey)
 
-	if err = panel.Orm.Create(account).Error; err != nil {
+	if err = app.Orm.Create(account).Error; err != nil {
 		return nil, err
 	}
 
@@ -121,11 +121,11 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 	}
 	account.PrivateKey = string(privateKey)
 
-	return panel.Orm.Save(account).Error
+	return app.Orm.Save(account).Error
 }
 
 func (r certAccountRepo) Delete(id uint) error {
-	return panel.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).Delete(&biz.CertAccount{}).Error
+	return app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).Delete(&biz.CertAccount{}).Error
 }
 
 // getZeroSSLEAB 获取 ZeroSSL EAB

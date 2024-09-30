@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -66,7 +66,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/redis/redis.conf", panel.Root))
+	config, err := io.Read(fmt.Sprintf("%s/server/redis/redis.conf", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -82,7 +82,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/redis/redis.conf", panel.Root), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/redis/redis.conf", app.Root), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -8,13 +8,13 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/migration"
-	"github.com/TheTNB/panel/internal/panel"
 )
 
 func initOrm() {
 	logLevel := logger.Error
-	if panel.Conf.Bool("database.debug") {
+	if app.Conf.Bool("database.debug") {
 		logLevel = logger.Info
 	}
 	// You can use any other database, like MySQL or PostgreSQL.
@@ -26,11 +26,11 @@ func initOrm() {
 	if err != nil {
 		panic(fmt.Sprintf("failed to connect database: %v", err))
 	}
-	panel.Orm = db
+	app.Orm = db
 }
 
 func runMigrate() {
-	migrator := gormigrate.New(panel.Orm, &gormigrate.Options{
+	migrator := gormigrate.New(app.Orm, &gormigrate.Options{
 		UseTransaction:            true, // Note: MySQL not support DDL transaction
 		ValidateUnknownMigrations: true,
 	}, migration.Migrations)

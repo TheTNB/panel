@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -30,13 +30,13 @@ func NewCertRepo() biz.CertRepo {
 func (r *certRepo) List(page, limit uint) ([]*biz.Cert, int64, error) {
 	var certs []*biz.Cert
 	var total int64
-	err := panel.Orm.Model(&biz.Cert{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
+	err := app.Orm.Model(&biz.Cert{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
 	return certs, total, err
 }
 
 func (r *certRepo) Get(id uint) (*biz.Cert, error) {
 	cert := new(biz.Cert)
-	err := panel.Orm.Model(&biz.Cert{}).Where("id = ?", id).First(cert).Error
+	err := app.Orm.Model(&biz.Cert{}).Where("id = ?", id).First(cert).Error
 	return cert, err
 }
 
@@ -49,14 +49,14 @@ func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 		Domains:   req.Domains,
 		AutoRenew: req.AutoRenew,
 	}
-	if err := panel.Orm.Create(cert).Error; err != nil {
+	if err := app.Orm.Create(cert).Error; err != nil {
 		return nil, err
 	}
 	return cert, nil
 }
 
 func (r *certRepo) Update(req *request.CertUpdate) error {
-	return panel.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Updates(&biz.Cert{
+	return app.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Updates(&biz.Cert{
 		AccountID: req.AccountID,
 		WebsiteID: req.WebsiteID,
 		DNSID:     req.DNSID,
@@ -67,7 +67,7 @@ func (r *certRepo) Update(req *request.CertUpdate) error {
 }
 
 func (r *certRepo) Delete(id uint) error {
-	return panel.Orm.Model(&biz.Cert{}).Where("id = ?", id).Delete(&biz.Cert{}).Error
+	return app.Orm.Model(&biz.Cert{}).Where("id = ?", id).Delete(&biz.Cert{}).Error
 }
 
 func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
@@ -92,7 +92,7 @@ func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
 					return nil, errors.New("通配符域名无法使用 HTTP 验证")
 				}
 			}
-			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", panel.Root, cert.Website.Name)
+			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
 			client.UseHTTP(conf, cert.Website.Path)
 		}
 	}
@@ -105,7 +105,7 @@ func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
 	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
-	if err = panel.Orm.Save(cert).Error; err != nil {
+	if err = app.Orm.Save(cert).Error; err != nil {
 		return nil, err
 	}
 
@@ -134,7 +134,7 @@ func (r *certRepo) ObtainManual(id uint) (*acme.Certificate, error) {
 	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
-	if err = panel.Orm.Save(cert).Error; err != nil {
+	if err = app.Orm.Save(cert).Error; err != nil {
 		return nil, err
 	}
 
@@ -171,7 +171,7 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 					return nil, errors.New("通配符域名无法使用 HTTP 验证")
 				}
 			}
-			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", panel.Root, cert.Website.Name)
+			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
 			client.UseHTTP(conf, cert.Website.Path)
 		}
 	}
@@ -184,7 +184,7 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 	cert.CertURL = ssl.URL
 	cert.Cert = string(ssl.ChainPEM)
 	cert.Key = string(ssl.PrivateKey)
-	if err = panel.Orm.Save(cert).Error; err != nil {
+	if err = app.Orm.Save(cert).Error; err != nil {
 		return nil, err
 	}
 
@@ -236,10 +236,10 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 		return err
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.pem", panel.Root, website.Name), cert.Cert, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.pem", app.Root, website.Name), cert.Cert, 0644); err != nil {
 		return err
 	}
-	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.key", panel.Root, website.Name), cert.Key, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.key", app.Root, website.Name), cert.Key, 0644); err != nil {
 		return err
 	}
 	if err = systemctl.Reload("openresty"); err != nil {

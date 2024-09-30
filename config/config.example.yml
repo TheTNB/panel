@@ -8,10 +8,10 @@ app:
   root: "/www"
 
 http:
-  debug: false
-  address: ":3000"
+  debug: true
+  port: 8888
   entrance: "/"
-  ssl: false
+  tls: false
 
 database:
   debug: false

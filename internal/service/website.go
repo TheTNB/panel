@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-rat/chix"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/io"
 )
 
@@ -26,12 +26,12 @@ func NewWebsiteService() *WebsiteService {
 }
 
 func (s *WebsiteService) GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
-	index, err := io.Read(filepath.Join(panel.Root, "server/openresty/html/index.html"))
+	index, err := io.Read(filepath.Join(app.Root, "server/openresty/html/index.html"))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	stop, err := io.Read(filepath.Join(panel.Root, "server/openresty/html/stop.html"))
+	stop, err := io.Read(filepath.Join(app.Root, "server/openresty/html/stop.html"))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return

@@ -9,7 +9,7 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -73,8 +73,8 @@ func (s *Service) UpdateDNS(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 	var total, used, free string
 	var size int64
-	if io.Exists(filepath.Join(panel.Root, "swap")) {
-		file, err := io.FileInfo(filepath.Join(panel.Root, "swap"))
+	if io.Exists(filepath.Join(app.Root, "swap")) {
+		file, err := io.FileInfo(filepath.Join(app.Root, "swap"))
 		if err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
 			return
@@ -115,16 +115,16 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if io.Exists(filepath.Join(panel.Root, "swap")) {
-		if _, err = shell.Execf("swapoff '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+	if io.Exists(filepath.Join(app.Root, "swap")) {
+		if _, err = shell.Execf("swapoff '%s'", filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if _, err = shell.Execf("rm -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+		if _, err = shell.Execf("rm -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if _, err = shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(panel.Root, "swap")); err != nil {
+		if _, err = shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
@@ -132,7 +132,7 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 
 	if req.Size > 1 {
 		var free string
-		free, err = shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", panel.Root)
+		free, err = shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", app.Root)
 		if err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, "获取磁盘空间失败")
 			return
@@ -142,31 +142,31 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		btrfsCheck, _ := shell.Execf("df -T %s | awk '{print $2}' | tail -n 1", panel.Root)
+		btrfsCheck, _ := shell.Execf("df -T %s | awk '{print $2}' | tail -n 1", app.Root)
 		if strings.Contains(btrfsCheck, "btrfs") {
-			if _, err = shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(panel.Root, "swap")); err != nil {
+			if _, err = shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(app.Root, "swap")); err != nil {
 				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
 		} else {
-			if _, err = shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(panel.Root, "swap"), req.Size); err != nil {
+			if _, err = shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(app.Root, "swap"), req.Size); err != nil {
 				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
-			if _, err = shell.Execf("mkswap -f '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+			if _, err = shell.Execf("mkswap -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
 				service.Error(w, http.StatusUnprocessableEntity, err.Error())
 				return
 			}
-			if err = io.Chmod(filepath.Join(panel.Root, "swap"), 0600); err != nil {
+			if err = io.Chmod(filepath.Join(app.Root, "swap"), 0600); err != nil {
 				service.Error(w, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
 				return
 			}
 		}
-		if _, err = shell.Execf("swapon '%s'", filepath.Join(panel.Root, "swap")); err != nil {
+		if _, err = shell.Execf("swapon '%s'", filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}
-		if _, err = shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(panel.Root, "swap")); err != nil {
+		if _, err = shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusUnprocessableEntity, err.Error())
 			return
 		}

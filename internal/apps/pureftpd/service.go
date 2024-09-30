@@ -8,7 +8,7 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
@@ -132,7 +132,7 @@ func (s *Service) ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 // GetPort 获取端口
 func (s *Service) GetPort(w http.ResponseWriter, r *http.Request) {
-	port, err := shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, panel.Root)
+	port, err := shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, app.Root)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取PureFtpd端口失败")
 		return
@@ -149,7 +149,7 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%d/g" %s/server/pure-ftpd/etc/pure-ftpd.conf`, req.Port, panel.Root); err != nil {
+	if _, err = shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%d/g" %s/server/pure-ftpd/etc/pure-ftpd.conf`, req.Port, app.Root); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

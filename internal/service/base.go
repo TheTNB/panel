@@ -10,8 +10,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/go-rat/chix"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/internal/panel"
 )
 
 // SuccessResponse 通用成功响应
@@ -87,12 +87,12 @@ func Bind[T any](r *http.Request) (*T, error) {
 	}
 	if reqWithRules, ok := any(req).(request.WithRules); ok {
 		if rules := reqWithRules.Rules(r); rules != nil {
-			panel.Validator.RegisterStructValidationMapRules(rules, req)
+			app.Validator.RegisterStructValidationMapRules(rules, req)
 		}
 	}
 
 	// 验证参数
-	err := panel.Validator.Struct(req)
+	err := app.Validator.Struct(req)
 	if err == nil {
 		return req, nil
 	}
@@ -106,7 +106,7 @@ func Bind[T any](r *http.Request) (*T, error) {
 					return nil, errors.New(msg)
 				}
 			}
-			return nil, errors.New(e.Translate(*panel.Translator)) // nolint:staticcheck
+			return nil, errors.New(e.Translate(*app.Translator)) // nolint:staticcheck
 		}
 	}
 

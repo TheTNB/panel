@@ -9,7 +9,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -27,7 +27,7 @@ func NewService() *Service {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", panel.Root))
+	config, err := io.Read(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取配置失败")
 		return
@@ -42,7 +42,7 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusInternalServerError, "配置不能为空")
 	}
 
-	if err := io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", panel.Root), config, 0644); err != nil {
+	if err := io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root), config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, "保存配置失败")
 	}
 
@@ -55,11 +55,11 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	if !io.Exists(fmt.Sprintf("%s/wwwlogs/nginx_error.log", panel.Root)) {
+	if !io.Exists(fmt.Sprintf("%s/wwwlogs/nginx_error.log", app.Root)) {
 		service.Success(w, "")
 	}
 
-	out, err := shell.Execf("tail -n 100 %s/%s", panel.Root, "/wwwlogs/openresty_error.log")
+	out, err := shell.Execf("tail -n 100 %s/%s", app.Root, "/wwwlogs/openresty_error.log")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 	}
@@ -68,7 +68,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/%s", panel.Root, "/wwwlogs/openresty_error.log"); err != nil {
+	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "/wwwlogs/openresty_error.log"); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 	}
 

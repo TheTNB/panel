@@ -2,13 +2,13 @@ package bootstrap
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 
+	"github.com/gookit/color"
 	"github.com/urfave/cli/v3"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/route"
 )
 
@@ -39,10 +39,10 @@ func initCli() {
 	cmd := &cli.Command{
 		Name:     "panel-cli",
 		Usage:    "耗子面板命令行工具",
-		Version:  panel.Version,
+		Version:  app.Version,
 		Commands: route.Cli(),
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		panic(fmt.Sprintf("failed to run cli: %v", err))
+		color.Redln(err.Error())
 	}
 }

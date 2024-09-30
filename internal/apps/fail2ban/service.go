@@ -9,9 +9,9 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
@@ -127,7 +127,7 @@ maxretry = ` + jailMaxRetry + `
 findtime = ` + jailFindTime + `
 bantime = ` + jailBanTime + `
 action = %(action_mwl)s
-logpath = ` + panel.Root + `/wwwlogs/` + website.Name + `.log
+logpath = ` + app.Root + `/wwwlogs/` + website.Name + `.log
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
 		raw += rule
@@ -170,13 +170,13 @@ ignoreregex =
 			filter = "sshd"
 			port, err = shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 		case "mysql":
-			logPath = panel.Root + "/server/mysql/mysql-error.log"
+			logPath = app.Root + "/server/mysql/mysql-error.log"
 			filter = "mysqld-auth"
-			port, err = shell.Execf("cat %s/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'", panel.Root)
+			port, err = shell.Execf("cat %s/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'", app.Root)
 		case "pure-ftpd":
 			logPath = "/var/log/messages"
 			filter = "pure-ftpd"
-			port, err = shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, panel.Root)
+			port, err = shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, app.Root)
 		default:
 			service.Error(w, http.StatusUnprocessableEntity, "未知服务")
 			return

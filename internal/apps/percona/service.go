@@ -7,9 +7,9 @@ import (
 
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
@@ -31,7 +31,7 @@ func NewService() *Service {
 
 // GetConfig 获取配置
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(panel.Root + "/server/mysql/conf/my.cnf")
+	config, err := io.Read(app.Root + "/server/mysql/conf/my.cnf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取 Percona 配置失败")
 		return
@@ -48,7 +48,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := io.Write(panel.Root+"/server/mysql/conf/my.cnf", req.Config, 0644); err != nil {
+	if err := io.Write(app.Root+"/server/mysql/conf/my.cnf", req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, "写入 Percona 配置失败")
 		return
 	}
@@ -138,7 +138,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 
 // ErrorLog 获取错误日志
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-error.log", panel.Root)
+	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-error.log", app.Root)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, log)
 		return
@@ -149,7 +149,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 
 // ClearErrorLog 清空错误日志
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", panel.Root); err != nil {
+	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", app.Root); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -159,7 +159,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 
 // SlowLog 获取慢查询日志
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
-	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-slow.log", panel.Root)
+	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-slow.log", app.Root)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, log)
 		return
@@ -170,7 +170,7 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 
 // ClearSlowLog 清空慢查询日志
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", panel.Root); err != nil {
+	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", app.Root); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -227,8 +227,8 @@ func (s *Service) getSock() string {
 	if io.Exists("/tmp/mysql.sock") {
 		return "/tmp/mysql.sock"
 	}
-	if io.Exists(panel.Root + "/server/mysql/config/my.cnf") {
-		config, _ := io.Read(panel.Root + "/server/mysql/config/my.cnf")
+	if io.Exists(app.Root + "/server/mysql/config/my.cnf") {
+		config, _ := io.Read(app.Root + "/server/mysql/config/my.cnf")
 		re := regexp.MustCompile(`socket\s*=\s*(['"]?)([^'"]+)`)
 		matches := re.FindStringSubmatch(config)
 		if len(matches) > 2 {

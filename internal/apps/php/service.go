@@ -11,9 +11,9 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -33,7 +33,7 @@ func NewService(version uint) *Service {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php.ini", panel.Root, s.version))
+	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php.ini", app.Root, s.version))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -49,7 +49,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php.ini", panel.Root, s.version), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php.ini", app.Root, s.version), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -58,7 +58,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", panel.Root, s.version))
+	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", app.Root, s.version))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -74,7 +74,7 @@ func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", panel.Root, s.version), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", app.Root, s.version), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -110,17 +110,17 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version)
+	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/php-fpm.log", app.Root, s.version)
 	service.Success(w, log)
 }
 
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/slow.log", panel.Root, s.version)
+	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/slow.log", app.Root, s.version)
 	service.Success(w, log)
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", panel.Root, s.version); err != nil {
+	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", app.Root, s.version); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -129,7 +129,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", panel.Root, s.version); err != nil {
+	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", app.Root, s.version); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -150,7 +150,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	raw, err := shell.Execf("%s/server/php/%d/bin/php -m", panel.Root, s.version)
+	raw, err := shell.Execf("%s/server/php/%d/bin/php -m", app.Root, s.version)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -183,10 +183,10 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' install %d >> '/tmp/%s.log' 2>&1`, panel.Root, req.Slug, s.version, req.Slug)
+	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' install %d >> '/tmp/%s.log' 2>&1`, app.Root, req.Slug, s.version, req.Slug)
 	officials := []string{"fileinfo", "exif", "imap", "pdo_pgsql", "zip", "bz2", "readline", "snmp", "ldap", "enchant", "pspell", "calendar", "gmp", "sysvmsg", "sysvsem", "sysvshm", "xsl", "intl", "gettext"}
 	if slices.Contains(officials, req.Slug) {
-		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' install '%d' '%s' >> '/tmp/%s.log' 2>&1`, panel.Root, s.version, req.Slug, req.Slug)
+		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' install '%d' '%s' >> '/tmp/%s.log' 2>&1`, app.Root, s.version, req.Slug, req.Slug)
 	}
 
 	task := new(biz.Task)
@@ -214,10 +214,10 @@ func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' uninstall %d >> '/tmp/%s.log' 2>&1`, panel.Root, req.Slug, s.version, req.Slug)
+	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' uninstall %d >> '/tmp/%s.log' 2>&1`, app.Root, req.Slug, s.version, req.Slug)
 	officials := []string{"fileinfo", "exif", "imap", "pdo_pgsql", "zip", "bz2", "readline", "snmp", "ldap", "enchant", "pspell", "calendar", "gmp", "sysvmsg", "sysvsem", "sysvshm", "xsl", "intl", "gettext"}
 	if slices.Contains(officials, req.Slug) {
-		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' uninstall '%d' '%s' >> '/tmp/%s.log' 2>&1`, panel.Root, s.version, req.Slug, req.Slug)
+		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' uninstall '%d' '%s' >> '/tmp/%s.log' 2>&1`, app.Root, s.version, req.Slug, req.Slug)
 	}
 
 	task := new(biz.Task)
@@ -372,7 +372,7 @@ func (s *Service) getExtensions() []Extension {
 		})
 	}
 
-	raw, _ := shell.Execf("%s/server/php/%d/bin/php -m", panel.Root, s.version)
+	raw, _ := shell.Execf("%s/server/php/%d/bin/php -m", app.Root, s.version)
 	extensionMap := make(map[string]*Extension)
 	for i := range extensions {
 		extensionMap[extensions[i].Slug] = &extensions[i]

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/TheTNB/panel/internal/panel"
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
@@ -17,7 +17,7 @@ func NewService() *Service {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/gitea/app.ini", panel.Root))
+	config, err := io.Read(fmt.Sprintf("%s/server/gitea/app.ini", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
@@ -33,7 +33,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/gitea/app.ini", panel.Root), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/gitea/app.ini", app.Root), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

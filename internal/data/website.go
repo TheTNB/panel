@@ -11,10 +11,10 @@ import (
 
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/internal/panel"
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
@@ -35,10 +35,10 @@ func NewWebsiteRepo() biz.WebsiteRepo {
 }
 
 func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error {
-	if err := io.Write(filepath.Join(panel.Root, "server/openresty/html/index.html"), req.Index, 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/openresty/html/index.html"), req.Index, 0644); err != nil {
 		return err
 	}
-	if err := io.Write(filepath.Join(panel.Root, "server/openresty/html/stop.html"), req.Stop, 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/openresty/html/stop.html"), req.Stop, 0644); err != nil {
 		return err
 	}
 
@@ -47,7 +47,7 @@ func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) err
 
 func (r *websiteRepo) Count() (int64, error) {
 	var count int64
-	if err := panel.Orm.Model(&biz.Website{}).Count(&count).Error; err != nil {
+	if err := app.Orm.Model(&biz.Website{}).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
@@ -56,11 +56,11 @@ func (r *websiteRepo) Count() (int64, error) {
 
 func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
 		return nil, err
 	}
 
-	config, err := io.Read(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"))
+	config, err := io.Read(filepath.Join(app.Root, "server/vhost", website.Name+".conf"))
 	if err != nil {
 		return nil, err
 	}
@@ -120,9 +120,9 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 		}
 	}
 
-	crt, _ := io.Read(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".pem"))
+	crt, _ := io.Read(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"))
 	setting.SSLCertificate = crt
-	key, _ := io.Read(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".key"))
+	key, _ := io.Read(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key"))
 	setting.SSLCertificateKey = key
 	if setting.SSL {
 		ssl := str.Cut(config, "# ssl标记位开始", "# ssl标记位结束")
@@ -155,9 +155,9 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 		setting.WafCache = match[1]
 	}
 
-	rewrite, _ := io.Read(filepath.Join(panel.Root, "server/vhost/rewrite", website.Name+".conf"))
+	rewrite, _ := io.Read(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"))
 	setting.Rewrite = rewrite
-	log, _ := shell.Execf(`tail -n 100 '%s/wwwlogs/%s.log'`, panel.Root, website.Name)
+	log, _ := shell.Execf(`tail -n 100 '%s/wwwlogs/%s.log'`, app.Root, website.Name)
 	setting.Log = log
 
 	return setting, err
@@ -165,7 +165,7 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 
 func (r *websiteRepo) GetByName(name string) (*types.WebsiteSetting, error) {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("name", name).First(website).Error; err != nil {
+	if err := app.Orm.Where("name", name).First(website).Error; err != nil {
 		return nil, err
 	}
 
@@ -177,11 +177,11 @@ func (r *websiteRepo) List(page, limit uint) ([]*biz.Website, int64, error) {
 	var websites []*biz.Website
 	var total int64
 
-	if err := panel.Orm.Model(&biz.Website{}).Count(&total).Error; err != nil {
+	if err := app.Orm.Model(&biz.Website{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if err := panel.Orm.Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&websites).Error; err != nil {
+	if err := app.Orm.Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&websites).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -196,7 +196,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		PHP:    cast.ToInt(req.PHP),
 		SSL:    false,
 	}
-	if err := panel.Orm.Create(w).Error; err != nil {
+	if err := app.Orm.Create(w).Error; err != nil {
 		return nil, err
 	}
 
@@ -302,21 +302,21 @@ server
     access_log %s/wwwlogs/%s.log;
     error_log %s/wwwlogs/%s.log;
 }
-`, portList, domainList, req.Path, req.PHP, panel.Root, panel.Root, req.Name, panel.Root, req.Name, panel.Root, req.Name, panel.Root, req.Name)
+`, portList, domainList, req.Path, req.PHP, app.Root, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name)
 
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost", req.Name+".conf"), nginxConf, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost", req.Name+".conf"), nginxConf, 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/rewrite", req.Name+".conf"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/rewrite", req.Name+".conf"), "", 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/acme", req.Name+".conf"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/acme", req.Name+".conf"), "", 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/ssl", req.Name+".pem"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", req.Name+".pem"), "", 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/ssl", req.Name+".key"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", req.Name+".key"), "", 0644); err != nil {
 		return nil, err
 	}
 
@@ -354,7 +354,7 @@ server
 		_, _ = shell.Execf(`echo "ALTER DATABASE '%s' OWNER TO '%s';" | su - postgres -c "psql"`, req.DBName, req.DBUser)
 		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE '%s' TO '%s';" | su - postgres -c "psql"`, req.DBName, req.DBUser)
 		userConfig := "host    " + req.DBName + "    " + req.DBUser + "    127.0.0.1/32    scram-sha-256"
-		_, _ = shell.Execf(`echo "`+userConfig+`" >> %s/server/postgresql/data/pg_hba.conf`, panel.Root)
+		_, _ = shell.Execf(`echo "`+userConfig+`" >> %s/server/postgresql/data/pg_hba.conf`, app.Root)
 		_ = systemctl.Reload("postgresql")
 	}
 
@@ -363,7 +363,7 @@ server
 
 func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", req.ID).First(website).Error; err != nil {
+	if err := app.Orm.Where("id", req.ID).First(website).Error; err != nil {
 		return err
 	}
 
@@ -372,12 +372,12 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	}
 
 	// 原文
-	raw, err := io.Read(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"))
+	raw, err := io.Read(filepath.Join(app.Root, "server/vhost", website.Name+".conf"))
 	if err != nil {
 		return err
 	}
 	if strings.TrimSpace(raw) != strings.TrimSpace(req.Raw) {
-		if err = io.Write(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"), req.Raw, 0644); err != nil {
+		if err = io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), req.Raw, 0644); err != nil {
 			return err
 		}
 		if err = systemctl.Reload("openresty"); err != nil {
@@ -490,7 +490,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
     waf_mode %s;
     waf_cc_deny %s;
     waf_cache %s;
-    `, wafStr, panel.Root, req.WafMode, req.WafCcDeny, req.WafCache)
+    `, wafStr, app.Root, req.WafMode, req.WafCcDeny, req.WafCache)
 	wafConfigOld := str.Cut(raw, "# waf标记位开始", "# waf标记位结束")
 	if len(strings.TrimSpace(wafConfigOld)) != 0 {
 		raw = strings.Replace(raw, wafConfigOld, "", -1)
@@ -498,10 +498,10 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	raw = strings.Replace(raw, "# waf标记位开始", wafConfig, -1)
 
 	// SSL
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".pem"), req.SSLCertificate, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"), req.SSLCertificate, 0644); err != nil {
 		return err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".key"), req.SSLCertificateKey, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key"), req.SSLCertificateKey, 0644); err != nil {
 		return err
 	}
 	website.SSL = req.SSL
@@ -521,7 +521,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     ssl_prefer_server_ciphers off;
     ssl_early_data on;
-    `, panel.Root, website.Name, panel.Root, website.Name)
+    `, app.Root, website.Name, app.Root, website.Name)
 		if req.HTTPRedirect {
 			sslConfig += `# http重定向标记位开始
     if ($server_port !~ 443){
@@ -567,14 +567,14 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		}
 	}
 
-	if err = panel.Orm.Save(website).Error; err != nil {
+	if err = app.Orm.Save(website).Error; err != nil {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
 		return err
 	}
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost/rewrite", website.Name+".conf"), req.Rewrite, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"), req.Rewrite, 0644); err != nil {
 		return err
 	}
 
@@ -588,7 +588,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 
 func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Preload("Cert").Where("id", req.ID).First(website).Error; err != nil {
+	if err := app.Orm.Preload("Cert").Where("id", req.ID).First(website).Error; err != nil {
 		return err
 	}
 
@@ -596,15 +596,15 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		return errors.New("网站" + website.Name + "已绑定SSL证书，请先删除证书")
 	}
 
-	if err := panel.Orm.Delete(website).Error; err != nil {
+	if err := app.Orm.Delete(website).Error; err != nil {
 		return err
 	}
 
-	_ = io.Remove(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"))
-	_ = io.Remove(filepath.Join(panel.Root, "server/vhost/rewrite", website.Name+".conf"))
-	_ = io.Remove(filepath.Join(panel.Root, "server/vhost/acme", website.Name+".conf"))
-	_ = io.Remove(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".pem"))
-	_ = io.Remove(filepath.Join(panel.Root, "server/vhost/ssl", website.Name+".key"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost", website.Name+".conf"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key"))
 
 	if req.Path {
 		_ = io.Remove(website.Path)
@@ -634,33 +634,33 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 
 func (r *websiteRepo) ClearLog(id uint) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
 		return err
 	}
 
-	_, err := shell.Execf(`echo "" > %s/wwwlogs/%s.log`, panel.Root, website.Name)
+	_, err := shell.Execf(`echo "" > %s/wwwlogs/%s.log`, app.Root, website.Name)
 	return err
 }
 
 func (r *websiteRepo) UpdateRemark(id uint, remark string) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
 		return err
 	}
 
 	website.Remark = remark
-	return panel.Orm.Save(website).Error
+	return app.Orm.Save(website).Error
 }
 
 func (r *websiteRepo) ResetConfig(id uint) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", id).First(&website).Error; err != nil {
+	if err := app.Orm.Where("id", id).First(&website).Error; err != nil {
 		return err
 	}
 
 	website.Status = true
 	website.SSL = false
-	if err := panel.Orm.Save(website).Error; err != nil {
+	if err := app.Orm.Save(website).Error; err != nil {
 		return err
 	}
 
@@ -724,14 +724,14 @@ server
     error_log %s/wwwlogs/%s.log;
 }
 
-`, website.Path, website.PHP, panel.Root, panel.Root, website.Name, panel.Root, website.Name, panel.Root, website.Name, panel.Root, website.Name)
-	if err := io.Write(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
+`, website.Path, website.PHP, app.Root, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name)
+	if err := io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
 		return nil
 	}
-	if err := io.Write(filepath.Join(panel.Root, "server/vhost/rewrite", website.Name+".conf"), "", 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"), "", 0644); err != nil {
 		return nil
 	}
-	if err := io.Write(filepath.Join(panel.Root, "server/vhost/acme", website.Name+".conf"), "", 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"), "", 0644); err != nil {
 		return nil
 	}
 	if err := systemctl.Reload("openresty"); err != nil {
@@ -744,16 +744,16 @@ server
 
 func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 	website := new(biz.Website)
-	if err := panel.Orm.Where("id", id).First(&website).Error; err != nil {
+	if err := app.Orm.Where("id", id).First(&website).Error; err != nil {
 		return err
 	}
 
 	website.Status = status
-	if err := panel.Orm.Save(website).Error; err != nil {
+	if err := app.Orm.Save(website).Error; err != nil {
 		return err
 	}
 
-	raw, err := io.Read(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"))
+	raw, err := io.Read(filepath.Join(app.Root, "server/vhost", website.Name+".conf"))
 	if err != nil {
 		return err
 	}
@@ -766,7 +766,7 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 			root := regexp.MustCompile(`# root\s+(.+);`).FindStringSubmatch(rootConfig)
 			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s;\n    ", root[1]))
 		} else {
-			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s/server/openresty/html;\n    # root %s;\n    ", panel.Root, match[1]))
+			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s/server/openresty/html;\n    # root %s;\n    ", app.Root, match[1]))
 		}
 	}
 
@@ -782,7 +782,7 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 		}
 	}
 
-	if err = io.Write(filepath.Join(panel.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
 		return err
 	}
 	if err = systemctl.Reload("openresty"); err != nil {

@@ -17,6 +17,7 @@ type User struct {
 }
 
 type UserRepo interface {
+	Create(username, password string) (*User, error)
 	CheckPassword(username, password string) (*User, error)
 	Get(id uint) (*User, error)
 	Save(user *User) error
