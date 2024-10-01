@@ -7,6 +7,7 @@ import (
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"moul.io/zapgorm2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/migration"
@@ -17,9 +18,13 @@ func initOrm() {
 	if app.Conf.Bool("database.debug") {
 		logLevel = logger.Info
 	}
+	zapLogger := zapgorm2.New(app.Logger)
+	zapLogger.LogMode(logLevel)
+	zapLogger.SetAsDefault()
+
 	// You can use any other database, like MySQL or PostgreSQL.
 	db, err := gorm.Open(sqlite.Open("storage/panel.db"), &gorm.Config{
-		Logger:                                   logger.Default.LogMode(logLevel),
+		Logger:                                   zapLogger,
 		SkipDefaultTransaction:                   true,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})

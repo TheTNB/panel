@@ -195,7 +195,6 @@ func (s *FileService) Download(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FileService) RemoteDownload(w http.ResponseWriter, r *http.Request) {
-	// TODO: 未实现
 }
 
 func (s *FileService) Info(w http.ResponseWriter, r *http.Request) {

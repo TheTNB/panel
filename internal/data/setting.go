@@ -5,6 +5,8 @@ import (
 	"errors"
 	"path/filepath"
 
+	"github.com/go-rat/utils/hash"
+	"github.com/goccy/go-yaml"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type settingRepo struct{}
@@ -69,9 +72,6 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 	}
 
 	userID := cast.ToUint(ctx.Value("user_id"))
-	if userID == 0 {
-		return nil, errors.New("获取用户 ID 失败")
-	}
 	user := new(biz.User)
 	if err := app.Orm.Where("id = ?", userID).First(user).Error; err != nil {
 		return nil, err
@@ -101,18 +101,69 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 	}, nil
 }
 
-func (r *settingRepo) UpdatePanelSetting(setting *request.PanelSetting) error {
+func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.PanelSetting) (bool, error) {
 	if err := r.Set(biz.SettingKeyName, setting.Name); err != nil {
-		return err
+		return false, err
 	}
 	if err := r.Set(biz.SettingKeyWebsitePath, setting.WebsitePath); err != nil {
-		return err
+		return false, err
 	}
 	if err := r.Set(biz.SettingKeyBackupPath, setting.BackupPath); err != nil {
-		return err
+		return false, err
 	}
 
-	// TODO fix other settings
+	if err := io.Write(filepath.Join(app.Root, "panel/storage/cert.pem"), setting.Cert, 0644); err != nil {
+		return false, err
+	}
+	if err := io.Write(filepath.Join(app.Root, "panel/storage/cert.key"), setting.Key, 0644); err != nil {
+		return false, err
+	}
 
-	return nil
+	restartFlag := false
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read("config/config.yml")
+	if err != nil {
+		return false, err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), &config, yaml.CommentToMap(cm)); err != nil {
+		return false, err
+	}
+
+	config.App.Locale = setting.Locale
+	config.HTTP.Port = setting.Port
+	config.HTTP.Entrance = setting.Entrance
+	config.HTTP.TLS = setting.HTTPS
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return false, err
+	}
+	if err = io.Write("config/config.yml", string(encoded), 0644); err != nil {
+		return false, err
+	}
+	if raw != string(encoded) {
+		restartFlag = true
+	}
+
+	user := new(biz.User)
+	userID := cast.ToUint(ctx.Value("user_id"))
+	if err = app.Orm.Where("id = ?", userID).First(user).Error; err != nil {
+		return false, err
+	}
+
+	user.Username = setting.Username
+	user.Email = setting.Email
+	if setting.Password != "" {
+		value, err := hash.NewArgon2id().Make(setting.Password)
+		if err != nil {
+			return false, err
+		}
+		user.Password = value
+	}
+	if err = app.Orm.Save(user).Error; err != nil {
+		return false, err
+	}
+
+	return restartFlag, nil
 }

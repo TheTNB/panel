@@ -6,6 +6,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type SettingService struct {
@@ -35,9 +36,14 @@ func (s *SettingService) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.settingRepo.UpdatePanelSetting(req); err != nil {
+	restart := false
+	if restart, err = s.settingRepo.UpdatePanelSetting(r.Context(), req); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if restart {
+		tools.RestartPanel()
 	}
 
 	Success(w, nil)

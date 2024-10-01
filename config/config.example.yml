@@ -1,17 +1,16 @@
 # 警告：未经指导私自修改此配置文件可能导致严重后果
 # Warning: Modifying this configuration file without guidance may cause serious consequences
 app:
-  key: "a-long-string-with-32-characters"
-  locale: "zh_CN"
-  timezone: "Asia/Shanghai"
-  version: "2.3.0"
-  root: "/www"
-
+  debug: false
+  key: a-long-string-with-32-characters
+  locale: zh_CN
+  timezone: Asia/Shanghai
+  version: 2.3.0
+  root: /www
 http:
   debug: true
   port: 8888
-  entrance: "/"
+  entrance: /
   tls: false
-
 database:
   debug: false

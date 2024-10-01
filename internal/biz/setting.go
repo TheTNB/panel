@@ -36,5 +36,5 @@ type SettingRepo interface {
 	Set(key SettingKey, value string) error
 	Delete(key SettingKey) error
 	GetPanelSetting(ctx context.Context) (*request.PanelSetting, error)
-	UpdatePanelSetting(setting *request.PanelSetting) error
+	UpdatePanelSetting(ctx context.Context, setting *request.PanelSetting) (bool, error)
 }

@@ -10,6 +10,7 @@ func boot() {
 
 	initConf()
 	initGlobal()
+	initLogger()
 	initOrm()
 	runMigrate()
 }
