@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"time"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -10,7 +12,7 @@ import (
 
 func initLogger() {
 	writeSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "storage/app.log",
+		Filename:   "storage/logs/app.log",
 		MaxSize:    10,
 		MaxBackups: 10,
 		MaxAge:     30,
@@ -23,7 +25,7 @@ func initLogger() {
 	}
 
 	config := zap.NewProductionEncoderConfig()
-	config.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05")
+	config.EncodeTime = zapcore.TimeEncoderOfLayout(time.DateTime)
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(config),
 		writeSyncer,

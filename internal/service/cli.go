@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	"github.com/go-rat/utils/hash"
 	"github.com/gookit/color"
@@ -214,7 +215,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("已经初始化过了")
 	}
 
-	settings := []biz.Setting{{Key: biz.SettingKeyName, Value: "耗子面板"}, {Key: biz.SettingKeyMonitor, Value: "1"}, {Key: biz.SettingKeyMonitorDays, Value: "30"}, {Key: biz.SettingKeyBackupPath, Value: "/www/backup"}, {Key: biz.SettingKeyWebsitePath, Value: "/www/wwwroot"}, {Key: biz.SettingKeyVersion, Value: app.Conf.String("app.version")}}
+	settings := []biz.Setting{{Key: biz.SettingKeyName, Value: "耗子面板"}, {Key: biz.SettingKeyMonitor, Value: "1"}, {Key: biz.SettingKeyMonitorDays, Value: "30"}, {Key: biz.SettingKeyBackupPath, Value: filepath.Join(app.Root, "backup")}, {Key: biz.SettingKeyWebsitePath, Value: filepath.Join(app.Root, "wwwroot")}, {Key: biz.SettingKeyVersion, Value: app.Conf.String("app.version")}}
 	if err := app.Orm.Create(&settings).Error; err != nil {
 		return fmt.Errorf("初始化失败: %v", err)
 	}

@@ -22,7 +22,6 @@ func initOrm() {
 	zapLogger.LogMode(logLevel)
 	zapLogger.SetAsDefault()
 
-	// You can use any other database, like MySQL or PostgreSQL.
 	db, err := gorm.Open(sqlite.Open("storage/panel.db"), &gorm.Config{
 		Logger:                                   zapLogger,
 		SkipDefaultTransaction:                   true,
