@@ -33,6 +33,8 @@ func initLogger() {
 	)
 
 	logger := zap.New(core)
-	defer logger.Sync()
+	defer func(logger *zap.Logger) {
+		_ = logger.Sync()
+	}(logger)
 	app.Logger = logger
 }
