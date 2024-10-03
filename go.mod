@@ -32,7 +32,7 @@ require (
 	github.com/libdns/dnspod v0.0.3
 	github.com/libdns/libdns v0.2.2
 	github.com/libdns/tencentcloud v1.0.0
-	github.com/mholt/acmez/v2 v2.0.2
+	github.com/mholt/acmez/v2 v2.0.3
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/sethvargo/go-limiter v1.0.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
