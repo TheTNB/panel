@@ -41,7 +41,7 @@ require (
 	github.com/urfave/cli/v3 v3.0.0-alpha9
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
-	golang.org/x/net v0.29.0
+	golang.org/x/net v0.30.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/gorm v1.25.12
 	moul.io/zapgorm2 v1.3.0
