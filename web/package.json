@@ -47,7 +47,7 @@
     "@types/node": "^20.16.5",
     "@unocss/eslint-config": "^0.63.0",
     "@vitejs/plugin-vue": "^5.1.3",
-    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-prettier": "^10.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/tsconfig": "^0.5.1",
     "colord": "^2.9.3",
