@@ -1,5 +1,4 @@
 import axios from 'axios'
-
 import { reqReject, reqResolve, resReject, resResolve } from './interceptors'
 
 export function createAxios(options = {}) {

@@ -10,7 +10,6 @@ import {
 } from 'naive-ui'
 import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 import { defineStore } from 'pinia'
-
 import { getNaiveThemeOverrides, initThemeSettings } from './helpers'
 
 type ThemeState = Theme.Setting
@@ -64,8 +63,8 @@ export const useThemeStore = defineStore('theme-store', {
       this.primaryColor = color
     },
     /** 设置语言 */
-    setLocale(language: string) {
-      this.locale = language
+    setLocale(locale: string) {
+      this.locale = locale
     }
   }
 })

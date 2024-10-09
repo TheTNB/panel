@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import Editor from '@guolao/vue-monaco-editor'
-
 import file from '@/api/panel/file'
 import { languageByPath } from '@/utils/file'
+import Editor from '@guolao/vue-monaco-editor'
 
 const props = defineProps({
   path: String,

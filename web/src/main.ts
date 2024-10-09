@@ -1,16 +1,15 @@
-import '@/styles/index.scss'
 import '@/styles/reset.css'
+import '@/styles/index.scss'
 import 'uno.css'
 
-import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 import { createApp } from 'vue'
-
-import info from '@/api/panel/info'
-import { setupI18n } from '@/i18n/i18n'
 import App from './App.vue'
-import { setupRouter } from './router'
 import { setupStore, useThemeStore } from './store'
+import { setupRouter } from './router'
+import { setupI18n } from '@/i18n/i18n'
 import { setupNaiveDiscreteApi } from './utils'
+import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
+import info from '@/api/panel/info'
 
 async function setupApp() {
   const app = createApp(App)

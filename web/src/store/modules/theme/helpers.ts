@@ -1,6 +1,5 @@
-import type { GlobalThemeOverrides } from 'naive-ui'
-
 import { addColorAlpha, getColorPalette } from '@/utils'
+import type { GlobalThemeOverrides } from 'naive-ui'
 import themeSetting from '~/settings/theme.json'
 
 type ColorType = 'primary' | 'info' | 'success' | 'warning' | 'error'
@@ -31,8 +30,8 @@ export function initThemeSettings(): Theme.Setting {
     warning: '#faad14',
     error: '#f5222d'
   }
-  const locale = themeSetting.locale || 'zh_CN'
-  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, locale }
+  const language = themeSetting.language || 'zh_CN'
+  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, language }
 }
 
 /** 获取naive的主题颜色 */

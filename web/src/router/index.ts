@@ -1,7 +1,6 @@
+import { usePermissionStore } from '@/store'
 import type { App } from 'vue'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
-
-import { usePermissionStore } from '@/store'
 import type { RoutesType, RouteType } from '~/types/router'
 import { setupRouterGuard } from './guard'
 import { basicRoutes, EMPTY_ROUTE, NOT_FOUND_ROUTE } from './routes'

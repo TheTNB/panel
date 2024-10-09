@@ -1,6 +1,5 @@
-import * as NaiveUI from 'naive-ui'
-
 import { useThemeStore } from '@/store'
+import * as NaiveUI from 'naive-ui'
 
 export async function setupNaiveDiscreteApi() {
   const themeStore = useThemeStore()

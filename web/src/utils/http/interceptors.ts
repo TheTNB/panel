@@ -1,5 +1,4 @@
 import type { AxiosError, AxiosResponse } from 'axios'
-
 import type { RequestConfig } from '~/types/axios'
 import { AxiosRejectError, resolveResError } from './helpers'
 

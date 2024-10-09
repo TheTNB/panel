@@ -1,6 +1,5 @@
-import type { Router } from 'vue-router'
-
 import app from '@/api/panel/app'
+import type { Router } from 'vue-router'
 
 export function createAppInstallGuard(router: Router) {
   router.beforeEach(async (to) => {

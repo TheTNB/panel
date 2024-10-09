@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
-
 import { renderIcon } from '@/utils'
+import { useI18n } from 'vue-i18n'
 import type { Meta } from '~/types/router'
 
 const { t } = useI18n()

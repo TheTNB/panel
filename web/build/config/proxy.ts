@@ -1,5 +1,4 @@
 import type { ProxyOptions } from 'vite'
-
 import { getProxyConfig } from '../../settings/proxy-config'
 
 export function createViteProxy(isUseProxy = true, proxyType: ProxyType) {
