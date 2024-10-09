@@ -62,9 +62,9 @@ func (r *appRepo) UpdateExist(slug string) bool {
 		return false
 	}
 
-	for v := range slices.Values(item.Versions) {
-		if v.Slug == installed.VersionSlug {
-			current := str.FirstElement(v.Subs)
+	for channel := range slices.Values(item.Channels) {
+		if channel.Slug == installed.Channel {
+			current := str.FirstElement(channel.Subs)
 			if current != nil && current.Version != installed.Version {
 				return true
 			}
@@ -141,7 +141,7 @@ func (r *appRepo) IsInstalled(query string, cond ...string) (bool, error) {
 	return count > 0, nil
 }
 
-func (r *appRepo) Install(slug, versionSlug string) error {
+func (r *appRepo) Install(channel, slug string) error {
 	item, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -155,17 +155,19 @@ func (r *appRepo) Install(slug, versionSlug string) error {
 		return errors.New("应用已安装")
 	}
 
-	var shellUrl string
-	for v := range slices.Values(item.Versions) {
-		vs, err := version.NewVersion(v.Panel)
+	shellUrl, shellChannel, shellVersion := "", "", ""
+	for ch := range slices.Values(item.Channels) {
+		vs, err := version.NewVersion(ch.Panel)
 		if err != nil {
 			continue
 		}
-		if v.Slug == versionSlug {
+		if ch.Slug == channel {
 			if vs.GreaterThan(panel) {
-				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, ch.Panel, app.Version)
 			}
-			shellUrl = v.Install
+			shellUrl = ch.Install
+			shellChannel = ch.Slug
+			shellVersion = str.FirstElement(ch.Subs).Version
 			break
 		}
 	}
@@ -180,7 +182,7 @@ func (r *appRepo) Install(slug, versionSlug string) error {
 	task := new(biz.Task)
 	task.Name = "安装应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, item.Slug)
+	task.Shell = fmt.Sprintf(`curl -s "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 	if err = r.taskRepo.Push(task); err != nil {
 		return err
@@ -189,7 +191,7 @@ func (r *appRepo) Install(slug, versionSlug string) error {
 	return err
 }
 
-func (r *appRepo) Uninstall(slug, versionSlug string) error {
+func (r *appRepo) Uninstall(slug string) error {
 	item, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -202,18 +204,24 @@ func (r *appRepo) Uninstall(slug, versionSlug string) error {
 	if installed, _ := r.IsInstalled(slug); !installed {
 		return errors.New("应用未安装")
 	}
+	installed, err := r.GetInstalled(slug)
+	if err != nil {
+		return err
+	}
 
-	var shellUrl string
-	for v := range slices.Values(item.Versions) {
-		vs, err := version.NewVersion(v.Panel)
+	shellUrl, shellChannel, shellVersion := "", "", ""
+	for ch := range slices.Values(item.Channels) {
+		vs, err := version.NewVersion(ch.Panel)
 		if err != nil {
 			continue
 		}
-		if v.Slug == versionSlug {
+		if ch.Slug == installed.Channel {
 			if vs.GreaterThan(panel) {
-				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, ch.Panel, app.Version)
 			}
-			shellUrl = v.Uninstall
+			shellUrl = ch.Uninstall
+			shellChannel = ch.Slug
+			shellVersion = installed.Version
 			break
 		}
 	}
@@ -228,7 +236,7 @@ func (r *appRepo) Uninstall(slug, versionSlug string) error {
 	task := new(biz.Task)
 	task.Name = "卸载应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, item.Slug)
+	task.Shell = fmt.Sprintf(`curl -s "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 	if err = r.taskRepo.Push(task); err != nil {
 		return err
@@ -237,7 +245,7 @@ func (r *appRepo) Uninstall(slug, versionSlug string) error {
 	return err
 }
 
-func (r *appRepo) Update(slug, versionSlug string) error {
+func (r *appRepo) Update(slug string) error {
 	item, err := r.Get(slug)
 	if err != nil {
 		return err
@@ -250,18 +258,24 @@ func (r *appRepo) Update(slug, versionSlug string) error {
 	if installed, _ := r.IsInstalled(slug); !installed {
 		return errors.New("应用未安装")
 	}
+	installed, err := r.GetInstalled(slug)
+	if err != nil {
+		return err
+	}
 
-	var shellUrl string
-	for v := range slices.Values(item.Versions) {
-		vs, err := version.NewVersion(v.Panel)
+	shellUrl, shellChannel, shellVersion := "", "", ""
+	for ch := range slices.Values(item.Channels) {
+		vs, err := version.NewVersion(ch.Panel)
 		if err != nil {
 			continue
 		}
-		if v.Slug == versionSlug {
+		if ch.Slug == installed.Channel {
 			if vs.GreaterThan(panel) {
-				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, ch.Panel, app.Version)
 			}
-			shellUrl = v.Update
+			shellUrl = ch.Update
+			shellChannel = ch.Slug
+			shellVersion = str.FirstElement(ch.Subs).Version
 			break
 		}
 	}
@@ -276,7 +290,7 @@ func (r *appRepo) Update(slug, versionSlug string) error {
 	task := new(biz.Task)
 	task.Name = "更新应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf("%s >> /tmp/%s.log 2>&1", shellUrl, item.Slug)
+	task.Shell = fmt.Sprintf(`curl -s "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 	if err = r.taskRepo.Push(task); err != nil {
 		return err

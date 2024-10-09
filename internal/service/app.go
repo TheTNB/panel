@@ -36,24 +36,35 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 
 	var apps []types.StoreApp
 	for _, item := range all {
-		installed, installedVersion, installedVersionSlug, updateExist, show := false, "", "", false, false
+		installed, installedChannel, installedVersion, updateExist, show := false, "", "", false, false
 		if _, ok := installedAppMap[item.Slug]; ok {
 			installed = true
+			installedChannel = installedAppMap[item.Slug].Channel
 			installedVersion = installedAppMap[item.Slug].Version
-			installedVersionSlug = installedAppMap[item.Slug].VersionSlug
 			updateExist = s.appRepo.UpdateExist(item.Slug)
 			show = installedAppMap[item.Slug].Show
 		}
 		apps = append(apps, types.StoreApp{
-			Name:                 item.Name,
-			Description:          item.Description,
-			Slug:                 item.Slug,
-			Versions:             item.Versions,
-			Installed:            installed,
-			InstalledVersion:     installedVersion,
-			InstalledVersionSlug: installedVersionSlug,
-			UpdateExist:          updateExist,
-			Show:                 show,
+			Name:        item.Name,
+			Description: item.Description,
+			Slug:        item.Slug,
+			Channels: []struct {
+				Slug      string `json:"slug"`
+				Name      string `json:"name"`
+				Panel     string `json:"panel"`
+				Install   string `json:"-"`
+				Uninstall string `json:"-"`
+				Update    string `json:"-"`
+				Subs      []struct {
+					Log     string `json:"log"`
+					Version string `json:"version"`
+				} `json:"subs"`
+			}(item.Channels),
+			Installed:        installed,
+			InstalledChannel: installedChannel,
+			InstalledVersion: installedVersion,
+			UpdateExist:      updateExist,
+			Show:             show,
 		})
 	}
 
@@ -72,7 +83,7 @@ func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.appRepo.Install(req.Slug, req.VersionSlug); err != nil {
+	if err = s.appRepo.Install(req.Channel, req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -81,13 +92,13 @@ func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.App](r)
+	req, err := Bind[request.AppSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.appRepo.Uninstall(req.Slug, req.VersionSlug); err != nil {
+	if err = s.appRepo.Uninstall(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -96,13 +107,13 @@ func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) Update(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.App](r)
+	req, err := Bind[request.AppSlug](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.appRepo.Update(req.Slug, req.VersionSlug); err != nil {
+	if err = s.appRepo.Update(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -1,8 +1,8 @@
 package request
 
 type App struct {
-	Slug        string `json:"slug" form:"slug"`
-	VersionSlug string `json:"version_slug" form:"version_slug"`
+	Slug    string `json:"slug" form:"slug"`
+	Channel string `json:"channel" form:"channel"`
 }
 
 type AppSlug struct {

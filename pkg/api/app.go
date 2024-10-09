@@ -14,7 +14,7 @@ type App struct {
 	Description string    `json:"description"`
 	Categories  []string  `json:"categories"`
 	Depends     string    `json:"depends"`
-	Versions    []struct {
+	Channels    []struct {
 		Slug      string `json:"slug"`
 		Name      string `json:"name"`
 		Panel     string `json:"panel"`
@@ -24,8 +24,8 @@ type App struct {
 		Subs      []struct {
 			Log     string `json:"log"`
 			Version string `json:"version"`
-		} `json:"versions"`
-	} `json:"versions"`
+		} `json:"subs"`
+	} `json:"channels"`
 	Order int `json:"order"`
 }
 

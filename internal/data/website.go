@@ -332,7 +332,7 @@ server
 		return nil, err
 	}
 
-	rootPassword, err := r.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+	rootPassword, err := r.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	if err == nil && req.DB && req.DBType == "mysql" {
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
 		if err != nil {
@@ -610,7 +610,7 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		_ = io.Remove(website.Path)
 	}
 	if req.DB {
-		rootPassword, err := r.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+		rootPassword, err := r.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 		if err != nil {
 			return err
 		}

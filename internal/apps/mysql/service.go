@@ -1,4 +1,4 @@
-package percona
+package mysql
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ func NewService() *Service {
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(app.Root + "/server/mysql/conf/my.cnf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "获取 Percona 配置失败")
+		service.Error(w, http.StatusInternalServerError, "获取配置失败")
 		return
 	}
 
@@ -49,12 +49,12 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := io.Write(app.Root+"/server/mysql/conf/my.cnf", req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, "写入 Percona 配置失败")
+		service.Error(w, http.StatusInternalServerError, "写入配置失败")
 		return
 	}
 
 	if err := systemctl.Reload("mysqld"); err != nil {
-		service.Error(w, http.StatusInternalServerError, "重载 Percona 失败")
+		service.Error(w, http.StatusInternalServerError, "重载失败")
 		return
 	}
 
@@ -63,14 +63,14 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 
 // Load 获取负载
 func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
-	rootPassword, err := s.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+	rootPassword, err := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "获取 Percona root密码失败")
+		service.Error(w, http.StatusInternalServerError, "获取root密码失败")
 		return
 
 	}
 	if len(rootPassword) == 0 {
-		service.Error(w, http.StatusUnprocessableEntity, "Percona root密码为空")
+		service.Error(w, http.StatusUnprocessableEntity, "root密码为空")
 		return
 	}
 
@@ -82,7 +82,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 
 	raw, err := shell.Execf(`mysqladmin -u root -p "%s" extended-status`, rootPassword)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "获取 Percona 负载失败")
+		service.Error(w, http.StatusInternalServerError, "获取负载失败")
 		return
 	}
 
@@ -180,13 +180,13 @@ func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 
 // GetRootPassword 获取root密码
 func (s *Service) GetRootPassword(w http.ResponseWriter, r *http.Request) {
-	rootPassword, err := s.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+	rootPassword, err := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "获取 Percona root密码失败")
+		service.Error(w, http.StatusInternalServerError, "获取root密码失败")
 		return
 	}
 	if len(rootPassword) == 0 {
-		service.Error(w, http.StatusUnprocessableEntity, "Percona root密码为空")
+		service.Error(w, http.StatusUnprocessableEntity, "root密码为空")
 		return
 	}
 
@@ -201,7 +201,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oldRootPassword, _ := s.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+	oldRootPassword, _ := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	mysql, err := db.NewMySQL("root", oldRootPassword, s.getSock(), "unix")
 	if err != nil {
 		// 尝试安全模式直接改密
@@ -215,7 +215,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if err = s.settingRepo.Set(biz.SettingKeyPerconaRootPassword, req.Password); err != nil {
+	if err = s.settingRepo.Set(biz.SettingKeyMySQLRootPassword, req.Password); err != nil {
 		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
 		return
 	}

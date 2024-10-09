@@ -1,4 +1,4 @@
-package percona
+package mysql
 
 type UpdateConfig struct {
 	Config string `form:"config" json:"config"`

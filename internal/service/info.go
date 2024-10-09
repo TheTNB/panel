@@ -87,7 +87,7 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	var databaseCount int64
 	if mysqlInstalled {
-		rootPassword, _ := s.settingRepo.Get(biz.SettingKeyPerconaRootPassword)
+		rootPassword, _ := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock")
 		if err == nil {
 			defer mysql.Close()

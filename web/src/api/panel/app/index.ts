@@ -7,7 +7,8 @@ export default {
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/app/list', { params: { page, limit } }),
   // 安装应用
-  install: (slug: string): Promise<AxiosResponse<any>> => request.post('/app/install', { slug }),
+  install: (slug: string, channel: string): Promise<AxiosResponse<any>> =>
+    request.post('/app/install', { slug, channel }),
   // 卸载应用
   uninstall: (slug: string): Promise<AxiosResponse<any>> =>
     request.post('/app/uninstall', { slug }),
@@ -18,5 +19,7 @@ export default {
     request.post('/app/updateShow', { slug, show }),
   // 应用是否已安装
   isInstalled: (slug: string): Promise<AxiosResponse<any>> =>
-    request.get('/app/isInstalled', { params: { slug } })
+    request.get('/app/isInstalled', { params: { slug } }),
+  // 更新缓存
+  updateCache: (): Promise<AxiosResponse<any>> => request.get('/app/updateCache')
 }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import VersionModal from '@/views/app/VersionModal.vue'
+
 import { NButton, NDataTable, NPopconfirm, NSwitch } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
@@ -8,6 +10,10 @@ import type { App } from '@/views/app/types'
 import app from '../../api/panel/app'
 
 const { t } = useI18n()
+
+const versionModalShow = ref(false)
+const versionModalOperation = ref('安装')
+const versionModalInfo = ref<App>({} as App)
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
@@ -27,12 +33,6 @@ const columns: any = [
   {
     title: t('appIndex.columns.installedVersion'),
     key: 'installed_version',
-    width: 100,
-    ellipsis: { tooltip: true }
-  },
-  {
-    title: t('appIndex.columns.version'),
-    key: 'version',
     width: 100,
     ellipsis: { tooltip: true }
   },
@@ -59,7 +59,7 @@ const columns: any = [
     hideInExcel: true,
     render(row: any) {
       return [
-        row.installed && row.installed_version != row.version
+        row.installed && row.update_exist
           ? h(
               NPopconfirm,
               {
@@ -87,7 +87,7 @@ const columns: any = [
               }
             )
           : null,
-        row.installed && row.installed_version == row.version
+        row.installed
           ? h(
               NButton,
               {
@@ -101,7 +101,7 @@ const columns: any = [
               }
             )
           : null,
-        row.installed && row.installed_version == row.version
+        row.installed
           ? h(
               NPopconfirm,
               {
@@ -130,27 +130,19 @@ const columns: any = [
           : null,
         !row.installed
           ? h(
-              NPopconfirm,
+              NButton,
               {
-                onPositiveClick: () => handleInstall(row.slug)
+                size: 'small',
+                type: 'info',
+                onClick: () => {
+                  versionModalShow.value = true
+                  versionModalOperation.value = '安装'
+                  versionModalInfo.value = row
+                }
               },
               {
-                default: () => {
-                  return t('appIndex.confirm.install', { app: row.name })
-                },
-                trigger: () => {
-                  return h(
-                    NButton,
-                    {
-                      size: 'small',
-                      type: 'info'
-                    },
-                    {
-                      default: () => t('appIndex.buttons.install'),
-                      icon: renderIcon('material-symbols:download-rounded', { size: 14 })
-                    }
-                  )
-                }
+                default: () => t('appIndex.buttons.install'),
+                icon: renderIcon('material-symbols:download-rounded', { size: 14 })
               }
             )
           : null
@@ -180,12 +172,6 @@ const handleShowChange = (row: any) => {
   })
 }
 
-const handleInstall = (slug: string) => {
-  app.install(slug).then(() => {
-    window.$message.success(t('appIndex.alerts.install'))
-  })
-}
-
 const handleUpdate = (slug: string) => {
   app.update(slug).then(() => {
     window.$message.success(t('appIndex.alerts.update'))
@@ -200,6 +186,12 @@ const handleUninstall = (slug: string) => {
 
 const handleManage = (slug: string) => {
   router.push({ name: 'apps-' + slug + '-index' })
+}
+
+const handleUpdateCache = () => {
+  app.updateCache().then(() => {
+    window.$message.success(t('appIndex.alerts.cache'))
+  })
 }
 
 const getAppList = async (page: number, limit: number) => {
@@ -232,8 +224,15 @@ onMounted(() => {
 
 <template>
   <common-page show-footer>
-    <n-space vertical>
-      <n-alert type="info">{{ $t('appIndex.alerts.info') }}</n-alert>
+    <template #action>
+      <div flex items-center>
+        <n-button class="ml-16" type="primary" @click="handleUpdateCache">
+          <TheIcon :size="18" class="mr-5" icon="material-symbols:refresh" />
+          {{ $t('appIndex.buttons.updateCache') }}
+        </n-button>
+      </div>
+    </template>
+    <n-flex vertical>
       <n-alert type="warning">{{ $t('appIndex.alerts.warning') }}</n-alert>
       <n-data-table
         striped
@@ -247,6 +246,11 @@ onMounted(() => {
         @update:page="onPageChange"
         @update:page-size="onPageSizeChange"
       />
-    </n-space>
+      <version-modal
+        v-model:show="versionModalShow"
+        v-model:operation="versionModalOperation"
+        v-model:info="versionModalInfo"
+      />
+    </n-flex>
   </common-page>
 </template>

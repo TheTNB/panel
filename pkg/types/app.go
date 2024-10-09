@@ -13,21 +13,21 @@ type StoreApp struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Slug        string `json:"slug"`
-	Versions    []struct {
+	Channels    []struct {
 		Slug      string `json:"slug"`
 		Name      string `json:"name"`
 		Panel     string `json:"panel"`
-		Install   string `json:"install"`
-		Uninstall string `json:"uninstall"`
-		Update    string `json:"update"`
+		Install   string `json:"-"`
+		Uninstall string `json:"-"`
+		Update    string `json:"-"`
 		Subs      []struct {
 			Log     string `json:"log"`
 			Version string `json:"version"`
-		} `json:"versions"`
-	} `json:"versions"`
-	Installed            bool   `json:"installed"`
-	InstalledVersion     string `json:"installed_version"`
-	InstalledVersionSlug string `json:"installed_version_slug"`
-	UpdateExist          bool   `json:"update_exist"`
-	Show                 bool   `json:"show"`
+		} `json:"subs"`
+	} `json:"channels"`
+	Installed        bool   `json:"installed"`
+	InstalledChannel string `json:"installed_channel"`
+	InstalledVersion string `json:"installed_version"`
+	UpdateExist      bool   `json:"update_exist"`
+	Show             bool   `json:"show"`
 }
