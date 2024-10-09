@@ -113,7 +113,7 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/app", func(r chi.Router) {
-			//r.Use(middleware.MustLogin)
+			r.Use(middleware.MustLogin)
 			app := service.NewAppService()
 			r.Get("/list", app.List)
 			r.Post("/install", app.Install)

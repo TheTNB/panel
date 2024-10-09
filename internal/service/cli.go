@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"path/filepath"
 
 	"github.com/go-rat/utils/hash"
@@ -95,17 +97,73 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) UserList(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	users := make([]biz.User, 0)
+	if err := app.Orm.Find(&users).Error; err != nil {
+		return fmt.Errorf("获取用户列表失败：%v", err)
+	}
+
+	for _, user := range users {
+		color.Greenln(fmt.Sprintf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05")))
+	}
+
 	return nil
 }
 
 func (s *CliService) UserName(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	user := new(biz.User)
+	oldUsername := cmd.Args().Get(0)
+	newUsername := cmd.Args().Get(1)
+	if oldUsername == "" {
+		return fmt.Errorf("旧用户名不能为空")
+	}
+	if newUsername == "" {
+		return fmt.Errorf("新用户名不能为空")
+	}
+
+	if err := app.Orm.Where("username", oldUsername).First(user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("用户不存在")
+		} else {
+			return fmt.Errorf("获取用户失败：%v", err)
+		}
+	}
+
+	user.Username = newUsername
+	if err := app.Orm.Save(user).Error; err != nil {
+		return fmt.Errorf("用户名修改失败：%v", err)
+	}
+
 	return nil
 }
 
 func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	user := new(biz.User)
+	username := cmd.Args().Get(0)
+	password := cmd.Args().Get(1)
+	if username == "" || password == "" {
+		return fmt.Errorf("用户名和密码不能为空")
+	}
+	if len(password) < 6 {
+		return fmt.Errorf("密码长度不能小于6")
+	}
+
+	if err := app.Orm.Where("username", username).First(user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("用户不存在")
+		} else {
+			return fmt.Errorf("获取用户失败：%v", err)
+		}
+	}
+
+	hashed, err := s.hash.Make(password)
+	if err != nil {
+		return fmt.Errorf("密码生成失败：%v", err)
+	}
+	user.Password = hashed
+	if err = app.Orm.Save(user).Error; err != nil {
+		return fmt.Errorf("密码修改失败：%v", err)
+	}
+
 	return nil
 }
 
