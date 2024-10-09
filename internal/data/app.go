@@ -7,12 +7,14 @@ import (
 	"slices"
 
 	"github.com/expr-lang/expr"
+	"github.com/hashicorp/go-version"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/apploader"
+	"github.com/TheTNB/panel/pkg/str"
 )
 
 type appRepo struct {
@@ -42,12 +44,34 @@ func (r *appRepo) All() api.Apps {
 }
 
 func (r *appRepo) Get(slug string) (*api.App, error) {
-	for app := range slices.Values(r.All()) {
-		if app.Slug == slug {
-			return app, nil
+	for item := range slices.Values(r.All()) {
+		if item.Slug == slug {
+			return item, nil
 		}
 	}
 	return nil, errors.New("应用不存在")
+}
+
+func (r *appRepo) UpdateExist(slug string) bool {
+	item, err := r.Get(slug)
+	if err != nil {
+		return false
+	}
+	installed, err := r.GetInstalled(slug)
+	if err != nil {
+		return false
+	}
+
+	for v := range slices.Values(item.Versions) {
+		if v.Slug == installed.VersionSlug {
+			current := str.FirstElement(v.Subs)
+			if current != nil && current.Version != installed.Version {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (r *appRepo) Installed() ([]*biz.App, error) {
@@ -117,8 +141,12 @@ func (r *appRepo) IsInstalled(query string, cond ...string) (bool, error) {
 	return count > 0, nil
 }
 
-func (r *appRepo) Install(slug string) error {
+func (r *appRepo) Install(slug, versionSlug string) error {
 	item, err := r.Get(slug)
+	if err != nil {
+		return err
+	}
+	panel, err := version.NewVersion(app.Version)
 	if err != nil {
 		return err
 	}
@@ -128,9 +156,16 @@ func (r *appRepo) Install(slug string) error {
 	}
 
 	var shellUrl string
-	for version := range slices.Values(item.Versions) {
-		if version.PanelVersion == app.Version {
-			shellUrl = version.Install
+	for v := range slices.Values(item.Versions) {
+		vs, err := version.NewVersion(v.Panel)
+		if err != nil {
+			continue
+		}
+		if v.Slug == versionSlug {
+			if vs.GreaterThan(panel) {
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+			}
+			shellUrl = v.Install
 			break
 		}
 	}
@@ -154,8 +189,12 @@ func (r *appRepo) Install(slug string) error {
 	return err
 }
 
-func (r *appRepo) Uninstall(slug string) error {
+func (r *appRepo) Uninstall(slug, versionSlug string) error {
 	item, err := r.Get(slug)
+	if err != nil {
+		return err
+	}
+	panel, err := version.NewVersion(app.Version)
 	if err != nil {
 		return err
 	}
@@ -165,14 +204,18 @@ func (r *appRepo) Uninstall(slug string) error {
 	}
 
 	var shellUrl string
-	for version := range slices.Values(item.Versions) {
-		if version.PanelVersion == app.Version {
-			shellUrl = version.Uninstall
+	for v := range slices.Values(item.Versions) {
+		vs, err := version.NewVersion(v.Panel)
+		if err != nil {
+			continue
+		}
+		if v.Slug == versionSlug {
+			if vs.GreaterThan(panel) {
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+			}
+			shellUrl = v.Uninstall
 			break
 		}
-	}
-	if shellUrl == "" && len(item.Versions) > 0 {
-		shellUrl = item.Versions[0].Uninstall
 	}
 	if shellUrl == "" {
 		return fmt.Errorf("无法获取应用 %s 的卸载脚本", item.Name)
@@ -194,8 +237,12 @@ func (r *appRepo) Uninstall(slug string) error {
 	return err
 }
 
-func (r *appRepo) Update(slug string) error {
+func (r *appRepo) Update(slug, versionSlug string) error {
 	item, err := r.Get(slug)
+	if err != nil {
+		return err
+	}
+	panel, err := version.NewVersion(app.Version)
 	if err != nil {
 		return err
 	}
@@ -205,9 +252,16 @@ func (r *appRepo) Update(slug string) error {
 	}
 
 	var shellUrl string
-	for version := range slices.Values(item.Versions) {
-		if version.PanelVersion == app.Version {
-			shellUrl = version.Update
+	for v := range slices.Values(item.Versions) {
+		vs, err := version.NewVersion(v.Panel)
+		if err != nil {
+			continue
+		}
+		if v.Slug == versionSlug {
+			if vs.GreaterThan(panel) {
+				return fmt.Errorf("应用 %s 需要面板版本 %s，当前版本 %s", item.Name, v.Panel, app.Version)
+			}
+			shellUrl = v.Update
 			break
 		}
 	}

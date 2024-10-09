@@ -7,26 +7,28 @@ import (
 )
 
 type App struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Slug      string    `gorm:"not null;unique" json:"slug"`
-	Version   string    `gorm:"not null" json:"version"`
-	Show      bool      `gorm:"not null" json:"show"`
-	ShowOrder int       `gorm:"not null" json:"show_order"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID          uint      `gorm:"primaryKey" json:"id"`
+	Slug        string    `gorm:"not null;unique" json:"slug"`
+	VersionSlug string    `gorm:"not null" json:"version_slug"`
+	Version     string    `gorm:"not null" json:"version"`
+	Show        bool      `gorm:"not null" json:"show"`
+	ShowOrder   int       `gorm:"not null" json:"show_order"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type AppRepo interface {
 	All() api.Apps
 	Get(slug string) (*api.App, error)
+	UpdateExist(slug string) bool
 	Installed() ([]*App, error)
 	GetInstalled(slug string) (*App, error)
 	GetInstalledAll(query string, cond ...string) ([]*App, error)
 	GetHomeShow() ([]map[string]string, error)
 	IsInstalled(query string, cond ...string) (bool, error)
-	Install(slug string) error
-	Uninstall(slug string) error
-	Update(slug string) error
+	Install(slug, versionSlug string) error
+	Uninstall(slug, versionSlug string) error
+	Update(slug, versionSlug string) error
 	UpdateShow(slug string, show bool) error
 	UpdateCache() error
 }

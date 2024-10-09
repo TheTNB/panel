@@ -10,11 +10,24 @@ type App struct {
 
 // StoreApp 商店应用结构
 type StoreApp struct {
-	Name             string `json:"name"`
-	Description      string `json:"description"`
-	Slug             string `json:"slug"`
-	Version          string `json:"version"`
-	Installed        bool   `json:"installed"`
-	InstalledVersion string `json:"installed_version"`
-	Show             bool   `json:"show"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Slug        string `json:"slug"`
+	Versions    []struct {
+		Slug      string `json:"slug"`
+		Name      string `json:"name"`
+		Panel     string `json:"panel"`
+		Install   string `json:"install"`
+		Uninstall string `json:"uninstall"`
+		Update    string `json:"update"`
+		Subs      []struct {
+			Log     string `json:"log"`
+			Version string `json:"version"`
+		} `json:"versions"`
+	} `json:"versions"`
+	Installed            bool   `json:"installed"`
+	InstalledVersion     string `json:"installed_version"`
+	InstalledVersionSlug string `json:"installed_version_slug"`
+	UpdateExist          bool   `json:"update_exist"`
+	Show                 bool   `json:"show"`
 }

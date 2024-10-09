@@ -8,7 +8,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -37,23 +36,24 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 
 	var apps []types.StoreApp
 	for _, item := range all {
-		installed, installedVersion, currentVersion, show := false, "", "", false
-		if str.FirstElement(item.Versions) != nil {
-			currentVersion = str.FirstElement(item.Versions).Version
-		}
+		installed, installedVersion, installedVersionSlug, updateExist, show := false, "", "", false, false
 		if _, ok := installedAppMap[item.Slug]; ok {
 			installed = true
 			installedVersion = installedAppMap[item.Slug].Version
+			installedVersionSlug = installedAppMap[item.Slug].VersionSlug
+			updateExist = s.appRepo.UpdateExist(item.Slug)
 			show = installedAppMap[item.Slug].Show
 		}
 		apps = append(apps, types.StoreApp{
-			Name:             item.Name,
-			Description:      item.Description,
-			Slug:             item.Slug,
-			Version:          currentVersion,
-			Installed:        installed,
-			InstalledVersion: installedVersion,
-			Show:             show,
+			Name:                 item.Name,
+			Description:          item.Description,
+			Slug:                 item.Slug,
+			Versions:             item.Versions,
+			Installed:            installed,
+			InstalledVersion:     installedVersion,
+			InstalledVersionSlug: installedVersionSlug,
+			UpdateExist:          updateExist,
+			Show:                 show,
 		})
 	}
 
@@ -66,13 +66,13 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.AppSlug](r)
+	req, err := Bind[request.App](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.appRepo.Install(req.Slug); err != nil {
+	if err = s.appRepo.Install(req.Slug, req.VersionSlug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -81,13 +81,13 @@ func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.AppSlug](r)
+	req, err := Bind[request.App](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.appRepo.Uninstall(req.Slug); err != nil {
+	if err = s.appRepo.Uninstall(req.Slug, req.VersionSlug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -96,13 +96,13 @@ func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) Update(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.AppSlug](r)
+	req, err := Bind[request.App](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	if err = s.appRepo.Update(req.Slug); err != nil {
+	if err = s.appRepo.Update(req.Slug, req.VersionSlug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

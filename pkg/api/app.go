@@ -15,11 +15,16 @@ type App struct {
 	Categories  []string  `json:"categories"`
 	Depends     string    `json:"depends"`
 	Versions    []struct {
-		Version      string `json:"version"`
-		Install      string `json:"install"`
-		Uninstall    string `json:"uninstall"`
-		Update       string `json:"update"`
-		PanelVersion string `json:"panel_version"`
+		Slug      string `json:"slug"`
+		Name      string `json:"name"`
+		Panel     string `json:"panel"`
+		Install   string `json:"install"`
+		Uninstall string `json:"uninstall"`
+		Update    string `json:"update"`
+		Subs      []struct {
+			Log     string `json:"log"`
+			Version string `json:"version"`
+		} `json:"versions"`
 	} `json:"versions"`
 	Order int `json:"order"`
 }
