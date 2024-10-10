@@ -129,12 +129,11 @@ onMounted(() => {
             />
           </n-form-item>
           <n-form-item label="端口">
-            <n-dynamic-input
-              v-model:value="setting.ports"
-              placeholder="80"
-              :min="1"
-              show-sort-button
-            />
+            <n-dynamic-input v-model:value="setting.ports" show-sort-button>
+              <template #default="{ index }">
+                <n-input-number v-model:value="setting.ports[index]" :min="1" :max="65535" />
+              </template>
+            </n-dynamic-input>
           </n-form-item>
         </n-form>
         <n-skeleton v-else text :repeat="10" />

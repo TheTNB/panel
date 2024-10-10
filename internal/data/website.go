@@ -88,13 +88,13 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 		if len(ports) == 0 {
 			continue
 		}
-		if !slices.Contains(setting.Ports, ports[0]) {
-			setting.Ports = append(setting.Ports, ports[0])
+		if !slices.Contains(setting.Ports, cast.ToUint(ports[0])) {
+			setting.Ports = append(setting.Ports, cast.ToUint(ports[0]))
 		}
 		if len(ports) > 1 && ports[1] == "ssl" {
-			setting.SSLPorts = append(setting.SSLPorts, ports[0])
+			setting.SSLPorts = append(setting.SSLPorts, cast.ToUint(ports[0]))
 		} else if len(ports) > 1 && ports[1] == "quic" {
-			setting.QUICPorts = append(setting.QUICPorts, ports[0])
+			setting.QUICPorts = append(setting.QUICPorts, cast.ToUint(ports[0]))
 		}
 	}
 	serverName := str.Cut(config, "# server_name标记位开始", "# server_name标记位结束")

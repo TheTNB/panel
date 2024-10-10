@@ -4,9 +4,9 @@ package types
 type WebsiteSetting struct {
 	Name              string   `json:"name"`
 	Domains           []string `json:"domains"`
-	Ports             []string `json:"ports"`
-	SSLPorts          []string `json:"ssl_ports"`
-	QUICPorts         []string `json:"quic_ports"`
+	Ports             []uint   `json:"ports"`
+	SSLPorts          []uint   `json:"ssl_ports"`
+	QUICPorts         []uint   `json:"quic_ports"`
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
