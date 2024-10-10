@@ -36,20 +36,23 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | For
 
 ## Operating Environment
 
-Rat Panel only supports the latest version of mainstream systems under the `amd64` | `arm64` architecture. It does not support `Ubuntu` because its releases are too frequent and difficult to maintain.
+Rat Panel supports mainstream systems under the `amd64` | `arm64` architecture.
 
-Recommended to use `Debian` for low-configuration machines, as its resource usage is lower than that of the `RHEL` system. For other machines, recommended to use `RockyLinux` | `AlmaLinux`, which has a longer maintenance cycle and is more stable.
+It is recommended to use `AlmaLinux` | `RockyLinux` first.
 
-For other RHEL 9.x systems not in the table, you can try to install it yourself, but normal operation is not guaranteed, and technical support is not provided (theoretically there will be no major question).
+For other systems not listed in the table below, you can try to install them by yourself, but there is no guarantee that they will run normally, and no technical support will be provided.
 
 | OS         | Version |
 |------------|---------|
 | RHEL       | 9       |
 | RockyLinux | 9       |
 | AlmaLinux  | 9       |
+| Ubuntu     | 22      |
+| Ubuntu     | 24      |
+| Debian     | 11      |
 | Debian     | 12      |
 
-As system versions are constantly updated, we may also terminate support for some older systems to ensure the stability of the panel.
+As system versions are constantly updated, we may also terminate support for some older systems to ensure the robustness of the panel.
 
 ## Install Panel
 
@@ -59,7 +62,7 @@ As system versions are constantly updated, we may also terminate support for som
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
 ```shell
-HAOZI_DL_URL="https://dl.cdn.haozi.net/panel"; curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/install_panel.sh.checksum.txt && sha256sum -c install_panel.sh.checksum.txt && bash install_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
+Version upgrade, installation paused!
 ```
 
 ## Uninstall Panel
@@ -69,7 +72,7 @@ Recommended to back up data and reinstall the system first, so that the system c
 If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
 
 ```shell
-HAOZI_DL_URL="https://dl.cdn.haozi.net/panel"; curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh && curl -sSL -O ${HAOZI_DL_URL}/uninstall_panel.sh.checksum.txt && sha256sum -c uninstall_panel.sh.checksum.txt && bash uninstall_panel.sh || echo "Checksum Verification Failed, File May Have Been Tampered With, Operation Terminated"
+curl -fsLm 10 -o uninstall_panel.sh https://dl.cdn.haozi.net/panel/uninstall_panel.sh && bash uninstall_panel.sh
 ```
 
 Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!
