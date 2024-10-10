@@ -10,7 +10,7 @@ type WebsiteSetting struct {
 	Root              string   `json:"root"`
 	Path              string   `json:"path"`
 	Index             string   `json:"index"`
-	PHP               string   `json:"php"`
+	PHP               int      `json:"php"`
 	OpenBasedir       bool     `json:"open_basedir"`
 	SSL               bool     `json:"ssl"`
 	SSLCertificate    string   `json:"ssl_certificate"`

@@ -15,6 +15,11 @@ type LV struct {
 	Value string `json:"value"`
 }
 
+type LVInt struct {
+	Label string `json:"label"`
+	Value int    `json:"value"`
+}
+
 // KVToMap 将 key-value 切片转换为 map
 func KVToMap(kvs []KV) map[string]string {
 	m := make(map[string]string)

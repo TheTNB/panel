@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/spf13/cast"
 	"net/http"
 	"regexp"
 	"strings"
@@ -173,9 +174,9 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
 	php, _ := s.appRepo.GetInstalledAll("slug like ?", "php%")
 
-	var phpData []types.LV
+	var phpData []types.LVInt
 	var dbData []types.LV
-	phpData = append(phpData, types.LV{Value: "0", Label: "不使用"})
+	phpData = append(phpData, types.LVInt{Value: 0, Label: "不使用"})
 	dbData = append(dbData, types.LV{Value: "0", Label: "不使用"})
 	for _, p := range php {
 		// 过滤 phpmyadmin
@@ -184,8 +185,8 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 			continue
 		}
 
-		app, _ := s.appRepo.Get(p.Slug)
-		phpData = append(phpData, types.LV{Value: strings.ReplaceAll(p.Slug, "php", ""), Label: app.Name})
+		item, _ := s.appRepo.Get(p.Slug)
+		phpData = append(phpData, types.LVInt{Value: cast.ToInt(strings.ReplaceAll(p.Slug, "php", "")), Label: item.Name})
 	}
 
 	if mysqlInstalled {

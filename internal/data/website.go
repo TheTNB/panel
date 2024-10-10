@@ -69,7 +69,7 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.SSL = website.SSL
-	setting.PHP = strconv.Itoa(website.PHP)
+	setting.PHP = website.PHP
 	setting.Raw = config
 
 	portStr := str.Cut(config, "# port标记位开始", "# port标记位结束")

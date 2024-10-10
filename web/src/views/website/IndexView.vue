@@ -450,7 +450,15 @@ onMounted(() => {
           <n-form-item :label="$t('websiteIndex.create.fields.port.label')">
             <n-dynamic-input v-model:value="addModel.ports" show-sort-button>
               <template #default="{ index }">
-                <n-input-number v-model:value="addModel.ports[index]" :min="1" :max="65535" />
+                <div style="display: flex; align-items: center; width: 100%">
+                  <n-input-number
+                    v-model:value="addModel.ports[index]"
+                    :min="1"
+                    :max="65535"
+                    clearable
+                    w-full
+                  />
+                </div>
               </template>
             </n-dynamic-input>
           </n-form-item>

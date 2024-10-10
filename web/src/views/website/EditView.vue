@@ -38,8 +38,8 @@ const setting = ref<WebsiteSetting>({
 const installedDbAndPhp = ref({
   php: [
     {
-      label: '',
-      value: ''
+      label: '不使用',
+      value: 0
     }
   ],
   db: [
@@ -131,7 +131,13 @@ onMounted(() => {
           <n-form-item label="端口">
             <n-dynamic-input v-model:value="setting.ports" show-sort-button>
               <template #default="{ index }">
-                <n-input-number v-model:value="setting.ports[index]" :min="1" :max="65535" />
+                <n-input-number
+                  v-model:value="setting.ports[index]"
+                  :min="1"
+                  :max="65535"
+                  clearable
+                  w-full
+                />
               </template>
             </n-dynamic-input>
           </n-form-item>
@@ -155,7 +161,7 @@ onMounted(() => {
           <n-form-item label="PHP版本">
             <n-select
               v-model:value="setting.php"
-              default-value="0"
+              :default-value="0"
               :options="installedDbAndPhp.php"
               placeholder="选择PHP版本"
               @keydown.enter.prevent
