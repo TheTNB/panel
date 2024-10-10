@@ -4,7 +4,7 @@ import type { MessageReactive, UploadFileInfo } from 'naive-ui'
 import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NTag } from 'naive-ui'
 
 import postgresql from '@/api/apps/postgresql'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { generateRandomString, renderIcon } from '@/utils'
 import type { Backup, Database, Role } from '@/views/apps/postgresql/types'
 
@@ -352,13 +352,13 @@ const showChangePasswordModal = (user: string) => {
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('postgresql').then((res: any) => {
+  await systemctl.isEnabled('postgresql').then((res: any) => {
     isEnabled.value = res.data
   })
 }
 
 const getStatus = async () => {
-  await service.status('postgresql').then((res: any) => {
+  await systemctl.status('postgresql').then((res: any) => {
     status.value = res.data
   })
 }
@@ -400,35 +400,35 @@ const handleClearLog = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('postgresql')
+    await systemctl.enable('postgresql')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('postgresql')
+    await systemctl.disable('postgresql')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStart = async () => {
-  await service.start('postgresql')
+  await systemctl.start('postgresql')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleStop = async () => {
-  await service.stop('postgresql')
+  await systemctl.stop('postgresql')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('postgresql')
+  await systemctl.restart('postgresql')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleReload = async () => {
-  await service.reload('postgresql')
+  await systemctl.reload('postgresql')
   window.$message.success('重载成功')
   await getStatus()
 }

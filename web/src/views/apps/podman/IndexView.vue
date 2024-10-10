@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NPopconfirm } from 'naive-ui'
 
 import podman from '@/api/apps/podman'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 
 const currentTab = ref('status')
 const status = ref(false)
@@ -16,13 +16,13 @@ const statusStr = computed(() => {
 })
 
 const getStatus = async () => {
-  await service.status('podman').then((res: any) => {
+  await systemctl.status('podman').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('podman').then((res: any) => {
+  await systemctl.isEnabled('podman').then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -47,29 +47,29 @@ const handleSaveStorageConfig = async () => {
 }
 
 const handleStart = async () => {
-  await service.start('podman')
+  await systemctl.start('podman')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleStop = async () => {
-  await service.stop('podman')
+  await systemctl.stop('podman')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('podman')
+  await systemctl.restart('podman')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('podman')
+    await systemctl.enable('podman')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('podman')
+    await systemctl.disable('podman')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()

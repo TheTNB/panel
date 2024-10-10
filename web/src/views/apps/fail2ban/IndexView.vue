@@ -2,7 +2,7 @@
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 
 import fail2ban from '@/api/apps/fail2ban'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import website from '@/api/panel/website'
 import { renderIcon } from '@/utils'
 import type { Jail } from '@/views/apps/fail2ban/types'
@@ -219,48 +219,48 @@ const onPageSizeChange = (pageSize: number) => {
 }
 
 const getStatus = async () => {
-  await service.status('fail2ban').then((res: any) => {
+  await systemctl.status('fail2ban').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('fail2ban').then((res: any) => {
+  await systemctl.isEnabled('fail2ban').then((res: any) => {
     isEnabled.value = res.data
   })
 }
 
 const handleStart = async () => {
-  await service.start('fail2ban')
+  await systemctl.start('fail2ban')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('fail2ban')
+    await systemctl.enable('fail2ban')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('fail2ban')
+    await systemctl.disable('fail2ban')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStop = async () => {
-  await service.stop('fail2ban')
+  await systemctl.stop('fail2ban')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('fail2ban')
+  await systemctl.restart('fail2ban')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleReload = async () => {
-  await service.reload('fail2ban')
+  await systemctl.reload('fail2ban')
   window.$message.success('重载成功')
   await getStatus()
 }

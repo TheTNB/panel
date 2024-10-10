@@ -2,7 +2,7 @@
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import pureftpd from '@/api/apps/pureftpd'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { generateRandomString, renderIcon } from '@/utils'
 import type { User } from '@/views/apps/pureftpd/types'
 
@@ -110,13 +110,13 @@ const userColumns: any = [
 const users = ref<User[]>([] as User[])
 
 const getStatus = async () => {
-  await service.status('pure-ftpd').then((res: any) => {
+  await systemctl.status('pure-ftpd').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('pure-ftpd').then((res: any) => {
+  await systemctl.isEnabled('pure-ftpd').then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -133,30 +133,30 @@ const handleSavePort = async () => {
 }
 
 const handleStart = async () => {
-  await service.start('pure-ftpd')
+  await systemctl.start('pure-ftpd')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('pure-ftpd')
+    await systemctl.enable('pure-ftpd')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('pure-ftpd')
+    await systemctl.disable('pure-ftpd')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStop = async () => {
-  await service.stop('pure-ftpd')
+  await systemctl.stop('pure-ftpd')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('pure-ftpd')
+  await systemctl.restart('pure-ftpd')
   window.$message.success('重启成功')
   await getStatus()
 }

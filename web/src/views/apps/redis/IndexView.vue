@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import redis from '@/api/apps/redis'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 
 const currentTab = ref('status')
 const status = ref(false)
@@ -30,13 +30,13 @@ const getLoad = async () => {
 }
 
 const getStatus = async () => {
-  await service.status('redis').then((res: any) => {
+  await systemctl.status('redis').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('redis').then((res: any) => {
+  await systemctl.isEnabled('redis').then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -53,30 +53,30 @@ const handleSaveConfig = async () => {
 }
 
 const handleStart = async () => {
-  await service.start('redis')
+  await systemctl.start('redis')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('redis')
+    await systemctl.enable('redis')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('redis')
+    await systemctl.disable('redis')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStop = async () => {
-  await service.stop('redis')
+  await systemctl.stop('redis')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('redis')
+  await systemctl.restart('redis')
   window.$message.success('重启成功')
   await getStatus()
 }

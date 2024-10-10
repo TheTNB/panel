@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import rsync from '@/api/apps/rsync'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { generateRandomString, renderIcon } from '@/utils'
 import type { Module } from '@/views/apps/rsync/types'
 
@@ -135,13 +135,13 @@ const onPageSizeChange = (pageSize: number) => {
 }
 
 const getStatus = async () => {
-  await service.status('rsyncd').then((res: any) => {
+  await systemctl.status('rsyncd').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('rsyncd').then((res: any) => {
+  await systemctl.isEnabled('rsyncd').then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -159,30 +159,30 @@ const handleSaveConfig = async () => {
 }
 
 const handleStart = async () => {
-  await service.start('rsyncd')
+  await systemctl.start('rsyncd')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('rsyncd')
+    await systemctl.enable('rsyncd')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('rsyncd')
+    await systemctl.disable('rsyncd')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStop = async () => {
-  await service.stop('rsyncd')
+  await systemctl.stop('rsyncd')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('rsyncd')
+  await systemctl.restart('rsyncd')
   window.$message.success('重启成功')
   await getStatus()
 }

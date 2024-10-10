@@ -37,18 +37,21 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
-	config := r.FormValue("config")
-	if len(config) == 0 {
-		service.Error(w, http.StatusInternalServerError, "配置不能为空")
+	req, err := service.Bind[UpdateConfig](r)
+	if err != nil {
+		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		return
 	}
 
-	if err := io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root), config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, "保存配置失败")
+		return
 	}
 
-	if err := systemctl.Reload("openresty"); err != nil {
+	if err = systemctl.Reload("openresty"); err != nil {
 		_, err = shell.Execf("openresty -t")
 		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("重载服务失败: %v", err))
+		return
 	}
 
 	service.Success(w, nil)
@@ -59,17 +62,14 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 		service.Success(w, "")
 	}
 
-	out, err := shell.Execf("tail -n 100 %s/%s", app.Root, "/wwwlogs/openresty_error.log")
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
-	}
-
+	out, _ := shell.Execf("tail -n 100 %s/%s", app.Root, "wwwlogs/openresty_error.log")
 	service.Success(w, out)
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "/wwwlogs/openresty_error.log"); err != nil {
+	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "wwwlogs/openresty_error.log"); err != nil {
 		service.Error(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	service.Success(w, nil)
@@ -88,6 +88,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	workers, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | wc -l")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取负载失败")
+		return
 	}
 	data = append(data, types.NV{
 		Name:  "工作进程",
@@ -97,6 +98,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	out, err := shell.Execf("ps aux | grep nginx | grep 'worker process' | awk '{memsum+=$6};END {print memsum}'")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取负载失败")
+		return
 	}
 	mem := str.FormatBytes(cast.ToFloat64(out))
 	data = append(data, types.NV{

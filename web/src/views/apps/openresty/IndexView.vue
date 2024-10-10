@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import openresty from '@/api/apps/openresty'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 
 const currentTab = ref('status')
 const status = ref(false)
@@ -32,13 +32,13 @@ const getLoad = async () => {
 }
 
 const getStatus = async () => {
-  service.status('openresty').then((res: any) => {
+  await systemctl.status('openresty').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('openresty').then((res: any) => {
+  await systemctl.isEnabled('openresty').then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -68,35 +68,35 @@ const handleClearErrorLog = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('openresty')
+    await systemctl.enable('openresty')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('openresty')
+    await systemctl.disable('openresty')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStart = async () => {
-  await service.start('openresty')
+  await systemctl.start('openresty')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleStop = async () => {
-  await service.stop('openresty')
+  await systemctl.stop('openresty')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('openresty')
+  await systemctl.restart('openresty')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleReload = async () => {
-  await service.reload('openresty')
+  await systemctl.reload('openresty')
   window.$message.success('重载成功')
   await getStatus()
 }

@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import php from '@/api/apps/php'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { renderIcon } from '@/utils'
 
 const route = useRoute()
@@ -107,13 +107,13 @@ const getExtensions = async () => {
 }
 
 const getStatus = async () => {
-  await service.status(`php-fpm-${version}`).then((res: any) => {
+  await systemctl.status(`php-fpm-${version}`).then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled(`php-fpm-${version}`).then((res: any) => {
+  await systemctl.isEnabled(`php-fpm-${version}`).then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -168,38 +168,38 @@ const handleClearSlowLog = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable(`php-fpm-${version}`)
+    await systemctl.enable(`php-fpm-${version}`)
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable(`php-fpm-${version}`)
+    await systemctl.disable(`php-fpm-${version}`)
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStart = async () => {
-  await service.start(`php-fpm-${version}`)
+  await systemctl.start(`php-fpm-${version}`)
   window.$message.success('启动成功')
   await getStatus()
   await getErrorLog()
 }
 
 const handleStop = async () => {
-  await service.stop(`php-fpm-${version}`)
+  await systemctl.stop(`php-fpm-${version}`)
   window.$message.success('停止成功')
   await getStatus()
   await getErrorLog()
 }
 
 const handleRestart = async () => {
-  await service.restart(`php-fpm-${version}`)
+  await systemctl.restart(`php-fpm-${version}`)
   window.$message.success('重启成功')
   await getStatus()
   await getErrorLog()
 }
 
 const handleReload = async () => {
-  await service.reload(`php-fpm-${version}`)
+  await systemctl.reload(`php-fpm-${version}`)
   window.$message.success('重载成功')
   await getStatus()
   await getErrorLog()

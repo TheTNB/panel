@@ -3,7 +3,7 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import supervisor from '@/api/apps/supervisor'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { renderIcon } from '@/utils'
 import type { Process } from '@/views/apps/supervisor/types'
 
@@ -217,13 +217,13 @@ const onPageSizeChange = (pageSize: number) => {
 }
 
 const getStatus = async () => {
-  await service.status(serviceName.value).then((res: any) => {
+  await systemctl.status(serviceName.value).then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled(serviceName.value).then((res: any) => {
+  await systemctl.isEnabled(serviceName.value).then((res: any) => {
     isEnabled.value = res.data
   })
 }
@@ -252,7 +252,7 @@ const handleClearLog = async () => {
 }
 
 const handleStart = async () => {
-  await service.start(serviceName.value)
+  await systemctl.start(serviceName.value)
   window.$message.success('启动成功')
   await getStatus()
   await getLog()
@@ -260,31 +260,31 @@ const handleStart = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable(serviceName.value)
+    await systemctl.enable(serviceName.value)
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable(serviceName.value)
+    await systemctl.disable(serviceName.value)
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStop = async () => {
-  await service.stop(serviceName.value)
+  await systemctl.stop(serviceName.value)
   window.$message.success('停止成功')
   await getStatus()
   await getLog()
 }
 
 const handleRestart = async () => {
-  await service.restart(serviceName.value)
+  await systemctl.restart(serviceName.value)
   window.$message.success('重启成功')
   await getStatus()
   await getLog()
 }
 
 const handleReload = async () => {
-  await service.reload(serviceName.value)
+  await systemctl.reload(serviceName.value)
   window.$message.success('重载成功')
   await getStatus()
   await getLog()

@@ -4,7 +4,7 @@ import type { MessageReactive, UploadFileInfo } from 'naive-ui'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import mysql from '@/api/apps/mysql'
-import service from '@/api/panel/system/service'
+import systemctl from '@/api/panel/systemctl'
 import { generateRandomString, renderIcon } from '@/utils'
 import type { Backup, Database, User } from '@/views/apps/mysql/types'
 
@@ -360,13 +360,13 @@ const showChangePrivilegesModal = (user: string) => {
 }
 
 const getIsEnabled = async () => {
-  await service.isEnabled('mysqld').then((res: any) => {
+  await systemctl.isEnabled('mysqld').then((res: any) => {
     isEnabled.value = res.data
   })
 }
 
 const getStatus = async () => {
-  await service.status('mysqld').then((res: any) => {
+  await systemctl.status('mysqld').then((res: any) => {
     status.value = res.data
   })
 }
@@ -415,35 +415,35 @@ const handleClearSlowLog = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await service.enable('mysqld')
+    await systemctl.enable('mysqld')
     window.$message.success('开启自启动成功')
   } else {
-    await service.disable('mysqld')
+    await systemctl.disable('mysqld')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStart = async () => {
-  await service.start('mysqld')
+  await systemctl.start('mysqld')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleStop = async () => {
-  await service.stop('mysqld')
+  await systemctl.stop('mysqld')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await service.restart('mysqld')
+  await systemctl.restart('mysqld')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleReload = async () => {
-  await service.reload('mysqld')
+  await systemctl.reload('mysqld')
   window.$message.success('重载成功')
   await getStatus()
 }
