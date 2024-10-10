@@ -29,7 +29,9 @@ builds:
 upx:
   - enabled: true
     # Filter by build ID.
-    ids: [ panel ]
+    ids:
+      - web
+      - cli
     # Compress argument.
     # Valid options are from '1' (faster) to '9' (better), and 'best'.
     compress: best
@@ -39,9 +41,10 @@ upx:
     brute: false
 
 archives:
-  - id: panel-archive
+  - id: panel
     builds:
-      - panel
+      - web
+      - cli
     format: zip
     wrap_in_directory: false
     strip_binary_directory: true
@@ -49,18 +52,3 @@ archives:
       - LICENSE
       - storage/*
       - config/*
-
-gitlab_urls:
-  api: https://git.haozi.net/api/v4/
-  download: https://git.haozi.net
-  # set to true if you use a self-signed certificate
-  skip_tls_verify: false
-  # set to true if you want to upload to the Package Registry rather than attachments
-  # Only works with GitLab 13.5+
-  #
-  # Since: v1.3
-  use_package_registry: true
-  # Set this if you set GITLAB_TOKEN to the value of CI_JOB_TOKEN.
-  #
-  # Since: v1.11
-  use_job_token: true
