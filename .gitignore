@@ -17,8 +17,6 @@ _cgo_export.*
 *.exe
 *.o
 *.so
-panel
-panel.exe
 
 # 压缩包
 # Git 自带压缩,如果这些压缩包里有代码,建议解压后 commit
