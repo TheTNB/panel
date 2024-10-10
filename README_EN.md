@@ -22,12 +22,12 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | For
 
 ## Advantages
 
-1. **Extremely low usage:** Deploying the panel + LNMP environment under Debian 12, the memory usage is less than 500 MB, far ahead of other panels using containerization.
+1. **Extremely low usage:** Deploying the panel + LNMP environment under Debian, the memory usage is less than 500 MB, far ahead of other panels using containerization.
 2. **Low destructiveness:** The design concept of the panel is to minimize the additional modifications to the system. Among similar panels, we have made the least modifications to the system.
 3. **Follow the times:** All components of the panel are at the forefront of the times, updated quickly, powerful functions, and guaranteed security.
-4. **Efficient operation and maintenance:** The panel UI interface is simple and easy to operate, and you can quickly deploy various environments and adjust application settings without complicated configuration.
+4. **Efficient operation and maintenance:** The panel is simple and easy to operate, and you can quickly deploy various environments and adjust application settings without complicated configuration.
 5. **Offline operation:** The panel can run without relying on any external services. You can even stop the panel process after deployment is complete, and it will not affect the deployed services.
-6. **Tested by time:** We have been using it in production environment since 2022, and it has been running stably for more than 1 year without any accidents.
+6. **Tested by time:** We have been using it in production environment since 2022, and it has been running stably for 2 year without any accidents.
 7. **Open source and open:** The panel is open source, you can freely modify and audit the panel source code, and the security is guaranteed.
 
 ## UI Screenshots
@@ -57,7 +57,7 @@ As system versions are constantly updated, we may also terminate support for som
 ## Install Panel
 
 > **Warning**
-> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. It is not recommended for users with zero basic knowledge to install and use Rat Panel.
+> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. We are not recommended for users with zero basic knowledge to install and use Rat Panel.
 
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
@@ -79,13 +79,13 @@ Before uninstalling the panel, please be sure to back up all data and uninstall 
 
 ## Daily Maintenance
 
-Use `panel` command for daily maintenance:
+Use `panel-cli` command for daily maintenance:
 
 ```shell
-panel
+panel-cli
 ```
 
-See more usage methods and tips in [Wiki](https://github.com/TheTNB/panel/wiki).
+See more usage methods and tips in [Document](https://tom.moe/docs?category=57).
 
 ## Feedback
 
@@ -99,13 +99,14 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 
 **Accept cloud resources and financial sponsorship, you can contact us through QQ group**
 
-### Server
+### Financial
 
 - [微晓朵](https://www.weixiaoduo.com/)
 
 ### CDN
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
+- [WAF PRO](https://waf.pro/)
 - [盾云CDN](http://cdn.ddunyun.com/)
 
 <p align="center">
