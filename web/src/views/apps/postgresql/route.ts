@@ -3,17 +3,17 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'postgresql16',
-  path: '/apps/postgresql16',
+  name: 'postgresql',
+  path: '/apps/postgresql',
   component: Layout,
   isHidden: true,
   children: [
     {
-      name: 'apps-postgresql16-index',
+      name: 'apps-postgresql-index',
       path: '',
-      component: () => import('../postgresql/IndexView.vue'),
+      component: () => import('./IndexView.vue'),
       meta: {
-        title: 'PostgreSQL 16',
+        title: 'PostgreSQL',
         icon: 'mdi:database',
         role: ['admin'],
         requireAuth: true

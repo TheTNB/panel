@@ -3,17 +3,17 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'mysql84',
-  path: '/apps/mysql84',
+  name: 'mysql',
+  path: '/apps/mysql',
   component: Layout,
   isHidden: true,
   children: [
     {
-      name: 'apps-mysql84-index',
+      name: 'apps-mysql-index',
       path: '',
-      component: () => import('../mysql/IndexView.vue'),
+      component: () => import('./IndexView.vue'),
       meta: {
-        title: 'MySQL 8.4',
+        title: 'Percona（MySQL）',
         icon: 'mdi:database',
         role: ['admin'],
         requireAuth: true

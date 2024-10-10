@@ -2,13 +2,13 @@ package service
 
 import (
 	"fmt"
-	"github.com/spf13/cast"
 	"net/http"
 	"regexp"
 	"strings"
 
 	"github.com/go-rat/chix"
 	"github.com/hashicorp/go-version"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"

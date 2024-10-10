@@ -22,43 +22,5 @@ export default {
   rootPassword: (): Promise<AxiosResponse<any>> => request.get('/apps/mysql/rootPassword'),
   // 修改 root 密码
   setRootPassword: (password: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/rootPassword', { password }),
-  // 数据库列表
-  databases: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/apps/mysql/databases', { params: { page, limit } }),
-  // 创建数据库
-  addDatabase: (database: any): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/databases', database),
-  // 删除数据库
-  deleteDatabase: (database: string): Promise<AxiosResponse<any>> =>
-    request.delete('/apps/mysql/databases', { params: { database } }),
-  // 备份列表
-  backups: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/apps/mysql/backups', { params: { page, limit } }),
-  // 创建备份
-  createBackup: (database: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/backups', { database }),
-  // 上传备份
-  uploadBackup: (backup: any): Promise<AxiosResponse<any>> =>
-    request.put('/apps/mysql/backups', backup),
-  // 删除备份
-  deleteBackup: (name: string): Promise<AxiosResponse<any>> =>
-    request.delete('/apps/mysql/backups', { params: { name } }),
-  // 还原备份
-  restoreBackup: (backup: string, database: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/backups/restore', { backup, database }),
-  // 用户列表
-  users: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/apps/mysql/users', { params: { page, limit } }),
-  // 创建用户
-  addUser: (user: any): Promise<AxiosResponse<any>> => request.post('/apps/mysql/users', user),
-  // 删除用户
-  deleteUser: (user: string): Promise<AxiosResponse<any>> =>
-    request.delete('/apps/mysql/users', { params: { user } }),
-  // 设置用户密码
-  setUserPassword: (user: string, password: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/users/password', { user, password }),
-  // 设置用户权限
-  setUserPrivileges: (user: string, database: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/mysql/users/privileges', { user, database })
+    request.post('/apps/mysql/rootPassword', { password })
 }

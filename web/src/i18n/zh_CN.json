@@ -348,8 +348,8 @@
       "actions": "操作"
     },
     "create": {
-      "trigger": "新建网站",
-      "title": "新建网站",
+      "trigger": "创建网站",
+      "title": "创建网站",
       "fields": {
         "name": {
           "label": "网站名",

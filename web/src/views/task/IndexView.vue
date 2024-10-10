@@ -4,7 +4,7 @@ import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import task from '@/api/panel/task'
-import { renderIcon } from '@/utils'
+import { formatDateTime, renderIcon } from '@/utils'
 import type { Task } from '@/views/task/types'
 
 const { t } = useI18n()
@@ -40,14 +40,20 @@ const columns: any = [
   {
     title: t('taskIndex.columns.createdAt'),
     key: 'created_at',
-    width: 160,
-    ellipsis: { tooltip: true }
+    width: 200,
+    ellipsis: { tooltip: true },
+    render(row: any): string {
+      return formatDateTime(row.created_at)
+    }
   },
   {
     title: t('taskIndex.columns.updatedAt'),
     key: 'updated_at',
-    width: 160,
-    ellipsis: { tooltip: true }
+    width: 200,
+    ellipsis: { tooltip: true },
+    render(row: any): string {
+      return formatDateTime(row.updated_at)
+    }
   },
   {
     title: t('taskIndex.columns.actions'),

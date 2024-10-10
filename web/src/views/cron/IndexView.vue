@@ -3,9 +3,10 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 
 import cron from '@/api/panel/cron'
+import file from '@/api/panel/file'
 import info from '@/api/panel/info'
 import website from '@/api/panel/website'
-import { renderIcon } from '@/utils'
+import { formatDateTime, renderIcon } from '@/utils'
 import type { CronTask } from '@/views/cron/types'
 
 const addModel = ref({
@@ -82,9 +83,19 @@ const columns: any = [
     key: 'created_at',
     width: 200,
     resizable: true,
-    ellipsis: { tooltip: true }
+    ellipsis: { tooltip: true },
+    render(row: any): string {
+      return formatDateTime(row.created_at)
+    }
   },
-  { title: '最后更新时间', key: 'updated_at', ellipsis: { tooltip: true } },
+  {
+    title: '最后更新时间',
+    key: 'updated_at',
+    ellipsis: { tooltip: true },
+    render(row: any): string {
+      return formatDateTime(row.updated_at)
+    }
+  },
   {
     title: '操作',
     key: 'actions',
@@ -219,20 +230,22 @@ const handleShowLog = async (row: any) => {
   })
 }
 
-const handleAdd = async () => {
-  await cron.add(addModel.value).then(() => {
-    window.$message.success('添加成功')
+const handleCreate = async () => {
+  await cron.create(addModel.value).then(() => {
+    window.$message.success('创建成功')
   })
   onPageChange(pagination.page)
 }
 
 const handleEdit = async (row: any) => {
-  cron.script(row.id).then((res) => {
-    editTask.value.id = row.id
-    editTask.value.name = row.name
-    editTask.value.time = row.time
-    editTask.value.script = res.data
-    editTaskModal.value = true
+  await cron.get(row.id).then(async (res) => {
+    await file.content(res.data.shell).then((res) => {
+      editTask.value.id = row.id
+      editTask.value.name = row.name
+      editTask.value.time = row.time
+      editTask.value.script = res.data
+      editTaskModal.value = true
+    })
   })
 }
 
@@ -270,7 +283,7 @@ onMounted(() => {
 <template>
   <common-page show-footer>
     <n-space vertical>
-      <n-card flex-1 rounded-10 title="添加计划任务">
+      <n-card flex-1 rounded-10 title="创建计划任务">
         <n-space vertical>
           <n-alert type="info">
             面板的计划任务均基于脚本运行，若任务类型满足不了需求，可自行修改对应的脚本。
@@ -347,7 +360,7 @@ onMounted(() => {
               <n-input-number v-model:value="addModel.save" />
             </n-form-item>
           </n-form>
-          <n-button type="primary" @click="handleAdd">添加</n-button>
+          <n-button type="primary" @click="handleCreate">创建</n-button>
         </n-space>
       </n-card>
       <n-card flex-1 rounded-10 title="计划任务列表">

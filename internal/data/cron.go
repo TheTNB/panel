@@ -40,7 +40,7 @@ func (r *cronRepo) Count() (int64, error) {
 func (r *cronRepo) List(page, limit uint) ([]*biz.Cron, int64, error) {
 	var cron []*biz.Cron
 	var total int64
-	err := app.Orm.Model(&biz.Cert{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&cron).Error
+	err := app.Orm.Model(&biz.Cron{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&cron).Error
 	return cron, total, err
 }
 

@@ -5,19 +5,19 @@ import { request } from '@/utils'
 export default {
   // 获取任务列表
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/cron/list', { params: { page, limit } }),
+    request.get('/cron', { params: { page, limit } }),
   // 获取任务脚本
-  script: (id: number): Promise<AxiosResponse<any>> => request.get('/cron/' + id),
-  // 添加任务
-  add: (task: any): Promise<AxiosResponse<any>> => request.post('/cron/add', task),
+  get: (id: number): Promise<AxiosResponse<any>> => request.get('/cron/' + id),
+  // 创建任务
+  create: (task: any): Promise<AxiosResponse<any>> => request.post('/cron', task),
   // 修改任务
   update: (id: number, name: string, time: string, script: string): Promise<AxiosResponse<any>> =>
     request.put('/cron/' + id, { name, time, script }),
   // 删除任务
   delete: (id: number): Promise<AxiosResponse<any>> => request.delete('/cron/' + id),
   // 获取任务日志
-  log: (id: number): Promise<AxiosResponse<any>> => request.get('/cron/log/' + id),
+  log: (id: number): Promise<AxiosResponse<any>> => request.get('/cron/' + id + '/log'),
   // 修改任务状态
   status: (id: number, status: boolean): Promise<AxiosResponse<any>> =>
-    request.post('/cron/status', { id, status })
+    request.post('/cron/' + id + '/status', { status })
 }
