@@ -122,7 +122,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	restartFlag := false
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read("config/config.yml")
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
 	if err != nil {
 		return false, err
 	}
@@ -139,7 +139,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	if err != nil {
 		return false, err
 	}
-	if err = io.Write("config/config.yml", string(encoded), 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0644); err != nil {
 		return false, err
 	}
 	if raw != string(encoded) {

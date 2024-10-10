@@ -8,15 +8,18 @@ import (
 	"path/filepath"
 
 	"github.com/go-rat/utils/hash"
+	"github.com/goccy/go-yaml"
 	"github.com/gookit/color"
 	"github.com/urfave/cli/v3"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type CliService struct {
@@ -287,6 +290,27 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	_, err = user.Create("admin", value)
 	if err != nil {
 		return fmt.Errorf("初始化失败: %v", err)
+	}
+
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), &config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.App.Key = str.RandomString(32)
+	config.HTTP.Entrance = "/" + str.RandomString(6)
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0644); err != nil {
+		return err
 	}
 
 	return nil

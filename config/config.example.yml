@@ -8,7 +8,7 @@ app:
   version: 2.3.0
   root: /www
 http:
-  debug: true
+  debug: false
   port: 8888
   entrance: /
   tls: false
