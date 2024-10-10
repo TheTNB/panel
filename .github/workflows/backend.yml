@@ -30,7 +30,7 @@ jobs:
       - name: Download frontend
         uses: dawidd6/action-download-artifact@v6
         with:
-          workflow: build-frontend.yml
+          workflow: frontend.yml
           name: frontend
           path: internal/embed/frontend
           check_artifacts: true

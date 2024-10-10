@@ -126,7 +126,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	if err != nil {
 		return false, err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), &config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
 		return false, err
 	}
 
