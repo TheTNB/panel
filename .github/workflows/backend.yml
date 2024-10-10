@@ -40,16 +40,16 @@ jobs:
           GOOS: linux
           GOARCH: ${{ matrix.goarch }}
         run: |
-          go build -ldflags '-s -w --extldflags "-static"' -o panel-${{ matrix.goarch }} ./cmd/web
+          go build -ldflags '-s -w --extldflags "-static"' -o web-${{ matrix.goarch }} ./cmd/web
           go build -ldflags '-s -w --extldflags "-static"' -o cli-${{ matrix.goarch }} ./cmd/cli
       - name: Compress ${{ matrix.goarch }}
         run: |
-          upx --best --lzma panel-${{ matrix.goarch }}
+          upx --best --lzma web-${{ matrix.goarch }}
           upx --best --lzma cli-${{ matrix.goarch }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.goarch }}
           path: |
-            panel-${{ matrix.goarch }}
+            web-${{ matrix.goarch }}
             cli-${{ matrix.goarch }}
