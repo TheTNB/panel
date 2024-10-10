@@ -16,7 +16,7 @@ type Versions []Version
 
 // LatestVersion 返回最新版本
 func (r *API) LatestVersion() (*Version, error) {
-	resp, err := r.client.R().SetResult(&Response{}).Get("/versions/latest")
+	resp, err := r.client.R().SetResult(&Response{}).Get("/version/latest")
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (r *API) LatestVersion() (*Version, error) {
 func (r *API) IntermediateVersions() (*Versions, error) {
 	resp, err := r.client.R().
 		SetQueryParam("start", r.panelVersion).
-		SetResult(&Response{}).Get("/versions/intermediate")
+		SetResult(&Response{}).Get("/version/intermediate")
 	if err != nil {
 		return nil, err
 	}
