@@ -31,10 +31,6 @@ const setting = ref<WebsiteSetting>({
   http_redirect: false,
   hsts: false,
   ocsp: false,
-  waf: false,
-  waf_mode: '',
-  waf_cc_deny: '',
-  waf_cache: '',
   rewrite: '',
   raw: '',
   log: ''
@@ -169,35 +165,6 @@ onMounted(() => {
           </n-form-item>
           <n-form-item label="防跨站攻击（PHP）">
             <n-switch v-model:value="setting.open_basedir" />
-          </n-form-item>
-        </n-form>
-        <n-skeleton v-else text :repeat="10" />
-      </n-tab-pane>
-      <n-tab-pane name="waf" tab="防火墙">
-        <n-alert type="info" mb-20>
-          面板自带开源的 ngx_waf 防火墙
-          <br />
-          文档参考：<a
-            href="https://docs.addesp.com/ngx_waf/zh-cn/advance/directive.html"
-            target="_blank"
-            >https://docs.addesp.com/ngx_waf/zh-cn/advance/directive.html</a
-          >
-        </n-alert>
-        <n-form v-if="setting">
-          <n-form-item label="总开关">
-            <n-space vertical>
-              <n-switch v-model:value="setting.waf" />
-              <n-tag>只有打开了总开关，下面的设置才会生效！</n-tag>
-            </n-space>
-          </n-form-item>
-          <n-form-item label="模式">
-            <n-input v-model:value="setting.waf_mode" placeholder="DYNAMIC" />
-          </n-form-item>
-          <n-form-item label="CC">
-            <n-input v-model:value="setting.waf_cc_deny" placeholder="rate=1000r/m duration=60m" />
-          </n-form-item>
-          <n-form-item label="缓存">
-            <n-input v-model:value="setting.waf_cache" placeholder="capacity=50" />
           </n-form-item>
         </n-form>
         <n-skeleton v-else text :repeat="10" />

@@ -140,21 +140,6 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 		setting.SSLDNSNames = decode.DNSNames
 	}
 
-	waf := str.Cut(config, "# waf标记位开始", "# waf标记位结束")
-	setting.Waf = strings.Contains(waf, "waf on;")
-	match = regexp.MustCompile(`waf_mode\s+([^;]*);?`).FindStringSubmatch(waf)
-	if len(match) > 1 {
-		setting.WafMode = match[1]
-	}
-	match = regexp.MustCompile(`waf_cc_deny\s+([^;]*);?`).FindStringSubmatch(waf)
-	if len(match) > 1 {
-		setting.WafCcDeny = match[1]
-	}
-	match = regexp.MustCompile(`waf_cache\s+([^;]*);?`).FindStringSubmatch(waf)
-	if len(match) > 1 {
-		setting.WafCache = match[1]
-	}
-
 	rewrite, _ := io.Read(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"))
 	setting.Rewrite = rewrite
 	log, _ := shell.Execf(`tail -n 100 '%s/wwwlogs/%s.log'`, app.Root, website.Name)
@@ -268,14 +253,6 @@ server
     include enable-php-%s.conf;
     # php标记位结束
 
-    # waf标记位开始
-    waf off;
-    waf_rule_path %s/server/openresty/ngx_waf/assets/rules/;
-    waf_mode DYNAMIC;
-    waf_cc_deny rate=1000r/m duration=60m;
-    waf_cache capacity=50;
-    # waf标记位结束
-
     # 错误页配置，可自行设置
     error_page 404 /404.html;
     #error_page 502 /502.html;
@@ -302,7 +279,7 @@ server
     access_log %s/wwwlogs/%s.log;
     error_log %s/wwwlogs/%s.log;
 }
-`, portList, domainList, req.Path, req.PHP, app.Root, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name)
+`, portList, domainList, req.Path, req.PHP, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name, app.Root, req.Name)
 
 	if err = io.Write(filepath.Join(app.Root, "server/vhost", req.Name+".conf"), nginxConf, 0644); err != nil {
 		return nil, err
@@ -478,24 +455,6 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 			}
 		}
 	}
-
-	// WAF
-	wafStr := "off"
-	if req.Waf {
-		wafStr = "on"
-	}
-	wafConfig := fmt.Sprintf(`# waf标记位开始
-    waf %s;
-    waf_rule_path %s/server/openresty/ngx_waf/assets/rules/;
-    waf_mode %s;
-    waf_cc_deny %s;
-    waf_cache %s;
-    `, wafStr, app.Root, req.WafMode, req.WafCcDeny, req.WafCache)
-	wafConfigOld := str.Cut(raw, "# waf标记位开始", "# waf标记位结束")
-	if len(strings.TrimSpace(wafConfigOld)) != 0 {
-		raw = strings.Replace(raw, wafConfigOld, "", -1)
-	}
-	raw = strings.Replace(raw, "# waf标记位开始", wafConfig, -1)
 
 	// SSL
 	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"), req.SSLCertificate, 0644); err != nil {
@@ -689,14 +648,6 @@ server
     include enable-php-%d.conf;
     # php标记位结束
 
-    # waf标记位开始
-    waf off;
-    waf_rule_path %s/server/openresty/ngx_waf/assets/rules/;
-    waf_mode DYNAMIC;
-    waf_cc_deny rate=1000r/m duration=60m;
-    waf_cache capacity=50;
-    # waf标记位结束
-
     # 错误页配置，可自行设置
     error_page 404 /404.html;
     #error_page 502 /502.html;
@@ -724,7 +675,7 @@ server
     error_log %s/wwwlogs/%s.log;
 }
 
-`, website.Path, website.PHP, app.Root, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name)
+`, website.Path, website.PHP, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name, app.Root, website.Name)
 	if err := io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
 		return nil
 	}

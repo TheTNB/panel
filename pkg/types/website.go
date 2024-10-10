@@ -23,10 +23,6 @@ type WebsiteSetting struct {
 	HTTPRedirect      bool     `json:"http_redirect"`
 	HSTS              bool     `json:"hsts"`
 	OCSP              bool     `json:"ocsp"`
-	Waf               bool     `json:"waf"`
-	WafMode           string   `json:"waf_mode"`
-	WafCcDeny         string   `json:"waf_cc_deny"`
-	WafCache          string   `json:"waf_cache"`
 	Rewrite           string   `json:"rewrite"`
 	Raw               string   `json:"raw"`
 	Log               string   `json:"log"`

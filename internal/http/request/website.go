@@ -1,7 +1,5 @@
 package request
 
-import "net/http"
-
 type WebsiteDefaultConfig struct {
 	Index string `json:"index" form:"index"`
 	Stop  string `json:"stop" form:"stop"`
@@ -37,10 +35,6 @@ type WebsiteUpdate struct {
 	SSL               bool     `form:"ssl" json:"ssl"`
 	HTTPRedirect      bool     `form:"http_redirect" json:"http_redirect"`
 	OpenBasedir       bool     `form:"open_basedir" json:"open_basedir"`
-	Waf               bool     `form:"waf" json:"waf"`
-	WafCache          string   `form:"waf_cache" json:"waf_cache"`
-	WafMode           string   `form:"waf_mode" json:"waf_mode"`
-	WafCcDeny         string   `form:"waf_cc_deny" json:"waf_cc_deny"`
 	Index             string   `form:"index" json:"index"`
 	Path              string   `form:"path" json:"path"`
 	Root              string   `form:"root" json:"root"`
@@ -49,20 +43,6 @@ type WebsiteUpdate struct {
 	PHP               int      `form:"php" json:"php"`
 	SSLCertificate    string   `form:"ssl_certificate" json:"ssl_certificate"`
 	SSLCertificateKey string   `form:"ssl_certificate_key" json:"ssl_certificate_key"`
-}
-
-func (r *WebsiteUpdate) Prepare(_ *http.Request) error {
-	if r.WafMode == "" {
-		r.WafMode = "DYNAMIC"
-	}
-	if r.WafCcDeny == "" {
-		r.WafCcDeny = "rate=1000r/m duration=60m"
-	}
-	if r.WafCache == "" {
-		r.WafCache = "capacity=50"
-	}
-
-	return nil
 }
 
 type WebsiteUpdateRemark struct {

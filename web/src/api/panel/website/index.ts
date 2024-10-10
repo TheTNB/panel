@@ -6,8 +6,8 @@ export default {
   // 列表
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/website', { params: { page, limit } }),
-  // 添加
-  add: (data: any): Promise<AxiosResponse<any>> => request.post('/website', data),
+  // 创建
+  create: (data: any): Promise<AxiosResponse<any>> => request.post('/website', data),
   // 删除
   delete: (data: any): Promise<AxiosResponse<any>> => request.post('/website/' + data.id, data),
   // 获取默认配置

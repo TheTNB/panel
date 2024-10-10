@@ -32,10 +32,6 @@ export interface WebsiteSetting {
   http_redirect: boolean
   hsts: boolean
   ocsp: boolean
-  waf: boolean
-  waf_mode: string
-  waf_cc_deny: string
-  waf_cache: string
   rewrite: string
   raw: string
   log: string

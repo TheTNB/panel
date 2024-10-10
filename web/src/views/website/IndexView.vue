@@ -190,7 +190,7 @@ const buttonDisabled = ref(false)
 const addModel = ref({
   name: '',
   domains: [] as Array<string>,
-  ports: [] as Array<string>,
+  ports: [] as Array<number>,
   php: '0',
   db: false,
   db_type: '0',
@@ -307,15 +307,15 @@ const handleAdd = async () => {
   buttonDisabled.value = true
   // 去除空的域名和端口
   addModel.value.domains = addModel.value.domains.filter((item) => item !== '')
-  addModel.value.ports = addModel.value.ports.filter((item) => item !== '')
+  addModel.value.ports = addModel.value.ports.filter((item) => item !== 0)
   // 端口为空自动添加 80 端口
   if (addModel.value.ports.length === 0) {
-    addModel.value.ports.push('80')
+    addModel.value.ports.push(80)
   }
   await website
-    .add(addModel.value)
+    .create(addModel.value)
     .then(() => {
-      window.$message.success('添加成功')
+      window.$message.success('创建成功')
       getWebsiteList(pagination.page, pagination.pageSize).then((res) => {
         data.value = res.items
         pagination.itemCount = res.total
@@ -325,7 +325,7 @@ const handleAdd = async () => {
       addModel.value = {
         name: '',
         domains: [] as Array<string>,
-        ports: [] as Array<string>,
+        ports: [] as Array<number>,
         php: '0',
         db: false,
         db_type: '0',
@@ -448,12 +448,11 @@ onMounted(() => {
         <n-col :span="2"></n-col>
         <n-col :span="11">
           <n-form-item :label="$t('websiteIndex.create.fields.port.label')">
-            <n-dynamic-input
-              v-model:value="addModel.ports"
-              placeholder="80"
-              :min="1"
-              show-sort-button
-            />
+            <n-dynamic-input v-model:value="addModel.ports" show-sort-button>
+              <template #default="{ index }">
+                <n-input-number v-model:value="addModel.ports[index]" :min="1" :max="65535" />
+              </template>
+            </n-dynamic-input>
           </n-form-item>
         </n-col>
       </n-row>
