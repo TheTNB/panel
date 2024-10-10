@@ -27,7 +27,7 @@ type AppRepo interface {
 	GetHomeShow() ([]map[string]string, error)
 	IsInstalled(query string, cond ...string) (bool, error)
 	Install(channel, slug string) error
-	Uninstall(slug string) error
+	UnInstall(slug string) error
 	Update(slug string) error
 	UpdateShow(slug string, show bool) error
 	UpdateCache() error

@@ -1,4 +1,4 @@
-import { usePermissionStore } from '@/store'
+import { usePermissionStore, useUserStore } from '@/store'
 import type { App } from 'vue'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import type { RoutesType, RouteType } from '~/types/router'
@@ -22,6 +22,8 @@ export async function setupRouter(app: App) {
 
 export async function addDynamicRoutes() {
   try {
+    const userStore = useUserStore()
+    await userStore.getUserInfo()
     const permissionStore = usePermissionStore()
     const accessRoutes = permissionStore.generateRoutes(['admin'])
     accessRoutes.forEach((route: RouteType) => {

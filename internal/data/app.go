@@ -191,7 +191,7 @@ func (r *appRepo) Install(channel, slug string) error {
 	return err
 }
 
-func (r *appRepo) Uninstall(slug string) error {
+func (r *appRepo) UnInstall(slug string) error {
 	item, err := r.Get(slug)
 	if err != nil {
 		return err

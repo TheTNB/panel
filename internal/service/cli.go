@@ -23,13 +23,15 @@ import (
 )
 
 type CliService struct {
-	repo biz.UserRepo
+	app  biz.AppRepo
+	user biz.UserRepo
 	hash hash.Hasher
 }
 
 func NewCliService() *CliService {
 	return &CliService{
-		repo: data.NewUserRepo(),
+		app:  data.NewAppRepo(),
+		user: data.NewUserRepo(),
 		hash: hash.NewArgon2id(),
 	}
 }
@@ -236,37 +238,116 @@ func (s *CliService) CutoffWebsite(ctx context.Context, cmd *cli.Command) error 
 }
 
 func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	channel := cmd.Args().Get(0)
+	slug := cmd.Args().Get(1)
+	if channel == "" || slug == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	if err := s.app.Install(channel, slug); err != nil {
+		return fmt.Errorf("应用安装失败：%v", err)
+	}
+
+	color.Greenln(fmt.Sprintf("已创建应用 %s 安装任务", slug))
+
 	return nil
 }
 
 func (s *CliService) AppUnInstall(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	slug := cmd.Args().First()
+	if slug == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	if err := s.app.UnInstall(slug); err != nil {
+		return fmt.Errorf("应用卸载失败：%v", err)
+	}
+
+	color.Greenln(fmt.Sprintf("已创建应用 %s 卸载任务", slug))
+
 	return nil
 }
 
 func (s *CliService) AppWrite(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	slug := cmd.Args().Get(0)
+	channel := cmd.Args().Get(1)
+	version := cmd.Args().Get(2)
+	if slug == "" || channel == "" || version == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	newApp := new(biz.App)
+	if err := app.Orm.Where("slug", slug).First(newApp).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("获取应用失败：%v", err)
+		}
+	}
+	newApp.Slug = slug
+	newApp.Channel = channel
+	newApp.Version = version
+	if err := app.Orm.Save(newApp).Error; err != nil {
+		return fmt.Errorf("应用保存失败：%v", err)
+	}
+
 	return nil
 }
 
 func (s *CliService) AppRemove(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	slug := cmd.Args().First()
+	if slug == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	if err := app.Orm.Where("slug", slug).Delete(&biz.App{}).Error; err != nil {
+		return fmt.Errorf("应用删除失败：%v", err)
+	}
+
 	return nil
 }
 
 func (s *CliService) ClearTask(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	if err := app.Orm.Model(&biz.Task{}).
+		Where("status", biz.TaskStatusRunning).Or("status", biz.TaskStatusWaiting).
+		Update("status", biz.TaskStatusFailed).
+		Error; err != nil {
+		return fmt.Errorf("任务清理失败：%v", err)
+	}
+
 	return nil
 }
 
 func (s *CliService) WriteSetting(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	key := cmd.Args().Get(0)
+	value := cmd.Args().Get(1)
+	if key == "" || value == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	setting := new(biz.Setting)
+	if err := app.Orm.Where("key", key).First(setting).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("获取设置失败：%v", err)
+		}
+	}
+	setting.Key = biz.SettingKey(key)
+	setting.Value = value
+	if err := app.Orm.Save(setting).Error; err != nil {
+		return fmt.Errorf("设置保存失败：%v", err)
+	}
+
 	return nil
 }
 
 func (s *CliService) RemoveSetting(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	key := cmd.Args().First()
+	if key == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	if err := app.Orm.Where("key", key).Delete(&biz.Setting{}).Error; err != nil {
+		return fmt.Errorf("设置删除失败：%v", err)
+	}
+
 	return nil
 }
 
@@ -313,5 +394,6 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	return nil
+	// 初始化应用中心缓存
+	return s.app.UpdateCache()
 }

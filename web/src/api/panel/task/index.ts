@@ -7,9 +7,9 @@ export default {
   status: (): Promise<AxiosResponse<any>> => request.get('/task/status'),
   // 获取任务列表
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/task/list', { params: { page, limit } }),
-  // 获取任务日志
-  log: (id: number): Promise<AxiosResponse<any>> => request.get('/task/log', { params: { id } }),
+    request.get('/task', { params: { page, limit } }),
+  // 获取任务
+  get: (id: number): Promise<AxiosResponse<any>> => request.get('/task/' + id),
   // 删除任务
-  delete: (id: number): Promise<AxiosResponse<any>> => request.post('/task/delete', { id })
+  delete: (id: number): Promise<AxiosResponse<any>> => request.delete('/task/' + id)
 }

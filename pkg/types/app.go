@@ -8,8 +8,8 @@ type App struct {
 	Route func(r chi.Router) `json:"-"`    // 路由
 }
 
-// StoreApp 商店应用结构
-type StoreApp struct {
+// AppCenter 应用中心结构
+type AppCenter struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Slug        string `json:"slug"`

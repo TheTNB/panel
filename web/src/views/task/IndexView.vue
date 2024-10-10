@@ -136,9 +136,9 @@ const handleDelete = (id: number) => {
 
 const handleShowLog = (id: number) => {
   task
-    .log(id)
+    .get(id)
     .then((res) => {
-      taskLog.value = res.data
+      taskLog.value = res.data.log
     })
     .catch(() => {
       autoRefresh.value = false

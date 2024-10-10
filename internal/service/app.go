@@ -34,7 +34,7 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 		installedAppMap[p.Slug] = p
 	}
 
-	var apps []types.StoreApp
+	var apps []types.AppCenter
 	for _, item := range all {
 		installed, installedChannel, installedVersion, updateExist, show := false, "", "", false, false
 		if _, ok := installedAppMap[item.Slug]; ok {
@@ -44,7 +44,7 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 			updateExist = s.appRepo.UpdateExist(item.Slug)
 			show = installedAppMap[item.Slug].Show
 		}
-		apps = append(apps, types.StoreApp{
+		apps = append(apps, types.AppCenter{
 			Name:        item.Name,
 			Description: item.Description,
 			Slug:        item.Slug,
@@ -98,7 +98,7 @@ func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.appRepo.Uninstall(req.Slug); err != nil {
+	if err = s.appRepo.UnInstall(req.Slug); err != nil {
 		Error(w, http.StatusInternalServerError, err.Error())
 		return
 	}

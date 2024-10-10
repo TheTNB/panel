@@ -38,13 +38,12 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/task", func(r chi.Router) {
-			// TODO 修改前端
 			r.Use(middleware.MustLogin)
 			task := service.NewTaskService()
 			r.Get("/status", task.Status)
 			r.Get("/", task.List)
-			r.Get("/{id}", task.Get)       // TODO 修改前端
-			r.Delete("/{id}", task.Delete) // TODO 修改前端
+			r.Get("/{id}", task.Get)
+			r.Delete("/{id}", task.Delete)
 		})
 
 		r.Route("/website", func(r chi.Router) {
