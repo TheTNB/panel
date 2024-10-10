@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"path/filepath"
 	"time"
 
 	"go.uber.org/zap"
@@ -12,7 +13,7 @@ import (
 
 func initLogger() {
 	writeSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   "storage/logs/app.log",
+		Filename:   filepath.Join(app.Root, "panel/storage/logs/app.log"),
 		MaxSize:    10,
 		MaxBackups: 10,
 		MaxAge:     30,

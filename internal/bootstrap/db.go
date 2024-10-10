@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -22,7 +23,7 @@ func initOrm() {
 	zapLogger.LogMode(logLevel)
 	zapLogger.SetAsDefault()
 
-	db, err := gorm.Open(sqlite.Open("storage/panel.db"), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(filepath.Join(app.Root, "panel/storage/panel.db")), &gorm.Config{
 		Logger:                                   zapLogger,
 		SkipDefaultTransaction:                   true,
 		DisableForeignKeyConstraintWhenMigrating: true,
