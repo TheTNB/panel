@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/glebarez/sqlite"
@@ -29,7 +29,7 @@ func initOrm() {
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if err != nil {
-		panic(fmt.Sprintf("failed to connect database: %v", err))
+		log.Fatalf("failed to connect database: %v", err)
 	}
 	app.Orm = db
 }
@@ -40,6 +40,6 @@ func runMigrate() {
 		ValidateUnknownMigrations: true,
 	}, migration.Migrations)
 	if err := migrator.Migrate(); err != nil {
-		panic(fmt.Sprintf("failed to migrate database: %v", err))
+		log.Fatalf("failed to migrate database: %v", err)
 	}
 }

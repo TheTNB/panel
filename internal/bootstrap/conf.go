@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,22 +17,22 @@ import (
 func initConf() {
 	executable, err := os.Executable()
 	if err != nil {
-		panic(fmt.Sprintf("failed to get executable: %v", err))
+		log.Fatalf("failed to get executable: %v", err)
 	}
 	res, err := filepath.EvalSymlinks(filepath.Dir(executable))
 	if err != nil {
-		panic(fmt.Sprintf("failed to get executable path: %v", err))
+		log.Fatalf("failed to get executable path: %v", err)
 	}
 	if isTesting() || isAir() || isDirectlyRun() {
 		res, err = os.Getwd()
 		if err != nil {
-			panic(fmt.Sprintf("failed to get working directory: %v", err))
+			log.Fatalf("failed to get working directory: %v", err)
 		}
 	}
 
 	app.Conf = koanf.New(".")
 	if err = app.Conf.Load(file.Provider(filepath.Join(res, "config/config.yml")), yaml.Parser()); err != nil {
-		panic(fmt.Sprintf("failed to load config: %v", err))
+		log.Fatalf("failed to load config: %v", err)
 	}
 }
 
@@ -44,7 +44,7 @@ func initGlobal() {
 	// 初始化时区
 	loc, err := time.LoadLocation(app.Conf.MustString("app.timezone"))
 	if err != nil {
-		panic(fmt.Sprintf("failed to load timezone: %v", err))
+		log.Fatalf("failed to load timezone: %v", err)
 	}
 	time.Local = loc
 }

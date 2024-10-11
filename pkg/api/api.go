@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -30,7 +31,7 @@ func NewAPI(panelVersion string, url ...string) *API {
 
 	hostInfo, err := host.Info()
 	if err != nil {
-		panic(fmt.Sprintf("failed to get host info: %v", err))
+		log.Fatalf("failed to get host info: %v", err)
 	}
 
 	client := resty.New()

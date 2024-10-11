@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/go-playground/locales/zh_Hans_CN"
 	ut "github.com/go-playground/universal-translator"
@@ -18,7 +18,7 @@ func initValidator() {
 
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	if err := zh.RegisterDefaultTranslations(validate, trans); err != nil {
-		panic(fmt.Sprintf("failed to register validator translations: %v", err))
+		log.Fatalf("failed to register validator translations: %v", err)
 	}
 
 	app.Translator = &trans

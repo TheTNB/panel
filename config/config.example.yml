@@ -11,6 +11,6 @@ http:
   debug: false
   port: 8888
   entrance: /
-  tls: false
+  tls: true
 database:
   debug: false

@@ -1,8 +1,11 @@
 package bootstrap
 
 import (
+	"crypto/tls"
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 
@@ -22,12 +25,29 @@ func initHttp() {
 	route.Http(app.Http)
 	apps.Boot(app.Http)
 
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:           fmt.Sprintf(":%d", app.Conf.MustInt("http.port")),
 		Handler:        http.AllowQuerySemicolons(app.Http),
 		MaxHeaderBytes: 2048 << 20,
 	}
-	if err := server.ListenAndServe(); err != nil {
-		panic(fmt.Sprintf("failed to start http server: %v", err))
+
+	if app.Conf.Bool("http.tls") {
+		srv.TLSConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+
+		cert := filepath.Join(app.Root, "panel/storage/cert.pem")
+		key := filepath.Join(app.Root, "panel/storage/cert.key")
+		go func() {
+			if err := srv.ListenAndServeTLS(cert, key); err != nil {
+				log.Fatalf("failed to start https server: %v", err)
+			}
+		}()
+	} else {
+		go func() {
+			if err := srv.ListenAndServe(); err != nil {
+				log.Fatalf("failed to start http server: %v", err)
+			}
+		}()
 	}
 }

@@ -1,7 +1,7 @@
 package bootstrap
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/robfig/cron/v3"
 
@@ -22,7 +22,7 @@ func initCron() {
 	app.Cron = c
 
 	if err := job.Boot(app.Cron); err != nil {
-		panic(fmt.Sprintf("failed to boot cron jobs: %v", err))
+		log.Fatalf("failed to boot cron jobs: %v", err)
 	}
 
 	c.Start()

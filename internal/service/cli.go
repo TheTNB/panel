@@ -70,8 +70,7 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		user.Email = str.RandomString(8) + "@example.com"
 	}
 
-	err = app.Orm.Save(user).Error
-	if err != nil {
+	if err = app.Orm.Save(user).Error; err != nil {
 		return fmt.Errorf("管理员信息保存失败：%v", err)
 	}
 

@@ -3,6 +3,7 @@ package apploader
 
 import (
 	"fmt"
+	"log"
 	"sync"
 
 	"github.com/go-chi/chi/v5"
@@ -14,7 +15,7 @@ var apps sync.Map
 
 func Register(app *types.App) {
 	if _, ok := apps.Load(app.Slug); ok {
-		panic(fmt.Sprintf("app %s already exists", app.Slug))
+		log.Fatalf("app %s already exists", app.Slug)
 	}
 	apps.Store(app.Slug, app)
 }

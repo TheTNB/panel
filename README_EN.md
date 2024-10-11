@@ -107,7 +107,7 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 
 - [无畏云加速](https://su.sctes.com/register?code=8st689ujpmm2p)
 - [WAF PRO](https://waf.pro/)
-- [盾云CDN](http://cdn.ddunyun.com/)
+- [盾云SCDN](https://scdn.ddunyun.com/)
 
 <p align="center">
   <a target="_blank" href="https://afdian.com/a/TheTNB">

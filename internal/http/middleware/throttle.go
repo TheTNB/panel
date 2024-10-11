@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -16,12 +16,12 @@ func Throttle(tokens uint64, interval time.Duration) func(next http.Handler) htt
 		Interval: interval,
 	})
 	if err != nil {
-		panic(fmt.Sprintf("failed to create throttle memorystore: %v", err))
+		log.Fatalf("failed to create throttle memorystore: %v", err)
 	}
 
 	limiter, err := httplimit.NewMiddleware(store, httplimit.IPKeyFunc())
 	if err != nil {
-		panic(fmt.Sprintf("failed to initialize throttle middleware: %v", err))
+		log.Fatalf("failed to initialize throttle middleware: %v", err)
 	}
 
 	return limiter.Handle

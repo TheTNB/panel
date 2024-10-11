@@ -21,7 +21,7 @@ func BootWeb() {
 	initSession()
 	initCron()
 	initQueue()
-	go initHttp()
+	initHttp()
 
 	select {}
 }
