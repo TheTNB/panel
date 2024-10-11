@@ -1,7 +1,6 @@
 package fail2ban
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -108,7 +107,7 @@ func (s *Service) Add(w http.ResponseWriter, r *http.Request) {
 	case "website":
 		website, err := s.websiteRepo.GetByName(jailWebsiteName)
 		if err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, fmt.Sprintf("获取网站配置失败：%s", err))
+			service.Error(w, http.StatusUnprocessableEntity, "获取网站配置失败：%v", err)
 			return
 		}
 		var ports string

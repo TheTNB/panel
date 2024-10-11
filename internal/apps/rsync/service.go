@@ -64,7 +64,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 					currentModule.AuthUser = value
 					currentModule.Secret, err = shell.Execf(`grep -E '^%s:.*$' /etc/rsyncd.secrets | awk -F ':' '{print $2}'`, currentModule.AuthUser)
 					if err != nil {
-						service.Error(w, http.StatusInternalServerError, "获取模块"+currentModule.AuthUser+"的密钥失败")
+						service.Error(w, http.StatusInternalServerError, "获取模块%s的密钥失败", currentModule.AuthUser)
 						return
 					}
 				case "hosts allow":
@@ -99,7 +99,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if strings.Contains(config, "["+req.Name+"]") {
-		service.Error(w, http.StatusUnprocessableEntity, "模块 "+req.Name+" 已存在")
+		service.Error(w, http.StatusUnprocessableEntity, "模块%s已存在", req.Name)
 		return
 	}
 

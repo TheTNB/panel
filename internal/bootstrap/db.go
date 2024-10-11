@@ -23,7 +23,7 @@ func initOrm() {
 	zapLogger.LogMode(logLevel)
 	zapLogger.SetAsDefault()
 
-	db, err := gorm.Open(sqlite.Open(filepath.Join(app.Root, "panel/storage/panel.db")), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(filepath.Join(app.Root, "panel/storage/app.db")), &gorm.Config{
 		Logger:                                   zapLogger,
 		SkipDefaultTransaction:                   true,
 		DisableForeignKeyConstraintWhenMigrating: true,

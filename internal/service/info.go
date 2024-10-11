@@ -7,12 +7,14 @@ import (
 	"strings"
 
 	"github.com/go-rat/chix"
+	"github.com/go-rat/utils/env"
 	"github.com/hashicorp/go-version"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -20,6 +22,7 @@ import (
 )
 
 type InfoService struct {
+	api         *api.API
 	taskRepo    biz.TaskRepo
 	websiteRepo biz.WebsiteRepo
 	appRepo     biz.AppRepo
@@ -29,6 +32,7 @@ type InfoService struct {
 
 func NewInfoService() *InfoService {
 	return &InfoService{
+		api:         api.NewAPI(app.Version),
 		taskRepo:    data.NewTaskRepo(),
 		websiteRepo: data.NewWebsiteRepo(),
 		appRepo:     data.NewAppRepo(),
@@ -204,7 +208,7 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 
 func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 	current := app.Conf.MustString("app.version")
-	latest, err := tools.GetLatestPanelVersion()
+	latest, err := s.api.LatestVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
 		return
@@ -234,7 +238,7 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 
 func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	current := app.Conf.MustString("app.version")
-	latest, err := tools.GetLatestPanelVersion()
+	latest, err := s.api.LatestVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
 		return
@@ -255,23 +259,13 @@ func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	versions, err := tools.GenerateVersions(current, latest.Version)
+	versions, err := s.api.IntermediateVersions()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取更新信息失败")
+		Error(w, http.StatusInternalServerError, "获取更新信息失败：%v", err)
 		return
 	}
 
-	var versionInfo []tools.PanelInfo
-	for _, v := range versions {
-		info, err := tools.GetPanelVersion(v)
-		if err != nil {
-			continue
-		}
-
-		versionInfo = append(versionInfo, info)
-	}
-
-	Success(w, versionInfo)
+	Success(w, versions)
 }
 
 func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
@@ -281,18 +275,44 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE)").Error; err != nil {
 		types.Status = types.StatusFailed
-		Error(w, http.StatusInternalServerError, fmt.Sprintf("面板数据库异常，已终止操作：%s", err.Error()))
+		Error(w, http.StatusInternalServerError, "面板数据库异常，已终止操作：%v", err)
 		return
 	}
 
-	panel, err := tools.GetLatestPanelVersion()
+	panel, err := s.api.LatestVersion()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取最新版本失败")
+		Error(w, http.StatusInternalServerError, "获取最新版本失败：%v", err)
+		return
+	}
+
+	// TODO 需要修改接口直接把arch传过去
+	var ver, url, checksum string
+	if env.IsX86() {
+		for _, v := range panel.Downloads {
+			if v.Arch == "amd64" {
+				ver = panel.Version
+				url = v.URL
+				checksum = v.Checksum
+				break
+			}
+		}
+	} else if env.IsArm() {
+		for _, v := range panel.Downloads {
+			if v.Arch == "arm64" {
+				ver = panel.Version
+				url = v.URL
+				checksum = v.Checksum
+				break
+			}
+
+		}
+	} else {
+		Error(w, http.StatusInternalServerError, "不支持的架构")
 		return
 	}
 
 	types.Status = types.StatusUpgrade
-	if err = tools.UpdatePanel(panel); err != nil {
+	if err = s.settingRepo.UpdatePanel(ver, url, checksum); err != nil {
 		types.Status = types.StatusFailed
 		Error(w, http.StatusInternalServerError, err.Error())
 		return

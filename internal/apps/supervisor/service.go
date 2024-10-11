@@ -96,7 +96,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = systemctl.Restart(s.name); err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("重启 %s 服务失败", s.name))
+		service.Error(w, http.StatusInternalServerError, "重启 %s 服务失败", s.name)
 		return
 	}
 

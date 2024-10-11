@@ -36,12 +36,12 @@ func Success(w http.ResponseWriter, data any) {
 }
 
 // Error 响应错误
-func Error(w http.ResponseWriter, code int, message string) {
+func Error(w http.ResponseWriter, code int, format string, args ...any) {
 	render := chix.NewRender(w)
 	defer render.Release()
 	render.Status(code)
 	render.JSON(&ErrorResponse{
-		Message: message,
+		Message: fmt.Sprintf(format, args...),
 	})
 }
 
@@ -117,8 +117,10 @@ func Bind[T any](r *http.Request) (*T, error) {
 func Paginate[T any](r *http.Request, allItems []T) (pagedItems []T, total uint) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		req.Page = 1
-		req.Limit = 10
+		req = &request.Paginate{
+			Page:  1,
+			Limit: 10,
+		}
 	}
 	total = uint(len(allItems))
 	startIndex := (req.Page - 1) * req.Limit

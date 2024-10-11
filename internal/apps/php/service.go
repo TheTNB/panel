@@ -86,7 +86,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get(fmt.Sprintf("http://127.0.0.1/phpfpm_status/%d", s.version))
 	if err != nil || !resp.IsSuccess() {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("获取负载状态失败：%v", err))
+		service.Error(w, http.StatusInternalServerError, "获取负载状态失败：%v", err)
 		return
 	}
 

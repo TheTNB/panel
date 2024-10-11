@@ -8,8 +8,14 @@ import (
 type Version struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Type        string    `json:"type"`
 	Version     string    `json:"version"`
 	Description string    `json:"description"`
+	Downloads   []struct {
+		URL      string `json:"url"`
+		Arch     string `json:"arch"`
+		Checksum string `json:"checksum"`
+	} `json:"downloads"`
 }
 
 type Versions []Version
