@@ -3,7 +3,7 @@ package data
 import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/job"
+	"github.com/TheTNB/panel/internal/queuejob"
 )
 
 type taskRepo struct{}
@@ -43,7 +43,22 @@ func (r *taskRepo) Push(task *biz.Task) error {
 	if err := app.Orm.Create(task).Error; err != nil {
 		return err
 	}
-	return app.Queue.Push(job.NewProcessTask(r), []any{
+	return app.Queue.Push(queuejob.NewProcessTask(r), []any{
 		task.ID,
 	})
+}
+
+func (r *taskRepo) DispatchWaiting() error {
+	var tasks []biz.Task
+	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
+		return err
+	}
+
+	for _, task := range tasks {
+		if err := r.Push(&task); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

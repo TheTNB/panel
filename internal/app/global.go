@@ -6,6 +6,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/go-rat/sessions"
 	"github.com/knadh/koanf/v2"
+	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
@@ -19,6 +20,7 @@ var (
 	Validator  *validator.Validate
 	Translator *ut.Translator
 	Session    *sessions.Manager
+	Cron       *cron.Cron
 	Queue      *queue.Queue
 	Logger     *zap.Logger
 )

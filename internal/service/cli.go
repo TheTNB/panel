@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"path/filepath"
 
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
 	"github.com/gookit/color"
 	"github.com/urfave/cli/v3"
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"

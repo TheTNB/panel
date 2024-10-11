@@ -28,4 +28,5 @@ type TaskRepo interface {
 	Delete(id uint) error
 	UpdateStatus(id uint, status TaskStatus) error
 	Push(task *Task) error
+	DispatchWaiting() error
 }
