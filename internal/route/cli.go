@@ -180,22 +180,29 @@ func Cli() []*cli.Command {
 			},
 		},
 		{
+			Name:   "setting",
+			Usage:  "设置管理",
+			Hidden: true,
+			Commands: []*cli.Command{
+				{
+					Name:   "write",
+					Usage:  "写入面板设置（仅限指导下使用）",
+					Hidden: true,
+					Action: cliService.WriteSetting,
+				},
+				{
+					Name:   "remove",
+					Usage:  "移除面板设置（仅限指导下使用）",
+					Hidden: true,
+					Action: cliService.RemoveSetting,
+				},
+			},
+		},
+		{
 			Name:   "clearTask",
 			Usage:  "清理面板任务队列（仅限指导下使用）",
 			Hidden: true,
 			Action: cliService.ClearTask,
-		},
-		{
-			Name:   "writeSetting",
-			Usage:  "写入面板设置（仅限指导下使用）",
-			Hidden: true,
-			Action: cliService.WriteSetting,
-		},
-		{
-			Name:   "removeSetting",
-			Usage:  "移除面板设置（仅限指导下使用）",
-			Hidden: true,
-			Action: cliService.RemoveSetting,
 		},
 		{
 			Name:   "init",
