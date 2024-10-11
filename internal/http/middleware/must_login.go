@@ -13,7 +13,7 @@ import (
 // MustLogin 确保已登录
 func MustLogin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, err := app.Session.GetSession(r)
+		sess, err := app.Session.GetSession(r)
 		if err != nil {
 			render := chix.NewRender(w)
 			render.Status(http.StatusInternalServerError)
@@ -22,7 +22,7 @@ func MustLogin(next http.Handler) http.Handler {
 			})
 		}
 
-		if session.Missing("user_id") {
+		if sess.Missing("user_id") {
 			render := chix.NewRender(w)
 			render.Status(http.StatusUnauthorized)
 			render.JSON(chix.M{
@@ -31,7 +31,7 @@ func MustLogin(next http.Handler) http.Handler {
 			return
 		}
 
-		userID := cast.ToUint(session.Get("user_id"))
+		userID := cast.ToUint(sess.Get("user_id"))
 		if userID == 0 {
 			render := chix.NewRender(w)
 			render.Status(http.StatusUnauthorized)

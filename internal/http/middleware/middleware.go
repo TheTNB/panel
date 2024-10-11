@@ -19,5 +19,8 @@ func GlobalMiddleware() []func(http.Handler) http.Handler {
 		middleware.Logger,
 		middleware.Recoverer,
 		middleware.Compress(5),
+		Entrance,
+		Status,
+		MustInstall,
 	}
 }

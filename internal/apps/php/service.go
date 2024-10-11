@@ -86,7 +86,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get(fmt.Sprintf("http://127.0.0.1/phpfpm_status/%d", s.version))
 	if err != nil || !resp.IsSuccess() {
-		service.Error(w, http.StatusInternalServerError, "获取负载状态失败")
+		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("获取负载状态失败：%v", err))
 		return
 	}
 
@@ -94,19 +94,19 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	dataKeys := []string{"应用池", "工作模式", "启动时间", "接受连接", "监听队列", "最大监听队列", "监听队列长度", "空闲进程数量", "活动进程数量", "总进程数量", "最大活跃进程数量", "达到进程上限次数", "慢请求"}
 	regexKeys := []string{"pool", "process manager", "start time", "accepted conn", "listen queue", "max listen queue", "listen queue len", "idle processes", "active processes", "total processes", "max active processes", "max children reached", "slow requests"}
 
-	data := make([]types.NV, len(dataKeys))
+	loads := make([]types.NV, len(dataKeys))
 	for i := range dataKeys {
-		data[i].Name = dataKeys[i]
+		loads[i].Name = dataKeys[i]
 
 		r := regexp.MustCompile(fmt.Sprintf("%s:\\s+(.*)", regexKeys[i]))
 		match := r.FindStringSubmatch(raw)
 
 		if len(match) > 1 {
-			data[i].Value = strings.TrimSpace(match[1])
+			loads[i].Value = strings.TrimSpace(match[1])
 		}
 	}
 
-	service.Success(w, data)
+	service.Success(w, loads)
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {

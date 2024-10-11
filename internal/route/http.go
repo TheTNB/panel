@@ -47,9 +47,7 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/website", func(r chi.Router) {
-			// TODO 修改前端
 			r.Use(middleware.MustLogin)
-			// r.Use(middleware.MustInstallWebServer)
 			website := service.NewWebsiteService()
 			r.Get("/defaultConfig", website.GetDefaultConfig)
 			r.Post("/defaultConfig", website.UpdateDefaultConfig)

@@ -8,6 +8,7 @@ type PanelConfig struct {
 }
 
 type PanelAppConfig struct {
+	Debug    bool   `yaml:"debug"`
 	Key      string `yaml:"key"`
 	Locale   string `yaml:"locale"`
 	Timezone string `yaml:"timezone"`

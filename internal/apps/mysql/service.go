@@ -216,7 +216,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err = s.settingRepo.Set(biz.SettingKeyMySQLRootPassword, req.Password); err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("设置保存失败: %v", err))
+		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("设置保存失败：%v", err))
 		return
 	}
 
