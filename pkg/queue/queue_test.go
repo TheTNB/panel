@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"context"
 	"errors"
 	"testing"
 	"time"
@@ -17,112 +18,71 @@ func TestQueueTestSuite(t *testing.T) {
 }
 
 func (suite *QueueTestSuite) TestQueueInitialization() {
-	queue := New()
+	queue := New(10)
 	suite.NotNil(queue)
 	suite.NotNil(queue.jobs)
-	suite.NotNil(queue.isShutdown)
-	suite.NotNil(queue.done)
 }
 
 func (suite *QueueTestSuite) TestPushJobToQueue() {
-	queue := New()
+	queue := New(10)
 	job := &MockJob{}
 	err := queue.Push(job, []any{"arg1", "arg2"})
 	suite.NoError(err)
-}
-
-func (suite *QueueTestSuite) TestPushJobToShutdownQueue() {
-	queue := New()
-	queue.Run()
-	suite.NoError(queue.Shutdown())
-	job := &MockJob{}
-	err := queue.Push(job, []any{"arg1", "arg2"})
-	suite.Error(err)
-	suite.EqualError(err, "queue is shutdown, cannot add new jobs")
 }
 
 func (suite *QueueTestSuite) TestBulkJobsToQueue() {
-	queue := New()
-	jobs := []Jobs{
+	queue := New(10)
+	jobs := []JobItem{
 		{Job: &MockJob{}, Args: []any{"arg1"}},
 		{Job: &MockJob{}, Args: []any{"arg2"}},
 	}
 	err := queue.Bulk(jobs)
 	suite.NoError(err)
-}
-
-func (suite *QueueTestSuite) TestBulkJobsToShutdownQueue() {
-	queue := New()
-	queue.Run()
-	suite.NoError(queue.Shutdown())
-	jobs := []Jobs{
-		{Job: &MockJob{}, Args: []any{"arg1"}},
-		{Job: &MockJob{}, Args: []any{"arg2"}},
-	}
-	err := queue.Bulk(jobs)
-	suite.Error(err)
-	suite.EqualError(err, "queue is shutdown, cannot add new jobs")
 }
 
 func (suite *QueueTestSuite) TestLaterJobExecution() {
-	queue := New()
-	job := &MockJob{}
-	err := queue.Later(1, job, []any{"arg1"})
-	suite.NoError(err)
-}
-
-func (suite *QueueTestSuite) TestLaterJobExecutionOnShutdownQueue() {
-	queue := New()
-	queue.Run()
-	suite.NoError(queue.Shutdown())
+	queue := New(10)
 	job := &MockJob{}
 	err := queue.Later(1, job, []any{"arg1"})
 	suite.NoError(err)
 }
 
 func (suite *QueueTestSuite) TestRunQueue() {
-	queue := New()
+	queue := New(10)
 	job := &MockJob{}
 	suite.NoError(queue.Push(job, []any{"arg1"}))
-	queue.Run()
+	queue.Run(context.Background())
 	time.Sleep(1 * time.Second)
 	suite.True(job.Executed)
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithLaterJob() {
-	queue := New()
+	queue := New(10)
 	job := &MockJob{}
 	suite.NoError(queue.Later(1, job, []any{"arg1"}))
-	queue.Run()
+	queue.Run(context.Background())
 	time.Sleep(2 * time.Second)
 	suite.True(job.Executed)
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithBulkJobs() {
-	queue := New()
-	jobs := []Jobs{
+	queue := New(10)
+	jobs := []JobItem{
 		{Job: &MockJob{}, Args: []any{"arg1"}},
 		{Job: &MockJob{}, Args: []any{"arg2"}},
 	}
 	suite.NoError(queue.Bulk(jobs))
-	queue.Run()
+	queue.Run(context.Background())
 	time.Sleep(1 * time.Second)
 }
 
 func (suite *QueueTestSuite) TestRunQueueWithErrHandle() {
-	queue := New()
+	queue := New(10)
 	job := &MockJob{}
 	suite.NoError(queue.Push(job, []any{"arg1"}))
-	queue.Run()
+	queue.Run(context.Background())
 	time.Sleep(1 * time.Second)
 	suite.Error(job.Err)
-}
-
-func (suite *QueueTestSuite) TestShutdownQueue() {
-	queue := New()
-	queue.Run()
-	err := queue.Shutdown()
-	suite.NoError(err)
 }
 
 type MockJob struct {

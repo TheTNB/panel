@@ -7,7 +7,7 @@ export default {
   list: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/app/list', { params: { page, limit } }),
   // 安装应用
-  install: (slug: string, channel: string): Promise<AxiosResponse<any>> =>
+  install: (slug: string, channel: string | null): Promise<AxiosResponse<any>> =>
     request.post('/app/install', { slug, channel }),
   // 卸载应用
   uninstall: (slug: string): Promise<AxiosResponse<any>> =>

@@ -11,8 +11,8 @@ const info = defineModel<App>('info', { type: Object, required: true })
 
 const doSubmit = ref(false)
 
-const model = reactive({
-  channel: '',
+const model = ref({
+  channel: null,
   version: ''
 })
 
@@ -26,15 +26,33 @@ const options = computed(() => {
 })
 
 const handleSubmit = () => {
-  app.install(info.value.slug, model.channel).then(() => {
-    window.$message.success(t('appIndex.alerts.install'))
-  })
+  app
+    .install(info.value.slug, model.value.channel)
+    .then(() => {
+      window.$message.success(t('appIndex.alerts.install'))
+    })
+    .finally(() => {
+      doSubmit.value = false
+      show.value = false
+      model.value = {
+        channel: null,
+        version: ''
+      }
+    })
 }
 
 const handleChannelUpdate = (value: string) => {
   const channel = info.value.channels.find((channel) => channel.slug === value)
   if (channel) {
-    model.version = channel.subs[0].version
+    model.value.version = channel.subs[0].version
+  }
+}
+
+const handleClose = () => {
+  show.value = false
+  model.value = {
+    channel: null,
+    version: ''
   }
 }
 </script>
@@ -48,6 +66,7 @@ const handleChannelUpdate = (value: string) => {
     size="huge"
     :bordered="false"
     :segmented="false"
+    @close="handleClose"
   >
     <n-form :model="model">
       <n-form-item path="channel" label="渠道">

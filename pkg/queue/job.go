@@ -9,7 +9,7 @@ type JobWithErrHandle interface {
 	ErrHandle(err error)
 }
 
-type Jobs struct {
+type JobItem struct {
 	Job   Job
 	Args  []any
 	Delay uint
