@@ -58,12 +58,12 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	out, _ := shell.Execf("tail -n 100 %s/%s", app.Root, "wwwlogs/openresty-error.log")
+	out, _ := shell.Execf("tail -n 100 %s/%s", app.Root, "wwwlogs/nginx-error.log")
 	service.Success(w, out)
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "wwwlogs/openresty-error.log"); err != nil {
+	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "wwwlogs/nginx-error.log"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

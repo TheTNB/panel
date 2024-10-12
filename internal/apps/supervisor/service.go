@@ -1,7 +1,6 @@
 package supervisor
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -201,7 +200,7 @@ func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+		service.Error(w, http.StatusInternalServerError, "无法从进程 %s 的配置文件中获取日志路径", req.Process)
 		return
 	}
 
@@ -225,7 +224,7 @@ func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+		service.Error(w, http.StatusInternalServerError, "无法从进程 %s 的配置文件中获取日志路径", req.Process)
 		return
 	}
 
@@ -342,7 +341,7 @@ func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 	if os.IsRHEL() {
 		logPath, err = shell.Execf(`cat '/etc/supervisord.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, req.Process)
 		if err != nil {
-			service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+			service.Error(w, http.StatusInternalServerError, "无法从进程 %s 的配置文件中获取日志路径", req.Process)
 			return
 		}
 		if err = io.Remove(`/etc/supervisord.d/` + req.Process + `.conf`); err != nil {
@@ -352,7 +351,7 @@ func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 	} else {
 		logPath, err = shell.Execf(`cat '/etc/supervisor/conf.d/%s.conf' | grep stdout_logfile= | awk -F "=" '{print $2}'`, req.Process)
 		if err != nil {
-			service.Error(w, http.StatusInternalServerError, fmt.Sprintf("无法从进程 %s 的配置文件中获取日志路径", req.Process))
+			service.Error(w, http.StatusInternalServerError, "无法从进程 %s 的配置文件中获取日志路径", req.Process)
 			return
 		}
 		if err = io.Remove(`/etc/supervisor/conf.d/` + req.Process + `.conf`); err != nil {
