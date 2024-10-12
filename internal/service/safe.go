@@ -23,7 +23,7 @@ func NewSafeService() *SafeService {
 func (s *SafeService) GetSSH(w http.ResponseWriter, r *http.Request) {
 	port, status, err := s.safeRepo.GetSSH()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	Success(w, chix.M{
@@ -35,12 +35,12 @@ func (s *SafeService) GetSSH(w http.ResponseWriter, r *http.Request) {
 func (s *SafeService) UpdateSSH(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SafeUpdateSSH](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.safeRepo.UpdateSSH(req.Port, req.Status); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (s *SafeService) UpdateSSH(w http.ResponseWriter, r *http.Request) {
 func (s *SafeService) GetPingStatus(w http.ResponseWriter, r *http.Request) {
 	status, err := s.safeRepo.GetPingStatus()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -60,12 +60,12 @@ func (s *SafeService) GetPingStatus(w http.ResponseWriter, r *http.Request) {
 func (s *SafeService) UpdatePingStatus(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SafeUpdatePingStatus](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.safeRepo.UpdatePingStatus(req.Status); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

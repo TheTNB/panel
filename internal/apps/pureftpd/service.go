@@ -58,7 +58,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -79,11 +79,11 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, err = shell.Execf(`yes '%s' | pure-pw useradd '%s' -u www -g www -d '%s'`, req.Password, req.Username, req.Path); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -94,16 +94,16 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf("pure-pw userdel '%s' -m", req.Username); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -114,16 +114,16 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *Service) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ChangePassword](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`yes '%s' | pure-pw passwd '%s' -m`, req.Password, req.Username); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if _, err = shell.Execf("pure-pw mkdb"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -145,12 +145,12 @@ func (s *Service) GetPort(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdatePort](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`sed -i "s/Bind.*/Bind 0.0.0.0,%d/g" %s/server/pure-ftpd/etc/pure-ftpd.conf`, req.Port, app.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -160,12 +160,12 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		Protocol: "tcp",
 	}, firewall.OperationAdd)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("pure-ftpd"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

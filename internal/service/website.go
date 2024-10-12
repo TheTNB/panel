@@ -28,12 +28,12 @@ func NewWebsiteService() *WebsiteService {
 func (s *WebsiteService) GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 	index, err := io.Read(filepath.Join(app.Root, "server/openresty/html/index.html"))
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	stop, err := io.Read(filepath.Join(app.Root, "server/openresty/html/stop.html"))
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -46,12 +46,12 @@ func (s *WebsiteService) GetDefaultConfig(w http.ResponseWriter, r *http.Request
 func (s *WebsiteService) UpdateDefaultConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteDefaultConfig](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.UpdateDefaultConfig(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -61,13 +61,13 @@ func (s *WebsiteService) UpdateDefaultConfig(w http.ResponseWriter, r *http.Requ
 func (s *WebsiteService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	websites, total, err := s.websiteRepo.List(req.Page, req.Limit)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (s *WebsiteService) List(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteCreate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (s *WebsiteService) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err = s.websiteRepo.Create(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -100,13 +100,13 @@ func (s *WebsiteService) Create(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	config, err := s.websiteRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -116,12 +116,12 @@ func (s *WebsiteService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteUpdate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.Update(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -131,12 +131,12 @@ func (s *WebsiteService) Update(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteDelete](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.Delete(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -146,12 +146,12 @@ func (s *WebsiteService) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) ClearLog(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.ClearLog(req.ID); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -161,12 +161,12 @@ func (s *WebsiteService) ClearLog(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) UpdateRemark(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteUpdateRemark](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.UpdateRemark(req.ID, req.Remark); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -176,12 +176,12 @@ func (s *WebsiteService) UpdateRemark(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) ResetConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.ResetConfig(req.ID); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -191,12 +191,12 @@ func (s *WebsiteService) ResetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *WebsiteService) UpdateStatus(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.WebsiteUpdateStatus](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.websiteRepo.UpdateStatus(req.ID, req.Status); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

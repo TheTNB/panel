@@ -22,7 +22,7 @@ func NewSettingService() *SettingService {
 func (s *SettingService) Get(w http.ResponseWriter, r *http.Request) {
 	setting, err := s.settingRepo.GetPanelSetting(r.Context())
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -32,13 +32,13 @@ func (s *SettingService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *SettingService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.PanelSetting](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	restart := false
 	if restart, err = s.settingRepo.UpdatePanelSetting(r.Context(), req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

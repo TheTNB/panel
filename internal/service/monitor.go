@@ -26,7 +26,7 @@ func NewMonitorService() *MonitorService {
 func (s *MonitorService) GetSetting(w http.ResponseWriter, r *http.Request) {
 	setting, err := s.monitorRepo.GetSetting()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -36,12 +36,12 @@ func (s *MonitorService) GetSetting(w http.ResponseWriter, r *http.Request) {
 func (s *MonitorService) UpdateSetting(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.MonitorSetting](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.monitorRepo.UpdateSetting(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (s *MonitorService) UpdateSetting(w http.ResponseWriter, r *http.Request) {
 
 func (s *MonitorService) Clear(w http.ResponseWriter, r *http.Request) {
 	if err := s.monitorRepo.Clear(); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -60,13 +60,13 @@ func (s *MonitorService) Clear(w http.ResponseWriter, r *http.Request) {
 func (s *MonitorService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.MonitorList](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	monitors, err := s.monitorRepo.List(time.UnixMilli(req.Start), time.UnixMilli(req.End))
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

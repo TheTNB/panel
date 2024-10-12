@@ -94,13 +94,13 @@ func (s *CertService) Algorithms(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	certs, total, err := s.certRepo.List(req.Page, req.Limit)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -113,13 +113,13 @@ func (s *CertService) List(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertCreate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	cert, err := s.certRepo.Create(req)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -129,12 +129,12 @@ func (s *CertService) Create(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertUpdate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.certRepo.Update(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -144,13 +144,13 @@ func (s *CertService) Update(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	cert, err := s.certRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -160,13 +160,13 @@ func (s *CertService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	err = s.certRepo.Delete(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -176,13 +176,13 @@ func (s *CertService) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	cert, err := s.certRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -193,7 +193,7 @@ func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -203,13 +203,13 @@ func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Renew(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	_, err = s.certRepo.Renew(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -219,13 +219,13 @@ func (s *CertService) Renew(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) ManualDNS(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	dns, err := s.certRepo.ManualDNS(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -235,13 +235,13 @@ func (s *CertService) ManualDNS(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) Deploy(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertDeploy](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	err = s.certRepo.Deploy(req.ID, req.WebsiteID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

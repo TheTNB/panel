@@ -39,7 +39,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "wwwlogs/openresty_error.log"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

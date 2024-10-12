@@ -30,13 +30,13 @@ func (s *TaskService) Status(w http.ResponseWriter, r *http.Request) {
 func (s *TaskService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	tasks, total, err := s.taskRepo.List(req.Page, req.Limit)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -49,13 +49,13 @@ func (s *TaskService) List(w http.ResponseWriter, r *http.Request) {
 func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	task, err := s.taskRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -70,13 +70,13 @@ func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *TaskService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	err = s.taskRepo.Delete(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

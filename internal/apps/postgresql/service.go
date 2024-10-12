@@ -35,7 +35,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *Service) GetUserConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateUserConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -144,7 +144,7 @@ func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
 // ClearLog 清空日志
 func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("rm -rf %s/server/postgresql/logs/postgresql-*.log", app.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

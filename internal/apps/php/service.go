@@ -35,7 +35,7 @@ func NewService(version uint) *Service {
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php.ini", app.Root, s.version))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -45,12 +45,12 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php.ini", app.Root, s.version), req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", app.Root, s.version))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -70,12 +70,12 @@ func (s *Service) GetFPMConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write(fmt.Sprintf("%s/server/php/%d/etc/php-fpm.conf", app.Root, s.version), req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/php-fpm.log", app.Root, s.version); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -130,7 +130,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/php/%d/var/log/slow.log", app.Root, s.version); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -152,7 +152,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 
 	raw, err := shell.Execf("%s/server/php/%d/bin/php -m", app.Root, s.version)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func (s *Service) ExtensionList(w http.ResponseWriter, r *http.Request) {
 func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ExtensionSlug](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 	task.Shell = cmd
 	task.Log = "/tmp/" + req.Slug + ".log"
 	if err = s.taskRepo.Push(task); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -205,7 +205,7 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ExtensionSlug](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -226,7 +226,7 @@ func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 	task.Shell = cmd
 	task.Log = "/tmp/" + req.Slug + ".log"
 	if err = s.taskRepo.Push(task); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

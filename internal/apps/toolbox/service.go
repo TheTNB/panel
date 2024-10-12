@@ -27,7 +27,7 @@ func NewService() *Service {
 func (s *Service) GetDNS(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/resolv.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	match := regexp.MustCompile(`nameserver\s+(\S+)`).FindAllStringSubmatch(raw, -1)
@@ -48,7 +48,7 @@ func (s *Service) GetDNS(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateDNS(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[DNS](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -111,21 +111,21 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SWAP](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if io.Exists(filepath.Join(app.Root, "swap")) {
 		if _, err = shell.Execf("swapoff '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, err.Error())
+			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 			return
 		}
 		if _, err = shell.Execf("rm -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, err.Error())
+			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 			return
 		}
 		if _, err = shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, err.Error())
+			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 			return
 		}
 	}
@@ -145,16 +145,16 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 		btrfsCheck, _ := shell.Execf("df -T %s | awk '{print $2}' | tail -n 1", app.Root)
 		if strings.Contains(btrfsCheck, "btrfs") {
 			if _, err = shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(app.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, err.Error())
+				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 				return
 			}
 		} else {
 			if _, err = shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(app.Root, "swap"), req.Size); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, err.Error())
+				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 				return
 			}
 			if _, err = shell.Execf("mkswap -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, err.Error())
+				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 				return
 			}
 			if err = io.Chmod(filepath.Join(app.Root, "swap"), 0600); err != nil {
@@ -163,11 +163,11 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if _, err = shell.Execf("swapon '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, err.Error())
+			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 			return
 		}
 		if _, err = shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, err.Error())
+			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 			return
 		}
 	}
@@ -214,12 +214,12 @@ func (s *Service) GetTimezone(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Timezone](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf("timedatectl set-timezone '%s'", req.Timezone); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -230,7 +230,7 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetHosts(w http.ResponseWriter, r *http.Request) {
 	hosts, err := io.Read("/etc/hosts")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -241,7 +241,7 @@ func (s *Service) GetHosts(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateHosts(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Hosts](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -257,7 +257,7 @@ func (s *Service) UpdateHosts(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Password](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -268,7 +268,7 @@ func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 
 	req.Password = strings.ReplaceAll(req.Password, `'`, `\'`)
 	if _, err = shell.Execf(`yes '%s' | passwd root`, req.Password); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 

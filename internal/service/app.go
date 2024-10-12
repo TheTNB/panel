@@ -94,12 +94,12 @@ func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.AppSlug](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.appRepo.UnInstall(req.Slug); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -109,12 +109,12 @@ func (s *AppService) Uninstall(w http.ResponseWriter, r *http.Request) {
 func (s *AppService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.AppSlug](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.appRepo.Update(req.Slug); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -124,12 +124,12 @@ func (s *AppService) Update(w http.ResponseWriter, r *http.Request) {
 func (s *AppService) UpdateShow(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.AppUpdateShow](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.appRepo.UpdateShow(req.Slug, req.Show); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -139,19 +139,19 @@ func (s *AppService) UpdateShow(w http.ResponseWriter, r *http.Request) {
 func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.AppSlug](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	app, err := s.appRepo.Get(req.Slug)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	installed, err := s.appRepo.IsInstalled(req.Slug)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -163,7 +163,7 @@ func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 
 func (s *AppService) UpdateCache(w http.ResponseWriter, r *http.Request) {
 	if err := s.appRepo.UpdateCache(); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

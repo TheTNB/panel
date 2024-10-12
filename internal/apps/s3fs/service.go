@@ -52,7 +52,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -99,7 +99,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, err = shell.Execf(`echo 's3fs#%s %s fuse _netdev,allow_other,nonempty,url=%s,passwd_file=/etc/passwd-s3fs-%s 0 0' >> /etc/fstab`, req.Bucket, req.Path, req.URL, cast.ToString(id)); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if mountCheck, err := shell.Execf("mount -a"); err != nil {
@@ -137,7 +137,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -165,15 +165,15 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err = shell.Execf(`fusermount -u '%s'`, mount.Path); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if _, err = shell.Execf(`umount '%s'`, mount.Path); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if _, err = shell.Execf(`sed -i 's@^s3fs#%s\s%s.*$@@g' /etc/fstab`, mount.Bucket, mount.Path); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if mountCheck, err := shell.Execf("mount -a"); err != nil {
@@ -181,7 +181,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err = io.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID)); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

@@ -25,7 +25,7 @@ func NewContainerImageService() *ContainerImageService {
 func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 	images, err := s.containerImageRepo.List()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -53,13 +53,13 @@ func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Exist(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	exist, err := s.containerImageRepo.Exist(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -69,12 +69,12 @@ func (s *ContainerImageService) Exist(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Pull(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImagePull](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.containerImageRepo.Pull(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -84,12 +84,12 @@ func (s *ContainerImageService) Pull(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Remove(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.containerImageRepo.Remove(req.ID); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -99,13 +99,13 @@ func (s *ContainerImageService) Remove(w http.ResponseWriter, r *http.Request) {
 func (s *ContainerImageService) Inspect(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerImageID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	inspect, err := s.containerImageRepo.Inspect(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -114,7 +114,7 @@ func (s *ContainerImageService) Inspect(w http.ResponseWriter, r *http.Request) 
 
 func (s *ContainerImageService) Prune(w http.ResponseWriter, r *http.Request) {
 	if err := s.containerImageRepo.Prune(); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

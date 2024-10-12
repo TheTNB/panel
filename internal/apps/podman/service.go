@@ -17,7 +17,7 @@ func NewService() *Service {
 func (s *Service) GetRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/containers/registries.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -27,17 +27,17 @@ func (s *Service) GetRegistryConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write("/etc/containers/registries.conf", req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("podman"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (s *Service) UpdateRegistryConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetStorageConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/containers/storage.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -57,17 +57,17 @@ func (s *Service) GetStorageConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateStorageConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write("/etc/containers/storage.conf", req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("podman"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

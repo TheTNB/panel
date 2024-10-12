@@ -18,7 +18,7 @@ func NewSystemctlService() *SystemctlService {
 func (s *SystemctlService) Status(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -34,7 +34,7 @@ func (s *SystemctlService) Status(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) IsEnabled(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func (s *SystemctlService) IsEnabled(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Enable(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (s *SystemctlService) Enable(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Disable(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (s *SystemctlService) Disable(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Restart(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -95,7 +95,7 @@ func (s *SystemctlService) Restart(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Reload(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -110,7 +110,7 @@ func (s *SystemctlService) Reload(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Start(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -125,7 +125,7 @@ func (s *SystemctlService) Start(w http.ResponseWriter, r *http.Request) {
 func (s *SystemctlService) Stop(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SystemctlService](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 

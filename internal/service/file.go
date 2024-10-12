@@ -31,18 +31,18 @@ func NewFileService() *FileService {
 func (s *FileService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileCreate](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if !req.Dir {
 		if _, err = shell.Execf("touch %s", req.Path); err != nil {
-			Error(w, http.StatusInternalServerError, err.Error())
+			Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	} else {
 		if err = io.Mkdir(req.Path, 0755); err != nil {
-			Error(w, http.StatusInternalServerError, err.Error())
+			Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
@@ -54,13 +54,13 @@ func (s *FileService) Create(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Content(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	fileInfo, err := io.FileInfo(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if fileInfo.IsDir() {
@@ -74,7 +74,7 @@ func (s *FileService) Content(w http.ResponseWriter, r *http.Request) {
 
 	content, err := io.Read(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -84,18 +84,18 @@ func (s *FileService) Content(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Save(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileSave](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	fileInfo, err := io.FileInfo(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.Write(req.Path, req.Content, fileInfo.Mode()); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -106,12 +106,12 @@ func (s *FileService) Save(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.Remove(req.Path); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -121,12 +121,12 @@ func (s *FileService) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileUpload](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.Write(req.Path, string(req.File), 0755); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -137,7 +137,7 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileMove](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -146,7 +146,7 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = io.Mv(req.Source, req.Target); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -156,7 +156,7 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileCopy](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -165,7 +165,7 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = io.Cp(req.Source, req.Target); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -175,13 +175,13 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Download(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	info, err := io.FileInfo(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if info.IsDir() {
@@ -201,13 +201,13 @@ func (s *FileService) RemoteDownload(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Info(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	info, err := io.FileInfo(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -224,23 +224,23 @@ func (s *FileService) Info(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Permission(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePermission](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	// 解析成8进制
 	mode, err := strconv.ParseUint(req.Mode, 8, 64)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.Chmod(req.Path, stdos.FileMode(mode)); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if err = io.Chown(req.Path, req.Owner, req.Group); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -250,18 +250,18 @@ func (s *FileService) Permission(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileCompress](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	format, err := io.FormatArchiveByPath(req.File)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.Compress(req.Paths, req.File, format); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -272,18 +272,18 @@ func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileUnCompress](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	format, err := io.FormatArchiveByPath(req.File)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = io.UnCompress(req.File, req.Path, format); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -294,7 +294,7 @@ func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) Search(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FileSearch](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -309,7 +309,7 @@ func (s *FileService) Search(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -319,13 +319,13 @@ func (s *FileService) Search(w http.ResponseWriter, r *http.Request) {
 func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	fileInfoList, err := io.ReadDir(req.Path)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

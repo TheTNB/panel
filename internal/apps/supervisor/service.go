@@ -51,7 +51,7 @@ func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
 // ClearLog 清空日志
 func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -80,7 +80,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -107,7 +107,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Processes(w http.ResponseWriter, r *http.Request) {
 	out, err := shell.Execf(`supervisorctl status | awk '{print $1}'`)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -146,12 +146,12 @@ func (s *Service) Processes(w http.ResponseWriter, r *http.Request) {
 func (s *Service) StartProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`supervisorctl start %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -162,12 +162,12 @@ func (s *Service) StartProcess(w http.ResponseWriter, r *http.Request) {
 func (s *Service) StopProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`supervisorctl stop %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -178,12 +178,12 @@ func (s *Service) StopProcess(w http.ResponseWriter, r *http.Request) {
 func (s *Service) RestartProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`supervisorctl restart %s`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -194,7 +194,7 @@ func (s *Service) RestartProcess(w http.ResponseWriter, r *http.Request) {
 func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -223,7 +223,7 @@ func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -240,7 +240,7 @@ func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err = shell.Execf(`echo "" > '%s'`, logPath); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -251,7 +251,7 @@ func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 func (s *Service) ProcessConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -263,7 +263,7 @@ func (s *Service) ProcessConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -274,7 +274,7 @@ func (s *Service) ProcessConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateProcessConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -285,7 +285,7 @@ func (s *Service) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -300,7 +300,7 @@ func (s *Service) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) CreateProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[CreateProcess](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -324,7 +324,7 @@ stdout_logfile_maxbytes=2MB
 	}
 
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -339,12 +339,12 @@ stdout_logfile_maxbytes=2MB
 func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if _, err = shell.Execf(`supervisorctl stop '%s'`, req.Process); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -356,7 +356,7 @@ func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err = io.Remove(`/etc/supervisord.d/` + req.Process + `.conf`); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	} else {
@@ -366,13 +366,13 @@ func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err = io.Remove(`/etc/supervisor/conf.d/` + req.Process + `.conf`); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
 
 	if err = io.Remove(logPath); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	_, _ = shell.Execf(`supervisorctl reread`)

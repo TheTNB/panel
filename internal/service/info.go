@@ -314,7 +314,7 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	types.Status = types.StatusUpgrade
 	if err = s.settingRepo.UpdatePanel(ver, url, checksum); err != nil {
 		types.Status = types.StatusFailed
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

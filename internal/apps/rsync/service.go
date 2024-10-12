@@ -24,7 +24,7 @@ func NewService() *Service {
 func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -89,13 +89,13 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if strings.Contains(config, "["+req.Name+"]") {
@@ -115,16 +115,16 @@ secrets file = /etc/rsyncd.secrets
 `
 
 	if err = io.WriteAppend("/etc/rsyncd.conf", conf); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if err = io.WriteAppend("/etc/rsyncd.secrets", fmt.Sprintf(`%s:%s\n`, req.AuthUser, req.Secret)); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -134,13 +134,13 @@ secrets file = /etc/rsyncd.secrets
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if !strings.Contains(config, "["+req.Name+"]") {
@@ -155,18 +155,18 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	if len(match) == 2 {
 		authUser := match[1]
 		if _, err = shell.Execf(`sed -i '/^%s:.*$/d' /etc/rsyncd.secrets`, authUser); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
 
 	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -176,13 +176,13 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Update](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if !strings.Contains(config, "["+req.Name+"]") {
@@ -207,22 +207,22 @@ secrets file = /etc/rsyncd.secrets
 	if len(match) == 2 {
 		authUser := match[1]
 		if _, err = shell.Execf(`sed -i '/^%s:.*$/d' /etc/rsyncd.secrets`, authUser); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
 
 	if err = io.Write("/etc/rsyncd.conf", config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	if err = io.WriteAppend("/etc/rsyncd.secrets", fmt.Sprintf(`%s:%s\n`, req.AuthUser, req.Secret)); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -232,7 +232,7 @@ secrets file = /etc/rsyncd.secrets
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -242,17 +242,17 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write("/etc/rsyncd.conf", req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	if err = systemctl.Restart("rsyncd"); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

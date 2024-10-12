@@ -32,7 +32,7 @@ func NewService() *Service {
 func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Add(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Add](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 	jailName := req.Name
@@ -95,7 +95,7 @@ func (s *Service) Add(w http.ResponseWriter, r *http.Request) {
 
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 	if (strings.Contains(raw, "["+jailName+"]") && jailType == "service") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-cc") && jailType == "website" && jailWebsiteMode == "cc") || (strings.Contains(raw, "["+jailWebsiteName+"]"+"-path") && jailType == "website" && jailWebsiteMode == "path") {
@@ -217,13 +217,13 @@ logpath = ` + logPath + `
 func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 	if !strings.Contains(raw, "["+req.Name+"]") {
@@ -251,7 +251,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 func (s *Service) BanList(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[BanList](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -296,7 +296,7 @@ func (s *Service) BanList(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Unban(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Unban](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -312,13 +312,13 @@ func (s *Service) Unban(w http.ResponseWriter, r *http.Request) {
 func (s *Service) SetWhiteList(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SetWhiteList](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 	// 正则替换
@@ -346,7 +346,7 @@ func (s *Service) SetWhiteList(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetWhiteList(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 	reg := regexp.MustCompile(`ignoreip\s*=\s*(.*)\n`)

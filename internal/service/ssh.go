@@ -29,7 +29,7 @@ func NewSSHService() *SSHService {
 func (s *SSHService) GetInfo(w http.ResponseWriter, r *http.Request) {
 	info, err := s.sshRepo.GetInfo()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -39,12 +39,12 @@ func (s *SSHService) GetInfo(w http.ResponseWriter, r *http.Request) {
 func (s *SSHService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.SSHUpdateInfo](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.sshRepo.UpdateInfo(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 }
@@ -52,7 +52,7 @@ func (s *SSHService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 func (s *SSHService) Session(w http.ResponseWriter, r *http.Request) {
 	info, err := s.sshRepo.GetInfo()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

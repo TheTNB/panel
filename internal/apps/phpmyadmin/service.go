@@ -43,7 +43,7 @@ func (s *Service) Info(w http.ResponseWriter, r *http.Request) {
 
 	conf, err := io.Read(fmt.Sprintf("%s/server/vhost/phpmyadmin.conf", app.Root))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	match := regexp.MustCompile(`listen\s+(\d+);`).FindStringSubmatch(conf)
@@ -61,13 +61,13 @@ func (s *Service) Info(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdatePort](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	conf, err := io.Read(fmt.Sprintf("%s/server/vhost/phpmyadmin.conf", app.Root))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	conf = regexp.MustCompile(`listen\s+(\d+);`).ReplaceAllString(conf, "listen "+cast.ToString(req.Port)+";")
@@ -82,7 +82,7 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		Protocol: "tcp",
 	}, firewall.OperationAdd)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/vhost/phpmyadmin.conf", app.Root))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -108,12 +108,12 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = io.Write(fmt.Sprintf("%s/server/vhost/phpmyadmin.conf", app.Root), req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

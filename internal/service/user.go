@@ -25,19 +25,19 @@ func NewUserService() *UserService {
 func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 	sess, err := app.Session.GetSession(r)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
 	req, err := Bind[request.UserLogin](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	user, err := s.repo.CheckPassword(req.Username, req.Password)
 	if err != nil {
-		Error(w, http.StatusForbidden, err.Error())
+		Error(w, http.StatusForbidden, "%v", err)
 		return
 	}
 

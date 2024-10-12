@@ -23,13 +23,13 @@ func NewCertAccountService() *CertAccountService {
 func (s *CertAccountService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	certDNS, total, err := s.certAccountRepo.List(req.Page, req.Limit)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -42,13 +42,13 @@ func (s *CertAccountService) List(w http.ResponseWriter, r *http.Request) {
 func (s *CertAccountService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertAccountCreate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	account, err := s.certAccountRepo.Create(req)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -58,12 +58,12 @@ func (s *CertAccountService) Create(w http.ResponseWriter, r *http.Request) {
 func (s *CertAccountService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertAccountUpdate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.certAccountRepo.Update(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -73,13 +73,13 @@ func (s *CertAccountService) Update(w http.ResponseWriter, r *http.Request) {
 func (s *CertAccountService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	account, err := s.certAccountRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -89,12 +89,12 @@ func (s *CertAccountService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *CertAccountService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.certAccountRepo.Delete(req.ID); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

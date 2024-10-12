@@ -23,13 +23,13 @@ func NewCertDNSService() *CertDNSService {
 func (s *CertDNSService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	certDNS, total, err := s.certDNSRepo.List(req.Page, req.Limit)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -42,13 +42,13 @@ func (s *CertDNSService) List(w http.ResponseWriter, r *http.Request) {
 func (s *CertDNSService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertDNSCreate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	certDNS, err := s.certDNSRepo.Create(req)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -58,12 +58,12 @@ func (s *CertDNSService) Create(w http.ResponseWriter, r *http.Request) {
 func (s *CertDNSService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertDNSUpdate](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.certDNSRepo.Update(req); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -73,13 +73,13 @@ func (s *CertDNSService) Update(w http.ResponseWriter, r *http.Request) {
 func (s *CertDNSService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	certDNS, err := s.certDNSRepo.Get(req.ID)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -89,12 +89,12 @@ func (s *CertDNSService) Get(w http.ResponseWriter, r *http.Request) {
 func (s *CertDNSService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.certDNSRepo.Delete(req.ID); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 

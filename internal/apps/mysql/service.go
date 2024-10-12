@@ -44,7 +44,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -150,7 +150,7 @@ func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 // ClearErrorLog 清空错误日志
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", app.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -171,7 +171,7 @@ func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 // ClearSlowLog 清空慢查询日志
 func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", app.Root); err != nil {
-		service.Error(w, http.StatusInternalServerError, err.Error())
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -197,7 +197,7 @@ func (s *Service) GetRootPassword(w http.ResponseWriter, r *http.Request) {
 func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SetRootPassword](r)
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, err.Error())
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
@@ -206,12 +206,12 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// 尝试安全模式直接改密
 		if err = db.MySQLResetRootPassword(req.Password); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	} else {
 		if err = mysql.UserPassword("root", req.Password); err != nil {
-			service.Error(w, http.StatusInternalServerError, err.Error())
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
