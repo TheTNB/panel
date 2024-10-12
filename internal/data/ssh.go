@@ -40,7 +40,7 @@ func (r *sshRepo) UpdateInfo(req *request.SSHUpdateInfo) error {
 	if err := r.settingRepo.Set(biz.SettingKeySshHost, req.Host); err != nil {
 		return err
 	}
-	if err := r.settingRepo.Set(biz.SettingKeySshPort, req.Port); err != nil {
+	if err := r.settingRepo.Set(biz.SettingKeySshPort, cast.ToString(req.Port)); err != nil {
 		return err
 	}
 	if err := r.settingRepo.Set(biz.SettingKeySshUser, req.User); err != nil {

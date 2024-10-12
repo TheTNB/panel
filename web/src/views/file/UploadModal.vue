@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UploadCustomRequestOptions } from 'naive-ui'
 
-import * as api from '@/api/panel/file'
+import api from '@/api/panel/file'
 import EventBus from '@/utils/event'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
@@ -11,7 +11,7 @@ const upload = ref<any>(null)
 const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequestOptions) => {
   const formData = new FormData()
   formData.append('file', file.file as File)
-  api.default
+  api
     .upload(`${path.value}/${file.name}`, formData, onProgress)
     .then(() => {
       window.$message.success(`上传 ${file.name} 成功`)

@@ -11,7 +11,7 @@ const addCertModel = ref<any>({
   domains: [],
   dns_id: 0,
   type: 'P256',
-  user_id: null,
+  account_id: null,
   website_id: 0,
   auto_renew: true
 })
@@ -19,7 +19,7 @@ const updateCertModel = ref<any>({
   domains: [],
   dns_id: 0,
   type: 'P256',
-  user_id: null,
+  account_id: null,
   website_id: 0,
   auto_renew: true
 })
@@ -40,7 +40,7 @@ const deployCertModel = ref<any>({
 const algorithms = ref<any>([])
 const websites = ref<any>([])
 const dns = ref<any>([])
-const users = ref<any>([])
+const accounts = ref<any>([])
 
 const certColumns: any = [
   {
@@ -94,7 +94,7 @@ const certColumns: any = [
   },
   {
     title: '关联账号',
-    key: 'user_id',
+    key: 'account_id',
     width: 200,
     resizable: true,
     ellipsis: { tooltip: true },
@@ -102,11 +102,11 @@ const certColumns: any = [
       return h(
         NTag,
         {
-          type: row.user == null ? 'error' : 'success',
+          type: row.account == null ? 'error' : 'success',
           bordered: false
         },
         {
-          default: () => (row.user?.email == null ? '无' : row.user.email)
+          default: () => (row.account?.email == null ? '无' : row.account.email)
         }
       )
     }
@@ -314,7 +314,7 @@ const certColumns: any = [
               updateCertModel.value.domains = row.domains
               updateCertModel.value.dns_id = row.dns_id
               updateCertModel.value.type = row.type
-              updateCertModel.value.user_id = row.user_id
+              updateCertModel.value.account_id = row.account_id
               updateCertModel.value.website_id = row.website_id
               updateCertModel.value.auto_renew = row.auto_renew
               updateCertModal.value = true
@@ -395,7 +395,7 @@ const handleAddCert = async () => {
   addCertModel.value.domains = []
   addCertModel.value.dns_id = 0
   addCertModel.value.type = 'P256'
-  addCertModel.value.user_id = 0
+  addCertModel.value.account_id = 0
   addCertModel.value.website_id = 0
   addCertModel.value.auto_renew = true
   await getAsyncData()
@@ -409,7 +409,7 @@ const handleUpdateCert = async () => {
   updateCertModel.value.domains = []
   updateCertModel.value.dns_id = 0
   updateCertModel.value.type = 'P256'
-  updateCertModel.value.user_id = 0
+  updateCertModel.value.account_id = 0
   updateCertModel.value.website_id = 0
   updateCertModel.value.auto_renew = true
   await getAsyncData()
@@ -459,10 +459,10 @@ const getAsyncData = async () => {
     })
   }
 
-  const { data: userData } = await cert.users(1, 10000)
-  users.value = []
-  for (const item of userData.items) {
-    users.value.push({
+  const { data: accountData } = await cert.accounts(1, 10000)
+  accounts.value = []
+  for (const item of accountData.items) {
+    accounts.value.push({
       label: item.email,
       value: item.id
     })
@@ -539,15 +539,15 @@ onMounted(() => {
             :options="websites"
           />
         </n-form-item>
-        <n-form-item path="user_id" label="账号">
+        <n-form-item path="account_id" label="账号">
           <n-select
-            v-model:value="addCertModel.user_id"
+            v-model:value="addCertModel.account_id"
             placeholder="选择用于签发证书的账号"
             clearable
-            :options="users"
+            :options="accounts"
           />
         </n-form-item>
-        <n-form-item path="user_id" label="DNS">
+        <n-form-item path="account_id" label="DNS">
           <n-select
             v-model:value="addCertModel.dns_id"
             placeholder="选择用于签发证书的DNS"
@@ -598,15 +598,15 @@ onMounted(() => {
             :options="websites"
           />
         </n-form-item>
-        <n-form-item path="user_id" label="账号">
+        <n-form-item path="account_id" label="账号">
           <n-select
-            v-model:value="updateCertModel.user_id"
+            v-model:value="updateCertModel.account_id"
             placeholder="选择用于签发证书的账号"
             clearable
-            :options="users"
+            :options="accounts"
           />
         </n-form-item>
-        <n-form-item path="user_id" label="DNS">
+        <n-form-item path="account_id" label="DNS">
           <n-select
             v-model:value="updateCertModel.dns_id"
             placeholder="选择用于签发证书的DNS"

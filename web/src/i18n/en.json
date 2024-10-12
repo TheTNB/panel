@@ -83,23 +83,6 @@
         "success": "Update successful"
       }
     },
-    "eggs": {
-      "count": {
-        "gt10": "What are you doing, ouch!",
-        "gt4": "Are you awesome, Brother Kun?",
-        "gt0": "If you look at it one more time, it will explode."
-      }
-    },
-    "about": {
-      "title": "About the panel",
-      "tnb": "The TNB development team wishes everyone a happy Dragon Boat Festival in 2024! Never downtime!",
-      "specialThanks": "Special thanks to the following supporters and {supporter}!",
-      "links": {
-        "group": "group",
-        "channel": "channel",
-        "supporter": ""
-      }
-    },
     "apps": {
       "title": "Quick App"
     }

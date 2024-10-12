@@ -10,7 +10,7 @@ type WebsiteCreate struct {
 	Domains    []string `form:"domains" json:"domains"`
 	Ports      []uint   `form:"ports" json:"ports"`
 	Path       string   `form:"path" json:"path"`
-	PHP        string   `form:"php" json:"php"`
+	PHP        int      `form:"php" json:"php"`
 	DB         bool     `form:"db" json:"db"`
 	DBType     string   `form:"db_type" json:"db_type"`
 	DBName     string   `form:"db_name" json:"db_name"`

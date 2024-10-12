@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/spf13/cast"
@@ -80,11 +81,16 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	raw, err := shell.Execf(`mysqladmin -u root -p "%s" extended-status`, rootPassword)
+	if err = os.Setenv("MYSQL_PWD", rootPassword); err != nil {
+		service.Error(w, http.StatusInternalServerError, "设置环境变量失败")
+		return
+	}
+	raw, err := shell.Execf(`mysqladmin -u root extended-status`)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取负载失败")
 		return
 	}
+	_ = os.Unsetenv("MYSQL_PWD")
 
 	var load []map[string]string
 	expressions := []struct {

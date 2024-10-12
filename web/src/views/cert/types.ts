@@ -1,6 +1,6 @@
 export interface Cert {
   id: number
-  user_id: number
+  account_id: number
   website_id: number
   dns_id: number
   type: string
@@ -13,7 +13,7 @@ export interface Cert {
   updated_at: string
   website: Website
   dns: DNS
-  user: User
+  account: Account
 }
 
 export interface Website {
@@ -43,7 +43,7 @@ export interface DNS {
   updated_at: string
 }
 
-export interface User {
+export interface Account {
   id: number
   email: string
   ca: string

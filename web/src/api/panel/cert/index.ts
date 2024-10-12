@@ -9,18 +9,18 @@ export default {
   dnsProviders: (): Promise<AxiosResponse<any>> => request.get('/cert/dnsProviders'),
   // 证书算法列表
   algorithms: (): Promise<AxiosResponse<any>> => request.get('/cert/algorithms'),
-  // ACME 用户列表
-  users: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/cert/users', { params: { page, limit } }),
-  // ACME 用户详情
-  userInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/users/${id}`),
-  // ACME 用户添加
-  userAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/users', data),
-  // ACME 用户更新
-  userUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
-    request.put(`/cert/users/${id}`, data),
-  // ACME 用户删除
-  userDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/users/${id}`),
+  // ACME 账号列表
+  accounts: (page: number, limit: number): Promise<AxiosResponse<any>> =>
+    request.get('/cert/account', { params: { page, limit } }),
+  // ACME 账号详情
+  accountInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/account/${id}`),
+  // ACME 账号添加
+  accountAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/account', data),
+  // ACME 账号更新
+  accountUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
+    request.put(`/cert/account/${id}`, data),
+  // ACME 账号删除
+  accountDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/account/${id}`),
   // DNS 记录列表
   dns: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/cert/dns', { params: { page, limit } }),
@@ -35,23 +35,26 @@ export default {
   dnsDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/dns/${id}`),
   // 证书列表
   certs: (page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/cert/certs', { params: { page, limit } }),
+    request.get('/cert/cert', { params: { page, limit } }),
   // 证书详情
-  certInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/certs/${id}`),
+  certInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/cert/${id}`),
   // 证书添加
-  certAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/certs', data),
+  certAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/cert', data),
   // 证书更新
   certUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
-    request.put(`/cert/certs/${id}`, data),
+    request.put(`/cert/cert/${id}`, data),
   // 证书删除
-  certDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/certs/${id}`),
+  certDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/cert/${id}`),
   // 签发
-  obtain: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/obtain`, { id }),
+  obtain: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/obtain`, { id }),
   // 续签
-  renew: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/renew`, { id }),
+  renew: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/renew`, { id }),
   // 获取 DNS 记录
-  manualDNS: (id: number): Promise<AxiosResponse<any>> => request.post(`/cert/manualDNS`, { id }),
+  manualDNS: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/manualDNS`, { id }),
   // 部署
   deploy: (id: number, website_id: number): Promise<AxiosResponse<any>> =>
-    request.post(`/cert/deploy`, { id, website_id })
+    request.post(`/cert/cert/${id}/deploy`, { id, website_id })
 }

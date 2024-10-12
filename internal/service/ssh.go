@@ -59,9 +59,6 @@ func (s *SSHService) Session(w http.ResponseWriter, r *http.Request) {
 	upGrader := websocket.Upgrader{
 		ReadBufferSize:  4096,
 		WriteBufferSize: 4096,
-		CheckOrigin: func(r *http.Request) bool {
-			return true
-		},
 	}
 
 	ws, err := upGrader.Upgrade(w, r, nil)

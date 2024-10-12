@@ -178,7 +178,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		Name:   req.Name,
 		Status: true,
 		Path:   req.Path,
-		PHP:    cast.ToInt(req.PHP),
+		PHP:    req.PHP,
 		SSL:    false,
 	}
 	if err := app.Orm.Create(w).Error; err != nil {
@@ -250,7 +250,7 @@ server
     # ssl标记位结束
 
     # php标记位开始
-    include enable-php-%s.conf;
+    include enable-php-%d.conf;
     # php标记位结束
 
     # 错误页配置，可自行设置

@@ -44,10 +44,13 @@ func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, e
 
 func (r *settingRepo) Set(key biz.SettingKey, value string) error {
 	setting := new(biz.Setting)
-	if err := app.Orm.Where("key = ?", key).FirstOrInit(setting).Error; err != nil {
-		return err
+	if err := app.Orm.Where("key = ?", key).First(setting).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
 	}
 
+	setting.Key = key
 	setting.Value = value
 	return app.Orm.Save(setting).Error
 }
@@ -278,6 +281,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 	_, _ = shell.Execf("systemctl daemon-reload")
 	_ = io.Remove("/tmp/panel-storage.zip")
+	_ = io.Remove(filepath.Join(app.Root, "panel/config.example.yml"))
 
 	return nil
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
@@ -61,59 +60,32 @@ func (r *safeRepo) UpdateSSH(port uint, status bool) error {
 }
 
 func (r *safeRepo) GetPingStatus() (bool, error) {
-	if os.IsRHEL() {
-		out, err := shell.Execf(`firewall-cmd --list-all`)
-		if err != nil {
-			return true, errors.New(out)
-		}
-
-		if !strings.Contains(out, `rule protocol value="icmp" drop`) {
-			return true, nil
-		} else {
-			return false, nil
-		}
-	} else {
-		config, err := io.Read("/etc/ufw/before.rules")
-		if err != nil {
-			return true, err
-		}
-		if strings.Contains(config, "-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT") {
-			return true, nil
-		} else {
-			return false, nil
-		}
+	out, err := shell.Execf(`firewall-cmd --list-all`)
+	if err != nil {
+		return true, errors.New(out)
 	}
+
+	if !strings.Contains(out, `rule protocol value="icmp" drop`) {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (r *safeRepo) UpdatePingStatus(status bool) error {
-	var out string
 	var err error
-	if os.IsRHEL() {
-		if status {
-			out, err = shell.Execf(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
-		} else {
-			out, err = shell.Execf(`firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'`)
-		}
+	if status {
+		_, err = shell.Execf(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
 	} else {
-		if status {
-			out, err = shell.Execf(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/g' /etc/ufw/before.rules`)
-		} else {
-			out, err = shell.Execf(`sed -i 's/-A ufw-before-input -p icmp --icmp-type echo-request -j ACCEPT/-A ufw-before-input -p icmp --icmp-type echo-request -j DROP/g' /etc/ufw/before.rules`)
-		}
+		_, err = shell.Execf(`firewall-cmd --permanent --add-rich-rule='rule protocol value=icmp drop'`)
 	}
-
 	if err != nil {
-		return errors.New(out)
+		return err
 	}
 
-	if os.IsRHEL() {
-		out, err = shell.Execf(`firewall-cmd --reload`)
-	} else {
-		out, err = shell.Execf(`ufw reload`)
-	}
-
+	_, err = shell.Execf(`firewall-cmd --reload`)
 	if err != nil {
-		return errors.New(out)
+		return err
 	}
 
 	return nil

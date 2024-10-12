@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/go-rat/chix"
-	"github.com/go-rat/utils/env"
 	"github.com/hashicorp/go-version"
 	"github.com/spf13/cast"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -285,31 +285,12 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO 需要修改接口直接把arch传过去
-	var ver, url, checksum string
-	if env.IsX86() {
-		for _, v := range panel.Downloads {
-			if v.Arch == "amd64" {
-				ver = panel.Version
-				url = v.URL
-				checksum = v.Checksum
-				break
-			}
-		}
-	} else if env.IsArm() {
-		for _, v := range panel.Downloads {
-			if v.Arch == "arm64" {
-				ver = panel.Version
-				url = v.URL
-				checksum = v.Checksum
-				break
-			}
-
-		}
-	} else {
-		Error(w, http.StatusInternalServerError, "不支持的架构")
+	download := str.FirstElement(panel.Downloads)
+	if download == nil {
+		Error(w, http.StatusInternalServerError, "获取下载链接失败")
 		return
 	}
+	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
 	types.Status = types.StatusUpgrade
 	if err = s.settingRepo.UpdatePanel(ver, url, checksum); err != nil {

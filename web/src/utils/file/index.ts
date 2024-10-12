@@ -286,7 +286,7 @@ const getFilename = (path: string) => {
   return parts.pop()!
 }
 
-const isArchive = (name: string) => {
+const isCompress = (name: string) => {
   const ext = getExt(name)
   return ['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)
 }
@@ -323,7 +323,7 @@ export {
   getExt,
   getFilename,
   getIconByExt,
-  isArchive,
+  isCompress,
   languageByPath,
   lastDirectory
 }

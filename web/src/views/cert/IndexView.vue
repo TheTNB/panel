@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import AccountView from '@/views/cert/AccountView.vue'
 import CertView from '@/views/cert/CertView.vue'
-import DNSView from '@/views/cert/DNSView.vue'
-import UserView from '@/views/cert/UserView.vue'
+import DnsView from '@/views/cert/DnsView.vue'
 
 const currentTab = ref('cert')
 </script>
@@ -10,13 +10,13 @@ const currentTab = ref('cert')
   <common-page show-footer>
     <n-tabs v-model:value="currentTab" type="line" animated>
       <n-tab-pane name="cert" tab="证书列表">
-        <CertView />
+        <cert-view />
       </n-tab-pane>
       <n-tab-pane name="user" tab="账号列表">
-        <UserView />
+        <account-view />
       </n-tab-pane>
       <n-tab-pane name="dns" tab="DNS 列表">
-        <DNSView />
+        <dns-view />
       </n-tab-pane>
     </n-tabs>
   </common-page>

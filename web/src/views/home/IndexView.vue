@@ -112,18 +112,6 @@ const handleUpdate = () => {
   })
 }
 
-let eggCount = 0
-const getEgg = () => {
-  eggCount++
-  if (eggCount > 10) {
-    return t('homeIndex.eggs.count.gt10')
-  } else if (eggCount > 4) {
-    return t('homeIndex.eggs.count.gt4')
-  } else {
-    return t('homeIndex.eggs.count.gt0')
-  }
-}
-
 const toSponsor = () => {
   if (locale.value === 'en') {
     window.open('https://opencollective.com/tnb')
@@ -540,101 +528,49 @@ onUnmounted(() => {
             </div>
           </n-gi>
         </n-grid>
-        <n-grid
-          x-gap="12"
-          y-gap="12"
-          cols="1 s:1 m:2 l:3 xl:3 2xl:3"
-          item-responsive
-          responsive="screen"
-        >
-          <n-gi span="2 s:1 m:1 l:2">
-            <div min-w-375 flex-1>
-              <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.apps.title')">
-                <n-grid
-                  v-if="homeApps"
-                  x-gap="12"
-                  y-gap="12"
-                  cols="3 s:1 m:2 l:3"
-                  item-responsive
-                  responsive="screen"
+
+        <div min-w-375 flex-1>
+          <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.apps.title')">
+            <n-grid
+              v-if="homeApps"
+              x-gap="12"
+              y-gap="12"
+              cols="3 s:1 m:2 l:3"
+              item-responsive
+              responsive="screen"
+            >
+              <n-gi v-for="item in homeApps" :key="item.name">
+                <n-card
+                  :segmented="true"
+                  size="small"
+                  cursor-pointer
+                  rounded-10
+                  hover:card-shadow
+                  @click="handleManageApp(item.slug)"
                 >
-                  <n-gi v-for="item in homeApps" :key="item.name">
-                    <n-card
-                      :segmented="true"
-                      size="small"
-                      cursor-pointer
-                      rounded-10
-                      hover:card-shadow
-                      @click="handleManageApp(item.slug)"
-                    >
-                      <n-space>
-                        <n-thing>
-                          <template #avatar>
-                            <n-avatar class="mt-4">
-                              <n-icon>
-                                <icon-mdi:package-variant-closed />
-                              </n-icon>
-                            </n-avatar>
-                          </template>
-                          <template #header>
-                            {{ item.name }}
-                          </template>
-                          <template #description>
-                            {{ item.version }}
-                          </template>
-                        </n-thing>
-                      </n-space>
-                    </n-card>
-                  </n-gi>
-                </n-grid>
-                <n-skeleton v-else text :repeat="9" />
-              </n-card>
-            </div>
-          </n-gi>
-          <n-gi>
-            <div min-w-375 flex-1>
-              <n-card
-                :segmented="true"
-                rounded-10
-                size="small"
-                :title="$t('homeIndex.about.title')"
-              >
-                <template #header-extra>
-                  <n-popover trigger="hover">
-                    <template #trigger>
-                      <n-icon size="20">
-                        <icon-mdi:about-circle-outline />
-                      </n-icon>
-                    </template>
-                    <span>{{ getEgg() }}</span>
-                  </n-popover>
-                </template>
-                <n-space vertical :size="12">
-                  <n-alert type="success">
-                    {{ $t('homeIndex.about.tnb') }}
-                  </n-alert>
-                  <n-alert type="info">
-                    <span
-                      v-html="
-                        $t('homeIndex.about.specialThanks', {
-                          supporter: `<a target='_blank' href='https://www.weixiaoduo.com/'>「薇晓朵」<\/a>`
-                        })
-                      "
-                    >
-                    </span>
-                  </n-alert>
-                  <n-image
-                    src="https://mirror.ghproxy.com/https://raw.githubusercontent.com/TheTNB/sponsor/main/sponsors.svg"
-                    width="100%"
-                    preview-disabled
-                    lazy
-                    @click="toSponsor"
-                  />
-                </n-space>
-              </n-card>
-            </div>
-          </n-gi>
-        </n-grid>
+                  <n-space>
+                    <n-thing>
+                      <template #avatar>
+                        <n-avatar class="mt-4">
+                          <n-icon>
+                            <icon-mdi:package-variant-closed />
+                          </n-icon>
+                        </n-avatar>
+                      </template>
+                      <template #header>
+                        {{ item.name }}
+                      </template>
+                      <template #description>
+                        {{ item.version }}
+                      </template>
+                    </n-thing>
+                  </n-space>
+                </n-card>
+              </n-gi>
+            </n-grid>
+            <n-skeleton v-else text :repeat="9" />
+          </n-card>
+        </div>
       </n-space>
     </div>
   </AppPage>

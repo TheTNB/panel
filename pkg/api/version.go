@@ -2,20 +2,25 @@ package api
 
 import (
 	"fmt"
+	"slices"
 	"time"
+
+	"github.com/go-rat/utils/env"
 )
 
+type VersionDownload struct {
+	URL      string `json:"url"`
+	Arch     string `json:"arch"`
+	Checksum string `json:"checksum"`
+}
+
 type Version struct {
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
-	Type        string    `json:"type"`
-	Version     string    `json:"version"`
-	Description string    `json:"description"`
-	Downloads   []struct {
-		URL      string `json:"url"`
-		Arch     string `json:"arch"`
-		Checksum string `json:"checksum"`
-	} `json:"downloads"`
+	CreatedAt   time.Time         `json:"created_at"`
+	UpdatedAt   time.Time         `json:"updated_at"`
+	Type        string            `json:"type"`
+	Version     string            `json:"version"`
+	Description string            `json:"description"`
+	Downloads   []VersionDownload `json:"downloads"`
 }
 
 type Versions []Version
@@ -34,6 +39,14 @@ func (r *API) LatestVersion() (*Version, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	arch := "amd64"
+	if env.IsArm() {
+		arch = "arm64"
+	}
+	slices.DeleteFunc(version.Downloads, func(item VersionDownload) bool {
+		return item.Arch != arch
+	})
 
 	return version, nil
 }

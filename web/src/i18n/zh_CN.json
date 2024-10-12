@@ -83,23 +83,6 @@
         "success": "当前已是最新版本"
       }
     },
-    "eggs": {
-      "count": {
-        "gt10": "你干嘛，哎呦！",
-        "gt4": "厉不厉害你坤哥",
-        "gt0": "在多一眼看一眼就会爆炸"
-      }
-    },
-    "about": {
-      "title": "关于面板",
-      "tnb": "树新蜂开发组祝大家 2024 端午安康！永不宕机！",
-      "specialThanks": "特别感谢以下支持者和 {supporter}！",
-      "links": {
-        "group": "群",
-        "channel": "频道",
-        "supporter": ""
-      }
-    },
     "apps": {
       "title": "快捷应用"
     }

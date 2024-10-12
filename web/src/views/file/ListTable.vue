@@ -6,7 +6,7 @@ import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import file from '@/api/panel/file'
 import TheIcon from '@/components/custom/TheIcon.vue'
 import EventBus from '@/utils/event'
-import { checkName, checkPath, getExt, getFilename, getIconByExt, isArchive } from '@/utils/file'
+import { checkName, checkPath, getExt, getFilename, getIconByExt, isCompress } from '@/utils/file'
 import EditModal from '@/views/file/EditModal.vue'
 import type { Marked } from '@/views/file/types'
 
@@ -14,7 +14,7 @@ const loading = ref(false)
 const path = defineModel<string>('path', { type: String, required: true })
 const selected = defineModel<any[]>('selected', { type: Array, default: () => [] })
 const marked = defineModel<Marked[]>('marked', { type: Array, default: () => [] })
-const archive = defineModel<boolean>('archive', { type: Boolean, required: true })
+const compress = defineModel<boolean>('compress', { type: Boolean, required: true })
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 const editorModal = ref(false)
 const editorFile = ref('')
@@ -24,8 +24,8 @@ const renameModel = ref({
   source: '',
   target: ''
 })
-const unArchiveModal = ref(false)
-const unArchiveModel = ref({
+const unCompressModal = ref(false)
+const unCompressModel = ref({
   path: '',
   file: ''
 })
@@ -125,7 +125,7 @@ const columns: DataTableColumns<RowData> = [
                 onClick: () => {
                   if (row.dir) {
                     selected.value = [row.full]
-                    archive.value = true
+                    compress.value = true
                   } else {
                     window.open('/api/panel/file/download?path=' + encodeURIComponent(row.full))
                   }
@@ -189,8 +189,8 @@ const columns: DataTableColumns<RowData> = [
                   { label: '复制', value: 'copy' },
                   { label: '移动', value: 'move' },
                   { label: '权限', value: 'permission' },
-                  { label: '压缩', value: 'archive' },
-                  { label: '解压', value: 'unarchive', disabled: !isArchive(row.name) }
+                  { label: '压缩', value: 'compress' },
+                  { label: '解压', value: 'uncompress', disabled: !isCompress(row.name) }
                 ],
                 onUpdateValue: (value) => {
                   switch (value) {
@@ -218,14 +218,14 @@ const columns: DataTableColumns<RowData> = [
                       selected.value = [row.full]
                       permission.value = true
                       break
-                    case 'archive':
+                    case 'compress':
                       selected.value = [row.full]
-                      archive.value = true
+                      compress.value = true
                       break
-                    case 'unarchive':
-                      unArchiveModel.value.file = row.full
-                      unArchiveModel.value.path = path.value
-                      unArchiveModal.value = true
+                    case 'uncompress':
+                      unCompressModel.value.file = row.full
+                      unCompressModel.value.path = path.value
+                      unCompressModal.value = true
                       break
                   }
                 }
@@ -306,11 +306,11 @@ const handleRename = () => {
   })
 }
 
-const handleUnArchive = () => {
+const handleUnCompress = () => {
   // 移除首位的 / 去检测
   if (
-    !unArchiveModel.value.path.startsWith('/') ||
-    !checkPath(unArchiveModel.value.path.slice(1))
+    !unCompressModel.value.path.startsWith('/') ||
+    !checkPath(unCompressModel.value.path.slice(1))
   ) {
     window.$message.error('路径不合法')
     return
@@ -319,11 +319,11 @@ const handleUnArchive = () => {
     duration: 0
   })
   file
-    .unArchive(unArchiveModel.value.file, unArchiveModel.value.path)
+    .unCompress(unCompressModel.value.file, unCompressModel.value.path)
     .then(() => {
       message?.destroy()
       window.$message.success('解压成功')
-      unArchiveModal.value = false
+      unCompressModal.value = false
       EventBus.emit('file:refresh')
     })
     .catch(() => {
@@ -391,9 +391,9 @@ onUnmounted(() => {
     </n-flex>
   </n-modal>
   <n-modal
-    v-model:show="unArchiveModal"
+    v-model:show="unCompressModal"
     preset="card"
-    :title="'解压缩 - ' + unArchiveModel.file"
+    :title="'解压缩 - ' + unCompressModel.file"
     style="width: 60vw"
     size="huge"
     :bordered="false"
@@ -402,10 +402,10 @@ onUnmounted(() => {
     <n-flex vertical>
       <n-form>
         <n-form-item label="解压到">
-          <n-input v-model:value="unArchiveModel.path" />
+          <n-input v-model:value="unCompressModel.path" />
         </n-form-item>
       </n-form>
-      <n-button type="primary" @click="handleUnArchive">解压</n-button>
+      <n-button type="primary" @click="handleUnCompress">解压</n-button>
     </n-flex>
   </n-modal>
 </template>

@@ -414,21 +414,15 @@ const getData = async () => {
   })
 }
 
-const getSwitchAndDays = async () => {
-  monitor.switchAndDays().then((res) => {
-    monitorSwitch.value = res.data.switch
+const getSetting = async () => {
+  monitor.setting().then((res) => {
+    monitorSwitch.value = res.data.enabled
     saveDay.value = res.data.days
   })
 }
 
-const handleSwitch = async () => {
-  monitor.switch(monitorSwitch.value).then(() => {
-    window.$message.success('操作成功')
-  })
-}
-
-const handleDays = async () => {
-  monitor.saveDays(saveDay.value).then(() => {
+const handleUpdate = async () => {
+  monitor.updateSetting(monitorSwitch.value, saveDay.value).then(() => {
     window.$message.success('操作成功')
   })
 }
@@ -469,7 +463,7 @@ watch([start, end], () => {
 })
 
 onMounted(() => {
-  getSwitchAndDays()
+  getSetting()
   getData()
 })
 </script>
@@ -485,7 +479,7 @@ onMounted(() => {
       >
         <n-grid cols="1 s:1 m:1 l:24 xl:24 2xl:24" item-responsive responsive="screen">
           <n-form-item-gi :span="3" label="开启监控">
-            <n-switch v-model:value="monitorSwitch" @update-value="handleSwitch" />
+            <n-switch v-model:value="monitorSwitch" @update-value="handleUpdate" />
           </n-form-item-gi>
           <n-form-item-gi :span="6" label="保存天数">
             <n-input-number v-model:value="saveDay">
@@ -493,7 +487,7 @@ onMounted(() => {
             </n-input-number>
           </n-form-item-gi>
           <n-form-item-gi :span="2">
-            <n-button type="primary" @click="handleDays">确定</n-button>
+            <n-button type="primary" @click="handleUpdate">确定</n-button>
           </n-form-item-gi>
           <n-form-item-gi :span="9" label="时间选择">
             <n-date-picker v-model:value="start" type="datetime" />

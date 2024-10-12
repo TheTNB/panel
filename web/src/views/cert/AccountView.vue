@@ -10,31 +10,31 @@ import {
 } from 'naive-ui'
 
 import cert from '@/api/panel/cert'
-import type { User } from '@/views/cert/types'
+import type { Account } from '@/views/cert/types'
 
 let messageReactive: MessageReactive | null = null
-const addUserModel = ref<any>({
+const addAccountModel = ref<any>({
   hmac_encoded: '',
   email: '',
   kid: '',
   key_type: 'P256',
   ca: 'letsencrypt'
 })
-const updateUserModel = ref<any>({
+const updateAccountModel = ref<any>({
   hmac_encoded: '',
   email: '',
   kid: '',
   key_type: 'P256',
   ca: 'letsencrypt'
 })
-const addUserModal = ref(false)
-const updateUserModal = ref(false)
-const updateUser = ref<any>()
+const addAccountModal = ref(false)
+const updateAccountModal = ref(false)
+const updateAccount = ref<any>()
 
 const caProviders = ref<any>([])
 const algorithms = ref<any>([])
 
-const userColumns: any = [
+const accountColumns: any = [
   { title: '邮箱', key: 'email', resizable: true, ellipsis: { tooltip: true } },
   {
     title: 'CA',
@@ -86,13 +86,13 @@ const userColumns: any = [
             size: 'small',
             type: 'primary',
             onClick: () => {
-              updateUser.value = row.id
-              updateUserModel.value.email = row.email
-              updateUserModel.value.hmac_encoded = row.hmac_encoded
-              updateUserModel.value.kid = row.kid
-              updateUserModel.value.key_type = row.key_type
-              updateUserModel.value.ca = row.ca
-              updateUserModal.value = true
+              updateAccount.value = row.id
+              updateAccountModel.value.email = row.email
+              updateAccountModel.value.hmac_encoded = row.hmac_encoded
+              updateAccountModel.value.kid = row.kid
+              updateAccountModel.value.key_type = row.key_type
+              updateAccountModel.value.ca = row.ca
+              updateAccountModal.value = true
             }
           },
           {
@@ -103,9 +103,9 @@ const userColumns: any = [
           NPopconfirm,
           {
             onPositiveClick: async () => {
-              await cert.userDelete(row.id)
+              await cert.accountDelete(row.id)
               window.$message.success('删除成功')
-              onUserPageChange(1)
+              onAccountPageChange(1)
             }
           },
           {
@@ -131,9 +131,9 @@ const userColumns: any = [
     }
   }
 ]
-const userData = ref<User[]>([] as User[])
+const accountData = ref<Account[]>([] as Account[])
 
-const userPagination = reactive({
+const accountPagination = reactive({
   page: 1,
   pageCount: 1,
   pageSize: 10,
@@ -143,51 +143,51 @@ const userPagination = reactive({
   pageSizes: [10, 20, 50, 100]
 })
 
-const onUserPageChange = (page: number) => {
-  userPagination.page = page
-  getUserList(page, userPagination.pageSize).then((res) => {
-    userData.value = res.items
-    userPagination.itemCount = res.total
-    userPagination.pageCount = res.total / userPagination.pageSize + 1
+const onAccountPageChange = (page: number) => {
+  accountPagination.page = page
+  getAccountList(page, accountPagination.pageSize).then((res) => {
+    accountData.value = res.items
+    accountPagination.itemCount = res.total
+    accountPagination.pageCount = res.total / accountPagination.pageSize + 1
   })
 }
 
-const onUserPageSizeChange = (pageSize: number) => {
-  userPagination.pageSize = pageSize
-  onUserPageChange(1)
+const onAccountPageSizeChange = (pageSize: number) => {
+  accountPagination.pageSize = pageSize
+  onAccountPageChange(1)
 }
 
-const getUserList = async (page: number, limit: number) => {
-  const { data } = await cert.users(page, limit)
+const getAccountList = async (page: number, limit: number) => {
+  const { data } = await cert.accounts(page, limit)
   return data
 }
 
-const handleAddUser = async () => {
+const handleAddAccount = async () => {
   messageReactive = window.$message.loading('正在向 CA 注册账号，请耐心等待', {
     duration: 0
   })
-  await cert.userAdd(addUserModel.value)
+  await cert.accountAdd(addAccountModel.value)
   messageReactive.destroy()
   window.$message.success('添加成功')
-  addUserModal.value = false
-  onUserPageChange(1)
-  addUserModel.value.email = ''
-  addUserModel.value.hmac_encoded = ''
-  addUserModel.value.kid = ''
+  addAccountModal.value = false
+  onAccountPageChange(1)
+  addAccountModel.value.email = ''
+  addAccountModel.value.hmac_encoded = ''
+  addAccountModel.value.kid = ''
 }
 
-const handleUpdateUser = async () => {
+const handleUpdateAccount = async () => {
   messageReactive = window.$message.loading('正在向 CA 注册账号，请耐心等待', {
     duration: 0
   })
-  await cert.userUpdate(updateUser.value, updateUserModel.value)
+  await cert.accountUpdate(updateAccount.value, updateAccountModel.value)
   messageReactive.destroy()
   window.$message.success('更新成功')
-  updateUserModal.value = false
-  onUserPageChange(1)
-  updateUserModel.value.email = ''
-  updateUserModel.value.hmac_encoded = ''
-  updateUserModel.value.kid = ''
+  updateAccountModal.value = false
+  onAccountPageChange(1)
+  updateAccountModel.value.email = ''
+  updateAccountModel.value.hmac_encoded = ''
+  updateAccountModel.value.kid = ''
 }
 
 onMounted(() => {
@@ -207,7 +207,7 @@ onMounted(() => {
       })
     }
   })
-  onUserPageChange(1)
+  onAccountPageChange(1)
 })
 </script>
 
@@ -215,7 +215,7 @@ onMounted(() => {
   <n-space vertical size="large">
     <n-card rounded-10>
       <n-space>
-        <n-button type="primary" @click="addUserModal = true"> 添加账号 </n-button>
+        <n-button type="primary" @click="addAccountModal = true"> 添加账号 </n-button>
       </n-space>
     </n-card>
     <n-data-table
@@ -223,16 +223,16 @@ onMounted(() => {
       remote
       :loading="false"
       :scroll-x="1200"
-      :columns="userColumns"
-      :data="userData"
+      :columns="accountColumns"
+      :data="accountData"
       :row-key="(row: any) => row.id"
-      :pagination="userPagination"
-      @update:page="onUserPageChange"
-      @update:page-size="onUserPageSizeChange"
+      :pagination="accountPagination"
+      @update:page="onAccountPageChange"
+      @update:page-size="onAccountPageSizeChange"
     />
   </n-space>
   <n-modal
-    v-model:show="addUserModal"
+    v-model:show="addAccountModal"
     preset="card"
     title="添加账号"
     style="width: 60vw"
@@ -245,10 +245,10 @@ onMounted(() => {
       <n-alert type="warning">
         境内无法使用 Google CA，其他 CA 视网络情况而定，建议使用 Let's Encrypt
       </n-alert>
-      <n-form :model="addUserModel">
+      <n-form :model="addAccountModel">
         <n-form-item path="ca" label="CA">
           <n-select
-            v-model:value="addUserModel.ca"
+            v-model:value="addAccountModel.ca"
             placeholder="选择 CA"
             clearable
             :options="caProviders"
@@ -256,7 +256,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="key_type" label="密钥类型">
           <n-select
-            v-model:value="addUserModel.key_type"
+            v-model:value="addAccountModel.key_type"
             placeholder="选择密钥类型"
             clearable
             :options="algorithms"
@@ -264,7 +264,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="email" label="邮箱">
           <n-input
-            v-model:value="addUserModel.email"
+            v-model:value="addAccountModel.email"
             type="text"
             @keydown.enter.prevent
             placeholder="输入邮箱地址"
@@ -272,7 +272,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="kid" label="KID">
           <n-input
-            v-model:value="addUserModel.kid"
+            v-model:value="addAccountModel.kid"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 KID"
@@ -280,18 +280,18 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="hmac_encoded" label="HMAC">
           <n-input
-            v-model:value="addUserModel.hmac_encoded"
+            v-model:value="addAccountModel.hmac_encoded"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 HMAC"
           />
         </n-form-item>
       </n-form>
-      <n-button type="info" block @click="handleAddUser">提交</n-button>
+      <n-button type="info" block @click="handleAddAccount">提交</n-button>
     </n-space>
   </n-modal>
   <n-modal
-    v-model:show="updateUserModal"
+    v-model:show="updateAccountModal"
     preset="card"
     title="修改账号"
     style="width: 60vw"
@@ -304,10 +304,10 @@ onMounted(() => {
       <n-alert type="warning">
         境内无法使用 Google CA，其他 CA 视网络情况而定，建议使用 Let's Encrypt
       </n-alert>
-      <n-form :model="updateUserModel">
+      <n-form :model="updateAccountModel">
         <n-form-item path="ca" label="CA">
           <n-select
-            v-model:value="updateUserModel.ca"
+            v-model:value="updateAccountModel.ca"
             placeholder="选择 CA"
             clearable
             :options="caProviders"
@@ -315,7 +315,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="key_type" label="密钥类型">
           <n-select
-            v-model:value="updateUserModel.key_type"
+            v-model:value="updateAccountModel.key_type"
             placeholder="选择密钥类型"
             clearable
             :options="algorithms"
@@ -323,7 +323,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="email" label="邮箱">
           <n-input
-            v-model:value="updateUserModel.email"
+            v-model:value="updateAccountModel.email"
             type="text"
             @keydown.enter.prevent
             placeholder="输入邮箱地址"
@@ -331,7 +331,7 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="kid" label="KID">
           <n-input
-            v-model:value="updateUserModel.kid"
+            v-model:value="updateAccountModel.kid"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 KID"
@@ -339,14 +339,14 @@ onMounted(() => {
         </n-form-item>
         <n-form-item path="hmac_encoded" label="HMAC">
           <n-input
-            v-model:value="updateUserModel.hmac_encoded"
+            v-model:value="updateAccountModel.hmac_encoded"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 HMAC"
           />
         </n-form-item>
       </n-form>
-      <n-button type="info" block @click="handleUpdateUser">提交</n-button>
+      <n-button type="info" block @click="handleUpdateAccount">提交</n-button>
     </n-space>
   </n-modal>
 </template>

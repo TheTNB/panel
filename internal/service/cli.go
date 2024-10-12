@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/go-rat/utils/env"
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
 	"github.com/gookit/color"
@@ -61,30 +60,11 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("获取最新版本失败：%v", err)
 	}
 
-	// TODO 需要修改接口直接把arch传过去
-	var ver, url, checksum string
-	if env.IsX86() {
-		for _, v := range panel.Downloads {
-			if v.Arch == "amd64" {
-				ver = panel.Version
-				url = v.URL
-				checksum = v.Checksum
-				break
-			}
-		}
-	} else if env.IsArm() {
-		for _, v := range panel.Downloads {
-			if v.Arch == "arm64" {
-				ver = panel.Version
-				url = v.URL
-				checksum = v.Checksum
-				break
-			}
-
-		}
-	} else {
-		return errors.New("不支持的架构")
+	download := str.FirstElement(panel.Downloads)
+	if download == nil {
+		return fmt.Errorf("下载地址为空")
 	}
+	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
 	return s.setting.UpdatePanel(ver, url, checksum)
 }

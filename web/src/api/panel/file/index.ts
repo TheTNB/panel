@@ -44,11 +44,11 @@ export default {
     group: string
   ): Promise<AxiosResponse<any>> => request.post('/file/permission', { path, mode, owner, group }),
   // 压缩文件
-  archive: (paths: string[], file: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/archive', { paths, file }),
+  compress: (paths: string[], file: string): Promise<AxiosResponse<any>> =>
+    request.post('/file/compress', { paths, file }),
   // 解压文件
-  unArchive: (file: string, path: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/unArchive', { file, path }),
+  unCompress: (file: string, path: string): Promise<AxiosResponse<any>> =>
+    request.post('/file/unCompress', { file, path }),
   // 搜索文件
   search: (keyword: string): Promise<AxiosResponse<any>> =>
     request.post('/file/search', { keyword }),

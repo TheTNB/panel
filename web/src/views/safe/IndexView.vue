@@ -87,7 +87,7 @@ const pagination = reactive({
 const selectedRowKeys = ref<any>([])
 
 const addModel = ref({
-  port: '',
+  port: 80,
   protocol: 'tcp'
 })
 
@@ -105,7 +105,7 @@ const handleDelete = async (row: any) => {
 const handleAdd = async () => {
   await safe.addFirewallRule(addModel.value.port, addModel.value.protocol).then(() => {
     window.$message.success(t('safeIndex.alerts.add'))
-    addModel.value.port = ''
+    addModel.value.port = 80
     addModel.value.protocol = 'tcp'
   })
   getFirewallRules(pagination.page, pagination.pageSize).then((res) => {
@@ -124,14 +124,12 @@ const getSetting = async () => {
   safe.firewallStatus().then((res) => {
     model.value.firewallStatus = res.data
   })
-  safe.sshStatus().then((res) => {
-    model.value.sshStatus = res.data
+  safe.ssh().then((res) => {
+    model.value.sshStatus = res.data.status
+    model.value.sshPort = res.data.port
   })
   safe.pingStatus().then((res) => {
     model.value.pingStatus = res.data
-  })
-  safe.sshPort().then((res) => {
-    model.value.sshPort = res.data
   })
 }
 
@@ -141,20 +139,14 @@ const handleFirewallStatus = () => {
   })
 }
 
-const handleSshStatus = () => {
-  safe.setSshStatus(model.value.sshStatus).then(() => {
+const handleSsh = () => {
+  safe.setSsh(model.value.sshStatus, model.value.sshPort).then(() => {
     window.$message.success(t('safeIndex.alerts.setup'))
   })
 }
 
 const handlePingStatus = () => {
   safe.setPingStatus(model.value.pingStatus).then(() => {
-    window.$message.success(t('safeIndex.alerts.setup'))
-  })
-}
-
-const handleSshPort = () => {
-  safe.setSshPort(model.value.sshPort).then(() => {
     window.$message.success(t('safeIndex.alerts.setup'))
   })
 }
@@ -231,7 +223,7 @@ onMounted(() => {
           <n-form-item :label="$t('safeIndex.filter.fields.ssh.label')">
             <n-switch
               v-model:value="model.sshStatus"
-              @update:value="handleSshStatus"
+              @update:value="handleSsh"
               :checkedChildren="$t('safeIndex.filter.fields.ssh.checked')"
               :unCheckedChildren="$t('safeIndex.filter.fields.ssh.unchecked')"
             />
@@ -245,7 +237,7 @@ onMounted(() => {
             />
           </n-form-item>
           <n-form-item :label="$t('safeIndex.filter.fields.port.label')">
-            <n-input-number v-model:value="model.sshPort" @blur="handleSshPort" />
+            <n-input-number v-model:value="model.sshPort" @blur="handleSsh" />
           </n-form-item>
         </n-form>
       </n-card>
@@ -257,9 +249,11 @@ onMounted(() => {
           {{ $t('safeIndex.confirm.batchDelete') }}
         </n-popconfirm>
         <n-text>{{ $t('safeIndex.portControl.title') }}</n-text>
-        <n-input
+        <n-input-number
           v-model:value="addModel.port"
           :placeholder="$t('safeIndex.portControl.fields.port.placeholder')"
+          :min="1"
+          :max="65535"
         />
         <n-select
           v-model:value="addModel.protocol"

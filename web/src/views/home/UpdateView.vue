@@ -6,10 +6,10 @@ import { useI18n } from 'vue-i18n'
 import info from '@/api/panel/info'
 import { router } from '@/router'
 import { formatDateTime } from '@/utils'
-import type { PanelInfo } from '@/views/home/types'
+import type { Version } from '@/views/home/types'
 
 const { t } = useI18n()
-const versions = ref<PanelInfo[] | null>(null)
+const versions = ref<Version[] | null>(null)
 let messageReactive: MessageReactive | null = null
 
 const getVersions = () => {
@@ -75,9 +75,9 @@ onMounted(() => {
         :type="Number(index) == 0 ? 'info' : 'default'"
         :key="index"
         :title="item.version"
-        :time="formatDateTime(item.date)"
+        :time="formatDateTime(item.updated_at)"
       >
-        <pre v-html="item.body" />
+        <pre v-html="item.description" />
       </n-timeline-item>
     </n-timeline>
     <div v-else pt-40>

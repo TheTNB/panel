@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { NButton, NInput } from 'naive-ui'
 
-import * as api from '@/api/panel/file'
+import api from '@/api/panel/file'
 import { generateRandomString, getBase } from '@/utils'
 import EventBus from '@/utils/event'
 
@@ -31,8 +31,8 @@ const handleArchive = async () => {
   const message = window.$message.loading('正在压缩中...', {
     duration: 0
   })
-  await api.default
-    .archive(selected.value, file.value)
+  await api
+    .compress(selected.value, file.value)
     .then(() => {
       window.$message.success('压缩成功')
       show.value = false
