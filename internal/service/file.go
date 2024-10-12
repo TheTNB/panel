@@ -142,7 +142,7 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径"+req.Target+"已存在")
+		Error(w, http.StatusForbidden, "目标路径%s已存在", req.Target)
 	}
 
 	if err = io.Mv(req.Source, req.Target); err != nil {
@@ -161,7 +161,7 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径"+req.Target+"已存在")
+		Error(w, http.StatusForbidden, "目标路径%s已存在", req.Target)
 	}
 
 	if err = io.Cp(req.Source, req.Target); err != nil {
