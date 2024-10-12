@@ -174,52 +174,52 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 
 func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	name := filepath.Base(url)
-	color.Greenln("目标版本: %s", version)
-	color.Greenln("下载链接: %s", url)
-	color.Greenln("文件名: %s", name)
+	color.Greenln("目标版本: ", version)
+	color.Greenln("下载链接: ", url)
+	color.Greenln("文件名: ", name)
 
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") || io.Exists("/tmp/panel-config.zip") {
-		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请谨慎排除后重试")
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请排除后重试")
 	}
 
 	color.Greenln("备份面板数据...")
 	// 备份面板
 	if err := io.Compress([]string{filepath.Join(app.Root, "panel")}, filepath.Join(app.Root, fmt.Sprintf("backup/panel/panel-%s.zip", time.Now().Format("20060102150405"))), io.Zip); err != nil {
-		color.Redln("备份面板失败")
+		color.Redln("备份面板失败：", err)
 		return err
 	}
 	if err := io.Compress([]string{filepath.Join(app.Root, "panel/storage")}, "/tmp/panel-storage.zip", io.Zip); err != nil {
-		color.Redln("备份面板数据失败")
+		color.Redln("备份面板数据失败：", err)
 		return err
 	}
 	if err := io.Compress([]string{filepath.Join(app.Root, "panel/config")}, "/tmp/panel-config.zip", io.Zip); err != nil {
-		color.Redln("备份面板配置失败")
+		color.Redln("备份面板配置失败：", err)
 		return err
 	}
 	if !io.Exists("/tmp/panel-storage.zip") || !io.Exists("/tmp/panel-config.zip") {
-		return errors.New("备份面板数据失败")
+		return errors.New("已备份面板数据检查失败")
 	}
 	color.Greenln("备份完成")
 
 	color.Greenln("清理旧版本...")
 	if _, err := shell.Execf("rm -rf %s/panel/*", app.Root); err != nil {
-		color.Redln("清理旧版本失败")
+		color.Redln("清理旧版本失败：", err)
 		return err
 	}
 	color.Greenln("清理完成")
 
 	color.Greenln("正在下载...")
 	if _, err := shell.Execf("wget -T 120 -t 3 -O %s/panel/%s %s", app.Root, name, url); err != nil {
-		color.Redln("下载失败")
+		color.Redln("下载失败：", err)
 		return err
 	}
 	if _, err := shell.Execf("wget -T 20 -t 3 -O %s/panel/%s %s", app.Root, name+".sha256", checksum); err != nil {
-		color.Redln("下载失败")
+		color.Redln("下载失败：", err)
 		return err
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel", name)) || !io.Exists(filepath.Join(app.Root, "panel", name+".sha256")) {
-		return errors.New("下载失败")
+		return errors.New("下载文件检查失败")
 	}
 	color.Greenln("下载完成")
 
@@ -229,32 +229,32 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		return errors.New("下载文件校验失败")
 	}
 	if err = io.Remove(filepath.Join(app.Root, "panel", name+".sha256")); err != nil {
-		color.Redln("清理校验文件失败")
+		color.Redln("清理校验文件失败：", err)
 		return err
 	}
 	color.Greenln("文件校验完成")
 
 	color.Greenln("更新新版本...")
 	if _, err = shell.Execf("cd %s/panel && unzip -o %s && rm -rf %s", app.Root, name, name); err != nil {
-		color.Redln("更新失败")
+		color.Redln("更新失败：", err)
 		return err
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
 	if err = io.Mv(filepath.Join(app.Root, "panel", "cli"), "/usr/local/sbin/panel-cli"); err != nil {
-		color.Redln("移动面板命令行工具失败")
+		color.Redln("移动面板命令行工具失败：", err)
 		return err
 	}
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板数据...")
-	if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel/storage"), io.Zip); err != nil {
-		color.Redln("恢复面板数据失败")
+	if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+		color.Redln("恢复面板数据失败：", err)
 		return err
 	}
-	if err = io.UnCompress("/tmp/panel-config.zip", filepath.Join(app.Root, "panel/config"), io.Zip); err != nil {
-		color.Redln("恢复面板配置失败")
+	if err = io.UnCompress("/tmp/panel-config.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+		color.Redln("恢复面板配置失败：", err)
 		return err
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
@@ -264,15 +264,15 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 	color.Greenln("运行升级后脚本...")
 	if _, err = shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
-		color.Redln("运行面板升级后脚本失败")
+		color.Redln("运行面板升级后脚本失败：", err)
 		return err
 	}
 	if _, err = shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
-		color.Redln("下载面板服务文件失败")
+		color.Redln("下载面板服务文件失败：", err)
 		return err
 	}
 	if _, err = shell.Execf("panel-cli setting write version %s", version); err != nil {
-		color.Redln("写入面板版本号失败")
+		color.Redln("写入面板版本号失败：", err)
 		return err
 	}
 

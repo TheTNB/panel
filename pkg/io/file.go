@@ -169,6 +169,28 @@ func UnCompress(src string, dst string, format FormatArchive) error {
 	return arch.Extract(context.Background(), file, nil, handler)
 }
 
+// FormatArchiveByPath 根据文件后缀获取压缩格式
+func FormatArchiveByPath(path string) (FormatArchive, error) {
+	switch filepath.Ext(path) {
+	case ".zip":
+		return Zip, nil
+	case ".gz":
+		return Gz, nil
+	case ".bz2":
+		return Bz2, nil
+	case ".tar":
+		return Tar, nil
+	case ".tar.gz":
+		return TarGz, nil
+	case ".xz":
+		return Xz, nil
+	case ".7z":
+		return SevenZip, nil
+	default:
+		return "", errors.New("unknown format")
+	}
+}
+
 // TempFile 创建临时文件
 func TempFile(prefix string) (*os.File, error) {
 	return os.CreateTemp("", prefix)
