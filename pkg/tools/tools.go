@@ -62,12 +62,7 @@ func GetMonitoringInfo() MonitoringInfo {
 
 func RestartPanel() {
 	color.Greenln("重启面板...")
-	err := shell.ExecfAsync("sleep 2 && systemctl restart panel")
-	if err != nil {
-		color.Redln("重启失败")
-		return
-	}
-
+	_ = shell.ExecfAsync("sleep 1 && systemctl restart panel")
 	color.Greenln("重启完成")
 }
 

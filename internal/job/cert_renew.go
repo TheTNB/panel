@@ -14,12 +14,12 @@ import (
 
 // CertRenew 证书续签
 type CertRenew struct {
-	cert biz.CertRepo
+	certRepo biz.CertRepo
 }
 
 func NewCertRenew() *CertRenew {
 	return &CertRenew{
-		cert: data.NewCertRepo(),
+		certRepo: data.NewCertRepo(),
 	}
 }
 
@@ -50,7 +50,7 @@ func (receiver *CertRenew) Run() {
 			continue
 		}
 
-		_, err = receiver.cert.Renew(cert.ID)
+		_, err = receiver.certRepo.Renew(cert.ID)
 		if err != nil {
 			app.Logger.Error("续签证书失败", zap.Error(err))
 		}

@@ -242,6 +242,10 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
+	if err = io.Mv(filepath.Join(app.Root, "panel", "cli"), "/usr/local/sbin/panel-cli"); err != nil {
+		color.Redln("移动面板命令行工具失败")
+		return err
+	}
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板数据...")
@@ -273,6 +277,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	color.Greenln("设置面板文件权限...")
+	_ = io.Chmod("/usr/local/sbin/panel-cli", 0700)
 	_ = io.Chmod("/etc/systemd/system/panel.servic", 0700)
 	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
 	color.Greenln("设置完成")

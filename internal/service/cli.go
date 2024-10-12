@@ -6,15 +6,18 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/go-rat/utils/env"
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
 	"github.com/gookit/color"
+	"github.com/spf13/cast"
 	"github.com/urfave/cli/v3"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
@@ -23,16 +26,20 @@ import (
 )
 
 type CliService struct {
-	app  biz.AppRepo
-	user biz.UserRepo
-	hash hash.Hasher
+	api     *api.API
+	app     biz.AppRepo
+	user    biz.UserRepo
+	setting biz.SettingRepo
+	hash    hash.Hasher
 }
 
 func NewCliService() *CliService {
 	return &CliService{
-		app:  data.NewAppRepo(),
-		user: data.NewUserRepo(),
-		hash: hash.NewArgon2id(),
+		api:     api.NewAPI(app.Version),
+		app:     data.NewAppRepo(),
+		user:    data.NewUserRepo(),
+		setting: data.NewSettingRepo(),
+		hash:    hash.NewArgon2id(),
 	}
 }
 
@@ -49,8 +56,37 @@ func (s *CliService) Start(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	panel, err := s.api.LatestVersion()
+	if err != nil {
+		return fmt.Errorf("获取最新版本失败：%v", err)
+	}
+
+	// TODO 需要修改接口直接把arch传过去
+	var ver, url, checksum string
+	if env.IsX86() {
+		for _, v := range panel.Downloads {
+			if v.Arch == "amd64" {
+				ver = panel.Version
+				url = v.URL
+				checksum = v.Checksum
+				break
+			}
+		}
+	} else if env.IsArm() {
+		for _, v := range panel.Downloads {
+			if v.Arch == "arm64" {
+				ver = panel.Version
+				url = v.URL
+				checksum = v.Checksum
+				break
+			}
+
+		}
+	} else {
+		return errors.New("不支持的架构")
+	}
+
+	return s.setting.UpdatePanel(ver, url, checksum)
 }
 
 func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
@@ -172,28 +208,133 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.HTTP.TLS = true
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+		return err
+	}
+
+	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.HTTP.TLS = false
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+		return err
+	}
+
+	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.HTTP.Entrance = "/" + str.RandomString(6)
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+		return err
+	}
+
+	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.HTTP.Entrance = "/"
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+		return err
+	}
+
+	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
-	return nil
+	port := cast.ToInt(cmd.Args().First())
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("端口范围错误")
+	}
+
+	config := new(types.PanelConfig)
+	cm := yaml.CommentMap{}
+	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	if err != nil {
+		return err
+	}
+	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+		return err
+	}
+
+	config.HTTP.Port = port
+
+	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+		return err
+	}
+
+	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error {
@@ -389,7 +530,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
 		return err
 	}
 

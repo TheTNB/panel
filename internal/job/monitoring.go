@@ -15,12 +15,12 @@ import (
 
 // Monitoring 系统监控
 type Monitoring struct {
-	setting biz.SettingRepo
+	settingRepo biz.SettingRepo
 }
 
 func NewMonitoring() *Monitoring {
 	return &Monitoring{
-		setting: data.NewSettingRepo(),
+		settingRepo: data.NewSettingRepo(),
 	}
 }
 
@@ -33,7 +33,7 @@ func (receiver *Monitoring) Run() {
 	//task := data.NewTaskRepo()
 	//_ = task.DispatchWaiting()
 
-	monitor, err := receiver.setting.Get(biz.SettingKeyMonitor)
+	monitor, err := receiver.settingRepo.Get(biz.SettingKeyMonitor)
 	if err != nil || !cast.ToBool(monitor) {
 		return
 	}
@@ -54,7 +54,7 @@ func (receiver *Monitoring) Run() {
 	}
 
 	// 删除过期数据
-	dayStr, err := receiver.setting.Get(biz.SettingKeyMonitorDays)
+	dayStr, err := receiver.settingRepo.Get(biz.SettingKeyMonitorDays)
 	if err != nil {
 		return
 	}

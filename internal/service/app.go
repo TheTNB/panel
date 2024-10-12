@@ -25,7 +25,7 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 	all := s.appRepo.All()
 	installedApps, err := s.appRepo.Installed()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 	installedAppMap := make(map[string]*biz.App)
@@ -79,12 +79,12 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 func (s *AppService) Install(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.App](r)
 	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, err.Error())
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
 	if err = s.appRepo.Install(req.Channel, req.Slug); err != nil {
-		Error(w, http.StatusInternalServerError, err.Error())
+		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
