@@ -280,6 +280,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	color.Greenln("升级完成")
 
 	_, _ = shell.Execf("systemctl daemon-reload")
+	_, _ = shell.Execf("systemctl restart panel")
 	_ = io.Remove("/tmp/panel-storage.zip")
 	_ = io.Remove(filepath.Join(app.Root, "panel/config.example.yml"))
 
