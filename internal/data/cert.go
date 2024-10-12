@@ -30,13 +30,13 @@ func NewCertRepo() biz.CertRepo {
 func (r *certRepo) List(page, limit uint) ([]*biz.Cert, int64, error) {
 	var certs []*biz.Cert
 	var total int64
-	err := app.Orm.Model(&biz.Cert{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
+	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
 	return certs, total, err
 }
 
 func (r *certRepo) Get(id uint) (*biz.Cert, error) {
 	cert := new(biz.Cert)
-	err := app.Orm.Model(&biz.Cert{}).Where("id = ?", id).First(cert).Error
+	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Where("id = ?", id).First(cert).Error
 	return cert, err
 }
 
