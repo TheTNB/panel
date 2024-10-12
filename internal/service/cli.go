@@ -456,6 +456,25 @@ func (s *CliService) ClearTask(ctx context.Context, cmd *cli.Command) error {
 	return nil
 }
 
+func (s *CliService) GetSetting(ctx context.Context, cmd *cli.Command) error {
+	key := cmd.Args().First()
+	if key == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	setting := new(biz.Setting)
+	if err := app.Orm.Where("key", key).First(setting).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("设置不存在")
+		}
+		return fmt.Errorf("获取设置失败：%v", err)
+	}
+
+	fmt.Print(setting.Value)
+
+	return nil
+}
+
 func (s *CliService) WriteSetting(ctx context.Context, cmd *cli.Command) error {
 	key := cmd.Args().Get(0)
 	value := cmd.Args().Get(1)

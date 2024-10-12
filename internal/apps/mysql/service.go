@@ -140,7 +140,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
 	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-error.log", app.Root)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, log)
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -161,7 +161,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
 	log, err := shell.Execf("tail -n 100 %s/server/mysql/mysql-slow.log", app.Root)
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, log)
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -216,7 +216,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err = s.settingRepo.Set(biz.SettingKeyMySQLRootPassword, req.Password); err != nil {
-		service.Error(w, http.StatusInternalServerError, fmt.Sprintf("设置保存失败：%v", err))
+		service.Error(w, http.StatusInternalServerError, "设置保存失败：%v", err)
 		return
 	}
 

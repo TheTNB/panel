@@ -185,6 +185,12 @@ func Cli() []*cli.Command {
 			Hidden: true,
 			Commands: []*cli.Command{
 				{
+					Name:   "get",
+					Usage:  "获取面板设置（仅限指导下使用）",
+					Hidden: true,
+					Action: cliService.GetSetting,
+				},
+				{
 					Name:   "write",
 					Usage:  "写入面板设置（仅限指导下使用）",
 					Hidden: true,
