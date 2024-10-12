@@ -33,7 +33,7 @@ _cgo_export.*
 *.log
 *.sqlite
 *.db
-config/config.yml
+config.yml
 
 # 临时文件
 tmp/

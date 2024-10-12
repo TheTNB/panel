@@ -72,7 +72,7 @@ Recommended to back up data and reinstall the system first, so that the system c
 If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
 
 ```shell
-curl -fsLm 10 -o uninstall_panel.sh https://dl.cdn.haozi.net/panel/uninstall_panel.sh && bash uninstall_panel.sh
+curl -fsLm 10 -o uninstall.sh https://dl.cdn.haozi.net/panel/uninstall.sh && bash uninstall.sh
 ```
 
 Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!

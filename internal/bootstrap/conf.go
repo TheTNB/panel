@@ -2,9 +2,6 @@ package bootstrap
 
 import (
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/knadh/koanf/parsers/yaml"
@@ -12,26 +9,17 @@ import (
 	"github.com/knadh/koanf/v2"
 
 	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/pkg/io"
 )
 
 func initConf() {
-	executable, err := os.Executable()
-	if err != nil {
-		log.Fatalf("failed to get executable: %v", err)
-	}
-	res, err := filepath.EvalSymlinks(filepath.Dir(executable))
-	if err != nil {
-		log.Fatalf("failed to get executable path: %v", err)
-	}
-	if isTesting() || isAir() || isDirectlyRun() {
-		res, err = os.Getwd()
-		if err != nil {
-			log.Fatalf("failed to get working directory: %v", err)
-		}
+	config := "/usr/local/etc/panel/config.yml"
+	if !io.Exists(config) {
+		config = "config.yml"
 	}
 
 	app.Conf = koanf.New(".")
-	if err = app.Conf.Load(file.Provider(filepath.Join(res, "config/config.yml")), yaml.Parser()); err != nil {
+	if err := app.Conf.Load(file.Provider(config), yaml.Parser()); err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 }
@@ -47,33 +35,4 @@ func initGlobal() {
 		log.Fatalf("failed to load timezone: %v", err)
 	}
 	time.Local = loc
-}
-
-// isTesting checks if the application is running in testing mode.
-func isTesting() bool {
-	for _, arg := range os.Args {
-		if strings.Contains(arg, "-test.") {
-			return true
-		}
-	}
-
-	return false
-}
-
-// isAir checks if the application is running using Air.
-func isAir() bool {
-	for _, arg := range os.Args {
-		if strings.Contains(filepath.ToSlash(arg), "/storage/temp") {
-			return true
-		}
-	}
-
-	return false
-}
-
-// isDirectlyRun checks if the application is running using go run.
-func isDirectlyRun() bool {
-	executable, _ := os.Executable()
-	return strings.Contains(filepath.Base(executable), os.TempDir()) ||
-		(strings.Contains(filepath.ToSlash(executable), "/var/folders") && strings.Contains(filepath.ToSlash(executable), "/T/go-build")) // macOS
 }

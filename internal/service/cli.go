@@ -210,7 +210,7 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 
@@ -235,7 +235,7 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -250,7 +250,7 @@ func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 
@@ -260,7 +260,7 @@ func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -275,7 +275,7 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 
@@ -285,7 +285,7 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -300,7 +300,7 @@ func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 
@@ -315,7 +315,7 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -330,7 +330,7 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 
@@ -515,7 +515,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
@@ -530,7 +530,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	if err != nil {
 		return err
 	}
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0700); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0700); err != nil {
 		return err
 	}
 

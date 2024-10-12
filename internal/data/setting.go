@@ -126,7 +126,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	restartFlag := false
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
-	raw, err := io.Read(filepath.Join(app.Root, "panel/config/config.yml"))
+	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return false, err
 	}
@@ -143,7 +143,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	if err != nil {
 		return false, err
 	}
-	if err = io.Write(filepath.Join(app.Root, "panel/config/config.yml"), string(encoded), 0644); err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0644); err != nil {
 		return false, err
 	}
 	if raw != string(encoded) {
@@ -179,7 +179,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	color.Greenln("文件名: ", name)
 
 	color.Greenln("前置检查...")
-	if io.Exists("/tmp/panel-storage.zip") || io.Exists("/tmp/panel-config.zip") {
+	if io.Exists("/tmp/panel-storage.zip") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请排除后重试")
 	}
 
@@ -193,11 +193,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		color.Redln("备份面板数据失败：", err)
 		return err
 	}
-	if err := io.Compress([]string{filepath.Join(app.Root, "panel/config")}, "/tmp/panel-config.zip", io.Zip); err != nil {
-		color.Redln("备份面板配置失败：", err)
-		return err
-	}
-	if !io.Exists("/tmp/panel-storage.zip") || !io.Exists("/tmp/panel-config.zip") {
+	if !io.Exists("/tmp/panel-storage.zip") {
 		return errors.New("已备份面板数据检查失败")
 	}
 	color.Greenln("备份完成")
@@ -242,19 +238,11 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
 		return errors.New("更新失败，可能是下载过程中出现了问题")
 	}
-	if err = io.Mv(filepath.Join(app.Root, "panel", "cli"), "/usr/local/sbin/panel-cli"); err != nil {
-		color.Redln("移动面板命令行工具失败：", err)
-		return err
-	}
 	color.Greenln("更新完成")
 
 	color.Greenln("恢复面板数据...")
 	if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
 		color.Redln("恢复面板数据失败：", err)
-		return err
-	}
-	if err = io.UnCompress("/tmp/panel-config.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
-		color.Redln("恢复面板配置失败：", err)
 		return err
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
@@ -275,10 +263,14 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		color.Redln("写入面板版本号失败：", err)
 		return err
 	}
+	if err = io.Mv(filepath.Join(app.Root, "panel/cli"), "/usr/local/sbin/panel-cli"); err != nil {
+		color.Redln("移动面板命令行工具失败：", err)
+		return err
+	}
 
 	color.Greenln("设置面板文件权限...")
 	_ = io.Chmod("/usr/local/sbin/panel-cli", 0700)
-	_ = io.Chmod("/etc/systemd/system/panel.servic", 0700)
+	_ = io.Chmod("/etc/systemd/system/panel.service", 0700)
 	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
 	color.Greenln("设置完成")
 
@@ -286,7 +278,6 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 	_, _ = shell.Execf("systemctl daemon-reload")
 	_ = io.Remove("/tmp/panel-storage.zip")
-	_ = io.Remove("/tmp/panel-config.zip")
 
 	return nil
 }

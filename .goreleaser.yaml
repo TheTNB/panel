@@ -51,5 +51,5 @@ archives:
     strip_binary_directory: true
     files:
       - LICENSE
+      - config.example.yml
       - storage/*
-      - config/*

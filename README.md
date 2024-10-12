@@ -72,7 +72,7 @@
 如果你无法重装系统，请以`root`用户登录服务器，执行以下命令卸载面板：
 
 ```shell
-curl -fsLm 10 -o uninstall_panel.sh https://dl.cdn.haozi.net/panel/uninstall_panel.sh && bash uninstall_panel.sh
+curl -fsLm 10 -o uninstall.sh https://dl.cdn.haozi.net/panel/uninstall.sh && bash uninstall.sh
 ```
 
 卸载面板前请务必备份好所有数据，提前卸载面板全部应用。卸载后数据将**无法恢复**！

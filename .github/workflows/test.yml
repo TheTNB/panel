@@ -19,6 +19,6 @@ jobs:
         run: sudo apt-get install -y curl jq
       - name: Set up environment
         run: |
-          cp config/config.example.yml config/config.yml
+          cp config.example.yml config.yml
       - name: Run tests
         run: go test ./...
