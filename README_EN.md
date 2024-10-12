@@ -42,14 +42,22 @@ It is recommended to use `AlmaLinux` | `Ubuntu` first.
 
 For other systems not listed in the table below, you can try to install them by yourself, but there is no technical support will be provided (accept related PR submissions).
 
-| OS         | Version |
-|------------|---------|
-| AlmaLinux  | 9       |
-| RockyLinux | 9       |
-| Ubuntu     | 22      |
-| Ubuntu     | 24      |
-| Debian     | 11      |
-| Debian     | 12      |
+| OS                  | Version | Note            |
+|---------------------|---------|-----------------|
+| AlmaLinux           | 9       | Recommended     |
+| AlmaLinux           | 8       | Not recommended |
+| RockyLinux          | 9       |                 |
+| RockyLinux          | 8       | Not recommended |
+| CentOS Stream       | 9       | Not recommended |
+| CentOS Stream       | 8       | Not recommended |
+| Ubuntu              | 22      |                 |
+| Ubuntu              | 24      | Recommended     |
+| Debian              | 11      |                 |
+| Debian              | 12      | Recommended     |
+| OpenCloudOS         | 9       |                 |
+| TencentOS Server    | 3.1     | Not recommended |
+| Alibaba Cloud Linux | 3.2     | Not recommended |
+| Anolis              | 8       | Not recommended |
 
 As system versions are constantly updated, we may also terminate support for some older systems to ensure the robustness of the panel.
 

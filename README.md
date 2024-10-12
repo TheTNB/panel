@@ -42,14 +42,22 @@
 
 不在下表中的其他系统，可自行尝试安装，但不提供技术支持（接受相关 PR 提交）。
 
-| 系统         | 版本 |
-|------------|----|
-| AlmaLinux  | 9  |
-| RockyLinux | 9  |
-| Ubuntu     | 22 |
-| Ubuntu     | 24 |
-| Debian     | 11 |
-| Debian     | 12 |
+| 系统                  | 版本  | 备注  |
+|---------------------|-----|-----|
+| AlmaLinux           | 9   | 推荐  |
+| AlmaLinux           | 8   | 不推荐 |
+| RockyLinux          | 9   |     |
+| RockyLinux          | 8   | 不推荐 |
+| CentOS Stream       | 9   | 不推荐 |
+| CentOS Stream       | 8   | 不推荐 |
+| Ubuntu              | 22  |     |
+| Ubuntu              | 24  | 推荐  |
+| Debian              | 11  |     |
+| Debian              | 12  | 推荐  |
+| OpenCloudOS         | 9   |     |
+| TencentOS Server    | 3.1 | 不推荐 |
+| Alibaba Cloud Linux | 3.2 | 不推荐 |
+| Anolis              | 8   | 不推荐 |
 
 随着系统版本的不断更新，我们亦可能会终止部分过于老旧的系统的支持，以保证面板的健壮性。
 
