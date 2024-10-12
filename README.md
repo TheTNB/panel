@@ -36,9 +36,9 @@
 
 ## 运行环境
 
-耗子面板支持 `amd64` | `arm64` 架构下的主流系统。
+耗子面板支持 `amd64` | `arm64` 架构下的主流系统，下表中的系统均已测试 LNMP 环境安装。
 
-优先建议使用 `AlmaLinux` | `Ubuntu`。
+优先建议使用标注**推荐**的系统，无特殊情况不建议使用标注**不推荐**的系统。
 
 不在下表中的其他系统，可自行尝试安装，但不提供技术支持（接受相关 PR 提交）。
 
@@ -55,6 +55,7 @@
 | Debian              | 11  |     |
 | Debian              | 12  | 推荐  |
 | OpenCloudOS         | 9   |     |
+| TencentOS Server    | 4   |     |
 | TencentOS Server    | 3.1 | 不推荐 |
 | Alibaba Cloud Linux | 3.2 | 不推荐 |
 | Anolis              | 8   | 不推荐 |

@@ -36,9 +36,9 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | For
 
 ## Operating Environment
 
-Rat Panel supports mainstream systems under the `amd64` | `arm64` architecture.
+Rat Panel supports mainstream systems under the `amd64` | `arm64` architecture, and the systems in the table below have been tested for LNMP environment installation.
 
-It is recommended to use `AlmaLinux` | `Ubuntu` first.
+It is recommended to use the systems marked **Recommended** first, and not recommended to use the systems marked **Not recommended** without special circumstances.
 
 For other systems not listed in the table below, you can try to install them by yourself, but there is no technical support will be provided (accept related PR submissions).
 
@@ -55,6 +55,7 @@ For other systems not listed in the table below, you can try to install them by 
 | Debian              | 11      |                 |
 | Debian              | 12      | Recommended     |
 | OpenCloudOS         | 9       |                 |
+| TencentOS Server    | 4       |                 |
 | TencentOS Server    | 3.1     | Not recommended |
 | Alibaba Cloud Linux | 3.2     | Not recommended |
 | Anolis              | 8       | Not recommended |
