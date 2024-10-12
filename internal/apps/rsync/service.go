@@ -144,7 +144,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !strings.Contains(config, "["+req.Name+"]") {
-		service.Error(w, http.StatusUnprocessableEntity, "模块 "+req.Name+" 不存在")
+		service.Error(w, http.StatusUnprocessableEntity, "模块%s不存在", req.Name)
 		return
 	}
 
@@ -186,7 +186,7 @@ func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !strings.Contains(config, "["+req.Name+"]") {
-		service.Error(w, http.StatusUnprocessableEntity, "模块 "+req.Name+" 不存在")
+		service.Error(w, http.StatusUnprocessableEntity, "模块%s不存在", req.Name)
 		return
 	}
 

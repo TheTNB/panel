@@ -134,7 +134,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
 	log, err := shell.Execf("tail -n 100 %s/server/postgresql/logs/postgresql-%s.log", app.Root, time.Now().Format(time.DateOnly))
 	if err != nil {
-		service.Error(w, http.StatusInternalServerError, log)
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
