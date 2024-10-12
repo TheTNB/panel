@@ -73,7 +73,7 @@ func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 	Success(w, chix.M{
 		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
 		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
-		"panel_version": app.Conf.MustString("app.version"),
+		"panel_version": app.Version,
 	})
 }
 
@@ -207,7 +207,7 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
-	current := app.Conf.MustString("app.version")
+	current := app.Version
 	latest, err := s.api.LatestVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
@@ -237,7 +237,7 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
-	current := app.Conf.MustString("app.version")
+	current := app.Version
 	latest, err := s.api.LatestVersion()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取最新版本失败")
