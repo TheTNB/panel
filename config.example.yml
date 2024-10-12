@@ -5,7 +5,6 @@ app:
   key: a-long-string-with-32-characters
   locale: zh_CN
   timezone: Asia/Shanghai
-  version: 2.3.0
   root: /www
 http:
   debug: false

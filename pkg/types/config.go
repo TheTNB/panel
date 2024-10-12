@@ -12,7 +12,6 @@ type PanelAppConfig struct {
 	Key      string `yaml:"key"`
 	Locale   string `yaml:"locale"`
 	Timezone string `yaml:"timezone"`
-	Version  string `yaml:"version"`
 	Root     string `yaml:"root"`
 }
 
