@@ -14,7 +14,7 @@ let messageReactive: MessageReactive | null = null
 
 const getVersions = () => {
   info.updateInfo().then((res: any) => {
-    versions.value = res.data.reverse()
+    versions.value = res.data
   })
 }
 
