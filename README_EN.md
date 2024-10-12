@@ -50,10 +50,10 @@ For other systems not listed in the table below, you can try to install them by 
 | RockyLinux          | 8       | Not recommended |
 | CentOS Stream       | 9       | Not recommended |
 | CentOS Stream       | 8       | Not recommended |
-| Ubuntu              | 22      |                 |
 | Ubuntu              | 24      | Recommended     |
-| Debian              | 11      |                 |
+| Ubuntu              | 22      |                 |
 | Debian              | 12      | Recommended     |
+| Debian              | 11      |                 |
 | OpenCloudOS         | 9       |                 |
 | TencentOS Server    | 4       |                 |
 | TencentOS Server    | 3.1     | Not recommended |

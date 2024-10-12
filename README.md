@@ -50,10 +50,10 @@
 | RockyLinux          | 8   | 不推荐 |
 | CentOS Stream       | 9   | 不推荐 |
 | CentOS Stream       | 8   | 不推荐 |
-| Ubuntu              | 22  |     |
 | Ubuntu              | 24  | 推荐  |
-| Debian              | 11  |     |
+| Ubuntu              | 22  |     |
 | Debian              | 12  | 推荐  |
+| Debian              | 11  |     |
 | OpenCloudOS         | 9   |     |
 | TencentOS Server    | 4   |     |
 | TencentOS Server    | 3.1 | 不推荐 |
