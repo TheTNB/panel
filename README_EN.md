@@ -38,15 +38,14 @@ Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | For
 
 Rat Panel supports mainstream systems under the `amd64` | `arm64` architecture.
 
-It is recommended to use `AlmaLinux` | `RockyLinux` first.
+It is recommended to use `AlmaLinux` | `Ubuntu` first.
 
-For other systems not listed in the table below, you can try to install them by yourself, but there is no guarantee that they will run normally, and no technical support will be provided.
+For other systems not listed in the table below, you can try to install them by yourself, but there is no technical support will be provided (accept related PR submissions).
 
 | OS         | Version |
 |------------|---------|
-| RHEL       | 9       |
-| RockyLinux | 9       |
 | AlmaLinux  | 9       |
+| RockyLinux | 9       |
 | Ubuntu     | 22      |
 | Ubuntu     | 24      |
 | Debian     | 11      |
