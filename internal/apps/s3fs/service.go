@@ -104,7 +104,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	if mountCheck, err := shell.Execf("mount -a"); err != nil {
 		_, _ = shell.Execf(`sed -i 's@^s3fs#%s\s%s.*$@@g' /etc/fstab`, req.Bucket, req.Path)
-		service.Error(w, http.StatusInternalServerError, "/etc/fstab 有误: "+mountCheck)
+		service.Error(w, http.StatusInternalServerError, "/etc/fstab有误：%s", mountCheck)
 		return
 	}
 	if _, err := shell.Execf(`df -h | grep '%s'`, req.Path); err != nil {
@@ -177,7 +177,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if mountCheck, err := shell.Execf("mount -a"); err != nil {
-		service.Error(w, http.StatusInternalServerError, "/etc/fstab 有误: "+mountCheck)
+		service.Error(w, http.StatusInternalServerError, "/etc/fstab有误：%s", mountCheck)
 		return
 	}
 	if err = io.Remove("/etc/passwd-s3fs-" + cast.ToString(mount.ID)); err != nil {

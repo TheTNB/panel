@@ -39,12 +39,7 @@ func (s *Service) Service(w http.ResponseWriter, r *http.Request) {
 
 // Log 日志
 func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
-	log, err := shell.Execf(`tail -n 200 /var/log/supervisor/supervisord.log`)
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, log)
-		return
-	}
-
+	log, _ := shell.Execf(`tail -n 200 /var/log/supervisor/supervisord.log`)
 	service.Success(w, log)
 }
 
@@ -210,12 +205,7 @@ func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log, err := shell.Execf(`tail -n 200 '%s'`, logPath)
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, log)
-		return
-	}
-
+	log, _ := shell.Execf(`tail -n 200 '%s'`, logPath)
 	service.Success(w, log)
 }
 
