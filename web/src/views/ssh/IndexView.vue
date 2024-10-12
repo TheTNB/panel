@@ -75,7 +75,7 @@ const openSession = () => {
   ws.onerror = (event) => {
     term.write('\r\nSSH连接发生错误，请刷新页面。')
     term.write('\r\nSSH connection error. Please refresh the page.\r\n')
-    console.error(event.error)
+    console.error(event)
     ws.close()
   }
 
