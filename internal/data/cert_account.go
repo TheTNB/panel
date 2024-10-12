@@ -50,6 +50,8 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 		if eabErr != nil {
 			return nil, eabErr
 		}
+		account.Kid = eab.KeyID
+		account.HmacEncoded = eab.MACKey
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogleCN, eab, acme.KeyType(account.KeyType))
 	case "google":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
@@ -62,6 +64,8 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 		if eabErr != nil {
 			return nil, eabErr
 		}
+		account.Kid = eab.KeyID
+		account.HmacEncoded = eab.MACKey
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAZeroSSL, eab, acme.KeyType(account.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
@@ -105,6 +109,8 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 		if eabErr != nil {
 			return eabErr
 		}
+		account.Kid = eab.KeyID
+		account.HmacEncoded = eab.MACKey
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogleCN, eab, acme.KeyType(account.KeyType))
 	case "google":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
@@ -117,6 +123,8 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 		if eabErr != nil {
 			return eabErr
 		}
+		account.Kid = eab.KeyID
+		account.HmacEncoded = eab.MACKey
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAZeroSSL, eab, acme.KeyType(account.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
