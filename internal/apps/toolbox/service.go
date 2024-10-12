@@ -138,7 +138,7 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if cast.ToInt64(free)*1024 < req.Size*1024*1024 {
-			service.Error(w, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余 "+str.FormatBytes(cast.ToFloat64(free)))
+			service.Error(w, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
 			return
 		}
 
