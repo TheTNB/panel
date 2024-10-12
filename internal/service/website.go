@@ -26,12 +26,12 @@ func NewWebsiteService() *WebsiteService {
 }
 
 func (s *WebsiteService) GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
-	index, err := io.Read(filepath.Join(app.Root, "server/openresty/html/index.html"))
+	index, err := io.Read(filepath.Join(app.Root, "server/nginx/html/index.html"))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
-	stop, err := io.Read(filepath.Join(app.Root, "server/openresty/html/stop.html"))
+	stop, err := io.Read(filepath.Join(app.Root, "server/nginx/html/stop.html"))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

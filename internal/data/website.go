@@ -35,14 +35,14 @@ func NewWebsiteRepo() biz.WebsiteRepo {
 }
 
 func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error {
-	if err := io.Write(filepath.Join(app.Root, "server/openresty/html/index.html"), req.Index, 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/nginx/html/index.html"), req.Index, 0644); err != nil {
 		return err
 	}
-	if err := io.Write(filepath.Join(app.Root, "server/openresty/html/stop.html"), req.Stop, 0644); err != nil {
+	if err := io.Write(filepath.Join(app.Root, "server/nginx/html/stop.html"), req.Stop, 0644); err != nil {
 		return err
 	}
 
-	return systemctl.Reload("openresty")
+	return systemctl.Reload("nginx")
 }
 
 func (r *websiteRepo) Count() (int64, error) {
@@ -304,8 +304,8 @@ server
 		return nil, err
 	}
 
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		return nil, err
 	}
 
@@ -357,8 +357,8 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		if err = io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), req.Raw, 0644); err != nil {
 			return err
 		}
-		if err = systemctl.Reload("openresty"); err != nil {
-			_, err = shell.Execf("openresty -t")
+		if err = systemctl.Reload("nginx"); err != nil {
+			_, err = shell.Execf("nginx -t")
 			return err
 		}
 
@@ -537,9 +537,9 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		return err
 	}
 
-	err = systemctl.Reload("openresty")
+	err = systemctl.Reload("nginx")
 	if err != nil {
-		_, err = shell.Execf("openresty -t")
+		_, err = shell.Execf("nginx -t")
 	}
 
 	return err
@@ -583,9 +583,9 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		_, _ = shell.Execf(`echo "DROP USER IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
 	}
 
-	err := systemctl.Reload("openresty")
+	err := systemctl.Reload("nginx")
 	if err != nil {
-		_, err = shell.Execf("openresty -t")
+		_, err = shell.Execf("nginx -t")
 	}
 
 	return err
@@ -685,8 +685,8 @@ server
 	if err := io.Write(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"), "", 0644); err != nil {
 		return nil
 	}
-	if err := systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err := systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		return err
 	}
 
@@ -717,7 +717,7 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 			root := regexp.MustCompile(`# root\s+(.+);`).FindStringSubmatch(rootConfig)
 			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s;\n    ", root[1]))
 		} else {
-			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s/server/openresty/html;\n    # root %s;\n    ", app.Root, match[1]))
+			raw = strings.ReplaceAll(raw, rootConfig, fmt.Sprintf("    root %s/server/nginx/html;\n    # root %s;\n    ", app.Root, match[1]))
 		}
 	}
 
@@ -736,8 +736,8 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 	if err = io.Write(filepath.Join(app.Root, "server/vhost", website.Name+".conf"), raw, 0644); err != nil {
 		return err
 	}
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		return err
 	}
 

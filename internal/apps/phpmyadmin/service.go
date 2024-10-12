@@ -86,8 +86,8 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		service.Error(w, http.StatusInternalServerError, "重载OpenResty失败：%v", err)
 		return
 	}
@@ -117,8 +117,8 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		service.Error(w, http.StatusInternalServerError, "重载OpenResty失败：%v", err)
 		return
 	}

@@ -33,7 +33,7 @@ func (s *APITestSuite) TestGetApps() {
 }
 
 func (s *APITestSuite) TestGetAppBySlug() {
-	_, err := s.api.AppBySlug("openresty")
+	_, err := s.api.AppBySlug("nginx")
 	s.NoError(err)
 }
 

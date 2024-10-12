@@ -1,4 +1,4 @@
-package openresty
+package nginx
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -9,7 +9,7 @@ import (
 
 func init() {
 	apploader.Register(&types.App{
-		Slug: "openresty",
+		Slug: "nginx",
 		Route: func(r chi.Router) {
 			service := NewService()
 			r.Get("/load", service.Load)

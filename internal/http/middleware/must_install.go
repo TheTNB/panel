@@ -15,7 +15,7 @@ func MustInstall(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var slugs []string
 		if strings.HasPrefix(r.URL.Path, "/api/website") {
-			slugs = append(slugs, "openresty")
+			slugs = append(slugs, "nginx")
 		} else if strings.HasPrefix(r.URL.Path, "/api/container") {
 			slugs = append(slugs, "podman", "docker")
 		} else if strings.HasPrefix(r.URL.Path, "/api/apps/") {

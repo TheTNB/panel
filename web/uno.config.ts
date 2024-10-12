@@ -4,17 +4,7 @@ import { defineConfig, presetAttributify, presetUno } from 'unocss'
 const config: UserConfig = {
   content: {
     pipeline: {
-      exclude: [
-        'node_modules',
-        '.git',
-        '.github',
-        '.vscode',
-        'build',
-        'dist',
-        'public',
-        'types',
-        './stats.html'
-      ]
+      exclude: ['node_modules', '.git', '.github', '.vscode', 'build', 'dist', 'public', 'types']
     }
   },
   presets: [presetUno({ dark: 'class' }), presetAttributify()],

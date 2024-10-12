@@ -7,7 +7,7 @@ import (
 	_ "github.com/TheTNB/panel/internal/apps/frp"
 	_ "github.com/TheTNB/panel/internal/apps/gitea"
 	_ "github.com/TheTNB/panel/internal/apps/mysql"
-	_ "github.com/TheTNB/panel/internal/apps/openresty"
+	_ "github.com/TheTNB/panel/internal/apps/nginx"
 	_ "github.com/TheTNB/panel/internal/apps/php"
 	_ "github.com/TheTNB/panel/internal/apps/phpmyadmin"
 	_ "github.com/TheTNB/panel/internal/apps/podman"

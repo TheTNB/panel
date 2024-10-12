@@ -1,4 +1,4 @@
-package openresty
+package nginx
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ func NewService() *Service {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root))
+	config, err := io.Read(fmt.Sprintf("%s/server/nginx/conf/nginx.conf", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取配置失败")
 		return
@@ -43,13 +43,13 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/openresty/conf/nginx.conf", app.Root), req.Config, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/nginx/conf/nginx.conf", app.Root), req.Config, 0644); err != nil {
 		service.Error(w, http.StatusInternalServerError, "保存配置失败")
 		return
 	}
 
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		service.Error(w, http.StatusInternalServerError, "重载服务失败：%v", err)
 		return
 	}

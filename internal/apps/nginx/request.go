@@ -1,4 +1,4 @@
-package openresty
+package nginx
 
 type UpdateConfig struct {
 	Config string `form:"config" json:"config"`

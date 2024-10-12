@@ -2,7 +2,7 @@
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
-import openresty from '@/api/apps/openresty'
+import nginx from '@/api/apps/nginx'
 import systemctl from '@/api/panel/systemctl'
 
 const currentTab = ref('status')
@@ -27,39 +27,39 @@ const columns: any = [
 const load = ref<any[]>([])
 
 const getLoad = async () => {
-  const { data } = await openresty.load()
+  const { data } = await nginx.load()
   return data
 }
 
 const getStatus = async () => {
-  await systemctl.status('openresty').then((res: any) => {
+  await systemctl.status('nginx').then((res: any) => {
     status.value = res.data
   })
 }
 
 const getIsEnabled = async () => {
-  await systemctl.isEnabled('openresty').then((res: any) => {
+  await systemctl.isEnabled('nginx').then((res: any) => {
     isEnabled.value = res.data
   })
 }
 
 const getErrorLog = async () => {
-  const { data } = await openresty.errorLog()
+  const { data } = await nginx.errorLog()
   return data
 }
 
 const getConfig = async () => {
-  const { data } = await openresty.config()
+  const { data } = await nginx.config()
   return data
 }
 
 const handleSaveConfig = async () => {
-  await openresty.saveConfig(config.value)
+  await nginx.saveConfig(config.value)
   window.$message.success('保存成功')
 }
 
 const handleClearErrorLog = async () => {
-  await openresty.clearErrorLog()
+  await nginx.clearErrorLog()
   getErrorLog().then((res) => {
     errorLog.value = res
   })
@@ -68,35 +68,35 @@ const handleClearErrorLog = async () => {
 
 const handleIsEnabled = async () => {
   if (isEnabled.value) {
-    await systemctl.enable('openresty')
+    await systemctl.enable('nginx')
     window.$message.success('开启自启动成功')
   } else {
-    await systemctl.disable('openresty')
+    await systemctl.disable('nginx')
     window.$message.success('禁用自启动成功')
   }
   await getIsEnabled()
 }
 
 const handleStart = async () => {
-  await systemctl.start('openresty')
+  await systemctl.start('nginx')
   window.$message.success('启动成功')
   await getStatus()
 }
 
 const handleStop = async () => {
-  await systemctl.stop('openresty')
+  await systemctl.stop('nginx')
   window.$message.success('停止成功')
   await getStatus()
 }
 
 const handleRestart = async () => {
-  await systemctl.restart('openresty')
+  await systemctl.restart('nginx')
   window.$message.success('重启成功')
   await getStatus()
 }
 
 const handleReload = async () => {
-  await systemctl.reload('openresty')
+  await systemctl.reload('nginx')
   window.$message.success('重载成功')
   await getStatus()
 }

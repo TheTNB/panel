@@ -47,8 +47,8 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 	if err = os.WriteFile(s.conf, []byte(conf), 0644); err != nil {
 		return fmt.Errorf("无法写入OpenResty配置文件: %w", err)
 	}
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		return fmt.Errorf("无法重载OpenResty: %w", err)
 	}
 
@@ -63,7 +63,7 @@ func (s httpSolver) CleanUp(_ context.Context, challenge acme.Challenge) error {
 
 	_ = os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath()))
 	_ = os.WriteFile(s.conf, []byte{}, 0644)
-	_ = systemctl.Reload("openresty")
+	_ = systemctl.Reload("nginx")
 	return nil
 }
 

@@ -15,7 +15,7 @@ export function createAppInstallGuard(router: Router) {
 
     // 网站
     if (to.path.startsWith('/website')) {
-      await app.isInstalled('openresty').then((res) => {
+      await app.isInstalled('nginx').then((res) => {
         if (!res.data.installed) {
           window.$message.error(`Web 服务器 ${res.data.name} 未安装`)
           return router.push({ name: 'app-index' })

@@ -242,8 +242,8 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.key", app.Root, website.Name), cert.Key, 0644); err != nil {
 		return err
 	}
-	if err = systemctl.Reload("openresty"); err != nil {
-		_, err = shell.Execf("openresty -t")
+	if err = systemctl.Reload("nginx"); err != nil {
+		_, err = shell.Execf("nginx -t")
 		return err
 	}
 

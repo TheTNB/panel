@@ -3,17 +3,17 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'openresty',
-  path: '/apps/openresty',
+  name: 'nginx',
+  path: '/apps/nginx',
   component: Layout,
   isHidden: true,
   children: [
     {
-      name: 'apps-openresty-index',
+      name: 'apps-nginx-index',
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: 'OpenResty',
+        title: 'OpenResty（Nginx）',
         icon: 'mdi:server-network',
         role: ['admin'],
         requireAuth: true
