@@ -44,7 +44,7 @@ func (r *API) LatestVersion() (*Version, error) {
 	if env.IsArm() {
 		arch = "arm64"
 	}
-	slices.DeleteFunc(version.Downloads, func(item VersionDownload) bool {
+	version.Downloads = slices.DeleteFunc(version.Downloads, func(item VersionDownload) bool {
 		return item.Arch != arch
 	})
 
