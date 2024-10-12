@@ -131,4 +131,4 @@ require (
 	modernc.org/sqlite v1.32.0 // indirect
 )
 
-replace github.com/mholt/acmez/v2 => github.com/TheTNB/acmez/v2 v2.0.0-20241012154227-1911c2ed4ae4
+replace github.com/mholt/acmez/v2 => github.com/TheTNB/acmez/v2 v2.0.0-20241012163130-5833d84639e0

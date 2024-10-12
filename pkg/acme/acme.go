@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	CAGoogleCN           = "https://panel.haozi.net/api/acme/google/directory"
+	CAGoogleCN           = "https://gts.rat.dev/directory"
 	CAGoogle             = "https://dv.acme-v02.api.pki.goog/directory"
 	CALetsEncryptStaging = "https://acme-staging-v02.api.letsencrypt.org/directory"
 	CALetsEncrypt        = "https://acme-v02.api.letsencrypt.org/directory"
