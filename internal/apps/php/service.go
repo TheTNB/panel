@@ -183,14 +183,14 @@ func (s *Service) InstallExtension(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' install %d >> '/tmp/%s.log' 2>&1`, app.Root, req.Slug, s.version, req.Slug)
+	cmd := fmt.Sprintf(`curl -fsLm 10 --retry 3 "https://dl.cdn.haozi.net/panel/php_exts/%s" | bash -s -- "install" "%d" >> /tmp/%s.log 2>&1`, req.Slug, s.version, req.Slug)
 	officials := []string{"fileinfo", "exif", "imap", "pdo_pgsql", "zip", "bz2", "readline", "snmp", "ldap", "enchant", "pspell", "calendar", "gmp", "sysvmsg", "sysvsem", "sysvshm", "xsl", "intl", "gettext"}
 	if slices.Contains(officials, req.Slug) {
-		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' install '%d' '%s' >> '/tmp/%s.log' 2>&1`, app.Root, s.version, req.Slug, req.Slug)
+		cmd = fmt.Sprintf(`curl -fsLm 10 --retry 3 "https://dl.cdn.haozi.net/panel/php_exts/official.sh" | bash -s -- "install" "%d" "%s" >> /tmp/%s.log 2>&1`, s.version, req.Slug, req.Slug)
 	}
 
 	task := new(biz.Task)
-	task.Name = fmt.Sprintf("安装 PHP-%d 扩展 %s", s.version, req.Slug)
+	task.Name = fmt.Sprintf("安装PHP-%d扩展 %s", s.version, req.Slug)
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = cmd
 	task.Log = "/tmp/" + req.Slug + ".log"
@@ -214,14 +214,14 @@ func (s *Service) UninstallExtension(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmd := fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/%s.sh' uninstall %d >> '/tmp/%s.log' 2>&1`, app.Root, req.Slug, s.version, req.Slug)
+	cmd := fmt.Sprintf(`curl -fsLm 10 --retry 3 "https://dl.cdn.haozi.net/panel/php_exts/%s" | bash -s -- "uninstall" "%d" >> /tmp/%s.log 2>&1`, req.Slug, s.version, req.Slug)
 	officials := []string{"fileinfo", "exif", "imap", "pdo_pgsql", "zip", "bz2", "readline", "snmp", "ldap", "enchant", "pspell", "calendar", "gmp", "sysvmsg", "sysvsem", "sysvshm", "xsl", "intl", "gettext"}
 	if slices.Contains(officials, req.Slug) {
-		cmd = fmt.Sprintf(`bash '%s/panel/scripts/php_extensions/official.sh' uninstall '%d' '%s' >> '/tmp/%s.log' 2>&1`, app.Root, s.version, req.Slug, req.Slug)
+		cmd = fmt.Sprintf(`curl -fsLm 10 --retry 3 "https://dl.cdn.haozi.net/panel/php_exts/official.sh" | bash -s -- "uninstall" "%d" "%s" >> /tmp/%s.log 2>&1`, s.version, req.Slug, req.Slug)
 	}
 
 	task := new(biz.Task)
-	task.Name = fmt.Sprintf("卸载 PHP-%d 扩展 %s", s.version, req.Slug)
+	task.Name = fmt.Sprintf("卸载PHP-%d扩展 %s", s.version, req.Slug)
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = cmd
 	task.Log = "/tmp/" + req.Slug + ".log"
