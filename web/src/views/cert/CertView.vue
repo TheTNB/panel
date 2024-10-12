@@ -426,12 +426,7 @@ const handleDeployCert = async () => {
 
 const getAsyncData = async () => {
   const { data: algorithmData } = await cert.algorithms()
-  for (const item of algorithmData) {
-    algorithms.value.push({
-      label: item.name,
-      value: item.key
-    })
-  }
+  algorithms.value = algorithmData
 
   const { data: websiteData } = await website.list(1, 10000)
   websites.value = []

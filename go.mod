@@ -130,3 +130,5 @@ require (
 	modernc.org/memory v1.8.0 // indirect
 	modernc.org/sqlite v1.32.0 // indirect
 )
+
+replace github.com/mholt/acmez/v2 => github.com/TheTNB/acmez/v2 v2.0.0-20241012154227-1911c2ed4ae4

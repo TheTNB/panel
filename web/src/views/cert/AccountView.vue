@@ -18,18 +18,22 @@ const addAccountModel = ref<any>({
   email: '',
   kid: '',
   key_type: 'P256',
-  ca: 'letsencrypt'
+  ca: 'googlecn'
 })
 const updateAccountModel = ref<any>({
   hmac_encoded: '',
   email: '',
   kid: '',
   key_type: 'P256',
-  ca: 'letsencrypt'
+  ca: 'googlecn'
 })
 const addAccountModal = ref(false)
 const updateAccountModal = ref(false)
 const updateAccount = ref<any>()
+
+const showEAB = computed(() => {
+  return addAccountModel.value.ca === 'google' || addAccountModel.value.ca === 'sslcom'
+})
 
 const caProviders = ref<any>([])
 const algorithms = ref<any>([])
@@ -51,20 +55,7 @@ const accountColumns: any = [
         },
         {
           default: () => {
-            switch (row.ca) {
-              case 'letsencrypt':
-                return "Let's Encrypt"
-              case 'zerossl':
-                return 'ZeroSSL'
-              case 'sslcom':
-                return 'SSL.com'
-              case 'buypass':
-                return 'Buypass'
-              case 'google':
-                return 'Google'
-              default:
-                return '未知'
-            }
+            return caProviders.value.find((item: any) => item.value === row.ca)?.label
           }
         }
       )
@@ -192,20 +183,10 @@ const handleUpdateAccount = async () => {
 
 onMounted(() => {
   cert.caProviders().then((res) => {
-    for (const item of res.data) {
-      caProviders.value.push({
-        label: item.name,
-        value: item.ca
-      })
-    }
+    caProviders.value = res.data
   })
   cert.algorithms().then((res) => {
-    for (const item of res.data) {
-      algorithms.value.push({
-        label: item.name,
-        value: item.key
-      })
-    }
+    algorithms.value = res.data
   })
   onAccountPageChange(1)
 })
@@ -243,7 +224,7 @@ onMounted(() => {
     <n-space vertical>
       <n-alert type="info"> Google 和 SSL.com 需要先去官网获得 KID 和 HMAC 并填入 </n-alert>
       <n-alert type="warning">
-        境内无法使用 Google CA，其他 CA 视网络情况而定，建议使用 Let's Encrypt
+        境内无法使用 Google，其他 CA 视网络情况而定，建议使用 GoogleCN 或 Let's Encrypt
       </n-alert>
       <n-form :model="addAccountModel">
         <n-form-item path="ca" label="CA">
@@ -270,7 +251,7 @@ onMounted(() => {
             placeholder="输入邮箱地址"
           />
         </n-form-item>
-        <n-form-item path="kid" label="KID">
+        <n-form-item v-if="showEAB" path="kid" label="KID">
           <n-input
             v-model:value="addAccountModel.kid"
             type="text"
@@ -278,7 +259,7 @@ onMounted(() => {
             placeholder="输入 KID"
           />
         </n-form-item>
-        <n-form-item path="hmac_encoded" label="HMAC">
+        <n-form-item v-if="showEAB" path="hmac_encoded" label="HMAC">
           <n-input
             v-model:value="addAccountModel.hmac_encoded"
             type="text"
@@ -302,7 +283,7 @@ onMounted(() => {
     <n-space vertical>
       <n-alert type="info"> Google 和 SSL.com 需要先去官网获得 KID 和 HMAC 并填入 </n-alert>
       <n-alert type="warning">
-        境内无法使用 Google CA，其他 CA 视网络情况而定，建议使用 Let's Encrypt
+        境内无法使用 Google，其他 CA 视网络情况而定，建议使用 GoogleCN 或 Let's Encrypt
       </n-alert>
       <n-form :model="updateAccountModel">
         <n-form-item path="ca" label="CA">

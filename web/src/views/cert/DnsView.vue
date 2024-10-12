@@ -187,12 +187,7 @@ const handleUpdateDNS = async () => {
 
 onMounted(async () => {
   cert.dnsProviders().then((res) => {
-    for (const item of res.data) {
-      dnsProviders.value.push({
-        label: item.name,
-        value: item.dns
-      })
-    }
+    dnsProviders.value = res.data
   })
   onDnsPageChange(1)
 })

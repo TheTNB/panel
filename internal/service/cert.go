@@ -9,6 +9,7 @@ import (
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type CertService struct {
@@ -22,70 +23,74 @@ func NewCertService() *CertService {
 }
 
 func (s *CertService) CAProviders(w http.ResponseWriter, r *http.Request) {
-	Success(w, []map[string]string{
+	Success(w, []types.LV{
 		{
-			"name": "Let's Encrypt",
-			"ca":   "letsencrypt",
+			Label: "GoogleCN（推荐）",
+			Value: "googlecn",
 		},
 		{
-			"name": "ZeroSSL",
-			"ca":   "zerossl",
+			Label: "Let's Encrypt",
+			Value: "letsencrypt",
 		},
 		{
-			"name": "SSL.com",
-			"ca":   "sslcom",
+			Label: "ZeroSSL",
+			Value: "zerossl",
 		},
 		{
-			"name": "Google",
-			"ca":   "google",
+			Label: "SSL.com",
+			Value: "sslcom",
 		},
 		{
-			"name": "Buypass",
-			"ca":   "buypass",
+			Label: "Google",
+			Value: "google",
+		},
+		{
+			Label: "Buypass",
+			Value: "buypass",
 		},
 	})
 
 }
 
 func (s *CertService) DNSProviders(w http.ResponseWriter, r *http.Request) {
-	Success(w, []map[string]any{
+	Success(w, []types.LV{
 		{
-			"name": "DNSPod",
-			"dns":  acme.DnsPod,
+			Label: "DNSPod",
+			Value: string(acme.DnsPod),
 		},
 		{
-			"name": "腾讯云",
-			"dns":  acme.Tencent,
+			Label: "腾讯云",
+			Value: string(acme.Tencent),
 		},
 		{
-			"name": "阿里云",
-			"dns":  acme.AliYun,
+			Label: "阿里云",
+			Value: string(acme.AliYun),
 		},
 		{
-			"name": "CloudFlare",
-			"dns":  acme.CloudFlare,
+			Label: "CloudFlare",
+			Value: string(acme.CloudFlare),
 		},
 	})
 
 }
 
 func (s *CertService) Algorithms(w http.ResponseWriter, r *http.Request) {
-	Success(w, []map[string]any{
+	Success(w, []types.LV{
 		{
-			"name": "EC256",
-			"key":  acme.KeyEC256,
+			Label: "EC256",
+			Value: string(acme.KeyEC256),
 		},
 		{
-			"name": "EC384",
-			"key":  acme.KeyEC384,
+			Label: "EC384",
+			Value: string(acme.KeyEC384),
 		},
 		{
-			"name": "RSA2048",
-			"key":  acme.KeyRSA2048,
+			Label: "RSA2048",
+			Value: string(acme.KeyRSA2048),
 		},
 		{
-			"name": "RSA4096",
-			"key":  acme.KeyRSA4096,
+			Label: "RSA4096",
+			Value: string(acme.KeyRSA4096),
 		},
 	})
 

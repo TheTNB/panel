@@ -17,10 +17,11 @@ import (
 )
 
 const (
+	CAGoogleCN           = "https://panel.haozi.net/api/acme/google/directory"
+	CAGoogle             = "https://dv.acme-v02.api.pki.goog/directory"
 	CALetsEncryptStaging = "https://acme-staging-v02.api.letsencrypt.org/directory"
 	CALetsEncrypt        = "https://acme-v02.api.letsencrypt.org/directory"
 	CAZeroSSL            = "https://acme.zerossl.com/v2/DV90"
-	CAGoogle             = "https://dv.acme-v02.api.pki.goog/directory"
 	CABuypass            = "https://api.buypass.com/acme/directory"
 	CASSLcom             = "https://acme.ssl.com/sslcom-dv-rsa"
 )

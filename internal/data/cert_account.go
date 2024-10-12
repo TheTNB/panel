@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -44,6 +45,14 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 	var err error
 	var client *acme.Client
 	switch account.CA {
+	case "googlecn":
+		eab, eabErr := r.getGoogleEAB()
+		if eabErr != nil {
+			return nil, eabErr
+		}
+		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogleCN, eab, acme.KeyType(account.KeyType))
+	case "google":
+		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	case "letsencrypt":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CALetsEncrypt, nil, acme.KeyType(account.KeyType))
 	case "buypass":
@@ -56,14 +65,12 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAZeroSSL, eab, acme.KeyType(account.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
-	case "google":
-		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	default:
 		return nil, errors.New("CA 提供商不支持")
 	}
 
 	if err != nil {
-		return nil, errors.New("向 CA 注册账号失败，请检查参数是否正确")
+		return nil, fmt.Errorf("注册账号失败：%v", err)
 	}
 
 	privateKey, err := cert.EncodeKey(client.Account.PrivateKey)
@@ -93,6 +100,14 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 
 	var client *acme.Client
 	switch account.CA {
+	case "googlecn":
+		eab, eabErr := r.getGoogleEAB()
+		if eabErr != nil {
+			return eabErr
+		}
+		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogleCN, eab, acme.KeyType(account.KeyType))
+	case "google":
+		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	case "letsencrypt":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CALetsEncrypt, nil, acme.KeyType(account.KeyType))
 	case "buypass":
@@ -105,8 +120,6 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAZeroSSL, eab, acme.KeyType(account.KeyType))
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
-	case "google":
-		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CAGoogle, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	default:
 		return errors.New("CA 提供商不支持")
 	}
@@ -126,6 +139,31 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 
 func (r certAccountRepo) Delete(id uint) error {
 	return app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).Delete(&biz.CertAccount{}).Error
+}
+
+// getGoogleEAB 获取 Google EAB
+func (r certAccountRepo) getGoogleEAB() (*acme.EAB, error) {
+	type data struct {
+		Message string `json:"message"`
+		Data    struct {
+			KeyId  string `json:"key_id"`
+			MacKey string `json:"mac_key"`
+		} `json:"data"`
+	}
+	client := resty.New()
+	client.SetTimeout(5 * time.Second)
+	client.SetRetryCount(2)
+
+	resp, err := client.R().SetResult(&data{}).Get("https://panel.haozi.net/api/acme/googleEAB")
+	if err != nil || !resp.IsSuccess() {
+		return &acme.EAB{}, errors.New("获取Google EAB失败")
+	}
+	eab := resp.Result().(*data)
+	if eab.Message != "success" {
+		return &acme.EAB{}, errors.New("获取Google EAB失败")
+	}
+
+	return &acme.EAB{KeyID: eab.Data.KeyId, MACKey: eab.Data.MacKey}, nil
 }
 
 // getZeroSSLEAB 获取 ZeroSSL EAB

@@ -254,6 +254,12 @@ func (r *certRepo) getClient(cert *biz.Cert) (*acme.Client, error) {
 	var ca string
 	var eab *acme.EAB
 	switch cert.Account.CA {
+	case "googlecn":
+		ca = acme.CAGoogleCN
+		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
+	case "google":
+		ca = acme.CAGoogle
+		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	case "letsencrypt":
 		ca = acme.CALetsEncrypt
 	case "buypass":
@@ -263,9 +269,6 @@ func (r *certRepo) getClient(cert *biz.Cert) (*acme.Client, error) {
 		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	case "sslcom":
 		ca = acme.CASSLcom
-		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
-	case "google":
-		ca = acme.CAGoogle
 		eab = &acme.EAB{KeyID: cert.Account.Kid, MACKey: cert.Account.HmacEncoded}
 	}
 
