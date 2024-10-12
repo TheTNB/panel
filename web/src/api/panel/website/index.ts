@@ -27,7 +27,7 @@ export default {
     request.post('/website/' + id + '/updateRemark', { remark }),
   // 重置配置
   resetConfig: (id: number): Promise<AxiosResponse<any>> =>
-    request.post('/website/' + id + '/resetConfig'),
+    request.post('/website/' + id + '/resetConfig', {}),
   // 修改状态
   status: (id: number, status: boolean): Promise<AxiosResponse<any>> =>
     request.post('/website/' + id + '/status', { status })

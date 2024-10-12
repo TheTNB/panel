@@ -51,7 +51,7 @@ const openSession = () => {
   term.loadAddon(fitAddon)
 
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-  const ws = new WebSocket(`${protocol}://${window.location.host}/api/panel/ssh/session`)
+  const ws = new WebSocket(`${protocol}://${window.location.host}/api/ssh/session`)
   ws.binaryType = 'arraybuffer'
 
   const enc = new TextDecoder('utf-8')
@@ -75,7 +75,7 @@ const openSession = () => {
   ws.onerror = (event) => {
     term.write('\r\nSSH连接发生错误，请刷新页面。')
     term.write('\r\nSSH connection error. Please refresh the page.\r\n')
-    console.error(event)
+    console.error(event.error)
     ws.close()
   }
 
