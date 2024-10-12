@@ -61,8 +61,10 @@
 
 如果你决定继续，请以`root`用户登录服务器，执行以下命令安装面板：
 
+**当前 v2.3.x 为测试版本，欢迎帮助我们测试在不同操作系统下的兼容性。**
+
 ```shell
-版本升级，暂停安装！
+curl -fsLm 10 -o install.sh https://dl.cdn.haozi.net/panel/install.sh && bash install.sh
 ```
 
 ## 卸载面板

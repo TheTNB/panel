@@ -61,8 +61,10 @@ As system versions are constantly updated, we may also terminate support for som
 
 If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
 
+**Current v2.3.x is a test version, welcome to help us test compatibility on different operating systems.**
+
 ```shell
-Version upgrade, installation paused!
+curl -fsLm 10 -o install.sh https://dl.cdn.haozi.net/panel/install.sh && bash install.sh
 ```
 
 ## Uninstall Panel
