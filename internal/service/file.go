@@ -4,6 +4,7 @@ package service
 
 import (
 	"fmt"
+	stdio "io"
 	"net/http"
 	stdos "os"
 	"path/filepath"
@@ -119,18 +120,43 @@ func (s *FileService) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FileUpload](r)
+	if err := r.ParseMultipartForm(2 << 30); err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	path := r.FormValue("path")
+	_, handler, err := r.FormFile("file")
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
-
-	if err = io.Write(req.Path, string(req.File), 0755); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
+	if io.Exists(path) {
+		Error(w, http.StatusForbidden, "目标路径%s已存在", path)
 		return
 	}
 
-	s.setPermission(req.Path, 0755, "www", "www")
+	if !io.Exists(filepath.Dir(path)) {
+		if err = io.Mkdir(filepath.Dir(path), 0755); err != nil {
+			Error(w, http.StatusInternalServerError, "创建文件夹失败：%v", err)
+			return
+		}
+	}
+
+	src, _ := handler.Open()
+	out, err := stdos.OpenFile(path, stdos.O_CREATE|stdos.O_RDWR|stdos.O_TRUNC, 0644)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "打开文件失败：%v", err)
+		return
+	}
+
+	if _, err = stdio.Copy(out, src); err != nil {
+		Error(w, http.StatusInternalServerError, "写入文件失败：%v", err)
+		return
+	}
+
+	_ = src.Close()
+	s.setPermission(path, 0755, "www", "www")
 	Success(w, nil)
 }
 

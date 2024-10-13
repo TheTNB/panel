@@ -7,7 +7,7 @@ export default {
   path: '/setting',
   component: Layout,
   meta: {
-    order: 10
+    order: 999
   },
   children: [
     {

@@ -7,7 +7,7 @@ export default {
   path: '/cron',
   component: Layout,
   meta: {
-    order: 5
+    order: 70
   },
   children: [
     {

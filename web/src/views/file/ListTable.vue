@@ -127,7 +127,7 @@ const columns: DataTableColumns<RowData> = [
                     selected.value = [row.full]
                     compress.value = true
                   } else {
-                    window.open('/api/panel/file/download?path=' + encodeURIComponent(row.full))
+                    window.open('/api/file/download?path=' + encodeURIComponent(row.full))
                   }
                 }
               },

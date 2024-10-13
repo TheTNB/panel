@@ -3,20 +3,20 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'monitor',
-  path: '/monitor',
+  name: 'backup',
+  path: '/backup',
   component: Layout,
   meta: {
-    order: 20
+    order: 60
   },
   children: [
     {
-      name: 'monitor-index',
+      name: 'backup-index',
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: 'monitorIndex.title',
-        icon: 'mdi:monitor',
+        title: '数据备份',
+        icon: 'mdi:backup-outline',
         role: ['admin'],
         requireAuth: true
       }

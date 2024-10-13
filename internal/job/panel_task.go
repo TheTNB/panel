@@ -35,7 +35,7 @@ func (receiver *PanelTask) Run() {
 	}
 
 	// 备份面板
-	if err := receiver.backupRepo.Create("panel", ""); err != nil {
+	if err := receiver.backupRepo.Create(biz.BackupTypePanel, ""); err != nil {
 		app.Logger.Error("备份面板失败", zap.Error(err))
 	}
 

@@ -7,7 +7,7 @@ export default {
   path: '/task',
   component: Layout,
   meta: {
-    order: 9
+    order: 100
   },
   children: [
     {

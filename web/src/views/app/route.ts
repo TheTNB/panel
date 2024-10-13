@@ -7,7 +7,7 @@ export default {
   path: '/app',
   component: Layout,
   meta: {
-    order: 8
+    order: 90
   },
   children: [
     {
@@ -16,7 +16,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: 'appIndex.title',
-        icon: 'mdi:puzzle-outline',
+        icon: 'mdi:apps',
         role: ['admin'],
         requireAuth: true
       }

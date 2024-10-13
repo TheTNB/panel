@@ -11,16 +11,16 @@ const currentTab = ref('container')
   <common-page show-footer>
     <n-tabs v-model:value="currentTab" type="line" animated size="large">
       <n-tab-pane name="container" tab="容器">
-        <ContainerView />
+        <container-view />
       </n-tab-pane>
       <n-tab-pane name="image" tab="镜像">
-        <ImageView />
+        <image-view />
       </n-tab-pane>
       <n-tab-pane name="network" tab="网络">
-        <NetworkView />
+        <network-view />
       </n-tab-pane>
       <n-tab-pane name="volume" tab="卷">
-        <VolumeView />
+        <volume-view />
       </n-tab-pane>
     </n-tabs>
   </common-page>

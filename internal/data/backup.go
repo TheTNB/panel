@@ -34,37 +34,38 @@ func NewBackupRepo() biz.BackupRepo {
 }
 
 // List 备份列表
-func (r *backupRepo) List(typ string) ([]*types.BackupFile, error) {
-	backupPath, err := r.GetPath(typ)
+func (r *backupRepo) List(typ biz.BackupType) ([]*types.BackupFile, error) {
+	path, err := r.GetPath(typ)
 	if err != nil {
 		return nil, err
 	}
 
-	files, err := io.ReadDir(backupPath)
+	files, err := io.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var backupList []*types.BackupFile
+	list := make([]*types.BackupFile, 0)
 	for _, file := range files {
 		info, err := file.Info()
 		if err != nil {
 			continue
 		}
-		backupList = append(backupList, &types.BackupFile{
+		list = append(list, &types.BackupFile{
 			Name: file.Name(),
+			Path: filepath.Join(path, file.Name()),
 			Size: str.FormatBytes(float64(info.Size())),
 		})
 	}
 
-	return backupList, nil
+	return list, nil
 }
 
 // Create 创建备份
 // typ 备份类型
 // target 目标名称
 // path 可选备份保存路径
-func (r *backupRepo) Create(typ, target string, path ...string) error {
+func (r *backupRepo) Create(typ biz.BackupType, target string, path ...string) error {
 	defPath, err := r.GetPath(typ)
 	if err != nil {
 		return err
@@ -74,13 +75,13 @@ func (r *backupRepo) Create(typ, target string, path ...string) error {
 	}
 
 	switch typ {
-	case "website":
+	case biz.BackupTypeWebsite:
 		return r.createWebsite(defPath, target)
-	case "mysql":
+	case biz.BackupTypeMySQL:
 		return r.createMySQL(defPath, target)
-	case "postgres":
+	case biz.BackupTypePostgres:
 		return r.createPostgres(defPath, target)
-	case "panel":
+	case biz.BackupTypePanel:
 		return r.createPanel(defPath)
 
 	}
@@ -89,7 +90,7 @@ func (r *backupRepo) Create(typ, target string, path ...string) error {
 }
 
 // Delete 删除备份
-func (r *backupRepo) Delete(typ, name string) error {
+func (r *backupRepo) Delete(typ biz.BackupType, name string) error {
 	path, err := r.GetPath(typ)
 	if err != nil {
 		return err
@@ -103,7 +104,7 @@ func (r *backupRepo) Delete(typ, name string) error {
 // typ 备份类型
 // backup 备份压缩包，可以是绝对路径或者相对路径
 // target 目标名称
-func (r *backupRepo) Restore(typ, backup, target string) error {
+func (r *backupRepo) Restore(typ biz.BackupType, backup, target string) error {
 	if !io.Exists(backup) {
 		path, err := r.GetPath(typ)
 		if err != nil {
@@ -113,11 +114,11 @@ func (r *backupRepo) Restore(typ, backup, target string) error {
 	}
 
 	switch typ {
-	case "website":
+	case biz.BackupTypeWebsite:
 		return r.restoreWebsite(backup, target)
-	case "mysql":
+	case biz.BackupTypeMySQL:
 		return r.restoreMySQL(backup, target)
-	case "postgres":
+	case biz.BackupTypePostgres:
 		return r.restorePostgres(backup, target)
 	}
 
@@ -189,13 +190,16 @@ func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 }
 
 // GetPath 获取备份路径
-func (r *backupRepo) GetPath(typ string) (string, error) {
+func (r *backupRepo) GetPath(typ biz.BackupType) (string, error) {
 	backupPath, err := r.setting.Get(biz.SettingKeyBackupPath)
 	if err != nil {
 		return "", err
 	}
+	if !slices.Contains([]biz.BackupType{biz.BackupTypePath, biz.BackupTypeWebsite, biz.BackupTypeMySQL, biz.BackupTypePostgres, biz.BackupTypeRedis, biz.BackupTypePanel}, typ) {
+		return "", errors.New("未知备份类型")
+	}
 
-	backupPath = filepath.Join(backupPath, typ)
+	backupPath = filepath.Join(backupPath, string(typ))
 	if !io.Exists(backupPath) {
 		if err = io.Mkdir(backupPath, 0644); err != nil {
 			return "", err
@@ -216,11 +220,22 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 		return err
 	}
 
+	var paths []string
+	dirs, err := io.ReadDir(website.Path)
+	if err != nil {
+		return err
+	}
+	for _, item := range dirs {
+		paths = append(paths, filepath.Join(website.Path, item.Name()))
+	}
+
+	start := time.Now()
 	backup := filepath.Join(to, fmt.Sprintf("%s_%s.zip", website.Name, time.Now().Format("20060102150405")))
-	if _, err = shell.Execf(`cd '%s' && zip -r '%s' .`, website.Path, backup); err != nil {
+	if err = io.Compress(paths, backup, io.Zip); err != nil {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
 	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
 	return nil
 }
@@ -249,6 +264,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 	if err = os.Setenv("MYSQL_PWD", rootPassword); err != nil {
 		return err
 	}
+	start := time.Now()
 	backup := filepath.Join(to, fmt.Sprintf("%s_%s.sql", name, time.Now().Format("20060102150405")))
 	if _, err = shell.Execf(`mysqldump -u root '%s' > '%s'`, name, backup); err != nil {
 		return err
@@ -264,6 +280,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
 	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
 	return nil
 }
@@ -285,6 +302,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
+	start := time.Now()
 	backup := filepath.Join(to, fmt.Sprintf("%s_%s.sql", name, time.Now().Format("20060102150405")))
 	if _, err = shell.Execf(`su - postgres -c "pg_dump '%s'" > '%s'`, name, backup); err != nil {
 		return err
@@ -297,6 +315,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
 	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
 	return nil
 }
@@ -309,6 +328,7 @@ func (r *backupRepo) createPanel(to string) error {
 		return err
 	}
 
+	start := time.Now()
 	if err := io.Compress([]string{
 		filepath.Join(app.Root, "panel"),
 		"/usr/local/sbin/panel-cli",
@@ -317,6 +337,7 @@ func (r *backupRepo) createPanel(to string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
 	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
 	return nil
 }

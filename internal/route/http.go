@@ -62,16 +62,14 @@ func Http(r chi.Router) {
 			r.Post("/{id}/status", website.UpdateStatus)
 		})
 
-		// TODO
 		r.Route("/backup", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			backup := service.NewBackupService()
-			r.Get("/backup", backup.List)
-			r.Post("/create", backup.Create)
-			r.Post("/update", backup.Update)
-			r.Get("/{id}", backup.Get)
-			r.Delete("/{id}", backup.Delete)
-			r.Delete("/{id}/restore", backup.Restore)
+			r.Get("/{type}", backup.List)
+			r.Post("/{type}", backup.Create)
+			r.Post("/{type}/upload", backup.Upload)
+			r.Delete("/{type}/delete", backup.Delete)
+			r.Post("/{type}/restore", backup.Restore)
 		})
 
 		r.Route("/cert", func(r chi.Router) {

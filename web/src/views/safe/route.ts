@@ -7,7 +7,7 @@ export default {
   path: '/safe',
   component: Layout,
   meta: {
-    order: 4
+    order: 30
   },
   children: [
     {

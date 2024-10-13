@@ -7,7 +7,7 @@ export default {
   path: '/cert',
   component: Layout,
   meta: {
-    order: 2
+    order: 10
   },
   children: [
     {

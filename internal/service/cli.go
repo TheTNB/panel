@@ -421,7 +421,7 @@ func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error 
 	color.Greenln(s.hr)
 	color.Greenln("|-备份类型：网站")
 	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
-	if err := s.backupRepo.Create("website", cmd.String("name"), cmd.String("path")); err != nil {
+	if err := s.backupRepo.Create(biz.BackupTypeWebsite, cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	color.Greenln(s.hr)
@@ -437,7 +437,7 @@ func (s *CliService) BackupDatabase(ctx context.Context, cmd *cli.Command) error
 	color.Greenln("|-备份类型：数据库")
 	color.Greenln(fmt.Sprintf("|-数据库：%s", cmd.String("type")))
 	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
-	if err := s.backupRepo.Create(cmd.String("type"), cmd.String("name"), cmd.String("path")); err != nil {
+	if err := s.backupRepo.Create(biz.BackupType(cmd.String("type")), cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	color.Greenln(s.hr)
@@ -451,7 +451,7 @@ func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
 	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
 	color.Greenln(s.hr)
 	color.Greenln("|-备份类型：面板")
-	if err := s.backupRepo.Create("panel", "", cmd.String("path")); err != nil {
+	if err := s.backupRepo.Create(biz.BackupTypePanel, "", cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	color.Greenln(s.hr)
@@ -461,7 +461,7 @@ func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
-	path, err := s.backupRepo.GetPath(cmd.String("type"))
+	path, err := s.backupRepo.GetPath(biz.BackupType(cmd.String("type")))
 	if err != nil {
 		return err
 	}

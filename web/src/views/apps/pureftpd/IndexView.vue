@@ -300,8 +300,8 @@ onMounted(() => {
       </n-tab-pane>
     </n-tabs>
   </common-page>
-  <n-modal v-model:show="addUserModal" title="新建用户">
-    <n-card closable @close="() => (addUserModal = false)" title="新建用户" style="width: 60vw">
+  <n-modal v-model:show="addUserModal" title="创建用户">
+    <n-card closable @close="() => (addUserModal = false)" title="创建用户" style="width: 60vw">
       <n-form :model="addUserModel">
         <n-form-item path="username" label="用户名">
           <n-input

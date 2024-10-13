@@ -329,7 +329,7 @@ onMounted(() => {
               <n-radio-group v-model:value="addModel.backup_type">
                 <n-radio value="website">网站目录</n-radio>
                 <n-radio value="mysql" :disabled="!mySQLInstalled"> MySQL 数据库</n-radio>
-                <n-radio value="postgresql" :disabled="!postgreSQLInstalled">
+                <n-radio value="postgres" :disabled="!postgreSQLInstalled">
                   PostgreSQL 数据库
                 </n-radio>
               </n-radio-group>

@@ -14,11 +14,6 @@ type FileSave struct {
 	Content string `form:"content" json:"content"`
 }
 
-type FileUpload struct {
-	Path string `json:"path" form:"path"`
-	File []byte `json:"file" form:"file"`
-}
-
 type FileMove struct {
 	Source string `form:"source" json:"source"`
 	Target string `form:"target" json:"target"`
