@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 )
 
 // Remove 删除文件/目录
@@ -157,4 +159,30 @@ func IsDir(path string) bool {
 		return false
 	}
 	return info.IsDir()
+}
+
+// SizeX 获取路径大小（du命令）
+func SizeX(path string) (int64, error) {
+	out, err := exec.Command("du", "-sb", path).Output()
+	if err != nil {
+		return 0, err
+	}
+
+	parts := strings.Fields(string(out))
+	if len(parts) == 0 {
+		return 0, fmt.Errorf("无法解析 du 输出")
+	}
+
+	return strconv.ParseInt(parts[0], 10, 64)
+}
+
+// CountX 统计目录下文件数
+func CountX(path string) (int64, error) {
+	out, err := exec.Command("find", path, "-printf", ".").Output()
+	if err != nil {
+		return 0, err
+	}
+
+	count := len(string(out))
+	return int64(count), nil
 }

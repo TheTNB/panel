@@ -57,7 +57,7 @@ const getRealtime = async () => {
     netTotalRecv.value = netTotalRecvTemp
     netCurrentSent.value = (netTotalSent.value - netTotalSentOld) / 3
     netCurrentRecv.value = (netTotalRecv.value - netTotalRecvOld) / 3
-    // 计算磁盘读写
+    // 计算硬盘读写
     let diskTotalReadTemp = 0
     let diskTotalWriteTemp = 0
     let diskTotalReadOld = diskTotalRead.value

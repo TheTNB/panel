@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"time"
 
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
@@ -16,6 +17,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/str"
@@ -25,33 +27,54 @@ import (
 )
 
 type CliService struct {
-	api     *api.API
-	app     biz.AppRepo
-	user    biz.UserRepo
-	setting biz.SettingRepo
-	hash    hash.Hasher
+	hr          string
+	api         *api.API
+	appRepo     biz.AppRepo
+	userRepo    biz.UserRepo
+	settingRepo biz.SettingRepo
+	backupRepo  biz.BackupRepo
+	websiteRepo biz.WebsiteRepo
+	hash        hash.Hasher
 }
 
 func NewCliService() *CliService {
 	return &CliService{
-		api:     api.NewAPI(app.Version),
-		app:     data.NewAppRepo(),
-		user:    data.NewUserRepo(),
-		setting: data.NewSettingRepo(),
-		hash:    hash.NewArgon2id(),
+		hr:          `+----------------------------------------------------`,
+		api:         api.NewAPI(app.Version),
+		appRepo:     data.NewAppRepo(),
+		userRepo:    data.NewUserRepo(),
+		settingRepo: data.NewSettingRepo(),
+		backupRepo:  data.NewBackupRepo(),
+		websiteRepo: data.NewWebsiteRepo(),
+		hash:        hash.NewArgon2id(),
 	}
 }
 
 func (s *CliService) Restart(ctx context.Context, cmd *cli.Command) error {
-	return systemctl.Restart("panel")
+	if err := systemctl.Restart("panel"); err != nil {
+		return err
+	}
+
+	color.Greenln("面板服务已重启")
+	return nil
 }
 
 func (s *CliService) Stop(ctx context.Context, cmd *cli.Command) error {
-	return systemctl.Stop("panel")
+	if err := systemctl.Stop("panel"); err != nil {
+		return err
+	}
+
+	color.Greenln("面板服务已停止")
+	return nil
 }
 
 func (s *CliService) Start(ctx context.Context, cmd *cli.Command) error {
-	return systemctl.Start("panel")
+	if err := systemctl.Start("panel"); err != nil {
+		return err
+	}
+
+	color.Greenln("面板服务已启动")
+	return nil
 }
 
 func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
@@ -66,7 +89,7 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 	}
 	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
-	return s.setting.UpdatePanel(ver, url, checksum)
+	return s.settingRepo.UpdatePanel(ver, url, checksum)
 }
 
 func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
@@ -153,6 +176,7 @@ func (s *CliService) UserName(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("用户名修改失败：%v", err)
 	}
 
+	color.Greenln(fmt.Sprintf("用户 %s 修改为 %s 成功", oldUsername, newUsername))
 	return nil
 }
 
@@ -184,6 +208,7 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("密码修改失败：%v", err)
 	}
 
+	color.Greenln(fmt.Sprintf("用户 %s 密码修改成功", username))
 	return nil
 }
 
@@ -209,6 +234,7 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	color.Greenln("已开启HTTPS")
 	return s.Restart(ctx, cmd)
 }
 
@@ -234,6 +260,7 @@ func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	color.Greenln("已关闭HTTPS")
 	return s.Restart(ctx, cmd)
 }
 
@@ -259,6 +286,8 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	color.Greenln("已开启访问入口")
+	color.Greenln(fmt.Sprintf("访问入口：%s", config.HTTP.Entrance))
 	return s.Restart(ctx, cmd)
 }
 
@@ -284,6 +313,7 @@ func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	color.Greenln("已关闭访问入口")
 	return s.Restart(ctx, cmd)
 }
 
@@ -314,46 +344,191 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("已修改端口为 %d", port))
 	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	var ports []uint
+	for _, port := range cmd.IntSlice("ports") {
+		if port < 1 || port > 65535 {
+			return fmt.Errorf("端口范围错误")
+		}
+		ports = append(ports, uint(port))
+	}
+	req := &request.WebsiteCreate{
+		Name:    cmd.String("name"),
+		Domains: cmd.StringSlice("domains"),
+		Ports:   ports,
+		Path:    cmd.String("path"),
+		PHP:     int(cmd.Int("php")),
+		DB:      false,
+	}
+
+	website, err := s.websiteRepo.Create(req)
+	if err != nil {
+		return err
+	}
+
+	color.Greenln(fmt.Sprintf("网站 %s 创建成功", website.Name))
 	return nil
 }
 
 func (s *CliService) WebsiteRemove(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	website, err := s.websiteRepo.GetByName(cmd.String("name"))
+	if err != nil {
+		return err
+	}
+	req := &request.WebsiteDelete{
+		ID: website.ID,
+	}
+
+	if err = s.websiteRepo.Delete(req); err != nil {
+		return err
+	}
+
+	color.Greenln(fmt.Sprintf("网站 %s 移除成功", website.Name))
 	return nil
 }
 
 func (s *CliService) WebsiteDelete(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	website, err := s.websiteRepo.GetByName(cmd.String("name"))
+	if err != nil {
+		return err
+	}
+	req := &request.WebsiteDelete{
+		ID:   website.ID,
+		Path: true,
+		DB:   true,
+	}
+
+	if err = s.websiteRepo.Delete(req); err != nil {
+		return err
+	}
+
+	color.Greenln(fmt.Sprintf("网站 %s 删除成功", website.Name))
 	return nil
 }
 
 func (s *CliService) WebsiteWrite(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	println("not support")
 	return nil
 }
 
 func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln("|-备份类型：网站")
+	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	if err := s.backupRepo.Create("website", cmd.String("name"), cmd.String("path")); err != nil {
+		return fmt.Errorf("|-备份失败：%v", err)
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupDatabase(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln("|-备份类型：数据库")
+	color.Greenln(fmt.Sprintf("|-数据库：%s", cmd.String("type")))
+	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	if err := s.backupRepo.Create(cmd.String("type"), cmd.String("name"), cmd.String("path")); err != nil {
+		return fmt.Errorf("|-备份失败：%v", err)
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln("|-备份类型：面板")
+	if err := s.backupRepo.Create("panel", "", cmd.String("path")); err != nil {
+		return fmt.Errorf("|-备份失败：%v", err)
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	return nil
+}
+
+func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
+	path, err := s.backupRepo.GetPath(cmd.String("type"))
+	if err != nil {
+		return err
+	}
+	if cmd.String("path") != "" {
+		path = cmd.String("path")
+	}
+
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始清理 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
+	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
+	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	if err = s.backupRepo.CleanExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
+		return fmt.Errorf("|-清理失败：%v", err)
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
 	return nil
 }
 
 func (s *CliService) CutoffWebsite(ctx context.Context, cmd *cli.Command) error {
-	println("Hello, World!")
+	website, err := s.websiteRepo.GetByName(cmd.String("name"))
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(app.Root, "wwwlogs")
+	if cmd.String("path") != "" {
+		path = cmd.String("path")
+	}
+
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始切割日志 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln("|-切割类型：网站")
+	color.Greenln(fmt.Sprintf("|-切割目标：%s", website.Name))
+	if err = s.backupRepo.CutoffLog(path, filepath.Join(app.Root, "wwwlogs", website.Name+".log")); err != nil {
+		return err
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 切割成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	return nil
+}
+
+func (s *CliService) CutoffClear(ctx context.Context, cmd *cli.Command) error {
+	if cmd.String("type") != "website" {
+		return errors.New("当前仅支持网站日志切割")
+	}
+	path := filepath.Join(app.Root, "wwwlogs")
+	if cmd.String("path") != "" {
+		path = cmd.String("path")
+	}
+
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("★ 开始清理切割日志 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
+	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
+	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	if err := s.backupRepo.CleanExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
+		return err
+	}
+	color.Greenln(s.hr)
+	color.Greenln(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	color.Greenln(s.hr)
 	return nil
 }
 
@@ -364,7 +539,7 @@ func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("参数不能为空")
 	}
 
-	if err := s.app.Install(channel, slug); err != nil {
+	if err := s.appRepo.Install(channel, slug); err != nil {
 		return fmt.Errorf("应用安装失败：%v", err)
 	}
 
@@ -379,7 +554,7 @@ func (s *CliService) AppUnInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("参数不能为空")
 	}
 
-	if err := s.app.UnInstall(slug); err != nil {
+	if err := s.appRepo.UnInstall(slug); err != nil {
 		return fmt.Errorf("应用卸载失败：%v", err)
 	}
 
@@ -496,7 +671,14 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("已经初始化过了")
 	}
 
-	settings := []biz.Setting{{Key: biz.SettingKeyName, Value: "耗子面板"}, {Key: biz.SettingKeyMonitor, Value: "1"}, {Key: biz.SettingKeyMonitorDays, Value: "30"}, {Key: biz.SettingKeyBackupPath, Value: filepath.Join(app.Root, "backup")}, {Key: biz.SettingKeyWebsitePath, Value: filepath.Join(app.Root, "wwwroot")}, {Key: biz.SettingKeyVersion, Value: app.Version}}
+	settings := []biz.Setting{
+		{Key: biz.SettingKeyName, Value: "耗子面板"},
+		{Key: biz.SettingKeyMonitor, Value: "1"},
+		{Key: biz.SettingKeyMonitorDays, Value: "30"},
+		{Key: biz.SettingKeyBackupPath, Value: filepath.Join(app.Root, "backup")},
+		{Key: biz.SettingKeyWebsitePath, Value: filepath.Join(app.Root, "wwwroot")},
+		{Key: biz.SettingKeyVersion, Value: app.Version},
+	}
 	if err := app.Orm.Create(&settings).Error; err != nil {
 		return fmt.Errorf("初始化失败：%v", err)
 	}
@@ -534,5 +716,5 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	// 初始化应用中心缓存
-	return s.app.UpdateCache()
+	return s.appRepo.UpdateCache()
 }

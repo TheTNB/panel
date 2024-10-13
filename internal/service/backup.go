@@ -1,12 +1,20 @@
 package service
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/data"
+)
 
 type BackupService struct {
+	backupRepo biz.BackupRepo
 }
 
 func NewBackupService() *BackupService {
-	return &BackupService{}
+	return &BackupService{
+		backupRepo: data.NewBackupRepo(),
+	}
 }
 
 func (s *BackupService) List(w http.ResponseWriter, r *http.Request) {

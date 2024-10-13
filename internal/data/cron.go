@@ -60,26 +60,26 @@ func (r *cronRepo) Create(req *request.CronCreate) error {
 
 	var script string
 	if req.Type == "backup" {
-		if len(req.BackupPath) == 0 {
-			req.BackupPath, _ = r.settingRepo.Get(biz.SettingKeyBackupPath)
-			if len(req.BackupPath) == 0 {
-				return errors.New("备份路径不能为空")
-			}
-			req.BackupPath = filepath.Join(req.BackupPath, req.BackupType)
-		}
-		script = fmt.Sprintf(`#!/bin/bash
+		if req.BackupType == "website" {
+			script = fmt.Sprintf(`#!/bin/bash
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
-# 耗子面板 - 数据备份脚本
+# 耗子面板 - 网站备份脚本
 
-type=%s
-path=%s
-name=%s
-save=%d
+panel-cli backup website -n %s -p %s
+panel-cli backup clear -t website -f %s -s %d -p %s
+`, req.Target, req.BackupPath, req.Target, req.Save, req.BackupPath)
+		}
+		if req.BackupType == "mysql" || req.BackupType == "postgres" {
+			script = fmt.Sprintf(`#!/bin/bash
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
-# 执行备份
-panel backup ${type} ${name} ${path} ${save}
-`, req.BackupType, req.BackupPath, req.Target, req.Save)
+# 耗子面板 - 数据库备份脚本
+
+panel-cli backup database -t %s -n %s -p %s
+panel-cli backup clear -t %s -f %s -s %d -p %s
+`, req.BackupType, req.Target, req.BackupPath, req.BackupType, req.Target, req.Save, req.BackupPath)
+		}
 	}
 	if req.Type == "cutoff" {
 		script = fmt.Sprintf(`#!/bin/bash
@@ -87,12 +87,10 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # 耗子面板 - 日志切割脚本
 
-name=%s
-save=%d
-
 # 执行切割
-panel cutoff ${name} ${save}
-`, req.Target, req.Save)
+panel-cli cutoff website -n %s -p %s
+panel-cli cutoff clear -t website -f %s -s %d -p %s
+`, req.Target, req.BackupPath, req.Target, req.Save, req.BackupPath)
 	}
 
 	shellDir := fmt.Sprintf("%s/server/cron/", app.Root)

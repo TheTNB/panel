@@ -77,6 +77,23 @@ func (m *Postgres) DatabaseDrop(name string) error {
 	return err
 }
 
+func (m *Postgres) DatabaseExist(name string) (bool, error) {
+	var count int
+	if err := m.QueryRow("SELECT COUNT(*) FROM pg_database WHERE datname = $1", name).Scan(&count); err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (m *Postgres) DatabaseSize(name string) (int64, error) {
+	query := fmt.Sprintf("SELECT pg_database_size('%s')", name)
+	var size int64
+	if err := m.QueryRow(query).Scan(&size); err != nil {
+		return 0, err
+	}
+	return size, nil
+}
+
 func (m *Postgres) UserCreate(user, password string) error {
 	_, err := m.Exec(fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", user, password))
 	if err != nil {

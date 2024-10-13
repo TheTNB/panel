@@ -108,7 +108,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		{`Max_used_connections\s+\|\s+(\d+)\s+\|`, "峰值连接数"},
 		{`Key_read_requests\s+\|\s+(\d+)\s+\|`, "索引命中率"},
 		{`Innodb_buffer_pool_reads\s+\|\s+(\d+)\s+\|`, "Innodb索引命中率"},
-		{`Created_tmp_disk_tables\s+\|\s+(\d+)\s+\|`, "创建临时表到磁盘"},
+		{`Created_tmp_disk_tables\s+\|\s+(\d+)\s+\|`, "创建临时表到硬盘"},
 		{`Open_tables\s+\|\s+(\d+)\s+\|`, "已打开的表"},
 		{`Select_full_join\s+\|\s+(\d+)\s+\|`, "没有使用索引的量"},
 		{`Select_full_range_join\s+\|\s+(\d+)\s+\|`, "没有索引的JOIN量"},

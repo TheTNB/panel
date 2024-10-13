@@ -98,18 +98,62 @@ func Cli() []*cli.Command {
 			Commands: []*cli.Command{
 				{
 					Name:   "create",
-					Usage:  "创建新站点",
+					Usage:  "创建新网站",
 					Action: cliService.WebsiteCreate,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Usage:    "网站名称",
+							Aliases:  []string{"n"},
+							Required: true,
+						},
+						&cli.StringSliceFlag{
+							Name:     "domains",
+							Usage:    "与网站关联的域名列表",
+							Aliases:  []string{"d"},
+							Required: true,
+						},
+						&cli.UintSliceFlag{
+							Name:     "ports",
+							Usage:    "网站使用的端口列表",
+							Aliases:  []string{"p"},
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:  "path",
+							Usage: "网站托管的路径（不填则默认路径）",
+						},
+						&cli.IntFlag{
+							Name:  "php",
+							Usage: "网站使用的 PHP 版本（不填不使用）",
+						},
+					},
 				},
 				{
 					Name:   "remove",
-					Usage:  "移除站点",
+					Usage:  "移除网站",
 					Action: cliService.WebsiteRemove,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Usage:    "网站名称",
+							Aliases:  []string{"n"},
+							Required: true,
+						},
+					},
 				},
 				{
 					Name:   "delete",
-					Usage:  "删除站点（包括站点目录、同名数据库）",
+					Usage:  "删除网站（包括网站目录、同名数据库）",
 					Action: cliService.WebsiteDelete,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Usage:    "网站名称",
+							Aliases:  []string{"n"},
+							Required: true,
+						},
+					},
 				},
 				{
 					Name:   "write",
@@ -121,22 +165,91 @@ func Cli() []*cli.Command {
 		},
 		{
 			Name:  "backup",
-			Usage: "备份数据",
+			Usage: "数据备份",
 			Commands: []*cli.Command{
 				{
 					Name:   "website",
 					Usage:  "备份网站",
 					Action: cliService.BackupWebsite,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Aliases:  []string{"n"},
+							Usage:    "网站名称",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "保存目录（不填则默认路径）",
+						},
+					},
 				},
 				{
 					Name:   "database",
 					Usage:  "备份数据库",
 					Action: cliService.BackupDatabase,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "type",
+							Aliases:  []string{"t"},
+							Usage:    "数据库类型",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:     "name",
+							Aliases:  []string{"n"},
+							Usage:    "数据库名称",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "保存目录（不填则默认路径）",
+						},
+					},
 				},
 				{
 					Name:   "panel",
 					Usage:  "备份面板",
 					Action: cliService.BackupPanel,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "保存目录（不填则默认路径）",
+						},
+					},
+				},
+				{
+					Name:   "clear",
+					Usage:  "清理备份",
+					Action: cliService.BackupClear,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "type",
+							Aliases:  []string{"t"},
+							Usage:    "备份类型",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:     "file",
+							Aliases:  []string{"f"},
+							Usage:    "备份文件",
+							Required: true,
+						},
+						&cli.IntFlag{
+							Name:     "save",
+							Aliases:  []string{"s"},
+							Usage:    "保存份数",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "备份目录（不填则默认路径）",
+						},
+					},
 				},
 			},
 		},
@@ -148,6 +261,50 @@ func Cli() []*cli.Command {
 					Name:   "website",
 					Usage:  "网站",
 					Action: cliService.CutoffWebsite,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Aliases:  []string{"n"},
+							Usage:    "网站名称",
+							Required: true,
+						},
+
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "保存目录（不填则默认路径）",
+						},
+					},
+				},
+				{
+					Name:   "clear",
+					Usage:  "清理切割的日志",
+					Action: cliService.CutoffClear,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "type",
+							Aliases:  []string{"t"},
+							Usage:    "切割类型",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:     "file",
+							Aliases:  []string{"f"},
+							Usage:    "切割文件",
+							Required: true,
+						},
+						&cli.IntFlag{
+							Name:     "save",
+							Aliases:  []string{"s"},
+							Usage:    "保存份数",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:    "path",
+							Aliases: []string{"p"},
+							Usage:   "切割目录（不填则默认路径）",
+						},
+					},
 				},
 			},
 		},

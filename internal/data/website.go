@@ -66,6 +66,7 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	}
 
 	setting := new(types.WebsiteSetting)
+	setting.ID = website.ID
 	setting.Name = website.Name
 	setting.Path = website.Path
 	setting.SSL = website.SSL

@@ -129,11 +129,11 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 		var free string
 		free, err = shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", app.Root)
 		if err != nil {
-			service.Error(w, http.StatusInternalServerError, "获取磁盘空间失败")
+			service.Error(w, http.StatusInternalServerError, "获取硬盘空间失败")
 			return
 		}
 		if cast.ToInt64(free)*1024 < req.Size*1024*1024 {
-			service.Error(w, http.StatusInternalServerError, "磁盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
+			service.Error(w, http.StatusInternalServerError, "硬盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
 			return
 		}
 

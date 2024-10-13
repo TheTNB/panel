@@ -2,6 +2,7 @@ package types
 
 // WebsiteSetting 网站设置
 type WebsiteSetting struct {
+	ID                uint     `json:"id"`
 	Name              string   `json:"name"`
 	Domains           []string `json:"domains"`
 	Ports             []uint   `json:"ports"`

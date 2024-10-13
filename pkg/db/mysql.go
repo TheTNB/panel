@@ -72,6 +72,31 @@ func (m *MySQL) DatabaseDrop(name string) error {
 	return err
 }
 
+func (m *MySQL) DatabaseExists(name string) (bool, error) {
+	rows, err := m.Query("SHOW DATABASES")
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var database string
+		if err := rows.Scan(&database); err != nil {
+			continue
+		}
+		if database == name {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+func (m *MySQL) DatabaseSize(name string) (int64, error) {
+	var size int64
+	err := m.QueryRow(fmt.Sprintf("SELECT SUM(data_length + index_length) FROM information_schema.tables WHERE table_schema = '%s'", name)).Scan(&size)
+	return size, err
+}
+
 func (m *MySQL) UserCreate(user, password string) error {
 	_, err := m.Exec(fmt.Sprintf("CREATE USER IF NOT EXISTS '%s'@'localhost' IDENTIFIED BY '%s'", user, password))
 	m.flushPrivileges()

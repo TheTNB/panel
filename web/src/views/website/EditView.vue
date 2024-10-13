@@ -10,6 +10,7 @@ const route = useRoute()
 const { id } = route.params
 
 const setting = ref<WebsiteSetting>({
+  if: 0,
   name: '',
   ports: [],
   ssl_ports: [],

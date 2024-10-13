@@ -47,7 +47,7 @@
         "total": "累计上行 { sent } / 累计下行 { received }"
       },
       "disk": {
-        "title": "磁盘",
+        "title": "硬盘",
         "current": "实时读取 { read }/s / 实时写入 { write }/s",
         "total": "累计读取 { read } / 累计写入 { write }"
       }

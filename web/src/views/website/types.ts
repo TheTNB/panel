@@ -11,6 +11,7 @@ export interface Website {
 }
 
 export interface WebsiteSetting {
+  id: number
   name: string
   ports: number[]
   ssl_ports: number[]
@@ -35,9 +36,4 @@ export interface WebsiteSetting {
   rewrite: string
   raw: string
   log: string
-}
-
-export interface Backup {
-  name: string
-  size: string
 }
