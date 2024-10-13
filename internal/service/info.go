@@ -300,8 +300,8 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	types.Status = types.StatusNormal
-	tools.RestartPanel()
 	Success(w, nil)
+	tools.RestartPanel()
 }
 
 func (s *InfoService) Restart(w http.ResponseWriter, r *http.Request) {

@@ -13,6 +13,7 @@ const appStore = useAppStore()
 const realtime = ref<Realtime | null>(null)
 const systemInfo = ref<SystemInfo | null>(null)
 const homeApps = ref<HomeApp[] | null>(null)
+const homeAppsLoading = ref(false)
 const countInfo = ref<CountInfo>({
   website: 0,
   database: 0,
@@ -86,8 +87,10 @@ const getCountInfo = async () => {
 }
 
 const getHomeApps = async () => {
+  homeAppsLoading.value = true
   info.homeApps().then((res) => {
     homeApps.value = res.data
+    homeAppsLoading.value = false
   })
 }
 
@@ -532,7 +535,7 @@ onUnmounted(() => {
         <div min-w-375 flex-1>
           <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.apps.title')">
             <n-grid
-              v-if="homeApps"
+              v-if="!homeAppsLoading"
               x-gap="12"
               y-gap="12"
               cols="3 s:1 m:2 l:3"
@@ -568,7 +571,8 @@ onUnmounted(() => {
                 </n-card>
               </n-gi>
             </n-grid>
-            <n-skeleton v-else text :repeat="9" />
+            <n-text v-if="!homeAppsLoading && !homeApps"> 您还没有设置任何应用在此显示！ </n-text>
+            <n-skeleton v-if="homeAppsLoading" text :repeat="9" />
           </n-card>
         </div>
       </n-space>
