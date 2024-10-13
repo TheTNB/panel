@@ -27,7 +27,7 @@ type WebsiteDelete struct {
 type WebsiteUpdate struct {
 	ID                uint     `form:"id" json:"id" validate:"required"`
 	Domains           []string `form:"domains" json:"domains" validate:"required"`
-	Ports             []uint   `form:"ports" json:"ports" validate:"required"`
+	Listens           []string `form:"listens" json:"listens" validate:"required"`
 	SSLPorts          []uint   `form:"ssl_ports" json:"ssl_ports" validate:"required"`
 	QUICPorts         []uint   `form:"quic_ports" json:"quic_ports" validate:"required"`
 	OCSP              bool     `form:"ocsp" json:"ocsp"`
