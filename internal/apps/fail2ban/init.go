@@ -13,7 +13,7 @@ func init() {
 		Route: func(r chi.Router) {
 			service := NewService()
 			r.Get("/jails", service.List)
-			r.Post("/jails", service.Add)
+			r.Post("/jails", service.Create)
 			r.Delete("/jails", service.Delete)
 			r.Get("/jails/{name}", service.BanList)
 			r.Post("/unban", service.Unban)

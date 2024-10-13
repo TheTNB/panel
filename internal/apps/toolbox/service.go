@@ -89,7 +89,7 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	match := regexp.MustCompile(`Swap:\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
-	if len(match) > 0 {
+	if len(match) >= 4 {
 		used = str.FormatBytes(cast.ToFloat64(match[2]) * 1024)
 		free = str.FormatBytes(cast.ToFloat64(match[3]) * 1024)
 	}
@@ -119,7 +119,7 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
-		if _, err = shell.Execf(`sed -i "|^%s|d" /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
+		if _, err = shell.Execf(`sed -i "\|^%s|d" /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
 			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}

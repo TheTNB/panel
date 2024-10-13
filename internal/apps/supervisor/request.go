@@ -5,12 +5,12 @@ type UpdateConfig struct {
 }
 
 type UpdateProcessConfig struct {
-	Process string `form:"config" json:"process"`
+	Process string `form:"process" json:"process"`
 	Config  string `form:"config" json:"config"`
 }
 
 type ProcessName struct {
-	Process string `form:"config" json:"process"`
+	Process string `form:"process" json:"process"`
 }
 
 type CreateProcess struct {

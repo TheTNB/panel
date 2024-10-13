@@ -3,9 +3,9 @@ package fail2ban
 type Add struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
-	MaxRetry    string `json:"maxretry"`
-	FindTime    string `json:"findtime"`
-	BanTime     string `json:"bantime"`
+	MaxRetry    int    `json:"maxretry"`
+	FindTime    int    `json:"findtime"`
+	BanTime     int    `json:"bantime"`
 	WebsiteName string `json:"website_name"`
 	WebsiteMode string `json:"website_mode"`
 	WebsitePath string `json:"website_path"`

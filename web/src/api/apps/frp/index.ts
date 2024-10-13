@@ -4,9 +4,9 @@ import { request } from '@/utils'
 
 export default {
   // 获取配置
-  config: (service: string): Promise<AxiosResponse<any>> =>
-    request.get('/apps/frp/config', { params: { service } }),
+  config: (name: string): Promise<AxiosResponse<any>> =>
+    request.get('/apps/frp/config', { params: { name } }),
   // 保存配置
-  saveConfig: (service: string, config: string): Promise<AxiosResponse<any>> =>
-    request.post('/apps/frp/config', { service, config })
+  saveConfig: (name: string, config: string): Promise<AxiosResponse<any>> =>
+    request.post('/apps/frp/config', { name, config })
 }

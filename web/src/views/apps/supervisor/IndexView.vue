@@ -291,7 +291,7 @@ const handleReload = async () => {
 }
 
 const handleAddProcess = async () => {
-  await supervisor.addProcess(addProcessModel.value)
+  await supervisor.createProcess(addProcessModel.value)
   window.$message.success('添加成功')
   addProcessModal.value = false
   onPageChange(1)

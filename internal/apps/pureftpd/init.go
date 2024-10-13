@@ -14,8 +14,8 @@ func init() {
 			service := NewService()
 			r.Get("/users", service.List)
 			r.Post("/users", service.Create)
-			r.Delete("/users/{name}", service.Delete)
-			r.Post("/users/{name}/password", service.ChangePassword)
+			r.Delete("/users/{username}", service.Delete)
+			r.Post("/users/{username}/password", service.ChangePassword)
 			r.Get("/port", service.GetPort)
 			r.Post("/port", service.UpdatePort)
 		},

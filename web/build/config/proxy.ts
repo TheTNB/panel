@@ -8,6 +8,7 @@ export function createViteProxy(isUseProxy = true, proxyType: ProxyType) {
   const proxy: Record<string, string | ProxyOptions> = {
     [proxyConfig.prefix]: {
       target: proxyConfig.target,
+      secure: proxyConfig.secure,
       changeOrigin: true,
       rewrite: (path: string) => path.replace(new RegExp(`^${proxyConfig.prefix}`), '')
     }

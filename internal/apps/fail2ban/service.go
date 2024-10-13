@@ -28,7 +28,7 @@ func NewService() *Service {
 	}
 }
 
-// List 所有 Fail2ban 规则
+// List 所有规则
 func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
@@ -77,8 +77,8 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// Add 添加 Fail2ban 规则
-func (s *Service) Add(w http.ResponseWriter, r *http.Request) {
+// Create 添加规则
+func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Add](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -86,9 +86,9 @@ func (s *Service) Add(w http.ResponseWriter, r *http.Request) {
 	}
 	jailName := req.Name
 	jailType := req.Type
-	jailMaxRetry := req.MaxRetry
-	jailFindTime := req.FindTime
-	jailBanTime := req.BanTime
+	jailMaxRetry := cast.ToString(req.MaxRetry)
+	jailFindTime := cast.ToString(req.FindTime)
+	jailBanTime := cast.ToString(req.BanTime)
 	jailWebsiteName := req.WebsiteName
 	jailWebsiteMode := req.WebsiteMode
 	jailWebsitePath := req.WebsitePath
