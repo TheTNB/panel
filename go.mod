@@ -13,7 +13,7 @@ require (
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.22.1
-	github.com/go-rat/chix v1.1.3
+	github.com/go-rat/chix v1.1.4
 	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.11
 	github.com/go-rat/utils v1.0.3
@@ -72,6 +72,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-rat/securecookie v1.0.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.0.0 // indirect
+	github.com/gofiber/schema v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
