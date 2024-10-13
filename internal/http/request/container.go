@@ -3,17 +3,17 @@ package request
 import "github.com/TheTNB/panel/pkg/types"
 
 type ContainerID struct {
-	ID string `json:"id" form:"id"`
+	ID string `json:"id" form:"id" validate:"required"`
 }
 
 type ContainerRename struct {
-	ID   string `form:"id" json:"id"`
-	Name string `form:"name" json:"name"`
+	ID   string `form:"id" json:"id" validate:"required"`
+	Name string `form:"name" json:"name" validate:"required"`
 }
 
 type ContainerCreate struct {
-	Name            string                  `form:"name" json:"name"`
-	Image           string                  `form:"image" json:"image"`
+	Name            string                  `form:"name" json:"name" validate:"required"`
+	Image           string                  `form:"image" json:"image" validate:"required"`
 	Ports           []types.ContainerPort   `form:"ports" json:"ports"`
 	Network         string                  `form:"network" json:"network"`
 	Volumes         []types.ContainerVolume `form:"volumes" json:"volumes"`

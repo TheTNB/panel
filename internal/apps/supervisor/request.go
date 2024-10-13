@@ -1,22 +1,22 @@
 package supervisor
 
 type UpdateConfig struct {
-	Config string `form:"config" json:"config"`
+	Config string `form:"config" json:"config" validate:"required"`
 }
 
 type UpdateProcessConfig struct {
-	Process string `form:"process" json:"process"`
-	Config  string `form:"config" json:"config"`
+	Process string `form:"process" json:"process" validate:"required"`
+	Config  string `form:"config" json:"config" validate:"required"`
 }
 
 type ProcessName struct {
-	Process string `form:"process" json:"process"`
+	Process string `form:"process" json:"process" validate:"required"`
 }
 
 type CreateProcess struct {
-	Name    string `form:"name" json:"name"`
-	User    string `form:"user" json:"user"`
-	Path    string `form:"path" json:"path"`
-	Command string `form:"command" json:"command"`
-	Num     int    `form:"num" json:"num"`
+	Name    string `form:"name" json:"name" validate:"required"`
+	User    string `form:"user" json:"user" validate:"required"`
+	Path    string `form:"path" json:"path" validate:"required"`
+	Command string `form:"command" json:"command" validate:"required"`
+	Num     int    `form:"num" json:"num" validate:"required,gte=1"`
 }

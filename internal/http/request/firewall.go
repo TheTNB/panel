@@ -5,6 +5,6 @@ type FirewallStatus struct {
 }
 
 type FirewallCreateRule struct {
-	Port     uint   `json:"port"`
-	Protocol string `json:"protocol"`
+	Port     uint   `json:"port" validate:"required"`
+	Protocol string `json:"protocol" validate:"required"`
 }

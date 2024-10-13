@@ -3,14 +3,14 @@ package request
 import "github.com/TheTNB/panel/pkg/acme"
 
 type CertDNSCreate struct {
-	Type string        `form:"type" json:"type"`
-	Name string        `form:"name" json:"name"`
+	Type string        `form:"type" json:"type" validate:"required"`
+	Name string        `form:"name" json:"name" validate:"required"`
 	Data acme.DNSParam `form:"data" json:"data"`
 }
 
 type CertDNSUpdate struct {
-	ID   uint          `form:"id" json:"id"`
-	Type string        `form:"type" json:"type"`
-	Name string        `form:"name" json:"name"`
+	ID   uint          `form:"id" json:"id" validate:"required"`
+	Type string        `form:"type" json:"type" validate:"required"`
+	Name string        `form:"name" json:"name" validate:"required"`
 	Data acme.DNSParam `form:"data" json:"data"`
 }

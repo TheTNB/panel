@@ -1,7 +1,7 @@
 package request
 
 type SafeUpdateSSH struct {
-	Port   uint `json:"port" form:"port"`
+	Port   uint `json:"port" form:"port"  validate:"required,number,gte=1,lte=65535"`
 	Status bool `json:"status" form:"status"`
 }
 

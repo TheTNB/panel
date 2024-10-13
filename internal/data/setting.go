@@ -178,9 +178,9 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 
 func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	name := filepath.Base(url)
-	color.Greenln("目标版本: ", version)
-	color.Greenln("下载链接: ", url)
-	color.Greenln("文件名: ", name)
+	color.Greenln("目标版本：", version)
+	color.Greenln("下载链接：", url)
+	color.Greenln("文件名：", name)
 
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") {

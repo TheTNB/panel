@@ -12,10 +12,9 @@ import type { CronTask } from '@/views/cron/types'
 const addModel = ref({
   name: '',
   type: 'shell',
-  backup_type: 'website',
-  website: '',
-  database: '',
+  target: '',
   save: 1,
+  backup_type: 'website',
   backup_path: '',
   script: '# 在此输入你要执行的脚本内容',
   time: '* * * * *'
@@ -194,7 +193,7 @@ const getWebsiteList = async (page: number, limit: number) => {
       value: item.name
     })
   }
-  addModel.value.website = websites.value[0]?.value
+  addModel.value.target = websites.value[0]?.value
 }
 
 const getPhpAndDb = async () => {
@@ -273,6 +272,14 @@ const handleCronSelectUpdate = (value: string) => {
   addModel.value.time = value
 }
 
+watch(addModel, (value) => {
+  if (value.backup_type === 'website') {
+    addModel.value.target = websites.value[0]?.value
+  } else {
+    addModel.value.target = ''
+  }
+})
+
 onMounted(() => {
   getPhpAndDb()
   getWebsiteList(1, 10000)
@@ -342,7 +349,7 @@ onMounted(() => {
               label="选择网站"
             >
               <n-select
-                v-model:value="addModel.website"
+                v-model:value="addModel.target"
                 :options="websites"
                 placeholder="选择网站"
               />
@@ -351,7 +358,7 @@ onMounted(() => {
               v-if="addModel.backup_type !== 'website' && addModel.type === 'backup'"
               label="数据库名"
             >
-              <n-input v-model:value="addModel.database" placeholder="数据库名" />
+              <n-input v-model:value="addModel.target" placeholder="数据库名" />
             </n-form-item>
             <n-form-item v-if="addModel.type === 'backup'" label="保存目录">
               <n-input v-model:value="addModel.backup_path" placeholder="保存目录" />
