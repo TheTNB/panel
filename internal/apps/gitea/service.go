@@ -17,12 +17,7 @@ func NewService() *Service {
 }
 
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
-	config, err := io.Read(fmt.Sprintf("%s/server/gitea/app.ini", app.Root))
-	if err != nil {
-		service.Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
+	config, _ := io.Read(fmt.Sprintf("%s/server/gitea/app.ini", app.Root))
 	service.Success(w, config)
 }
 

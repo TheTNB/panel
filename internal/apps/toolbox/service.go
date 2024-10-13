@@ -52,11 +52,6 @@ func (s *Service) UpdateDNS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(req.DNS1) == 0 || len(req.DNS2) == 0 {
-		service.Error(w, http.StatusUnprocessableEntity, "DNS 信息不能为空")
-		return
-	}
-
 	var dns string
 	dns += "nameserver " + req.DNS1 + "\n"
 	dns += "nameserver " + req.DNS2 + "\n"
@@ -76,7 +71,7 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 	if io.Exists(filepath.Join(app.Root, "swap")) {
 		file, err := io.FileInfo(filepath.Join(app.Root, "swap"))
 		if err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
+			service.Error(w, http.StatusInternalServerError, "获取 SWAP 信息失败")
 			return
 		}
 
@@ -89,7 +84,7 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 
 	raw, err := shell.Execf("free | grep Swap")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "获取 SWAP 信息失败")
+		service.Error(w, http.StatusInternalServerError, "获取 SWAP 信息失败")
 		return
 	}
 
@@ -117,15 +112,15 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 
 	if io.Exists(filepath.Join(app.Root, "swap")) {
 		if _, err = shell.Execf("swapoff '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 		if _, err = shell.Execf("rm -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
-		if _, err = shell.Execf(`sed -i '%s/d' /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+		if _, err = shell.Execf(`sed -i "|^%s|d" /etc/fstab`, filepath.Join(app.Root, "swap")); err != nil {
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
@@ -134,40 +129,40 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 		var free string
 		free, err = shell.Execf("df -k %s | awk '{print $4}' | tail -n 1", app.Root)
 		if err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "获取磁盘空间失败")
+			service.Error(w, http.StatusInternalServerError, "获取磁盘空间失败")
 			return
 		}
 		if cast.ToInt64(free)*1024 < req.Size*1024*1024 {
-			service.Error(w, http.StatusUnprocessableEntity, "磁盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
+			service.Error(w, http.StatusInternalServerError, "磁盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
 			return
 		}
 
 		btrfsCheck, _ := shell.Execf("df -T %s | awk '{print $2}' | tail -n 1", app.Root)
 		if strings.Contains(btrfsCheck, "btrfs") {
 			if _, err = shell.Execf("btrfs filesystem mkswapfile --size %dM --uuid clear %s", req.Size, filepath.Join(app.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+				service.Error(w, http.StatusInternalServerError, "%v", err)
 				return
 			}
 		} else {
 			if _, err = shell.Execf("dd if=/dev/zero of=%s bs=1M count=%d", filepath.Join(app.Root, "swap"), req.Size); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+				service.Error(w, http.StatusInternalServerError, "%v", err)
 				return
 			}
 			if _, err = shell.Execf("mkswap -f '%s'", filepath.Join(app.Root, "swap")); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+				service.Error(w, http.StatusInternalServerError, "%v", err)
 				return
 			}
 			if err = io.Chmod(filepath.Join(app.Root, "swap"), 0600); err != nil {
-				service.Error(w, http.StatusUnprocessableEntity, "设置 SWAP 权限失败")
+				service.Error(w, http.StatusInternalServerError, "设置 SWAP 权限失败")
 				return
 			}
 		}
 		if _, err = shell.Execf("swapon '%s'", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 		if _, err = shell.Execf("echo '%s    swap    swap    defaults    0 0' >> /etc/fstab", filepath.Join(app.Root, "swap")); err != nil {
-			service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}
 	}
@@ -179,19 +174,19 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 func (s *Service) GetTimezone(w http.ResponseWriter, r *http.Request) {
 	raw, err := shell.Execf("timedatectl | grep zone")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "获取时区信息失败")
+		service.Error(w, http.StatusInternalServerError, "获取时区信息失败")
 		return
 	}
 
 	match := regexp.MustCompile(`zone:\s+(\S+)`).FindStringSubmatch(raw)
 	if len(match) == 0 {
-		service.Error(w, http.StatusUnprocessableEntity, "找不到时区信息")
+		service.Error(w, http.StatusInternalServerError, "找不到时区信息")
 		return
 	}
 
 	zonesRaw, err := shell.Execf("timedatectl list-timezones")
 	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "获取时区列表失败")
+		service.Error(w, http.StatusInternalServerError, "获取时区列表失败")
 		return
 	}
 	zones := strings.Split(zonesRaw, "\n")
@@ -219,7 +214,7 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err = shell.Execf("timedatectl set-timezone '%s'", req.Timezone); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
@@ -228,12 +223,7 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 
 // GetHosts 获取 hosts 信息
 func (s *Service) GetHosts(w http.ResponseWriter, r *http.Request) {
-	hosts, err := io.Read("/etc/hosts")
-	if err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
+	hosts, _ := io.Read("/etc/hosts")
 	service.Success(w, hosts)
 }
 
@@ -246,7 +236,7 @@ func (s *Service) UpdateHosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = io.Write("/etc/hosts", req.Hosts, 0644); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "写入 hosts 信息失败")
+		service.Error(w, http.StatusInternalServerError, "写入 hosts 信息失败")
 		return
 	}
 
@@ -268,7 +258,7 @@ func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 
 	req.Password = strings.ReplaceAll(req.Password, `'`, `\'`)
 	if _, err = shell.Execf(`yes '%s' | passwd root`, req.Password); err != nil {
-		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
