@@ -61,6 +61,9 @@ func (r *backupRepo) List(typ string) ([]*types.BackupFile, error) {
 }
 
 // Create 创建备份
+// typ 备份类型
+// target 目标名称
+// path 可选备份保存路径
 func (r *backupRepo) Create(typ, target string, path ...string) error {
 	defPath, err := r.GetPath(typ)
 	if err != nil {
@@ -96,6 +99,31 @@ func (r *backupRepo) Delete(typ, name string) error {
 	return io.Remove(file)
 }
 
+// Restore 恢复备份
+// typ 备份类型
+// backup 备份压缩包，可以是绝对路径或者相对路径
+// target 目标名称
+func (r *backupRepo) Restore(typ, backup, target string) error {
+	if !io.Exists(backup) {
+		path, err := r.GetPath(typ)
+		if err != nil {
+			return err
+		}
+		backup = filepath.Join(path, backup)
+	}
+
+	switch typ {
+	case "website":
+		return r.restoreWebsite(backup, target)
+	case "mysql":
+		return r.restoreMySQL(backup, target)
+	case "postgres":
+		return r.restorePostgres(backup, target)
+	}
+
+	return errors.New("未知备份类型")
+}
+
 // CutoffLog 切割日志
 // path 保存目录绝对路径
 // target 待切割日志文件绝对路径
@@ -112,11 +140,11 @@ func (r *backupRepo) CutoffLog(path, target string) error {
 	return io.Remove(target)
 }
 
-// CleanExpired 清理过期备份
+// ClearExpired 清理过期备份
 // path 备份目录绝对路径
 // prefix 目标文件前缀
 // save 保存份数
-func (r *backupRepo) CleanExpired(path, prefix string, save int) error {
+func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 	files, err := io.ReadDir(path)
 	if err != nil {
 		return err
@@ -151,8 +179,9 @@ func (r *backupRepo) CleanExpired(path, prefix string, save int) error {
 	toDelete := filtered[save:]
 	for _, file := range toDelete {
 		filePath := filepath.Join(path, file.Name())
+		color.Greenln(fmt.Sprintf("|-清理过期文件：%s", filePath))
 		if err = os.Remove(filePath); err != nil {
-			return err
+			color.Redln(fmt.Sprintf("|-清理失败：%v", err))
 		}
 	}
 
@@ -192,6 +221,7 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
 	return nil
 }
 
@@ -234,6 +264,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
 	return nil
 }
 
@@ -266,6 +297,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
 	return nil
 }
 
@@ -277,20 +309,25 @@ func (r *backupRepo) createPanel(to string) error {
 		return err
 	}
 
-	return io.Compress([]string{
+	if err := io.Compress([]string{
 		filepath.Join(app.Root, "panel"),
 		"/usr/local/sbin/panel-cli",
 		"/usr/local/etc/panel/config.yml",
-	}, backup, io.Zip)
+	}, backup, io.Zip); err != nil {
+		return err
+	}
+
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
+	return nil
 }
 
 // restoreWebsite 恢复网站备份
-func (r *backupRepo) restoreWebsite(backup, name string) error {
+func (r *backupRepo) restoreWebsite(backup, target string) error {
 	if !io.Exists(backup) {
 		return errors.New("备份文件不存在")
 	}
 
-	website, err := r.website.GetByName(name)
+	website, err := r.website.GetByName(target)
 	if err != nil {
 		return err
 	}
@@ -316,7 +353,7 @@ func (r *backupRepo) restoreWebsite(backup, name string) error {
 }
 
 // restoreMySQL 恢复 MySQL 备份
-func (r *backupRepo) restoreMySQL(backup, name string) error {
+func (r *backupRepo) restoreMySQL(backup, target string) error {
 	if !io.Exists(backup) {
 		return errors.New("备份文件不存在")
 	}
@@ -329,8 +366,8 @@ func (r *backupRepo) restoreMySQL(backup, name string) error {
 	if err != nil {
 		return err
 	}
-	if exist, _ := mysql.DatabaseExists(name); !exist {
-		return fmt.Errorf("数据库不存在：%s", name)
+	if exist, _ := mysql.DatabaseExists(target); !exist {
+		return fmt.Errorf("数据库不存在：%s", target)
 	}
 	if err = os.Setenv("MYSQL_PWD", rootPassword); err != nil {
 		return err
@@ -341,18 +378,21 @@ func (r *backupRepo) restoreMySQL(backup, name string) error {
 		if err != nil {
 			return err
 		}
-		defer io.Remove(filepath.Dir(backup))
 	}
 
-	if _, err = shell.Execf(`mysql -u root '%s' < '%s'`, name, backup); err != nil {
+	if _, err = shell.Execf(`mysql -u root '%s' < '%s'`, target, backup); err != nil {
+		return err
+	}
+	if err = os.Unsetenv("MYSQL_PWD"); err != nil {
 		return err
 	}
 
-	return os.Unsetenv("MYSQL_PWD")
+	_ = io.Remove(filepath.Dir(backup))
+	return nil
 }
 
 // restorePostgres 恢复 PostgreSQL 备份
-func (r *backupRepo) restorePostgres(backup, name string) error {
+func (r *backupRepo) restorePostgres(backup, target string) error {
 	if !io.Exists(backup) {
 		return errors.New("备份文件不存在")
 	}
@@ -361,8 +401,8 @@ func (r *backupRepo) restorePostgres(backup, name string) error {
 	if err != nil {
 		return err
 	}
-	if exist, _ := postgres.DatabaseExist(name); !exist {
-		return fmt.Errorf("数据库不存在：%s", name)
+	if exist, _ := postgres.DatabaseExist(target); !exist {
+		return fmt.Errorf("数据库不存在：%s", target)
 	}
 
 	if !strings.HasSuffix(backup, ".sql") {
@@ -370,13 +410,13 @@ func (r *backupRepo) restorePostgres(backup, name string) error {
 		if err != nil {
 			return err
 		}
-		defer io.Remove(filepath.Dir(backup))
 	}
 
-	if _, err = shell.Execf(`su - postgres -c "psql '%s'" < '%s'`, name, backup); err != nil {
+	if _, err = shell.Execf(`su - postgres -c "psql '%s'" < '%s'`, target, backup); err != nil {
 		return err
 	}
 
+	_ = io.Remove(filepath.Dir(backup))
 	return nil
 }
 

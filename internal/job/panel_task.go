@@ -42,7 +42,7 @@ func (receiver *PanelTask) Run() {
 	// 清理备份
 	path, err := receiver.backupRepo.GetPath("panel")
 	if err == nil {
-		if err = receiver.backupRepo.CleanExpired(path, "panel_", 10); err != nil {
+		if err = receiver.backupRepo.ClearExpired(path, "panel_", 10); err != nil {
 			app.Logger.Error("清理面板备份失败", zap.Error(err))
 		}
 	}

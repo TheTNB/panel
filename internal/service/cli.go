@@ -475,7 +475,7 @@ func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
 	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
 	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
 	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
-	if err = s.backupRepo.CleanExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
+	if err = s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return fmt.Errorf("|-清理失败：%v", err)
 	}
 	color.Greenln(s.hr)
@@ -523,7 +523,7 @@ func (s *CliService) CutoffClear(ctx context.Context, cmd *cli.Command) error {
 	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
 	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
 	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
-	if err := s.backupRepo.CleanExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
+	if err := s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return err
 	}
 	color.Greenln(s.hr)
