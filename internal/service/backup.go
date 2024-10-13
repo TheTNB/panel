@@ -62,6 +62,10 @@ func (s *BackupService) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, handler, err := r.FormFile("file")
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "上传文件失败：%v", err)
+		return
+	}
 	path, err := s.backupRepo.GetPath(biz.BackupType(r.FormValue("type")))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)

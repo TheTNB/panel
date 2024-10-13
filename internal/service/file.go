@@ -128,7 +128,7 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	path := r.FormValue("path")
 	_, handler, err := r.FormFile("file")
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
+		Error(w, http.StatusInternalServerError, "上传文件失败：%v", err)
 		return
 	}
 	if io.Exists(path) {
