@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/gookit/color"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -61,9 +60,7 @@ func GetMonitoringInfo() MonitoringInfo {
 }
 
 func RestartPanel() {
-	color.Greenln("重启面板...")
 	_ = shell.ExecfAsync("sleep 1 && systemctl restart panel")
-	color.Greenln("重启完成")
 }
 
 // IsChina 是否中国大陆

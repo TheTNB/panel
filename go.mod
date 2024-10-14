@@ -35,6 +35,7 @@ require (
 	github.com/mholt/acmez/v2 v2.0.3
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/samber/lo v1.47.0
 	github.com/sethvargo/go-limiter v1.0.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
 	github.com/spf13/cast v1.7.0
@@ -103,7 +104,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/samber/lo v1.47.0 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.597 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect

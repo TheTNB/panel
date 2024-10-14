@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 
@@ -43,6 +44,6 @@ func initCli() {
 		Commands: route.Cli(),
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		color.Redln(err.Error())
+		color.Redln(fmt.Sprintf("|-%v", err))
 	}
 }
