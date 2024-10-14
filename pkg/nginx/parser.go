@@ -39,7 +39,7 @@ func (p *Parser) Config() *config.Config {
 }
 
 // Find 通过表达式查找配置
-// eg: Find("server.listen")
+// e.g. Find("server.listen")
 func (p *Parser) Find(key string) ([]config.IDirective, error) {
 	parts := strings.Split(key, ".")
 	var block *config.Block
@@ -71,7 +71,7 @@ func (p *Parser) Find(key string) ([]config.IDirective, error) {
 }
 
 // FindOne 通过表达式查找一个配置
-// eg: FindOne("server.server_name")
+// e.g. FindOne("server.server_name")
 func (p *Parser) FindOne(key string) (config.IDirective, error) {
 	directives, err := p.Find(key)
 	if err != nil {
@@ -85,7 +85,7 @@ func (p *Parser) FindOne(key string) (config.IDirective, error) {
 }
 
 // Clear 通过表达式移除配置
-// eg: Clear("server.server_name")
+// e.g. Clear("server.server_name")
 func (p *Parser) Clear(key string) error {
 	parts := strings.Split(key, ".")
 	last := parts[len(parts)-1]
@@ -120,7 +120,7 @@ func (p *Parser) Clear(key string) error {
 }
 
 // Set 通过表达式设置配置
-// eg: Set("server.server_name", []directive)
+// e.g. Set("server.server_name", []directive)
 func (p *Parser) Set(key string, directives []*config.Directive) error {
 	parts := strings.Split(key, ".")
 

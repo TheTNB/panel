@@ -177,10 +177,18 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 }
 
 func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
+	// 预先优化数据库
+	if err := app.Orm.Exec("VACUUM").Error; err != nil {
+		return err
+	}
+	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
+		return err
+	}
+
 	name := filepath.Base(url)
-	color.Greenln("目标版本：", version)
-	color.Greenln("下载链接：", url)
-	color.Greenln("文件名：", name)
+	color.Greenln(fmt.Sprintf("目标版本：%s", version))
+	color.Greenln(fmt.Sprintf("下载链接：%s", url))
+	color.Greenln(fmt.Sprintf("文件名：%s", name))
 
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") {

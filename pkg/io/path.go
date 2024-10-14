@@ -2,6 +2,7 @@ package io
 
 import (
 	"fmt"
+	"github.com/TheTNB/panel/pkg/shell"
 	"io"
 	"os"
 	"os/exec"
@@ -49,17 +50,14 @@ func Empty(path string) bool {
 }
 
 func Mv(src, dst string) error {
-	err := os.Rename(src, dst)
-	if err != nil {
-		// 如果在不同的文件系统中移动文件，os.Rename 可能会失败
-		err = Cp(src, dst)
-		if err != nil {
+	if err := os.Rename(src, dst); err != nil {
+		// 在不同的文件系统中无法使用os.Rename
+		if _, err = shell.Execf(`mv -f '%s' '%s'`, src, dst); err != nil {
 			return err
 		}
-		err = os.RemoveAll(src)
 	}
 
-	return err
+	return nil
 }
 
 // Cp 复制文件或目录
@@ -145,6 +143,11 @@ func Size(path string) (int64, error) {
 // TempDir 创建临时目录
 func TempDir(prefix string) (string, error) {
 	return os.MkdirTemp("", prefix)
+}
+
+// TempFile 创建临时文件
+func TempFile(dir, prefix string) (*os.File, error) {
+	return os.CreateTemp(dir, prefix)
 }
 
 // ReadDir 读取目录

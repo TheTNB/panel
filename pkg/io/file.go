@@ -191,11 +191,6 @@ func FormatArchiveByPath(path string) (FormatArchive, error) {
 	}
 }
 
-// TempFile 创建临时文件
-func TempFile(prefix string) (*os.File, error) {
-	return os.CreateTemp("", prefix)
-}
-
 // IsSymlink 判读是否为软链接
 func IsSymlink(mode os.FileMode) bool {
 	return mode&os.ModeSymlink != 0

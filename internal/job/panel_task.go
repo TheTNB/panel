@@ -33,6 +33,10 @@ func (receiver *PanelTask) Run() {
 		types.Status = types.StatusFailed
 		app.Logger.Error("优化面板数据库失败", zap.Error(err))
 	}
+	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
+		types.Status = types.StatusFailed
+		app.Logger.Error("优化面板数据库失败", zap.Error(err))
+	}
 
 	// 备份面板
 	if err := receiver.backupRepo.Create(biz.BackupTypePanel, ""); err != nil {
