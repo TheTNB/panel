@@ -55,6 +55,7 @@ func (r *backupRepo) List(typ biz.BackupType) ([]*types.BackupFile, error) {
 			Name: file.Name(),
 			Path: filepath.Join(path, file.Name()),
 			Size: str.FormatBytes(float64(info.Size())),
+			Time: info.ModTime(),
 		})
 	}
 
@@ -334,6 +335,9 @@ func (r *backupRepo) createPanel(to string) error {
 		"/usr/local/sbin/panel-cli",
 		"/usr/local/etc/panel/config.yml",
 	}, backup, io.Zip); err != nil {
+		return err
+	}
+	if err := io.Chmod(backup, 0600); err != nil {
 		return err
 	}
 

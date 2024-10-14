@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"time"
+	"slices"
 
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
@@ -202,7 +202,6 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists(filepath.Join("/tmp", name)) || !io.Exists(filepath.Join("/tmp", name+".sha256")) {
 		return errors.New("下载文件检查失败")
 	}
-	color.Greenln("下载完成")
 
 	color.Greenln("校验下载文件...")
 	if check, err := shell.Execf("cd /tmp && sha256sum -c %s --ignore-missing", name+".sha256"); check != name+": OK" || err != nil {
@@ -212,16 +211,16 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		color.Redln("清理校验文件失败：", err)
 		return err
 	}
-	color.Greenln("文件校验完成")
 
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") {
-		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请排除后重试")
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败所致，请运行 panel-cli fix 修复后重试")
 	}
 
 	color.Greenln("备份面板数据...")
 	// 备份面板
-	if err := io.Compress([]string{filepath.Join(app.Root, "panel")}, filepath.Join(app.Root, fmt.Sprintf("backup/panel/panel-%s.zip", time.Now().Format("20060102150405"))), io.Zip); err != nil {
+	backup := NewBackupRepo()
+	if err := backup.Create(biz.BackupTypePanel, ""); err != nil {
 		color.Redln("备份面板失败：", err)
 		return err
 	}
@@ -232,14 +231,12 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists("/tmp/panel-storage.zip") {
 		return errors.New("已备份面板数据检查失败")
 	}
-	color.Greenln("备份完成")
 
 	color.Greenln("清理旧版本...")
 	if _, err := shell.Execf("rm -rf %s/panel/*", app.Root); err != nil {
 		color.Redln("清理旧版本失败：", err)
 		return err
 	}
-	color.Greenln("清理完成")
 
 	color.Greenln("解压新版本...")
 	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel"), io.Zip); err != nil {
@@ -249,7 +246,6 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
 		return errors.New("解压失败，缺失文件")
 	}
-	color.Greenln("解压完成")
 
 	color.Greenln("恢复面板数据...")
 	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
@@ -259,7 +255,6 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
 		return errors.New("恢复面板数据失败")
 	}
-	color.Greenln("恢复完成")
 
 	color.Greenln("运行升级后脚本...")
 	if _, err := shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
@@ -279,17 +274,117 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		return err
 	}
 
-	color.Greenln("设置面板文件权限...")
+	color.Greenln("设置关键文件权限...")
 	_ = io.Chmod("/usr/local/sbin/panel-cli", 0700)
 	_ = io.Chmod("/etc/systemd/system/panel.service", 0700)
 	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
-	color.Greenln("设置完成")
 
 	color.Greenln("升级完成")
 
 	_, _ = shell.Execf("systemctl daemon-reload")
 	_ = io.Remove("/tmp/panel-storage.zip")
 	_ = io.Remove(filepath.Join(app.Root, "panel/config.example.yml"))
+	tools.RestartPanel()
+
+	return nil
+}
+
+func (r *settingRepo) FixPanel() error {
+	color.Greenln("开始修复面板...")
+	// 检查关键文件是否正常
+	flag := false
+	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
+		flag = true
+	}
+	if !io.Exists(filepath.Join(app.Root, "panel", "storage", "app.db")) {
+		flag = true
+	}
+	if io.Exists("/tmp/panel-storage.zip") {
+		flag = true
+	}
+	if !flag {
+		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 升级版本")
+	}
+
+	// 从备份目录中找最新的备份文件
+	backup := NewBackupRepo()
+	list, err := backup.List(biz.BackupTypePanel)
+	if err != nil {
+		return err
+	}
+	slices.SortFunc(list, func(a *types.BackupFile, b *types.BackupFile) int {
+		return int(b.Time.Unix() - a.Time.Unix())
+	})
+	if len(list) == 0 {
+		return fmt.Errorf("未找到备份文件，无法自动修复")
+	}
+	latest := list[0]
+	color.Greenln(fmt.Sprintf("使用备份文件：%s", latest.Name))
+
+	// 解压备份文件
+	color.Greenln("解压备份文件...")
+	if err = io.Remove("/tmp/panel-fix"); err != nil {
+		return fmt.Errorf("清理临时目录失败：%w", err)
+	}
+	if err = io.UnCompress(latest.Path, "/tmp/panel-fix", io.Zip); err != nil {
+		return fmt.Errorf("解压备份文件失败：%w", err)
+	}
+
+	// 移动文件到对应位置
+	color.Greenln("移动备份文件...")
+	if io.Exists(filepath.Join("/tmp/panel-fix", "panel")) && io.IsDir(filepath.Join("/tmp/panel-fix", "panel")) {
+		if err = io.Remove(filepath.Join(app.Root, "panel")); err != nil {
+			return fmt.Errorf("删除目录失败：%w", err)
+		}
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "panel"), filepath.Join(app.Root)); err != nil {
+			return fmt.Errorf("移动目录失败：%w", err)
+		}
+	}
+	if io.Exists(filepath.Join("/tmp/panel-fix", "config.yml")) {
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "config.yml"), "/usr/local/etc/panel/config.yml"); err != nil {
+			return fmt.Errorf("移动文件失败：%w", err)
+		}
+	}
+	if io.Exists(filepath.Join("/tmp/panel-fix", "panel-cli")) {
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "panel-cli"), "/usr/local/sbin/panel-cli"); err != nil {
+			return fmt.Errorf("移动文件失败：%w", err)
+		}
+	}
+
+	// tmp目录下如果有storage备份，则解压回去
+	color.Greenln("恢复面板数据...")
+	if io.Exists("/tmp/panel-storage.zip") {
+		if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+			return fmt.Errorf("恢复面板数据失败：%w", err)
+		}
+		if err = io.Remove("/tmp/panel-storage.zip"); err != nil {
+			return fmt.Errorf("清理临时文件失败：%w", err)
+		}
+	}
+
+	// 下载服务文件
+	if !io.Exists("/etc/systemd/system/panel.service") {
+		if _, err = shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
+			return err
+		}
+	}
+
+	// 处理权限
+	color.Greenln("设置关键文件权限...")
+	if err = io.Chmod("/usr/local/etc/panel/config.yml", 0600); err != nil {
+		return err
+	}
+	if err = io.Chmod("/etc/systemd/system/panel.service", 0700); err != nil {
+		return err
+	}
+	if err = io.Chmod("/usr/local/sbin/panel-cli", 0700); err != nil {
+		return err
+	}
+	if err = io.Chmod(filepath.Join(app.Root, "panel"), 0700); err != nil {
+		return err
+	}
+
+	color.Greenln("修复完成")
 	tools.RestartPanel()
 
 	return nil

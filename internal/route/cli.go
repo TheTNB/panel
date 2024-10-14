@@ -30,6 +30,11 @@ func Cli() []*cli.Command {
 			Action: cliService.Update,
 		},
 		{
+			Name:   "fix",
+			Usage:  "修复面板",
+			Action: cliService.Fix,
+		},
+		{
 			Name:   "info",
 			Usage:  "输出面板基本信息",
 			Action: cliService.Info,

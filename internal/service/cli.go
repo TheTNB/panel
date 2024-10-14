@@ -92,6 +92,10 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 	return s.settingRepo.UpdatePanel(ver, url, checksum)
 }
 
+func (s *CliService) Fix(ctx context.Context, cmd *cli.Command) error {
+	return s.settingRepo.FixPanel()
+}
+
 func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	user := new(biz.User)
 	if err := app.Orm.Where("id", 1).First(user).Error; err != nil {
