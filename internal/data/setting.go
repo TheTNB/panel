@@ -294,7 +294,21 @@ func (r *settingRepo) FixPanel() error {
 		flag = true
 	}
 	if !flag {
-		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 升级版本")
+		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 升级面板")
+	}
+
+	// 再次确认是否需要修复
+	if io.Exists("/tmp/panel-storage.zip") {
+		// 文件齐全情况下只移除临时文件
+		if io.Exists(filepath.Join(app.Root, "panel", "web")) &&
+			io.Exists(filepath.Join(app.Root, "panel", "storage", "app.db")) &&
+			io.Exists("/usr/local/etc/panel/config.yml") {
+			if err := io.Remove("/tmp/panel-storage.zip"); err != nil {
+				return fmt.Errorf("清理临时文件失败：%w", err)
+			}
+			color.Greenln("已清理临时文件，请运行 panel-cli update 升级面板")
+			return nil
+		}
 	}
 
 	// 从备份目录中找最新的备份文件
