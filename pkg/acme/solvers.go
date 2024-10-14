@@ -45,11 +45,11 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 }
 `, challenge.Token, challenge.KeyAuthorization)
 	if err = os.WriteFile(s.conf, []byte(conf), 0644); err != nil {
-		return fmt.Errorf("无法写入OpenResty配置文件: %w", err)
+		return fmt.Errorf("无法写入Nginx配置文件: %w", err)
 	}
 	if err = systemctl.Reload("nginx"); err != nil {
 		_, err = shell.Execf("nginx -t")
-		return fmt.Errorf("无法重载OpenResty: %w", err)
+		return fmt.Errorf("无法重载Nginx: %w", err)
 	}
 
 	return nil

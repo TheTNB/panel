@@ -206,6 +206,7 @@ func (s *NginxTestSuite) TestAccessLog() {
 	s.Equal("/www/wwwlogs/default.log", log)
 	s.NoError(parser.SetAccessLog("/www/wwwlogs/access.log"))
 	log, err = parser.GetAccessLog()
+	s.NoError(err)
 	s.Equal("/www/wwwlogs/access.log", log)
 }
 
@@ -217,5 +218,6 @@ func (s *NginxTestSuite) TestErrorLog() {
 	s.Equal("/www/wwwlogs/default.log", log)
 	s.NoError(parser.SetErrorLog("/www/wwwlogs/error.log"))
 	log, err = parser.GetErrorLog()
+	s.NoError(err)
 	s.Equal("/www/wwwlogs/error.log", log)
 }

@@ -66,8 +66,8 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # 耗子面板 - 网站备份脚本
 
-panel-cli backup website -n %s -p %s
-panel-cli backup clear -t website -f %s -s %d -p %s
+panel-cli backup website -n '%s' -p '%s'
+panel-cli backup clear -t website -f '%s' -s '%d' -p '%s'
 `, req.Target, req.BackupPath, req.Target, req.Save, req.BackupPath)
 		}
 		if req.BackupType == "mysql" || req.BackupType == "postgres" {
@@ -76,8 +76,8 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:$PATH
 
 # 耗子面板 - 数据库备份脚本
 
-panel-cli backup database -t %s -n %s -p %s
-panel-cli backup clear -t %s -f %s -s %d -p %s
+panel-cli backup database -t '%s' -n '%s' -p '%s'
+panel-cli backup clear -t '%s' -f '%s' -s '%d' -p '%s'
 `, req.BackupType, req.Target, req.BackupPath, req.BackupType, req.Target, req.Save, req.BackupPath)
 		}
 	}
