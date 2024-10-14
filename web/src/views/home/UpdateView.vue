@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { MdPreview } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 import type { MessageReactive } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
@@ -77,7 +79,14 @@ onMounted(() => {
         :title="item.version"
         :time="formatDateTime(item.updated_at)"
       >
-        <pre v-html="item.description" />
+        <MdPreview
+          v-model="item.description"
+          noMermaid
+          noKatex
+          noIconfont
+          noHighlight
+          noImgZoomIn
+        />
       </n-timeline-item>
     </n-timeline>
     <div v-else pt-40>

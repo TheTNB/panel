@@ -190,6 +190,30 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	color.Greenln(fmt.Sprintf("下载链接：%s", url))
 	color.Greenln(fmt.Sprintf("文件名：%s", name))
 
+	color.Greenln("正在下载...")
+	if _, err := shell.Execf("wget -T 120 -t 3 -O /tmp/%s %s", name, url); err != nil {
+		color.Redln("下载失败：", err)
+		return err
+	}
+	if _, err := shell.Execf("wget -T 20 -t 3 -O /tmp/%s %s", name+".sha256", checksum); err != nil {
+		color.Redln("下载失败：", err)
+		return err
+	}
+	if !io.Exists(filepath.Join("/tmp", name)) || !io.Exists(filepath.Join("/tmp", name+".sha256")) {
+		return errors.New("下载文件检查失败")
+	}
+	color.Greenln("下载完成")
+
+	color.Greenln("校验下载文件...")
+	if check, err := shell.Execf("cd /tmp && sha256sum -c %s --ignore-missing", name+".sha256"); check != name+": OK" || err != nil {
+		return errors.New("下载文件校验失败")
+	}
+	if err := io.Remove(filepath.Join("/tmp", name+".sha256")); err != nil {
+		color.Redln("清理校验文件失败：", err)
+		return err
+	}
+	color.Greenln("文件校验完成")
+
 	color.Greenln("前置检查...")
 	if io.Exists("/tmp/panel-storage.zip") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败导致的，请排除后重试")
@@ -217,43 +241,18 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 	color.Greenln("清理完成")
 
-	color.Greenln("正在下载...")
-	if _, err := shell.Execf("wget -T 120 -t 3 -O %s/panel/%s %s", app.Root, name, url); err != nil {
-		color.Redln("下载失败：", err)
-		return err
-	}
-	if _, err := shell.Execf("wget -T 20 -t 3 -O %s/panel/%s %s", app.Root, name+".sha256", checksum); err != nil {
-		color.Redln("下载失败：", err)
-		return err
-	}
-	if !io.Exists(filepath.Join(app.Root, "panel", name)) || !io.Exists(filepath.Join(app.Root, "panel", name+".sha256")) {
-		return errors.New("下载文件检查失败")
-	}
-	color.Greenln("下载完成")
-
-	color.Greenln("校验下载文件...")
-	check, err := shell.Execf("cd %s/panel && sha256sum -c %s --ignore-missing", app.Root, name+".sha256")
-	if check != name+": OK" || err != nil {
-		return errors.New("下载文件校验失败")
-	}
-	if err = io.Remove(filepath.Join(app.Root, "panel", name+".sha256")); err != nil {
-		color.Redln("清理校验文件失败：", err)
-		return err
-	}
-	color.Greenln("文件校验完成")
-
-	color.Greenln("更新新版本...")
-	if _, err = shell.Execf("cd %s/panel && unzip -o %s && rm -rf %s", app.Root, name, name); err != nil {
-		color.Redln("更新失败：", err)
+	color.Greenln("解压新版本...")
+	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+		color.Redln("解压失败：", err)
 		return err
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
-		return errors.New("更新失败，可能是下载过程中出现了问题")
+		return errors.New("解压失败，缺失文件")
 	}
-	color.Greenln("更新完成")
+	color.Greenln("解压完成")
 
 	color.Greenln("恢复面板数据...")
-	if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
 		color.Redln("恢复面板数据失败：", err)
 		return err
 	}
@@ -263,19 +262,19 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	color.Greenln("恢复完成")
 
 	color.Greenln("运行升级后脚本...")
-	if _, err = shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
+	if _, err := shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
 		color.Redln("运行面板升级后脚本失败：", err)
 		return err
 	}
-	if _, err = shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
+	if _, err := shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
 		color.Redln("下载面板服务文件失败：", err)
 		return err
 	}
-	if _, err = shell.Execf("panel-cli setting write version %s", version); err != nil {
+	if _, err := shell.Execf("panel-cli setting write version %s", version); err != nil {
 		color.Redln("写入面板版本号失败：", err)
 		return err
 	}
-	if err = io.Mv(filepath.Join(app.Root, "panel/cli"), "/usr/local/sbin/panel-cli"); err != nil {
+	if err := io.Mv(filepath.Join(app.Root, "panel/cli"), "/usr/local/sbin/panel-cli"); err != nil {
 		color.Redln("移动面板命令行工具失败：", err)
 		return err
 	}

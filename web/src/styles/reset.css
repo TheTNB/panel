@@ -22,18 +22,6 @@ a:active {
   text-decoration: none;
 }
 
-ol,
-ul {
-  list-style: none;
-}
-
-input,
-textarea {
-  outline: none;
-  border: none;
-  resize: none;
-}
-
 body {
   font-size: 14px;
   font-weight: 400;
