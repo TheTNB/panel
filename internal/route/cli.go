@@ -108,15 +108,15 @@ func Cli() []*cli.Command {
 							Required: true,
 						},
 						&cli.StringSliceFlag{
-							Name:     "domains",
+							Name:     "domain",
 							Usage:    "与网站关联的域名列表",
 							Aliases:  []string{"d"},
 							Required: true,
 						},
-						&cli.UintSliceFlag{
-							Name:     "ports",
-							Usage:    "网站使用的端口列表",
-							Aliases:  []string{"p"},
+						&cli.StringSliceFlag{
+							Name:     "listen",
+							Usage:    "与网站关联的监听地址列表",
+							Aliases:  []string{"l"},
 							Required: true,
 						},
 						&cli.StringFlag{

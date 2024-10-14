@@ -50,6 +50,20 @@ func (p *Parser) SetIndex(index []string) error {
 	})
 }
 
+func (p *Parser) SetIndexWithComment(index []string, comment []string) error {
+	if err := p.Clear("server.index"); err != nil {
+		return err
+	}
+
+	return p.Set("server", []*config.Directive{
+		{
+			Name:       "index",
+			Parameters: index,
+			Comment:    comment,
+		},
+	})
+}
+
 func (p *Parser) SetRoot(root string) error {
 	if err := p.Clear("server.root"); err != nil {
 		return err
@@ -59,6 +73,20 @@ func (p *Parser) SetRoot(root string) error {
 		{
 			Name:       "root",
 			Parameters: []string{root},
+		},
+	})
+}
+
+func (p *Parser) SetRootWithComment(root string, comment []string) error {
+	if err := p.Clear("server.root"); err != nil {
+		return err
+	}
+
+	return p.Set("server", []*config.Directive{
+		{
+			Name:       "root",
+			Parameters: []string{root},
+			Comment:    comment,
 		},
 	})
 }
@@ -127,7 +155,7 @@ func (p *Parser) SetPHP(php int) error {
 	return p.Set("server", directives)
 }
 
-func (p *Parser) UnSetHTTPS() error {
+func (p *Parser) ClearSetHTTPS() error {
 	if err := p.Clear("server.ssl_certificate"); err != nil {
 		return err
 	}
@@ -157,7 +185,7 @@ func (p *Parser) UnSetHTTPS() error {
 }
 
 func (p *Parser) SetHTTPS(cert, key string) error {
-	if err := p.UnSetHTTPS(); err != nil {
+	if err := p.ClearSetHTTPS(); err != nil {
 		return err
 	}
 
@@ -287,7 +315,7 @@ func (p *Parser) SetHSTS(hsts bool) error {
 	return p.Set("server", directives)
 }
 
-func (p *Parser) SetHTTPSRedirect(httpRedirect bool) error {
+func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	// if 重定向
 	ifs, err := p.Find("server.if")
 	if err != nil {

@@ -68,8 +68,8 @@ func (s *NginxTestSuite) TestIncludes() {
 	s.NoError(err)
 	includes, comments, err := parser.GetIncludes()
 	s.NoError(err)
-	s.Equal([]string{"/www/server/vhost/rewrite/default.conf", "enable-php-0.conf"}, includes)
-	s.Equal([][]string{{"# 伪静态规则"}, []string(nil)}, comments)
+	s.Equal([]string{"enable-php-0.conf"}, includes)
+	s.Equal([][]string{[]string(nil)}, comments)
 	s.NoError(parser.SetIncludes([]string{"/www/server/vhost/rewrite/default.conf"}, nil))
 	includes, comments, err = parser.GetIncludes()
 	s.NoError(err)
@@ -80,6 +80,16 @@ func (s *NginxTestSuite) TestIncludes() {
 	s.NoError(err)
 	s.Equal([]string{"/www/server/vhost/rewrite/test.conf"}, includes)
 	s.Equal([][]string{{"# 伪静态规则测试"}}, comments)
+}
+
+func (s *NginxTestSuite) TestPHP() {
+	parser, err := NewParser()
+	s.NoError(err)
+	s.Equal(0, parser.GetPHP())
+	s.NoError(parser.SetPHP(80))
+	s.Equal(80, parser.GetPHP())
+	s.NoError(parser.SetPHP(0))
+	s.Equal(0, parser.GetPHP())
 }
 
 func (s *NginxTestSuite) TestHTTP() {
@@ -126,6 +136,8 @@ func (s *NginxTestSuite) TestOCSP() {
 	s.NoError(err)
 	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
 	s.False(parser.GetOCSP())
+	s.NoError(parser.SetOCSP(false))
+	s.False(parser.GetOCSP())
 	s.NoError(parser.SetOCSP(true))
 	s.True(parser.GetOCSP())
 	s.NoError(parser.SetOCSP(false))
@@ -136,6 +148,8 @@ func (s *NginxTestSuite) TestHSTS() {
 	parser, err := NewParser()
 	s.NoError(err)
 	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.False(parser.GetHSTS())
+	s.NoError(parser.SetHSTS(false))
 	s.False(parser.GetHSTS())
 	s.NoError(parser.SetHSTS(true))
 	s.True(parser.GetHSTS())
@@ -148,9 +162,11 @@ func (s *NginxTestSuite) TestHTTPSRedirect() {
 	s.NoError(err)
 	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
 	s.False(parser.GetHTTPSRedirect())
-	s.NoError(parser.SetHTTPSRedirect(true))
+	s.NoError(parser.SetHTTPRedirect(false))
+	s.False(parser.GetHTTPSRedirect())
+	s.NoError(parser.SetHTTPRedirect(true))
 	s.True(parser.GetHTTPSRedirect())
-	s.NoError(parser.SetHTTPSRedirect(false))
+	s.NoError(parser.SetHTTPRedirect(false))
 	s.False(parser.GetHTTPSRedirect())
 }
 

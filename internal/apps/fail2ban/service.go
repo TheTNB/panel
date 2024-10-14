@@ -1,6 +1,7 @@
 package fail2ban
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -111,10 +112,12 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var ports string
-		for _, port := range website.Ports {
-			fields := strings.Fields(cast.ToString(port))
-			ports += fields[0] + ","
+		for _, listen := range website.Listens {
+			if port, err := cast.ToIntE(listen.Address); err == nil {
+				ports += fmt.Sprintf("%d", port) + ","
+			}
 		}
+		ports = strings.TrimSuffix(ports, ",")
 
 		rule := `
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-START

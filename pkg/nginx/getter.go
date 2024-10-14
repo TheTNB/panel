@@ -38,6 +38,15 @@ func (p *Parser) GetIndex() ([]string, error) {
 	return directive.GetParameters(), nil
 }
 
+func (p *Parser) GetIndexWithComment() ([]string, []string, error) {
+	directive, err := p.FindOne("server.index")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return directive.GetParameters(), directive.GetComment(), nil
+}
+
 func (p *Parser) GetRoot() (string, error) {
 	directive, err := p.FindOne("server.root")
 	if err != nil {
@@ -48,6 +57,18 @@ func (p *Parser) GetRoot() (string, error) {
 	}
 
 	return directive.GetParameters()[0], nil
+}
+
+func (p *Parser) GetRootWithComment() (string, []string, error) {
+	directive, err := p.FindOne("server.root")
+	if err != nil {
+		return "", nil, err
+	}
+	if len(directive.GetParameters()) == 0 {
+		return "", directive.GetComment(), nil
+	}
+
+	return directive.GetParameters()[0], directive.GetComment(), nil
 }
 
 func (p *Parser) GetIncludes() (includes []string, comments [][]string, err error) {
@@ -67,10 +88,10 @@ func (p *Parser) GetIncludes() (includes []string, comments [][]string, err erro
 	return includes, comments, nil
 }
 
-func (p *Parser) GetPHP() (int, error) {
+func (p *Parser) GetPHP() int {
 	directives, err := p.Find("server.include")
 	if err != nil {
-		return 0, err
+		return 0
 	}
 
 	var result int
@@ -82,7 +103,7 @@ func (p *Parser) GetPHP() (int, error) {
 		}
 	}
 
-	return result, err
+	return result
 }
 
 func (p *Parser) GetHTTPS() bool {
@@ -145,21 +166,21 @@ func (p *Parser) GetHSTS() bool {
 	return false
 }
 
-func (p *Parser) GetHTTPSRedirect() (bool, error) {
+func (p *Parser) GetHTTPSRedirect() bool {
 	directives, err := p.Find("server.if")
 	if err != nil {
-		return false, err
+		return false
 	}
 
 	for _, dir := range directives {
 		for _, dir2 := range dir.GetBlock().GetDirectives() {
 			if dir2.GetName() == "return" && slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
-				return true, nil
+				return true
 			}
 		}
 	}
 
-	return false, nil
+	return false
 }
 
 func (p *Parser) GetAccessLog() (string, error) {

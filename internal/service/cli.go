@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/go-rat/utils/hash"
@@ -350,16 +351,17 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 
 func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error {
 	var ports []uint
-	for _, port := range cmd.IntSlice("ports") {
+	for port := range slices.Values(cmd.IntSlice("ports")) {
 		if port < 1 || port > 65535 {
 			return fmt.Errorf("端口范围错误")
 		}
 		ports = append(ports, uint(port))
 	}
+
 	req := &request.WebsiteCreate{
 		Name:    cmd.String("name"),
 		Domains: cmd.StringSlice("domains"),
-		Ports:   ports,
+		Listens: cmd.StringSlice("listen"),
 		Path:    cmd.String("path"),
 		PHP:     int(cmd.Int("php")),
 		DB:      false,
