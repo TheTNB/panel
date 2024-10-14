@@ -49,13 +49,13 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := io.Write(app.Root+"/server/mysql/conf/my.cnf", req.Config, 0644); err != nil {
-		service.Error(w, http.StatusInternalServerError, "写入配置失败")
+	if err = io.Write(app.Root+"/server/mysql/conf/my.cnf", req.Config, 0644); err != nil {
+		service.Error(w, http.StatusInternalServerError, "写入配置失败：%v", err)
 		return
 	}
 
-	if err := systemctl.Reload("mysqld"); err != nil {
-		service.Error(w, http.StatusInternalServerError, "重载失败")
+	if err = systemctl.Restart("mysqld"); err != nil {
+		service.Error(w, http.StatusInternalServerError, "重启失败：%v", err)
 		return
 	}
 
