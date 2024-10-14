@@ -39,7 +39,7 @@ require (
 	github.com/shirou/gopsutil v2.21.11+incompatible
 	github.com/spf13/cast v1.7.0
 	github.com/stretchr/testify v1.9.0
-	github.com/tufanbarisyildirim/gonginx v0.0.0-20240907135031-d38eb71142ac
+	github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8
 	github.com/urfave/cli/v3 v3.0.0-alpha9.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.28.0
