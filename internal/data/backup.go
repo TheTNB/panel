@@ -237,7 +237,7 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 	}
 
 	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
 	return nil
 }
 
@@ -282,7 +282,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 	}
 
 	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
 	return nil
 }
 
@@ -317,7 +317,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 	}
 
 	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup+".zip"))
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
 	return nil
 }
 
@@ -342,7 +342,7 @@ func (r *backupRepo) createPanel(to string) error {
 	}
 
 	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", backup))
+	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
 	return nil
 }
 
