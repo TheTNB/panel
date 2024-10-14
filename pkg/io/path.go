@@ -2,13 +2,14 @@ package io
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/pkg/shell"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/TheTNB/panel/pkg/shell"
 )
 
 // Remove 删除文件/目录

@@ -9,7 +9,8 @@ export default {
   // 创建
   create: (data: any): Promise<AxiosResponse<any>> => request.post('/website', data),
   // 删除
-  delete: (data: any): Promise<AxiosResponse<any>> => request.post('/website/' + data.id, data),
+  delete: (id: number, path: boolean, db: boolean): Promise<AxiosResponse<any>> =>
+    request.delete(`/website/${id}`, { params: { path, db } }),
   // 获取默认配置
   defaultConfig: (): Promise<AxiosResponse<any>> => request.get('/website/defaultConfig'),
   // 保存默认配置

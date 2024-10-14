@@ -12,7 +12,7 @@ type Website struct {
 	Name      string    `gorm:"not null;unique" json:"name"`
 	Status    bool      `gorm:"not null;default:true" json:"status"`
 	Path      string    `gorm:"not null" json:"path"`
-	HTTPS     bool      `gorm:"not null" json:"https"`
+	Https     bool      `gorm:"not null" json:"https"`
 	Remark    string    `gorm:"not null" json:"remark"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

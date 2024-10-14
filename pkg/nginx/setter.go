@@ -328,6 +328,11 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	var directives []*config.Directive
 	var foundFlag bool
 	for _, dir := range ifs { // 所有 if
+		if !httpRedirect {
+			if len(dir.GetParameters()) == 3 && dir.GetParameters()[0] == "($scheme" && dir.GetParameters()[1] == "=" && dir.GetParameters()[2] == "http)" {
+				continue
+			}
+		}
 		var ifDirectives []config.IDirective
 		for _, dir2 := range dir.GetBlock().GetDirectives() { // 每个 if 中所有指令
 			if !httpRedirect {

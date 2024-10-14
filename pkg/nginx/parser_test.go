@@ -3,8 +3,9 @@ package nginx
 import (
 	"testing"
 
-	"github.com/TheTNB/panel/pkg/io"
 	"github.com/stretchr/testify/suite"
+
+	"github.com/TheTNB/panel/pkg/io"
 )
 
 type NginxTestSuite struct {
@@ -51,6 +52,20 @@ func (s *NginxTestSuite) TestIndex() {
 	s.Equal([]string{"index.html", "index.htm"}, index)
 }
 
+func (s *NginxTestSuite) TestIndexWithComment() {
+	parser, err := NewParser()
+	s.NoError(err)
+	index, comment, err := parser.GetIndexWithComment()
+	s.NoError(err)
+	s.Equal([]string{"index.php", "index.html", "index.htm"}, index)
+	s.Equal([]string(nil), comment)
+	s.NoError(parser.SetIndexWithComment([]string{"index.html", "index.htm"}, []string{"# 测试"}))
+	index, comment, err = parser.GetIndexWithComment()
+	s.NoError(err)
+	s.Equal([]string{"index.html", "index.htm"}, index)
+	s.Equal([]string{"# 测试"}, comment)
+}
+
 func (s *NginxTestSuite) TestRoot() {
 	parser, err := NewParser()
 	s.NoError(err)
@@ -61,6 +76,20 @@ func (s *NginxTestSuite) TestRoot() {
 	root, err = parser.GetRoot()
 	s.NoError(err)
 	s.Equal("/www/wwwroot/test", root)
+}
+
+func (s *NginxTestSuite) TestRootWithComment() {
+	parser, err := NewParser()
+	s.NoError(err)
+	root, comment, err := parser.GetRootWithComment()
+	s.NoError(err)
+	s.Equal("/www/wwwroot/default", root)
+	s.Equal([]string(nil), comment)
+	s.NoError(parser.SetRootWithComment("/www/wwwroot/test", []string{"# 测试"}))
+	root, comment, err = parser.GetRootWithComment()
+	s.NoError(err)
+	s.Equal("/www/wwwroot/test", root)
+	s.Equal([]string{"# 测试"}, comment)
 }
 
 func (s *NginxTestSuite) TestIncludes() {
@@ -106,7 +135,6 @@ func (s *NginxTestSuite) TestHTTPS() {
 	s.False(parser.GetHTTPS())
 	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
 	s.True(parser.GetHTTPS())
-	io.Write("testdata/https.conf", parser.Dump(), 0755)
 	expect, err := io.Read("testdata/https.conf")
 	s.NoError(err)
 	s.Equal(expect, parser.Dump())

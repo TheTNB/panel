@@ -4,7 +4,7 @@ import { NButton } from 'naive-ui'
 
 import info from '@/api/panel/info'
 import website from '@/api/panel/website'
-import type { WebsiteSetting } from '@/views/website/types'
+import type { WebsiteListen, WebsiteSetting } from '@/views/website/types'
 
 const route = useRoute()
 const { id } = route.params
@@ -12,16 +12,14 @@ const { id } = route.params
 const setting = ref<WebsiteSetting>({
   id: 0,
   name: '',
-  ports: [],
-  ssl_ports: [],
-  quic_ports: [],
+  listens: [] as WebsiteListen[],
   domains: [],
   root: '',
   path: '',
-  index: '',
+  index: [],
   php: 0,
   open_basedir: false,
-  ssl: false,
+  https: false,
   ssl_certificate: '',
   ssl_certificate_key: '',
   ssl_not_before: '',
@@ -63,16 +61,23 @@ const getWebsiteSetting = async () => {
 }
 
 const handleSave = async () => {
-  if (setting.value.ssl) {
-    if (setting.value.ssl_certificate == '') {
-      window.$message.error('请填写证书')
-      return
-    }
-    if (setting.value.ssl_certificate_key == '') {
-      window.$message.error('请填写私钥')
-      return
-    }
+  // 如果没有任何监听地址设置了https，则自动添加443
+  if (setting.value.https && !setting.value.listens.some((item) => item.https)) {
+    setting.value.listens.push({
+      address: '443',
+      https: true,
+      quic: true
+    })
   }
+  // 如果关闭了https，自动禁用所有https和quic
+  if (!setting.value.https) {
+    setting.value.listens = setting.value.listens.filter((item) => item.address !== '443') // 443直接删掉
+    setting.value.listens.forEach((item) => {
+      item.https = false
+      item.quic = false
+    })
+  }
+
   await website.saveConfig(Number(id), setting.value).then(() => {
     getWebsiteSetting()
     window.$message.success('保存成功')
@@ -100,6 +105,14 @@ const title = computed(() => {
   return '编辑网站 - 加载中...'
 })
 
+const onCreateListen = () => {
+  return {
+    address: '',
+    https: false,
+    quic: false
+  }
+}
+
 onMounted(() => {
   getWebsiteSetting()
   getPhpAndDb()
@@ -119,7 +132,7 @@ onMounted(() => {
     </template>
 
     <n-tabs type="line" animated>
-      <n-tab-pane name="domain" tab="域名端口">
+      <n-tab-pane name="domain" tab="域名监听">
         <n-form v-if="setting">
           <n-form-item label="域名">
             <n-dynamic-input
@@ -129,16 +142,18 @@ onMounted(() => {
               show-sort-button
             />
           </n-form-item>
-          <n-form-item label="端口">
-            <n-dynamic-input v-model:value="setting.ports" show-sort-button>
-              <template #default="{ index }">
-                <n-input-number
-                  v-model:value="setting.ports[index]"
-                  :min="1"
-                  :max="65535"
-                  clearable
-                  w-full
-                />
+          <n-form-item label="监听地址">
+            <n-dynamic-input
+              v-model:value="setting.listens"
+              show-sort-button
+              :on-create="onCreateListen"
+            >
+              <template #default="{ value }">
+                <div flex items-center w-full>
+                  <n-input v-model:value="value.address" clearable />
+                  <n-checkbox v-model:checked="value.https" ml-20 mr-20 w-120> HTTPS </n-checkbox>
+                  <n-checkbox v-model:checked="value.quic" w-200> QUIC(HTTP3) </n-checkbox>
+                </div>
               </template>
             </n-dynamic-input>
           </n-form-item>
@@ -157,7 +172,7 @@ onMounted(() => {
             />
           </n-form-item>
           <n-form-item label="默认文档">
-            <n-input v-model:value="setting.index" placeholder="输入默认文档（多个用空格分隔）" />
+            <n-dynamic-tags v-model:value="setting.index" />
           </n-form-item>
           <n-form-item label="PHP版本">
             <n-select
@@ -177,8 +192,7 @@ onMounted(() => {
       </n-tab-pane>
       <n-tab-pane name="https" tab="HTTPS">
         <n-flex vertical v-if="setting">
-          <n-alert type="info">开启 HTTPS 前，请先在域名端口处添加 443 端口！</n-alert>
-          <n-card v-if="setting.ssl">
+          <n-card v-if="setting.https && setting.ssl_issuer != ''">
             <n-descriptions title="证书信息" :column="2">
               <n-descriptions-item>
                 <template #label>证书有效期</template>
@@ -210,27 +224,7 @@ onMounted(() => {
           </n-card>
           <n-form>
             <n-form-item label="总开关（只有打开了总开关，下面的设置才会生效！）">
-              <n-switch v-model:value="setting.ssl" />
-            </n-form-item>
-            <n-form-item label="HTTPS（SSL）端口">
-              <n-checkbox-group v-model:value="setting.ssl_ports">
-                <n-checkbox
-                  v-for="item in setting.ports"
-                  :key="item"
-                  :value="item"
-                  :label="String(item)"
-                />
-              </n-checkbox-group>
-            </n-form-item>
-            <n-form-item label="QUIC（HTTP3）端口">
-              <n-checkbox-group v-model:value="setting.quic_ports">
-                <n-checkbox
-                  v-for="item in setting.ports"
-                  :key="item"
-                  :value="item"
-                  :label="String(item)"
-                />
-              </n-checkbox-group>
+              <n-switch v-model:value="setting.https" />
             </n-form-item>
           </n-form>
           <n-form inline>

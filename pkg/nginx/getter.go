@@ -99,7 +99,7 @@ func (p *Parser) GetPHP() int {
 		if slices.ContainsFunc(dir.GetParameters(), func(s string) bool {
 			return strings.HasPrefix(s, "enable-php-") && strings.HasSuffix(s, ".conf")
 		}) {
-			_, err = fmt.Sscanf(dir.GetParameters()[0], "enable-php-%d.conf", &result)
+			_, _ = fmt.Sscanf(dir.GetParameters()[0], "enable-php-%d.conf", &result)
 		}
 	}
 

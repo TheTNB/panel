@@ -108,13 +108,13 @@ func Cli() []*cli.Command {
 							Required: true,
 						},
 						&cli.StringSliceFlag{
-							Name:     "domain",
+							Name:     "domains",
 							Usage:    "与网站关联的域名列表",
 							Aliases:  []string{"d"},
 							Required: true,
 						},
 						&cli.StringSliceFlag{
-							Name:     "listen",
+							Name:     "listens",
 							Usage:    "与网站关联的监听地址列表",
 							Aliases:  []string{"l"},
 							Required: true,

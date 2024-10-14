@@ -4,8 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"slices"
 	"strings"
+
+	"github.com/samber/lo"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -70,7 +71,7 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	setting.ID = website.ID
 	setting.Name = website.Name
 	setting.Path = website.Path
-	setting.HTTPS = website.HTTPS
+	setting.HTTPS = website.Https
 	setting.PHP = p.GetPHP()
 	setting.Raw = config
 	// 监听地址
@@ -78,16 +79,28 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	if err != nil {
 		return nil, err
 	}
-	for listen := range slices.Values(listens) {
-		if len(listen) == 0 {
-			continue
-		}
-		setting.Listens = append(setting.Listens, types.WebsiteListen{
-			Address: listen[0],
-			HTTPS:   slices.Contains(listen, "ssl"),
-			QUIC:    slices.Contains(listen, "quic"),
-		})
-	}
+	setting.Listens = lo.Map(
+		lo.UniqBy(listens, func(listen []string) string {
+			if len(listen) == 0 {
+				return ""
+			}
+			return listen[0]
+		}),
+		func(listen []string, _ int) types.WebsiteListen {
+			addr := listen[0]
+			grouped := lo.GroupBy(listens, func(listen []string) string {
+				if len(listen) == 0 {
+					return ""
+				}
+				return listen[0]
+			})[addr]
+			return types.WebsiteListen{
+				Address: addr,
+				HTTPS:   lo.SomeBy(grouped, func(listen []string) bool { return lo.Contains(listen, "ssl") }),
+				QUIC:    lo.SomeBy(grouped, func(listen []string) bool { return lo.Contains(listen, "quic") }),
+			}
+		},
+	)
 	// 域名
 	domains, err := p.GetServerName()
 	if err != nil {
@@ -174,8 +187,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	// 监听地址
 	var listens [][]string
 	for _, listen := range req.Listens {
-		listens = append(listens, []string{listen})           // ipv4
-		listens = append(listens, []string{"[::]:" + listen}) // ipv6
+		listens = append(listens, []string{listen})
 	}
 	if err = p.SetListen(listens); err != nil {
 		return nil, err
@@ -260,7 +272,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		Name:   req.Name,
 		Status: true,
 		Path:   req.Path,
-		HTTPS:  false,
+		Https:  false,
 	}
 	if err = app.Orm.Create(w).Error; err != nil {
 		return nil, err
@@ -335,7 +347,9 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	// 监听地址
 	var listens [][]string
 	for _, listen := range req.Listens {
-		listens = append(listens, []string{listen.Address})
+		if !listen.HTTPS && !listen.QUIC {
+			listens = append(listens, []string{listen.Address})
+		}
 		if listen.HTTPS {
 			listens = append(listens, []string{listen.Address, "ssl"})
 		}
@@ -383,7 +397,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	if err = io.Write(keyPath, req.SSLCertificateKey, 0644); err != nil {
 		return err
 	}
-	website.HTTPS = req.HTTPS
+	website.Https = req.HTTPS
 	if req.HTTPS {
 		if err = p.SetHTTPS(certPath, keyPath); err != nil {
 			return err
@@ -418,6 +432,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	}
 	userIni := filepath.Join(req.Root, ".user.ini")
 	if req.OpenBasedir {
+		_, _ = shell.Execf(`chattr -i '%s'`, userIni)
 		if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Root), 0644); err != nil {
 			return err
 		}
@@ -444,6 +459,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 
 	if err = systemctl.Reload("nginx"); err != nil {
 		_, err = shell.Execf("nginx -t")
+		return err
 	}
 
 	return nil
@@ -488,6 +504,7 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 
 	if err := systemctl.Reload("nginx"); err != nil {
 		_, err = shell.Execf("nginx -t")
+		return err
 	}
 
 	return nil
@@ -554,7 +571,7 @@ func (r *websiteRepo) ResetConfig(id uint) error {
 	}
 
 	website.Status = true
-	website.HTTPS = false
+	website.Https = false
 	if err := app.Orm.Save(website).Error; err != nil {
 		return err
 	}
@@ -598,6 +615,10 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 		if len(rootComment) == 0 {
 			return fmt.Errorf("未找到运行目录注释")
 		}
+		if len(rootComment) != 1 {
+			return fmt.Errorf("运行目录注释数量不正确，预期1个，实际%d个", len(rootComment))
+		}
+		rootComment[0] = strings.TrimPrefix(rootComment[0], "# ")
 		if !io.Exists(rootComment[0]) {
 			return fmt.Errorf("运行目录不存在")
 		}
@@ -607,14 +628,18 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 		if len(indexComment) == 0 {
 			return fmt.Errorf("未找到默认文档注释")
 		}
-		if err = p.SetIndex(strings.Fields(indexStr)); err != nil {
+		if len(indexComment) != 1 {
+			return fmt.Errorf("默认文档注释数量不正确，预期1个，实际%d个", len(indexComment))
+		}
+		indexComment[0] = strings.TrimPrefix(indexComment[0], "# ")
+		if err = p.SetIndex(strings.Fields(indexComment[0])); err != nil {
 			return err
 		}
 	} else {
-		if err = p.SetRootWithComment(filepath.Join(app.Root, "server/nginx/html"), []string{root}); err != nil {
+		if err = p.SetRootWithComment(filepath.Join(app.Root, "server/nginx/html"), []string{"# " + root}); err != nil {
 			return err
 		}
-		if err = p.SetIndexWithComment([]string{"stop.html"}, []string{indexStr}); err != nil {
+		if err = p.SetIndexWithComment([]string{"stop.html"}, []string{"# " + indexStr}); err != nil {
 			return err
 		}
 	}

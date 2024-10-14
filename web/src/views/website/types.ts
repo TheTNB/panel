@@ -10,19 +10,23 @@ export interface Website {
   updated_at: string
 }
 
+export interface WebsiteListen {
+  address: string
+  https: boolean
+  quic: boolean
+}
+
 export interface WebsiteSetting {
   id: number
   name: string
-  ports: number[]
-  ssl_ports: number[]
-  quic_ports: number[]
+  listens: WebsiteListen[]
   domains: string[]
   root: string
   path: string
-  index: string
+  index: string[]
   php: number
   open_basedir: boolean
-  ssl: boolean
+  https: boolean
   ssl_certificate: string
   ssl_certificate_key: string
   ssl_not_before: string

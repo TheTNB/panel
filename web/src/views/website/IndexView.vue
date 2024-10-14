@@ -182,15 +182,15 @@ const pagination = reactive({
   pageSizes: [15, 30, 50, 100]
 })
 
-const addModal = ref(false)
+const createModal = ref(false)
 const editDefaultPageModal = ref(false)
 
 const buttonLoading = ref(false)
 const buttonDisabled = ref(false)
-const addModel = ref({
+const createModel = ref({
   name: '',
   domains: [] as Array<string>,
-  ports: [] as Array<number>,
+  listens: [] as Array<string>,
   php: 0,
   db: false,
   db_type: '0',
@@ -201,7 +201,6 @@ const addModel = ref({
   remark: ''
 })
 const deleteModel = ref({
-  id: 0,
   path: true,
   db: false
 })
@@ -284,12 +283,10 @@ const handleEdit = (row: any) => {
 }
 
 const handleDelete = async (id: number) => {
-  deleteModel.value.id = id
-  await website.delete(deleteModel.value).then(() => {
+  await website.delete(id, deleteModel.value.path, deleteModel.value.db).then(() => {
     window.$message.success('删除成功')
     onPageChange(pagination.page)
   })
-  deleteModel.value.id = 0
   deleteModel.value.path = true
 }
 
@@ -302,18 +299,18 @@ const handleSaveDefaultPage = () => {
     })
 }
 
-const handleAdd = async () => {
+const handleCreate = async () => {
   buttonLoading.value = true
   buttonDisabled.value = true
   // 去除空的域名和端口
-  addModel.value.domains = addModel.value.domains.filter((item) => item !== '')
-  addModel.value.ports = addModel.value.ports.filter((item) => item !== 0)
+  createModel.value.domains = createModel.value.domains.filter((item) => item !== '')
+  createModel.value.listens = createModel.value.listens.filter((item) => item !== '')
   // 端口为空自动添加 80 端口
-  if (addModel.value.ports.length === 0) {
-    addModel.value.ports.push(80)
+  if (createModel.value.listens.length === 0) {
+    createModel.value.listens.push('80')
   }
   await website
-    .create(addModel.value)
+    .create(createModel.value)
     .then(() => {
       window.$message.success('创建成功')
       getWebsiteList(pagination.page, pagination.pageSize).then((res) => {
@@ -321,11 +318,11 @@ const handleAdd = async () => {
         pagination.itemCount = res.total
         pagination.pageCount = res.total / pagination.pageSize + 1
       })
-      addModal.value = false
-      addModel.value = {
+      createModal.value = false
+      createModel.value = {
         name: '',
         domains: [] as Array<string>,
-        ports: [] as Array<number>,
+        listens: [] as Array<string>,
         php: 0,
         db: false,
         db_type: '0',
@@ -351,14 +348,10 @@ const batchDelete = async () => {
   }
 
   for (const id of selectedRowKeys.value) {
-    deleteModel.value.id = id
-    deleteModel.value.path = true
-    deleteModel.value.db = false
-    await website.delete(deleteModel.value).then(() => {
+    await website.delete(id, true, false).then(() => {
       let site = data.value.find((item) => item.id === id)
       window.$message.success('网站 ' + site?.name + ' 删除成功')
     })
-    deleteModel.value.id = 0
   }
 
   onPageChange(pagination.page)
@@ -386,7 +379,7 @@ onMounted(() => {
     <n-space vertical size="large">
       <n-card rounded-10>
         <n-space>
-          <n-button type="primary" @click="addModal = true">
+          <n-button type="primary" @click="createModal = true">
             {{ $t('websiteIndex.create.trigger') }}
           </n-button>
           <n-popconfirm @positive-click="batchDelete">
@@ -416,19 +409,19 @@ onMounted(() => {
     </n-space>
   </common-page>
   <n-modal
-    v-model:show="addModal"
+    v-model:show="createModal"
     :title="$t('websiteIndex.create.title')"
     preset="card"
     style="width: 60vw"
     size="huge"
     :bordered="false"
     :segmented="false"
-    @close="addModal = false"
+    @close="createModal = false"
   >
-    <n-form :model="addModel">
+    <n-form :model="createModel">
       <n-form-item path="name" :label="$t('websiteIndex.create.fields.name.label')">
         <n-input
-          v-model:value="addModel.name"
+          v-model:value="createModel.name"
           type="text"
           @keydown.enter.prevent
           :placeholder="$t('websiteIndex.create.fields.name.placeholder')"
@@ -438,7 +431,7 @@ onMounted(() => {
         <n-col :span="11">
           <n-form-item :label="$t('websiteIndex.create.fields.domains.label')">
             <n-dynamic-input
-              v-model:value="addModel.domains"
+              v-model:value="createModel.domains"
               placeholder="example.com"
               :min="1"
               show-sort-button
@@ -448,19 +441,12 @@ onMounted(() => {
         <n-col :span="2"></n-col>
         <n-col :span="11">
           <n-form-item :label="$t('websiteIndex.create.fields.port.label')">
-            <n-dynamic-input v-model:value="addModel.ports" show-sort-button>
-              <template #default="{ index }">
-                <div style="display: flex; align-items: center; width: 100%">
-                  <n-input-number
-                    v-model:value="addModel.ports[index]"
-                    :min="1"
-                    :max="65535"
-                    clearable
-                    w-full
-                  />
-                </div>
-              </template>
-            </n-dynamic-input>
+            <n-dynamic-input
+              v-model:value="createModel.listens"
+              placeholder="80"
+              :min="1"
+              show-sort-button
+            />
           </n-form-item>
         </n-col>
       </n-row>
@@ -468,7 +454,7 @@ onMounted(() => {
         <n-col :span="11">
           <n-form-item path="php" :label="$t('websiteIndex.create.fields.phpVersion.label')">
             <n-select
-              v-model:value="addModel.php"
+              v-model:value="createModel.php"
               :options="installedDbAndPhp.php"
               :placeholder="$t('websiteIndex.create.fields.phpVersion.placeholder')"
               @keydown.enter.prevent
@@ -480,16 +466,16 @@ onMounted(() => {
         <n-col :span="11">
           <n-form-item path="db" :label="$t('websiteIndex.create.fields.db.label')">
             <n-select
-              v-model:value="addModel.db_type"
+              v-model:value="createModel.db_type"
               :options="installedDbAndPhp.db"
               :placeholder="$t('websiteIndex.create.fields.db.placeholder')"
               @keydown.enter.prevent
               @update:value="
                 () => {
-                  addModel.db = addModel.db_type != '0'
-                  addModel.db_name = formatDbValue(addModel.name)
-                  addModel.db_user = formatDbValue(addModel.name)
-                  addModel.db_password = generateRandomString(16)
+                  createModel.db = createModel.db_type != '0'
+                  createModel.db_name = formatDbValue(createModel.name)
+                  createModel.db_user = formatDbValue(createModel.name)
+                  createModel.db_password = generateRandomString(16)
                 }
               "
             >
@@ -500,12 +486,12 @@ onMounted(() => {
       <n-row :gutter="[0, 24]">
         <n-col :span="7">
           <n-form-item
-            v-if="addModel.db"
+            v-if="createModel.db"
             path="db_name"
             :label="$t('websiteIndex.create.fields.dbName.label')"
           >
             <n-input
-              v-model:value="addModel.db_name"
+              v-model:value="createModel.db_name"
               type="text"
               @keydown.enter.prevent
               :placeholder="$t('websiteIndex.create.fields.dbName.placeholder')"
@@ -515,12 +501,12 @@ onMounted(() => {
         <n-col :span="1"></n-col>
         <n-col :span="7">
           <n-form-item
-            v-if="addModel.db"
+            v-if="createModel.db"
             path="db_user"
             :label="$t('websiteIndex.create.fields.dbUser.label')"
           >
             <n-input
-              v-model:value="addModel.db_user"
+              v-model:value="createModel.db_user"
               type="text"
               @keydown.enter.prevent
               :placeholder="$t('websiteIndex.create.fields.dbUser.placeholder')"
@@ -530,12 +516,12 @@ onMounted(() => {
         <n-col :span="1"></n-col>
         <n-col :span="8">
           <n-form-item
-            v-if="addModel.db"
+            v-if="createModel.db"
             path="db_password"
             :label="$t('websiteIndex.create.fields.dbPassword.label')"
           >
             <n-input
-              v-model:value="addModel.db_password"
+              v-model:value="createModel.db_password"
               type="text"
               @keydown.enter.prevent
               :placeholder="$t('websiteIndex.create.fields.dbPassword.placeholder')"
@@ -545,7 +531,7 @@ onMounted(() => {
       </n-row>
       <n-form-item path="path" :label="$t('websiteIndex.create.fields.path.label')">
         <n-input
-          v-model:value="addModel.path"
+          v-model:value="createModel.path"
           type="text"
           @keydown.enter.prevent
           :placeholder="$t('websiteIndex.create.fields.path.placeholder')"
@@ -553,7 +539,7 @@ onMounted(() => {
       </n-form-item>
       <n-form-item path="remark" :label="$t('websiteIndex.create.fields.remark.label')">
         <n-input
-          v-model:value="addModel.remark"
+          v-model:value="createModel.remark"
           type="textarea"
           @keydown.enter.prevent
           :placeholder="$t('websiteIndex.create.fields.remark.placeholder')"
@@ -567,7 +553,7 @@ onMounted(() => {
           block
           :loading="buttonLoading"
           :disabled="buttonDisabled"
-          @click="handleAdd"
+          @click="handleCreate"
         >
           {{ $t('websiteIndex.create.actions.submit') }}
         </n-button>
