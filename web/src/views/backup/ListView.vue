@@ -4,6 +4,7 @@ import { renderIcon } from '@/utils'
 import type { MessageReactive } from 'naive-ui'
 import { NButton, NInput, NPopconfirm } from 'naive-ui'
 
+import { formatDateTime } from '@/utils'
 import type { Backup } from './types'
 
 const type = defineModel<string>('type', { type: String, required: true })
@@ -18,7 +19,16 @@ const restoreModel = ref({
 
 const columns: any = [
   { title: '文件名', key: 'name', fixed: 'left', resizable: true, ellipsis: { tooltip: true } },
-  { title: '大小', key: 'size', width: 200, ellipsis: { tooltip: true } },
+  { title: '大小', key: 'size', width: 160, ellipsis: { tooltip: true } },
+  {
+    title: '更新日期',
+    key: 'time',
+    width: 200,
+    ellipsis: { tooltip: true },
+    render(row: any) {
+      return formatDateTime(row.time)
+    }
+  },
   {
     title: '操作',
     key: 'actions',
