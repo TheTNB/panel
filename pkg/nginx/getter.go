@@ -50,18 +50,21 @@ func (p *Parser) GetRoot() (string, error) {
 	return directive.GetParameters()[0], nil
 }
 
-func (p *Parser) GetIncludes() ([]string, error) {
+func (p *Parser) GetIncludes() (includes []string, comments [][]string, err error) {
 	directives, err := p.Find("server.include")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	var result []string
 	for _, dir := range directives {
-		result = append(result, dir.GetParameters()...)
+		if len(dir.GetParameters()) != 1 {
+			return nil, nil, fmt.Errorf("invalid include directive, expected 1 parameter but got %d", len(dir.GetParameters()))
+		}
+		includes = append(includes, dir.GetParameters()[0])
+		comments = append(comments, dir.GetComment())
 	}
 
-	return result, nil
+	return includes, comments, nil
 }
 
 func (p *Parser) GetPHP() (int, error) {
@@ -94,34 +97,55 @@ func (p *Parser) GetHTTPS() bool {
 	return true
 }
 
-func (p *Parser) GetOCSP() (bool, error) {
-	directive, err := p.FindOne("server.ssl_stapling")
+func (p *Parser) GetHTTPSProtocols() []string {
+	directive, err := p.FindOne("server.ssl_protocols")
 	if err != nil {
-		return false, err
-	}
-	if len(directive.GetParameters()) == 0 {
-		return false, nil
+		return nil
 	}
 
-	return directive.GetParameters()[0] == "on", nil
+	return directive.GetParameters()
 }
 
-func (p *Parser) GetHSTS() (bool, error) {
+func (p *Parser) GetHTTPSCiphers() string {
+	directive, err := p.FindOne("server.ssl_ciphers")
+	if err != nil {
+		return ""
+	}
+	if len(directive.GetParameters()) == 0 {
+		return ""
+	}
+
+	return directive.GetParameters()[0]
+}
+
+func (p *Parser) GetOCSP() bool {
+	directive, err := p.FindOne("server.ssl_stapling")
+	if err != nil {
+		return false
+	}
+	if len(directive.GetParameters()) == 0 {
+		return false
+	}
+
+	return directive.GetParameters()[0] == "on"
+}
+
+func (p *Parser) GetHSTS() bool {
 	directives, err := p.Find("server.add_header")
 	if err != nil {
-		return false, err
+		return false
 	}
 
 	for _, dir := range directives {
 		if slices.Contains(dir.GetParameters(), "Strict-Transport-Security") {
-			return true, nil
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }
 
-func (p *Parser) GetHTTPRedirect() (bool, error) {
+func (p *Parser) GetHTTPSRedirect() (bool, error) {
 	directives, err := p.Find("server.if")
 	if err != nil {
 		return false, err

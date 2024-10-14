@@ -63,16 +63,21 @@ func (p *Parser) SetRoot(root string) error {
 	})
 }
 
-func (p *Parser) SetIncludes(includes []string) error {
+func (p *Parser) SetIncludes(includes []string, comments [][]string) error {
 	if err := p.Clear("server.include"); err != nil {
 		return err
 	}
 
 	var directives []*config.Directive
-	for _, i := range includes {
+	for i, item := range includes {
+		var comment []string
+		if i < len(comments) {
+			comment = comments[i]
+		}
 		directives = append(directives, &config.Directive{
 			Name:       "include",
-			Parameters: []string{i},
+			Parameters: []string{item},
+			Comment:    comment,
 		})
 	}
 
@@ -160,7 +165,6 @@ func (p *Parser) SetHTTPS(cert, key string) error {
 		{
 			Name:       "ssl_certificate",
 			Parameters: []string{cert},
-			Comment:    []string{"# https配置"},
 		},
 		{
 			Name:       "ssl_certificate_key",
@@ -189,6 +193,32 @@ func (p *Parser) SetHTTPS(cert, key string) error {
 		{
 			Name:       "ssl_early_data",
 			Parameters: []string{"on"},
+		},
+	})
+}
+
+func (p *Parser) SetHTTPSProtocols(protocols []string) error {
+	if err := p.Clear("server.ssl_protocols"); err != nil {
+		return err
+	}
+
+	return p.Set("server", []*config.Directive{
+		{
+			Name:       "ssl_protocols",
+			Parameters: protocols,
+		},
+	})
+}
+
+func (p *Parser) SetHTTPSCiphers(ciphers string) error {
+	if err := p.Clear("server.ssl_ciphers"); err != nil {
+		return err
+	}
+
+	return p.Set("server", []*config.Directive{
+		{
+			Name:       "ssl_ciphers",
+			Parameters: []string{ciphers},
 		},
 	})
 }
@@ -251,15 +281,15 @@ func (p *Parser) SetHSTS(hsts bool) error {
 		directives = append(directives, &config.Directive{
 			Name:       "add_header",
 			Parameters: []string{"Strict-Transport-Security", "max-age=31536000"},
-			Comment:    []string{"# hsts配置"},
 		})
 	}
 
 	return p.Set("server", directives)
 }
 
-func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
-	old, err := p.Find("server.if")
+func (p *Parser) SetHTTPSRedirect(httpRedirect bool) error {
+	// if 重定向
+	ifs, err := p.Find("server.if")
 	if err != nil {
 		return err
 	}
@@ -269,27 +299,25 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 
 	var directives []*config.Directive
 	var foundFlag bool
-	for _, dir := range old {
-		for _, dir2 := range dir.GetBlock().GetDirectives() { // if 中所有指令
-			if block, ok := dir2.GetBlock().(*config.Block); ok {
-				var newDirectives []config.IDirective
-				for _, directive := range block.GetDirectives() {
-					if !httpRedirect {
-						// 不启用http重定向，则判断并移除特定的return指令
-						if directive.GetName() != "return" && !slices.Contains(directive.GetParameters(), "https://$host$request_uri") {
-							newDirectives = append(newDirectives, directive)
-						}
-					} else {
-						// 启用http重定向，需要检查防止重复添加
-						if directive.GetName() == "return" && slices.Contains(directive.GetParameters(), "https://$host$request_uri") {
-							foundFlag = true
-						}
-						newDirectives = append(newDirectives, directive)
-					}
-
+	for _, dir := range ifs { // 所有 if
+		var ifDirectives []config.IDirective
+		for _, dir2 := range dir.GetBlock().GetDirectives() { // 每个 if 中所有指令
+			if !httpRedirect {
+				// 不启用http重定向，则判断并移除特定的return指令
+				if dir2.GetName() != "return" && !slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
+					ifDirectives = append(ifDirectives, dir2)
 				}
-				block.Directives = newDirectives
+			} else {
+				// 启用http重定向，需要检查防止重复添加
+				if dir2.GetName() == "return" && slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
+					foundFlag = true
+				}
+				ifDirectives = append(ifDirectives, dir2)
 			}
+		}
+		// 写回 if 指令
+		if block, ok := dir.GetBlock().(*config.Block); ok {
+			block.Directives = ifDirectives
 		}
 		directives = append(directives, &config.Directive{
 			Block:      dir.GetBlock(),
@@ -304,16 +332,61 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 			Name:       "if",
 			Block:      &config.Block{},
 			Parameters: []string{"($scheme", "=", "http)"},
-			Comment:    []string{"# http重定向"},
 		}
 		redirectDir := &config.Directive{
 			Name:       "return",
-			Parameters: []string{"301", "https://$host$request_uri"},
+			Parameters: []string{"308", "https://$host$request_uri"},
 		}
 		redirectDir.SetParent(ifDir.GetBlock())
 		ifBlock := ifDir.GetBlock().(*config.Block)
 		ifBlock.Directives = append(ifBlock.Directives, redirectDir)
 		directives = append(directives, ifDir)
+	}
+
+	if err = p.Set("server", directives); err != nil {
+		return err
+	}
+
+	// error_page 497 重定向
+	directives = nil
+	errorPages, err := p.Find("server.error_page")
+	if err != nil {
+		return err
+	}
+	if err = p.Clear("server.error_page"); err != nil {
+		return err
+	}
+	var found497 bool
+	for _, dir := range errorPages {
+		if !httpRedirect {
+			// 不启用https重定向，则判断并移除特定的return指令
+			if !slices.Contains(dir.GetParameters(), "497") && !slices.Contains(dir.GetParameters(), "https://$host:$server_port$request_uri") {
+				directives = append(directives, &config.Directive{
+					Block:      dir.GetBlock(),
+					Name:       dir.GetName(),
+					Parameters: dir.GetParameters(),
+					Comment:    dir.GetComment(),
+				})
+			}
+		} else {
+			// 启用https重定向，需要检查防止重复添加
+			if slices.Contains(dir.GetParameters(), "497") && slices.Contains(dir.GetParameters(), "https://$host:$server_port$request_uri") {
+				found497 = true
+			}
+			directives = append(directives, &config.Directive{
+				Block:      dir.GetBlock(),
+				Name:       dir.GetName(),
+				Parameters: dir.GetParameters(),
+				Comment:    dir.GetComment(),
+			})
+		}
+	}
+
+	if !found497 && httpRedirect {
+		directives = append(directives, &config.Directive{
+			Name:       "error_page",
+			Parameters: []string{"497", "=307", "https://$host:$server_port$request_uri"},
+		})
 	}
 
 	return p.Set("server", directives)

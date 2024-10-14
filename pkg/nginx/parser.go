@@ -160,8 +160,12 @@ func (p *Parser) Dump() string {
 
 func (p *Parser) sortDirectives(directives []config.IDirective, orderIndex map[string]int) {
 	slices.SortFunc(directives, func(a config.IDirective, b config.IDirective) int {
-		return orderIndex[a.GetName()] - orderIndex[b.GetName()]
+		if orderIndex[a.GetName()] != orderIndex[b.GetName()] {
+			return orderIndex[a.GetName()] - orderIndex[b.GetName()]
+		}
+		return slices.Compare(a.GetParameters(), b.GetParameters())
 	})
+
 	for _, directive := range directives {
 		if block, ok := directive.GetBlock().(*config.Block); ok {
 			p.sortDirectives(block.Directives, orderIndex)
