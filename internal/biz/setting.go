@@ -21,6 +21,7 @@ const (
 	SettingKeySshPort           SettingKey = "ssh_port"
 	SettingKeySshUser           SettingKey = "ssh_user"
 	SettingKeySshPassword       SettingKey = "ssh_password"
+	SettingKeyOfflineMode       SettingKey = "offline_mode"
 )
 
 type Setting struct {
@@ -33,6 +34,7 @@ type Setting struct {
 
 type SettingRepo interface {
 	Get(key SettingKey, defaultValue ...string) (string, error)
+	GetBool(key SettingKey, defaultValue ...bool) (bool, error)
 	Set(key SettingKey, value string) error
 	Delete(key SettingKey) error
 	GetPanelSetting(ctx context.Context) (*request.PanelSetting, error)

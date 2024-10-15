@@ -226,12 +226,15 @@
           "placeholder": "admin{'@'}example.com"
         },
         "port": {
-          "label": "Port (After saving, restart the panel and modify the browser address bar's port to the new port to access the panel)",
+          "label": "Port",
           "placeholder": "8888"
         },
         "entrance": {
-          "label": "Security entrance (After saving, restart the panel and clear the browser Cookies to take effect)",
+          "label": "Security entrance",
           "placeholder": "admin"
+        },
+        "offline": {
+          "label": "Offline mode"
         },
         "https": {
           "label": "Panel HTTPS"

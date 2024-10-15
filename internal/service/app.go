@@ -12,12 +12,14 @@ import (
 )
 
 type AppService struct {
-	appRepo biz.AppRepo
+	appRepo     biz.AppRepo
+	settingRepo biz.SettingRepo
 }
 
 func NewAppService() *AppService {
 	return &AppService{
-		appRepo: data.NewAppRepo(),
+		appRepo:     data.NewAppRepo(),
+		settingRepo: data.NewSettingRepo(),
 	}
 }
 
@@ -162,6 +164,11 @@ func (s *AppService) IsInstalled(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *AppService) UpdateCache(w http.ResponseWriter, r *http.Request) {
+	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
+		Error(w, http.StatusForbidden, "离线模式下无法更新应用列表缓存")
+		return
+	}
+
 	if err := s.appRepo.UpdateCache(); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

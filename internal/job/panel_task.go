@@ -14,14 +14,16 @@ import (
 
 // PanelTask 面板每日任务
 type PanelTask struct {
-	appRepo    biz.AppRepo
-	backupRepo biz.BackupRepo
+	appRepo     biz.AppRepo
+	backupRepo  biz.BackupRepo
+	settingRepo biz.SettingRepo
 }
 
 func NewPanelTask() *PanelTask {
 	return &PanelTask{
-		appRepo:    data.NewAppRepo(),
-		backupRepo: data.NewBackupRepo(),
+		appRepo:     data.NewAppRepo(),
+		backupRepo:  data.NewBackupRepo(),
+		settingRepo: data.NewSettingRepo(),
 	}
 }
 
@@ -52,8 +54,10 @@ func (receiver *PanelTask) Run() {
 	}
 
 	// 更新商店缓存
-	if err = receiver.appRepo.UpdateCache(); err != nil {
-		app.Logger.Error("更新商店缓存失败", zap.Error(err))
+	if offline, err := receiver.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
+		if err = receiver.appRepo.UpdateCache(); err != nil {
+			app.Logger.Error("更新商店缓存失败", zap.Error(err))
+		}
 	}
 
 	// 回收内存

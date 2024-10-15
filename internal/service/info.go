@@ -207,6 +207,11 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 }
 
 func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
+	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
+		Error(w, http.StatusForbidden, "离线模式下无法检查更新")
+		return
+	}
+
 	current := app.Version
 	latest, err := s.api.LatestVersion()
 	if err != nil {
@@ -237,6 +242,11 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
+	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
+		Error(w, http.StatusForbidden, "离线模式下无法检查更新")
+		return
+	}
+
 	current := app.Version
 	latest, err := s.api.LatestVersion()
 	if err != nil {
@@ -261,7 +271,7 @@ func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 	versions, err := s.api.IntermediateVersions()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取更新信息失败：%v", err)
+		Error(w, http.StatusInternalServerError, "获取升级信息失败：%v", err)
 		return
 	}
 
@@ -269,13 +279,13 @@ func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
-	if s.taskRepo.HasRunningTask() {
-		Error(w, http.StatusInternalServerError, "当前有任务正在执行，禁止更新")
+	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
+		Error(w, http.StatusForbidden, "离线模式下无法升级")
 		return
 	}
-	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE)").Error; err != nil {
-		types.Status = types.StatusFailed
-		Error(w, http.StatusInternalServerError, "面板数据库异常，已终止操作：%v", err)
+
+	if s.taskRepo.HasRunningTask() {
+		Error(w, http.StatusInternalServerError, "后台任务正在运行，禁止升级，请稍后再试")
 		return
 	}
 
@@ -306,7 +316,7 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 
 func (s *InfoService) Restart(w http.ResponseWriter, r *http.Request) {
 	if s.taskRepo.HasRunningTask() {
-		Error(w, http.StatusInternalServerError, "当前有任务正在执行，禁止重启")
+		Error(w, http.StatusInternalServerError, "后台任务正在运行，禁止重启，请稍后再试")
 		return
 	}
 

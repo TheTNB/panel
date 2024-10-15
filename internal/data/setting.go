@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/go-rat/utils/hash"
 	"path/filepath"
 	"slices"
 
-	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
 	"github.com/gookit/color"
 	"github.com/spf13/cast"
@@ -22,10 +22,14 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type settingRepo struct{}
+type settingRepo struct {
+	taskRepo biz.TaskRepo
+}
 
 func NewSettingRepo() biz.SettingRepo {
-	return &settingRepo{}
+	return &settingRepo{
+		taskRepo: NewTaskRepo(),
+	}
 }
 
 func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, error) {
@@ -41,6 +45,21 @@ func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, e
 	}
 
 	return setting.Value, nil
+}
+
+func (r *settingRepo) GetBool(key biz.SettingKey, defaultValue ...bool) (bool, error) {
+	setting := new(biz.Setting)
+	if err := app.Orm.Where("key = ?", key).First(setting).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, err
+		}
+	}
+
+	if setting.Value == "" && len(defaultValue) > 0 {
+		return defaultValue[0], nil
+	}
+
+	return cast.ToBool(setting.Value), nil
 }
 
 func (r *settingRepo) Set(key biz.SettingKey, value string) error {
@@ -66,16 +85,20 @@ func (r *settingRepo) Delete(key biz.SettingKey) error {
 }
 
 func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSetting, error) {
-	name := new(biz.Setting)
-	if err := app.Orm.Where("key = ?", biz.SettingKeyName).First(name).Error; err != nil {
+	name, err := r.Get(biz.SettingKeyName)
+	if err != nil {
 		return nil, err
 	}
-	websitePath := new(biz.Setting)
-	if err := app.Orm.Where("key = ?", biz.SettingKeyWebsitePath).First(websitePath).Error; err != nil {
+	offlineMode, err := r.Get(biz.SettingKeyOfflineMode)
+	if err != nil {
 		return nil, err
 	}
-	backupPath := new(biz.Setting)
-	if err := app.Orm.Where("key = ?", biz.SettingKeyBackupPath).First(backupPath).Error; err != nil {
+	websitePath, err := r.Get(biz.SettingKeyWebsitePath)
+	if err != nil {
+		return nil, err
+	}
+	backupPath, err := r.Get(biz.SettingKeyBackupPath)
+	if err != nil {
 		return nil, err
 	}
 
@@ -95,11 +118,12 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 	}
 
 	return &request.PanelSetting{
-		Name:        name.Value,
+		Name:        name,
 		Locale:      app.Conf.String("app.locale"),
 		Entrance:    app.Conf.String("http.entrance"),
-		WebsitePath: websitePath.Value,
-		BackupPath:  backupPath.Value,
+		OfflineMode: cast.ToBool(offlineMode),
+		WebsitePath: websitePath,
+		BackupPath:  backupPath,
 		Username:    user.Username,
 		Email:       user.Email,
 		Port:        app.Conf.Int("http.port"),
@@ -113,6 +137,9 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	if err := r.Set(biz.SettingKeyName, setting.Name); err != nil {
 		return false, err
 	}
+	if err := r.Set(biz.SettingKeyOfflineMode, cast.ToString(setting.OfflineMode)); err != nil {
+		return false, err
+	}
 	if err := r.Set(biz.SettingKeyWebsitePath, setting.WebsitePath); err != nil {
 		return false, err
 	}
@@ -120,6 +147,37 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 		return false, err
 	}
 
+	// 用户
+	user := new(biz.User)
+	userID := cast.ToUint(ctx.Value("user_id"))
+	if err := app.Orm.Where("id = ?", userID).First(user).Error; err != nil {
+		return false, err
+	}
+
+	user.Username = setting.Username
+	user.Email = setting.Email
+	if setting.Password != "" {
+		value, err := hash.NewArgon2id().Make(setting.Password)
+		if err != nil {
+			return false, err
+		}
+		user.Password = value
+	}
+	if err := app.Orm.Save(user).Error; err != nil {
+		return false, err
+	}
+
+	// 下面是需要需要重启的设置
+	// 面板HTTPS
+	restartFlag := false
+	oldCert, _ := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
+	oldKey, _ := io.Read(filepath.Join(app.Root, "panel/storage/cert.key"))
+	if oldCert != setting.Cert || oldKey != setting.Key {
+		if r.taskRepo.HasRunningTask() {
+			return false, errors.New("后台任务正在运行，禁止修改部分设置，请稍后再试")
+		}
+		restartFlag = true
+	}
 	if err := io.Write(filepath.Join(app.Root, "panel/storage/cert.pem"), setting.Cert, 0644); err != nil {
 		return false, err
 	}
@@ -127,7 +185,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 		return false, err
 	}
 
-	restartFlag := false
+	// 面板主配置
 	config := new(types.PanelConfig)
 	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
@@ -147,29 +205,13 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	if err != nil {
 		return false, err
 	}
-	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0644); err != nil {
-		return false, err
-	}
 	if raw != string(encoded) {
+		if r.taskRepo.HasRunningTask() {
+			return false, errors.New("后台任务正在运行，禁止修改部分设置，请稍后再试")
+		}
 		restartFlag = true
 	}
-
-	user := new(biz.User)
-	userID := cast.ToUint(ctx.Value("user_id"))
-	if err = app.Orm.Where("id = ?", userID).First(user).Error; err != nil {
-		return false, err
-	}
-
-	user.Username = setting.Username
-	user.Email = setting.Email
-	if setting.Password != "" {
-		value, err := hash.NewArgon2id().Make(setting.Password)
-		if err != nil {
-			return false, err
-		}
-		user.Password = value
-	}
-	if err = app.Orm.Save(user).Error; err != nil {
+	if err = io.Write("/usr/local/etc/panel/config.yml", string(encoded), 0644); err != nil {
 		return false, err
 	}
 
@@ -222,7 +264,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		color.Greenln("|-前置检查...")
 	}
 	if io.Exists("/tmp/panel-storage.zip") {
-		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败所致，请运行 panel-cli fix 修复后重试")
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次升级失败所致，请运行 panel-cli fix 修复后重试")
 	}
 
 	if app.IsCli {

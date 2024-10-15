@@ -6,6 +6,7 @@ export interface Setting {
   email: string
   port: number
   entrance: string
+  offline_mode: boolean
   website_path: string
   backup_path: string
   https: boolean

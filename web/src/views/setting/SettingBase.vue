@@ -16,6 +16,7 @@ const model = ref<Setting>({
   email: '',
   port: 8888,
   entrance: '',
+  offline_mode: false,
   website_path: '',
   backup_path: '',
   https: false,
@@ -66,7 +67,7 @@ onMounted(() => {
           :placeholder="$t('settingIndex.edit.fields.name.placeholder')"
         />
       </n-form-item>
-      <n-form-item :label="$t('settingIndex.edit.fields.locale.label')">
+      <n-form-item v-show="false" label="$t('settingIndex.edit.fields.locale.label')">
         <n-select v-model:value="model.locale" :options="locales"> </n-select>
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.username.label')">
@@ -98,6 +99,9 @@ onMounted(() => {
           v-model:value="model.entrance"
           :placeholder="$t('settingIndex.edit.fields.entrance.placeholder')"
         />
+      </n-form-item>
+      <n-form-item :label="$t('settingIndex.edit.fields.offline.label')">
+        <n-switch v-model:value="model.offline_mode" />
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.path.label')">
         <n-input
