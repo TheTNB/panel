@@ -67,7 +67,13 @@ As system versions are constantly updated, we may also terminate support for som
 > **Warning**
 > Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. We are not recommended for users with zero basic knowledge to install and use Rat Panel.
 
-If you decide to continue, please log in to the server as `root` user and execute the following command to install the panel:
+If your server has an unmounted data disk, you can run the following command as the `root` user to automatically mount it before installation. The panel does not support cross-directory migration after installation.
+
+```shell
+curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
+```
+
+After you are ready, log in to the server as the `root` user and execute the following command to install the panel:
 
 **Current v2.3.x is a test version, welcome to help us test compatibility on different operating systems.**
 
