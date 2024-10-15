@@ -1,4 +1,4 @@
-name: Issue Auto Close
+name: Issue Auto Lock
 on:
   schedule:
     - cron: "0 */6 * * *"
@@ -12,16 +12,14 @@ permissions:
   issues: write
   contents: read
 jobs:
-  issue-close:
+  issue-lock:
     runs-on: ubuntu-latest
     steps:
       - name: Set GH_REPO
         run: echo "GH_REPO=${{ github.repository }}" >> $GITHUB_ENV
-      - name: Auto Lock Baipiao
-        uses: devhaozi/issue-auto-lock@v1.0.0
+      - name: Auto Lock Issue
+        uses: devhaozi/issue-auto-lock@v1
         with:
           gh_repo: ${{ github.repository }}
           gh_token: ${{ secrets.GITHUB_TOKEN }}
           issue_labels: "⭐ No Star"
-          issue_close_comment: 'Thank you for opening this issue. I noticed that you haven not given me a star yet, so I will close this issue. Please give me a star first and wait for it to be unlocked. Thank you for your understanding.'
-          issue_reopen_comment: 'Thank you for giving me a star. I have unlocked this issue. If you have any questions, please feel free to ask. Thank you for your support.'
