@@ -1,0 +1,25 @@
+name: Issue Auto Reply
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  issues:
+    types: [ opened ]
+permissions:
+  issues: write
+  contents: read
+jobs:
+  issue-close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set GH_REPO
+        run: echo "GH_REPO=${{ github.repository }}" >> $GITHUB_ENV
+      - name: Auto Lock Baipiao
+        uses: 14790897/auto-lock-baipiao@v1.0.1
+        with:
+          gh_repo: ${{ github.repository }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          issue_labels: "⭐ No Star"
