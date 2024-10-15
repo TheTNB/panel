@@ -119,9 +119,15 @@ panel-cli
 
 ### CDN
 
-[![无畏云加速](.github/assets/sctes.png)](https://su.sctes.com/register?code=8st689ujpmm2p)
-[![WAFPRO](.github/assets/wafpro.png)](https://su.sctes.com/register?code=8st689ujpmm2p)
-[![盾云SCDN](.github/assets/ddunyun.png)](https://scdn.ddunyun.com/)
+<a href="https://su.sctes.com/register?code=8st689ujpmm2p">
+  <img height="80" src=".github/assets/sctes.png" alt="无畏云加速">
+</a>
+<a href="https://su.sctes.com/register?code=8st689ujpmm2p">
+  <img height="80" src=".github/assets/wafpro.png" alt="WAFPRO">
+</a>
+<a href="https://scdn.ddunyun.com/">
+  <img height="80" src=".github/assets/ddunyun.png" alt="盾云SCDN">
+</a>
 
 <p align="center">
   <a target="_blank" href="https://afdian.com/a/TheTNB">
