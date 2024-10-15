@@ -9,6 +9,7 @@ import (
 	"github.com/go-playground/validator/v10/translations/zh"
 
 	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/http/rule"
 )
 
 func initValidator() {
@@ -23,4 +24,7 @@ func initValidator() {
 
 	app.Translator = &trans
 	app.Validator = validate
+	if err := rule.RegisterRules(validate); err != nil {
+		log.Fatalf("failed to register validator rules: %v", err)
+	}
 }

@@ -10,7 +10,7 @@ type CertCreate struct {
 }
 
 type CertUpdate struct {
-	ID        uint     `form:"id" json:"id" validate:"required"`
+	ID        uint     `form:"id" json:"id" validate:"required,exists=certs id"`
 	Type      string   `form:"type" json:"type" validate:"required"`
 	Domains   []string `form:"domains" json:"domains" validate:"min=1,dive,required"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
@@ -20,6 +20,6 @@ type CertUpdate struct {
 }
 
 type CertDeploy struct {
-	ID        uint `form:"id" json:"id" validate:"required"`
+	ID        uint `form:"id" json:"id" validate:"required,exists=certs id"`
 	WebsiteID uint `form:"website_id" json:"website_id" validate:"required"`
 }

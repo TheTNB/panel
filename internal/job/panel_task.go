@@ -27,7 +27,7 @@ func NewPanelTask() *PanelTask {
 	}
 }
 
-func (receiver *PanelTask) Run() {
+func (r *PanelTask) Run() {
 	types.Status = types.StatusMaintain
 
 	// 优化数据库
@@ -41,21 +41,21 @@ func (receiver *PanelTask) Run() {
 	}
 
 	// 备份面板
-	if err := receiver.backupRepo.Create(biz.BackupTypePanel, ""); err != nil {
+	if err := r.backupRepo.Create(biz.BackupTypePanel, ""); err != nil {
 		app.Logger.Error("备份面板失败", zap.Error(err))
 	}
 
 	// 清理备份
-	path, err := receiver.backupRepo.GetPath("panel")
+	path, err := r.backupRepo.GetPath("panel")
 	if err == nil {
-		if err = receiver.backupRepo.ClearExpired(path, "panel_", 10); err != nil {
+		if err = r.backupRepo.ClearExpired(path, "panel_", 10); err != nil {
 			app.Logger.Error("清理面板备份失败", zap.Error(err))
 		}
 	}
 
 	// 更新商店缓存
-	if offline, err := receiver.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
-		if err = receiver.appRepo.UpdateCache(); err != nil {
+	if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
+		if err = r.appRepo.UpdateCache(); err != nil {
 			app.Logger.Error("更新商店缓存失败", zap.Error(err))
 		}
 	}

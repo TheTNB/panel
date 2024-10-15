@@ -20,19 +20,19 @@ func NewProcessTask(taskRepo biz.TaskRepo) *ProcessTask {
 	}
 }
 
-func (receiver *ProcessTask) Handle(args ...any) error {
+func (r *ProcessTask) Handle(args ...any) error {
 	taskID, ok := args[0].(uint)
 	if !ok {
 		return errors.New("参数错误")
 	}
-	receiver.taskID = taskID
+	r.taskID = taskID
 
-	task, err := receiver.taskRepo.Get(taskID)
+	task, err := r.taskRepo.Get(taskID)
 	if err != nil {
 		return err
 	}
 
-	if err = receiver.taskRepo.UpdateStatus(taskID, biz.TaskStatusRunning); err != nil {
+	if err = r.taskRepo.UpdateStatus(taskID, biz.TaskStatusRunning); err != nil {
 		return err
 	}
 
@@ -40,13 +40,13 @@ func (receiver *ProcessTask) Handle(args ...any) error {
 		return err
 	}
 
-	if err = receiver.taskRepo.UpdateStatus(taskID, biz.TaskStatusSuccess); err != nil {
+	if err = r.taskRepo.UpdateStatus(taskID, biz.TaskStatusSuccess); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (receiver *ProcessTask) ErrHandle(err error) {
-	_ = receiver.taskRepo.UpdateStatus(receiver.taskID, biz.TaskStatusFailed)
+func (r *ProcessTask) ErrHandle(err error) {
+	_ = r.taskRepo.UpdateStatus(r.taskID, biz.TaskStatusFailed)
 }

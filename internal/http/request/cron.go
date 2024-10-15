@@ -1,9 +1,9 @@
 package request
 
 type CronCreate struct {
-	Name       string `form:"name" json:"name" validate:"required"`
+	Name       string `form:"name" json:"name" validate:"required,not_exists=crons name"`
 	Type       string `form:"type" json:"type" validate:"required"`
-	Time       string `form:"time" json:"time" validate:"required"`
+	Time       string `form:"time" json:"time" validate:"required,cron"`
 	Script     string `form:"script" json:"script"`
 	BackupType string `form:"backup_type" json:"backup_type" validate:"required"`
 	BackupPath string `form:"backup_path" json:"backup_path"`
@@ -12,13 +12,13 @@ type CronCreate struct {
 }
 
 type CronUpdate struct {
-	ID     uint   `form:"id" json:"id" validate:"required"`
+	ID     uint   `form:"id" json:"id" validate:"required,exists=crons id"`
 	Name   string `form:"name" json:"name" validate:"required"`
-	Time   string `form:"time" json:"time" validate:"required"`
+	Time   string `form:"time" json:"time" validate:"required,cron"`
 	Script string `form:"script" json:"script" validate:"required"`
 }
 
 type CronStatus struct {
-	ID     uint `form:"id" json:"id" validate:"required"`
+	ID     uint `form:"id" json:"id" validate:"required,exists=crons id"`
 	Status bool `form:"status" json:"status"`
 }

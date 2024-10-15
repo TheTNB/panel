@@ -8,7 +8,7 @@ type WebsiteDefaultConfig struct {
 }
 
 type WebsiteCreate struct {
-	Name       string   `form:"name" json:"name" validate:"required"`
+	Name       string   `form:"name" json:"name" validate:"required,not_exists=websites name"`
 	Listens    []string `form:"listens" json:"listens" validate:"min=1,dive,required"`
 	Domains    []string `form:"domains" json:"domains" validate:"min=1,dive,required"`
 	Path       string   `form:"path" json:"path"`
@@ -21,13 +21,13 @@ type WebsiteCreate struct {
 }
 
 type WebsiteDelete struct {
-	ID   uint `form:"id" json:"id" validate:"required"`
+	ID   uint `form:"id" json:"id" validate:"required,exists=websites id"`
 	Path bool `form:"path" json:"path"`
 	DB   bool `form:"db" json:"db"`
 }
 
 type WebsiteUpdate struct {
-	ID                uint                  `form:"id" json:"id" validate:"required"`
+	ID                uint                  `form:"id" json:"id" validate:"required,exists=websites id"`
 	Listens           []types.WebsiteListen `form:"listens" json:"listens" validate:"min=1"`
 	Domains           []string              `form:"domains" json:"domains" validate:"min=1,dive,required"`
 	HTTPS             bool                  `form:"https" json:"https"`
@@ -46,11 +46,11 @@ type WebsiteUpdate struct {
 }
 
 type WebsiteUpdateRemark struct {
-	ID     uint   `form:"id" json:"id" validate:"required"`
+	ID     uint   `form:"id" json:"id" validate:"required,exists=websites id"`
 	Remark string `form:"remark" json:"remark"`
 }
 
 type WebsiteUpdateStatus struct {
-	ID     uint `json:"id" form:"id" validate:"required"`
+	ID     uint `json:"id" form:"id" validate:"required,exists=websites id"`
 	Status bool `json:"status" form:"status"`
 }

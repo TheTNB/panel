@@ -24,7 +24,7 @@ func NewMonitoring() *Monitoring {
 	}
 }
 
-func (receiver *Monitoring) Run() {
+func (r *Monitoring) Run() {
 	if types.Status != types.StatusNormal {
 		return
 	}
@@ -33,7 +33,7 @@ func (receiver *Monitoring) Run() {
 	//task := data.NewTaskRepo()
 	//_ = task.DispatchWaiting()
 
-	monitor, err := receiver.settingRepo.Get(biz.SettingKeyMonitor)
+	monitor, err := r.settingRepo.Get(biz.SettingKeyMonitor)
 	if err != nil || !cast.ToBool(monitor) {
 		return
 	}
@@ -54,7 +54,7 @@ func (receiver *Monitoring) Run() {
 	}
 
 	// 删除过期数据
-	dayStr, err := receiver.settingRepo.Get(biz.SettingKeyMonitorDays)
+	dayStr, err := r.settingRepo.Get(biz.SettingKeyMonitorDays)
 	if err != nil {
 		return
 	}

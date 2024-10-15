@@ -23,7 +23,7 @@ func NewCertRenew() *CertRenew {
 	}
 }
 
-func (receiver *CertRenew) Run() {
+func (r *CertRenew) Run() {
 	if types.Status != types.StatusNormal {
 		return
 	}
@@ -50,7 +50,7 @@ func (receiver *CertRenew) Run() {
 			continue
 		}
 
-		_, err = receiver.certRepo.Renew(cert.ID)
+		_, err = r.certRepo.Renew(cert.ID)
 		if err != nil {
 			app.Logger.Error("续签证书失败", zap.Error(err))
 		}
