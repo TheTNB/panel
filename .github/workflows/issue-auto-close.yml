@@ -18,7 +18,7 @@ jobs:
       - name: Set GH_REPO
         run: echo "GH_REPO=${{ github.repository }}" >> $GITHUB_ENV
       - name: Auto Lock Baipiao
-        uses: 14790897/auto-lock-baipiao@v0.1.7
+        uses: 14790897/auto-lock-baipiao@v1.0.1
         with:
           gh_repo: ${{ github.repository }}
           gh_token: ${{ secrets.GITHUB_TOKEN }}
