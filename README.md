@@ -73,7 +73,7 @@
 curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
 ```
 
-准备就绪后，请以`root`用户登录服务器，执行以下命令安装面板：
+准备就绪后，请以`root`用户登录服务器，运行以下命令安装面板：
 
 **当前 v2.3.x 为测试版本，欢迎帮助我们测试在不同操作系统下的兼容性。**
 

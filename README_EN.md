@@ -73,7 +73,7 @@ If your server has an unmounted data disk, you can run the following command as 
 curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
 ```
 
-After you are ready, log in to the server as the `root` user and execute the following command to install the panel:
+After you are ready, log in to the server as the `root` user and run the following command to install the panel:
 
 **Current v2.3.x is a test version, welcome to help us test compatibility on different operating systems.**
 
