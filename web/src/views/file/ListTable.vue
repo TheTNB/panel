@@ -255,11 +255,11 @@ const data = ref<RowData[]>([])
 const pagination = reactive({
   page: 1,
   pageCount: 1,
-  pageSize: 20,
+  pageSize: 100,
   itemCount: 0,
   showQuickJumper: true,
   showSizePicker: true,
-  pageSizes: [20, 50, 100, 200, 500, 1000]
+  pageSizes: [100, 200, 500, 1000, 1500, 2000, 5000]
 })
 
 const handlePageSizeChange = (pageSize: number) => {

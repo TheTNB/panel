@@ -126,11 +126,11 @@ const selectedRowKeys = ref<any>([])
 const pagination = reactive({
   page: 1,
   pageCount: 1,
-  pageSize: 15,
+  pageSize: 20,
   itemCount: 0,
   showQuickJumper: true,
   showSizePicker: true,
-  pageSizes: [15, 30, 50, 100]
+  pageSizes: [20, 50, 100, 200]
 })
 
 const handleDelete = (id: number) => {
