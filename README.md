@@ -111,11 +111,15 @@ panel-cli
 
 ### 资金
 
-[![微晓朵](.github/assets/wxd.png)](https://www.weixiaoduo.com/)
+<a href="https://www.weixiaoduo.com/">
+  <img height="80" src=".github/assets/wxd.png" alt="微晓朵">
+</a>
 
 ### 服务器
 
-[![林枫云](.github/assets/dk.png)](https://www.dkdun.cn/)
+<a href="https://www.dkdun.cn/">
+  <img height="80" src=".github/assets/dk.png" alt="林枫云">
+</a>
 
 ### CDN
 

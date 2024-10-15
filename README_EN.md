@@ -111,11 +111,15 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 
 ### Financial
 
-[![微晓朵](.github/assets/wxd.png)](https://www.weixiaoduo.com/)
+<a href="https://www.weixiaoduo.com/">
+  <img height="80" src=".github/assets/wxd.png" alt="微晓朵">
+</a>
 
 ### Server
 
-[![林枫云](.github/assets/dk.png)](https://www.dkdun.cn/)
+<a href="https://www.dkdun.cn/">
+  <img height="80" src=".github/assets/dk.png" alt="林枫云">
+</a>
 
 ### CDN
 
