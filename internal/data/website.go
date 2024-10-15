@@ -131,9 +131,9 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 		setting.OCSP = p.GetOCSP()
 	}
 	// 证书
-	crt, _ := io.Read(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"))
+	crt, _ := io.Read(filepath.Join(app.Root, "server/vhost/cert", website.Name+".pem"))
 	setting.SSLCertificate = crt
-	key, _ := io.Read(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key"))
+	key, _ := io.Read(filepath.Join(app.Root, "server/vhost/cert", website.Name+".key"))
 	setting.SSLCertificateKey = key
 	// 解析证书信息
 	if decode, err := cert.ParseCert(crt); err == nil {
@@ -208,13 +208,15 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	if err = p.SetPHP(req.PHP); err != nil {
 		return nil, err
 	}
-	// 伪静态
+	// 伪静态和acme
 	includes, comments, err := p.GetIncludes()
 	if err != nil {
 		return nil, err
 	}
 	includes = append(includes, filepath.Join(app.Root, "server/vhost/rewrite", req.Name+".conf"))
+	includes = append(includes, filepath.Join(app.Root, "server/vhost/acme", req.Name+".conf"))
 	comments = append(comments, []string{"# 伪静态规则"})
+	comments = append(comments, []string{"# acme http-01"})
 	if err = p.SetIncludes(includes, comments); err != nil {
 		return nil, err
 	}
@@ -252,10 +254,13 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	if err = io.Write(filepath.Join(app.Root, "server/vhost/rewrite", req.Name+".conf"), "", 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", req.Name+".pem"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/acme", req.Name+".conf"), "", 0644); err != nil {
 		return nil, err
 	}
-	if err = io.Write(filepath.Join(app.Root, "server/vhost/ssl", req.Name+".key"), "", 0644); err != nil {
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/cert", req.Name+".pem"), "", 0644); err != nil {
+		return nil, err
+	}
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/cert", req.Name+".key"), "", 0644); err != nil {
 		return nil, err
 	}
 
@@ -389,8 +394,8 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		return err
 	}
 	// HTTPS
-	certPath := filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem")
-	keyPath := filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key")
+	certPath := filepath.Join(app.Root, "server/vhost/cert", website.Name+".pem")
+	keyPath := filepath.Join(app.Root, "server/vhost/cert", website.Name+".key")
 	if err = io.Write(certPath, req.SSLCertificate, 0644); err != nil {
 		return err
 	}
@@ -471,14 +476,14 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		return err
 	}
 	if website.Cert != nil {
-		return errors.New("网站" + website.Name + "已绑定SSL证书，请先删除证书")
+		return errors.New("网站" + website.Name + "已绑定证书，请先删除证书")
 	}
 
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost", website.Name+".conf"))
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"))
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"))
-	_ = io.Remove(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".pem"))
-	_ = io.Remove(filepath.Join(app.Root, "server/vhost/ssl", website.Name+".key"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/cert", website.Name+".pem"))
+	_ = io.Remove(filepath.Join(app.Root, "server/vhost/cert", website.Name+".key"))
 
 	if req.Path {
 		_ = io.Remove(website.Path)

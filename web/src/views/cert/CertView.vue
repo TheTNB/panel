@@ -215,7 +215,7 @@ const certColumns: any = [
                         cert
                           .obtain(row.id)
                           .then(() => {
-                            window.$message.success('签发成功，请前往网站管理启用 SSL')
+                            window.$message.success('签发成功，请前往网站管理启用HTTPS')
                             onCertPageChange(1)
                           })
                           .finally(() => {
@@ -228,7 +228,7 @@ const certColumns: any = [
                     cert
                       .obtain(row.id)
                       .then(() => {
-                        window.$message.success('签发成功，请前往网站管理启用 SSL')
+                        window.$message.success('签发成功，请前往网站管理启用HTTPS')
                         onCertPageChange(1)
                       })
                       .finally(() => {
@@ -276,7 +276,7 @@ const certColumns: any = [
                   })
                   await cert.renew(row.id)
                   messageReactive.destroy()
-                  window.$message.success('续签成功，请前往网站管理启用 SSL')
+                  window.$message.success('续签成功')
                   onCertPageChange(1)
                 }
               },
@@ -417,7 +417,7 @@ const handleUpdateCert = async () => {
 
 const handleDeployCert = async () => {
   await cert.deploy(deployCertModel.value.id, deployCertModel.value.website_id)
-  window.$message.success('部署成功，请前往网站管理启用 SSL')
+  window.$message.success('部署成功，请前往网站管理启用HTTPS')
   deployCertModal.value = false
   deployCertModel.value.id = 0
   deployCertModel.value.website_id = 0

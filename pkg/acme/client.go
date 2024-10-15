@@ -60,8 +60,8 @@ func (c *Client) UseHTTP(conf, path string) {
 	}
 }
 
-// ObtainSSL 签发 SSL 证书
-func (c *Client) ObtainSSL(ctx context.Context, domains []string, keyType KeyType) (Certificate, error) {
+// ObtainCertificate 签发 SSL 证书
+func (c *Client) ObtainCertificate(ctx context.Context, domains []string, keyType KeyType) (Certificate, error) {
 	certPrivateKey, err := generatePrivateKey(keyType)
 	if err != nil {
 		return Certificate{}, err
@@ -76,12 +76,12 @@ func (c *Client) ObtainSSL(ctx context.Context, domains []string, keyType KeyTyp
 		return Certificate{}, err
 	}
 
-	cert := c.selectPreferredChain(certs)
-	return Certificate{PrivateKey: pemPrivateKey, Certificate: cert}, nil
+	crt := c.selectPreferredChain(certs)
+	return Certificate{PrivateKey: pemPrivateKey, Certificate: crt}, nil
 }
 
-// ObtainSSLManual 手动验证 SSL 证书
-func (c *Client) ObtainSSLManual() (Certificate, error) {
+// ObtainCertificateManual 手动验证 SSL 证书
+func (c *Client) ObtainCertificateManual() (Certificate, error) {
 	// 发送信号，开始验证
 	c.controlChan <- struct{}{}
 	// 等待验证完成
@@ -94,20 +94,20 @@ func (c *Client) ObtainSSLManual() (Certificate, error) {
 	return data.(Certificate), nil
 }
 
-// RenewSSL 续签 SSL 证书
-func (c *Client) RenewSSL(ctx context.Context, certUrl string, domains []string, keyType KeyType) (Certificate, error) {
+// RenewCertificate 续签 SSL 证书
+func (c *Client) RenewCertificate(ctx context.Context, certUrl string, domains []string, keyType KeyType) (Certificate, error) {
 	_, err := c.zClient.GetCertificateChain(ctx, c.Account, certUrl)
 	if err != nil {
 		return Certificate{}, err
 	}
 
-	return c.ObtainSSL(ctx, domains, keyType)
+	return c.ObtainCertificate(ctx, domains, keyType)
 }
 
 // GetDNSRecords 获取 DNS 解析（手动设置）
 func (c *Client) GetDNSRecords(ctx context.Context, domains []string, keyType KeyType) ([]DNSRecord, error) {
 	go func(ctx context.Context, domains []string, keyType KeyType) {
-		certs, err := c.ObtainSSL(ctx, domains, keyType)
+		certs, err := c.ObtainCertificate(ctx, domains, keyType)
 		// 将证书和错误信息发送到 dataChan
 		if err != nil {
 			c.dataChan <- err

@@ -133,7 +133,7 @@ func (s *NginxTestSuite) TestHTTPS() {
 	parser, err := NewParser()
 	s.NoError(err)
 	s.False(parser.GetHTTPS())
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.True(parser.GetHTTPS())
 	expect, err := io.Read("testdata/https.conf")
 	s.NoError(err)
@@ -143,7 +143,7 @@ func (s *NginxTestSuite) TestHTTPS() {
 func (s *NginxTestSuite) TestHTTPSProtocols() {
 	parser, err := NewParser()
 	s.NoError(err)
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.Equal([]string{"TLSv1.2", "TLSv1.3"}, parser.GetHTTPSProtocols())
 	s.NoError(parser.SetHTTPSProtocols([]string{"TLSv1.3"}))
 	s.Equal([]string{"TLSv1.3"}, parser.GetHTTPSProtocols())
@@ -152,7 +152,7 @@ func (s *NginxTestSuite) TestHTTPSProtocols() {
 func (s *NginxTestSuite) TestHTTPSCiphers() {
 	parser, err := NewParser()
 	s.NoError(err)
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.Equal("ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305", parser.GetHTTPSCiphers())
 	s.NoError(parser.SetHTTPSCiphers("TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384"))
 	s.Equal("TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384", parser.GetHTTPSCiphers())
@@ -162,7 +162,7 @@ func (s *NginxTestSuite) TestOCSP() {
 	parser, err := NewParser()
 	s.NoError(err)
 	s.NoError(err)
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.False(parser.GetOCSP())
 	s.NoError(parser.SetOCSP(false))
 	s.False(parser.GetOCSP())
@@ -175,7 +175,7 @@ func (s *NginxTestSuite) TestOCSP() {
 func (s *NginxTestSuite) TestHSTS() {
 	parser, err := NewParser()
 	s.NoError(err)
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.False(parser.GetHSTS())
 	s.NoError(parser.SetHSTS(false))
 	s.False(parser.GetHSTS())
@@ -188,7 +188,7 @@ func (s *NginxTestSuite) TestHSTS() {
 func (s *NginxTestSuite) TestHTTPSRedirect() {
 	parser, err := NewParser()
 	s.NoError(err)
-	s.NoError(parser.SetHTTPS("/www/server/vhost/ssl/default.pem", "/www/server/vhost/ssl/default.key"))
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
 	s.False(parser.GetHTTPSRedirect())
 	s.NoError(parser.SetHTTPRedirect(false))
 	s.False(parser.GetHTTPSRedirect())

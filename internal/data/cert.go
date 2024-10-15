@@ -97,7 +97,7 @@ func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
 		}
 	}
 
-	ssl, err := client.ObtainSSL(context.Background(), cert.Domains, acme.KeyType(cert.Type))
+	ssl, err := client.ObtainCertificate(context.Background(), cert.Domains, acme.KeyType(cert.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (r *certRepo) ObtainManual(id uint) (*acme.Certificate, error) {
 		return nil, errors.New("请重新获取 DNS 解析记录")
 	}
 
-	ssl, err := r.client.ObtainSSLManual()
+	ssl, err := r.client.ObtainCertificateManual()
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 		}
 	}
 
-	ssl, err := client.RenewSSL(context.Background(), cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
+	ssl, err := client.RenewCertificate(context.Background(), cert.CertURL, cert.Domains, acme.KeyType(cert.Type))
 	if err != nil {
 		return nil, err
 	}
@@ -236,10 +236,10 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 		return err
 	}
 
-	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.pem", app.Root, website.Name), cert.Cert, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/vhost/cert/%s.pem", app.Root, website.Name), cert.Cert, 0644); err != nil {
 		return err
 	}
-	if err = io.Write(fmt.Sprintf("%s/server/vhost/ssl/%s.key", app.Root, website.Name), cert.Key, 0644); err != nil {
+	if err = io.Write(fmt.Sprintf("%s/server/vhost/cert/%s.key", app.Root, website.Name), cert.Key, 0644); err != nil {
 		return err
 	}
 	if err = systemctl.Reload("nginx"); err != nil {

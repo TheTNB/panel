@@ -34,8 +34,8 @@ func (s *ClientTestSuite) TestObtainSSL() {
 
 	time.Sleep(2 * time.Minute)
 
-	ssl, err := client.ObtainSSLManual()*/
-	ssl, err := client.ObtainSSL(ctx, []string{"*.haozi.net", "haozi.net"}, KeyEC256)
+	ssl, err := client.ObtainCertificateManual()*/
+	ssl, err := client.ObtainCertificate(ctx, []string{"*.haozi.net", "haozi.net"}, KeyEC256)
 	s.Error(err)
 	s.NotNil(ssl)
 }
