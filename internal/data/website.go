@@ -556,7 +556,9 @@ func (r *websiteRepo) ResetConfig(id uint) error {
 		return err
 	}
 	includes = append(includes, filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"))
+	includes = append(includes, filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"))
 	comments = append(comments, []string{"# 伪静态规则"})
+	comments = append(comments, []string{"# acme http-01"})
 	if err = p.SetIncludes(includes, comments); err != nil {
 		return err
 	}
@@ -574,10 +576,13 @@ func (r *websiteRepo) ResetConfig(id uint) error {
 	if err = io.Write(filepath.Join(app.Root, "server/vhost/rewrite", website.Name+".conf"), "", 0644); err != nil {
 		return nil
 	}
+	if err = io.Write(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"), "", 0644); err != nil {
+		return err
+	}
 
 	website.Status = true
 	website.Https = false
-	if err := app.Orm.Save(website).Error; err != nil {
+	if err = app.Orm.Save(website).Error; err != nil {
 		return err
 	}
 
