@@ -30,4 +30,5 @@ var (
 	Root    string
 	Version string
 	Locale  string
+	IsCli   bool
 )

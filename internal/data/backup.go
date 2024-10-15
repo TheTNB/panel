@@ -181,9 +181,15 @@ func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 	toDelete := filtered[save:]
 	for _, file := range toDelete {
 		filePath := filepath.Join(path, file.Name())
-		color.Greenln(fmt.Sprintf("|-清理过期文件：%s", filePath))
+		if app.IsCli {
+			color.Greenln(fmt.Sprintf("|-清理过期文件：%s", filePath))
+		}
 		if err = os.Remove(filePath); err != nil {
-			color.Redln(fmt.Sprintf("|-清理失败：%v", err))
+			if app.IsCli {
+				color.Redln(fmt.Sprintf("|-清理失败：%v", err))
+			} else {
+				return fmt.Errorf("清理失败：%v", err)
+			}
 		}
 	}
 
@@ -236,8 +242,10 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
+		color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+	}
 	return nil
 }
 
@@ -281,8 +289,10 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
+		color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+	}
 	return nil
 }
 
@@ -316,8 +326,10 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
+		color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+	}
 	return nil
 }
 
@@ -341,8 +353,10 @@ func (r *backupRepo) createPanel(to string) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-	color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
+		color.Greenln(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+	}
 	return nil
 }
 
@@ -463,10 +477,12 @@ func (r *backupRepo) preCheckPath(to, path string) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
-	color.Greenln(fmt.Sprintf("|-目标文件数：%d", files))
-	color.Greenln(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
-	color.Greenln(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
+		color.Greenln(fmt.Sprintf("|-目标文件数：%d", files))
+		color.Greenln(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
+		color.Greenln(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+	}
 
 	if uint64(size) > usage.Free {
 		return errors.New("备份目录空间不足")
@@ -487,9 +503,11 @@ func (r *backupRepo) preCheckDB(to string, size int64) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
-	color.Greenln(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
-	color.Greenln(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+	if app.IsCli {
+		color.Greenln(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
+		color.Greenln(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
+		color.Greenln(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+	}
 
 	if uint64(size) > usage.Free {
 		return errors.New("备份目录空间不足")
