@@ -1,14 +1,22 @@
 package data
 
 import (
+	"sync"
+
+	"go.uber.org/zap"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/queuejob"
 )
 
+var taskDispatchOnce sync.Once
+
 type taskRepo struct{}
 
 func NewTaskRepo() biz.TaskRepo {
+	task := &taskRepo{}
+	taskDispatchOnce.Do(task.DispatchWaiting)
 	return &taskRepo{}
 }
 
@@ -48,17 +56,19 @@ func (r *taskRepo) Push(task *biz.Task) error {
 	})
 }
 
-func (r *taskRepo) DispatchWaiting() error {
+func (r *taskRepo) DispatchWaiting() {
 	var tasks []biz.Task
 	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
-		return err
+		app.Logger.Error("获取待处理任务失败", zap.Error(err))
+		return
 	}
 
 	for _, task := range tasks {
-		if err := r.Push(&task); err != nil {
-			return err
+		if err := app.Queue.Push(queuejob.NewProcessTask(r), []any{
+			task.ID,
+		}); err != nil {
+			app.Logger.Error("推送任务失败", zap.Error(err))
+			return
 		}
 	}
-
-	return nil
 }

@@ -19,8 +19,8 @@ func BootWeb() {
 	boot()
 	initValidator()
 	initSession()
-	initCron()
 	initQueue()
+	initCron()
 	initHttp()
 
 	select {}
