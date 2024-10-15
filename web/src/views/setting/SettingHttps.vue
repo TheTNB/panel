@@ -13,6 +13,7 @@ const model = ref<Setting>({
   email: '',
   port: 8888,
   entrance: '',
+  offline_mode: false,
   website_path: '',
   backup_path: '',
   https: false,
