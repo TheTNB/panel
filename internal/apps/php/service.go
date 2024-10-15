@@ -259,7 +259,7 @@ func (s *Service) getExtensions() []Extension {
 		{
 			Name:        "exif",
 			Slug:        "exif",
-			Description: "通过 exif 扩展，你可以操作图像元数据。",
+			Description: "通过 exif 扩展，您可以操作图像元数据。",
 		},
 		{
 			Name:        "pdo_pgsql",

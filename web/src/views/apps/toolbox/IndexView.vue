@@ -139,7 +139,7 @@ onMounted(() => {
       <n-tab-pane name="hosts" tab="Host">
         <n-space vertical>
           <n-alert type="warning">
-            此处修改的是系统 Hosts 文件，如果你不了解这是干什么的，请不要随意修改！
+            此处修改的是系统 Hosts 文件，如果您不了解这是干什么的，请不要随意修改！
           </n-alert>
           <Editor
             v-model:value="hosts"

@@ -205,7 +205,7 @@ onMounted(() => {
       <n-tab-pane name="config" tab="主配置">
         <n-space vertical>
           <n-alert type="warning">
-            此处修改的是 PostgreSQL 主配置文件，如果你不了解各参数的含义，请不要随意修改！
+            此处修改的是 PostgreSQL 主配置文件，如果您不了解各参数的含义，请不要随意修改！
           </n-alert>
           <Editor
             v-model:value="config"
@@ -224,7 +224,7 @@ onMounted(() => {
       <n-tab-pane name="user-config" tab="用户配置">
         <n-space vertical>
           <n-alert type="warning">
-            此处修改的是 PostgreSQL 用户配置文件，如果你不了解各参数的含义，请不要随意修改！
+            此处修改的是 PostgreSQL 用户配置文件，如果您不了解各参数的含义，请不要随意修改！
           </n-alert>
           <Editor
             v-model:value="userConfig"

@@ -68,7 +68,7 @@ body:
     attributes:
       label: 描述问题 (Describe The Problem)
       description: |
-        简明概要地描述你遇到的问题。
+        简明概要地描述您遇到的问题。
         Briefly describe the problem you are having.
     validations:
       required: true
@@ -91,7 +91,7 @@ body:
     attributes:
       label: 预期行为 (Expected Behavior)
       description: |
-        简明概要地描述你期望发生的事情。
+        简明概要地描述您期望发生的事情。
         Briefly describe what you expect to happen.
     validations:
       required: true
@@ -113,7 +113,7 @@ body:
     attributes:
       label: 截图 (Screenshots)
       description: |
-        如果有，添加屏幕截图可帮助更快定位你的问题。
+        如果有，添加屏幕截图可帮助更快定位您的问题。
         If so, adding screenshots can help locate your issue faster.
         可以复制图片后在此区域内粘贴以添加图片。
         Pictures can be copied and pasted in this area to add pictures.
@@ -128,7 +128,7 @@ body:
       description: |
         运行环境？浏览器？软件版本？相关的配置？链接？参考资料？
         Environment? Browser? Software version? Related configuration? Link? References?
-        任何能让我们对你所遇到的问题有更多了解的东西。
+        任何能让我们对您所遇到的问题有更多了解的东西。
         Anything that can give us more insight into the problem you're having.
     validations:
       required: false

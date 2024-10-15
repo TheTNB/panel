@@ -25,7 +25,7 @@ body:
     attributes:
       label: 描述功能 (Describe Feature)
       description: |
-        简明概要地描述你的新功能，以及它将解决什么问题。
+        简明概要地描述您的新功能，以及它将解决什么问题。
         Briefly describe your new feature and what problem it will solve.
     validations:
       required: true

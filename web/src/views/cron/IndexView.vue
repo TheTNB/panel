@@ -16,7 +16,7 @@ const addModel = ref({
   save: 1,
   backup_type: 'website',
   backup_path: '',
-  script: '# 在此输入你要执行的脚本内容',
+  script: '# 在此输入您要执行的脚本内容',
   time: '* * * * *'
 })
 
