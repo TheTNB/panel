@@ -16,8 +16,8 @@ import (
 type Operation string
 
 var (
-	OperationAdd Operation = "add"
-	OperationDel Operation = "remove"
+	OperationAdd    Operation = "add"
+	OperationRemove Operation = "remove"
 )
 
 type Firewall struct {
@@ -58,13 +58,21 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 			if len(port) == 0 {
 				continue
 			}
-			var itemPort FireInfo
+			var item FireInfo
 			if strings.Contains(port, "/") {
-				itemPort.Port = cast.ToUint(strings.Split(port, "/")[0])
-				itemPort.Protocol = strings.Split(port, "/")[1]
+				ruleItem := strings.Split(port, "/")
+				portItem := strings.Split(ruleItem[0], "-")
+				if len(portItem) > 1 {
+					item.PortStart = cast.ToUint(portItem[0])
+					item.PortEnd = cast.ToUint(portItem[1])
+				} else {
+					item.PortStart = cast.ToUint(ruleItem[0])
+					item.PortEnd = cast.ToUint(ruleItem[0])
+				}
+				item.Protocol = ruleItem[1]
 			}
-			itemPort.Strategy = "accept"
-			data = append(data, itemPort)
+			item.Strategy = "accept"
+			data = append(data, item)
 		}
 	}()
 	go func() {
@@ -73,7 +81,6 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 		if err != nil {
 			return
 		}
-
 		data = append(data, rich...)
 	}()
 
@@ -81,13 +88,13 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 	return data, nil
 }
 
-func (r *Firewall) ListForward() ([]FireInfo, error) {
+func (r *Firewall) ListForward() ([]FireForwardInfo, error) {
 	out, err := shell.Execf("firewall-cmd --zone=public --list-forward-ports")
 	if err != nil {
 		return nil, err
 	}
 
-	var data []FireInfo
+	var data []FireForwardInfo
 	for _, line := range strings.Split(out, "\n") {
 		line = strings.TrimFunc(line, func(r rune) bool {
 			return r <= 32
@@ -100,7 +107,7 @@ func (r *Firewall) ListForward() ([]FireInfo, error) {
 			if len(match[4]) == 0 {
 				match[4] = "127.0.0.1"
 			}
-			data = append(data, FireInfo{
+			data = append(data, FireForwardInfo{
 				Port:       cast.ToUint(match[1]),
 				Protocol:   match[2],
 				TargetIP:   match[4],
@@ -132,10 +139,17 @@ func (r *Firewall) ListRichRule() ([]FireInfo, error) {
 	return data, nil
 }
 
-func (r *Firewall) Port(port FireInfo, operation Operation) error {
-	stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d/%s --permanent", operation, port.Port, port.Protocol)
+func (r *Firewall) Port(rule FireInfo, operation Operation) error {
+	if rule.PortEnd == 0 {
+		rule.PortEnd = rule.PortStart
+	}
+	// 不支持的切换使用rich rules
+	if rule.Direction != "in" || rule.Family != "ipv4" || rule.Address != "" || rule.Strategy != "accept" {
+		return r.RichRules(rule, operation)
+	}
+	stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d-%d/%s --permanent", operation, rule.PortStart, rule.PortEnd, rule.Protocol)
 	if err != nil {
-		return fmt.Errorf("%s port %d/%s failed, err: %s", operation, port.Port, port.Protocol, stdout)
+		return fmt.Errorf("%s port %d-%d/%s failed, err: %s", operation, rule.PortStart, rule.PortEnd, rule.Protocol, stdout)
 	}
 
 	_, err = shell.Execf("firewall-cmd --reload")
@@ -146,22 +160,29 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 	families := strings.Split(rule.Family, "/") // ipv4 ipv6
 
 	for _, family := range families {
-		var ruleStr strings.Builder
-		ruleStr.WriteString(fmt.Sprintf(`rule family="%s" `, family))
+		var ruleBuilder strings.Builder
+		ruleBuilder.WriteString(fmt.Sprintf(`rule family="%s" `, family))
+
 		if len(rule.Address) != 0 {
-			ruleStr.WriteString(fmt.Sprintf(`source address="%s" `, rule.Address))
+			if rule.Direction == "in" {
+				ruleBuilder.WriteString(fmt.Sprintf(`source address="%s" `, rule.Address))
+			} else if rule.Direction == "out" {
+				ruleBuilder.WriteString(fmt.Sprintf(`destination address="%s" `, rule.Address))
+			} else {
+				return fmt.Errorf("invalid direction: %s", rule.Direction)
+			}
 		}
-		if rule.Port != 0 {
-			ruleStr.WriteString(fmt.Sprintf(`port port="%d" `, rule.Port))
+		if rule.PortStart != 0 && rule.PortEnd != 0 {
+			ruleBuilder.WriteString(fmt.Sprintf(`port port="%d-%d" `, rule.PortStart, rule.PortEnd))
 		}
 		if len(rule.Protocol) != 0 {
-			ruleStr.WriteString(fmt.Sprintf(`protocol="%s" `, rule.Protocol))
+			ruleBuilder.WriteString(fmt.Sprintf(`protocol="%s" `, rule.Protocol))
 		}
 
-		ruleStr.WriteString(rule.Strategy)
-		_, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr.String())
+		ruleBuilder.WriteString(rule.Strategy)
+		_, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleBuilder.String())
 		if err != nil {
-			return fmt.Errorf("%s rich rules (%s) failed, err: %v", operation, ruleStr.String(), err)
+			return fmt.Errorf("%s rich rules (%s) failed, err: %v", operation, ruleBuilder.String(), err)
 		}
 	}
 
@@ -202,7 +223,14 @@ func (r *Firewall) parseRichRule(line string) (*FireInfo, error) {
 
 		itemRule.Family = match[1]
 		itemRule.Address = match[2]
-		itemRule.Port = cast.ToUint(match[3])
+		ports := strings.Split(match[3], "-")
+		if len(ports) > 1 {
+			itemRule.PortStart = cast.ToUint(ports[0])
+			itemRule.PortEnd = cast.ToUint(ports[1])
+		} else {
+			itemRule.PortStart = cast.ToUint(match[3])
+			itemRule.PortEnd = cast.ToUint(match[3])
+		}
 		itemRule.Protocol = match[4]
 		itemRule.Strategy = match[5]
 	}

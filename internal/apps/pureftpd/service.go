@@ -156,8 +156,9 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 
 	fw := firewall.NewFirewall()
 	err = fw.Port(firewall.FireInfo{
-		Port:     req.Port,
-		Protocol: "tcp",
+		PortStart: req.Port,
+		PortEnd:   req.Port,
+		Protocol:  "tcp",
 	}, firewall.OperationAdd)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)

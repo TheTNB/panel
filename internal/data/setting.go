@@ -205,8 +205,9 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	// 放行端口
 	fw := firewall.NewFirewall()
 	err = fw.Port(firewall.FireInfo{
-		Port:     uint(config.HTTP.Port),
-		Protocol: "tcp",
+		PortStart: uint(config.HTTP.Port),
+		PortEnd:   uint(config.HTTP.Port),
+		Protocol:  "tcp",
 	}, firewall.OperationAdd)
 	if err != nil {
 		return false, err
