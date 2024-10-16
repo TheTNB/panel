@@ -64,64 +64,6 @@
       "actions": "Actions"
     }
   },
-  "safeIndex": {
-    "title": "Security",
-    "buttons": {
-      "delete": "Delete",
-      "add": "Add",
-      "batchDelete": "Batch Delete"
-    },
-    "columns": {
-      "port": "Port",
-      "protocol": "Protocol",
-      "actions": "Actions"
-    },
-    "confirm": {
-      "delete": "Are you sure you want to delete the rule?",
-      "batchDelete": "High-risk operation! Are you sure you want to delete the selected rules?"
-    },
-    "alerts": {
-      "undelete": "undelete",
-      "delete": "successfully deleted",
-      "add": "added successfully",
-      "setup": "setup successful",
-      "select": "Please select the rule to delete",
-      "ruleDelete": "Rule {rule} deleted successfully"
-    },
-    "filter": {
-      "fields": {
-        "firewall": {
-          "label": "Firewall status",
-          "checked": "open",
-          "unchecked": "close"
-        },
-        "ssh": {
-          "label": "SSH status",
-          "checked": "open",
-          "unchecked": "close"
-        },
-        "ping": {
-          "label": "Ping status",
-          "checked": "open",
-          "unchecked": "close"
-        },
-        "port": {
-          "label": "SSH port"
-        }
-      }
-    },
-    "portControl": {
-      "title": "Port control",
-      "fields": {
-        "port": {
-          "placeholder": "Example：3306, 1000-2000"
-        },
-        "protocol": {
-          "placeholder": "protocol"
-        }
-      }
-    }
-  },
   "settingIndex": {
     "title": "Settings",
     "info": "Update panel settings / entry, adjust browser address accordingly to access panel!",
