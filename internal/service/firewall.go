@@ -74,7 +74,7 @@ func (s *FirewallService) GetRules(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FirewallCreateRule](r)
+	req, err := Bind[request.FirewallRule](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
@@ -89,7 +89,7 @@ func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FirewallService) DeleteRule(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FirewallCreateRule](r)
+	req, err := Bind[request.FirewallRule](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return

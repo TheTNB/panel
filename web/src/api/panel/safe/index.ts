@@ -16,7 +16,7 @@ export default {
     request.post('/firewall/rule', { port, protocol }),
   // 删除防火墙规则
   deleteFirewallRule: (port: number, protocol: string): Promise<AxiosResponse<any>> =>
-    request.delete('/firewall/rule', { data: { port, protocol } }),
+    request.delete('/firewall/rule', { params: { port, protocol } }),
   // 获取SSH
   ssh: (): Promise<AxiosResponse<any>> => request.get('/safe/ssh'),
   // 设置SSH
