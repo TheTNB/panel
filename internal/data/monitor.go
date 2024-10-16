@@ -50,7 +50,7 @@ func (r monitorRepo) UpdateSetting(setting *request.MonitorSetting) error {
 }
 
 func (r monitorRepo) Clear() error {
-	return app.Orm.Delete(&biz.Monitor{}).Error
+	return app.Orm.Where("1 = 1").Delete(&biz.Monitor{}).Error
 }
 
 func (r monitorRepo) List(start, end time.Time) ([]*biz.Monitor, error) {

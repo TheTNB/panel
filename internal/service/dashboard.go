@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"github.com/shirou/gopsutil/disk"
+	"net"
 	"net/http"
 	"regexp"
 	"strings"
@@ -82,15 +84,36 @@ func (s *DashboardService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 所有网卡名称
+	var nets []types.LV
+	netInterfaces, _ := net.Interfaces()
+	for _, v := range netInterfaces {
+		nets = append(nets, types.LV{
+			Value: v.Name,
+			Label: v.Name,
+		})
+	}
+	// 所有硬盘名称
+	var disks []types.LV
+	partitions, _ := disk.Partitions(false)
+	for _, v := range partitions {
+		disks = append(disks, types.LV{
+			Value: v.Device,
+			Label: fmt.Sprintf("%s (%s)", v.Device, v.Mountpoint),
+		})
+	}
+
 	Success(w, chix.M{
 		"procs":          hostInfo.Procs,
 		"hostname":       hostInfo.Hostname,
+		"panel_version":  app.Version,
 		"kernel_arch":    hostInfo.KernelArch,
 		"kernel_version": hostInfo.KernelVersion,
 		"os_name":        hostInfo.Platform + " " + hostInfo.PlatformVersion,
 		"boot_time":      hostInfo.BootTime,
-		"uptime":         fmt.Sprintf("%.2f", float64(hostInfo.Uptime)/86400),
-		"panel_version":  app.Version,
+		"uptime":         hostInfo.Uptime,
+		"nets":           nets,
+		"disks":          disks,
 	})
 }
 

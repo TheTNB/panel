@@ -12,7 +12,7 @@ import {
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-import info from '@/api/panel/info'
+import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
 import { generateRandomString, isNullOrUndef, renderIcon } from '@/utils'
 import type { Website } from './types'
@@ -225,7 +225,7 @@ const installedDbAndPhp = ref({
 })
 
 const getPhpAndDb = async () => {
-  const { data } = await info.installedDbAndPhp()
+  const { data } = await dashboard.installedDbAndPhp()
   installedDbAndPhp.value = data
 }
 

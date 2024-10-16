@@ -12,7 +12,7 @@ import { setupNaiveDiscreteApi } from './utils'
 
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
-import info from '@/api/panel/info'
+import dashboard from '@/api/panel/dashboard'
 
 async function setupApp() {
   const app = createApp(App)
@@ -37,7 +37,7 @@ const title = ref('')
 
 const setupPanel = async () => {
   const themeStore = useThemeStore()
-  await info
+  await dashboard
     .panel()
     .then((response) => response.json())
     .then((data) => {

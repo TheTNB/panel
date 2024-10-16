@@ -15,13 +15,13 @@ export function formatDate(date: Time = undefined, format = 'yyyy-MM-dd') {
 
 /** 格式化持续时间，转为 x天x小时x分钟x秒 */
 export function formatDuration(seconds: number) {
-  const duration = Duration.fromObject({ seconds })
-  const days = Math.floor(duration.as('days'))
+  const duration = Duration.fromObject({ seconds }).shiftTo('days', 'hours', 'minutes', 'seconds')
+  const days = duration.days
   const hours = duration.hours
   const minutes = duration.minutes
   const secs = duration.seconds
 
-  return `${days}天${hours}时${minutes}分${secs}秒`
+  return `${days}天${hours}小时${minutes}分钟${secs}秒`
 }
 
 /** 生成随机字符串 */

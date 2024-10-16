@@ -2,7 +2,7 @@
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton } from 'naive-ui'
 
-import info from '@/api/panel/info'
+import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
 import type { WebsiteListen, WebsiteSetting } from '@/views/website/types'
 
@@ -50,7 +50,7 @@ const installedDbAndPhp = ref({
 })
 
 const getPhpAndDb = async () => {
-  const { data } = await info.installedDbAndPhp()
+  const { data } = await dashboard.installedDbAndPhp()
   installedDbAndPhp.value = data
 }
 

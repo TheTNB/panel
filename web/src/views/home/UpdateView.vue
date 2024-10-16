@@ -5,7 +5,7 @@ import type { MessageReactive } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
-import info from '@/api/panel/info'
+import dashboard from '@/api/panel/dashboard'
 import { router } from '@/router'
 import { formatDateTime } from '@/utils'
 import type { Version } from '@/views/home/types'
@@ -15,7 +15,7 @@ const versions = ref<Version[] | null>(null)
 let messageReactive: MessageReactive | null = null
 
 const getVersions = () => {
-  info.updateInfo().then((res: any) => {
+  dashboard.updateInfo().then((res: any) => {
     versions.value = res.data
   })
 }
@@ -30,7 +30,7 @@ const handleUpdate = () => {
       messageReactive = window.$message.loading(t('homeUpdate.confirm.update.loading'), {
         duration: 0
       })
-      info
+      dashboard
         .update()
         .then(() => {
           messageReactive?.destroy()

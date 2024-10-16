@@ -140,7 +140,8 @@ interface DiskUsageStat {
 
 export interface Realtime {
   cpus: CpuInfoStat[]
-  percent: number[]
+  percent: number
+  percents: number[]
   load: LoadAvgStat
   host: HostInfoStat
   mem: VirtualMemoryStat
@@ -152,9 +153,16 @@ export interface Realtime {
 }
 
 export interface SystemInfo {
-  os_name: string
-  uptime: string
+  procs: number
+  hostname: string
   panel_version: string
+  kernel_arch: string
+  kernel_version: string
+  os_name: string
+  boot_time: number
+  uptime: number
+  nets: any[]
+  disks: any[]
 }
 
 export interface CountInfo {

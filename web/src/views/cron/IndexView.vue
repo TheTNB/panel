@@ -3,8 +3,8 @@ import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 
 import cron from '@/api/panel/cron'
+import dashboard from '@/api/panel/dashboard'
 import file from '@/api/panel/file'
-import info from '@/api/panel/info'
 import website from '@/api/panel/website'
 import { formatDateTime, renderIcon } from '@/utils'
 import type { CronTask } from '@/views/cron/types'
@@ -197,7 +197,7 @@ const getWebsiteList = async (page: number, limit: number) => {
 }
 
 const getPhpAndDb = async () => {
-  const { data } = await info.installedDbAndPhp()
+  const { data } = await dashboard.installedDbAndPhp()
   installedDbAndPhp.value = data
 }
 

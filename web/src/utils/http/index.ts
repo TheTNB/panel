@@ -3,6 +3,7 @@ import { reqReject, reqResolve, resReject, resResolve } from './interceptors'
 
 export function createAxios(options = {}) {
   const defaultOptions = {
+    adapter: 'fetch',
     timeout: 0
   }
   const service = axios.create({

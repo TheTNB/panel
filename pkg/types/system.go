@@ -7,6 +7,7 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
+	"time"
 )
 
 // CurrentInfo 监控信息
@@ -22,4 +23,5 @@ type CurrentInfo struct {
 	DiskIO    []disk.IOCountersStat  `json:"disk_io"`
 	Disk      []disk.PartitionStat   `json:"disk"`
 	DiskUsage []disk.UsageStat       `json:"disk_usage"`
+	Time      time.Time              `json:"time"`
 }
