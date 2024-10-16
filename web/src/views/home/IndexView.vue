@@ -213,27 +213,27 @@ const fetchCurrent = async () => {
 
       // 图表数据填充
       netBytesSent.value.push(calculateSize(current.netBytesSent))
-      if (netBytesSent.value.length > 20) {
+      if (netBytesSent.value.length > 10) {
         netBytesSent.value.splice(0, 1)
       }
       netBytesRecv.value.push(calculateSize(current.netBytesRecv))
-      if (netBytesRecv.value.length > 20) {
+      if (netBytesRecv.value.length > 10) {
         netBytesRecv.value.splice(0, 1)
       }
       diskReadBytes.value.push(calculateSize(current.diskReadBytes))
-      if (diskReadBytes.value.length > 20) {
+      if (diskReadBytes.value.length > 10) {
         diskReadBytes.value.splice(0, 1)
       }
       diskWriteBytes.value.push(calculateSize(current.diskWriteBytes))
-      if (diskWriteBytes.value.length > 20) {
+      if (diskWriteBytes.value.length > 10) {
         diskWriteBytes.value.splice(0, 1)
       }
       timeDiskData.value.push(formatDateTime(data.time))
-      if (timeDiskData.value.length > 20) {
+      if (timeDiskData.value.length > 10) {
         timeDiskData.value.splice(0, 1)
       }
       timeNetData.value.push(formatDateTime(data.time))
-      if (timeNetData.value.length > 20) {
+      if (timeNetData.value.length > 10) {
         timeNetData.value.splice(0, 1)
       }
 
