@@ -16,7 +16,7 @@ func NewNotExists(db *gorm.DB) *NotExists {
 	return &NotExists{DB: db}
 }
 
-// NotExists 格式 `not_exists=categories，id，other_field`
+// NotExists 格式 `not_exists=categories id other_field`
 func (r *NotExists) NotExists(fl validator.FieldLevel) bool {
 	requestValue := fl.Field().Interface()
 	params := strings.Fields(fl.Param())

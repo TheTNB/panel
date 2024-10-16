@@ -16,6 +16,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
@@ -200,6 +201,16 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	config.HTTP.Port = setting.Port
 	config.HTTP.Entrance = setting.Entrance
 	config.HTTP.TLS = setting.HTTPS
+
+	// 放行端口
+	fw := firewall.NewFirewall()
+	err = fw.Port(firewall.FireInfo{
+		Port:     uint(config.HTTP.Port),
+		Protocol: "tcp",
+	}, firewall.OperationAdd)
+	if err != nil {
+		return false, err
+	}
 
 	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
 	if err != nil {

@@ -16,7 +16,7 @@ func NewExists(db *gorm.DB) *Exists {
 	return &Exists{DB: db}
 }
 
-// Exists 格式 `exists=categories，id，other_field`
+// Exists 格式 `exists=categories id other_field`
 func (r *Exists) Exists(fl validator.FieldLevel) bool {
 	requestValue := fl.Field().Interface()
 	params := strings.Fields(fl.Param())
