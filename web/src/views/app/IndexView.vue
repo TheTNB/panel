@@ -228,7 +228,7 @@ onMounted(() => {
     <template #action>
       <div flex items-center>
         <n-button class="ml-16" type="primary" @click="handleUpdateCache">
-          <TheIcon :size="18" class="mr-5" icon="material-symbols:refresh" />
+          <TheIcon :size="18" icon="material-symbols:refresh" />
           {{ $t('appIndex.buttons.updateCache') }}
         </n-button>
       </div>

@@ -5,9 +5,11 @@ type FirewallStatus struct {
 }
 
 type FirewallRule struct {
-	PortStart uint     `json:"port_start" validate:"required,gte=1,lte=65535"`
-	PortEnd   uint     `json:"port_end" validate:"required,gte=1,lte=65535"`
-	Protocols []string `json:"protocols" validate:"min=1,dive,oneof=tcp udp"`
-	Address   string   `json:"address"`
-	Strategy  string   `json:"strategy" validate:"required,oneof=accept drop"`
+	Family    string `json:"family" validate:"required,oneof=ipv4 ipv6"`
+	PortStart uint   `json:"port_start" validate:"required,gte=1,lte=65535"`
+	PortEnd   uint   `json:"port_end" validate:"required,gte=1,lte=65535"`
+	Protocol  string `json:"protocol" validate:"min=1,oneof=tcp udp tcp/udp"`
+	Address   string `json:"address"`
+	Strategy  string `json:"strategy" validate:"required,oneof=accept drop reject"`
+	Direction string `json:"direction"`
 }

@@ -498,7 +498,7 @@ onMounted(() => {
             <n-popconfirm @positive-click="handleClear">
               <template #trigger>
                 <n-button type="error">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:delete-outline" />
+                  <TheIcon :size="18" icon="material-symbols:delete-outline" />
                   清除监控记录
                 </n-button>
               </template>

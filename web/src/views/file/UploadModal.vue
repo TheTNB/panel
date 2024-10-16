@@ -43,7 +43,7 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
     >
       <n-upload-dragger>
         <div style="margin-bottom: 12px">
-          <the-icon :size="48" class="mr-5" icon="bi:arrow-up-square" />
+          <the-icon :size="48" icon="bi:arrow-up-square" />
         </div>
         <NText style="font-size: 16px"> 点击或者拖动文件到该区域来上传</NText>
         <NP depth="3" style="margin: 8px 0 0 0"> 不支持断点续传，大文件建议使用 FTP 上传 </NP>

@@ -3,8 +3,9 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/go-rat/chix"
+
+	"github.com/TheTNB/panel/internal/app"
 )
 
 // Status 检查程序状态

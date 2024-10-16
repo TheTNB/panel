@@ -62,11 +62,7 @@ onMounted(() => {
     <template #action>
       <div>
         <n-button v-if="versions" class="ml-16" type="primary" @click="handleUpdate">
-          <TheIcon
-            :size="18"
-            class="mr-5"
-            icon="material-symbols:arrow-circle-up-outline-rounded"
-          />
+          <TheIcon :size="18" icon="material-symbols:arrow-circle-up-outline-rounded" />
           {{ $t('homeUpdate.button.update') }}
         </n-button>
       </div>

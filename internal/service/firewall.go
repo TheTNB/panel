@@ -2,7 +2,6 @@ package service
 
 import (
 	"net/http"
-	"slices"
 
 	"github.com/go-rat/chix"
 
@@ -80,13 +79,11 @@ func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for protocol := range slices.Values(req.Protocols) {
-		if err = s.firewall.Port(firewall.FireInfo{
-			PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: protocol, Address: req.Address, Strategy: req.Strategy,
-		}, firewall.OperationAdd); err != nil {
-			Error(w, http.StatusInternalServerError, "%v", err)
-			return
-		}
+	if err = s.firewall.Port(firewall.FireInfo{
+		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: req.Protocol, Address: req.Address, Strategy: req.Strategy, Direction: req.Direction,
+	}, firewall.OperationAdd); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
 	}
 
 	Success(w, nil)
@@ -99,13 +96,11 @@ func (s *FirewallService) DeleteRule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for protocol := range slices.Values(req.Protocols) {
-		if err = s.firewall.Port(firewall.FireInfo{
-			PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: protocol, Address: req.Address, Strategy: req.Strategy,
-		}, firewall.OperationRemove); err != nil {
-			Error(w, http.StatusInternalServerError, "%v", err)
-			return
-		}
+	if err = s.firewall.Port(firewall.FireInfo{
+		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: req.Protocol, Address: req.Address, Strategy: req.Strategy, Direction: req.Direction,
+	}, firewall.OperationRemove); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
 	}
 
 	Success(w, nil)

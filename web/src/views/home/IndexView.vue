@@ -674,18 +674,14 @@ if (import.meta.hot) {
                         <n-popconfirm @positive-click="handleRestartPanel">
                           <template #trigger>
                             <n-button type="warning" size="small">
-                              <TheIcon :size="20" class="mr-5" icon="mdi:restart" />
+                              <TheIcon :size="20" icon="mdi:restart" />
                               重启面板
                             </n-button>
                           </template>
                           确定要重启面板吗？
                         </n-popconfirm>
                         <n-button type="success" @click="handleUpdate" size="small">
-                          <TheIcon
-                            :size="20"
-                            class="mr-5"
-                            icon="mdi:arrow-up-bold-circle-outline"
-                          />
+                          <TheIcon :size="20" icon="mdi:arrow-up-bold-circle-outline" />
                           检查更新
                         </n-button>
                       </n-space>

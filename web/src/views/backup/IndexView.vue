@@ -30,7 +30,7 @@ const handleCreate = () => {
     <template #action>
       <div flex items-center>
         <n-button class="ml-16" type="primary" @click="createModal = true">
-          <TheIcon :size="18" class="mr-5" icon="material-symbols:add" />
+          <TheIcon :size="18" icon="material-symbols:add" />
           创建备份
         </n-button>
       </div>

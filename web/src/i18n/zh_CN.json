@@ -64,64 +64,6 @@
       "actions": "操作"
     }
   },
-  "safeIndex": {
-    "title": "系统安全",
-    "buttons": {
-      "delete": "删除",
-      "add": "添加",
-      "batchDelete": "批量删除"
-    },
-    "columns": {
-      "port": "端口",
-      "protocol": "协议",
-      "actions": "操作"
-    },
-    "confirm": {
-      "delete": "确定删除规则吗？",
-      "batchDelete": " 高危操作！确定删除选中的规则吗？"
-    },
-    "alerts": {
-      "undelete": "取消删除",
-      "delete": "删除成功",
-      "add": "添加成功",
-      "setup": "设置成功",
-      "select": "请选择要删除的规则",
-      "ruleDelete": "规则 {rule} 删除成功"
-    },
-    "filter": {
-      "fields": {
-        "firewall": {
-          "label": "防火墙状态",
-          "checked": "开启",
-          "unchecked": "关闭"
-        },
-        "ssh": {
-          "label": "SSH状态",
-          "checked": "开启",
-          "unchecked": "关闭"
-        },
-        "ping": {
-          "label": "Ping状态",
-          "checked": "开启",
-          "unchecked": "关闭"
-        },
-        "port": {
-          "label": "SSH端口"
-        }
-      }
-    },
-    "portControl": {
-      "title": "端口控制",
-      "fields": {
-        "port": {
-          "placeholder": "例如：3306, 1000-2000"
-        },
-        "protocol": {
-          "placeholder": "协议"
-        }
-      }
-    }
-  },
   "settingIndex": {
     "title": "面板设置",
     "info": "修改面板端口 / 入口后，需要在浏览器地址栏做相应修改方可打开面板！",

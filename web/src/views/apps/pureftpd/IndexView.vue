@@ -222,7 +222,7 @@ onMounted(() => {
   <common-page show-footer>
     <template #action>
       <n-button v-if="currentTab == 'status'" class="ml-16" type="primary" @click="handleSavePort">
-        <TheIcon :size="18" class="mr-5" icon="material-symbols:save-outline" />
+        <TheIcon :size="18" icon="material-symbols:save-outline" />
         保存
       </n-button>
       <n-button
@@ -231,7 +231,7 @@ onMounted(() => {
         type="primary"
         @click="addUserModal = true"
       >
-        <TheIcon :size="18" class="mr-5" icon="material-symbols:add" />
+        <TheIcon :size="18" icon="material-symbols:add" />
         添加用户
       </n-button>
     </template>
@@ -251,28 +251,20 @@ onMounted(() => {
               </n-alert>
               <n-space>
                 <n-button type="success" @click="handleStart">
-                  <TheIcon
-                    :size="24"
-                    class="mr-5"
-                    icon="material-symbols:play-arrow-outline-rounded"
-                  />
+                  <TheIcon :size="24" icon="material-symbols:play-arrow-outline-rounded" />
                   启动
                 </n-button>
                 <n-popconfirm @positive-click="handleStop">
                   <template #trigger>
                     <n-button type="error">
-                      <TheIcon
-                        :size="24"
-                        class="mr-5"
-                        icon="material-symbols:stop-outline-rounded"
-                      />
+                      <TheIcon :size="24" icon="material-symbols:stop-outline-rounded" />
                       停止
                     </n-button>
                   </template>
                   停止 Pure-Ftpd 会导致无法使用 FTP 服务，确定要停止吗？
                 </n-popconfirm>
                 <n-button type="warning" @click="handleRestart">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:replay-rounded" />
+                  <TheIcon :size="18" icon="material-symbols:replay-rounded" />
                   重启
                 </n-button>
               </n-space>

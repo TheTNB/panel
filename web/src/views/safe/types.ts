@@ -1,4 +1,7 @@
 export interface FirewallRule {
-  port: string
-  protocol: string
+  port_start: number
+  port_end: number
+  protocols: string[]
+  address: string
+  strategy: string
 }

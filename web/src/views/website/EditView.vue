@@ -125,7 +125,7 @@ onMounted(() => {
       <div flex items-center>
         <n-tag type="warning">如果您修改了原文，那么点击保存后，其余的修改将不会生效！</n-tag>
         <n-button class="ml-16" type="primary" @click="handleSave">
-          <TheIcon :size="18" class="mr-5" icon="material-symbols:save-outline" />
+          <TheIcon :size="18" icon="material-symbols:save-outline" />
           保存
         </n-button>
       </div>
@@ -287,7 +287,7 @@ onMounted(() => {
             <n-popconfirm @positive-click="handleReset">
               <template #trigger>
                 <n-button type="success">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:refresh" />
+                  <TheIcon :size="18" icon="material-symbols:refresh" />
                   重置配置
                 </n-button>
               </template>

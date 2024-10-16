@@ -112,28 +112,20 @@ onMounted(() => {
               </n-alert>
               <n-space>
                 <n-button type="success" @click="handleStart('frps')">
-                  <TheIcon
-                    :size="24"
-                    class="mr-5"
-                    icon="material-symbols:play-arrow-outline-rounded"
-                  />
+                  <TheIcon :size="24" icon="material-symbols:play-arrow-outline-rounded" />
                   启动
                 </n-button>
                 <n-popconfirm @positive-click="handleStop('frps')">
                   <template #trigger>
                     <n-button type="error">
-                      <TheIcon
-                        :size="24"
-                        class="mr-5"
-                        icon="material-symbols:stop-outline-rounded"
-                      />
+                      <TheIcon :size="24" icon="material-symbols:stop-outline-rounded" />
                       停止
                     </n-button>
                   </template>
                   确定要停止 Frps 吗？
                 </n-popconfirm>
                 <n-button type="warning" @click="handleRestart('frps')">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:replay-rounded" />
+                  <TheIcon :size="18" icon="material-symbols:replay-rounded" />
                   重启
                 </n-button>
               </n-space>
@@ -142,7 +134,7 @@ onMounted(() => {
           <n-card title="修改配置" rounded-10>
             <template #header-extra>
               <n-button type="primary" @click="handleSaveConfig('frps')">
-                <TheIcon :size="18" class="mr-5" icon="material-symbols:save-outline-rounded" />
+                <TheIcon :size="18" icon="material-symbols:save-outline-rounded" />
                 保存
               </n-button>
             </template>
@@ -176,28 +168,20 @@ onMounted(() => {
               </n-alert>
               <n-space>
                 <n-button type="success" @click="handleStart('frpc')">
-                  <TheIcon
-                    :size="24"
-                    class="mr-5"
-                    icon="material-symbols:play-arrow-outline-rounded"
-                  />
+                  <TheIcon :size="24" icon="material-symbols:play-arrow-outline-rounded" />
                   启动
                 </n-button>
                 <n-popconfirm @positive-click="handleStop('frpc')">
                   <template #trigger>
                     <n-button type="error">
-                      <TheIcon
-                        :size="24"
-                        class="mr-5"
-                        icon="material-symbols:stop-outline-rounded"
-                      />
+                      <TheIcon :size="24" icon="material-symbols:stop-outline-rounded" />
                       停止
                     </n-button>
                   </template>
                   确定要停止 Frpc 吗？
                 </n-popconfirm>
                 <n-button type="warning" @click="handleRestart('frpc')">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:replay-rounded" />
+                  <TheIcon :size="18" icon="material-symbols:replay-rounded" />
                   重启
                 </n-button>
               </n-space>
@@ -206,7 +190,7 @@ onMounted(() => {
           <n-card title="修改配置" rounded-10>
             <template #header-extra>
               <n-button type="primary" @click="handleSaveConfig('frpc')">
-                <TheIcon :size="18" class="mr-5" icon="material-symbols:save-outline-rounded" />
+                <TheIcon :size="18" icon="material-symbols:save-outline-rounded" />
                 保存
               </n-button>
             </template>

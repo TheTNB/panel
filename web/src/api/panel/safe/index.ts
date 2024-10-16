@@ -11,12 +11,12 @@ export default {
   // 获取防火墙规则
   firewallRules: (page: number, limit: number): Promise<AxiosResponse<any>> =>
     request.get('/firewall/rule', { params: { page, limit } }),
-  // 添加防火墙规则
-  addFirewallRule: (port: number, protocol: string): Promise<AxiosResponse<any>> =>
-    request.post('/firewall/rule', { port, protocol }),
+  // 创建防火墙规则
+  createFirewallRule: (rule: any): Promise<AxiosResponse<any>> =>
+    request.post('/firewall/rule', rule),
   // 删除防火墙规则
-  deleteFirewallRule: (port: number, protocol: string): Promise<AxiosResponse<any>> =>
-    request.delete('/firewall/rule', { params: { port, protocol } }),
+  deleteFirewallRule: (rule: any): Promise<AxiosResponse<any>> =>
+    request.delete('/firewall/rule', { data: rule }),
   // 获取SSH
   ssh: (): Promise<AxiosResponse<any>> => request.get('/safe/ssh'),
   // 设置SSH

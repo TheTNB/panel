@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { NButton, NDataTable, NPopconfirm, NSpace } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { NButton, NDataTable, NPopconfirm, NSpace, NTag } from 'naive-ui'
 
 import safe from '@/api/panel/safe'
 import { renderIcon } from '@/utils'
+import CreateModal from '@/views/safe/CreateModal.vue'
 import type { FirewallRule } from '@/views/safe/types'
 
-const { t } = useI18n()
+const createModalShow = ref(false)
 
 const model = ref({
   firewallStatus: false,
@@ -18,38 +18,130 @@ const model = ref({
 const columns: any = [
   { type: 'selection', fixed: 'left' },
   {
-    title: t('safeIndex.columns.port'),
-    key: 'port',
-    width: 200,
-    resizable: true,
-    ellipsis: { tooltip: true }
-  },
-  {
-    title: t('safeIndex.columns.protocol'),
+    title: '传输协议',
     key: 'protocol',
+    width: 150,
     resizable: true,
-    ellipsis: { tooltip: true }
+    ellipsis: { tooltip: true },
+    render(row: any): any {
+      return h(NTag, null, {
+        default: () => {
+          if (row.protocol !== '') {
+            return row.protocol
+          }
+          return '无'
+        }
+      })
+    }
   },
   {
-    title: t('safeIndex.columns.actions'),
+    title: '网络协议',
+    key: 'family',
+    width: 150,
+    resizable: true,
+    ellipsis: { tooltip: true },
+    render(row: any): any {
+      return h(NTag, null, {
+        default: () => {
+          if (row.family !== '') {
+            return row.family
+          }
+          return '无'
+        }
+      })
+    }
+  },
+  {
+    title: '端口',
+    key: 'port',
+    width: 250,
+    resizable: true,
+    ellipsis: { tooltip: true },
+    render(row: any): any {
+      if (row.port_start == row.port_end) {
+        return row.port_start
+      }
+      return `${row.port_start}-${row.port_end}`
+    }
+  },
+  {
+    title: '策略',
+    key: 'strategy',
+    width: 150,
+    render(row: any): any {
+      return h(
+        NTag,
+        {
+          type:
+            row.strategy === 'accept' ? 'success' : row.strategy === 'drop' ? 'warning' : 'error'
+        },
+        {
+          default: () => {
+            switch (row.strategy) {
+              case 'accept':
+                return '接受'
+              case 'drop':
+                return '丢弃'
+              case 'reject':
+                return '拒绝'
+              default:
+                return '未知'
+            }
+          }
+        }
+      )
+    }
+  },
+  {
+    title: '方向',
+    key: 'direction',
+    width: 150,
+    render(row: any): any {
+      return h(NTag, null, {
+        default: () => {
+          switch (row.direction) {
+            case 'in':
+              return '传入'
+            case 'out':
+              return '传出'
+            default:
+              return '未知'
+          }
+        }
+      })
+    }
+  },
+  {
+    title: '目标',
+    key: 'address',
+    render(row: any): any {
+      return h(NTag, null, {
+        default: () => {
+          if (row.address === '') {
+            return '所有'
+          }
+          return row.address
+        }
+      })
+    }
+  },
+  {
+    title: '操作',
     key: 'actions',
-    width: 140,
     align: 'center',
     fixed: 'right',
+    width: 150,
     hideInExcel: true,
     render(row: any) {
       return [
         h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete(row),
-            onNegativeClick: () => {
-              window.$message.info(t('safeIndex.alerts.undelete'))
-            }
+            onPositiveClick: () => handleDelete(row)
           },
           {
             default: () => {
-              return t('safeIndex.confirm.delete')
+              return '确定要删除吗？'
             },
             trigger: () => {
               return h(
@@ -60,7 +152,7 @@ const columns: any = [
                   style: 'margin-left: 15px;'
                 },
                 {
-                  default: () => t('safeIndex.buttons.delete'),
+                  default: () => '删除',
                   icon: renderIcon('material-symbols:delete-outline', { size: 14 })
                 }
               )
@@ -86,41 +178,23 @@ const pagination = reactive({
 
 const selectedRowKeys = ref<any>([])
 
-const addModel = ref({
-  port: 80,
-  protocol: 'tcp'
-})
-
 const handleDelete = async (row: any) => {
-  await safe.deleteFirewallRule(row.port, row.protocol).then(() => {
-    window.$message.success(t('safeIndex.alerts.delete'))
+  await safe.deleteFirewallRule(row).then(() => {
+    window.$message.success('删除成功')
   })
-  getFirewallRules(pagination.page, pagination.pageSize).then((res) => {
+  fetchFirewallRules(pagination.page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
   })
 }
 
-const handleAdd = async () => {
-  await safe.addFirewallRule(addModel.value.port, addModel.value.protocol).then(() => {
-    window.$message.success(t('safeIndex.alerts.add'))
-    addModel.value.port = 80
-    addModel.value.protocol = 'tcp'
-  })
-  getFirewallRules(pagination.page, pagination.pageSize).then((res) => {
-    data.value = res.items
-    pagination.itemCount = res.total
-    pagination.pageCount = res.total / pagination.pageSize + 1
-  })
-}
-
-const getFirewallRules = async (page: number, limit: number) => {
+const fetchFirewallRules = async (page: number, limit: number) => {
   const { data } = await safe.firewallRules(page, limit)
   return data
 }
 
-const getSetting = async () => {
+const fetchSetting = async () => {
   safe.firewallStatus().then((res) => {
     model.value.firewallStatus = res.data
   })
@@ -135,44 +209,39 @@ const getSetting = async () => {
 
 const handleFirewallStatus = () => {
   safe.setFirewallStatus(model.value.firewallStatus).then(() => {
-    window.$message.success(t('safeIndex.alerts.setup'))
+    window.$message.success('设置成功')
   })
 }
 
 const handleSsh = () => {
   safe.setSsh(model.value.sshStatus, model.value.sshPort).then(() => {
-    window.$message.success(t('safeIndex.alerts.setup'))
+    window.$message.success('设置成功')
   })
 }
 
 const handlePingStatus = () => {
   safe.setPingStatus(model.value.pingStatus).then(() => {
-    window.$message.success(t('safeIndex.alerts.setup'))
+    window.$message.success('设置成功')
   })
 }
 
 const batchDelete = async () => {
   if (selectedRowKeys.value.length === 0) {
-    window.$message.info(t('safeIndex.alerts.select'))
+    window.$message.info('请选择要删除的规则')
     return
   }
 
   for (const key of selectedRowKeys.value) {
-    // 通过 / 分割端口和协议
-    const [port, protocol] = key.split('/')
-    if (!port || !protocol) {
-      continue
-    }
-
-    await safe.deleteFirewallRule(port, protocol).then(() => {
-      let rule = data.value.find((item) => item.port === port && item.protocol === protocol)
-      window.$message.success(
-        t('safeIndex.alerts.ruleDelete', { rule: rule?.port + '/' + rule?.protocol })
-      )
+    // 解析json
+    const rule = JSON.parse(key)
+    await safe.deleteFirewallRule(rule).then(() => {
+      let port =
+        rule.port_start == rule.port_end ? rule.port_start : `${rule.port_start}-${rule.port_end}`
+      window.$message.success(`${rule.family} 规则 ${port}/${rule.protocol} 删除成功`)
     })
   }
 
-  getFirewallRules(pagination.page, pagination.pageSize).then((res) => {
+  fetchFirewallRules(pagination.page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
@@ -185,7 +254,7 @@ const onChecked = (rowKeys: any) => {
 
 const onPageChange = (page: number) => {
   pagination.page = page
-  getFirewallRules(page, pagination.pageSize).then((res) => {
+  fetchFirewallRules(page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
@@ -197,13 +266,13 @@ const onPageSizeChange = (pageSize: number) => {
   onPageChange(1)
 }
 
+watch(createModalShow, () => {
+  onPageChange(1)
+})
+
 onMounted(() => {
-  getSetting()
-  getFirewallRules(pagination.page, pagination.pageSize).then((res) => {
-    data.value = res.items
-    pagination.itemCount = res.total
-    pagination.pageCount = res.total / pagination.pageSize + 1
-  })
+  fetchSetting()
+  onPageChange(1)
 })
 </script>
 
@@ -212,61 +281,34 @@ onMounted(() => {
     <n-space vertical>
       <n-card flex-1 rounded-10>
         <n-form inline>
-          <n-form-item :label="$t('safeIndex.filter.fields.firewall.label')">
-            <n-switch
-              v-model:value="model.firewallStatus"
-              @update:value="handleFirewallStatus"
-              :checkedChildren="$t('safeIndex.filter.fields.firewall.checked')"
-              :unCheckedChildren="$t('safeIndex.filter.fields.firewall.unchecked')"
-            />
+          <n-form-item label="防火墙">
+            <n-switch v-model:value="model.firewallStatus" @update:value="handleFirewallStatus" />
           </n-form-item>
-          <n-form-item :label="$t('safeIndex.filter.fields.ssh.label')">
-            <n-switch
-              v-model:value="model.sshStatus"
-              @update:value="handleSsh"
-              :checkedChildren="$t('safeIndex.filter.fields.ssh.checked')"
-              :unCheckedChildren="$t('safeIndex.filter.fields.ssh.unchecked')"
-            />
+          <n-form-item label="SSH">
+            <n-switch v-model:value="model.sshStatus" @update:value="handleSsh" />
           </n-form-item>
-          <n-form-item :label="$t('safeIndex.filter.fields.ping.label')">
-            <n-switch
-              v-model:value="model.pingStatus"
-              @update:value="handlePingStatus"
-              :checkedChildren="$t('safeIndex.filter.fields.ping.checked')"
-              :unCheckedChildren="$t('safeIndex.filter.fields.ping.unchecked')"
-            />
+          <n-form-item label="Ping">
+            <n-switch v-model:value="model.pingStatus" @update:value="handlePingStatus" />
           </n-form-item>
-          <n-form-item :label="$t('safeIndex.filter.fields.port.label')">
+          <n-form-item label="SSH端口">
             <n-input-number v-model:value="model.sshPort" @blur="handleSsh" />
           </n-form-item>
         </n-form>
       </n-card>
       <n-space flex items-center>
+        <n-button type="primary" @click="createModalShow = true">
+          <TheIcon :size="18" icon="material-symbols:add" />
+          创建规则
+        </n-button>
         <n-popconfirm @positive-click="batchDelete">
           <template #trigger>
-            <n-button type="warning"> {{ $t('safeIndex.buttons.batchDelete') }} </n-button>
+            <n-button type="warning">
+              <TheIcon :size="18" icon="material-symbols:delete-outline" />
+              批量删除
+            </n-button>
           </template>
-          {{ $t('safeIndex.confirm.batchDelete') }}
+          确定要批量删除吗？
         </n-popconfirm>
-        <n-text>{{ $t('safeIndex.portControl.title') }}</n-text>
-        <n-input-number
-          v-model:value="addModel.port"
-          :placeholder="$t('safeIndex.portControl.fields.port.placeholder')"
-          :min="1"
-          :max="65535"
-        />
-        <n-select
-          v-model:value="addModel.protocol"
-          :placeholder="$t('safeIndex.portControl.fields.protocol.placeholder')"
-          style="width: 120px"
-          :options="[
-            { label: 'TCP', value: 'tcp' },
-            { label: 'UDP', value: 'udp' }
-          ]"
-        />
-        <n-button type="primary" @click="handleAdd">
-          {{ $t('safeIndex.buttons.add') }}
-        </n-button>
       </n-space>
 
       <n-data-table
@@ -276,7 +318,7 @@ onMounted(() => {
         :scroll-x="1200"
         :columns="columns"
         :data="data"
-        :row-key="(row: any) => row.port + '/' + row.protocol"
+        :row-key="(row: any) => JSON.stringify(row)"
         :pagination="pagination"
         @update:checked-row-keys="onChecked"
         @update:page="onPageChange"
@@ -284,6 +326,7 @@ onMounted(() => {
       />
     </n-space>
   </common-page>
+  <create-modal v-model:show="createModalShow" />
 </template>
 
 <style scoped lang="scss"></style>

@@ -6,7 +6,7 @@ type FireInfo struct {
 	PortStart uint   `json:"port_start"` // 1-65535
 	PortEnd   uint   `json:"port_end"`   // 1-65535
 	Protocol  string `json:"protocol"`   // tcp udp tcp/udp
-	Strategy  string `json:"strategy"`   // accept drop
+	Strategy  string `json:"strategy"`   // accept drop reject
 	Direction string `json:"direction"`  // in out 入站或出站
 }
 

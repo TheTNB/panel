@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"github.com/shirou/gopsutil/disk"
 	"net"
 	"net/http"
 	"regexp"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/go-rat/chix"
 	"github.com/hashicorp/go-version"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
 	"github.com/spf13/cast"
 

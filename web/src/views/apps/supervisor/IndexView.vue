@@ -368,7 +368,7 @@ onUnmounted(() => {
         type="primary"
         @click="handleSaveConfig"
       >
-        <TheIcon :size="18" class="mr-5" icon="material-symbols:save-outline" />
+        <TheIcon :size="18" icon="material-symbols:save-outline" />
         保存
       </n-button>
       <n-button
@@ -377,11 +377,11 @@ onUnmounted(() => {
         type="primary"
         @click="addProcessModal = true"
       >
-        <TheIcon :size="18" class="mr-5" icon="material-symbols:add" />
+        <TheIcon :size="18" icon="material-symbols:add" />
         添加进程
       </n-button>
       <n-button v-if="currentTab == 'log'" class="ml-16" type="primary" @click="handleClearLog">
-        <TheIcon :size="18" class="mr-5" icon="material-symbols:delete-outline" />
+        <TheIcon :size="18" icon="material-symbols:delete-outline" />
         清空日志
       </n-button>
     </template>
@@ -401,32 +401,24 @@ onUnmounted(() => {
               </n-alert>
               <n-space>
                 <n-button type="success" @click="handleStart">
-                  <TheIcon
-                    :size="24"
-                    class="mr-5"
-                    icon="material-symbols:play-arrow-outline-rounded"
-                  />
+                  <TheIcon :size="24" icon="material-symbols:play-arrow-outline-rounded" />
                   启动
                 </n-button>
                 <n-popconfirm @positive-click="handleStop">
                   <template #trigger>
                     <n-button type="error">
-                      <TheIcon
-                        :size="24"
-                        class="mr-5"
-                        icon="material-symbols:stop-outline-rounded"
-                      />
+                      <TheIcon :size="24" icon="material-symbols:stop-outline-rounded" />
                       停止
                     </n-button>
                   </template>
                   停止 Supervisor 会导致 Supervisor 管理的所有进程被杀死，确定要停止吗？
                 </n-popconfirm>
                 <n-button type="warning" @click="handleRestart">
-                  <TheIcon :size="18" class="mr-5" icon="material-symbols:replay-rounded" />
+                  <TheIcon :size="18" icon="material-symbols:replay-rounded" />
                   重启
                 </n-button>
                 <n-button type="primary" @click="handleReload">
-                  <TheIcon :size="20" class="mr-5" icon="material-symbols:refresh-rounded" />
+                  <TheIcon :size="20" icon="material-symbols:refresh-rounded" />
                   重载
                 </n-button>
               </n-space>
