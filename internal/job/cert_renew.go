@@ -9,7 +9,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	pkgcert "github.com/TheTNB/panel/pkg/cert"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 // CertRenew 证书续签
@@ -24,7 +23,7 @@ func NewCertRenew() *CertRenew {
 }
 
 func (r *CertRenew) Run() {
-	if types.Status != types.StatusNormal {
+	if app.Status != app.StatusNormal {
 		return
 	}
 

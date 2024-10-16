@@ -8,11 +8,13 @@ import (
 
 	"github.com/go-rat/chix"
 	"github.com/hashicorp/go-version"
+	"github.com/shirou/gopsutil/host"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -21,7 +23,7 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type InfoService struct {
+type DashboardService struct {
 	api         *api.API
 	taskRepo    biz.TaskRepo
 	websiteRepo biz.WebsiteRepo
@@ -30,8 +32,8 @@ type InfoService struct {
 	cronRepo    biz.CronRepo
 }
 
-func NewInfoService() *InfoService {
-	return &InfoService{
+func NewDashboardService() *DashboardService {
+	return &DashboardService{
 		api:         api.NewAPI(app.Version),
 		taskRepo:    data.NewTaskRepo(),
 		websiteRepo: data.NewWebsiteRepo(),
@@ -41,7 +43,7 @@ func NewInfoService() *InfoService {
 	}
 }
 
-func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) Panel(w http.ResponseWriter, r *http.Request) {
 	name, _ := s.settingRepo.Get(biz.SettingKeyName)
 	if name == "" {
 		name = "耗子面板"
@@ -53,31 +55,46 @@ func (s *InfoService) Panel(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *InfoService) HomeApps(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) HomeApps(w http.ResponseWriter, r *http.Request) {
 	apps, err := s.appRepo.GetHomeShow()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取首页应用失败")
+		Error(w, http.StatusInternalServerError, "获取首页应用失败: %v", err)
 		return
 	}
 
 	Success(w, apps)
 }
 
-func (s *InfoService) Realtime(w http.ResponseWriter, r *http.Request) {
-	Success(w, tools.GetMonitoringInfo())
+func (s *DashboardService) Current(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.DashboardCurrent](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	Success(w, tools.CurrentInfo(req.Nets, req.Disks))
 }
 
-func (s *InfoService) SystemInfo(w http.ResponseWriter, r *http.Request) {
-	monitorInfo := tools.GetMonitoringInfo()
+func (s *DashboardService) SystemInfo(w http.ResponseWriter, r *http.Request) {
+	hostInfo, err := host.Info()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "获取系统信息失败")
+		return
+	}
 
 	Success(w, chix.M{
-		"os_name":       monitorInfo.Host.Platform + " " + monitorInfo.Host.PlatformVersion,
-		"uptime":        fmt.Sprintf("%.2f", float64(monitorInfo.Host.Uptime)/86400),
-		"panel_version": app.Version,
+		"procs":          hostInfo.Procs,
+		"hostname":       hostInfo.Hostname,
+		"kernel_arch":    hostInfo.KernelArch,
+		"kernel_version": hostInfo.KernelVersion,
+		"os_name":        hostInfo.Platform + " " + hostInfo.PlatformVersion,
+		"boot_time":      hostInfo.BootTime,
+		"uptime":         fmt.Sprintf("%.2f", float64(hostInfo.Uptime)/86400),
+		"panel_version":  app.Version,
 	})
 }
 
-func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	websiteCount, err := s.websiteRepo.Count()
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "获取网站数量失败")
@@ -173,7 +190,7 @@ func (s *InfoService) CountInfo(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) {
 	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
 	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
 	php, _ := s.appRepo.GetInstalledAll("slug like ?", "php%")
@@ -206,7 +223,7 @@ func (s *InfoService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
 		Error(w, http.StatusForbidden, "离线模式下无法检查更新")
 		return
@@ -241,7 +258,7 @@ func (s *InfoService) CheckUpdate(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
 		Error(w, http.StatusForbidden, "离线模式下无法检查更新")
 		return
@@ -278,7 +295,7 @@ func (s *InfoService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	Success(w, versions)
 }
 
-func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) Update(w http.ResponseWriter, r *http.Request) {
 	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
 		Error(w, http.StatusForbidden, "离线模式下无法升级")
 		return
@@ -302,19 +319,19 @@ func (s *InfoService) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
-	types.Status = types.StatusUpgrade
+	app.Status = app.StatusUpgrade
 	if err = s.settingRepo.UpdatePanel(ver, url, checksum); err != nil {
-		types.Status = types.StatusFailed
+		app.Status = app.StatusFailed
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	types.Status = types.StatusNormal
+	app.Status = app.StatusNormal
 	Success(w, nil)
 	tools.RestartPanel()
 }
 
-func (s *InfoService) Restart(w http.ResponseWriter, r *http.Request) {
+func (s *DashboardService) Restart(w http.ResponseWriter, r *http.Request) {
 	if s.taskRepo.HasRunningTask() {
 		Error(w, http.StatusInternalServerError, "后台任务正在运行，禁止重启，请稍后再试")
 		return

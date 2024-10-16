@@ -1,15 +1,27 @@
-import dayjs from 'dayjs'
+import { DateTime, Duration } from 'luxon'
 
 type Time = undefined | string | Date
 
-/** 格式化时间，默认格式：YYYY-MM-DD HH:mm:ss */
-export function formatDateTime(time: Time, format = 'YYYY-MM-DD HH:mm:ss'): string {
-  return dayjs(time).format(format)
+/** 格式化时间，默认格式：yyyy-MM-dd HH:mm:ss */
+export function formatDateTime(time: Time, format = 'yyyy-MM-dd HH:mm:ss'): string {
+  const dateTime = time ? DateTime.fromJSDate(new Date(time)) : DateTime.now()
+  return dateTime.toFormat(format)
 }
 
-/** 格式化日期，默认格式：YYYY-MM-DD */
-export function formatDate(date: Time = undefined, format = 'YYYY-MM-DD') {
+/** 格式化日期，默认格式：yyyy-MM-dd */
+export function formatDate(date: Time = undefined, format = 'yyyy-MM-dd') {
   return formatDateTime(date, format)
+}
+
+/** 格式化持续时间，转为 x天x小时x分钟x秒 */
+export function formatDuration(seconds: number) {
+  const duration = Duration.fromObject({ seconds })
+  const days = Math.floor(duration.as('days'))
+  const hours = duration.hours
+  const minutes = duration.minutes
+  const secs = duration.seconds
+
+  return `${days}天${hours}时${minutes}分${secs}秒`
 }
 
 /** 生成随机字符串 */

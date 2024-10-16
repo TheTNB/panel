@@ -10,7 +10,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 // Monitoring 系统监控
@@ -25,7 +24,7 @@ func NewMonitoring() *Monitoring {
 }
 
 func (r *Monitoring) Run() {
-	if types.Status != types.StatusNormal {
+	if app.Status != app.StatusNormal {
 		return
 	}
 
@@ -38,13 +37,13 @@ func (r *Monitoring) Run() {
 		return
 	}
 
-	info := tools.GetMonitoringInfo()
+	info := tools.CurrentInfo(nil, nil)
 
 	// 去除部分数据以减少数据库存储
 	info.Disk = nil
 	info.Cpus = nil
 
-	if types.Status != types.StatusNormal {
+	if app.Status != app.StatusNormal {
 		return
 	}
 
@@ -59,7 +58,7 @@ func (r *Monitoring) Run() {
 		return
 	}
 	day := cast.ToInt(dayStr)
-	if day <= 0 || types.Status != types.StatusNormal {
+	if day <= 0 || app.Status != app.StatusNormal {
 		return
 	}
 	if err = app.Orm.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format("2006-01-02 15:04:05")).Delete(&biz.Monitor{}).Error; err != nil {

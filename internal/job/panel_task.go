@@ -9,7 +9,6 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 // PanelTask 面板每日任务
@@ -28,15 +27,15 @@ func NewPanelTask() *PanelTask {
 }
 
 func (r *PanelTask) Run() {
-	types.Status = types.StatusMaintain
+	app.Status = app.StatusMaintain
 
 	// 优化数据库
 	if err := app.Orm.Exec("VACUUM").Error; err != nil {
-		types.Status = types.StatusFailed
+		app.Status = app.StatusFailed
 		app.Logger.Error("优化面板数据库失败", zap.Error(err))
 	}
 	if err := app.Orm.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
-		types.Status = types.StatusFailed
+		app.Status = app.StatusFailed
 		app.Logger.Error("优化面板数据库失败", zap.Error(err))
 	}
 
@@ -64,5 +63,5 @@ func (r *PanelTask) Run() {
 	runtime.GC()
 	debug.FreeOSMemory()
 
-	types.Status = types.StatusNormal
+	app.Status = app.StatusNormal
 }

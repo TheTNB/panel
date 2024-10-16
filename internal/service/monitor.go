@@ -101,7 +101,7 @@ func (s *MonitorService) List(w http.ResponseWriter, r *http.Request) {
 		list.Load.Load1 = append(list.Load.Load1, monitor.Info.Load.Load1)
 		list.Load.Load5 = append(list.Load.Load5, monitor.Info.Load.Load5)
 		list.Load.Load15 = append(list.Load.Load15, monitor.Info.Load.Load15)
-		list.CPU.Percent = append(list.CPU.Percent, fmt.Sprintf("%.2f", monitor.Info.Percent[0]))
+		list.CPU.Percent = append(list.CPU.Percent, fmt.Sprintf("%.2f", monitor.Info.Percent))
 		list.Mem.Available = append(list.Mem.Available, fmt.Sprintf("%.2f", float64(monitor.Info.Mem.Available)/1024/1024))
 		list.Mem.Used = append(list.Mem.Used, fmt.Sprintf("%.2f", float64(monitor.Info.Mem.Used)/1024/1024))
 		list.SWAP.Used = append(list.SWAP.Used, fmt.Sprintf("%.2f", float64(monitor.Info.Swap.Used)/1024/1024))

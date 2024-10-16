@@ -25,10 +25,20 @@ var (
 	Logger     *zap.Logger
 )
 
+// 定义面板状态常量
+const (
+	StatusNormal = iota
+	StatusMaintain
+	StatusClosed
+	StatusUpgrade
+	StatusFailed
+)
+
 // 面板全局变量
 var (
 	Root    string
 	Version string
 	Locale  string
 	IsCli   bool
+	Status  = StatusNormal
 )

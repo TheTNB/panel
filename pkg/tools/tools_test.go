@@ -15,7 +15,7 @@ func TestHelperTestSuite(t *testing.T) {
 }
 
 func (s *HelperTestSuite) TestGetMonitoringInfo() {
-	s.NotNil(GetMonitoringInfo())
+	s.NotNil(CurrentInfo(nil, nil))
 }
 
 func (s *HelperTestSuite) TestGetPublicIP() {

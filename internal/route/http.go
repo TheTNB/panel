@@ -23,18 +23,18 @@ func Http(r chi.Router) {
 			r.With(middleware.MustLogin).Get("/info", user.Info)
 		})
 
-		r.Route("/info", func(r chi.Router) {
-			info := service.NewInfoService()
-			r.Get("/panel", info.Panel)
-			r.With(middleware.MustLogin).Get("/homeApps", info.HomeApps)
-			r.With(middleware.MustLogin).Get("/realtime", info.Realtime)
-			r.With(middleware.MustLogin).Get("/systemInfo", info.SystemInfo)
-			r.With(middleware.MustLogin).Get("/countInfo", info.CountInfo)
-			r.With(middleware.MustLogin).Get("/installedDbAndPhp", info.InstalledDbAndPhp)
-			r.With(middleware.MustLogin).Get("/checkUpdate", info.CheckUpdate)
-			r.With(middleware.MustLogin).Get("/updateInfo", info.UpdateInfo)
-			r.With(middleware.MustLogin).Post("/update", info.Update)
-			r.With(middleware.MustLogin).Post("/restart", info.Restart)
+		r.Route("/dashboard", func(r chi.Router) {
+			dashboard := service.NewDashboardService()
+			r.Get("/panel", dashboard.Panel)
+			r.With(middleware.MustLogin).Get("/homeApps", dashboard.HomeApps)
+			r.With(middleware.MustLogin).Post("/current", dashboard.Current)
+			r.With(middleware.MustLogin).Get("/systemInfo", dashboard.SystemInfo)
+			r.With(middleware.MustLogin).Get("/countInfo", dashboard.CountInfo)
+			r.With(middleware.MustLogin).Get("/installedDbAndPhp", dashboard.InstalledDbAndPhp)
+			r.With(middleware.MustLogin).Get("/checkUpdate", dashboard.CheckUpdate)
+			r.With(middleware.MustLogin).Get("/updateInfo", dashboard.UpdateInfo)
+			r.With(middleware.MustLogin).Post("/update", dashboard.Update)
+			r.With(middleware.MustLogin).Post("/restart", dashboard.Restart)
 		})
 
 		r.Route("/task", func(r chi.Router) {
