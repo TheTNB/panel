@@ -1,15 +1,13 @@
 import { DateTime, Duration } from 'luxon'
 
-type Time = undefined | string | Date
-
 /** 格式化时间，默认格式：yyyy-MM-dd HH:mm:ss */
-export function formatDateTime(time: Time, format = 'yyyy-MM-dd HH:mm:ss'): string {
+export function formatDateTime(time: any, format = 'yyyy-MM-dd HH:mm:ss'): string {
   const dateTime = time ? DateTime.fromJSDate(new Date(time)) : DateTime.now()
   return dateTime.toFormat(format)
 }
 
 /** 格式化日期，默认格式：yyyy-MM-dd */
-export function formatDate(date: Time = undefined, format = 'yyyy-MM-dd') {
+export function formatDate(date: any, format = 'yyyy-MM-dd') {
   return formatDateTime(date, format)
 }
 
@@ -22,6 +20,11 @@ export function formatDuration(seconds: number) {
   const secs = duration.seconds
 
   return `${days}天${hours}小时${minutes}分钟${secs}秒`
+}
+
+/** 转时间戳 */
+export function toTimestamp(time: any) {
+  return DateTime.fromJSDate(new Date(time)).toSeconds()
 }
 
 /** 生成随机字符串 */

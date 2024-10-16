@@ -15,7 +15,7 @@ import { useI18n } from 'vue-i18n'
 import dashboard from '@/api/panel/dashboard'
 import { router } from '@/router'
 import { useAppStore } from '@/store'
-import { formatDateTime, formatDuration } from '@/utils/common'
+import { formatDateTime, formatDuration, toTimestamp } from '@/utils/common'
 import { formatBytes, formatPercent } from '@/utils/file'
 import VChart from 'vue-echarts'
 import type { CountInfo, HomeApp, Realtime, SystemInfo } from './types'
@@ -30,7 +30,7 @@ use([
   DataZoomComponent
 ])
 
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 const appStore = useAppStore()
 const realtime = ref<Realtime | null>(null)
 const systemInfo = ref<SystemInfo | null>(null)
@@ -46,6 +46,13 @@ const countInfo = ref<CountInfo>({
 const nets = ref<Array<string>>([]) // 选择的网卡
 const disks = ref<Array<string>>([]) // 选择的硬盘
 const chartType = ref('net')
+const unitType = ref('KB')
+const units = [
+  { label: 'B', value: 'B' },
+  { label: 'KB', value: 'KB' },
+  { label: 'MB', value: 'MB' },
+  { label: 'GB', value: 'GB' }
+]
 
 const cores = ref(0)
 const diskReadBytes = ref<Array<number>>([])
@@ -69,7 +76,8 @@ const current = reactive({
   diskRWBytes: 0,
   diskRWTime: 0,
   netBytesSent: 0,
-  netBytesRecv: 0
+  netBytesRecv: 0,
+  time: 0
 })
 
 const chartDisk = computed(() => {
@@ -89,7 +97,7 @@ const chartDisk = computed(() => {
       formatter: function (params: any) {
         let res = params[0].name + '<br/>'
         params.forEach(function (item: any) {
-          res += `${item.marker} ${item.seriesName}: ${item.value} MB<br/>`
+          res += `${item.marker} ${item.seriesName}: ${item.value} ${unitType.value}<br/>`
         })
         return res
       }
@@ -104,10 +112,10 @@ const chartDisk = computed(() => {
       data: timeDiskData.value
     },
     yAxis: {
-      name: '单位 MB',
+      name: `单位 ${unitType.value}`,
       type: 'value',
       axisLabel: {
-        formatter: '{value} MB'
+        formatter: `{value} ${unitType.value}`
       }
     },
     series: [
@@ -145,94 +153,110 @@ const chartDisk = computed(() => {
   }
 })
 
-const getCurrent = async () => {
-  const { data } = await dashboard.current(nets.value, disks.value)
-  data.percent = formatPercent(data.percent)
-  data.mem.usedPercent = formatPercent(data.mem.usedPercent)
-  // 计算 CPU 核心数
-  if (cores.value == 0) {
-    for (let i = 0; i < data.cpus.length; i++) {
-      cores.value += data.cpus[i].cores
-    }
-  }
-  // 计算实时数据
-  let netTotalSentTemp = 0
-  let netTotalRecvTemp = 0
-  for (let i = 0; i < data.net.length; i++) {
-    if (data.net[i].name === 'lo') {
-      continue
-    }
-    netTotalSentTemp += data.net[i].bytesSent
-    netTotalRecvTemp += data.net[i].bytesRecv
-  }
-  current.netBytesSent = total.netBytesSent != 0 ? (netTotalSentTemp - total.netBytesSent) / 3 : 0
-  current.netBytesRecv = total.netBytesRecv != 0 ? (netTotalRecvTemp - total.netBytesRecv) / 3 : 0
-  total.netBytesSent = netTotalSentTemp
-  total.netBytesRecv = netTotalRecvTemp
-  // 计算硬盘读写
-  let diskTotalReadTemp = 0
-  let diskTotalWriteTemp = 0
-  let diskRWTimeTemp = 0
-  for (let i = 0; i < data.disk_io.length; i++) {
-    diskTotalReadTemp += data.disk_io[i].readBytes
-    diskTotalWriteTemp += data.disk_io[i].writeBytes
-    diskRWTimeTemp += data.disk_io[i].readTime + data.disk_io[i].writeTime
-  }
-  current.diskReadBytes =
-    total.diskReadBytes != 0 ? (diskTotalReadTemp - total.diskReadBytes) / 3 : 0
-  current.diskWriteBytes =
-    total.diskWriteBytes != 0 ? (diskTotalWriteTemp - total.diskWriteBytes) / 3 : 0
-  current.diskRWBytes =
-    total.diskRWBytes != 0 ? (diskTotalReadTemp + diskTotalWriteTemp - total.diskRWBytes) / 3 : 0
-  current.diskRWTime =
-    total.diskRWTime != 0 ? Number(((diskRWTimeTemp - total.diskRWTime) / 3).toFixed(2)) : 0
-  total.diskReadBytes = diskTotalReadTemp
-  total.diskWriteBytes = diskTotalWriteTemp
-  total.diskRWBytes = diskTotalReadTemp + diskTotalWriteTemp
-  total.diskRWTime = diskRWTimeTemp
+let isFetching = false
 
-  // 图表数据填充
-  netBytesSent.value.push(Number((current.netBytesSent / 1024 / 1024).toFixed(2)))
-  if (netBytesSent.value.length > 20) {
-    netBytesSent.value.splice(0, 1)
-  }
-  netBytesRecv.value.push(Number((current.netBytesRecv / 1024 / 1024).toFixed(2)))
-  if (netBytesRecv.value.length > 20) {
-    netBytesRecv.value.splice(0, 1)
-  }
-  diskReadBytes.value.push(Number((current.diskReadBytes / 1024 / 1024).toFixed(2)))
-  if (diskReadBytes.value.length > 20) {
-    diskReadBytes.value.splice(0, 1)
-  }
-  diskWriteBytes.value.push(Number((current.diskWriteBytes / 1024 / 1024).toFixed(2)))
-  if (diskWriteBytes.value.length > 20) {
-    diskWriteBytes.value.splice(0, 1)
-  }
-  timeDiskData.value.push(formatDateTime(data.time))
-  if (timeDiskData.value.length > 20) {
-    timeDiskData.value.splice(0, 1)
-  }
-  timeNetData.value.push(formatDateTime(data.time))
-  if (timeNetData.value.length > 20) {
-    timeNetData.value.splice(0, 1)
-  }
+const fetchCurrent = async () => {
+  if (isFetching) return
+  isFetching = true
+  dashboard
+    .current(nets.value, disks.value)
+    .then(({ data }) => {
+      data.percent = formatPercent(data.percent)
+      data.mem.usedPercent = formatPercent(data.mem.usedPercent)
+      // 计算 CPU 核心数
+      if (cores.value == 0) {
+        for (let i = 0; i < data.cpus.length; i++) {
+          cores.value += data.cpus[i].cores
+        }
+      }
+      // 计算实时数据
+      let time = current.time == 0 ? 3 : toTimestamp(data.time) - current.time
+      let netTotalSentTemp = 0
+      let netTotalRecvTemp = 0
+      for (let i = 0; i < data.net.length; i++) {
+        if (data.net[i].name === 'lo') {
+          continue
+        }
+        netTotalSentTemp += data.net[i].bytesSent
+        netTotalRecvTemp += data.net[i].bytesRecv
+      }
+      current.netBytesSent =
+        total.netBytesSent != 0 ? (netTotalSentTemp - total.netBytesSent) / time : 0
+      current.netBytesRecv =
+        total.netBytesRecv != 0 ? (netTotalRecvTemp - total.netBytesRecv) / time : 0
+      total.netBytesSent = netTotalSentTemp
+      total.netBytesRecv = netTotalRecvTemp
+      // 计算硬盘读写
+      let diskTotalReadTemp = 0
+      let diskTotalWriteTemp = 0
+      let diskRWTimeTemp = 0
+      for (let i = 0; i < data.disk_io.length; i++) {
+        diskTotalReadTemp += data.disk_io[i].readBytes
+        diskTotalWriteTemp += data.disk_io[i].writeBytes
+        diskRWTimeTemp += data.disk_io[i].readTime + data.disk_io[i].writeTime
+      }
+      current.diskReadBytes =
+        total.diskReadBytes != 0 ? (diskTotalReadTemp - total.diskReadBytes) / time : 0
+      current.diskWriteBytes =
+        total.diskWriteBytes != 0 ? (diskTotalWriteTemp - total.diskWriteBytes) / time : 0
+      current.diskRWBytes =
+        total.diskRWBytes != 0
+          ? (diskTotalReadTemp + diskTotalWriteTemp - total.diskRWBytes) / time
+          : 0
+      current.diskRWTime =
+        total.diskRWTime != 0 ? Number(((diskRWTimeTemp - total.diskRWTime) / time).toFixed(2)) : 0
+      current.time = toTimestamp(data.time)
+      total.diskReadBytes = diskTotalReadTemp
+      total.diskWriteBytes = diskTotalWriteTemp
+      total.diskRWBytes = diskTotalReadTemp + diskTotalWriteTemp
+      total.diskRWTime = diskRWTimeTemp
 
-  realtime.value = data
+      // 图表数据填充
+      netBytesSent.value.push(calculateSize(current.netBytesSent))
+      if (netBytesSent.value.length > 20) {
+        netBytesSent.value.splice(0, 1)
+      }
+      netBytesRecv.value.push(calculateSize(current.netBytesRecv))
+      if (netBytesRecv.value.length > 20) {
+        netBytesRecv.value.splice(0, 1)
+      }
+      diskReadBytes.value.push(calculateSize(current.diskReadBytes))
+      if (diskReadBytes.value.length > 20) {
+        diskReadBytes.value.splice(0, 1)
+      }
+      diskWriteBytes.value.push(calculateSize(current.diskWriteBytes))
+      if (diskWriteBytes.value.length > 20) {
+        diskWriteBytes.value.splice(0, 1)
+      }
+      timeDiskData.value.push(formatDateTime(data.time))
+      if (timeDiskData.value.length > 20) {
+        timeDiskData.value.splice(0, 1)
+      }
+      timeNetData.value.push(formatDateTime(data.time))
+      if (timeNetData.value.length > 20) {
+        timeNetData.value.splice(0, 1)
+      }
+
+      realtime.value = data
+    })
+    .finally(() => {
+      isFetching = false
+    })
 }
 
-const getSystemInfo = async () => {
+const fetchSystemInfo = async () => {
   dashboard.systemInfo().then((res) => {
     systemInfo.value = res.data
   })
 }
 
-const getCountInfo = async () => {
+const fetchCountInfo = async () => {
   dashboard.countInfo().then((res) => {
     countInfo.value = res.data
   })
 }
 
-const getHomeApps = async () => {
+const fetchHomeApps = async () => {
   homeAppsLoading.value = true
   dashboard.homeApps().then((res) => {
     homeApps.value = res.data
@@ -242,9 +266,9 @@ const getHomeApps = async () => {
 
 const handleRestartPanel = () => {
   clearInterval(homeInterval)
-  window.$message.loading(t('homeIndex.system.restart.loading'))
+  window.$message.loading('面板重启中...')
   dashboard.restart().then(() => {
-    window.$message.success(t('homeIndex.system.restart.success'))
+    window.$message.success('面板重启成功')
     setTimeout(() => {
       appStore.reloadPage()
     }, 3000)
@@ -256,7 +280,7 @@ const handleUpdate = () => {
     if (res.data.update) {
       router.push({ name: 'home-update' })
     } else {
-      window.$message.success(t('homeIndex.system.update.success'))
+      window.$message.success('当前已是最新版本')
     }
   })
 }
@@ -275,6 +299,21 @@ const toGit = () => {
 
 const handleManageApp = (slug: string) => {
   router.push({ name: 'apps-' + slug + '-index' })
+}
+
+const calculateSize = (bytes: any) => {
+  switch (unitType.value) {
+    case 'B':
+      return Number(bytes.toFixed(2))
+    case 'KB':
+      return Number((bytes / 1024).toFixed(2))
+    case 'MB':
+      return Number((bytes / 1024 / 1024).toFixed(2))
+    case 'GB':
+      return Number((bytes / 1024 / 1024 / 1024).toFixed(2))
+    default:
+      return 0
+  }
 }
 
 const clearCurrent = () => {
@@ -299,13 +338,12 @@ const quantifier = computed(() => {
 let homeInterval: any = null
 
 onMounted(() => {
-  getCurrent()
-  getSystemInfo()
-  getCountInfo()
-  getHomeApps()
+  fetchCurrent()
+  fetchSystemInfo()
+  fetchCountInfo()
+  fetchHomeApps()
   homeInterval = setInterval(() => {
-    getCurrent()
-    getSystemInfo()
+    fetchCurrent()
   }, 3000)
 })
 
@@ -329,37 +367,29 @@ if (import.meta.hot) {
           <n-page-header :subtitle="systemInfo?.panel_version">
             <n-grid :cols="4" pb-10>
               <n-gi>
-                <n-statistic
-                  :label="$t('homeIndex.website')"
-                  :value="countInfo.website + quantifier"
-                />
+                <n-statistic label="网站" :value="countInfo.website + quantifier" />
               </n-gi>
               <n-gi>
-                <n-statistic
-                  :label="$t('homeIndex.database')"
-                  :value="countInfo.database + quantifier"
-                />
+                <n-statistic label="数据库" :value="countInfo.database + quantifier" />
               </n-gi>
               <n-gi>
                 <n-statistic label="FTP" :value="countInfo.ftp + quantifier" />
               </n-gi>
               <n-gi>
-                <n-statistic :label="$t('homeIndex.cron')" :value="countInfo.cron + quantifier" />
+                <n-statistic label="计划任务" :value="countInfo.cron + quantifier" />
               </n-gi>
             </n-grid>
-            <template #title>{{ $t('name') }}</template>
+            <template #title>耗子面板</template>
             <template #extra>
               <n-space>
-                <n-button type="primary" @click="toSponsor">
-                  {{ $t('homeIndex.sponsor') }}
-                </n-button>
-                <n-button @click="toGit">{{ $t('homeIndex.git') }}</n-button>
+                <n-button type="primary" @click="toSponsor"> 赞助支持 </n-button>
+                <n-button @click="toGit">开源地址</n-button>
               </n-space>
             </template>
           </n-page-header>
         </n-card>
 
-        <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.resources.title')">
+        <n-card :segmented="true" rounded-10 size="small" title="资源总览">
           <n-flex v-if="realtime" size="large">
             <n-popover trigger="hover">
               <template #trigger>
@@ -525,11 +555,11 @@ if (import.meta.hot) {
               </template>
               <n-table :single-line="false">
                 <tr>
-                  <th>{{ $t('homeIndex.store.columns.path') }}</th>
+                  <th>挂载点</th>
                   <td>{{ item.path }}</td>
                 </tr>
                 <tr>
-                  <th>{{ $t('homeIndex.store.columns.type') }}</th>
+                  <th>文件系统</th>
                   <td>{{ item.fstype }}</td>
                 </tr>
                 <tr>
@@ -561,61 +591,113 @@ if (import.meta.hot) {
           responsive="screen"
         >
           <n-gi>
-            <n-card
-              :segmented="true"
-              rounded-10
-              size="small"
-              :title="$t('homeIndex.apps.title')"
-              min-h-375
-            >
-              <n-grid
-                v-if="!homeAppsLoading"
-                x-gap="12"
-                y-gap="12"
-                cols="3 s:1 m:2 l:3"
-                item-responsive
-                responsive="screen"
-              >
-                <n-gi v-for="item in homeApps" :key="item.name">
-                  <n-card
-                    :segmented="true"
-                    size="small"
-                    cursor-pointer
-                    rounded-10
-                    hover:card-shadow
-                    @click="handleManageApp(item.slug)"
+            <n-flex vertical>
+              <n-card :segmented="true" size="small" title="快捷应用" min-h-280 rounded-10>
+                <n-scrollbar max-h-210>
+                  <n-grid
+                    v-if="!homeAppsLoading"
+                    x-gap="12"
+                    y-gap="12"
+                    cols="3 s:1 m:2 l:3"
+                    item-responsive
+                    responsive="screen"
                   >
-                    <n-space>
-                      <n-thing>
-                        <template #avatar>
-                          <n-avatar class="mt-4">
-                            <n-icon>
-                              <icon-mdi:package-variant-closed />
-                            </n-icon>
-                          </n-avatar>
-                        </template>
-                        <template #header>
-                          {{ item.name }}
-                        </template>
-                        <template #description>
-                          {{ item.version }}
-                        </template>
-                      </n-thing>
-                    </n-space>
-                  </n-card>
-                </n-gi>
-              </n-grid>
-              <n-text v-if="!homeAppsLoading && !homeApps"> 您还没有设置任何应用在此显示！ </n-text>
-              <n-skeleton v-if="homeAppsLoading" text :repeat="9" />
-            </n-card>
+                    <n-gi v-for="item in homeApps" :key="item.name">
+                      <n-card
+                        :segmented="true"
+                        size="small"
+                        cursor-pointer
+                        rounded-10
+                        hover:card-shadow
+                        @click="handleManageApp(item.slug)"
+                      >
+                        <n-space>
+                          <n-thing>
+                            <template #avatar>
+                              <n-avatar class="mt-4">
+                                <TheIcon :size="24" icon="mdi:package-variant-closed" />
+                              </n-avatar>
+                            </template>
+                            <template #header>
+                              {{ item.name }}
+                            </template>
+                            <template #description>
+                              {{ item.version }}
+                            </template>
+                          </n-thing>
+                        </n-space>
+                      </n-card>
+                    </n-gi>
+                  </n-grid>
+                </n-scrollbar>
+                <n-text v-if="!homeAppsLoading && !homeApps">
+                  您还没有设置任何应用在此显示！
+                </n-text>
+                <n-skeleton v-if="homeAppsLoading" text :repeat="10" />
+              </n-card>
+              <n-card :segmented="true" rounded-10 size="small" title="系统信息">
+                <n-table v-if="systemInfo" :single-line="false">
+                  <tr>
+                    <th>主机名</th>
+                    <td>
+                      {{ systemInfo?.hostname || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>面板版本</th>
+                    <td>
+                      {{ systemInfo?.panel_version || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>系统版本</th>
+                    <td>
+                      {{ `${systemInfo?.os_name} ${systemInfo?.kernel_arch}` || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>内核版本</th>
+                    <td>
+                      {{ systemInfo?.kernel_version || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>运行时间</th>
+                    <td>
+                      {{ formatDuration(Number(systemInfo?.uptime)) || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>操作</th>
+                    <td>
+                      <n-space>
+                        <n-popconfirm @positive-click="handleRestartPanel">
+                          <template #trigger>
+                            <n-button type="warning" size="small">
+                              <TheIcon :size="20" class="mr-5" icon="mdi:restart" />
+                              重启面板
+                            </n-button>
+                          </template>
+                          确定要重启面板吗？
+                        </n-popconfirm>
+                        <n-button type="success" @click="handleUpdate" size="small">
+                          <TheIcon
+                            :size="20"
+                            class="mr-5"
+                            icon="mdi:arrow-up-bold-circle-outline"
+                          />
+                          检查更新
+                        </n-button>
+                      </n-space>
+                    </td>
+                  </tr>
+                </n-table>
+                <n-skeleton v-else text :repeat="10" />
+              </n-card>
+            </n-flex>
           </n-gi>
           <n-gi>
-            <n-card
-              :segmented="true"
-              rounded-10
-              size="small"
-              :title="$t('homeIndex.traffic.title')"
-            >
+            <n-card :segmented="true" rounded-10 size="small" title="实时监控">
               <n-flex vertical v-if="systemInfo">
                 <n-form
                   inline
@@ -629,7 +711,15 @@ if (import.meta.hot) {
                       <n-radio-button value="disk" label="硬盘" />
                     </n-radio-group>
                   </n-form-item>
-                  <n-form-item v-if="chartType == 'net'" label="网卡" ml-auto>
+                  <n-form-item label="单位" ml-auto>
+                    <n-select
+                      v-model:value="unitType"
+                      :options="units"
+                      @update-value="clearCurrent"
+                      w-80
+                    ></n-select>
+                  </n-form-item>
+                  <n-form-item v-if="chartType == 'net'" label="网卡">
                     <n-select
                       multiple
                       v-model:value="nets"
@@ -638,7 +728,7 @@ if (import.meta.hot) {
                       w-200
                     ></n-select>
                   </n-form-item>
-                  <n-form-item v-if="chartType == 'disk'" label="硬盘" ml-auto>
+                  <n-form-item v-if="chartType == 'disk'" label="硬盘">
                     <n-select
                       multiple
                       v-model:value="disks"
@@ -664,60 +754,10 @@ if (import.meta.hot) {
                   <v-chart class="chart" :option="chartDisk" autoresize />
                 </n-card>
               </n-flex>
-              <n-skeleton v-else text :repeat="10" />
+              <n-skeleton v-else text :repeat="24" />
             </n-card>
           </n-gi>
         </n-grid>
-
-        <n-card :segmented="true" rounded-10 size="small" :title="$t('homeIndex.system.title')">
-          <n-table :single-line="false">
-            <tr>
-              <th>{{ $t('homeIndex.system.columns.os') }}</th>
-              <td>
-                {{ systemInfo?.os_name || $t('homeIndex.system.columns.loading') }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('homeIndex.system.columns.panel') }}</th>
-              <td>
-                {{ systemInfo?.panel_version || $t('homeIndex.system.columns.loading') }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('homeIndex.system.columns.uptime') }}</th>
-              <td>
-                {{
-                  formatDuration(Number(systemInfo?.uptime)) ||
-                  $t('homeIndex.system.columns.loading')
-                }}
-              </td>
-            </tr>
-            <tr>
-              <th>{{ $t('homeIndex.system.columns.operate') }}</th>
-              <td>
-                <n-space>
-                  <n-popconfirm @positive-click="handleRestartPanel">
-                    <template #trigger>
-                      <n-button type="warning">
-                        <n-icon size="20">
-                          <icon-mdi:restart />
-                        </n-icon>
-                        {{ $t('homeIndex.system.restart.label') }}
-                      </n-button>
-                    </template>
-                    {{ $t('homeIndex.system.restart.confirm') }}
-                  </n-popconfirm>
-                  <n-button type="success" @click="handleUpdate">
-                    <n-icon size="20">
-                      <icon-mdi:arrow-up-bold-circle-outline />
-                    </n-icon>
-                    {{ $t('homeIndex.system.update.label') }}
-                  </n-button>
-                </n-space>
-              </td>
-            </tr>
-          </n-table>
-        </n-card>
       </n-space>
     </div>
   </AppPage>
