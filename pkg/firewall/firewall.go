@@ -150,7 +150,7 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 		return fmt.Errorf("invalid port range: %d-%d", rule.PortStart, rule.PortEnd)
 	}
 	// 不支持的切换使用rich rules
-	if rule.Direction != "in" || rule.Family != "ipv4" || rule.Address != "" || rule.Strategy != "accept" {
+	if rule.Direction != "in" || (rule.Family != "" && rule.Family != "ipv4") || rule.Address != "" || rule.Strategy != "accept" {
 		return r.RichRules(rule, operation)
 	}
 
