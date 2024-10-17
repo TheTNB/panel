@@ -6,7 +6,7 @@ type App struct {
 }
 
 type AppSlug struct {
-	Slug string `json:"slug" form:"slug" validate:"required,exists=apps slug"`
+	Slug string `json:"slug" form:"slug" validate:"required"`
 }
 
 type AppUpdateShow struct {
