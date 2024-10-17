@@ -37,7 +37,7 @@ func (suite *NTPTestSuite) TestUpdateSystemTime() {
 		suite.T().Skip("Skipping on Windows")
 	}
 	err := UpdateSystemTime(time.Now())
-	suite.Error(err) // GitHub action not support
+	suite.NoError(err)
 }
 
 func (suite *NTPTestSuite) TestUpdateSystemTimeZone() {
