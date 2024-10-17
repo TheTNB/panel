@@ -80,6 +80,28 @@ const current = reactive({
   time: 0
 })
 
+const statusColor = (percentage: number) => {
+  if (percentage >= 90) {
+    return 'var(--error-color)'
+  } else if (percentage >= 80) {
+    return 'var(--warning-color)'
+  } else if (percentage >= 70) {
+    return 'var(--info-color)'
+  }
+  return 'var(--success-color)'
+}
+
+const statusText = (percentage: number) => {
+  if (percentage >= 90) {
+    return '运行堵塞'
+  } else if (percentage >= 80) {
+    return '运行缓慢'
+  } else if (percentage >= 70) {
+    return '运行正常'
+  }
+  return '运行流畅'
+}
+
 const chartDisk = computed(() => {
   return {
     title: {
@@ -414,11 +436,12 @@ if (import.meta.hot) {
                 <n-flex vertical flex items-center p-20 pl-40 pr-40>
                   <p>负载状态</p>
                   <n-progress
-                    :percentage="formatPercent((realtime.load.load1 / cores) * 100)"
                     type="dashboard"
+                    :percentage="formatPercent((realtime.load.load1 / cores) * 100)"
+                    :color="statusColor((realtime.load.load1 / cores) * 100)"
                   >
                   </n-progress>
-                  <p>运行流畅</p>
+                  <p>{{ statusText((realtime.load.load1 / cores) * 100) }}</p>
                 </n-flex>
               </template>
               <n-table :single-line="false" striped>
@@ -449,8 +472,13 @@ if (import.meta.hot) {
               <template #trigger>
                 <n-flex vertical flex items-center p-20 pl-40 pr-40>
                   <p>CPU</p>
-                  <n-progress :percentage="realtime.percent" type="dashboard"> </n-progress>
-                  <p>{{ cores }}核心</p>
+                  <n-progress
+                    type="dashboard"
+                    :percentage="realtime.percent"
+                    :color="statusColor(realtime.percent)"
+                  >
+                  </n-progress>
+                  <p>{{ cores }} 核心</p>
                 </n-flex>
               </template>
               <n-table :single-line="false" striped>
@@ -477,8 +505,13 @@ if (import.meta.hot) {
               <template #trigger>
                 <n-flex vertical flex items-center p-20 pl-40 pr-40>
                   <p>内存</p>
-                  <n-progress :percentage="realtime.mem.usedPercent" type="dashboard"> </n-progress>
-                  <p>运行流畅</p>
+                  <n-progress
+                    type="dashboard"
+                    :percentage="realtime.mem.usedPercent"
+                    :color="statusColor(realtime.mem.usedPercent)"
+                  >
+                  </n-progress>
+                  <p>{{ formatBytes(realtime.mem.total) }}</p>
                 </n-flex>
               </template>
               <n-table :single-line="false" striped>
@@ -566,7 +599,11 @@ if (import.meta.hot) {
               <template #trigger>
                 <n-flex vertical flex items-center p-20 pl-40 pr-40>
                   <p>{{ item.path }}</p>
-                  <n-progress :percentage="formatPercent(item.usedPercent)" type="dashboard">
+                  <n-progress
+                    type="dashboard"
+                    :percentage="formatPercent(item.usedPercent)"
+                    :color="statusColor(item.usedPercent)"
+                  >
                   </n-progress>
                   <p>{{ formatBytes(item.used) }} / {{ formatBytes(item.total) }}</p>
                 </n-flex>
