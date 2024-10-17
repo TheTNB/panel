@@ -16,7 +16,7 @@ func Status(next http.Handler) http.Handler {
 			render := chix.NewRender(w)
 			render.Status(http.StatusServiceUnavailable)
 			render.JSON(chix.M{
-				"message": "面板升级中，请稍后刷新",
+				"message": "面板更新中，请稍后刷新",
 			})
 			return
 		case app.StatusMaintain:

@@ -295,7 +295,7 @@ func (r *appRepo) Update(slug string) error {
 	}
 
 	task := new(biz.Task)
-	task.Name = "升级应用 " + item.Name
+	task.Name = "更新应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"

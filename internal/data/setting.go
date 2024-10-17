@@ -276,7 +276,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		color.Greenln("|-前置检查...")
 	}
 	if io.Exists("/tmp/panel-storage.zip") {
-		return errors.New("检测到 /tmp 存在临时文件，可能是上次升级失败所致，请运行 panel-cli fix 修复后重试")
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败所致，请运行 panel-cli fix 修复后重试")
 	}
 
 	if app.IsCli {
@@ -328,10 +328,10 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-运行升级后脚本...")
+		color.Greenln("|-运行更新后脚本...")
 	}
 	if _, err := shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
-		return fmt.Errorf("运行面板升级后脚本失败：%w", err)
+		return fmt.Errorf("运行面板更新后脚本失败：%w", err)
 	}
 	if _, err := shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
 		return fmt.Errorf("下载面板服务文件失败：%w", err)
@@ -351,7 +351,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
 
 	if app.IsCli {
-		color.Greenln("|-升级完成")
+		color.Greenln("|-更新完成")
 	}
 
 	_, _ = shell.Execf("systemctl daemon-reload")
@@ -378,7 +378,7 @@ func (r *settingRepo) FixPanel() error {
 		flag = true
 	}
 	if !flag {
-		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 升级面板")
+		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 更新面板")
 	}
 
 	// 再次确认是否需要修复
@@ -391,7 +391,7 @@ func (r *settingRepo) FixPanel() error {
 				return fmt.Errorf("清理临时文件失败：%w", err)
 			}
 			if app.IsCli {
-				color.Greenln("已清理临时文件，请运行 panel-cli update 升级面板")
+				color.Greenln("已清理临时文件，请运行 panel-cli update 更新面板")
 			}
 			return nil
 		}

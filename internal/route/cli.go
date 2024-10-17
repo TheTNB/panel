@@ -26,7 +26,7 @@ func Cli() []*cli.Command {
 		},
 		{
 			Name:   "update",
-			Usage:  "升级面板",
+			Usage:  "更新面板",
 			Action: cliService.Update,
 		},
 		{
@@ -326,6 +326,11 @@ func Cli() []*cli.Command {
 					Name:   "uninstall",
 					Usage:  "卸载应用",
 					Action: cliService.AppUnInstall,
+				},
+				{
+					Name:   "update",
+					Usage:  "更新应用",
+					Action: cliService.AppUpdate,
 				},
 				{
 					Name:   "write",

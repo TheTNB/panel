@@ -27,7 +27,7 @@ body:
           required: false
         - label: 这个问题可以被稳定复现 (The problem can be stably reproduced)
           required: false
-        - label: 问题是在升级之后产生的 (The problem is generated after upgrading)
+        - label: 问题是在更新之后产生的 (The problem is generated after upgrading)
           required: false
   - type: dropdown
     id: system

@@ -530,8 +530,8 @@ func (s *CliService) CutoffClear(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
-	channel := cmd.Args().Get(0)
-	slug := cmd.Args().Get(1)
+	slug := cmd.Args().First()
+	channel := cmd.Args().Get(1)
 	if channel == "" || slug == "" {
 		return fmt.Errorf("参数不能为空")
 	}
@@ -540,7 +540,7 @@ func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用安装失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("已创建应用 %s 安装任务", slug))
+	color.Greenln(fmt.Sprintf("应用 %s 安装完成", slug))
 
 	return nil
 }
@@ -555,7 +555,22 @@ func (s *CliService) AppUnInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用卸载失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("已创建应用 %s 卸载任务", slug))
+	color.Greenln(fmt.Sprintf("应用 %s 卸载完成", slug))
+
+	return nil
+}
+
+func (s *CliService) AppUpdate(ctx context.Context, cmd *cli.Command) error {
+	slug := cmd.Args().First()
+	if slug == "" {
+		return fmt.Errorf("参数不能为空")
+	}
+
+	if err := s.appRepo.Update(slug); err != nil {
+		return fmt.Errorf("应用更新失败：%v", err)
+	}
+
+	color.Greenln(fmt.Sprintf("应用 %s 更新完成", slug))
 
 	return nil
 }

@@ -311,7 +311,7 @@ func (s *DashboardService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 	versions, err := s.api.IntermediateVersions()
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "获取升级信息失败：%v", err)
+		Error(w, http.StatusInternalServerError, "获取更新信息失败：%v", err)
 		return
 	}
 
@@ -320,12 +320,12 @@ func (s *DashboardService) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 
 func (s *DashboardService) Update(w http.ResponseWriter, r *http.Request) {
 	if offline, _ := s.settingRepo.GetBool(biz.SettingKeyOfflineMode); offline {
-		Error(w, http.StatusForbidden, "离线模式下无法升级")
+		Error(w, http.StatusForbidden, "离线模式下无法更新")
 		return
 	}
 
 	if s.taskRepo.HasRunningTask() {
-		Error(w, http.StatusInternalServerError, "后台任务正在运行，禁止升级，请稍后再试")
+		Error(w, http.StatusInternalServerError, "后台任务正在运行，禁止更新，请稍后再试")
 		return
 	}
 
