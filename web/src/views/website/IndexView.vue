@@ -52,15 +52,6 @@ const columns: any = [
     ellipsis: { tooltip: true }
   },
   {
-    title: 'PHP',
-    key: 'php',
-    width: 60,
-    ellipsis: { tooltip: true },
-    render(row: any) {
-      return row.php === 0 ? '不使用' : row.php
-    }
-  },
-  {
     title: 'SSL',
     key: 'ssl',
     width: 60,
