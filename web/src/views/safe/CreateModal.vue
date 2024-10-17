@@ -79,6 +79,7 @@ const handleCreate = async () => {
       strategy: 'accept',
       direction: 'in'
     }
+    show.value = false
   })
 }
 </script>
