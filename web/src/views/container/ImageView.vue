@@ -25,14 +25,14 @@ const columns: any = [
   {
     title: 'ID',
     key: 'id',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '容器数',
     key: 'containers',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
@@ -56,14 +56,14 @@ const columns: any = [
   {
     title: '大小',
     key: 'size',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '创建时间',
     key: 'created',
-    minWidth: 200,
+    width: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },

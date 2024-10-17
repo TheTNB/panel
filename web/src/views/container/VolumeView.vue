@@ -35,14 +35,14 @@ const columns: any = [
   {
     title: '驱动',
     key: 'driver',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '范围',
     key: 'scope',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
@@ -56,7 +56,7 @@ const columns: any = [
   {
     title: '创建时间',
     key: 'created',
-    minWidth: 200,
+    width: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },

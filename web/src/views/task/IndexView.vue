@@ -26,7 +26,7 @@ const columns: any = [
   {
     title: t('taskIndex.columns.status'),
     key: 'status',
-    minWidth: 100,
+    width: 150,
     ellipsis: { tooltip: true },
     render(row: any) {
       return row.status === 'finished'
@@ -41,7 +41,7 @@ const columns: any = [
   {
     title: t('taskIndex.columns.createdAt'),
     key: 'created_at',
-    minWidth: 200,
+    width: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.created_at)
@@ -50,7 +50,7 @@ const columns: any = [
   {
     title: t('taskIndex.columns.updatedAt'),
     key: 'updated_at',
-    minWidth: 200,
+    width: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.updated_at)

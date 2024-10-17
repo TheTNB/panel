@@ -25,11 +25,16 @@ const columns: any = [
     resizable: true,
     ellipsis: { tooltip: true }
   },
-  { title: '大小', key: 'size', minWidth: 160, ellipsis: { tooltip: true } },
+  {
+    title: '大小',
+    key: 'size',
+    width: 160,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '更新日期',
     key: 'time',
-    minWidth: 200,
+    width: 200,
     ellipsis: { tooltip: true },
     render(row: any) {
       return formatDateTime(row.time)

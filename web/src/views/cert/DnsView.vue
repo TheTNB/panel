@@ -43,7 +43,7 @@ const dnsColumns: any = [
   {
     title: '类型',
     key: 'type',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {

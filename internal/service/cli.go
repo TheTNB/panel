@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/TheTNB/panel/pkg/ntp"
 	"path/filepath"
 	"time"
 
@@ -612,6 +613,20 @@ func (s *CliService) AppRemove(ctx context.Context, cmd *cli.Command) error {
 	return nil
 }
 
+func (s *CliService) SyncTime(ctx context.Context, cmd *cli.Command) error {
+	now, err := ntp.Now()
+	if err != nil {
+		return err
+	}
+
+	if err = ntp.UpdateSystemTime(now); err != nil {
+		return err
+	}
+
+	color.Greenln("时间同步成功")
+	return nil
+}
+
 func (s *CliService) ClearTask(ctx context.Context, cmd *cli.Command) error {
 	if err := app.Orm.Model(&biz.Task{}).
 		Where("status", biz.TaskStatusRunning).Or("status", biz.TaskStatusWaiting).
@@ -620,6 +635,7 @@ func (s *CliService) ClearTask(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("任务清理失败：%v", err)
 	}
 
+	color.Greenln("任务清理成功")
 	return nil
 }
 

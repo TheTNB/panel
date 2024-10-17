@@ -61,7 +61,7 @@ const columns: any = [
   {
     title: '任务类型',
     key: 'type',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     render(row: any) {
       return row.type === 'shell' ? '运行脚本' : row.type === 'backup' ? '备份数据' : '切割日志'
@@ -70,7 +70,7 @@ const columns: any = [
   {
     title: '启用',
     key: 'status',
-    minWidth: 60,
+    width: 100,
     align: 'center',
     resizable: true,
     render(row: any) {
@@ -85,14 +85,14 @@ const columns: any = [
   {
     title: '任务周期',
     key: 'time',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '创建时间',
     key: 'created_at',
-    minWidth: 200,
+    width: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): string {
@@ -102,7 +102,7 @@ const columns: any = [
   {
     title: '最后更新时间',
     key: 'updated_at',
-    minWidth: 200,
+    width: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.updated_at)

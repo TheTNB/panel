@@ -20,7 +20,7 @@ const columns: any = [
   {
     title: '传输协议',
     key: 'protocol',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -37,7 +37,7 @@ const columns: any = [
   {
     title: '网络协议',
     key: 'family',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -54,7 +54,7 @@ const columns: any = [
   {
     title: '端口',
     key: 'port',
-    minWidth: 200,
+    minWidth: 300,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -129,7 +129,7 @@ const columns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 150,
+    width: 200,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

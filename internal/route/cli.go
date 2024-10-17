@@ -372,7 +372,12 @@ func Cli() []*cli.Command {
 			},
 		},
 		{
-			Name:   "clearTask",
+			Name:   "sync-time",
+			Usage:  "同步系统时间",
+			Action: cliService.SyncTime,
+		},
+		{
+			Name:   "clear-task",
 			Usage:  "清理面板任务队列（仅限指导下使用）",
 			Hidden: true,
 			Action: cliService.ClearTask,

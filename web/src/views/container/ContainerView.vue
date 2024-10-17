@@ -35,7 +35,7 @@ const columns: any = [
   {
     title: '状态',
     key: 'state',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     render(row: any) {
       return h(NSwitch, {
@@ -56,7 +56,7 @@ const columns: any = [
   {
     title: '端口（主机->容器）',
     key: 'ports',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -70,7 +70,7 @@ const columns: any = [
   {
     title: '运行状态',
     key: 'status',
-    minWidth: 300,
+    width: 300,
     resizable: true,
     ellipsis: { tooltip: true }
   },

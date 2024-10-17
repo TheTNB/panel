@@ -20,27 +20,27 @@ const columns: any = [
   {
     title: t('appIndex.columns.name'),
     key: 'name',
-    minWidth: 200,
+    width: 300,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.description'),
     key: 'description',
-    minWidth: 200,
+    minWidth: 300,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.installedVersion'),
     key: 'installed_version',
-    minWidth: 100,
+    width: 100,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.show'),
     key: 'show',
-    minWidth: 100,
+    width: 100,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {

@@ -49,7 +49,7 @@ const accountColumns: any = [
   {
     title: 'CA',
     key: 'ca',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -70,7 +70,7 @@ const accountColumns: any = [
   {
     title: '密钥类型',
     key: 'key_type',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true }
   },

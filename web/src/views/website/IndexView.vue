@@ -26,14 +26,14 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.name'),
     key: 'name',
-    minWidth: 150,
+    width: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('websiteIndex.columns.status'),
     key: 'status',
-    minWidth: 60,
+    width: 150,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -54,7 +54,7 @@ const columns: any = [
   {
     title: 'SSL',
     key: 'ssl',
-    minWidth: 60,
+    width: 150,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -73,7 +73,6 @@ const columns: any = [
     ellipsis: { tooltip: true },
     render(row: any) {
       return h(NInput, {
-        class: 'w-100',
         size: 'small',
         value: row.remark,
         onBlur: () => handleRemark(row),

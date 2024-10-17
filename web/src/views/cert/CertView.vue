@@ -64,7 +64,7 @@ const certColumns: any = [
   {
     title: '类型',
     key: 'type',
-    minWidth: 100,
+    width: 100,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -153,7 +153,7 @@ const certColumns: any = [
   {
     title: '自动续签',
     key: 'auto_renew',
-    minWidth: 100,
+    width: 100,
     align: 'center',
     resizable: true,
     render(row: any) {
