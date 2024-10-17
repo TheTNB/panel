@@ -25,7 +25,7 @@ const columns: any = [
     render(row: any) {
       return h(TheIcon, {
         icon: row.icon,
-        size: 24
+        size: 26
       })
     }
   },

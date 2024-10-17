@@ -10,6 +10,7 @@ type App struct {
 
 // AppCenter 应用中心结构
 type AppCenter struct {
+	Icon        string `json:"icon"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Slug        string `json:"slug"`
