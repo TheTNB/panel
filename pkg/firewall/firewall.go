@@ -14,13 +14,6 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Operation string
-
-var (
-	OperationAdd    Operation = "add"
-	OperationRemove Operation = "remove"
-)
-
 type Firewall struct {
 	forwardListRegex *regexp.Regexp
 	richRuleRegex    *regexp.Regexp
@@ -70,7 +63,7 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 					item.PortStart = cast.ToUint(ruleItem[0])
 					item.PortEnd = cast.ToUint(ruleItem[0])
 				}
-				item.Protocol = ruleItem[1]
+				item.Protocol = Protocol(ruleItem[1])
 			}
 			item.Family = "ipv4"
 			item.Strategy = "accept"
@@ -112,7 +105,7 @@ func (r *Firewall) ListForward() ([]FireForwardInfo, error) {
 			}
 			data = append(data, FireForwardInfo{
 				Port:       cast.ToUint(match[1]),
-				Protocol:   match[2],
+				Protocol:   Protocol(match[2]),
 				TargetIP:   match[4],
 				TargetPort: match[3],
 			})
@@ -154,7 +147,7 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 		return r.RichRules(rule, operation)
 	}
 
-	protocols := strings.Split(rule.Protocol, "/")
+	protocols := strings.Split(string(rule.Protocol), "/")
 	for protocol := range slices.Values(protocols) {
 		stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d-%d/%s --permanent", operation, rule.PortStart, rule.PortEnd, protocol)
 		if err != nil {
@@ -167,7 +160,7 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 }
 
 func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
-	protocols := strings.Split(rule.Protocol, "/")
+	protocols := strings.Split(string(rule.Protocol), "/")
 	for protocol := range slices.Values(protocols) {
 		var ruleBuilder strings.Builder
 		ruleBuilder.WriteString(fmt.Sprintf(`rule family="%s" `, rule.Family))
@@ -177,6 +170,8 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 				ruleBuilder.WriteString(fmt.Sprintf(`source address="%s" `, rule.Address))
 			} else if rule.Direction == "out" {
 				ruleBuilder.WriteString(fmt.Sprintf(`destination address="%s" `, rule.Address))
+			} else if rule.Direction != "" {
+				return fmt.Errorf("invalid direction: %s", rule.Direction)
 			}
 		}
 		if rule.PortStart != 0 && rule.PortEnd != 0 && (rule.PortStart != 1 && rule.PortEnd != 65535) { // 1-65535是解析出来无端口规则的情况
@@ -189,7 +184,7 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 			ruleBuilder.WriteString(fmt.Sprintf(`protocol="%s" `, protocol))
 		}
 
-		ruleBuilder.WriteString(rule.Strategy)
+		ruleBuilder.WriteString(string(rule.Strategy))
 		_, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleBuilder.String())
 		if err != nil {
 			return fmt.Errorf("%s rich rules (%s) failed, err: %v", operation, ruleBuilder.String(), err)
@@ -236,8 +231,8 @@ func (r *Firewall) parseRichRule(line string) (FireInfo, error) {
 	fireInfo := FireInfo{
 		Family:   match[1],
 		Address:  match[3],
-		Protocol: match[5],
-		Strategy: match[6],
+		Protocol: Protocol(match[5]),
+		Strategy: Strategy(match[6]),
 	}
 
 	if match[2] == "destination" {

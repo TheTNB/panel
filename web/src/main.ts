@@ -33,7 +33,7 @@ async function setupApp() {
   app.mount('#app')
 }
 
-const title = ref('')
+const title = ref(import.meta.env.VITE_APP_TITLE)
 
 const setupPanel = async () => {
   const themeStore = useThemeStore()

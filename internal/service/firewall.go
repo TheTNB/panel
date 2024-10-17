@@ -80,7 +80,7 @@ func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.firewall.Port(firewall.FireInfo{
-		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: req.Protocol, Address: req.Address, Strategy: req.Strategy, Direction: req.Direction,
+		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
 	}, firewall.OperationAdd); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -97,7 +97,7 @@ func (s *FirewallService) DeleteRule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.firewall.Port(firewall.FireInfo{
-		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: req.Protocol, Address: req.Address, Strategy: req.Strategy, Direction: req.Direction,
+		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
 	}, firewall.OperationRemove); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

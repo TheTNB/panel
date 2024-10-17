@@ -207,7 +207,8 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	err = fw.Port(firewall.FireInfo{
 		PortStart: uint(config.HTTP.Port),
 		PortEnd:   uint(config.HTTP.Port),
-		Protocol:  "tcp",
+		Direction: firewall.DirectionIn,
+		Strategy:  firewall.StrategyAccept,
 	}, firewall.OperationAdd)
 	if err != nil {
 		return false, err
