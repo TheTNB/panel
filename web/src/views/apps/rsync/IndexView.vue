@@ -43,21 +43,37 @@ const processColumns: any = [
   {
     title: '名称',
     key: 'name',
-    width: 200,
-    fixed: 'left',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
-  { title: '目录', key: 'path', width: 250, resizable: true, ellipsis: { tooltip: true } },
-  { title: '用户', key: 'auth_user', width: 200, resizable: true, ellipsis: { tooltip: true } },
-  { title: '主机', key: 'hosts_allow', width: 250, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '目录',
+    key: 'path',
+    minWidth: 250,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
+    title: '用户',
+    key: 'auth_user',
+    minWidth: 200,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
+    title: '主机',
+    key: 'hosts_allow',
+    minWidth: 250,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   { title: '备注', key: 'comment', resizable: true, ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    minWidth: 200,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -299,6 +315,7 @@ onMounted(() => {
           <n-data-table
             striped
             remote
+            :scroll-x="1000"
             :loading="false"
             :columns="processColumns"
             :data="modules"

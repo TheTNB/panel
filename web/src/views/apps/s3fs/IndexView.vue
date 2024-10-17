@@ -29,18 +29,16 @@ const columns: any = [
   {
     title: '挂载路径',
     key: 'path',
-    fixed: 'left',
-    width: 250,
+    minWidth: 250,
     resizable: true,
     ellipsis: { tooltip: true }
   },
-  { title: 'Bucket', key: 'bucket', resizable: true, ellipsis: { tooltip: true } },
+  { title: 'Bucket', key: 'bucket', resizable: true, minWidth: 250, ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
-    width: 240,
+    minWidth: 240,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -124,6 +122,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :loading="false"
         :columns="columns"
         :data="mounts"

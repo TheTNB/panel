@@ -19,13 +19,14 @@ const columns: any = [
   {
     title: t('taskIndex.columns.name'),
     key: 'name',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('taskIndex.columns.status'),
     key: 'status',
-    width: 100,
+    minWidth: 100,
     ellipsis: { tooltip: true },
     render(row: any) {
       return row.status === 'finished'
@@ -40,7 +41,7 @@ const columns: any = [
   {
     title: t('taskIndex.columns.createdAt'),
     key: 'created_at',
-    width: 200,
+    minWidth: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.created_at)
@@ -49,7 +50,7 @@ const columns: any = [
   {
     title: t('taskIndex.columns.updatedAt'),
     key: 'updated_at',
-    width: 200,
+    minWidth: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.updated_at)
@@ -58,9 +59,8 @@ const columns: any = [
   {
     title: t('taskIndex.columns.actions'),
     key: 'actions',
-    width: 200,
+    minWidth: 200,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -208,6 +208,7 @@ onUnmounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :loading="false"
         :columns="columns"
         :data="tasks"

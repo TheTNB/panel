@@ -38,7 +38,7 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '名称',
     key: 'name',
-    width: '180',
+    minWidth: 180,
     ellipsis: {
       tooltip: true
     },
@@ -78,15 +78,35 @@ const columns: DataTableColumns<RowData> = [
       )
     }
   },
-  { title: '权限', key: 'mode', width: '80' },
-  { title: '所有者', key: 'owner', width: '80' },
-  { title: '组', key: 'group', width: '80' },
-  { title: '大小', key: 'size', width: '80' },
-  { title: '修改时间', key: 'modify', width: '150' },
+  {
+    title: '权限',
+    key: 'mode',
+    minWidth: 80
+  },
+  {
+    title: '所有者',
+    key: 'owner',
+    minWidth: 80
+  },
+  {
+    title: '组',
+    key: 'group',
+    minWidth: 80
+  },
+  {
+    title: '大小',
+    key: 'size',
+    minWidth: 80
+  },
+  {
+    title: '修改时间',
+    key: 'modify',
+    minWidth: 150
+  },
   {
     title: '操作',
     key: 'action',
-    width: '340',
+    minWidth: 340,
     render(row) {
       return h(
         NSpace,
@@ -355,7 +375,11 @@ onUnmounted(() => {
 
 <template>
   <n-data-table
+    remote
+    striped
+    virtual-scroll
     size="small"
+    :scroll-x="1000"
     :columns="columns"
     :data="data"
     :loading="loading"
@@ -363,9 +387,6 @@ onUnmounted(() => {
     :row-key="(row: any) => row.full"
     :checked-row-keys="selected"
     max-height="60vh"
-    remote
-    striped
-    virtual-scroll
     @update:page="handlePageChange"
     @update:page-size="handlePageSizeChange"
     @update:checked-row-keys="onChecked"

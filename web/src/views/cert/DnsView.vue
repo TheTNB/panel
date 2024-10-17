@@ -33,11 +33,17 @@ const updateDNS = ref<any>()
 const dnsProviders = ref<any>([])
 
 const dnsColumns: any = [
-  { title: '备注名称', key: 'name', resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '备注名称',
+    key: 'name',
+    minWidth: 200,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '类型',
     key: 'type',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -69,9 +75,8 @@ const dnsColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    minWidth: 200,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -203,8 +208,8 @@ onMounted(async () => {
     <n-data-table
       striped
       remote
+      :scroll-x="1000"
       :loading="false"
-      :scroll-x="1200"
       :columns="dnsColumns"
       :data="dnsData"
       :row-key="(row: any) => row.id"

@@ -51,11 +51,17 @@ const websites = ref<any>([])
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
-  { title: '任务名', key: 'name', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '任务名',
+    key: 'name',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '任务类型',
     key: 'type',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     render(row: any) {
       return row.type === 'shell' ? '运行脚本' : row.type === 'backup' ? '备份数据' : '切割日志'
@@ -64,7 +70,7 @@ const columns: any = [
   {
     title: '启用',
     key: 'status',
-    width: 60,
+    minWidth: 60,
     align: 'center',
     resizable: true,
     render(row: any) {
@@ -76,11 +82,17 @@ const columns: any = [
       })
     }
   },
-  { title: '任务周期', key: 'time', width: 100, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '任务周期',
+    key: 'time',
+    minWidth: 100,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '创建时间',
     key: 'created_at',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): string {
@@ -90,6 +102,7 @@ const columns: any = [
   {
     title: '最后更新时间',
     key: 'updated_at',
+    minWidth: 200,
     ellipsis: { tooltip: true },
     render(row: any): string {
       return formatDateTime(row.updated_at)
@@ -98,9 +111,8 @@ const columns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 280,
+    minWidth: 280,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -374,6 +386,7 @@ onMounted(() => {
         <n-data-table
           striped
           remote
+          :scroll-x="1000"
           :data="data"
           :columns="columns"
           :row-key="(row: any) => row.id"

@@ -18,8 +18,19 @@ const statusStr = computed(() => {
 })
 
 const loadColumns: any = [
-  { title: '属性', key: 'name', fixed: 'left', resizable: true, ellipsis: { tooltip: true } },
-  { title: '当前值', key: 'value', width: 200, ellipsis: { tooltip: true } }
+  {
+    title: '属性',
+    key: 'name',
+    minWidth: 200,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
+    title: '当前值',
+    key: 'value',
+    minWidth: 200,
+    ellipsis: { tooltip: true }
+  }
 ]
 
 const load = ref<any[]>([])
@@ -161,7 +172,14 @@ onMounted(() => {
         </n-space>
       </n-tab-pane>
       <n-tab-pane name="load" tab="负载状态">
-        <n-data-table striped remote :loading="false" :columns="loadColumns" :data="load" />
+        <n-data-table
+          striped
+          remote
+          :scroll-x="1000"
+          :loading="false"
+          :columns="loadColumns"
+          :data="load"
+        />
       </n-tab-pane>
     </n-tabs>
   </common-page>

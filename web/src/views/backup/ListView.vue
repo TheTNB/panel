@@ -18,12 +18,18 @@ const restoreModel = ref({
 })
 
 const columns: any = [
-  { title: '文件名', key: 'name', fixed: 'left', resizable: true, ellipsis: { tooltip: true } },
-  { title: '大小', key: 'size', width: 160, ellipsis: { tooltip: true } },
+  {
+    title: '文件名',
+    key: 'name',
+    minWidth: 200,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  { title: '大小', key: 'size', minWidth: 160, ellipsis: { tooltip: true } },
   {
     title: '更新日期',
     key: 'time',
-    width: 200,
+    minWidth: 200,
     ellipsis: { tooltip: true },
     render(row: any) {
       return formatDateTime(row.time)
@@ -32,9 +38,8 @@ const columns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    minWidth: 200,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -142,6 +147,7 @@ onMounted(() => {
   <n-data-table
     striped
     remote
+    :scroll-x="1000"
     :loading="false"
     :columns="columns"
     :data="data"

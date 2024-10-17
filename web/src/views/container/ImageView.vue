@@ -22,18 +22,24 @@ const onChecked = (rowKeys: any) => {
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
-  { title: 'ID', key: 'id', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: 'ID',
+    key: 'id',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '容器数',
     key: 'containers',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '镜像',
     key: 'repo_tags',
-    width: 300,
+    minWidth: 300,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -50,23 +56,22 @@ const columns: any = [
   {
     title: '大小',
     key: 'size',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '创建时间',
     key: 'created',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '操作',
     key: 'actions',
-    width: 120,
+    minWidth: 120,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -174,6 +179,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :data="data"
         :columns="columns"
         :row-key="(row: any) => row.id"

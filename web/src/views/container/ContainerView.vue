@@ -25,11 +25,17 @@ const onChecked = (rowKeys: any) => {
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
-  { title: '容器名', key: 'name', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '容器名',
+    key: 'name',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '状态',
     key: 'state',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     render(row: any) {
       return h(NSwitch, {
@@ -46,10 +52,11 @@ const columns: any = [
       })
     }
   },
-  { title: '镜像', key: 'image', width: 300, resizable: true, ellipsis: { tooltip: true } },
+  { title: '镜像', key: 'image', minWidth: 300, resizable: true, ellipsis: { tooltip: true } },
   {
     title: '端口（主机->容器）',
     key: 'ports',
+    minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -63,16 +70,15 @@ const columns: any = [
   {
     title: '运行状态',
     key: 'status',
-    width: 300,
+    minWidth: 300,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '操作',
     key: 'actions',
-    width: 250,
+    minWidth: 250,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -433,6 +439,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :data="data"
         :columns="columns"
         :row-key="(row: any) => row.id"

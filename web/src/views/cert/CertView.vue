@@ -46,6 +46,7 @@ const certColumns: any = [
   {
     title: '域名',
     key: 'domains',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -63,7 +64,7 @@ const certColumns: any = [
   {
     title: '类型',
     key: 'type',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -95,7 +96,7 @@ const certColumns: any = [
   {
     title: '关联账号',
     key: 'account_id',
-    width: 200,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -114,7 +115,7 @@ const certColumns: any = [
   {
     title: '关联网站',
     key: 'website_id',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -133,7 +134,7 @@ const certColumns: any = [
   {
     title: '关联DNS',
     key: 'dns_id',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -152,7 +153,7 @@ const certColumns: any = [
   {
     title: '自动续签',
     key: 'auto_renew',
-    width: 100,
+    minWidth: 100,
     align: 'center',
     resizable: true,
     render(row: any) {
@@ -167,9 +168,8 @@ const certColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 350,
+    minWidth: 350,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     resizable: true,
     render(row: any) {
@@ -485,8 +485,8 @@ onMounted(() => {
     <n-data-table
       striped
       remote
+      :scroll-x="1000"
       :loading="false"
-      :scroll-x="1200"
       :columns="certColumns"
       :data="certData"
       :row-key="(row: any) => row.id"

@@ -40,14 +40,13 @@ const jailsColumns: any = [
   {
     title: '名称',
     key: 'name',
-    fixed: 'left',
-    width: 300,
+    minWidth: 250,
     ellipsis: { tooltip: true }
   },
   {
     title: '状态',
     key: 'enabled',
-    width: 60,
+    minWidth: 60,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -58,16 +57,21 @@ const jailsColumns: any = [
       })
     }
   },
-  { title: '最大尝试', key: 'max_retry', width: 150, ellipsis: { tooltip: true } },
-  { title: '封禁时间', key: 'ban_time', width: 150, ellipsis: { tooltip: true } },
-  { title: '周期', key: 'find_time', width: 150, ellipsis: { tooltip: true } },
-  { title: '日志路径', key: 'log_path', resizable: true, ellipsis: { tooltip: true } },
+  { title: '最大尝试', key: 'max_retry', minWidth: 150, ellipsis: { tooltip: true } },
+  { title: '封禁时间', key: 'ban_time', minWidth: 150, ellipsis: { tooltip: true } },
+  { title: '周期', key: 'find_time', minWidth: 150, ellipsis: { tooltip: true } },
+  {
+    title: '日志路径',
+    key: 'log_path',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    minWidth: 280,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -123,16 +127,15 @@ const banedIPColumns: any = [
   {
     title: 'IP',
     key: 'ip',
-    fixed: 'left',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    minWidth: 100,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -376,6 +379,7 @@ onMounted(() => {
           <n-data-table
             striped
             remote
+            :scroll-x="1000"
             :loading="false"
             :columns="jailsColumns"
             :data="jails"
@@ -475,6 +479,7 @@ onMounted(() => {
           <n-data-table
             striped
             remote
+            :scroll-x="300"
             :loading="false"
             :columns="banedIPColumns"
             :data="jailBanedList"

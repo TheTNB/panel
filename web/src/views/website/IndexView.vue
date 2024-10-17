@@ -26,14 +26,14 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.name'),
     key: 'name',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('websiteIndex.columns.status'),
     key: 'status',
-    width: 60,
+    minWidth: 60,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -47,14 +47,14 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.path'),
     key: 'path',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: 'SSL',
     key: 'ssl',
-    width: 60,
+    minWidth: 60,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -68,11 +68,12 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.remark'),
     key: 'remark',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
       return h(NInput, {
+        class: 'w-100',
         size: 'small',
         value: row.remark,
         onBlur: () => handleRemark(row),
@@ -85,9 +86,8 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.actions'),
     key: 'actions',
-    width: 240,
+    minWidth: 280,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -388,7 +388,7 @@ onMounted(() => {
         striped
         remote
         :loading="false"
-        :scroll-x="1200"
+        :scroll-x="1000"
         :columns="columns"
         :data="data"
         :row-key="(row: any) => row.id"

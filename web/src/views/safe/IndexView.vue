@@ -20,7 +20,7 @@ const columns: any = [
   {
     title: '传输协议',
     key: 'protocol',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -37,7 +37,7 @@ const columns: any = [
   {
     title: '网络协议',
     key: 'family',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -54,7 +54,7 @@ const columns: any = [
   {
     title: '端口',
     key: 'port',
-    width: 250,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -67,7 +67,7 @@ const columns: any = [
   {
     title: '策略',
     key: 'strategy',
-    width: 150,
+    minWidth: 100,
     render(row: any): any {
       return h(
         NTag,
@@ -95,7 +95,7 @@ const columns: any = [
   {
     title: '方向',
     key: 'direction',
-    width: 150,
+    minWidth: 100,
     render(row: any): any {
       return h(NTag, null, {
         default: () => {
@@ -114,6 +114,7 @@ const columns: any = [
   {
     title: '目标',
     key: 'address',
+    minWidth: 100,
     render(row: any): any {
       return h(NTag, null, {
         default: () => {
@@ -129,8 +130,7 @@ const columns: any = [
     title: '操作',
     key: 'actions',
     align: 'center',
-    fixed: 'right',
-    width: 150,
+    minWidth: 150,
     hideInExcel: true,
     render(row: any) {
       return [
@@ -314,8 +314,8 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :loading="false"
-        :scroll-x="1200"
         :columns="columns"
         :data="data"
         :row-key="(row: any) => JSON.stringify(row)"

@@ -45,18 +45,22 @@ const userColumns: any = [
   {
     title: '用户名',
     key: 'username',
-    fixed: 'left',
-    width: 250,
+    minWidth: 250,
     resizable: true,
     ellipsis: { tooltip: true }
   },
-  { title: '路径', key: 'path', resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '路径',
+    key: 'path',
+    minWidth: 250,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '操作',
     key: 'actions',
-    width: 240,
+    minWidth: 240,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -281,6 +285,7 @@ onMounted(() => {
           <n-data-table
             striped
             remote
+            :scroll-x="1000"
             :loading="false"
             :columns="userColumns"
             :data="users"

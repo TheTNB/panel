@@ -39,11 +39,17 @@ const caProviders = ref<any>([])
 const algorithms = ref<any>([])
 
 const accountColumns: any = [
-  { title: '邮箱', key: 'email', resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '邮箱',
+    key: 'email',
+    minWidth: 200,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: 'CA',
     key: 'ca',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -61,13 +67,18 @@ const accountColumns: any = [
       )
     }
   },
-  { title: '密钥类型', key: 'key_type', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '密钥类型',
+    key: 'key_type',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    minWidth: 200,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -202,8 +213,8 @@ onMounted(() => {
     <n-data-table
       striped
       remote
+      :scroll-x="1000"
       :loading="false"
-      :scroll-x="1200"
       :columns="accountColumns"
       :data="accountData"
       :row-key="(row: any) => row.id"

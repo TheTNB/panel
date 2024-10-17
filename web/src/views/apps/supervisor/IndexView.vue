@@ -43,19 +43,36 @@ const processColumns: any = [
   {
     title: '名称',
     key: 'name',
-    fixed: 'left',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
-  { title: '状态', key: 'status', width: 100, resizable: true, ellipsis: { tooltip: true } },
-  { title: 'PID', key: 'pid', width: 100, resizable: true, ellipsis: { tooltip: true } },
-  { title: '运行时间', key: 'uptime', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '状态',
+    key: 'status',
+    minWidth: 100,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
+    title: 'PID',
+    key: 'pid',
+    minWidth: 100,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
+    title: '运行时间',
+    key: 'uptime',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '操作',
     key: 'actions',
-    width: 500,
+    minWidth: 500,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -431,6 +448,7 @@ onUnmounted(() => {
           <n-data-table
             striped
             remote
+            :scroll-x="1000"
             :loading="false"
             :columns="processColumns"
             :data="processes"

@@ -20,26 +20,27 @@ const columns: any = [
   {
     title: t('appIndex.columns.name'),
     key: 'name',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.description'),
     key: 'description',
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.installedVersion'),
     key: 'installed_version',
-    width: 100,
+    minWidth: 100,
     ellipsis: { tooltip: true }
   },
   {
     title: t('appIndex.columns.show'),
     key: 'show',
-    width: 100,
+    minWidth: 100,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
@@ -53,9 +54,8 @@ const columns: any = [
   {
     title: t('appIndex.columns.actions'),
     key: 'actions',
-    width: 280,
+    minWidth: 280,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -238,6 +238,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :loading="false"
         :columns="columns"
         :data="apps"

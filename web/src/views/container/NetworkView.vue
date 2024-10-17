@@ -44,25 +44,31 @@ const onChecked = (rowKeys: any) => {
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
-  { title: '名称', key: 'name', width: 150, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '名称',
+    key: 'name',
+    minWidth: 150,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
   {
     title: '驱动',
     key: 'driver',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '范围',
     key: 'scope',
-    width: 100,
+    minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '子网',
     key: 'subnet',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -79,7 +85,7 @@ const columns: any = [
   {
     title: '网关',
     key: 'gateway',
-    width: 150,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {
@@ -96,16 +102,15 @@ const columns: any = [
   {
     title: '创建时间',
     key: 'created',
-    width: 200,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
     title: '操作',
     key: 'actions',
-    width: 120,
+    minWidth: 120,
     align: 'center',
-    fixed: 'right',
     hideInExcel: true,
     render(row: any) {
       return [
@@ -213,6 +218,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
+        :scroll-x="1000"
         :data="data"
         :columns="columns"
         :row-key="(row: any) => row.id"
