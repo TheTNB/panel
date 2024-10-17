@@ -12,6 +12,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/ntp"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/types"
@@ -216,6 +217,64 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 	if _, err = shell.Execf("timedatectl set-timezone '%s'", req.Timezone); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
+	}
+
+	service.Success(w, nil)
+}
+
+// UpdateTime 设置时间
+func (s *Service) UpdateTime(w http.ResponseWriter, r *http.Request) {
+	req, err := service.Bind[Time](r)
+	if err != nil {
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if err = ntp.UpdateSystemTime(req.Time); err != nil {
+		service.Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	service.Success(w, nil)
+
+}
+
+// SyncTime 同步时间
+func (s *Service) SyncTime(w http.ResponseWriter, r *http.Request) {
+	now, err := ntp.Now()
+	if err != nil {
+		service.Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	if err = ntp.UpdateSystemTime(now); err != nil {
+		service.Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	service.Success(w, nil)
+}
+
+// GetHostname 获取主机名
+func (s *Service) GetHostname(w http.ResponseWriter, r *http.Request) {
+	hostname, _ := io.Read("/etc/hostname")
+	service.Success(w, strings.TrimSpace(hostname))
+}
+
+// UpdateHostname 设置主机名
+func (s *Service) UpdateHostname(w http.ResponseWriter, r *http.Request) {
+	req, err := service.Bind[Hostname](r)
+	if err != nil {
+		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if _, err = shell.Execf("hostnamectl set-hostname '%s'", req.Hostname); err != nil {
+		// 直接写 /etc/hostname
+		if err = io.Write("/etc/hostname", req.Hostname, 0644); err != nil {
+			service.Error(w, http.StatusInternalServerError, "写入主机名失败")
+			return
+		}
 	}
 
 	service.Success(w, nil)

@@ -14,7 +14,7 @@ func RegisterRules(v *validator.Validate) error {
 	if err := v.RegisterValidation("not_exists", NewNotExists(app.Orm).NotExists); err != nil {
 		return err
 	}
-	if err := v.RegisterValidation("regexp", NewRegexp().Regexp); err != nil {
+	if err := v.RegisterValidation("regex", NewRegex().Regex); err != nil {
 		return err
 	}
 	if err := v.RegisterValidation("password", NewPassword().Password); err != nil {
@@ -41,12 +41,12 @@ func RegisterRules(v *validator.Validate) error {
 		}); err != nil {
 		return err
 	}
-	if err := v.RegisterTranslation("regexp", *app.Translator,
+	if err := v.RegisterTranslation("regex", *app.Translator,
 		func(ut ut.Translator) error {
-			return ut.Add("regexp", "{0} 格式不正确", true)
+			return ut.Add("regex", "{0} 格式不正确", true)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("regexp", fe.Field())
+			t, _ := ut.T("regex", fe.Field())
 			return t
 		}); err != nil {
 		return err

@@ -47,12 +47,12 @@ func Now(address ...string) (time.Time, error) {
 }
 
 func UpdateSystemTime(time time.Time) error {
-	_, err := shell.Execf(`sudo date -s "%s"`, time.Format("2006-01-02 15:04:05"))
+	_, err := shell.Execf(`date -s '%s'`, time.Format("2006-01-02 15:04:05"))
 	return err
 }
 
 func UpdateSystemTimeZone(timezone string) error {
-	_, err := shell.Execf(`sudo timedatectl set-timezone %s`, timezone)
+	_, err := shell.Execf(`timedatectl set-timezone '%s'`, timezone)
 	return err
 }
 
