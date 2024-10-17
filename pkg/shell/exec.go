@@ -80,3 +80,13 @@ func ExecfWithTimeout(timeout time.Duration, shell string, args ...any) (string,
 
 	return strings.TrimSpace(stdout.String()), err
 }
+
+// ExecfWithOutput 执行 shell 命令并输出到终端
+func ExecfWithOutput(shell string, args ...any) error {
+	_ = os.Setenv("LC_ALL", "C")
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
+}

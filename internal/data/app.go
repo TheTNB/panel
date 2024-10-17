@@ -14,6 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/apploader"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/str"
 )
 
@@ -179,16 +180,17 @@ func (r *appRepo) Install(channel, slug string) error {
 		return err
 	}
 
+	if app.IsCli {
+		return shell.ExecfWithOutput(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s"`, shellUrl, shellChannel, shellVersion)
+	}
+
 	task := new(biz.Task)
 	task.Name = "安装应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
-	if err = r.taskRepo.Push(task); err != nil {
-		return err
-	}
 
-	return err
+	return r.taskRepo.Push(task)
 }
 
 func (r *appRepo) UnInstall(slug string) error {
@@ -233,16 +235,17 @@ func (r *appRepo) UnInstall(slug string) error {
 		return err
 	}
 
+	if app.IsCli {
+		return shell.ExecfWithOutput(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s"`, shellUrl, shellChannel, shellVersion)
+	}
+
 	task := new(biz.Task)
 	task.Name = "卸载应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
-	if err = r.taskRepo.Push(task); err != nil {
-		return err
-	}
 
-	return err
+	return r.taskRepo.Push(task)
 }
 
 func (r *appRepo) Update(slug string) error {
@@ -287,16 +290,17 @@ func (r *appRepo) Update(slug string) error {
 		return err
 	}
 
+	if app.IsCli {
+		return shell.ExecfWithOutput(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s"`, shellUrl, shellChannel, shellVersion)
+	}
+
 	task := new(biz.Task)
 	task.Name = "升级应用 " + item.Name
 	task.Status = biz.TaskStatusWaiting
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
-	if err = r.taskRepo.Push(task); err != nil {
-		return err
-	}
 
-	return err
+	return r.taskRepo.Push(task)
 }
 
 func (r *appRepo) UpdateShow(slug string, show bool) error {
