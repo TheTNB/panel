@@ -70,7 +70,7 @@ const jailsColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 280,
+    width: 280,
     align: 'center',
     hideInExcel: true,
     render(row: any) {
@@ -134,7 +134,7 @@ const banedIPColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 100,
+    width: 100,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

@@ -54,7 +54,7 @@ const columns: any = [
   {
     title: t('appIndex.columns.actions'),
     key: 'actions',
-    minWidth: 280,
+    width: 280,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

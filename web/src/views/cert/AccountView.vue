@@ -77,7 +77,7 @@ const accountColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 200,
+    width: 200,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

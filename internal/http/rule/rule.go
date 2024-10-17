@@ -53,7 +53,7 @@ func RegisterRules(v *validator.Validate) error {
 	}
 	if err := v.RegisterTranslation("password", *app.Translator,
 		func(ut ut.Translator) error {
-			return ut.Add("password", "密码不满足要求（8-20位，至少包含大小写字母、数字、特殊字符中的两种）", true)
+			return ut.Add("password", "密码不满足要求（8-20位，至少包含字母、数字、特殊字符中的两种）", true)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
 			t, _ := ut.T("password")

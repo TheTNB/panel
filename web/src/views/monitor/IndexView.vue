@@ -408,13 +408,13 @@ const net = ref<any>({
   ]
 })
 
-const getData = async () => {
+const fetchData = async () => {
   monitor.list(start.value, end.value).then((res) => {
     data.value = res.data
   })
 }
 
-const getSetting = async () => {
+const fetchSetting = async () => {
   monitor.setting().then((res) => {
     monitorSwitch.value = res.data.enabled
     saveDay.value = res.data.days
@@ -459,12 +459,12 @@ watch([start, end], () => {
     window.$message.error('开始时间不能大于结束时间')
     return
   }
-  getData()
+  fetchData()
 })
 
 onMounted(() => {
-  getSetting()
-  getData()
+  fetchSetting()
+  fetchData()
 })
 </script>
 

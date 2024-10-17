@@ -71,7 +71,7 @@ const processColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 500,
+    width: 500,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

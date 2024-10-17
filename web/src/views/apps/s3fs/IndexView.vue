@@ -37,7 +37,7 @@ const columns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 240,
+    width: 240,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

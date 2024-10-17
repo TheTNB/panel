@@ -86,7 +86,7 @@ const columns: any = [
   {
     title: t('websiteIndex.columns.actions'),
     key: 'actions',
-    minWidth: 280,
+    width: 220,
     align: 'center',
     hideInExcel: true,
     render(row: any) {

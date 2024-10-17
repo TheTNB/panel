@@ -106,7 +106,7 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '操作',
     key: 'action',
-    minWidth: 340,
+    width: 340,
     render(row) {
       return h(
         NSpace,

@@ -168,7 +168,7 @@ const certColumns: any = [
   {
     title: '操作',
     key: 'actions',
-    minWidth: 350,
+    width: 350,
     align: 'center',
     hideInExcel: true,
     resizable: true,
