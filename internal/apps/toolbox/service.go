@@ -251,11 +251,6 @@ func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !regexp.MustCompile(`^[a-zA-Z0-9·~!@#$%^&*()_+-=\[\]{};:'",./<>?]{6,20}$`).MatchString(req.Password) {
-		service.Error(w, http.StatusUnprocessableEntity, "密码必须为 6-20 位字母、数字或特殊字符")
-		return
-	}
-
 	req.Password = strings.ReplaceAll(req.Password, `'`, `\'`)
 	if _, err = shell.Execf(`yes '%s' | passwd root`, req.Password); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)

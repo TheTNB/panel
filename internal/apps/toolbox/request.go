@@ -18,5 +18,5 @@ type Hosts struct {
 }
 
 type Password struct {
-	Password string `form:"password" json:"password" validate:"required"`
+	Password string `form:"password" json:"password" validate:"required,password"`
 }

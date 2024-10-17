@@ -17,6 +17,9 @@ func RegisterRules(v *validator.Validate) error {
 	if err := v.RegisterValidation("regexp", NewRegexp().Regexp); err != nil {
 		return err
 	}
+	if err := v.RegisterValidation("password", NewPassword().Password); err != nil {
+		return err
+	}
 
 	if err := v.RegisterTranslation("exists", *app.Translator,
 		func(ut ut.Translator) error {
@@ -44,6 +47,16 @@ func RegisterRules(v *validator.Validate) error {
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
 			t, _ := ut.T("regexp", fe.Field())
+			return t
+		}); err != nil {
+		return err
+	}
+	if err := v.RegisterTranslation("password", *app.Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("password", "密码不满足要求（8-20位，至少包含大小写字母、数字、特殊字符中的两种）", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("password")
 			return t
 		}); err != nil {
 		return err

@@ -2,7 +2,7 @@ package pureftpd
 
 type Create struct {
 	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
+	Password string `form:"password" json:"password" validate:"required,password"`
 	Path     string `form:"path" json:"path" validate:"required"`
 }
 
@@ -12,7 +12,7 @@ type Delete struct {
 
 type ChangePassword struct {
 	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
+	Password string `form:"password" json:"password" validate:"required,password"`
 }
 
 type UpdatePort struct {

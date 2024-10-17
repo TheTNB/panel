@@ -17,7 +17,7 @@ type WebsiteCreate struct {
 	DBType     string   `form:"db_type" json:"db_type"`
 	DBName     string   `form:"db_name" json:"db_name"`
 	DBUser     string   `form:"db_user" json:"db_user"`
-	DBPassword string   `form:"db_password" json:"db_password"`
+	DBPassword string   `form:"db_password" json:"db_password" validate:"password"`
 }
 
 type WebsiteDelete struct {

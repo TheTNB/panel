@@ -147,6 +147,10 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 		return r.RichRules(rule, operation)
 	}
 
+	// 未设置协议默认为tcp/udp
+	if rule.Protocol == "" {
+		rule.Protocol = ProtocolTCPUDP
+	}
 	protocols := strings.Split(string(rule.Protocol), "/")
 	for protocol := range slices.Values(protocols) {
 		stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d-%d/%s --permanent", operation, rule.PortStart, rule.PortEnd, protocol)

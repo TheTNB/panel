@@ -8,7 +8,7 @@ type PanelSetting struct {
 	WebsitePath string `json:"website_path" validate:"required"`
 	BackupPath  string `json:"backup_path" validate:"required"`
 	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password"`
+	Password    string `json:"password" validate:"password"`
 	Email       string `json:"email" validate:"required"`
 	Port        int    `json:"port" validate:"required,number,gte=1,lte=65535"`
 	HTTPS       bool   `json:"https"`
