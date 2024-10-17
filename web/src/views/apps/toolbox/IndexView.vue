@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Editor from '@guolao/vue-monaco-editor'
-import { NButton } from 'naive-ui'
 import { DateTime } from 'luxon'
+import { NButton } from 'naive-ui'
 
 import toolbox from '@/api/apps/toolbox'
 
@@ -73,7 +73,7 @@ const handleUpdateRootPassword = async () => {
 }
 
 const handleUpdateTime = async () => {
-  await toolbox.updateTime(DateTime.fromMillis(time.value).toISO())
+  await toolbox.updateTime(String(DateTime.fromMillis(time.value).toISO()))
   await toolbox.updateTimezone(timezone.value)
   window.$message.success('保存成功')
 }

@@ -173,14 +173,11 @@ export interface CountInfo {
 }
 
 export interface HomeApp {
-  id: number
+  description: string
+  icon: string
+  name: string
   slug: string
   version: string
-  show: boolean
-  show_order: number
-  name: string
-  created_at: string
-  updated_at: string
 }
 
 export interface VersionDownload {
