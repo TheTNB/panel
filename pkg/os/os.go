@@ -2,6 +2,8 @@ package os
 
 import (
 	"bufio"
+	"fmt"
+	"net"
 	"os"
 	"strings"
 )
@@ -57,4 +59,24 @@ func IsUbuntu() bool {
 	}
 	id, idLike := osRelease["ID"], osRelease["ID_LIKE"]
 	return id == "ubuntu" || strings.Contains(idLike, "ubuntu")
+}
+
+func TCPPortInUse(port uint) bool {
+	addr := fmt.Sprintf(":%d", port)
+	conn, err := net.Listen("tcp", addr)
+	if err != nil {
+		return true
+	}
+	defer conn.Close()
+	return false
+}
+
+func UDPPortInUse(port uint) bool {
+	addr := fmt.Sprintf(":%d", port)
+	conn, err := net.ListenPacket("udp", addr)
+	if err != nil {
+		return true
+	}
+	defer conn.Close()
+	return false
 }

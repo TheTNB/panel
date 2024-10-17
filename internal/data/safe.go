@@ -60,7 +60,7 @@ func (r *safeRepo) UpdateSSH(port uint, status bool) error {
 }
 
 func (r *safeRepo) GetPingStatus() (bool, error) {
-	out, err := shell.Execf(`firewall-cmd --list-all`)
+	out, err := shell.Execf(`firewall-cmd --list-rich-rules`)
 	if err != nil {
 		return true, errors.New(out)
 	}

@@ -22,7 +22,7 @@ func Execf(shell string, args ...any) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return "", errors.New(strings.TrimSpace(stderr.String()))
+		return strings.TrimSpace(stdout.String()), errors.New(strings.TrimSpace(stderr.String()))
 	}
 
 	return strings.TrimSpace(stdout.String()), err
@@ -71,10 +71,10 @@ func ExecfWithTimeout(timeout time.Duration, shell string, args ...any) (string,
 	select {
 	case <-time.After(timeout):
 		_ = cmd.Process.Kill()
-		return "", errors.New("执行超时")
+		return strings.TrimSpace(stdout.String()), errors.New("执行超时")
 	case err = <-done:
 		if err != nil {
-			return "", errors.New(strings.TrimSpace(stderr.String()))
+			return strings.TrimSpace(stdout.String()), errors.New(strings.TrimSpace(stderr.String()))
 		}
 	}
 

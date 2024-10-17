@@ -3,6 +3,7 @@ package firewall
 import (
 	"errors"
 	"fmt"
+	"net"
 	"regexp"
 	"slices"
 	"strings"
@@ -22,7 +23,7 @@ type Firewall struct {
 func NewFirewall() *Firewall {
 	firewall := &Firewall{
 		forwardListRegex: regexp.MustCompile(`^port=(\d{1,5}):proto=(.+?):toport=(\d{1,5}):toaddr=(.*)$`),
-		richRuleRegex:    regexp.MustCompile(`^rule family="([^"]+)"(?: .*?(source|destination) address="([^"]+)")?(?: .*?port port="([^"]+)")?(?: .*?protocol="([^"]+)")?.*?(accept|drop|reject)$`),
+		richRuleRegex:    regexp.MustCompile(`^rule family="([^"]+)"(?: .*?(source|destination) address="([^"]+)")?(?: .*?port port="([^"]+)")?(?: .*?protocol(?: value)?="([^"]+)")?.*?(accept|drop|reject)$`),
 	}
 
 	return firewall
@@ -107,7 +108,7 @@ func (r *Firewall) ListForward() ([]FireForwardInfo, error) {
 				Port:       cast.ToUint(match[1]),
 				Protocol:   Protocol(match[2]),
 				TargetIP:   match[4],
-				TargetPort: match[3],
+				TargetPort: cast.ToUint(match[3]),
 			})
 		}
 	}
@@ -182,10 +183,18 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 			ruleBuilder.WriteString(fmt.Sprintf(`port port="%d-%d" `, rule.PortStart, rule.PortEnd))
 		}
 		if operation == OperationRemove && protocol != "" && rule.Protocol != "tcp/udp" { // 删除操作，可以不指定协议
-			ruleBuilder.WriteString(fmt.Sprintf(`protocol="%s" `, protocol))
+			ruleBuilder.WriteString(`protocol`)
+			if rule.PortStart == 0 && rule.PortEnd == 0 { // IP 规则下，必须添加 value
+				ruleBuilder.WriteString(` value`)
+			}
+			ruleBuilder.WriteString(fmt.Sprintf(`="%s" `, protocol))
 		}
 		if operation == OperationAdd && protocol != "" {
-			ruleBuilder.WriteString(fmt.Sprintf(`protocol="%s" `, protocol))
+			ruleBuilder.WriteString(`protocol`)
+			if rule.PortStart == 0 && rule.PortEnd == 0 { // IP 规则下，必须添加 value
+				ruleBuilder.WriteString(` value`)
+			}
+			ruleBuilder.WriteString(fmt.Sprintf(`="%s" `, protocol))
 		}
 
 		ruleBuilder.WriteString(string(rule.Strategy))
@@ -199,26 +208,29 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 	return err
 }
 
-func (r *Firewall) PortForward(info Forward, operation Operation) error {
+func (r *Firewall) Forward(rule Forward, operation Operation) error {
 	if err := r.enableForward(); err != nil {
 		return err
 	}
 
-	var ruleStr strings.Builder
-	ruleStr.WriteString(fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%d:proto=%s:", operation, info.Port, info.Protocol))
-	if info.TargetIP != "" && info.TargetIP != "127.0.0.1" && info.TargetIP != "localhost" {
-		ruleStr.WriteString(fmt.Sprintf("toaddr=%s:toport=%d", info.TargetIP, info.TargetPort))
-	} else {
-		ruleStr.WriteString(fmt.Sprintf("toport=%d", info.TargetPort))
-	}
-	ruleStr.WriteString(" --permanent")
+	protocols := strings.Split(string(rule.Protocol), "/")
+	for protocol := range slices.Values(protocols) {
+		var ruleBuilder strings.Builder
+		ruleBuilder.WriteString(fmt.Sprintf("firewall-cmd --zone=public --%s-forward-port=port=%d:proto=%s:", operation, rule.Port, protocol))
+		if rule.TargetIP != "" && !r.isLocalAddress(rule.TargetIP) {
+			ruleBuilder.WriteString(fmt.Sprintf("toport=%d:toaddr=%s", rule.TargetPort, rule.TargetIP))
+		} else {
+			ruleBuilder.WriteString(fmt.Sprintf("toport=%d", rule.TargetPort))
+		}
+		ruleBuilder.WriteString(" --permanent")
 
-	_, err := shell.Execf(ruleStr.String()) // nolint: govet
-	if err != nil {
-		return fmt.Errorf("%s port forward failed, err: %v", operation, err)
+		_, err := shell.Execf(ruleBuilder.String()) // nolint: govet
+		if err != nil {
+			return fmt.Errorf("%s port forward failed, err: %v", operation, err)
+		}
 	}
 
-	_, err = shell.Execf("firewall-cmd --reload")
+	_, err := shell.Execf("firewall-cmd --reload")
 	return err
 }
 
@@ -270,15 +282,31 @@ func (r *Firewall) enableForward() error {
 		if out == "no" {
 			out, err = shell.Execf("firewall-cmd --zone=public --add-masquerade --permanent")
 			if err != nil {
-				return fmt.Errorf("%s: %s", err, out)
+				return fmt.Errorf("%v: %s", err, out)
 			}
-
 			_, err = shell.Execf("firewall-cmd --reload")
 			return err
 		}
-
 		return fmt.Errorf("%v: %s", err, out)
 	}
 
 	return nil
+}
+
+func (r *Firewall) isLocalAddress(ip string) bool {
+	parsed := net.ParseIP(ip)
+	if parsed == nil {
+		return false
+	}
+	if parsed.IsLoopback() {
+		return true
+	}
+	if parsed.IsUnspecified() {
+		return true
+	}
+	if strings.ToLower(ip) == "localhost" {
+		return true
+	}
+
+	return false
 }

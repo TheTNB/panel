@@ -60,27 +60,30 @@ const directions = [
 const createModel = ref({
   family: 'ipv4',
   protocol: 'tcp',
-  port_start: 80,
-  port_end: 80,
-  address: '',
+  address: [],
   strategy: 'accept',
   direction: 'in'
 })
 
 const handleCreate = async () => {
-  await firewall.createRule(createModel.value).then(() => {
-    window.$message.success('创建成功')
-    createModel.value = {
-      family: 'ipv4',
-      protocol: 'tcp',
-      port_start: 80,
-      port_end: 80,
-      address: '',
-      strategy: 'accept',
-      direction: 'in'
-    }
-    show.value = false
-  })
+  for (const address of createModel.value.address) {
+    await firewall
+      .createIpRule({
+        ...createModel.value,
+        address
+      })
+      .then(() => {
+        window.$message.success(`${address} 创建成功`)
+      })
+  }
+  createModel.value = {
+    family: 'ipv4',
+    protocol: 'tcp',
+    address: [],
+    strategy: 'accept',
+    direction: 'in'
+  }
+  show.value = false
 }
 </script>
 
@@ -102,31 +105,10 @@ const handleCreate = async () => {
       <n-form-item path="family" label="网络协议">
         <n-select v-model:value="createModel.family" :options="families" />
       </n-form-item>
-      <n-row :gutter="[0, 24]">
-        <n-col :span="12">
-          <n-form-item path="port_start" label="起始端口">
-            <n-input-number
-              v-model:value="createModel.port_start"
-              :min="1"
-              :max="65535"
-              placeholder="80"
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="12">
-          <n-form-item path="port_end" label="结束端口">
-            <n-input-number
-              v-model:value="createModel.port_end"
-              :min="1"
-              :max="65535"
-              placeholder="80"
-            />
-          </n-form-item>
-        </n-col>
-      </n-row>
-      <n-form-item path="address" label="目标">
-        <n-input
+      <n-form-item path="address" label="IP 地址">
+        <n-dynamic-input
           v-model:value="createModel.address"
+          show-sort-button
           placeholder="可选输入 IP 或 IP 段：127.0.0.1 或 172.16.0.0/24（多个以英文逗号隔开）"
         />
       </n-form-item>

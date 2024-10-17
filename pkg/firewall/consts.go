@@ -41,16 +41,15 @@ type FireInfo struct {
 }
 
 type FireForwardInfo struct {
-	Address    string   `json:"address"`    // 源地址
-	Port       uint     `json:"port"`       // 1-65535
-	Protocol   Protocol `json:"protocol"`   // tcp udp tcp/udp
-	TargetIP   string   `json:"targetIP"`   // 目标地址
-	TargetPort string   `json:"targetPort"` // 1-65535
+	Port       uint     `json:"port"`        // 1-65535
+	Protocol   Protocol `json:"protocol"`    // tcp udp tcp/udp
+	TargetIP   string   `json:"target_ip"`   // 目标地址
+	TargetPort uint     `json:"target_port"` // 1-65535
 }
 
 type Forward struct {
-	Protocol   Protocol `json:"protocol"`   // tcp udp tcp/udp
-	Port       uint     `json:"port"`       // 1-65535
-	TargetIP   string   `json:"targetIP"`   // 目标地址
-	TargetPort uint     `json:"targetPort"` // 1-65535
+	Protocol   Protocol `json:"protocol"`    // tcp udp tcp/udp
+	Port       uint     `json:"port"`        // 1-65535
+	TargetIP   string   `json:"target_ip"`   // 目标地址
+	TargetPort uint     `json:"target_port"` // 1-65535
 }

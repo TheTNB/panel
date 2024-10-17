@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/TheTNB/panel/pkg/ntp"
 	"path/filepath"
 	"time"
 
@@ -21,6 +20,7 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/ntp"
 	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"

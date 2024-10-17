@@ -148,6 +148,12 @@ func Http(r chi.Router) {
 			r.Get("/rule", firewall.GetRules)
 			r.Post("/rule", firewall.CreateRule)
 			r.Delete("/rule", firewall.DeleteRule)
+			r.Get("/ipRule", firewall.GetIPRules)
+			r.Post("/ipRule", firewall.CreateIPRule)
+			r.Delete("/ipRule", firewall.DeleteIPRule)
+			r.Get("/forward", firewall.GetForwards)
+			r.Post("/forward", firewall.CreateForward)
+			r.Delete("/forward", firewall.DeleteForward)
 		})
 
 		r.Route("/ssh", func(r chi.Router) {
