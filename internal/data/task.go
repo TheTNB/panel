@@ -57,6 +57,11 @@ func (r *taskRepo) Push(task *biz.Task) error {
 }
 
 func (r *taskRepo) DispatchWaiting() {
+	// cli下不处理
+	if app.IsCli {
+		return
+	}
+
 	var tasks []biz.Task
 	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
 		app.Logger.Error("获取待处理任务失败", zap.Error(err))

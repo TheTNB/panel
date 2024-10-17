@@ -132,6 +132,15 @@ const chartDisk = computed(() => {
         },
         markLine: {
           data: [{ type: 'average', name: '平均值' }]
+        },
+        lineStyle: {
+          color: 'rgb(247, 184, 81)'
+        },
+        itemStyle: {
+          color: 'rgb(247, 184, 81)'
+        },
+        areaStyle: {
+          color: 'rgb(247, 184, 81)'
         }
       },
       {
@@ -147,6 +156,15 @@ const chartDisk = computed(() => {
         },
         markLine: {
           data: [{ type: 'average', name: '平均值' }]
+        },
+        lineStyle: {
+          color: 'rgb(82, 169, 255)'
+        },
+        itemStyle: {
+          color: 'rgb(82, 169, 255)'
+        },
+        areaStyle: {
+          color: 'rgb(82, 169, 255)'
         }
       }
     ]
