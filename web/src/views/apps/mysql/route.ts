@@ -14,7 +14,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: 'Percona（MySQL）',
-        icon: 'mdi:database',
+        icon: 'logos:percona',
         role: ['admin'],
         requireAuth: true
       }

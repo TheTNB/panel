@@ -14,7 +14,7 @@ export default {
       component: () => import('../php/IndexView.vue'),
       meta: {
         title: 'PHP 8.3',
-        icon: 'mdi:language-php',
+        icon: 'logos:php',
         role: ['admin'],
         requireAuth: true,
         php: 83

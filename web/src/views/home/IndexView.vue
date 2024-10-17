@@ -632,9 +632,9 @@ if (import.meta.hot) {
                         <n-space>
                           <n-thing>
                             <template #avatar>
-                              <n-avatar class="mt-4">
-                                <TheIcon :size="24" icon="mdi:package-variant-closed" />
-                              </n-avatar>
+                              <div class="mt-8">
+                                <TheIcon :size="30" :icon="item.icon" />
+                              </div>
                             </template>
                             <template #header>
                               {{ item.name }}

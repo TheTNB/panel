@@ -47,6 +47,7 @@ func (s *AppService) List(w http.ResponseWriter, r *http.Request) {
 			show = installedAppMap[item.Slug].Show
 		}
 		apps = append(apps, types.AppCenter{
+			Icon:        item.Icon,
 			Name:        item.Name,
 			Description: item.Description,
 			Slug:        item.Slug,

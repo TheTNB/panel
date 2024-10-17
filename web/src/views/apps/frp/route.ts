@@ -14,7 +14,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: 'Frp',
-        icon: 'mdi:virtual-private-network',
+        icon: 'icon-park-outline:connection-box',
         role: ['admin'],
         requireAuth: true
       }

@@ -4,6 +4,7 @@ import VersionModal from '@/views/app/VersionModal.vue'
 import { NButton, NDataTable, NPopconfirm, NSwitch } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
+import TheIcon from '@/components/custom/TheIcon.vue'
 import { router } from '@/router'
 import { renderIcon } from '@/utils'
 import type { App } from '@/views/app/types'
@@ -16,7 +17,18 @@ const versionModalOperation = ref('安装')
 const versionModalInfo = ref<App>({} as App)
 
 const columns: any = [
-  { type: 'selection', fixed: 'left' },
+  {
+    key: 'icon',
+    fixed: 'left',
+    width: 80,
+    align: 'center',
+    render(row: any) {
+      return h(TheIcon, {
+        icon: row.icon,
+        size: 24
+      })
+    }
+  },
   {
     title: t('appIndex.columns.name'),
     key: 'name',
