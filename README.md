@@ -46,19 +46,20 @@
 |---------------------|-----|-----|
 | AlmaLinux           | 9   | 推荐  |
 | AlmaLinux           | 8   | 不推荐 |
-| RockyLinux          | 9   |     |
+| RockyLinux          | 9   | 支持  |
 | RockyLinux          | 8   | 不推荐 |
 | CentOS Stream       | 9   | 不推荐 |
 | CentOS Stream       | 8   | 不推荐 |
 | Ubuntu              | 24  | 推荐  |
-| Ubuntu              | 22  |     |
+| Ubuntu              | 22  | 支持  |
 | Debian              | 12  | 推荐  |
-| Debian              | 11  |     |
-| OpenCloudOS         | 9   |     |
-| TencentOS Server    | 4   |     |
+| Debian              | 11  | 支持  |
+| OpenCloudOS         | 9   | 支持  |
+| TencentOS Server    | 4   | 支持  |
 | TencentOS Server    | 3.1 | 不推荐 |
 | Alibaba Cloud Linux | 3.2 | 不推荐 |
 | Anolis              | 8   | 不推荐 |
+| openEuler           | 22  | 不推荐 |
 
 随着系统版本的不断更新，我们亦可能会终止部分过于老旧的系统的支持，以保证面板的健壮性。
 

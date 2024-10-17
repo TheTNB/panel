@@ -37,5 +37,5 @@ export default {
     request.post(`/apps/php${version}/extensions`, { slug }),
   // 卸载拓展
   uninstallExtension: (version: number, slug: string): Promise<AxiosResponse<any>> =>
-    request.delete(`/apps/php${version}/extensions`, { params: { slug } })
+    request.delete(`/apps/php${version}/extensions`, { data: { slug } })
 }

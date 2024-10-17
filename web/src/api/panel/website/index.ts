@@ -10,7 +10,7 @@ export default {
   create: (data: any): Promise<AxiosResponse<any>> => request.post('/website', data),
   // 删除
   delete: (id: number, path: boolean, db: boolean): Promise<AxiosResponse<any>> =>
-    request.delete(`/website/${id}`, { params: { path, db } }),
+    request.delete(`/website/${id}`, { data: { path, db } }),
   // 获取默认配置
   defaultConfig: (): Promise<AxiosResponse<any>> => request.get('/website/defaultConfig'),
   // 保存默认配置
@@ -28,7 +28,7 @@ export default {
     request.post('/website/' + id + '/updateRemark', { remark }),
   // 重置配置
   resetConfig: (id: number): Promise<AxiosResponse<any>> =>
-    request.post('/website/' + id + '/resetConfig', {}),
+    request.post('/website/' + id + '/resetConfig'),
   // 修改状态
   status: (id: number, status: boolean): Promise<AxiosResponse<any>> =>
     request.post('/website/' + id + '/status', { status })

@@ -46,19 +46,20 @@ For other systems not listed in the table below, you can try to install them by 
 |---------------------|---------|-----------------|
 | AlmaLinux           | 9       | Recommended     |
 | AlmaLinux           | 8       | Not recommended |
-| RockyLinux          | 9       |                 |
+| RockyLinux          | 9       | Support         |
 | RockyLinux          | 8       | Not recommended |
 | CentOS Stream       | 9       | Not recommended |
 | CentOS Stream       | 8       | Not recommended |
 | Ubuntu              | 24      | Recommended     |
-| Ubuntu              | 22      |                 |
+| Ubuntu              | 22      | Support         |
 | Debian              | 12      | Recommended     |
-| Debian              | 11      |                 |
-| OpenCloudOS         | 9       |                 |
-| TencentOS Server    | 4       |                 |
+| Debian              | 11      | Support         |
+| OpenCloudOS         | 9       | Support         |
+| TencentOS Server    | 4       | Support         |
 | TencentOS Server    | 3.1     | Not recommended |
 | Alibaba Cloud Linux | 3.2     | Not recommended |
 | Anolis              | 8       | Not recommended |
+| openEuler           | 22      | Not recommended |
 
 As system versions are constantly updated, we may also terminate support for some older systems to ensure the robustness of the panel.
 

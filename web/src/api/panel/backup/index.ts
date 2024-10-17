@@ -17,7 +17,7 @@ export default {
   },
   // 删除备份
   delete: (type: string, file: string): Promise<AxiosResponse<any>> =>
-    request.delete(`/backup/${type}/delete`, { params: { file } }),
+    request.delete(`/backup/${type}/delete`, { data: { file } }),
   // 恢复备份
   restore: (type: string, file: string, target: string): Promise<AxiosResponse<any>> =>
     request.post(`/backup/${type}/restore`, { file, target })

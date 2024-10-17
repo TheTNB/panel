@@ -69,8 +69,10 @@ func Bind[T any](r *http.Request) (*T, error) {
 		return nil, err
 	}
 	if slices.Contains([]string{"POST", "PUT", "PATCH", "DELETE"}, strings.ToUpper(r.Method)) {
-		if err := binder.Body(req); err != nil {
-			return nil, err
+		if r.ContentLength > 0 {
+			if err := binder.Body(req); err != nil {
+				return nil, err
+			}
 		}
 	}
 

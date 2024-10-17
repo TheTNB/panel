@@ -10,7 +10,7 @@ export default {
   add: (data: any): Promise<AxiosResponse<any>> => request.post('/apps/fail2ban/jails', data),
   // 删除保护
   delete: (name: string): Promise<AxiosResponse<any>> =>
-    request.delete('/apps/fail2ban/jails', { params: { name } }),
+    request.delete('/apps/fail2ban/jails', { data: { name } }),
   // 封禁列表
   jail: (name: string): Promise<AxiosResponse<any>> => request.get('/apps/fail2ban/jails/' + name),
   // 解封 IP

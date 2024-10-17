@@ -19,19 +19,19 @@ export default {
     request.get('/apps/supervisor/processes', { params: { page, limit } }),
   // 进程启动
   startProcess: (process: string): Promise<AxiosResponse<any>> =>
-    request.post(`/apps/supervisor/processes/${process}/start`, {}),
+    request.post(`/apps/supervisor/processes/${process}/start`),
   // 进程停止
   stopProcess: (process: string): Promise<AxiosResponse<any>> =>
-    request.post(`/apps/supervisor/processes/${process}/stop`, {}),
+    request.post(`/apps/supervisor/processes/${process}/stop`),
   // 进程重启
   restartProcess: (process: string): Promise<AxiosResponse<any>> =>
-    request.post(`/apps/supervisor/processes/${process}/restart`, {}),
+    request.post(`/apps/supervisor/processes/${process}/restart`),
   // 进程日志
   processLog: (process: string): Promise<AxiosResponse<any>> =>
     request.get(`/apps/supervisor/processes/${process}/log`),
   // 清空进程日志
   clearProcessLog: (process: string): Promise<AxiosResponse<any>> =>
-    request.post(`/apps/supervisor/processes/${process}/clearLog`, {}),
+    request.post(`/apps/supervisor/processes/${process}/clearLog`),
   // 进程配置
   processConfig: (process: string): Promise<AxiosResponse<any>> =>
     request.get(`/apps/supervisor/processes/${process}`),
