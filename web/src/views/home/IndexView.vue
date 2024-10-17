@@ -610,8 +610,8 @@ if (import.meta.hot) {
         >
           <n-gi>
             <n-flex vertical>
-              <n-card :segmented="true" size="small" title="快捷应用" min-h-280 rounded-10>
-                <n-scrollbar max-h-210>
+              <n-card :segmented="true" size="small" title="快捷应用" min-h-340 rounded-10>
+                <n-scrollbar max-h-270>
                   <n-grid
                     v-if="!homeAppsLoading"
                     x-gap="12"
@@ -651,7 +651,7 @@ if (import.meta.hot) {
                 <n-text v-if="!homeAppsLoading && !homeApps">
                   您还没有设置任何应用在此显示！
                 </n-text>
-                <n-skeleton v-if="homeAppsLoading" text :repeat="10" />
+                <n-skeleton v-if="homeAppsLoading" text :repeat="12" />
               </n-card>
               <n-card :segmented="true" rounded-10 size="small" title="系统信息">
                 <n-table v-if="systemInfo" :single-line="false">
@@ -659,12 +659,6 @@ if (import.meta.hot) {
                     <th>主机名</th>
                     <td>
                       {{ systemInfo?.hostname || '加载中...' }}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>面板版本</th>
-                    <td>
-                      {{ systemInfo?.panel_version || '加载中...' }}
                     </td>
                   </tr>
                   <tr>
@@ -706,7 +700,7 @@ if (import.meta.hot) {
                     </td>
                   </tr>
                 </n-table>
-                <n-skeleton v-else text :repeat="10" />
+                <n-skeleton v-else text :repeat="9" />
               </n-card>
             </n-flex>
           </n-gi>
@@ -764,7 +758,7 @@ if (import.meta.hot) {
                   <n-tag>实时读写 {{ formatBytes(current.diskRWBytes) }}/s</n-tag>
                   <n-tag>读写延迟 {{ current.diskRWTime }}ms</n-tag>
                 </n-flex>
-                <n-card :bordered="false" h-480>
+                <n-card :bordered="false" h-497>
                   <v-chart class="chart" :option="chartDisk" autoresize />
                 </n-card>
               </n-flex>
