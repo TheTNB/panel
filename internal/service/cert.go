@@ -55,10 +55,6 @@ func (s *CertService) CAProviders(w http.ResponseWriter, r *http.Request) {
 func (s *CertService) DNSProviders(w http.ResponseWriter, r *http.Request) {
 	Success(w, []types.LV{
 		{
-			Label: "DNSPod",
-			Value: string(acme.DnsPod),
-		},
-		{
 			Label: "腾讯云",
 			Value: string(acme.Tencent),
 		},

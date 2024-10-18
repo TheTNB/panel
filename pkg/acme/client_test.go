@@ -20,7 +20,7 @@ func (s *ClientTestSuite) TestObtainSSL() {
 	client, err := NewRegisterAccount(ctx, "ci@haozi.net", CALetsEncryptStaging, nil, KeyEC256)
 	s.Nil(err)
 
-	client.UseDns(DnsPod, DNSParam{
+	client.UseDns(AliYun, DNSParam{
 		ID:    "123456",
 		Token: "654321",
 	})

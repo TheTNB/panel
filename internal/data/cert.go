@@ -93,7 +93,7 @@ func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
 				}
 			}
 			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
-			client.UseHTTP(conf, cert.Website.Path)
+			client.UseHTTP(conf)
 		}
 	}
 
@@ -172,7 +172,7 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 				}
 			}
 			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
-			client.UseHTTP(conf, cert.Website.Path)
+			client.UseHTTP(conf)
 		}
 	}
 
@@ -251,6 +251,10 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 }
 
 func (r *certRepo) getClient(cert *biz.Cert) (*acme.Client, error) {
+	if cert.Account == nil {
+		return nil, errors.New("该证书没有关联账号，无法签发")
+	}
+
 	var ca string
 	var eab *acme.EAB
 	switch cert.Account.CA {

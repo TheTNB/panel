@@ -1,7 +1,7 @@
 {
   "name": "耗子面板",
   "certIndex": {
-    "title": "TLS 证书"
+    "title": "HTTPS 证书"
   },
   "containerIndex": {
     "title": "容器管理"

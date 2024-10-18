@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/libdns/alidns"
 	"github.com/libdns/cloudflare"
-	"github.com/libdns/dnspod"
 	"github.com/libdns/libdns"
 	"github.com/libdns/tencentcloud"
 	"github.com/mholt/acmez/v2/acme"
@@ -21,35 +20,20 @@ import (
 
 type httpSolver struct {
 	conf string
-	path string
 }
 
 func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
-	var err error
-	if s.path == "" {
-		return nil
-	}
-
-	challengeFilePath := filepath.Join(s.path, challenge.HTTP01ResourcePath())
-	if err = os.MkdirAll(filepath.Dir(challengeFilePath), 0755); err != nil {
-		return fmt.Errorf("无法在网站目录创建HTTP挑战所需的目录: %w", err)
-	}
-
-	if err = os.WriteFile(challengeFilePath, []byte(challenge.KeyAuthorization), 0644); err != nil {
-		return fmt.Errorf("无法在网站目录创建HTTP挑战所需的文件: %w", err)
-	}
-
-	conf := fmt.Sprintf(`location = /.well-known/acme-challenge/%s {
+	conf := fmt.Sprintf(`location = %s {
     default_type text/plain;
     return 200 %q;
 }
-`, challenge.Token, challenge.KeyAuthorization)
-	if err = os.WriteFile(s.conf, []byte(conf), 0644); err != nil {
-		return fmt.Errorf("无法写入Nginx配置文件: %w", err)
+`, challenge.HTTP01ResourcePath(), challenge.KeyAuthorization)
+	if err := os.WriteFile(s.conf, []byte(conf), 0644); err != nil {
+		return fmt.Errorf("无法写入 Nginx 配置文件: %w", err)
 	}
-	if err = systemctl.Reload("nginx"); err != nil {
+	if err := systemctl.Reload("nginx"); err != nil {
 		_, err = shell.Execf("nginx -t")
-		return fmt.Errorf("无法重载Nginx: %w", err)
+		return fmt.Errorf("无法重载 Nginx: %w", err)
 	}
 
 	return nil
@@ -57,11 +41,6 @@ func (s httpSolver) Present(_ context.Context, challenge acme.Challenge) error {
 
 // CleanUp cleans up the HTTP server if it is the last one to finish.
 func (s httpSolver) CleanUp(_ context.Context, challenge acme.Challenge) error {
-	if s.path == "" {
-		return nil
-	}
-
-	_ = os.Remove(filepath.Join(s.path, challenge.HTTP01ResourcePath()))
 	_ = os.WriteFile(s.conf, []byte{}, 0644)
 	_ = systemctl.Reload("nginx")
 	return nil
@@ -78,11 +57,11 @@ func (s dnsSolver) Present(ctx context.Context, challenge acme.Challenge) error 
 	keyAuth := challenge.DNS01KeyAuthorization()
 	provider, err := s.getDNSProvider()
 	if err != nil {
-		return fmt.Errorf("获取DNS提供商失败: %w", err)
+		return fmt.Errorf("获取 DNS 提供商失败: %w", err)
 	}
 	zone, err := publicsuffix.EffectiveTLDPlusOne(dnsName)
 	if err != nil {
-		return fmt.Errorf("获取域名%q的顶级域失败: %w", dnsName, err)
+		return fmt.Errorf("获取域名 %q 的顶级域失败: %w", dnsName, err)
 	}
 
 	rec := libdns.Record{
@@ -91,12 +70,12 @@ func (s dnsSolver) Present(ctx context.Context, challenge acme.Challenge) error 
 		Value: keyAuth,
 	}
 
-	results, err := provider.AppendRecords(ctx, zone+".", []libdns.Record{rec})
+	results, err := provider.SetRecords(ctx, zone+".", []libdns.Record{rec})
 	if err != nil {
-		return fmt.Errorf("域名%q添加临时记录%q失败: %w", zone, dnsName, err)
+		return fmt.Errorf("域名 %q 添加临时记录 %q 失败: %w", zone, dnsName, err)
 	}
 	if len(results) != 1 {
-		return fmt.Errorf("预期添加1条记录，但实际添加了%d条记录", len(results))
+		return fmt.Errorf("预期添加 1 条记录，但实际添加了 %d 条记录", len(results))
 	}
 
 	s.records = &results
@@ -107,13 +86,16 @@ func (s dnsSolver) CleanUp(ctx context.Context, challenge acme.Challenge) error 
 	dnsName := challenge.DNS01TXTRecordName()
 	provider, err := s.getDNSProvider()
 	if err != nil {
-		return fmt.Errorf("获取DNS提供商失败: %w", err)
+		return fmt.Errorf("获取 DNS 提供商失败: %w", err)
 	}
-	zone, _ := publicsuffix.EffectiveTLDPlusOne(dnsName)
 
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
 
+	zone, err := publicsuffix.EffectiveTLDPlusOne(dnsName)
+	if err != nil {
+		return fmt.Errorf("获取域名 %q 的顶级域失败: %w", dnsName, err)
+	}
 	_, _ = provider.DeleteRecords(ctx, zone+".", *s.records)
 	return nil
 }
@@ -122,23 +104,19 @@ func (s dnsSolver) getDNSProvider() (DNSProvider, error) {
 	var dns DNSProvider
 
 	switch s.dns {
-	case DnsPod:
-		dns = &dnspod.Provider{
-			APIToken: s.param.ID + "," + s.param.Token,
-		}
 	case Tencent:
 		dns = &tencentcloud.Provider{
-			SecretId:  s.param.AccessKey,
-			SecretKey: s.param.SecretKey,
+			SecretId:  s.param.AK,
+			SecretKey: s.param.SK,
 		}
 	case AliYun:
 		dns = &alidns.Provider{
-			AccKeyID:     s.param.AccessKey,
-			AccKeySecret: s.param.SecretKey,
+			AccKeyID:     s.param.AK,
+			AccKeySecret: s.param.SK,
 		}
 	case CloudFlare:
 		dns = &cloudflare.Provider{
-			APIToken: s.param.APIkey,
+			APIToken: s.param.AK,
 		}
 	default:
 		return nil, fmt.Errorf("未知的DNS提供商 %q", s.dns)
@@ -150,22 +128,18 @@ func (s dnsSolver) getDNSProvider() (DNSProvider, error) {
 type DnsType string
 
 const (
-	DnsPod     DnsType = "dnspod"
 	Tencent    DnsType = "tencent"
 	AliYun     DnsType = "aliyun"
 	CloudFlare DnsType = "cloudflare"
 )
 
 type DNSParam struct {
-	ID        string `form:"id" json:"id"`
-	Token     string `form:"token" json:"token"`
-	AccessKey string `form:"access_key" json:"access_key"`
-	SecretKey string `form:"secret_key" json:"secret_key"`
-	APIkey    string `form:"api_key" json:"api_key"`
+	AK string `form:"ak" json:"ak"`
+	SK string `form:"sk" json:"sk"`
 }
 
 type DNSProvider interface {
-	libdns.RecordAppender
+	libdns.RecordSetter
 	libdns.RecordDeleter
 }
 
@@ -177,17 +151,19 @@ type manualDNSSolver struct {
 }
 
 func (s manualDNSSolver) Present(ctx context.Context, challenge acme.Challenge) error {
-	dnsName := challenge.DNS01TXTRecordName()
+	full := challenge.DNS01TXTRecordName()
 	keyAuth := challenge.DNS01KeyAuthorization()
+	domain, err := publicsuffix.EffectiveTLDPlusOne(full)
+	if err != nil {
+		return fmt.Errorf("获取 %q 的顶级域失败: %w", full, err)
+	}
 
 	*s.records = append(*s.records, DNSRecord{
-		Key:   dnsName,
-		Value: keyAuth,
+		Name:   strings.TrimSuffix(full, "."+domain),
+		Domain: domain,
+		Value:  keyAuth,
 	})
 	s.dataChan <- *s.records
-
-	_, cancel := context.WithTimeout(ctx, 2*time.Minute)
-	defer cancel()
 
 	<-s.controlChan
 	return nil
@@ -198,6 +174,7 @@ func (s manualDNSSolver) CleanUp(_ context.Context, _ acme.Challenge) error {
 }
 
 type DNSRecord struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	Name   string `json:"name"`
+	Domain string `json:"domain"`
+	Value  string `json:"value"`
 }

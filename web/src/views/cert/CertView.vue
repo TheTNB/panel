@@ -192,16 +192,26 @@ const certColumns: any = [
                     window.$message.info('请先前往域名处设置 DNS 解析，再继续签发')
                     const d = window.$dialog.info({
                       style: 'width: 60vw',
-                      title: 'DNS 记录列表',
+                      title: '待设置DNS 记录列表',
                       content: () => {
                         return h(NTable, [
                           h('thead', [
-                            h('tr', [h('th', '域名'), h('th', '类型'), h('th', '记录值')])
+                            h('tr', [
+                              h('th', '域名'),
+                              h('th', '类型'),
+                              h('th', '主机记录'),
+                              h('th', '记录值')
+                            ])
                           ]),
                           h(
                             'tbody',
                             data.map((item: any) =>
-                              h('tr', [h('td', item?.key), h('td', 'TXT'), h('td', item?.value)])
+                              h('tr', [
+                                h('td', item?.domain),
+                                h('td', 'TXT'),
+                                h('td', item?.name),
+                                h('td', item?.value)
+                              ])
                             )
                           )
                         ])
@@ -215,7 +225,7 @@ const certColumns: any = [
                         cert
                           .obtain(row.id)
                           .then(() => {
-                            window.$message.success('签发成功，请前往网站管理启用HTTPS')
+                            window.$message.success('签发成功')
                             onCertPageChange(1)
                           })
                           .finally(() => {
@@ -228,7 +238,7 @@ const certColumns: any = [
                     cert
                       .obtain(row.id)
                       .then(() => {
-                        window.$message.success('签发成功，请前往网站管理启用HTTPS')
+                        window.$message.success('签发成功')
                         onCertPageChange(1)
                       })
                       .finally(() => {
@@ -417,7 +427,7 @@ const handleUpdateCert = async () => {
 
 const handleDeployCert = async () => {
   await cert.deploy(deployCertModel.value.id, deployCertModel.value.website_id)
-  window.$message.success('部署成功，请前往网站管理启用HTTPS')
+  window.$message.success('部署成功')
   deployCertModal.value = false
   deployCertModel.value.id = 0
   deployCertModel.value.website_id = 0

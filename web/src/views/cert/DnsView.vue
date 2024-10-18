@@ -6,24 +6,18 @@ import type { DNS } from '@/views/cert/types'
 
 const addDNSModel = ref<any>({
   data: {
-    token: '',
-    id: '',
-    access_key: '',
-    api_key: '',
-    secret_key: ''
+    ak: '',
+    sk: ''
   },
-  type: 'dnspod',
+  type: 'tencent',
   name: ''
 })
 const updateDNSModel = ref<any>({
   data: {
-    token: '',
-    id: '',
-    access_key: '',
-    api_key: '',
-    secret_key: ''
+    ak: '',
+    sk: ''
   },
-  type: 'dnspod',
+  type: 'tencent',
   name: ''
 })
 const addDNSModal = ref(false)
@@ -56,8 +50,6 @@ const dnsColumns: any = [
         {
           default: () => {
             switch (row.type) {
-              case 'dnspod':
-                return 'DnsPod'
               case 'tencent':
                 return '腾讯云'
               case 'aliyun':
@@ -87,11 +79,8 @@ const dnsColumns: any = [
             type: 'primary',
             onClick: () => {
               updateDNS.value = row.id
-              updateDNSModel.value.data.token = row.dns_param.token
-              updateDNSModel.value.data.id = row.dns_param.id
-              updateDNSModel.value.data.access_key = row.dns_param.access_key
-              updateDNSModel.value.data.api_key = row.dns_param.api_key
-              updateDNSModel.value.data.secret_key = row.dns_param.secret_key
+              updateDNSModel.value.data.ak = row.dns_param.ak
+              updateDNSModel.value.data.sk = row.dns_param.sk
               updateDNSModel.value.type = row.type
               updateDNSModel.value.name = row.name
               updateDNSModal.value = true
@@ -169,11 +158,8 @@ const handleAddDNS = async () => {
   window.$message.success('添加成功')
   addDNSModal.value = false
   onDnsPageChange(1)
-  addDNSModel.value.data.token = ''
-  addDNSModel.value.data.id = ''
-  addDNSModel.value.data.access_key = ''
-  addDNSModel.value.data.api_key = ''
-  addDNSModel.value.data.secret_key = ''
+  addDNSModel.value.data.ak = ''
+  addDNSModel.value.data.sk = ''
   addDNSModel.value.name = ''
 }
 
@@ -182,11 +168,8 @@ const handleUpdateDNS = async () => {
   window.$message.success('更新成功')
   updateDNSModal.value = false
   onDnsPageChange(1)
-  updateDNSModel.value.data.token = ''
-  updateDNSModel.value.data.id = ''
-  updateDNSModel.value.data.access_key = ''
-  updateDNSModel.value.data.api_key = ''
-  updateDNSModel.value.data.secret_key = ''
+  updateDNSModel.value.data.ak = ''
+  updateDNSModel.value.data.sk = ''
   updateDNSModel.value.name = ''
 }
 
@@ -245,57 +228,41 @@ onMounted(async () => {
             :options="dnsProviders"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'dnspod'" path="id" label="ID">
+        <n-form-item v-if="addDNSModel.type == 'tencent'" path="ak" label="SecretId">
           <n-input
-            v-model:value="addDNSModel.data.id"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入 DnsPod ID"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'dnspod'" path="token" label="Token">
-          <n-input
-            v-model:value="addDNSModel.data.token"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入 DnsPod Token"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'tencent'" path="access_key" label="SecretId">
-          <n-input
-            v-model:value="addDNSModel.data.access_key"
+            v-model:value="addDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
             placeholder="输入腾讯云 SecretId"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'tencent'" path="secret_key" label="SecretKey">
+        <n-form-item v-if="addDNSModel.type == 'tencent'" path="sk" label="SecretKey">
           <n-input
-            v-model:value="addDNSModel.data.secret_key"
+            v-model:value="addDNSModel.data.sk"
             type="text"
             @keydown.enter.prevent
             placeholder="输入腾讯云 SecretKey"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="access_key" label="Access Key">
+        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="ak" label="Access Key">
           <n-input
-            v-model:value="addDNSModel.data.access_key"
+            v-model:value="addDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
             placeholder="输入阿里云 Access Key"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="secret_key" label="Secret Key">
+        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="sk" label="Secret Key">
           <n-input
-            v-model:value="addDNSModel.data.secret_key"
+            v-model:value="addDNSModel.data.sk"
             type="text"
             @keydown.enter.prevent
             placeholder="输入阿里云 Secret Key"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'cloudflare'" path="api_key" label="API Key">
+        <n-form-item v-if="addDNSModel.type == 'cloudflare'" path="ak" label="API Key">
           <n-input
-            v-model:value="addDNSModel.data.api_key"
+            v-model:value="addDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 Cloudflare API Key"
@@ -332,33 +299,33 @@ onMounted(async () => {
             :options="dnsProviders"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'dnspod'" path="id" label="ID">
+        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="ak" label="SecretId">
           <n-input
-            v-model:value="updateDNSModel.data.id"
+            v-model:value="updateDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入 DnsPod ID"
+            placeholder="输入腾讯云 SecretId"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'dnspod'" path="token" label="Token">
+        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="sk" label="SecretKey">
           <n-input
-            v-model:value="updateDNSModel.data.token"
+            v-model:value="updateDNSModel.data.sk"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入 DnsPod Token"
+            placeholder="输入腾讯云 SecretKey"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'aliyun'" path="access_key" label="Access Key">
+        <n-form-item v-if="updateDNSModel.type == 'aliyun'" path="ak" label="Access Key">
           <n-input
-            v-model:value="updateDNSModel.data.access_key"
+            v-model:value="updateDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
             placeholder="输入阿里云 Access Key"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'aliyun'" path="secret_key" label="Secret Key">
+        <n-form-item v-if="updateDNSModel.type == 'aliyun'" path="sk" label="Secret Key">
           <n-input
-            v-model:value="updateDNSModel.data.secret_key"
+            v-model:value="updateDNSModel.data.sk"
             type="text"
             @keydown.enter.prevent
             placeholder="输入阿里云 Secret Key"
@@ -366,7 +333,7 @@ onMounted(async () => {
         </n-form-item>
         <n-form-item v-if="updateDNSModel.type == 'cloudflare'" path="api_key" label="API Key">
           <n-input
-            v-model:value="updateDNSModel.data.api_key"
+            v-model:value="updateDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
             placeholder="输入 Cloudflare API Key"

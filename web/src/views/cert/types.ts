@@ -33,11 +33,8 @@ export interface DNS {
   type: string
   name: string
   data: {
-    id: string
-    token: string
-    access_key: string
-    secret_key: string
-    api_key: string
+    ak: string
+    sk: string
   }
   created_at: string
   updated_at: string
