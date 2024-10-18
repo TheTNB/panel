@@ -9,6 +9,7 @@ import (
 
 	"github.com/libdns/alidns"
 	"github.com/libdns/cloudflare"
+	"github.com/libdns/huaweicloud"
 	"github.com/libdns/libdns"
 	"github.com/libdns/tencentcloud"
 	"github.com/mholt/acmez/v2/acme"
@@ -104,15 +105,20 @@ func (s dnsSolver) getDNSProvider() (DNSProvider, error) {
 	var dns DNSProvider
 
 	switch s.dns {
+	case AliYun:
+		dns = &alidns.Provider{
+			AccKeyID:     s.param.AK,
+			AccKeySecret: s.param.SK,
+		}
 	case Tencent:
 		dns = &tencentcloud.Provider{
 			SecretId:  s.param.AK,
 			SecretKey: s.param.SK,
 		}
-	case AliYun:
-		dns = &alidns.Provider{
-			AccKeyID:     s.param.AK,
-			AccKeySecret: s.param.SK,
+	case Huawei:
+		dns = &huaweicloud.Provider{
+			AccessKeyId:     s.param.AK,
+			SecretAccessKey: s.param.SK,
 		}
 	case CloudFlare:
 		dns = &cloudflare.Provider{
@@ -130,6 +136,7 @@ type DnsType string
 const (
 	Tencent    DnsType = "tencent"
 	AliYun     DnsType = "aliyun"
+	Huawei     DnsType = "huawei"
 	CloudFlare DnsType = "cloudflare"
 )
 

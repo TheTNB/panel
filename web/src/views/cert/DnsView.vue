@@ -9,7 +9,7 @@ const addDNSModel = ref<any>({
     ak: '',
     sk: ''
   },
-  type: 'tencent',
+  type: 'aliyun',
   name: ''
 })
 const updateDNSModel = ref<any>({
@@ -17,7 +17,7 @@ const updateDNSModel = ref<any>({
     ak: '',
     sk: ''
   },
-  type: 'tencent',
+  type: 'aliyun',
   name: ''
 })
 const addDNSModal = ref(false)
@@ -50,10 +50,12 @@ const dnsColumns: any = [
         {
           default: () => {
             switch (row.type) {
-              case 'tencent':
-                return '腾讯云'
               case 'aliyun':
                 return '阿里云'
+              case 'tencent':
+                return '腾讯云'
+              case 'huawei':
+                return '华为云'
               case 'cloudflare':
                 return 'Cloudflare'
               default:
@@ -228,6 +230,22 @@ onMounted(async () => {
             :options="dnsProviders"
           />
         </n-form-item>
+        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="ak" label="Access Key">
+          <n-input
+            v-model:value="addDNSModel.data.ak"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入阿里云 Access Key"
+          />
+        </n-form-item>
+        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="sk" label="Secret Key">
+          <n-input
+            v-model:value="addDNSModel.data.sk"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入阿里云 Secret Key"
+          />
+        </n-form-item>
         <n-form-item v-if="addDNSModel.type == 'tencent'" path="ak" label="SecretId">
           <n-input
             v-model:value="addDNSModel.data.ak"
@@ -244,20 +262,20 @@ onMounted(async () => {
             placeholder="输入腾讯云 SecretKey"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="ak" label="Access Key">
+        <n-form-item v-if="addDNSModel.type == 'huawei'" path="ak" label="AccessKeyId">
           <n-input
             v-model:value="addDNSModel.data.ak"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入阿里云 Access Key"
+            placeholder="输入华为云 AccessKeyId"
           />
         </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="sk" label="Secret Key">
+        <n-form-item v-if="addDNSModel.type == 'huawei'" path="sk" label="SecretAccessKey">
           <n-input
             v-model:value="addDNSModel.data.sk"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入阿里云 Secret Key"
+            placeholder="输入华为云 SecretAccessKey"
           />
         </n-form-item>
         <n-form-item v-if="addDNSModel.type == 'cloudflare'" path="ak" label="API Key">
@@ -299,22 +317,7 @@ onMounted(async () => {
             :options="dnsProviders"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="ak" label="SecretId">
-          <n-input
-            v-model:value="updateDNSModel.data.ak"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入腾讯云 SecretId"
-          />
-        </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="sk" label="SecretKey">
-          <n-input
-            v-model:value="updateDNSModel.data.sk"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入腾讯云 SecretKey"
-          />
-        </n-form-item>
+
         <n-form-item v-if="updateDNSModel.type == 'aliyun'" path="ak" label="Access Key">
           <n-input
             v-model:value="updateDNSModel.data.ak"
@@ -331,7 +334,40 @@ onMounted(async () => {
             placeholder="输入阿里云 Secret Key"
           />
         </n-form-item>
-        <n-form-item v-if="updateDNSModel.type == 'cloudflare'" path="api_key" label="API Key">
+        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="ak" label="SecretId">
+          <n-input
+            v-model:value="updateDNSModel.data.ak"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入腾讯云 SecretId"
+          />
+        </n-form-item>
+        <n-form-item v-if="updateDNSModel.type == 'tencent'" path="sk" label="SecretKey">
+          <n-input
+            v-model:value="updateDNSModel.data.sk"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入腾讯云 SecretKey"
+          />
+        </n-form-item>
+
+        <n-form-item v-if="updateDNSModel.type == 'huawei'" path="ak" label="AccessKeyId">
+          <n-input
+            v-model:value="updateDNSModel.data.ak"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入华为云 AccessKeyId"
+          />
+        </n-form-item>
+        <n-form-item v-if="updateDNSModel.type == 'huawei'" path="sk" label="SecretAccessKey">
+          <n-input
+            v-model:value="updateDNSModel.data.sk"
+            type="text"
+            @keydown.enter.prevent
+            placeholder="输入华为云 SecretAccessKey"
+          />
+        </n-form-item>
+        <n-form-item v-if="updateDNSModel.type == 'cloudflare'" path="ak" label="API Key">
           <n-input
             v-model:value="updateDNSModel.data.ak"
             type="text"
