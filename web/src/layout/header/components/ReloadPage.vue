@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { useAppStore } from '@/store'
+import { useTabStore } from '@/store'
 
-const appStore = useAppStore()
+const tabStore = useTabStore()
 
 const handleReloadPage = () => {
-  appStore.reloadPage()
+  tabStore.reloadTab(tabStore.active)
 }
 </script>
 

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { useAppStore, useTabStore } from '@/store'
+import { useTabStore } from '@/store'
 import { renderIcon } from '@/utils'
 
 interface Props {
   show?: boolean
+  keepAlive?: boolean
   currentPath?: string
   x: number
   y: number
@@ -11,26 +12,38 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   show: false,
+  keepAlive: false,
   currentPath: ''
 })
 
 const emit = defineEmits(['update:show'])
 
 const tabStore = useTabStore()
-const appStore = useAppStore()
 
 const options = computed(() => [
-  {
-    label: '重新加载',
-    key: 'reload',
-    disabled: props.currentPath !== tabStore.active,
-    icon: renderIcon('mdi:refresh', { size: 14 })
-  },
   {
     label: '关闭',
     key: 'close',
     disabled: tabStore.tabs.length <= 1,
     icon: renderIcon('mdi:close', { size: 14 })
+  },
+  {
+    label: '重载',
+    key: 'reload',
+    disabled: props.currentPath !== tabStore.active,
+    icon: renderIcon('mdi:refresh', { size: 14 })
+  },
+  {
+    label: '固定',
+    key: 'pin',
+    disabled: props.keepAlive,
+    icon: renderIcon('mdi:pin', { size: 14 })
+  },
+  {
+    label: '取消固定',
+    key: 'unpin',
+    disabled: !props.keepAlive,
+    icon: renderIcon('mdi:pin-off', { size: 14 })
   },
   {
     label: '关闭其他',
@@ -65,15 +78,27 @@ const dropdownShow = computed({
 
 const actionMap = new Map([
   [
-    'reload',
-    () => {
-      appStore.reloadPage()
-    }
-  ],
-  [
     'close',
     () => {
       tabStore.removeTab(props.currentPath)
+    }
+  ],
+  [
+    'reload',
+    () => {
+      tabStore.reloadTab(props.currentPath)
+    }
+  ],
+  [
+    'pin',
+    () => {
+      tabStore.pinTab(props.currentPath)
+    }
+  ],
+  [
+    'unpin',
+    () => {
+      tabStore.unpinTab(props.currentPath)
     }
   ],
   [

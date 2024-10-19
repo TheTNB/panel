@@ -14,7 +14,7 @@ import { useI18n } from 'vue-i18n'
 
 import dashboard from '@/api/panel/dashboard'
 import { router } from '@/router'
-import { useAppStore } from '@/store'
+import { useTabStore } from '@/store'
 import { formatDateTime, formatDuration, toTimestamp } from '@/utils/common'
 import { formatBytes, formatPercent } from '@/utils/file'
 import VChart from 'vue-echarts'
@@ -31,7 +31,7 @@ use([
 ])
 
 const { locale } = useI18n()
-const appStore = useAppStore()
+const tabStore = useTabStore()
 const realtime = ref<Realtime | null>(null)
 const systemInfo = ref<SystemInfo | null>(null)
 const homeApps = ref<HomeApp[] | null>(null)
@@ -310,7 +310,7 @@ const handleRestartPanel = () => {
   dashboard.restart().then(() => {
     window.$message.success('面板重启成功')
     setTimeout(() => {
-      appStore.reloadPage()
+      tabStore.reloadTab(tabStore.active)
     }, 3000)
   })
 }

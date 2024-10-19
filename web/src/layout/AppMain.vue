@@ -1,11 +1,17 @@
 <script lang="ts" setup>
-import { useAppStore } from '@/store'
+import { useTabStore } from '@/store'
 
-const appStore = useAppStore()
+const tabStore = useTabStore()
+
+const keepAliveNames = computed(() => {
+  return tabStore.tabs.filter((item) => item.keepAlive).map((item) => item.name)
+})
 </script>
 
 <template>
   <router-view v-slot="{ Component, route }">
-    <component :is="Component" v-if="appStore.reloadFlag" :key="route.path" />
+    <keep-alive :include="keepAliveNames">
+      <component :is="Component" v-if="!tabStore.reloading" :key="route.path" />
+    </keep-alive>
   </router-view>
 </template>

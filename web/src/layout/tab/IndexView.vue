@@ -8,6 +8,7 @@ const tabStore = useTabStore()
 
 interface ContextMenuOption {
   show: boolean
+  keepAlive: boolean
   x: number
   y: number
   currentPath: string
@@ -15,6 +16,7 @@ interface ContextMenuOption {
 
 const contextMenuOption = reactive<ContextMenuOption>({
   show: false,
+  keepAlive: false,
   x: 0,
   y: 0,
   currentPath: ''
@@ -33,15 +35,15 @@ function hideContextMenu() {
   contextMenuOption.show = false
 }
 
-function setContextMenu(x: number, y: number, currentPath: string) {
-  Object.assign(contextMenuOption, { x, y, currentPath })
+function setContextMenu(x: number, y: number, keepAlive: boolean, currentPath: string) {
+  Object.assign(contextMenuOption, { x, y, keepAlive, currentPath })
 }
 
 // 右击菜单
 async function handleContextMenu(e: MouseEvent, tabItem: TabItem) {
   const { clientX, clientY } = e
   hideContextMenu()
-  setContextMenu(clientX, clientY, tabItem.path)
+  setContextMenu(clientX, clientY, tabItem.keepAlive, tabItem.path)
   await nextTick()
   showContextMenu()
 }
@@ -68,6 +70,7 @@ async function handleContextMenu(e: MouseEvent, tabItem: TabItem) {
     <ContextMenu
       v-model:show="contextMenuOption.show"
       :current-path="contextMenuOption.currentPath"
+      :keep-alive="contextMenuOption.keepAlive"
       :x="contextMenuOption.x"
       :y="contextMenuOption.y"
     />

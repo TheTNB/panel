@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useAppStore, usePermissionStore, useThemeStore } from '@/store'
+import { usePermissionStore, useTabStore, useThemeStore } from '@/store'
 import { isUrl, renderIcon } from '@/utils'
 import type { MenuInst, MenuOption } from 'naive-ui'
 import type { VNodeChild } from 'vue'
@@ -11,7 +11,7 @@ const router = useRouter()
 const currentRoute = useRoute()
 const permissionStore = usePermissionStore()
 const themeStore = useThemeStore()
-const appStore = useAppStore()
+const tabStore = useTabStore()
 
 const menu = ref<MenuInst>()
 watch(currentRoute, async () => {
@@ -93,7 +93,8 @@ function handleMenuSelect(key: string, item: MenuOption) {
     window.open(menuItem.path)
     return
   }
-  if (menuItem.path === currentRoute.path && !currentRoute.meta?.keepAlive) appStore.reloadPage()
+  if (menuItem.path === currentRoute.path && !currentRoute.meta?.keepAlive)
+    tabStore.reloadTab(currentRoute.path)
   else router.push(menuItem.path)
 
   // 手机端自动收起菜单

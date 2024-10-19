@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'website-edit'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton } from 'naive-ui'
 

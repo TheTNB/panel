@@ -5,6 +5,7 @@ export const WITHOUT_TAB_PATHS = ['/404', '/login']
 
 export interface Tab {
   active: string
+  reloading: boolean
   tabs: Array<TabItem>
 }
 
@@ -12,17 +13,20 @@ export interface TabItem {
   name: string
   path: string
   title: string
+  keepAlive: boolean
 }
 
 export const useTabStore = defineStore('tab', {
   state: (): Tab => {
     return {
       active: '',
+      reloading: false,
       tabs: []
     }
   },
   actions: {
-    setActiveTab(path: string) {
+    async setActiveTab(path: string) {
+      await nextTick()
       this.active = path
     },
     setTabs(tabs: Array<TabItem>) {
@@ -33,6 +37,30 @@ export const useTabStore = defineStore('tab', {
       if (WITHOUT_TAB_PATHS.includes(tab.path) || this.tabs.some((item) => item.path === tab.path))
         return
       this.setTabs([...this.tabs, tab])
+    },
+    async reloadTab(path: string) {
+      const findItem = this.tabs.find((item) => item.path === path)
+      if (!findItem) return
+      const keepLive = findItem.keepAlive
+      findItem.keepAlive = false // 取消keepAlive
+      window.$loadingBar.start()
+      this.reloading = true
+      await nextTick()
+      this.reloading = false
+      await nextTick()
+      findItem.keepAlive = keepLive // 恢复keepAlive原状态
+      setTimeout(() => {
+        document.documentElement.scrollTo({ left: 0, top: 0 })
+        window.$loadingBar.finish()
+      }, 100)
+    },
+    pinTab(path: string) {
+      const findItem = this.tabs.find((item) => item.path === path)
+      if (findItem) findItem.keepAlive = true
+    },
+    unpinTab(path: string) {
+      const findItem = this.tabs.find((item) => item.path === path)
+      if (findItem) findItem.keepAlive = false
     },
     removeTab(path: string) {
       if (path === this.active) {
@@ -65,5 +93,7 @@ export const useTabStore = defineStore('tab', {
       this.setActiveTab('')
     }
   },
-  persist: true
+  persist: {
+    storage: sessionStorage
+  }
 })

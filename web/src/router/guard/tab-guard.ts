@@ -12,7 +12,8 @@ export function createTabGuard(router: Router) {
     tabStore.addTab({
       name: String(name),
       path,
-      title
+      title,
+      keepAlive: false
     })
   })
 }
