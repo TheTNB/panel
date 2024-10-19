@@ -50,7 +50,7 @@ const username = computed(() => {
 <template>
   <n-dropdown :options="options" @select="handleSelect">
     <div flex cursor-pointer items-center>
-      <span>{{ username }}</span>
+      <span text-16>{{ username }}</span>
     </div>
   </n-dropdown>
 </template>

@@ -9,7 +9,12 @@ const handleReloadPage = () => {
 </script>
 
 <template>
-  <n-icon mr-20 cursor-pointer size="18" @click="handleReloadPage">
-    <icon-mdi-refresh />
-  </n-icon>
+  <n-tooltip trigger="hover">
+    <template #trigger>
+      <n-icon mr-20 cursor-pointer size="20" @click="handleReloadPage">
+        <icon-mdi-refresh />
+      </n-icon>
+    </template>
+    刷新标签页
+  </n-tooltip>
 </template>

@@ -6,6 +6,7 @@ import ThemeMode from './components/ThemeMode.vue'
 import UserAvatar from './components/UserAvatar.vue'
 
 import MenuCollapse from '@/layout/header/components/MenuCollapse.vue'
+import ThemeSetting from '@/layout/header/components/ThemeSetting.vue'
 import { useThemeStore } from '@/store'
 
 const themeStore = useThemeStore()
@@ -20,8 +21,9 @@ const themeStore = useThemeStore()
     <span v-if="!themeStore.isMobile && themeStore.tab.visible" mx-6 opacity-20>|</span>
     <div ml-auto flex flex-shrink-0 items-center px-12>
       <ReloadPage />
-      <ThemeMode />
       <FullScreen />
+      <ThemeMode />
+      <ThemeSetting />
       <UserAvatar />
     </div>
   </div>
