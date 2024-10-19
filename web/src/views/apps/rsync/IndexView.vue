@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-rsync-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 

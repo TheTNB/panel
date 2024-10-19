@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+defineOptions({
+  name: 'home-index'
+})
+
 import { LineChart } from 'echarts/charts'
 import {
   DataZoomComponent,

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'task-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 import { useI18n } from 'vue-i18n'

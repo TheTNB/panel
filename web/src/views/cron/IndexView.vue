@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'cron-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 

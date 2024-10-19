@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'app-index'
+})
+
 import VersionModal from '@/views/app/VersionModal.vue'
 
 import { NButton, NDataTable, NPopconfirm, NSwitch } from 'naive-ui'

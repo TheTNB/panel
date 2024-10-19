@@ -11,13 +11,12 @@ export default {
     {
       name: 'apps-php83-index',
       path: '',
-      component: () => import('../php/IndexView.vue'),
+      component: () => import('./IndexView.vue'),
       meta: {
         title: 'PHP 8.3',
         icon: 'logos:php',
         role: ['admin'],
-        requireAuth: true,
-        php: 83
+        requireAuth: true
       }
     }
   ]

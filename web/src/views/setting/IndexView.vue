@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'setting-index'
+})
+
 import SettingBase from '@/views/setting/SettingBase.vue'
 import SettingHttps from '@/views/setting/SettingHttps.vue'
 

@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'backup-index'
+})
+
 import backup from '@/api/panel/backup'
 import ListView from '@/views/backup/ListView.vue'
 import { NButton, NInput } from 'naive-ui'

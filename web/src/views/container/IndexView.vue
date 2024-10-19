@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'container-index'
+})
+
 import ContainerView from '@/views/container/ContainerView.vue'
 import ImageView from '@/views/container/ImageView.vue'
 import NetworkView from '@/views/container/NetworkView.vue'

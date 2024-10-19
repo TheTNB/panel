@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-fail2ban-index'
+})
+
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 
 import fail2ban from '@/api/apps/fail2ban'

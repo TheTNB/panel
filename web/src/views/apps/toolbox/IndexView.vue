@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-toolbox-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { DateTime } from 'luxon'
 import { NButton } from 'naive-ui'

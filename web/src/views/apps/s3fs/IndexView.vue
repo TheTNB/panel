@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-s3fs-index'
+})
+
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import s3fs from '@/api/apps/s3fs'

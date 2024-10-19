@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'home-update'
+})
+
 import { MdPreview } from 'md-editor-v3'
 import 'md-editor-v3/lib/style.css'
 import type { MessageReactive } from 'naive-ui'

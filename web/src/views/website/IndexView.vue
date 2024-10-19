@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+defineOptions({
+  name: 'website-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import {
   NButton,

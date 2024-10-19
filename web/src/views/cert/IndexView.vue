@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'cert-index'
+})
+
 import AccountView from '@/views/cert/AccountView.vue'
 import CertView from '@/views/cert/CertView.vue'
 import DnsView from '@/views/cert/DnsView.vue'

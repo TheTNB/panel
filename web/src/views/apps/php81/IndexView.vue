@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-php81-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
@@ -6,9 +10,8 @@ import php from '@/api/apps/php'
 import systemctl from '@/api/panel/systemctl'
 import { renderIcon } from '@/utils'
 
-const route = useRoute()
 const currentTab = ref('status')
-const version = Number(route.meta.php)
+const version = Number(81)
 const status = ref(false)
 const isEnabled = ref(false)
 const config = ref('')

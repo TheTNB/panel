@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'monitor-index'
+})
+
 import { LineChart } from 'echarts/charts'
 import {
   DataZoomComponent,

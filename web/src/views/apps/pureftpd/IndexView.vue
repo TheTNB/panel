@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-pureftpd-index'
+})
+
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import pureftpd from '@/api/apps/pureftpd'

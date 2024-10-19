@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-phpmyadmin-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton } from 'naive-ui'
 

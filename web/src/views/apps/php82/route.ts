@@ -11,13 +11,12 @@ export default {
     {
       name: 'apps-php82-index',
       path: '',
-      component: () => import('../php/IndexView.vue'),
+      component: () => import('./IndexView.vue'),
       meta: {
         title: 'PHP 8.2',
         icon: 'logos:php',
         role: ['admin'],
-        requireAuth: true,
-        php: 82
+        requireAuth: true
       }
     }
   ]

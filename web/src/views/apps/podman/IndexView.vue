@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'apps-podman-index'
+})
+
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NPopconfirm } from 'naive-ui'
 

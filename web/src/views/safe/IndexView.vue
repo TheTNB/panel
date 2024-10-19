@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'safe-index'
+})
+
 import ForwardView from '@/views/safe/ForwardView.vue'
 import IpRuleView from '@/views/safe/IpRuleView.vue'
 import RuleView from '@/views/safe/RuleView.vue'

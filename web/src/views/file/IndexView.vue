@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'file-index'
+})
+
 import CompressModal from '@/views/file/CompressModal.vue'
 import ListTable from '@/views/file/ListTable.vue'
 import PathInput from '@/views/file/PathInput.vue'
