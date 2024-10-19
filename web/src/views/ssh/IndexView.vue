@@ -23,6 +23,16 @@ const model = ref({
   password: ''
 })
 
+const terminal = ref<HTMLElement | null>(null)
+const term = ref()
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+const ws = new WebSocket(`${protocol}://${window.location.host}/api/ssh/session`)
+const attachAddon = new AttachAddon(ws)
+const fitAddon = new FitAddon()
+const clipboardAddon = new ClipboardAddon()
+const webLinksAddon = new WebLinksAddon()
+const webglAddon = new WebglAddon()
+
 const handleSave = () => {
   ssh
     .saveInfo(model.value.host, model.value.port, model.value.user, model.value.password)
@@ -41,56 +51,54 @@ const getInfo = () => {
 }
 
 const openSession = () => {
-  const term = new Terminal({
+  term.value = new Terminal({
     lineHeight: 1.2,
     fontSize: 14,
     fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
     cursorBlink: true,
     cursorStyle: 'underline',
-    scrollback: 1000,
-    scrollSensitivity: 15,
     tabStopWidth: 4,
     theme: { background: '#111', foreground: '#fff' }
   })
 
-  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-  const ws = new WebSocket(`${protocol}://${window.location.host}/api/ssh/session`)
-
-  const attachAddon = new AttachAddon(ws)
-  term.loadAddon(attachAddon)
-  const fitAddon = new FitAddon()
-  term.loadAddon(fitAddon)
-  const clipboardAddon = new ClipboardAddon()
-  term.loadAddon(clipboardAddon)
-  const webLinksAddon = new WebLinksAddon()
-  term.loadAddon(webLinksAddon)
-  const webglAddon = new WebglAddon()
-  term.loadAddon(webglAddon)
+  term.value.loadAddon(attachAddon)
+  term.value.loadAddon(fitAddon)
+  term.value.loadAddon(clipboardAddon)
+  term.value.loadAddon(webLinksAddon)
+  term.value.loadAddon(webglAddon)
   webglAddon.onContextLoss(() => {
     webglAddon.dispose()
   })
 
   ws.onopen = () => {
-    term.open(document.getElementById('terminal') as HTMLElement)
+    term.value.open(terminal.value!)
     fitAddon.fit()
-    term.write('\r\n欢迎来到耗子面板 SSH，连接成功。')
-    term.write('\r\nWelcome to Rat Panel SSH. Connection success.\r\n')
-    term.focus()
+    term.value.focus()
+    window.addEventListener(
+      'resize',
+      () => {
+        fitAddon.fit()
+      },
+      false
+    )
   }
 
   ws.onclose = () => {
-    term.write('\r\nSSH连接已关闭，请刷新页面。')
-    term.write('\r\nSSH connection closed. Please refresh the page.\r\n')
+    term.value.write('\r\n连接已关闭，请刷新重试。')
+    term.value.write('\r\nConnection closed. Please refresh.')
+    window.removeEventListener('resize', () => {
+      fitAddon.fit()
+    })
   }
 
   ws.onerror = (event) => {
-    term.write('\r\nSSH连接发生错误，请刷新页面。')
-    term.write('\r\nSSH connection error. Please refresh the page.\r\n')
+    term.value.write('\r\n连接发生错误，请刷新重试。')
+    term.value.write('\r\nConnection error. Please refresh .')
     console.error(event)
     ws.close()
   }
 
-  term.onResize(({ cols, rows }) => {
+  term.value.onResize(({ cols, rows }: { cols: number; rows: number }) => {
     if (ws.readyState === 1) {
       ws.send(
         JSON.stringify({
@@ -101,14 +109,20 @@ const openSession = () => {
       )
     }
   })
+}
 
-  window.addEventListener(
-    'resize',
-    () => {
-      fitAddon.fit()
-    },
-    false
-  )
+const onTermWheel = (event: WheelEvent) => {
+  if (event.ctrlKey) {
+    event.preventDefault()
+    if (event.deltaY > 0) {
+      if (term.value.options.fontSize > 12) {
+        term.value.options.fontSize = term.value.options.fontSize - 1
+      }
+    } else {
+      term.value.options.fontSize = term.value.options.fontSize + 1
+    }
+    fitAddon.fit()
+  }
 }
 
 onMounted(() => {
@@ -159,10 +173,9 @@ onMounted(() => {
           </n-button>
         </n-form-item>
       </n-form>
-      <div
-        id="terminal"
-        style="width: 100%; height: 70vh; background-color: #000000; margin-top: 20px"
-      ></div>
+      <n-card>
+        <div ref="terminal" @wheel="onTermWheel" h-600></div>
+      </n-card>
     </n-space>
   </common-page>
 </template>

@@ -54,7 +54,7 @@ func NewTurn(ws *websocket.Conn, client *ssh.Client) (*Turn, error) {
 }
 
 func (t *Turn) Write(p []byte) (n int, err error) {
-	writer, err := t.ws.NextWriter(websocket.BinaryMessage)
+	writer, err := t.ws.NextWriter(websocket.TextMessage)
 	if err != nil {
 		return 0, err
 	}
