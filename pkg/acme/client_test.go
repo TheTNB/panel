@@ -21,8 +21,8 @@ func (s *ClientTestSuite) TestObtainSSL() {
 	s.Nil(err)
 
 	client.UseDns(AliYun, DNSParam{
-		ID:    "123456",
-		Token: "654321",
+		AK: "123456",
+		SK: "654321",
 	})
 
 	/*client.UseManualDns(2)
