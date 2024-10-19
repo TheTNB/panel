@@ -1,31 +1,28 @@
-import { decrypto, encrypto } from '@/utils'
-
 interface StorageData {
-  value: unknown
+  value: any
   expire: number | null
 }
 
-/** 默认缓存期限为7天 */
-const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7
+/** 默认保存期限为永久 */
+const DEFAULT_CACHE_TIME = 0
 
-export function setLocal(key: string, value: unknown, expire: number | null = DEFAULT_CACHE_TIME) {
+export function setLocal(key: string, value: any, expire: number | null = DEFAULT_CACHE_TIME) {
   const storageData: StorageData = {
     value,
-    expire: expire !== null ? new Date().getTime() + expire * 1000 : null
+    expire: expire !== 0 && expire !== null ? new Date().getTime() + expire * 1000 : 0
   }
-  const json = encrypto(storageData)
+  const json = JSON.stringify(storageData)
   window.localStorage.setItem(key, json)
 }
 
 export function getLocal<T>(key: string) {
   const json = window.localStorage.getItem(key)
   if (json) {
-    let storageData: StorageData | null = null
-    storageData = decrypto(json)
+    const storageData = JSON.parse(json)
     if (storageData) {
       const { value, expire } = storageData
       // 没有过期时间或者在有效期内则直接返回
-      if (expire === null || expire >= Date.now()) return value as T
+      if (expire === 0 || expire >= Date.now()) return value as T
     }
     removeLocal(key)
     return null
@@ -36,8 +33,7 @@ export function getLocal<T>(key: string) {
 export function getLocalExpire(key: string): number | null {
   const json = window.localStorage.getItem(key)
   if (json) {
-    let storageData: StorageData | null = null
-    storageData = decrypto(json)
+    const storageData = JSON.parse(json)
     if (storageData) {
       return storageData.expire
     }

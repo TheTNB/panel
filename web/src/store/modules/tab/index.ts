@@ -1,29 +1,32 @@
 import { router } from '@/router'
-import { setSession } from '@/utils'
 import { defineStore } from 'pinia'
-import { activeTab, tabs, WITHOUT_TAB_PATHS } from './helpers'
+
+export const WITHOUT_TAB_PATHS = ['/404', '/login']
+
+export interface Tab {
+  active: string
+  tabs: Array<TabItem>
+}
 
 export interface TabItem {
   name: string
   path: string
-  title?: string
+  title: string
 }
 
 export const useTabStore = defineStore('tab', {
-  state() {
+  state: (): Tab => {
     return {
-      tabs: <Array<TabItem>>tabs || [],
-      activeTab: <string>activeTab || ''
+      active: '',
+      tabs: []
     }
   },
   actions: {
     setActiveTab(path: string) {
-      this.activeTab = path
-      setSession('activeTab', path)
+      this.active = path
     },
     setTabs(tabs: Array<TabItem>) {
       this.tabs = tabs
-      setSession('tabs', tabs)
     },
     addTab(tab: TabItem) {
       this.setActiveTab(tab.path)
@@ -32,7 +35,7 @@ export const useTabStore = defineStore('tab', {
       this.setTabs([...this.tabs, tab])
     },
     removeTab(path: string) {
-      if (path === this.activeTab) {
+      if (path === this.active) {
         const activeIndex = this.tabs.findIndex((item) => item.path === path)
         if (activeIndex > 0) router.push(this.tabs[activeIndex - 1].path)
         else router.push(this.tabs[activeIndex + 1].path)
@@ -41,25 +44,26 @@ export const useTabStore = defineStore('tab', {
     },
     removeOther(curPath: string) {
       this.setTabs(this.tabs.filter((tab) => tab.path === curPath))
-      if (curPath !== this.activeTab) router.push(this.tabs[this.tabs.length - 1].path)
+      if (curPath !== this.active) router.push(this.tabs[this.tabs.length - 1].path)
     },
     removeLeft(curPath: string) {
       const curIndex = this.tabs.findIndex((item) => item.path === curPath)
       const filterTabs = this.tabs.filter((item, index) => index >= curIndex)
       this.setTabs(filterTabs)
-      if (!filterTabs.find((item) => item.path === this.activeTab))
+      if (!filterTabs.find((item) => item.path === this.active))
         router.push(filterTabs[filterTabs.length - 1].path)
     },
     removeRight(curPath: string) {
       const curIndex = this.tabs.findIndex((item) => item.path === curPath)
       const filterTabs = this.tabs.filter((item, index) => index <= curIndex)
       this.setTabs(filterTabs)
-      if (!filterTabs.find((item) => item.path === this.activeTab))
+      if (!filterTabs.find((item) => item.path === this.active))
         router.push(filterTabs[filterTabs.length - 1].path)
     },
     resetTabs() {
       this.setTabs([])
       this.setActiveTab('')
     }
-  }
+  },
+  persist: true
 })

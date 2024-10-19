@@ -28,9 +28,9 @@ if (localLoginInfo) {
   loginInfo.value.password = localLoginInfo.password || ''
 }
 
+const userStore = useUserStore()
 const loging = ref<boolean>(false)
 const isRemember = useStorage('isRemember', false)
-const userStore = useUserStore()
 
 async function handleLogin() {
   const { username, password } = loginInfo.value
@@ -49,7 +49,8 @@ async function handleLogin() {
       }
 
       await addDynamicRoutes()
-      await userStore.getUserInfo()
+      const { data } = await user.info()
+      userStore.set(data)
       if (query.redirect) {
         const path = query.redirect as string
         Reflect.deleteProperty(query, 'redirect')
@@ -69,7 +70,8 @@ onMounted(async () => {
   await user.isLogin().then(async (res) => {
     if (res.data) {
       await addDynamicRoutes()
-      await userStore.getUserInfo()
+      const { data } = await user.info()
+      userStore.set(data)
       if (query.redirect) {
         const path = query.redirect as string
         Reflect.deleteProperty(query, 'redirect')

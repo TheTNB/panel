@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import user from '@/api/panel/user'
 import { router } from '@/router'
 import { useUserStore } from '@/store'
 import { renderIcon } from '@/utils'
@@ -18,7 +19,7 @@ const options = [
   }
 ]
 
-function handleSelect(key: string) {
+const handleSelect = (key: string) => {
   if (key === 'logout') {
     window.$dialog.info({
       content: '确认退出？',
@@ -26,7 +27,9 @@ function handleSelect(key: string) {
       positiveText: '确定',
       negativeText: '取消',
       onPositiveClick() {
-        userStore.logout()
+        user.logout().then(() => {
+          userStore.logout()
+        })
         window.$message.success('已退出登录!')
       }
     })
@@ -35,12 +38,19 @@ function handleSelect(key: string) {
     router.push({ name: 'setting-index' })
   }
 }
+
+const username = computed(() => {
+  if (userStore.username !== '') {
+    return userStore.username
+  }
+  return '未知'
+})
 </script>
 
 <template>
   <n-dropdown :options="options" @select="handleSelect">
     <div flex cursor-pointer items-center>
-      <span hidden sm:block>{{ userStore.username }}</span>
+      <span>{{ username }}</span>
     </div>
   </n-dropdown>
 </template>

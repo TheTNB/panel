@@ -32,6 +32,7 @@
     "luxon": "^3.5.0",
     "marked": "^14.1.2",
     "pinia": "^2.2.4",
+    "pinia-plugin-persistedstate": "^4.1.1",
     "remove": "^0.1.5",
     "vue": "^3.5.11",
     "vue-echarts": "^7.0.3",

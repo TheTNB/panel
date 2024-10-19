@@ -13,7 +13,7 @@ interface ColorAction {
 }
 
 /** 初始化主题配置 */
-export function initThemeSettings(): Theme.Setting {
+export function defaultSettings(): Theme.Setting {
   const isMobile = themeSetting.isMobile || false
   const darkMode = themeSetting.darkMode || false
   const sider = themeSetting.sider || {

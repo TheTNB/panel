@@ -23,7 +23,7 @@ const options = computed(() => [
   {
     label: '重新加载',
     key: 'reload',
-    disabled: props.currentPath !== tabStore.activeTab,
+    disabled: props.currentPath !== tabStore.active,
     icon: renderIcon('mdi:refresh', { size: 14 })
   },
   {

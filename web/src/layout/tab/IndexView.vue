@@ -3,7 +3,6 @@ import type { TabItem } from '@/store'
 import { useTabStore } from '@/store'
 import ContextMenu from './components/ContextMenu.vue'
 
-const route = useRoute()
 const router = useRouter()
 const tabStore = useTabStore()
 
@@ -20,16 +19,6 @@ const contextMenuOption = reactive<ContextMenuOption>({
   y: 0,
   currentPath: ''
 })
-
-watch(
-  () => route.path,
-  () => {
-    const { name, fullPath: path } = route
-    const title = (route.meta?.title as string) || ''
-    tabStore.addTab({ name: name as string, path, title })
-  },
-  { immediate: true }
-)
 
 function handleTagClick(path: string) {
   tabStore.setActiveTab(path)
@@ -61,12 +50,10 @@ async function handleContextMenu(e: MouseEvent, tabItem: TabItem) {
 <template>
   <div>
     <n-tabs
-      :value="tabStore.activeTab"
+      :value="tabStore.active"
       :closable="tabStore.tabs.length > 1"
       type="card"
       @close="(path: string) => tabStore.removeTab(path)"
-      bg-white
-      dark:bg-dark
     >
       <n-tab
         v-for="item in tabStore.tabs"

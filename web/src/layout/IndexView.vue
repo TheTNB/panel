@@ -2,7 +2,6 @@
 import AppMain from './AppMain.vue'
 import AppHeader from './header/IndexView.vue'
 import SideBar from './sidebar/IndexView.vue'
-import AppTab from './tab/IndexView.vue'
 
 import { useThemeStore } from '@/store'
 
@@ -47,9 +46,6 @@ const themeStore = useThemeStore()
       >
         <AppHeader />
       </header>
-      <section v-if="themeStore.tab.visible" border-b p-10 bc-eee sm:block dark:border-0>
-        <AppTab />
-      </section>
       <section bg="#f5f6fb" flex-1 overflow-hidden dark:bg-hex-101014>
         <AppMain />
       </section>

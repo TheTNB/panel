@@ -10,7 +10,7 @@ import {
 } from 'naive-ui'
 import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
 import { defineStore } from 'pinia'
-import { getNaiveThemeOverrides, initThemeSettings } from './helpers'
+import { defaultSettings, getNaiveThemeOverrides } from './helpers'
 
 type ThemeState = Theme.Setting
 
@@ -19,8 +19,8 @@ const locales: Record<string, { locale: NLocale; dateLocale: NDateLocale }> = {
   en: { locale: enUS, dateLocale: dateEnUS }
 }
 
-export const useThemeStore = defineStore('theme-store', {
-  state: (): ThemeState => initThemeSettings(),
+export const useThemeStore = defineStore('theme', {
+  state: (): ThemeState => defaultSettings(),
   getters: {
     naiveThemeOverrides(): GlobalThemeOverrides {
       return getNaiveThemeOverrides({
@@ -66,5 +66,6 @@ export const useThemeStore = defineStore('theme-store', {
     setLocale(locale: string) {
       this.locale = locale
     }
-  }
+  },
+  persist: true
 })
