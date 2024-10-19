@@ -85,7 +85,7 @@ func (s *Service) calculateCpuScore(duration time.Duration) int {
 
 // calculateScore 计算内存/硬盘成绩
 func (s *Service) calculateScore(duration time.Duration) int {
-	score := int((10 / duration.Seconds()) * float64(10000))
+	score := int((20 / duration.Seconds()) * float64(30000))
 
 	if score < 0 {
 		score = 0
@@ -169,7 +169,7 @@ func (s *Service) machineLearning(multi bool) int {
 }
 
 func (s *Service) machineLearningTask(numThreads int) {
-	size := 850
+	size := 900
 	a := make([][]float64, size)
 	b := make([][]float64, size)
 	for i := 0; i < size; i++ {

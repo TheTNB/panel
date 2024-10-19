@@ -62,35 +62,35 @@ const cpuTotal = computed(() => {
 
 const memory = ref({
   score: 0,
-  bandwidth: '无结果',
-  latency: '无结果'
+  bandwidth: '待跑分',
+  latency: '待跑分'
 })
 
 const disk = ref({
   score: 0,
   1024: {
-    read_iops: '无结果',
-    read_speed: '无结果',
-    write_iops: '无结果',
-    write_speed: '无结果'
+    read_iops: '待跑分',
+    read_speed: '待跑分',
+    write_iops: '待跑分',
+    write_speed: '待跑分'
   },
   4: {
-    read_iops: '无结果',
-    read_speed: '无结果',
-    write_iops: '无结果',
-    write_speed: '无结果'
+    read_iops: '待跑分',
+    read_speed: '待跑分',
+    write_iops: '待跑分',
+    write_speed: '待跑分'
   },
   512: {
-    read_iops: '无结果',
-    read_speed: '无结果',
-    write_iops: '无结果',
-    write_speed: '无结果'
+    read_iops: '待跑分',
+    read_speed: '待跑分',
+    write_iops: '待跑分',
+    write_speed: '待跑分'
   },
   64: {
-    read_iops: '无结果',
-    read_speed: '无结果',
-    write_iops: '无结果',
-    write_speed: '无结果'
+    read_iops: '待跑分',
+    read_speed: '待跑分',
+    write_iops: '待跑分',
+    write_speed: '待跑分'
   }
 })
 
@@ -143,6 +143,7 @@ const handleTest = async () => {
                     / 多核
                     <n-number-animation :from="0" :to="cpuTotal.multi" show-separator />
                   </div>
+                  <div v-else>待跑分</div>
                   <n-progress
                     type="circle"
                     :percentage="100"
@@ -193,6 +194,7 @@ const handleTest = async () => {
                   <div v-if="memory.score !== 0">
                     <n-number-animation :from="0" :to="memory.score" show-separator />
                   </div>
+                  <div v-else>待跑分</div>
                   <n-progress
                     type="circle"
                     :percentage="100"
@@ -223,6 +225,7 @@ const handleTest = async () => {
                   <div v-if="disk.score !== 0">
                     <n-number-animation :from="0" :to="disk.score" show-separator />
                   </div>
+                  <div v-else>待跑分</div>
                   <n-progress
                     type="circle"
                     :percentage="100"
