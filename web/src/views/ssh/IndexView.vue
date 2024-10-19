@@ -3,18 +3,18 @@ defineOptions({
   name: 'ssh-index'
 })
 
+import { AttachAddon } from '@xterm/addon-attach'
+import { ClipboardAddon } from '@xterm/addon-clipboard'
 import { FitAddon } from '@xterm/addon-fit'
+import { WebLinksAddon } from '@xterm/addon-web-links'
+import { WebglAddon } from '@xterm/addon-webgl'
 import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
-import CryptoJS from 'crypto-js'
 import { useI18n } from 'vue-i18n'
 
 import ssh from '@/api/panel/ssh'
 
 const { t } = useI18n()
-
-const msgData = '1'
-const msgResize = '2'
 
 const model = ref({
   host: '',
@@ -42,32 +42,39 @@ const getInfo = () => {
 
 const openSession = () => {
   const term = new Terminal({
-    fontSize: 15,
-    cursorBlink: true, // 光标闪烁
-    theme: {
-      foreground: '#ECECEC', // 字体
-      background: '#000000', //背景色
-      cursor: 'help' // 设置光标
-    }
+    lineHeight: 1.2,
+    fontSize: 14,
+    fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+    cursorBlink: true,
+    cursorStyle: 'underline',
+    scrollback: 1000,
+    scrollSensitivity: 15,
+    tabStopWidth: 4,
+    theme: { background: '#111', foreground: '#fff' }
   })
-
-  const fitAddon = new FitAddon()
-  term.loadAddon(fitAddon)
 
   const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
   const ws = new WebSocket(`${protocol}://${window.location.host}/api/ssh/session`)
-  ws.binaryType = 'arraybuffer'
 
-  const enc = new TextDecoder('utf-8')
-  ws.onmessage = (event) => {
-    term.write(enc.decode(event.data))
-  }
+  const attachAddon = new AttachAddon(ws)
+  term.loadAddon(attachAddon)
+  const fitAddon = new FitAddon()
+  term.loadAddon(fitAddon)
+  const clipboardAddon = new ClipboardAddon()
+  term.loadAddon(clipboardAddon)
+  const webLinksAddon = new WebLinksAddon()
+  term.loadAddon(webLinksAddon)
+  const webglAddon = new WebglAddon()
+  term.loadAddon(webglAddon)
+  webglAddon.onContextLoss(() => {
+    webglAddon.dispose()
+  })
 
   ws.onopen = () => {
     term.open(document.getElementById('terminal') as HTMLElement)
     fitAddon.fit()
-    term.write('\r\n欢迎来到耗子面板SSH，连接成功。')
-    term.write('\r\nWelcome to HaoZiPanel SSH. Connection success.\r\n')
+    term.write('\r\n欢迎来到耗子面板 SSH，连接成功。')
+    term.write('\r\nWelcome to Rat Panel SSH. Connection success.\r\n')
     term.focus()
   }
 
@@ -83,22 +90,14 @@ const openSession = () => {
     ws.close()
   }
 
-  term.onData((data) => {
-    ws.send(msgData + CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(data)))
-  })
-
   term.onResize(({ cols, rows }) => {
     if (ws.readyState === 1) {
       ws.send(
-        msgResize +
-          CryptoJS.enc.Base64.stringify(
-            CryptoJS.enc.Utf8.parse(
-              JSON.stringify({
-                columns: cols,
-                rows: rows
-              })
-            )
-          )
+        JSON.stringify({
+          resize: true,
+          columns: cols,
+          rows: rows
+        })
       )
     }
   })

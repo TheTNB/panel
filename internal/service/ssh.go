@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"net/http"
 	"sync"
@@ -9,7 +8,9 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/spf13/cast"
+	"go.uber.org/zap"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -74,11 +75,9 @@ func (s *SSHService) Session(w http.ResponseWriter, r *http.Request) {
 		cast.ToString(info["password"]),
 	)
 	client, err := ssh.NewSSHClient(config)
-
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		ErrorSystem(w)
 		return
 	}
 	defer client.Close()
@@ -87,38 +86,28 @@ func (s *SSHService) Session(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		_ = ws.WriteControl(websocket.CloseMessage,
 			[]byte(err.Error()), time.Now().Add(time.Second))
-		ErrorSystem(w)
 		return
 	}
 	defer turn.Close()
 
-	var bufPool = sync.Pool{
-		New: func() any {
-			return new(bytes.Buffer)
-		},
-	}
-	var logBuff = bufPool.Get().(*bytes.Buffer)
-	logBuff.Reset()
-	defer bufPool.Put(logBuff)
-
-	sshCtx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	wg := sync.WaitGroup{}
 	wg.Add(2)
+
 	go func() {
 		defer wg.Done()
-		if err = turn.LoopRead(logBuff, sshCtx); err != nil {
-			ErrorSystem(w)
+		if err = turn.Handle(ctx); err != nil {
+			app.Logger.Error("读取 ssh 数据失败", zap.Error(err))
 			return
 		}
 	}()
 	go func() {
 		defer wg.Done()
-		if err = turn.SessionWait(); err != nil {
-			ErrorSystem(w)
-			return
+		if err = turn.Wait(); err != nil {
+			app.Logger.Error("保持 ssh 会话失败", zap.Error(err))
 		}
 		cancel()
 	}()
-	wg.Wait()
 
+	wg.Wait()
 }

@@ -1,11 +1,10 @@
 package ssh
 
 import (
+	"os"
 	"time"
 
 	"golang.org/x/crypto/ssh"
-
-	"github.com/TheTNB/panel/pkg/io"
 )
 
 type AuthMethod int8
@@ -45,11 +44,12 @@ func ClientConfigPublicKey(hostAddr, user, keyPath string) *ClientConfig {
 }
 
 func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
-	config := &ssh.ClientConfig{
-		Timeout:         conf.Timeout,
-		User:            conf.User,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
+	config := &ssh.ClientConfig{}
+	config.SetDefaults()
+	config.Timeout = conf.Timeout
+	config.User = conf.User
+	config.HostKeyCallback = ssh.InsecureIgnoreHostKey()
+
 	switch conf.AuthMethod {
 	case PASSWORD:
 		config.Auth = []ssh.AuthMethod{ssh.Password(conf.Password)}
@@ -60,18 +60,19 @@ func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 		}
 		config.Auth = []ssh.AuthMethod{ssh.PublicKeys(signer)}
 	}
-	c, err := ssh.Dial("tcp", conf.HostAddr, config)
+	c, err := ssh.Dial("tcp", conf.HostAddr, config) // TODO support ipv6
 	if err != nil {
 		return nil, err
 	}
+
 	return c, nil
 }
 
 func getKey(keyPath string) (ssh.Signer, error) {
-	key, err := io.Read(keyPath)
+	key, err := os.ReadFile(keyPath)
 	if err != nil {
 		return nil, err
 	}
 
-	return ssh.ParsePrivateKey([]byte(key))
+	return ssh.ParsePrivateKey(key)
 }
