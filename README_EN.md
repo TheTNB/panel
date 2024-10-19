@@ -124,7 +124,7 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 
 ### Server
 
-<a href="https://www.dkdun.cn/">
+<a href="https://www.dkdun.cn/aff/MQZZNVHQ">
   <img height="80" src=".github/assets/dk.png" alt="林枫云">
 </a>
 

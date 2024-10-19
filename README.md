@@ -124,7 +124,7 @@ panel-cli
 
 ### 服务器
 
-<a href="https://www.dkdun.cn/">
+<a href="https://www.dkdun.cn/aff/MQZZNVHQ">
   <img height="80" src=".github/assets/dk.png" alt="林枫云">
 </a>
 
