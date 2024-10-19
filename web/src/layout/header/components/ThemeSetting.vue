@@ -9,6 +9,7 @@ const themeStore = useThemeStore()
     <template #trigger>
       <n-color-picker
         class="mr-16 h-24 w-24"
+        :show-alpha="false"
         v-model:value="themeStore.primaryColor"
         :render-label="() => ''"
       />
