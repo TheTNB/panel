@@ -16,7 +16,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: 'monitorIndex.title',
-        icon: 'mdi:monitor',
+        icon: 'mdi:chart-line',
         role: ['admin'],
         requireAuth: true
       }

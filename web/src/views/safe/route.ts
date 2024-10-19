@@ -16,7 +16,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: '系统安全',
-        icon: 'mdi:server-security',
+        icon: 'mdi:shield-check-outline',
         role: ['admin'],
         requireAuth: true
       }

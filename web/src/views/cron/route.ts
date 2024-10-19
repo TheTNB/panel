@@ -16,7 +16,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: 'cronIndex.title',
-        icon: 'mdi:clock-outline',
+        icon: 'mdi:timer-outline',
         role: ['admin'],
         requireAuth: true
       }

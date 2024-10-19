@@ -3,20 +3,18 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'task',
-  path: '/task',
+  name: 'benchmark',
+  path: '/apps/benchmark',
   component: Layout,
-  meta: {
-    order: 100
-  },
+  isHidden: true,
   children: [
     {
-      name: 'task-index',
+      name: 'apps-benchmark-index',
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: 'taskIndex.title',
-        icon: 'mdi:table-sync',
+        title: '耗子跑分',
+        icon: 'dashicons:performance',
         role: ['admin'],
         requireAuth: true
       }

@@ -17,7 +17,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: '仪表盘',
-        icon: 'mdi:monitor-dashboard',
+        icon: 'mdi:speedometer',
         role: ['admin'],
         requireAuth: true
       }

@@ -1,6 +1,7 @@
-import type { AxiosResponse } from 'axios'
-
 import { request } from '@/utils'
+
+import type { AxiosResponse } from 'axios'
+import type { RequestConfig } from '~/types/axios'
 
 export default {
   // 面板信息
@@ -11,7 +12,7 @@ export default {
   homeApps: (): Promise<AxiosResponse<any>> => request.get('/dashboard/homeApps'),
   // 实时信息
   current: (nets: string[], disks: string[]): Promise<AxiosResponse<any>> =>
-    request.post('/dashboard/current', { nets, disks }),
+    request.post('/dashboard/current', { nets, disks }, { noNeedTip: true } as RequestConfig),
   // 系统信息
   systemInfo: (): Promise<AxiosResponse<any>> => request.get('/dashboard/systemInfo'),
   // 统计信息

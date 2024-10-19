@@ -29,7 +29,8 @@ const columns: any = [
     render(row: any) {
       return h(TheIcon, {
         icon: row.icon,
-        size: 26
+        size: 26,
+        color: `var(--primary-color)`
       })
     }
   },
