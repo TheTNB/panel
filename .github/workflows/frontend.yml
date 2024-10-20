@@ -30,7 +30,7 @@ jobs:
         # We need to run the dev server first to generate the auto-imports files
         run: |
           cp .env.production .env
-          cp settings/proxy-config.ts.example settings/proxy-config.ts
+          cp settings/proxy-config.example.ts settings/proxy-config.ts
           pnpm dev &
           sleep 5
           kill %1
