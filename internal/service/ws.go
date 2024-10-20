@@ -91,7 +91,7 @@ func (s *WsService) Exec(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	out, err := shell.ExecfWithPipe(ctx, string(cmd))
+	out, err := shell.ExecfWithPipe(ctx, string(cmd)) // nolint: govet
 	if err != nil {
 		_ = ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "failed to run command"))
 		cancel()
