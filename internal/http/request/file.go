@@ -37,6 +37,11 @@ type FileCopy struct {
 	Force  bool   `form:"force" json:"force"`
 }
 
+type FileRemoteDownload struct {
+	Path string `form:"path" json:"path" validate:"required"`
+	URL  string `form:"url" json:"url" validate:"required"`
+}
+
 type FilePermission struct {
 	Path  string `form:"path" json:"path" validate:"required"`
 	Mode  string `form:"mode" json:"mode" validate:"required"`

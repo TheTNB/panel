@@ -14,30 +14,50 @@ const compress = defineModel<boolean>('compress', { type: Boolean, required: tru
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 
 const upload = ref(false)
-const newModal = ref(false)
-const newModel = ref({
+const create = ref(false)
+const createModel = ref({
   dir: false,
   path: ''
 })
+const download = ref(false)
+const downloadModel = ref({
+  path: '',
+  url: ''
+})
 
-const showNew = (value: string) => {
-  newModel.value.dir = value !== 'file'
-  newModel.value.path = ''
-  newModal.value = true
+const showCreate = (value: string) => {
+  createModel.value.dir = value !== 'file'
+  createModel.value.path = ''
+  create.value = true
 }
 
-const handleNew = () => {
-  if (!checkName(newModel.value.path)) {
+const handleCreate = () => {
+  if (!checkName(createModel.value.path)) {
     window.$message.error('名称不合法')
     return
   }
 
-  const fullPath = path.value + '/' + newModel.value.path
-  file.create(fullPath, newModel.value.dir).then(() => {
-    newModal.value = false
+  const fullPath = path.value + '/' + createModel.value.path
+  file.create(fullPath, createModel.value.dir).then(() => {
+    create.value = false
     window.$message.success('创建成功')
     EventBus.emit('file:refresh')
   })
+}
+
+const handleDownload = () => {
+  if (!checkName(downloadModel.value.path)) {
+    window.$message.error('名称不合法')
+    return
+  }
+
+  file
+    .remoteDownload(path.value + '/' + downloadModel.value.path, downloadModel.value.url)
+    .then(() => {
+      download.value = false
+      window.$message.success('下载任务创建成功')
+      EventBus.emit('file:refresh')
+    })
 }
 
 const handleCopy = () => {
@@ -103,6 +123,23 @@ const bulkDelete = () => {
     })
   }
 }
+
+// 自动填充下载文件名
+watch(
+  () => downloadModel.value.url,
+  (newUrl) => {
+    if (!newUrl) return
+    try {
+      const url = new URL(newUrl)
+      const path = url.pathname.split('/').pop()
+      if (path) {
+        downloadModel.value.path = decodeURIComponent(path)
+      }
+    } catch (error) {
+      /* empty */
+    }
+  }
+)
 </script>
 
 <template>
@@ -112,12 +149,12 @@ const bulkDelete = () => {
         { label: '文件', value: 'file' },
         { label: '文件夹', value: 'folder' }
       ]"
-      @update:value="showNew"
+      @update:value="showCreate"
     >
       <n-button type="primary"> 创建 </n-button>
     </n-popselect>
     <n-button @click="upload = true"> 上传 </n-button>
-    <n-button style="display: none"> 远程下载 </n-button>
+    <n-button @click="download = true"> 远程下载 </n-button>
     <div ml-auto>
       <n-flex>
         <n-button v-if="marked.length" secondary type="primary" @click="handlePaste">
@@ -139,7 +176,7 @@ const bulkDelete = () => {
     </div>
   </n-flex>
   <n-modal
-    v-model:show="newModal"
+    v-model:show="create"
     preset="card"
     title="创建"
     style="width: 60vw"
@@ -148,12 +185,33 @@ const bulkDelete = () => {
     :segmented="false"
   >
     <n-space vertical>
-      <n-form :model="newModel">
+      <n-form :model="createModel">
         <n-form-item label="名称">
-          <n-input v-model:value="newModel.path" />
+          <n-input v-model:value="createModel.path" />
         </n-form-item>
       </n-form>
-      <n-button type="info" block @click="handleNew">提交</n-button>
+      <n-button type="info" block @click="handleCreate">提交</n-button>
+    </n-space>
+  </n-modal>
+  <n-modal
+    v-model:show="download"
+    preset="card"
+    title="远程下载"
+    style="width: 60vw"
+    size="huge"
+    :bordered="false"
+    :segmented="false"
+  >
+    <n-space vertical>
+      <n-form :model="downloadModel">
+        <n-form-item label="下载链接">
+          <n-input :input-props="{ type: 'url' }" v-model:value="downloadModel.url" />
+        </n-form-item>
+        <n-form-item label="保存文件名">
+          <n-input v-model:value="downloadModel.path" />
+        </n-form-item>
+      </n-form>
+      <n-button type="info" block @click="handleDownload">提交</n-button>
     </n-space>
   </n-modal>
   <upload-modal v-model:show="upload" v-model:path="path" />

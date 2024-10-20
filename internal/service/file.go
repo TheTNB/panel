@@ -17,6 +17,8 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
@@ -25,10 +27,13 @@ import (
 )
 
 type FileService struct {
+	taskRepo biz.TaskRepo
 }
 
 func NewFileService() *FileService {
-	return &FileService{}
+	return &FileService{
+		taskRepo: data.NewTaskRepo(),
+	}
 }
 
 func (s *FileService) Create(w http.ResponseWriter, r *http.Request) {
@@ -225,7 +230,25 @@ func (s *FileService) Download(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FileService) RemoteDownload(w http.ResponseWriter, r *http.Request) {
-	// TODO: 未实现
+	req, err := Bind[request.FileRemoteDownload](r)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	timestamp := time.Now().Format("20060102150405")
+	task := new(biz.Task)
+	task.Name = "下载远程文件"
+	task.Status = biz.TaskStatusWaiting
+	task.Shell = fmt.Sprintf(`wget -o /tmp/remote-download-%s.log -O '%s' '%s'`, timestamp, req.Path, req.URL)
+	task.Log = fmt.Sprintf("/tmp/remote-download-%s.log", timestamp)
+
+	if err = s.taskRepo.Push(task); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, nil)
 }
 
 func (s *FileService) Info(w http.ResponseWriter, r *http.Request) {

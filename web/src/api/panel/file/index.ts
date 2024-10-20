@@ -31,8 +31,8 @@ export default {
   copy: (source: string, target: string): Promise<AxiosResponse<any>> =>
     request.post('/file/copy', { source, target }),
   // 远程下载
-  remoteDownload: (url: string, path: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/remoteDownload', { url, path }),
+  remoteDownload: (path: string, url: string): Promise<AxiosResponse<any>> =>
+    request.post('/file/remoteDownload', { path, url }),
   // 获取文件信息
   info: (path: string): Promise<AxiosResponse<any>> =>
     request.get('/file/info', { params: { path } }),
