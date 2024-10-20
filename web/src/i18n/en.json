@@ -155,42 +155,6 @@
       }
     }
   },
-  "taskIndex": {
-    "title": "Tasks",
-    "alerts": {
-      "delete": "Task has been deleted"
-    },
-    "buttons": {
-      "delete": "delete",
-      "log": "log",
-      "undelete": "undelete"
-    },
-    "confirm": {
-      "delete": "Are you sure you want to delete the task?"
-    },
-    "columns": {
-      "name": "task name",
-      "status": "status",
-      "createdAt": "created at",
-      "updatedAt": "updated at",
-      "actions": "actions"
-    },
-    "options": {
-      "status": {
-        "finished": "finished",
-        "waiting": "waiting",
-        "failed": "failed",
-        "running": "running"
-      }
-    },
-    "logModal": {
-      "title": "Task log",
-      "autoRefresh": {
-        "on": "Auto refresh on",
-        "off": "Auto refresh off"
-      }
-    }
-  },
   "websiteIndex": {
     "title": "Websites",
     "columns": {

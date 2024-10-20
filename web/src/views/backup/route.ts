@@ -15,7 +15,7 @@ export default {
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: '数据备份',
+        title: '备份',
         icon: 'mdi:backup-outline',
         role: ['admin'],
         requireAuth: true

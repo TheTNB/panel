@@ -15,7 +15,7 @@ export default {
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: 'taskIndex.title',
+        title: '任务',
         icon: 'mdi:table-sync',
         role: ['admin'],
         requireAuth: true

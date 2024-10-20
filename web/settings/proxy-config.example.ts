@@ -24,6 +24,6 @@ const proxyConfigMappings: Record<ProxyType, ProxyConfig> = {
   ]
 }
 
-export function getProxyConfig(envType: ProxyType = 'dev'): ProxyConfig {
+export function getProxyConfigs(envType: ProxyType = 'dev'): ProxyConfig[] {
   return proxyConfigMappings[envType]
 }

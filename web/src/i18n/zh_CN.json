@@ -1,16 +1,16 @@
 {
   "name": "耗子面板",
   "certIndex": {
-    "title": "HTTPS 证书"
+    "title": "证书"
   },
   "containerIndex": {
-    "title": "容器管理"
+    "title": "容器"
   },
   "cronIndex": {
     "title": "计划任务"
   },
   "fileIndex": {
-    "title": "文件管理"
+    "title": "文件"
   },
   "homeUpdate": {
     "title": "更新面板",
@@ -33,10 +33,10 @@
     }
   },
   "monitorIndex": {
-    "title": "资源监控"
+    "title": "监控"
   },
   "appIndex": {
-    "title": "应用中心",
+    "title": "应用",
     "alerts": {
       "cache": "缓存更新成功",
       "warning": "更新应用前强烈建议先备份/快照，以免出现问题时无法回滚！",
@@ -65,7 +65,7 @@
     }
   },
   "settingIndex": {
-    "title": "面板设置",
+    "title": "设置",
     "info": "修改面板端口 / 入口后，需要在浏览器地址栏做相应修改方可打开面板！",
     "edit": {
       "toasts": {
@@ -127,7 +127,7 @@
     }
   },
   "sshIndex": {
-    "title": "SSH 终端",
+    "title": "终端",
     "alerts": {
       "save": "保存成功"
     },
@@ -155,44 +155,8 @@
       }
     }
   },
-  "taskIndex": {
-    "title": "后台任务",
-    "alerts": {
-      "delete": "任务已删除"
-    },
-    "buttons": {
-      "delete": "删除",
-      "log": "日志",
-      "undelete": "取消删除"
-    },
-    "confirm": {
-      "delete": "确定删除此任务记录吗？"
-    },
-    "columns": {
-      "name": "任务名",
-      "status": "状态",
-      "createdAt": "创建时间",
-      "updatedAt": "更新时间",
-      "actions": "操作"
-    },
-    "options": {
-      "status": {
-        "finished": "已完成",
-        "waiting": "等待中",
-        "failed": "已失败",
-        "running": "运行中"
-      }
-    },
-    "logModal": {
-      "title": "任务日志",
-      "autoRefresh": {
-        "on": "自动刷新开启",
-        "off": "自动刷新关闭"
-      }
-    }
-  },
   "websiteIndex": {
-    "title": "网站管理",
+    "title": "网站",
     "columns": {
       "name": "网站名",
       "status": "运行",
