@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/go-rat/chix"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
@@ -327,22 +328,18 @@ func (s *FileService) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	paths := make(map[string]stdos.FileInfo)
-	err = filepath.Walk(req.Path, func(path string, info stdos.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if strings.Contains(info.Name(), req.KeyWord) {
-			paths[path] = info
-		}
-		return nil
-	})
+	results, err := io.SearchX(req.Path, req.Keyword, req.Sub)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	Success(w, paths)
+	paged, total := Paginate(r, s.formatInfo(results))
+
+	Success(w, chix.M{
+		"total": total,
+		"items": paged,
+	})
 }
 
 func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
@@ -378,14 +375,27 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	var paths []any
-	for _, file := range list {
-		info, _ := file.Info()
-		stat := info.Sys().(*syscall.Stat_t)
+	paged, total := Paginate(r, s.formatDir(req.Path, list))
 
+	Success(w, chix.M{
+		"total": total,
+		"items": paged,
+	})
+}
+
+// formatDir 格式化目录信息
+func (s *FileService) formatDir(base string, entries []stdos.DirEntry) []any {
+	var paths []any
+	for _, file := range entries {
+		info, err := file.Info()
+		if err != nil {
+			continue
+		}
+
+		stat := info.Sys().(*syscall.Stat_t)
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
-			"full":     filepath.Join(req.Path, info.Name()),
+			"full":     filepath.Join(base, info.Name()),
 			"size":     str.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
@@ -395,21 +405,52 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 			"gid":      stat.Gid,
 			"hidden":   io.IsHidden(info.Name()),
 			"symlink":  io.IsSymlink(info.Mode()),
-			"link":     io.GetSymlink(filepath.Join(req.Path, info.Name())),
+			"link":     io.GetSymlink(filepath.Join(base, info.Name())),
 			"dir":      info.IsDir(),
 			"modify":   info.ModTime().Format(time.DateTime),
 		})
 	}
 
-	paged, total := Paginate(r, paths)
-
-	Success(w, chix.M{
-		"total": total,
-		"items": paged,
-	})
+	return paths
 }
 
-// setPermission
+// formatInfo 格式化文件信息
+func (s *FileService) formatInfo(infos map[string]stdos.FileInfo) []map[string]any {
+	var paths []map[string]any
+	for path, info := range infos {
+		stat := info.Sys().(*syscall.Stat_t)
+		paths = append(paths, map[string]any{
+			"name":     info.Name(),
+			"full":     path,
+			"size":     str.FormatBytes(float64(info.Size())),
+			"mode_str": info.Mode().String(),
+			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
+			"owner":    os.GetUser(stat.Uid),
+			"group":    os.GetGroup(stat.Gid),
+			"uid":      stat.Uid,
+			"gid":      stat.Gid,
+			"hidden":   io.IsHidden(info.Name()),
+			"symlink":  io.IsSymlink(info.Mode()),
+			"link":     io.GetSymlink(path),
+			"dir":      info.IsDir(),
+			"modify":   info.ModTime().Format(time.DateTime),
+		})
+	}
+
+	slices.SortFunc(paths, func(a, b map[string]any) int {
+		if cast.ToBool(a["dir"]) && !cast.ToBool(b["dir"]) {
+			return -1
+		}
+		if !cast.ToBool(a["dir"]) && cast.ToBool(b["dir"]) {
+			return 1
+		}
+		return strings.Compare(strings.ToLower(cast.ToString(a["name"])), strings.ToLower(cast.ToString(b["name"])))
+	})
+
+	return paths
+}
+
+// setPermission 设置权限
 func (s *FileService) setPermission(path string, mode stdos.FileMode, owner, group string) {
 	_ = io.Chmod(path, mode)
 	_ = io.Chown(path, owner, group)

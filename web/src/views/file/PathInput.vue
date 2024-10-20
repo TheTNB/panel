@@ -4,6 +4,7 @@ import { onUnmounted } from 'vue'
 
 import EventBus from '@/utils/event'
 import { checkPath } from '@/utils/file'
+import SearchModal from '@/views/file/SearchModal.vue'
 
 const path = defineModel<string>('path', { type: String, required: true })
 const isInput = ref(false)
@@ -12,6 +13,12 @@ const input = ref('www')
 
 const history: string[] = []
 let current = -1
+
+const searchModal = ref(false)
+const search = ref({
+  keyword: '',
+  sub: false
+})
 
 const handleInput = () => {
   isInput.value = true
@@ -84,7 +91,7 @@ const handlePushHistory = (path: string) => {
 }
 
 const handleSearch = () => {
-  window.$message.info('搜索功能暂未实现')
+  searchModal.value = true
 }
 
 watch(
@@ -141,9 +148,9 @@ onUnmounted(() => {
       />
     </n-input-group>
     <n-input-group w-400>
-      <n-input placeholder="请输入搜索内容">
+      <n-input v-model:value="search.keyword" placeholder="请输入搜索内容">
         <template #suffix>
-          <n-checkbox> 包含子目录 </n-checkbox>
+          <n-checkbox v-model:checked="search.sub"> 包含子目录 </n-checkbox>
         </template>
       </n-input>
       <n-button type="primary" @click="handleSearch">
@@ -151,6 +158,12 @@ onUnmounted(() => {
       </n-button>
     </n-input-group>
   </n-flex>
+  <search-modal
+    v-model:show="searchModal"
+    v-model:path="path"
+    v-model:keyword="search.keyword"
+    v-model:sub="search.sub"
+  />
 </template>
 
 <style scoped lang="scss"></style>

@@ -71,13 +71,8 @@ const columns: DataTableColumns<RowData> = [
     title: '名称',
     key: 'name',
     minWidth: 180,
-    ellipsis: {
-      tooltip: true
-    },
     defaultSortOrder: false,
-    sorter(row1, row2) {
-      return row1.name - row2.name
-    },
+    sorter: 'default',
     render(row) {
       let icon = 'bi:file-earmark'
       if (row.dir) {
@@ -388,7 +383,6 @@ const handleRename = () => {
   const target = path.value + '/' + renameModel.value.target
   if (!checkName(renameModel.value.source) || !checkName(renameModel.value.target)) {
     window.$message.error('名称不合法')
-    console.log(source, target)
     return
   }
 
@@ -500,8 +494,6 @@ const handleSorterChange = (sorter: {
 }) => {
   if (!sorter || sorter.columnKey === 'name') {
     if (!loading.value) {
-      console.log(sorter)
-      console.log(sorter.order)
       switch (sorter.order) {
         case 'ascend':
           sort.value = 'asc'

@@ -1,5 +1,11 @@
 package request
 
+import (
+	"net/http"
+
+	"github.com/spf13/cast"
+)
+
 type FileList struct {
 	Path string `json:"path" form:"path" validate:"required"`
 	Sort string `json:"sort" form:"sort"`
@@ -50,5 +56,11 @@ type FileUnCompress struct {
 
 type FileSearch struct {
 	Path    string `form:"path" json:"path" validate:"required"`
-	KeyWord string `form:"keyword" json:"keyword" validate:"required"`
+	Keyword string `form:"keyword" json:"keyword" validate:"required"`
+	Sub     bool   `form:"sub" json:"sub"`
+}
+
+func (r *FileSearch) Prepare(req *http.Request) error {
+	r.Sub = cast.ToBool(req.FormValue("sub"))
+	return nil
 }

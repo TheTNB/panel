@@ -232,7 +232,7 @@ func Http(r chi.Router) {
 			r.Post("/permission", file.Permission)
 			r.Post("/compress", file.Compress)
 			r.Post("/unCompress", file.UnCompress)
-			r.Post("/search", file.Search)
+			r.Get("/search", file.Search)
 			r.Get("/list", file.List)
 		})
 

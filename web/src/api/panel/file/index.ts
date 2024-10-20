@@ -50,8 +50,14 @@ export default {
   unCompress: (file: string, path: string): Promise<AxiosResponse<any>> =>
     request.post('/file/unCompress', { file, path }),
   // 搜索文件
-  search: (keyword: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/search', { keyword }),
+  search: (
+    path: string,
+    keyword: string,
+    sub: boolean,
+    page: number,
+    limit: number
+  ): Promise<AxiosResponse<any>> =>
+    request.get('/file/search', { params: { path, keyword, sub, page, limit } }),
   // 获取文件列表
   list: (path: string, page: number, limit: number, sort: string): Promise<AxiosResponse<any>> =>
     request.get('/file/list', { params: { path, page, limit, sort } })

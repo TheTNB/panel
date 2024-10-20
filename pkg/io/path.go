@@ -1,6 +1,7 @@
 package io
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -146,11 +147,6 @@ func TempDir(prefix string) (string, error) {
 	return os.MkdirTemp("", prefix)
 }
 
-// TempFile 创建临时文件
-func TempFile(dir, prefix string) (*os.File, error) {
-	return os.CreateTemp(dir, prefix)
-}
-
 // ReadDir 读取目录
 func ReadDir(path string) ([]os.DirEntry, error) {
 	return os.ReadDir(path)
@@ -189,4 +185,58 @@ func CountX(path string) (int64, error) {
 
 	count := len(string(out))
 	return int64(count), nil
+}
+
+// Search 查找文件/文件夹
+func Search(path, keyword string, sub bool) (map[string]os.FileInfo, error) {
+	paths := make(map[string]os.FileInfo)
+	baseDepth := strings.Count(filepath.Clean(path), string(os.PathSeparator))
+
+	err := filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !sub && strings.Count(p, string(os.PathSeparator)) > baseDepth+1 {
+			return filepath.SkipDir
+		}
+		if strings.Contains(info.Name(), keyword) {
+			paths[p] = info
+		}
+		return nil
+	})
+
+	return paths, err
+}
+
+// SearchX 查找文件/文件夹（find命令）
+func SearchX(path, keyword string, sub bool) (map[string]os.FileInfo, error) {
+	paths := make(map[string]os.FileInfo)
+
+	var cmd *exec.Cmd
+	if sub {
+		cmd = exec.Command("find", path, "-name", "*"+keyword+"*")
+	} else {
+		cmd = exec.Command("find", path, "-maxdepth", "1", "-name", "*"+keyword+"*")
+	}
+	var out bytes.Buffer
+	cmd.Stdout = &out
+
+	if err := cmd.Run(); err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(out.String(), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		info, err := os.Stat(line)
+		if err != nil {
+			return nil, err
+		}
+		paths[line] = info
+	}
+
+	return paths, nil
 }
