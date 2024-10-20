@@ -2,8 +2,10 @@ package shell
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -89,4 +91,20 @@ func ExecfWithOutput(shell string, args ...any) error {
 	cmd.Stderr = os.Stderr
 
 	return cmd.Run()
+}
+
+// ExecfWithPipe 执行 shell 命令并返回管道
+func ExecfWithPipe(ctx context.Context, shell string, args ...any) (out io.ReadCloser, err error) {
+	_ = os.Setenv("LC_ALL", "C")
+
+	cmd := exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(shell, args...))
+
+	out, err = cmd.StdoutPipe()
+	if err != nil {
+		return
+	}
+
+	cmd.Stderr = cmd.Stdout
+	err = cmd.Start()
+	return
 }

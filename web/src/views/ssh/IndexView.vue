@@ -3,6 +3,7 @@ defineOptions({
   name: 'ssh-index'
 })
 
+import ws from '@/api/ws'
 import { AttachAddon } from '@xterm/addon-attach'
 import { ClipboardAddon } from '@xterm/addon-clipboard'
 import { FitAddon } from '@xterm/addon-fit'
@@ -25,12 +26,8 @@ const model = ref({
 
 const terminal = ref<HTMLElement | null>(null)
 const term = ref()
-const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-const ws = new WebSocket(`${protocol}://${window.location.host}/api/ssh/session`)
-const attachAddon = new AttachAddon(ws)
+let sshWs: WebSocket | null = null
 const fitAddon = new FitAddon()
-const clipboardAddon = new ClipboardAddon()
-const webLinksAddon = new WebLinksAddon()
 const webglAddon = new WebglAddon()
 
 const handleSave = () => {
@@ -51,26 +48,27 @@ const getInfo = () => {
 }
 
 const openSession = () => {
-  term.value = new Terminal({
-    lineHeight: 1.2,
-    fontSize: 14,
-    fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
-    cursorBlink: true,
-    cursorStyle: 'underline',
-    tabStopWidth: 4,
-    theme: { background: '#111', foreground: '#fff' }
-  })
+  ws.ssh().then((ws) => {
+    sshWs = ws
+    term.value = new Terminal({
+      lineHeight: 1.2,
+      fontSize: 14,
+      fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+      cursorBlink: true,
+      cursorStyle: 'underline',
+      tabStopWidth: 4,
+      theme: { background: '#111', foreground: '#fff' }
+    })
 
-  term.value.loadAddon(attachAddon)
-  term.value.loadAddon(fitAddon)
-  term.value.loadAddon(clipboardAddon)
-  term.value.loadAddon(webLinksAddon)
-  term.value.loadAddon(webglAddon)
-  webglAddon.onContextLoss(() => {
-    webglAddon.dispose()
-  })
+    term.value.loadAddon(new AttachAddon(ws))
+    term.value.loadAddon(fitAddon)
+    term.value.loadAddon(new ClipboardAddon())
+    term.value.loadAddon(new WebLinksAddon())
+    term.value.loadAddon(webglAddon)
+    webglAddon.onContextLoss(() => {
+      webglAddon.dispose()
+    })
 
-  ws.onopen = () => {
     term.value.open(terminal.value!)
     fitAddon.fit()
     term.value.focus()
@@ -81,33 +79,33 @@ const openSession = () => {
       },
       false
     )
-  }
 
-  ws.onclose = () => {
-    term.value.write('\r\n连接已关闭，请刷新重试。')
-    term.value.write('\r\nConnection closed. Please refresh.')
-    window.removeEventListener('resize', () => {
-      fitAddon.fit()
-    })
-  }
-
-  ws.onerror = (event) => {
-    term.value.write('\r\n连接发生错误，请刷新重试。')
-    term.value.write('\r\nConnection error. Please refresh .')
-    console.error(event)
-    ws.close()
-  }
-
-  term.value.onResize(({ cols, rows }: { cols: number; rows: number }) => {
-    if (ws.readyState === 1) {
-      ws.send(
-        JSON.stringify({
-          resize: true,
-          columns: cols,
-          rows: rows
-        })
-      )
+    ws.onclose = () => {
+      term.value.write('\r\n连接已关闭，请刷新重试。')
+      term.value.write('\r\nConnection closed. Please refresh.')
+      window.removeEventListener('resize', () => {
+        fitAddon.fit()
+      })
     }
+
+    ws.onerror = (event) => {
+      term.value.write('\r\n连接发生错误，请刷新重试。')
+      term.value.write('\r\nConnection error. Please refresh .')
+      console.error(event)
+      ws.close()
+    }
+
+    term.value.onResize(({ cols, rows }: { cols: number; rows: number }) => {
+      if (ws.readyState === 1) {
+        ws.send(
+          JSON.stringify({
+            resize: true,
+            columns: cols,
+            rows: rows
+          })
+        )
+      }
+    })
   })
 }
 
@@ -128,6 +126,12 @@ const onTermWheel = (event: WheelEvent) => {
 onMounted(() => {
   getInfo()
   openSession()
+})
+
+onUnmounted(() => {
+  if (sshWs) {
+    sshWs.close()
+  }
 })
 </script>
 

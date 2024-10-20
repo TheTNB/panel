@@ -80,6 +80,7 @@ func (t *Turn) Handle(context context.Context) error {
 		default:
 			_, data, err := t.ws.ReadMessage()
 			if err != nil {
+				// 通常是客户端关闭连接
 				return fmt.Errorf("reading ws message err: %v", err)
 			}
 

@@ -3,47 +3,44 @@ defineOptions({
   name: 'task-index'
 })
 
-import Editor from '@guolao/vue-monaco-editor'
-import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { LogInst, NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import task from '@/api/panel/task'
+import ws from '@/api/ws'
 import { formatDateTime, renderIcon } from '@/utils'
 import type { Task } from '@/views/task/types'
 
-const { t } = useI18n()
 const taskLogModal = ref(false)
 const taskLog = ref('')
-
-const autoRefresh = ref(false)
-const currentTaskId = ref(0)
+const logRef = ref<LogInst | null>(null)
+let logWs: WebSocket | null = null
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
   {
-    title: t('taskIndex.columns.name'),
+    title: '任务名',
     key: 'name',
     minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
-    title: t('taskIndex.columns.status'),
+    title: '状态',
     key: 'status',
     width: 150,
     ellipsis: { tooltip: true },
     render(row: any) {
       return row.status === 'finished'
-        ? t('taskIndex.options.status.finished')
+        ? '已完成'
         : row.status === 'waiting'
-          ? t('taskIndex.options.status.waiting')
+          ? '等待中'
           : row.status === 'failed'
-            ? t('taskIndex.options.status.failed')
-            : t('taskIndex.options.status.running')
+            ? '已失败'
+            : '运行中'
     }
   },
   {
-    title: t('taskIndex.columns.createdAt'),
+    title: '创建时间',
     key: 'created_at',
     width: 200,
     ellipsis: { tooltip: true },
@@ -52,7 +49,7 @@ const columns: any = [
     }
   },
   {
-    title: t('taskIndex.columns.updatedAt'),
+    title: '完成时间',
     key: 'updated_at',
     width: 200,
     ellipsis: { tooltip: true },
@@ -61,7 +58,7 @@ const columns: any = [
     }
   },
   {
-    title: t('taskIndex.columns.actions'),
+    title: '操作',
     key: 'actions',
     width: 200,
     align: 'center',
@@ -76,14 +73,12 @@ const columns: any = [
                 type: 'warning',
                 secondary: true,
                 onClick: () => {
-                  handleShowLog(row.id)
-                  currentTaskId.value = row.id
+                  handleShowLog(row.log)
                   taskLogModal.value = true
-                  autoRefresh.value = true
                 }
               },
               {
-                default: () => t('taskIndex.buttons.log'),
+                default: () => '日志',
                 icon: renderIcon('material-symbols:visibility', { size: 14 })
               }
             )
@@ -92,14 +87,11 @@ const columns: any = [
           ? h(
               NPopconfirm,
               {
-                onPositiveClick: () => handleDelete(row.id),
-                onNegativeClick: () => {
-                  window.$message.info(t('taskIndex.buttons.undelete'))
-                }
+                onPositiveClick: () => handleDelete(row.id)
               },
               {
                 default: () => {
-                  return t('taskIndex.confirm.delete')
+                  return '确定要删除吗？'
                 },
                 trigger: () => {
                   return h(
@@ -110,7 +102,7 @@ const columns: any = [
                       style: 'margin-left: 15px;'
                     },
                     {
-                      default: () => t('taskIndex.buttons.delete'),
+                      default: () => '删除',
                       icon: renderIcon('material-symbols:delete-outline', { size: 14 })
                     }
                   )
@@ -139,23 +131,39 @@ const pagination = reactive({
 
 const handleDelete = (id: number) => {
   task.delete(id).then(() => {
-    window.$message.success(t('taskIndex.alerts.delete'))
+    window.$message.success('删除成功')
     onPageChange(pagination.page)
   })
 }
 
-const handleShowLog = (id: number) => {
-  task
-    .get(id)
-    .then((res) => {
-      taskLog.value = res.data.log
+const handleShowLog = (path: string) => {
+  const cmd = `tail -f ${path}`
+  ws.exec(cmd)
+    .then((ws: WebSocket) => {
+      logWs = ws
+      taskLogModal.value = true
+      ws.onmessage = (event) => {
+        taskLog.value += event.data + '\n'
+        const lines = taskLog.value.split('\n')
+        if (lines.length > 2000) {
+          taskLog.value = lines.slice(lines.length - 2000).join('\n')
+        }
+      }
     })
     .catch(() => {
-      autoRefresh.value = false
+      window.$message.error('获取日志流失败')
     })
 }
 
-const getTaskList = async (page: number, limit: number) => {
+const handleCloseLog = () => {
+  if (logWs) {
+    logWs.close()
+  }
+  taskLogModal.value = false
+  taskLog.value = ''
+}
+
+const fetchTaskList = async (page: number, limit: number) => {
   const { data } = await task.list(page, limit)
   return data
 }
@@ -166,7 +174,7 @@ const onChecked = (rowKeys: any) => {
 
 const onPageChange = (page: number) => {
   pagination.page = page
-  getTaskList(page, pagination.pageSize).then((res) => {
+  fetchTaskList(page, pagination.pageSize).then((res) => {
     tasks.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
@@ -178,30 +186,16 @@ const onPageSizeChange = (pageSize: number) => {
   onPageChange(1)
 }
 
-let timer: any = null
-const setAutoRefreshTimer = () => {
-  timer = setInterval(() => {
-    handleShowLog(currentTaskId.value)
-  }, 2000)
-}
-
-watch(
-  () => autoRefresh.value,
-  (value) => {
-    if (value) {
-      setAutoRefreshTimer()
-    } else {
-      clearInterval(timer)
-    }
-  },
-  { immediate: true }
-)
-
 onMounted(() => {
   onPageChange(pagination.page)
 })
-onUnmounted(() => {
-  clearInterval(timer)
+
+watchEffect(() => {
+  if (taskLog.value) {
+    nextTick(() => {
+      logRef.value?.scrollTo({ position: 'bottom', silent: true })
+    })
+  }
 })
 </script>
 
@@ -227,42 +221,14 @@ onUnmounted(() => {
   <n-modal
     v-model:show="taskLogModal"
     preset="card"
-    :title="$t('taskIndex.logModal.title')"
+    title="任务日志"
     style="width: 80vw"
     size="huge"
     :bordered="false"
     :segmented="false"
-    @close="
-      () => {
-        autoRefresh = false
-        taskLogModal = false
-      }
-    "
-    @mask-click="
-      () => {
-        autoRefresh = false
-        taskLogModal = false
-      }
-    "
+    @close="handleCloseLog"
+    @mask-click="handleCloseLog"
   >
-    <template #header-extra>
-      <n-switch v-model:value="autoRefresh" style="margin-right: 10px">
-        <template #checked>{{ $t('taskIndex.logModal.autoRefresh.on') }}</template>
-        <template #unchecked>{{ $t('taskIndex.logModal.autoRefresh.off') }}</template>
-      </n-switch>
-    </template>
-    <Editor
-      v-model:value="taskLog"
-      language="shell"
-      theme="vs-dark"
-      height="60vh"
-      mt-8
-      :options="{
-        automaticLayout: true,
-        formatOnType: true,
-        formatOnPaste: true,
-        readOnly: true
-      }"
-    />
+    <n-log ref="logRef" :log="taskLog" trim :rows="40" />
   </n-modal>
 </template>

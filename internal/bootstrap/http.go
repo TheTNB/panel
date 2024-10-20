@@ -23,6 +23,7 @@ func initHttp() {
 
 	// add route
 	route.Http(app.Http)
+	route.Ws(app.Http)
 	apps.Boot(app.Http)
 
 	srv := &http.Server{

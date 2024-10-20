@@ -161,7 +161,6 @@ func Http(r chi.Router) {
 			ssh := service.NewSSHService()
 			r.Get("/info", ssh.GetInfo)
 			r.Post("/info", ssh.UpdateInfo)
-			r.Get("/session", ssh.Session)
 		})
 
 		r.Route("/container", func(r chi.Router) {

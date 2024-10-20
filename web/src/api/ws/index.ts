@@ -1,0 +1,24 @@
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+const base = `${protocol}://${window.location.host}/api/ws/`
+
+export default {
+  // 执行命令
+  exec: (cmd: string): Promise<WebSocket> => {
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(base + 'exec')
+      ws.onopen = () => {
+        ws.send(cmd)
+        resolve(ws)
+      }
+      ws.onerror = (e) => reject(e)
+    })
+  },
+  // 连接SSH
+  ssh: (): Promise<WebSocket> => {
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(base + 'ssh')
+      ws.onopen = () => resolve(ws)
+      ws.onerror = (e) => reject(e)
+    })
+  }
+}
