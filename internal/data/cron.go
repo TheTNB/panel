@@ -92,6 +92,9 @@ panel-cli cutoff website -n %s -p %s
 panel-cli cutoff clear -t website -f %s -s %d -p %s
 `, req.Target, req.BackupPath, req.Target, req.Save, req.BackupPath)
 	}
+	if req.Type == "shell" {
+		script = req.Script
+	}
 
 	shellDir := fmt.Sprintf("%s/server/cron/", app.Root)
 	shellLogDir := fmt.Sprintf("%s/server/cron/logs/", app.Root)
@@ -198,24 +201,6 @@ func (r *cronRepo) Status(id uint, status bool) error {
 	cron.Status = status
 
 	return app.Orm.Save(cron).Error
-}
-
-func (r *cronRepo) Log(id uint) (string, error) {
-	cron, err := r.Get(id)
-	if err != nil {
-		return "", err
-	}
-
-	if !io.Exists(cron.Log) {
-		return "", errors.New("日志文件不存在")
-	}
-
-	log, err := shell.Execf("tail -n 1000 '%s'", cron.Log)
-	if err != nil {
-		return "", err
-	}
-
-	return log, nil
 }
 
 // addToSystem 添加到系统
