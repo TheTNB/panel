@@ -2,6 +2,7 @@
 import ws from '@/api/ws'
 import type { LogInst } from 'naive-ui'
 
+const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps({
   path: String
 })
@@ -28,7 +29,7 @@ const init = async () => {
     })
 }
 
-const close = () => {
+const handleClose = () => {
   if (logWs) {
     logWs.close()
   }
@@ -38,7 +39,7 @@ const close = () => {
 watch(
   () => props.path,
   () => {
-    close()
+    handleClose()
     init()
   }
 )
@@ -51,21 +52,25 @@ watchEffect(() => {
   }
 })
 
-onMounted(() => {
-  init()
-})
-
-onUnmounted(() => {
-  close()
-})
-
 defineExpose({
   init
 })
 </script>
 
 <template>
-  <n-log ref="logRef" :log="log" trim :rows="40" />
+  <n-modal
+    v-model:show="show"
+    preset="card"
+    title="日志"
+    style="width: 80vw"
+    size="huge"
+    :bordered="false"
+    :segmented="false"
+    @close="handleClose"
+    @mask-click="handleClose"
+  >
+    <n-log ref="logRef" :log="log" trim :rows="40" />
+  </n-modal>
 </template>
 
 <style scoped lang="scss"></style>

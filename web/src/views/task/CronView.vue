@@ -1,9 +1,4 @@
 <script setup lang="ts">
-defineOptions({
-  name: 'cron-index'
-})
-
-import CreateModal from '@/views/task/CreateModal.vue'
 import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
 
@@ -267,7 +262,7 @@ onMounted(() => {
     </n-card>
   </n-flex>
   <create-modal v-model:show="createModal" />
-  <realtime-log v-model:show="logModal" :path="logPath" />
+  <realtime-log-modal v-model:show="logModal" :path="logPath" />
   <n-modal
     v-model:show="editModal"
     preset="card"

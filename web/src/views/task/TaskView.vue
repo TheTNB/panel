@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import RealtimeLog from '@/components/common/RealtimeLog.vue'
-
-defineOptions({
-  name: 'task-index'
-})
-
 import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import task from '@/api/panel/task'
+import RealtimeLogModal from '@/components/common/RealtimeLogModal.vue'
 import { formatDateTime, renderIcon } from '@/utils'
 import type { Task } from '@/views/task/types'
 
@@ -180,5 +175,5 @@ onMounted(() => {
       @update:page-size="onPageSizeChange"
     />
   </n-flex>
-  <realtime-log v-model:show="logModal" :path="logPath" />
+  <realtime-log-modal v-model:show="logModal" :path="logPath" />
 </template>

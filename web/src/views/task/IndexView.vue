@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineOptions({
+  name: 'task-index'
+})
+
 import CronView from '@/views/task/CronView.vue'
 import TaskView from '@/views/task/TaskView.vue'
 

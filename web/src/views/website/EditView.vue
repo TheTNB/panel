@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import ws from '@/api/ws'
-
 defineOptions({
   name: 'website-edit'
 })
 
 import Editor from '@guolao/vue-monaco-editor'
-import { type LogInst, NButton } from 'naive-ui'
+import { NButton } from 'naive-ui'
 
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
@@ -16,9 +14,6 @@ const current = ref('listen')
 const route = useRoute()
 const { id } = route.params
 
-const log = ref('')
-const logRef = ref<LogInst | null>(null)
-let logWs: WebSocket | null = null
 const setting = ref<WebsiteSetting>({
   id: 0,
   name: '',
@@ -101,24 +96,6 @@ const handleReset = async () => {
   })
 }
 
-const initLog = async () => {
-  const cmd = `tail -n 40 -f ${setting.value.log}`
-  ws.exec(cmd)
-    .then((ws: WebSocket) => {
-      logWs = ws
-      ws.onmessage = (event) => {
-        log.value += event.data + '\n'
-        const lines = log.value.split('\n')
-        if (lines.length > 2000) {
-          log.value = lines.slice(lines.length - 2000).join('\n')
-        }
-      }
-    })
-    .catch(() => {
-      window.$message.error('获取日志流失败')
-    })
-}
-
 const clearLog = async () => {
   await website.clearLog(Number(id)).then(() => {
     getWebsiteSetting()
@@ -141,24 +118,9 @@ const onCreateListen = () => {
   }
 }
 
-watchEffect(() => {
-  if (log.value) {
-    nextTick(() => {
-      logRef.value?.scrollTo({ position: 'bottom', silent: true })
-    })
-  }
-})
-
 onMounted(async () => {
   await getWebsiteSetting()
   await getPhpAndDb()
-  await initLog()
-})
-
-onUnmounted(() => {
-  if (logWs) {
-    logWs.close()
-  }
 })
 </script>
 
@@ -369,7 +331,7 @@ onUnmounted(() => {
               查看。
             </n-alert>
           </n-flex>
-          <n-log ref="logRef" :log="log" trim :rows="40" />
+          <realtime-log :path="setting.log" />
         </n-flex>
       </n-tab-pane>
     </n-tabs>
