@@ -114,19 +114,3 @@ func (s *CronService) Status(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, nil)
 }
-
-func (s *CronService) Log(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	log, err := s.cronRepo.Log(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, log)
-}

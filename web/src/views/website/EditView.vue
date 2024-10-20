@@ -1,18 +1,24 @@
 <script setup lang="ts">
+import ws from '@/api/ws'
+
 defineOptions({
   name: 'website-edit'
 })
 
 import Editor from '@guolao/vue-monaco-editor'
-import { NButton } from 'naive-ui'
+import { type LogInst, NButton } from 'naive-ui'
 
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
 import type { WebsiteListen, WebsiteSetting } from '@/views/website/types'
 
+const current = ref('listen')
 const route = useRoute()
 const { id } = route.params
 
+const log = ref('')
+const logRef = ref<LogInst | null>(null)
+let logWs: WebSocket | null = null
 const setting = ref<WebsiteSetting>({
   id: 0,
   name: '',
@@ -95,6 +101,24 @@ const handleReset = async () => {
   })
 }
 
+const initLog = async () => {
+  const cmd = `tail -n 40 -f ${setting.value.log}`
+  ws.exec(cmd)
+    .then((ws: WebSocket) => {
+      logWs = ws
+      ws.onmessage = (event) => {
+        log.value += event.data + '\n'
+        const lines = log.value.split('\n')
+        if (lines.length > 2000) {
+          log.value = lines.slice(lines.length - 2000).join('\n')
+        }
+      }
+    })
+    .catch(() => {
+      window.$message.error('获取日志流失败')
+    })
+}
+
 const clearLog = async () => {
   await website.clearLog(Number(id)).then(() => {
     getWebsiteSetting()
@@ -117,26 +141,61 @@ const onCreateListen = () => {
   }
 }
 
-onMounted(() => {
-  getWebsiteSetting()
-  getPhpAndDb()
+watchEffect(() => {
+  if (log.value) {
+    nextTick(() => {
+      logRef.value?.scrollTo({ position: 'bottom', silent: true })
+    })
+  }
+})
+
+onMounted(async () => {
+  await getWebsiteSetting()
+  await getPhpAndDb()
+  await initLog()
+})
+
+onUnmounted(() => {
+  if (logWs) {
+    logWs.close()
+  }
 })
 </script>
 
 <template>
   <common-page show-footer :title="title">
     <template #action>
-      <div flex items-center>
-        <n-tag type="warning">如果您修改了原文，那么点击保存后，其余的修改将不会生效！</n-tag>
-        <n-button class="ml-16" type="primary" @click="handleSave">
+      <n-flex>
+        <n-tag v-if="current === 'config'" type="warning">
+          如果您修改了原文，那么点击保存后，其余的修改将不会生效！
+        </n-tag>
+        <n-popconfirm v-if="current === 'config'" @positive-click="handleReset">
+          <template #trigger>
+            <n-button type="success">
+              <TheIcon :size="18" icon="material-symbols:refresh" />
+              重置配置
+            </n-button>
+          </template>
+          确定要重置配置吗？
+        </n-popconfirm>
+        <n-button v-if="current !== 'log'" class="ml-16" type="primary" @click="handleSave">
           <TheIcon :size="18" icon="material-symbols:save-outline" />
           保存
         </n-button>
-      </div>
+        <n-popconfirm v-if="current === 'log'" @positive-click="clearLog">
+          <template #trigger>
+            <n-button type="primary">
+              <TheIcon :size="18" icon="material-symbols:delete-outline" />
+              清空日志
+            </n-button>
+          </template>
+          确定要清空吗？
+        </n-popconfirm>
+      </n-flex>
     </template>
 
-    <n-tabs type="line" animated>
-      <n-tab-pane name="domain" tab="域名监听">
+    <n-tabs v-model:value="current" type="line" animated>
+      <n-tab-pane name="listen" tab="域名监听">
         <n-form v-if="setting">
           <n-form-item label="域名">
             <n-dynamic-input
@@ -262,8 +321,8 @@ onMounted(() => {
         <n-skeleton v-else text :repeat="10" />
       </n-tab-pane>
       <n-tab-pane name="rewrite" tab="伪静态">
-        <n-space vertical>
-          <n-alert type="info">
+        <n-flex vertical>
+          <n-alert type="info" w-full>
             设置伪静态规则，填入
             <n-tag>location</n-tag>
             部分即可
@@ -280,24 +339,13 @@ onMounted(() => {
               formatOnPaste: true
             }"
           />
-        </n-space>
+        </n-flex>
       </n-tab-pane>
       <n-tab-pane name="config" tab="配置原文">
-        <n-space vertical>
-          <n-space flex items-center>
-            <n-alert type="warning">
-              如果您不了解配置规则，请勿随意修改，否则可能会导致网站无法访问或面板功能异常！如果已经遇到问题，可尝试重置配置！
-            </n-alert>
-            <n-popconfirm @positive-click="handleReset">
-              <template #trigger>
-                <n-button type="success">
-                  <TheIcon :size="18" icon="material-symbols:refresh" />
-                  重置配置
-                </n-button>
-              </template>
-              确定要重置配置吗？
-            </n-popconfirm>
-          </n-space>
+        <n-flex vertical>
+          <n-alert type="warning" w-full>
+            如果您不了解配置规则，请勿随意修改，否则可能会导致网站无法访问或面板功能异常！如果已经遇到问题，可尝试重置配置！
+          </n-alert>
           <Editor
             v-if="setting"
             v-model:value="setting.raw"
@@ -310,33 +358,19 @@ onMounted(() => {
               formatOnPaste: true
             }"
           />
-        </n-space>
+        </n-flex>
       </n-tab-pane>
       <n-tab-pane name="log" tab="访问日志">
-        <n-space vertical>
-          <n-popconfirm @positive-click="clearLog">
-            <template #trigger>
-              <n-button type="primary">
-                <TheIcon :size="18" icon="material-symbols:delete-outline" />
-                清空日志
-              </n-button>
-            </template>
-            确定要清空吗？
-          </n-popconfirm>
-          <Editor
-            v-if="setting"
-            v-model:value="setting.log"
-            language="ini"
-            theme="vs-dark"
-            height="60vh"
-            :options="{
-              automaticLayout: true,
-              formatOnType: true,
-              formatOnPaste: true,
-              readOnly: true
-            }"
-          />
-        </n-space>
+        <n-flex vertical>
+          <n-flex flex items-center>
+            <n-alert type="warning" w-full>
+              全部日志可通过下载文件
+              <n-tag>{{ setting.log }}</n-tag>
+              查看。
+            </n-alert>
+          </n-flex>
+          <n-log ref="logRef" :log="log" trim :rows="40" />
+        </n-flex>
       </n-tab-pane>
     </n-tabs>
   </common-page>

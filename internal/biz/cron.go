@@ -26,5 +26,4 @@ type CronRepo interface {
 	Update(req *request.CronUpdate) error
 	Delete(id uint) error
 	Status(id uint, status bool) error
-	Log(id uint) (string, error)
 }

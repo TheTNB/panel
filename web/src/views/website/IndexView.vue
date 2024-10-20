@@ -370,7 +370,7 @@ onMounted(() => {
 
 <template>
   <common-page show-footer>
-    <n-space vertical size="large">
+    <n-flex vertical size="large">
       <n-card rounded-10>
         <n-space>
           <n-button type="primary" @click="createModal = true">
@@ -400,7 +400,7 @@ onMounted(() => {
         @update:page="onPageChange"
         @update:page-size="onPageSizeChange"
       />
-    </n-space>
+    </n-flex>
   </common-page>
   <n-modal
     v-model:show="createModal"

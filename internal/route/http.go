@@ -128,7 +128,6 @@ func Http(r chi.Router) {
 			r.Get("/{id}", cron.Get)
 			r.Delete("/{id}", cron.Delete)
 			r.Post("/{id}/status", cron.Status)
-			r.Get("/{id}/log", cron.Log)
 		})
 
 		r.Route("/safe", func(r chi.Router) {

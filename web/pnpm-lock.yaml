@@ -11,6 +11,9 @@ importers:
       '@guolao/vue-monaco-editor':
         specifier: ^1.5.4
         version: 1.5.4(monaco-editor@0.52.0)(vue@3.5.12(typescript@5.6.3))
+      '@vue-js-cron/naive-ui':
+        specifier: ^2.0.5
+        version: 2.0.5
       '@vueuse/core':
         specifier: ^11.1.0
         version: 11.1.0(vue@3.5.12(typescript@5.6.3))
@@ -35,6 +38,9 @@ importers:
       axios:
         specifier: ^1.7.7
         version: 1.7.7
+      cronstrue:
+        specifier: ^2.50.0
+        version: 2.50.0
       echarts:
         specifier: ^5.5.1
         version: 5.5.1
@@ -1235,6 +1241,12 @@ packages:
   '@volar/typescript@2.4.6':
     resolution: {integrity: sha512-NMIrA7y5OOqddL9VtngPWYmdQU03htNKFtAYidbYfWA0TOhyGVd9tfcP4TsLWQ+RBWDZCbBqsr8xzU0ZOxYTCQ==}
 
+  '@vue-js-cron/core@5.2.0':
+    resolution: {integrity: sha512-Vc7Xbj6K/7D4M2yjO+lipeTBeE4OYXCf6FdDDIYKKMjbdGFG+Fs+V7W+6bvnH31lTZ8xSmSgqPF68/JhIfytZQ==}
+
+  '@vue-js-cron/naive-ui@2.0.5':
+    resolution: {integrity: sha512-ngNsoRmkX5YpzAXJoP3vwvwRkDUMoe18iMEGYWz5txaNtR/0JUu+AanhIqmsOnmqhu7IDW+Mc11ceRbEc4R0mA==}
+
   '@vue/compiler-core@3.5.12':
     resolution: {integrity: sha512-ISyBTRMmMYagUxhcpyEH0hpXRd/KqDU4ymofPgl2XAkY9ZhQ+h0ovEZJIiPop13UmR/54oA2cgMDjgroRelaEw==}
 
@@ -1567,6 +1579,10 @@ packages:
 
   crelt@1.0.6:
     resolution: {integrity: sha512-VQ2MBenTq1fWZUH9DJNGti7kKv6EeAuYr3cLwxUWhIu1baTaXh4Ib5W2CqHVqib4/MqbYGJqiL3Zb8GJZr3l4g==}
+
+  cronstrue@2.50.0:
+    resolution: {integrity: sha512-ULYhWIonJzlScCCQrPUG5uMXzXxSixty4djud9SS37DoNxDdkeRocxzHuAo4ImRBUK+mAuU5X9TSwEDccnnuPg==}
+    hasBin: true
 
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -2424,6 +2440,10 @@ packages:
 
   muggle-string@0.4.1:
     resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
+
+  mustache@4.2.0:
+    resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
+    hasBin: true
 
   naive-ui@2.40.1:
     resolution: {integrity: sha512-3NkL+vLRQZKQxCHXa+7xiD6oM74OrQELaehDkGYRYpr6kjT+JJB+Z7h+5LC70gn8VkbgCAETv0+uRWF+6MLlgQ==}
@@ -4496,6 +4516,14 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
+  '@vue-js-cron/core@5.2.0':
+    dependencies:
+      mustache: 4.2.0
+
+  '@vue-js-cron/naive-ui@2.0.5':
+    dependencies:
+      '@vue-js-cron/core': 5.2.0
+
   '@vue/compiler-core@3.5.12':
     dependencies:
       '@babel/parser': 7.25.8
@@ -4884,6 +4912,8 @@ snapshots:
       toggle-selection: 1.0.6
 
   crelt@1.0.6: {}
+
+  cronstrue@2.50.0: {}
 
   cross-spawn@7.0.3:
     dependencies:
@@ -5841,6 +5871,8 @@ snapshots:
   ms@2.1.3: {}
 
   muggle-string@0.4.1: {}
+
+  mustache@4.2.0: {}
 
   naive-ui@2.40.1(vue@3.5.12(typescript@5.6.3)):
     dependencies:

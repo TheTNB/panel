@@ -8,7 +8,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/shell"
 )
 
 type TaskService struct {
@@ -57,11 +56,6 @@ func (s *TaskService) Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
-	}
-
-	log, err := shell.Execf(`tail -n 500 '%s'`, task.Log)
-	if err == nil {
-		task.Log = log
 	}
 
 	Success(w, task)

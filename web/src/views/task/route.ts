@@ -7,7 +7,7 @@ export default {
   path: '/task',
   component: Layout,
   meta: {
-    order: 100
+    order: 80
   },
   children: [
     {
@@ -16,7 +16,7 @@ export default {
       component: () => import('./IndexView.vue'),
       meta: {
         title: '任务',
-        icon: 'mdi:table-sync',
+        icon: 'mdi:timetable',
         role: ['admin'],
         requireAuth: true
       }

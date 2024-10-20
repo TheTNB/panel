@@ -7,7 +7,7 @@ export default {
   path: '/ssh',
   component: Layout,
   meta: {
-    order: 80
+    order: 70
   },
   children: [
     {

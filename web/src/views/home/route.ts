@@ -16,8 +16,8 @@ export default {
       path: 'home',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: '仪表盘',
-        icon: 'mdi:speedometer',
+        title: '首页',
+        icon: 'mdi:home-outline',
         role: ['admin'],
         requireAuth: true
       }
