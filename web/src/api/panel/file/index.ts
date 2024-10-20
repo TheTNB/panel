@@ -53,6 +53,6 @@ export default {
   search: (keyword: string): Promise<AxiosResponse<any>> =>
     request.post('/file/search', { keyword }),
   // 获取文件列表
-  list: (path: string, page: number, limit: number): Promise<AxiosResponse<any>> =>
-    request.get('/file/list', { params: { path, page, limit } })
+  list: (path: string, page: number, limit: number, sort: string): Promise<AxiosResponse<any>> =>
+    request.get('/file/list', { params: { path, page, limit, sort } })
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
-import { NButton, NInput, NPopconfirm, NPopselect, NSpace } from 'naive-ui'
+import { NButton, NInput, NPopconfirm, NPopselect, NSpace, NTag } from 'naive-ui'
+
+import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 
 import file from '@/api/panel/file'
@@ -11,6 +12,7 @@ import EditModal from '@/views/file/EditModal.vue'
 import type { Marked } from '@/views/file/types'
 
 const loading = ref(false)
+const sort = ref<string>('')
 const path = defineModel<string>('path', { type: String, required: true })
 const selected = defineModel<any[]>('selected', { type: Array, default: () => [] })
 const marked = defineModel<Marked[]>('marked', { type: Array, default: () => [] })
@@ -18,6 +20,11 @@ const compress = defineModel<boolean>('compress', { type: Boolean, required: tru
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 const editorModal = ref(false)
 const editorFile = ref('')
+
+const showDropdown = ref(false)
+const selectedRow = ref<any>()
+const dropdownX = ref(0)
+const dropdownY = ref(0)
 
 const renameModal = ref(false)
 const renameModel = ref({
@@ -28,6 +35,31 @@ const unCompressModal = ref(false)
 const unCompressModel = ref({
   path: '',
   file: ''
+})
+
+const options = computed<DropdownOption[]>(() => {
+  if (selectedRow.value == null) return []
+  return [
+    {
+      label: selectedRow.value.dir ? '打开' : '编辑',
+      key: selectedRow.value.dir ? 'open' : 'edit'
+    },
+    { label: '复制', key: 'copy' },
+    { label: '移动', key: 'move' },
+    { label: '权限', key: 'permission' },
+    {
+      label: selectedRow.value.dir ? '压缩' : '下载',
+      key: selectedRow.value.dir ? 'compress' : 'download'
+    },
+    {
+      label: '解压',
+      key: 'uncompress',
+      show: isCompress(selectedRow.value.full),
+      disabled: !isCompress(selectedRow.value.full)
+    },
+    { label: '重命名', key: 'rename' },
+    { label: () => h('span', { style: { color: 'red' } }, '删除'), key: 'delete' }
+  ]
 })
 
 const columns: DataTableColumns<RowData> = [
@@ -42,6 +74,10 @@ const columns: DataTableColumns<RowData> = [
     ellipsis: {
       tooltip: true
     },
+    defaultSortOrder: false,
+    sorter(row1, row2) {
+      return row1.name - row2.name
+    },
     render(row) {
       let icon = 'bi:file-earmark'
       if (row.dir) {
@@ -53,27 +89,27 @@ const columns: DataTableColumns<RowData> = [
       return h(
         NSpace,
         {
+          class: 'table-name',
           onClick: () => {
             if (row.dir) {
               path.value = row.full
+            } else {
+              editorFile.value = row.full
+              editorModal.value = true
             }
           }
         },
         () => [
-          h(TheIcon, { icon }),
-          h(
-            'p',
-            {},
-            {
-              default: () => {
-                if (row.symlink) {
-                  return row.name + ' -> ' + row.link
-                } else {
-                  return row.name
-                }
+          h(TheIcon, { icon, size: 24, color: `var(--primary-color)` }),
+          h('span', null, {
+            default: () => {
+              if (row.symlink) {
+                return row.name + ' -> ' + row.link
+              } else {
+                return row.name
               }
             }
-          )
+          })
         ]
       )
     }
@@ -81,27 +117,46 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '权限',
     key: 'mode',
-    minWidth: 80
+    minWidth: 80,
+    render(row: any): any {
+      return h(
+        NTag,
+        { type: 'success', size: 'small', bordered: false },
+        { default: () => row.mode }
+      )
+    }
   },
   {
-    title: '所有者',
-    key: 'owner',
-    minWidth: 80
-  },
-  {
-    title: '组',
-    key: 'group',
-    minWidth: 80
+    title: '所有者 / 组',
+    key: 'owner/group',
+    minWidth: 120,
+    render(row: any): any {
+      return h('div', null, [
+        h(NTag, { type: 'primary', size: 'small', bordered: false }, { default: () => row.owner }),
+        ' / ',
+        h(NTag, { type: 'primary', size: 'small', bordered: false }, { default: () => row.group })
+      ])
+    }
   },
   {
     title: '大小',
     key: 'size',
-    minWidth: 80
+    minWidth: 80,
+    render(row: any): any {
+      return h(NTag, { type: 'info', size: 'small', bordered: false }, { default: () => row.size })
+    }
   },
   {
     title: '修改时间',
     key: 'modify',
-    minWidth: 150
+    minWidth: 200,
+    render(row: any): any {
+      return h(
+        NTag,
+        { type: 'warning', size: 'small', bordered: false },
+        { default: () => row.modify }
+      )
+    }
   },
   {
     title: '操作',
@@ -116,8 +171,9 @@ const columns: DataTableColumns<RowData> = [
             h(
               NButton,
               {
-                tertiary: true,
                 size: 'small',
+                type: row.dir ? 'success' : 'primary',
+                tertiary: true,
                 onClick: () => {
                   if (!row.dir && !row.symlink) {
                     editorFile.value = row.full
@@ -140,8 +196,9 @@ const columns: DataTableColumns<RowData> = [
             h(
               NButton,
               {
-                tertiary: true,
                 size: 'small',
+                type: row.dir ? 'primary' : 'info',
+                tertiary: true,
                 onClick: () => {
                   if (row.dir) {
                     selected.value = [row.full]
@@ -164,8 +221,9 @@ const columns: DataTableColumns<RowData> = [
             h(
               NButton,
               {
-                tertiary: true,
+                type: 'warning',
                 size: 'small',
+                tertiary: true,
                 onClick: () => {
                   renameModel.value.source = getFilename(row.name)
                   renameModel.value.target = getFilename(row.name)
@@ -193,9 +251,9 @@ const columns: DataTableColumns<RowData> = [
                   return h(
                     NButton,
                     {
-                      tertiary: true,
                       size: 'small',
-                      type: 'error'
+                      type: 'error',
+                      tertiary: true
                     },
                     { default: () => '删除' }
                   )
@@ -270,6 +328,21 @@ const columns: DataTableColumns<RowData> = [
   }
 ]
 
+const rowProps = (row: any) => {
+  return {
+    onContextmenu: (e: MouseEvent) => {
+      e.preventDefault()
+      showDropdown.value = false
+      nextTick().then(() => {
+        showDropdown.value = true
+        selectedRow.value = row
+        dropdownX.value = e.clientX
+        dropdownY.value = e.clientY
+      })
+    }
+  }
+}
+
 const data = ref<RowData[]>([])
 
 const pagination = reactive({
@@ -302,7 +375,7 @@ const handleRefresh = async () => {
 }
 
 const getList = async (path: string, page: number, limit: number) => {
-  await file.list(path, page, limit).then((res) => {
+  await file.list(path, page, limit, sort.value).then((res) => {
     data.value = res.data.items
     pagination.page = page
     pagination.itemCount = res.data.total
@@ -356,6 +429,97 @@ const onChecked = (rowKeys: any) => {
   selected.value = rowKeys
 }
 
+const handleSelect = (key: string) => {
+  switch (key) {
+    case 'open':
+      path.value = selectedRow.value.full
+      break
+    case 'edit':
+      editorFile.value = selectedRow.value.full
+      editorModal.value = true
+      break
+    case 'copy':
+      marked.value = [
+        {
+          name: selectedRow.value.name,
+          source: selectedRow.value.full,
+          type: 'copy'
+        }
+      ]
+      window.$message.success('标记成功，请前往目标路径粘贴')
+      break
+    case 'move':
+      marked.value = [
+        {
+          name: selectedRow.value.name,
+          source: selectedRow.value.full,
+          type: 'move'
+        }
+      ]
+      window.$message.success('标记成功，请前往目标路径粘贴')
+      break
+    case 'permission':
+      selected.value = [selectedRow.value.full]
+      permission.value = true
+      break
+    case 'compress':
+      selected.value = [selectedRow.value.full]
+      compress.value = true
+      break
+    case 'download':
+      window.open('/api/file/download?path=' + encodeURIComponent(selectedRow.value.full))
+      break
+    case 'uncompress':
+      unCompressModel.value.file = selectedRow.value.full
+      unCompressModel.value.path = path.value
+      unCompressModal.value = true
+      break
+    case 'rename':
+      renameModel.value.source = getFilename(selectedRow.value.name)
+      renameModel.value.target = getFilename(selectedRow.value.name)
+      renameModal.value = true
+      break
+    case 'delete':
+      file.delete(selectedRow.value.full).then(() => {
+        window.$message.success('删除成功')
+        EventBus.emit('file:refresh')
+      })
+      break
+  }
+  onCloseDropdown()
+}
+
+const onCloseDropdown = () => {
+  selectedRow.value = null
+  showDropdown.value = false
+}
+
+const handleSorterChange = (sorter: {
+  columnKey: string | number | null
+  order: 'ascend' | 'descend' | false
+}) => {
+  if (!sorter || sorter.columnKey === 'name') {
+    if (!loading.value) {
+      console.log(sorter)
+      console.log(sorter.order)
+      switch (sorter.order) {
+        case 'ascend':
+          sort.value = 'asc'
+          handleRefresh()
+          break
+        case 'descend':
+          sort.value = 'desc'
+          handleRefresh()
+          break
+        default:
+          sort.value = ''
+          handleRefresh()
+          break
+      }
+    }
+  }
+}
+
 onMounted(() => {
   watch(
     path,
@@ -379,9 +543,10 @@ onUnmounted(() => {
     striped
     virtual-scroll
     size="small"
-    :scroll-x="1000"
+    :scroll-x="1200"
     :columns="columns"
     :data="data"
+    :row-props="rowProps"
     :loading="loading"
     :pagination="pagination"
     :row-key="(row: any) => row.full"
@@ -389,9 +554,19 @@ onUnmounted(() => {
     max-height="60vh"
     @update:page="handlePageChange"
     @update:page-size="handlePageSizeChange"
+    @update:sorter="handleSorterChange"
     @update:checked-row-keys="onChecked"
   />
-
+  <n-dropdown
+    placement="bottom-start"
+    trigger="manual"
+    :x="dropdownX"
+    :y="dropdownY"
+    :options="options"
+    :show="showDropdown"
+    :on-clickoutside="onCloseDropdown"
+    @select="handleSelect"
+  />
   <edit-modal v-model:show="editorModal" v-model:file="editorFile" />
   <n-modal
     v-model:show="renameModal"
@@ -431,4 +606,13 @@ onUnmounted(() => {
   </n-modal>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.table-name) {
+  cursor: pointer;
+}
+
+:deep(.table-name:hover) {
+  color: var(--primary-color);
+  opacity: 0.6;
+}
+</style>

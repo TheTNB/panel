@@ -8,6 +8,7 @@ import (
 	"net/http"
 	stdos "os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"syscall"
@@ -132,7 +133,7 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if io.Exists(path) {
-		Error(w, http.StatusForbidden, "目标路径%s已存在", path)
+		Error(w, http.StatusForbidden, "目标路径 %s 已存在", path)
 		return
 	}
 
@@ -168,7 +169,8 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径%s已存在", req.Target)
+		Error(w, http.StatusForbidden, "目标路径 %s 已存在", req.Target)
+		return
 	}
 
 	if err = io.Mv(req.Source, req.Target); err != nil {
@@ -187,7 +189,8 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径%s已存在", req.Target)
+		Error(w, http.StatusForbidden, "目标路径 %s 已存在", req.Target)
+		return
 	}
 
 	if err = io.Cp(req.Source, req.Target); err != nil {
@@ -343,21 +346,41 @@ func (s *FileService) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FilePath](r)
+	req, err := Bind[request.FileList](r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	fileInfoList, err := io.ReadDir(req.Path)
+	list, err := io.ReadDir(req.Path)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
+	}
+
+	if req.Sort == "asc" {
+		slices.SortFunc(list, func(a, b stdos.DirEntry) int {
+			return strings.Compare(strings.ToLower(b.Name()), strings.ToLower(a.Name()))
+		})
+	} else if req.Sort == "desc" {
+		slices.SortFunc(list, func(a, b stdos.DirEntry) int {
+			return strings.Compare(strings.ToLower(a.Name()), strings.ToLower(b.Name()))
+		})
+	} else {
+		slices.SortFunc(list, func(a, b stdos.DirEntry) int {
+			if a.IsDir() && !b.IsDir() {
+				return -1
+			}
+			if !a.IsDir() && b.IsDir() {
+				return 1
+			}
+			return strings.Compare(strings.ToLower(a.Name()), strings.ToLower(b.Name()))
+		})
 	}
 
 	var paths []any
-	for _, fileInfo := range fileInfoList {
-		info, _ := fileInfo.Info()
+	for _, file := range list {
+		info, _ := file.Info()
 		stat := info.Sys().(*syscall.Stat_t)
 
 		paths = append(paths, map[string]any{

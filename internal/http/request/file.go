@@ -1,5 +1,10 @@
 package request
 
+type FileList struct {
+	Path string `json:"path" form:"path" validate:"required"`
+	Sort string `json:"sort" form:"sort"`
+}
+
 type FilePath struct {
 	Path string `json:"path" form:"path" validate:"required"`
 }
