@@ -16,7 +16,6 @@ const serviceName = ref('supervisor')
 const status = ref(false)
 const isEnabled = ref(false)
 const config = ref('')
-const log = ref('')
 const processLog = ref('')
 
 const addProcessModal = ref(false)
@@ -249,12 +248,6 @@ const getIsEnabled = async () => {
   })
 }
 
-const getLog = async () => {
-  supervisor.log().then((res: any) => {
-    log.value = res.data
-  })
-}
-
 const getConfig = async () => {
   supervisor.config().then((res: any) => {
     config.value = res.data
@@ -264,7 +257,6 @@ const getConfig = async () => {
 const handleSaveConfig = async () => {
   await supervisor.saveConfig(config.value)
   window.$message.success('保存成功')
-  await getLog()
 }
 
 const handleClearLog = async () => {
@@ -276,7 +268,6 @@ const handleStart = async () => {
   await systemctl.start(serviceName.value)
   window.$message.success('启动成功')
   await getStatus()
-  await getLog()
 }
 
 const handleIsEnabled = async () => {
@@ -294,21 +285,18 @@ const handleStop = async () => {
   await systemctl.stop(serviceName.value)
   window.$message.success('停止成功')
   await getStatus()
-  await getLog()
 }
 
 const handleRestart = async () => {
   await systemctl.restart(serviceName.value)
   window.$message.success('重启成功')
   await getStatus()
-  await getLog()
 }
 
 const handleReload = async () => {
   await systemctl.reload(serviceName.value)
   window.$message.success('重载成功')
   await getStatus()
-  await getLog()
 }
 
 const handleAddProcess = async () => {
@@ -482,19 +470,7 @@ onUnmounted(() => {
         </n-space>
       </n-tab-pane>
       <n-tab-pane name="log" tab="日志">
-        <Editor
-          v-model:value="log"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log path="/var/log/supervisor/supervisord.log" />
       </n-tab-pane>
     </n-tabs>
   </common-page>
@@ -551,29 +527,7 @@ onUnmounted(() => {
       </n-col>
     </n-row>
   </n-modal>
-  <n-modal
-    v-model:show="processLogModal"
-    preset="card"
-    title="进程日志"
-    style="width: 80vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
-    <Editor
-      v-model:value="processLog"
-      language="ini"
-      theme="vs-dark"
-      height="60vh"
-      mt-8
-      :options="{
-        automaticLayout: true,
-        formatOnType: true,
-        formatOnPaste: true,
-        readOnly: true
-      }"
-    />
-  </n-modal>
+  <realtime-log-modal v-model:show="processLogModal" :path="processLog" />
   <n-modal
     v-model:show="editProcessModal"
     preset="card"

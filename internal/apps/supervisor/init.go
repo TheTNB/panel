@@ -13,7 +13,6 @@ func init() {
 		Route: func(r chi.Router) {
 			service := NewService()
 			r.Get("/service", service.Service)
-			r.Get("/log", service.Log)
 			r.Post("/clearLog", service.ClearLog)
 			r.Get("/config", service.GetConfig)
 			r.Post("/config", service.UpdateConfig)

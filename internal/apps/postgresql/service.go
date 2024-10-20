@@ -132,8 +132,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 
 // Log 获取日志
 func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 100 %s/server/postgresql/logs/postgresql-%s.log", app.Root, time.Now().Format(time.DateOnly))
-	service.Success(w, log)
+	service.Success(w, fmt.Sprintf("%s/server/postgresql/logs/postgresql-%s.log", app.Root, time.Now().Format(time.DateOnly)))
 }
 
 // ClearLog 清空日志

@@ -58,8 +58,7 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	out, _ := shell.Execf("tail -n 100 %s/%s", app.Root, "wwwlogs/nginx-error.log")
-	service.Success(w, out)
+	service.Success(w, fmt.Sprintf("%s/%s", app.Root, "wwwlogs/nginx-error.log"))
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {

@@ -111,13 +111,11 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/php-fpm.log", app.Root, s.version)
-	service.Success(w, log)
+	service.Success(w, fmt.Sprintf("%s/server/php/%d/var/log/php-fpm.log", app.Root, s.version))
 }
 
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 500 %s/server/php/%d/var/log/slow.log", app.Root, s.version)
-	service.Success(w, log)
+	service.Success(w, fmt.Sprintf("%s/server/php/%d/var/log/slow.log", app.Root, s.version))
 }
 
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {

@@ -36,12 +36,6 @@ func (s *Service) Service(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, s.name)
 }
 
-// Log 日志
-func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf(`tail -n 200 /var/log/supervisor/supervisord.log`)
-	service.Success(w, log)
-}
-
 // ClearLog 清空日志
 func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
@@ -204,8 +198,7 @@ func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log, _ := shell.Execf(`tail -n 200 '%s'`, logPath)
-	service.Success(w, log)
+	service.Success(w, logPath)
 }
 
 // ClearProcessLog 清空进程日志

@@ -163,7 +163,6 @@ const getFPMConfig = async () => {
 const handleSaveConfig = async () => {
   await php.saveConfig(version, config.value)
   window.$message.success('保存成功')
-  await getErrorLog()
 }
 
 const handleSaveFPMConfig = async () => {
@@ -174,13 +173,11 @@ const handleSaveFPMConfig = async () => {
 
 const handleClearErrorLog = async () => {
   await php.clearErrorLog(version)
-  await getErrorLog()
   window.$message.success('清空成功')
 }
 
 const handleClearSlowLog = async () => {
   await php.clearSlowLog(version)
-  await getSlowLog()
   window.$message.success('清空成功')
 }
 
@@ -199,28 +196,24 @@ const handleStart = async () => {
   await systemctl.start(`php-fpm-${version}`)
   window.$message.success('启动成功')
   await getStatus()
-  await getErrorLog()
 }
 
 const handleStop = async () => {
   await systemctl.stop(`php-fpm-${version}`)
   window.$message.success('停止成功')
   await getStatus()
-  await getErrorLog()
 }
 
 const handleRestart = async () => {
   await systemctl.restart(`php-fpm-${version}`)
   window.$message.success('重启成功')
   await getStatus()
-  await getErrorLog()
 }
 
 const handleReload = async () => {
   await systemctl.reload(`php-fpm-${version}`)
   window.$message.success('重载成功')
   await getStatus()
-  await getErrorLog()
 }
 
 const handleInstallExtension = async (slug: string) => {
@@ -394,34 +387,10 @@ onMounted(() => {
         />
       </n-tab-pane>
       <n-tab-pane name="error-log" tab="错误日志">
-        <Editor
-          v-model:value="errorLog"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log :path="errorLog" />
       </n-tab-pane>
       <n-tab-pane name="slow-log" tab="慢日志">
-        <Editor
-          v-model:value="slowLog"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log :path="slowLog" />
       </n-tab-pane>
     </n-tabs>
   </common-page>

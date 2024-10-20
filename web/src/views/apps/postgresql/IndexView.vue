@@ -87,9 +87,6 @@ const handleSaveUserConfig = async () => {
 
 const handleClearLog = async () => {
   await postgresql.clearLog()
-  getLog().then((res) => {
-    log.value = res
-  })
   window.$message.success('清空成功')
 }
 
@@ -258,19 +255,7 @@ onMounted(() => {
         />
       </n-tab-pane>
       <n-tab-pane name="log" tab="日志">
-        <Editor
-          v-model:value="log"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log :path="log" />
       </n-tab-pane>
     </n-tabs>
   </common-page>

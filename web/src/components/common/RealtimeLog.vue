@@ -11,7 +11,7 @@ const logRef = ref<LogInst | null>(null)
 let logWs: WebSocket | null = null
 
 const init = async () => {
-  const cmd = `tail -n 40 -f ${props.path}`
+  const cmd = `tail -n 40 -f '${props.path}'`
   ws.exec(cmd)
     .then((ws: WebSocket) => {
       logWs = ws

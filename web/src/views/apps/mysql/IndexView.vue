@@ -87,17 +87,11 @@ const handleSaveConfig = async () => {
 
 const handleClearErrorLog = async () => {
   await mysql.clearErrorLog()
-  getErrorLog().then((res) => {
-    errorLog.value = res
-  })
   window.$message.success('清空成功')
 }
 
 const handleClearSlowLog = async () => {
   await mysql.clearSlowLog()
-  getSlowLog().then((res) => {
-    slowLog.value = res
-  })
   window.$message.success('清空成功')
 }
 
@@ -268,34 +262,10 @@ onMounted(() => {
         />
       </n-tab-pane>
       <n-tab-pane name="error-log" tab="错误日志">
-        <Editor
-          v-model:value="errorLog"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log :path="errorLog" />
       </n-tab-pane>
       <n-tab-pane name="slow-log" tab="慢查询日志">
-        <Editor
-          v-model:value="slowLog"
-          language="ini"
-          theme="vs-dark"
-          height="60vh"
-          mt-8
-          :options="{
-            automaticLayout: true,
-            formatOnType: true,
-            formatOnPaste: true,
-            readOnly: true
-          }"
-        />
+        <realtime-log :path="slowLog" />
       </n-tab-pane>
     </n-tabs>
   </common-page>

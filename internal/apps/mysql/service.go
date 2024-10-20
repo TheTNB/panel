@@ -144,8 +144,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 
 // ErrorLog 获取错误日志
 func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 100 %s/server/mysql/mysql-error.log", app.Root)
-	service.Success(w, log)
+	service.Success(w, fmt.Sprintf("%s/server/mysql/mysql-error.log", app.Root))
 }
 
 // ClearErrorLog 清空错误日志
@@ -160,8 +159,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 
 // SlowLog 获取慢查询日志
 func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
-	log, _ := shell.Execf("tail -n 100 %s/server/mysql/mysql-slow.log", app.Root)
-	service.Success(w, log)
+	service.Success(w, fmt.Sprintf("%s/server/mysql/mysql-slow.log", app.Root))
 }
 
 // ClearSlowLog 清空慢查询日志
