@@ -3,7 +3,8 @@ defineOptions({
   name: 'task-index'
 })
 
-import { LogInst, NButton, NDataTable, NPopconfirm } from 'naive-ui'
+import type { LogInst } from 'naive-ui'
+import { NButton, NDataTable, NPopconfirm } from 'naive-ui'
 
 import task from '@/api/panel/task'
 import ws from '@/api/ws'
