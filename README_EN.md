@@ -18,7 +18,7 @@
 
 The Rat Panel is an open source lightweight Linux server operation and maintenance management panel developed using Golang and Vue.
 
-Communication QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
+QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group：[Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
 
 ## Advantages
 
