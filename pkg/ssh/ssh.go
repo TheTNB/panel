@@ -1,7 +1,6 @@
 package ssh
 
 import (
-	"os"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -19,7 +18,7 @@ type ClientConfig struct {
 	HostAddr   string
 	User       string
 	Password   string
-	KeyPath    string
+	Key        string
 	Timeout    time.Duration
 }
 
@@ -33,13 +32,13 @@ func ClientConfigPassword(hostAddr, user, Password string) *ClientConfig {
 	}
 }
 
-func ClientConfigPublicKey(hostAddr, user, keyPath string) *ClientConfig {
+func ClientConfigPublicKey(hostAddr, user, key string) *ClientConfig {
 	return &ClientConfig{
 		Timeout:    time.Second * 5,
 		AuthMethod: PUBLICKEY,
 		HostAddr:   hostAddr,
 		User:       user,
-		KeyPath:    keyPath,
+		Key:        key,
 	}
 }
 
@@ -54,7 +53,7 @@ func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 	case PASSWORD:
 		config.Auth = []ssh.AuthMethod{ssh.Password(conf.Password)}
 	case PUBLICKEY:
-		signer, err := getKey(conf.KeyPath)
+		signer, err := parseKey(conf.Key)
 		if err != nil {
 			return nil, err
 		}
@@ -68,11 +67,6 @@ func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 	return c, nil
 }
 
-func getKey(keyPath string) (ssh.Signer, error) {
-	key, err := os.ReadFile(keyPath)
-	if err != nil {
-		return nil, err
-	}
-
-	return ssh.ParsePrivateKey(key)
+func parseKey(key string) (ssh.Signer, error) {
+	return ssh.ParsePrivateKey([]byte(key))
 }
