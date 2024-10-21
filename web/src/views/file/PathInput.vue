@@ -4,7 +4,6 @@ import { onUnmounted } from 'vue'
 
 import EventBus from '@/utils/event'
 import { checkPath } from '@/utils/file'
-import SearchModal from '@/views/file/SearchModal.vue'
 
 const path = defineModel<string>('path', { type: String, required: true })
 const isInput = ref(false)
