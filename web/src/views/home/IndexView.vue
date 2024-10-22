@@ -106,7 +106,7 @@ const statusText = (percentage: number) => {
   return '运行流畅'
 }
 
-const chartDisk = computed(() => {
+const chartOptions = computed(() => {
   return {
     title: {
       text: chartType.value == 'net' ? '网络' : '硬盘',
@@ -804,7 +804,7 @@ if (import.meta.hot) {
                   <n-tag>读写延迟 {{ current.diskRWTime }}ms</n-tag>
                 </n-flex>
                 <n-card :bordered="false" h-497>
-                  <v-chart class="chart" :option="chartDisk" autoresize />
+                  <v-chart class="chart" :option="chartOptions" autoresize />
                 </n-card>
               </n-flex>
               <n-skeleton v-else text :repeat="24" />

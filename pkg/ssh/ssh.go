@@ -6,43 +6,47 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-type AuthMethod int8
+type AuthMethod string
 
 const (
-	PASSWORD AuthMethod = iota + 1
-	PUBLICKEY
+	PASSWORD  AuthMethod = "password"
+	PUBLICKEY AuthMethod = "publickey"
 )
 
 type ClientConfig struct {
-	AuthMethod AuthMethod
-	HostAddr   string
-	User       string
-	Password   string
-	Key        string
-	Timeout    time.Duration
+	AuthMethod AuthMethod    `json:"auth_method"`
+	Host       string        `json:"host"`
+	User       string        `json:"user"`
+	Password   string        `json:"password"`
+	Key        string        `json:"key"`
+	Timeout    time.Duration `json:"timeout"`
 }
 
-func ClientConfigPassword(hostAddr, user, Password string) *ClientConfig {
+func ClientConfigPassword(host, user, Password string) *ClientConfig {
 	return &ClientConfig{
-		Timeout:    time.Second * 5,
+		Timeout:    10 * time.Second,
 		AuthMethod: PASSWORD,
-		HostAddr:   hostAddr,
+		Host:       host,
 		User:       user,
 		Password:   Password,
 	}
 }
 
-func ClientConfigPublicKey(hostAddr, user, key string) *ClientConfig {
+func ClientConfigPublicKey(host, user, key string) *ClientConfig {
 	return &ClientConfig{
-		Timeout:    time.Second * 5,
+		Timeout:    10 * time.Second,
 		AuthMethod: PUBLICKEY,
-		HostAddr:   hostAddr,
+		Host:       host,
 		User:       user,
 		Key:        key,
 	}
 }
 
-func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
+func NewSSHClient(conf ClientConfig) (*ssh.Client, error) {
+	if conf.Timeout == 0 {
+		conf.Timeout = 10 * time.Second
+	}
+
 	config := &ssh.ClientConfig{}
 	config.SetDefaults()
 	config.Timeout = conf.Timeout
@@ -59,7 +63,7 @@ func NewSSHClient(conf *ClientConfig) (*ssh.Client, error) {
 		}
 		config.Auth = []ssh.AuthMethod{ssh.PublicKeys(signer)}
 	}
-	c, err := ssh.Dial("tcp", conf.HostAddr, config) // TODO support ipv6
+	c, err := ssh.Dial("tcp", conf.Host, config) // TODO support ipv6
 	if err != nil {
 		return nil, err
 	}

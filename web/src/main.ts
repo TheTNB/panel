@@ -14,7 +14,7 @@ import { setupNaiveDiscreteApi } from './utils'
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
 import dashboard from '@/api/panel/dashboard'
-import CronNaivePlugin, { CronNaive } from '@vue-js-cron/naive-ui'
+import CronNaivePlugin from '@vue-js-cron/naive-ui'
 
 async function setupApp() {
   const app = createApp(App)
@@ -27,7 +27,6 @@ async function setupApp() {
     }
   })
   app.use(CronNaivePlugin)
-  app.component('CronNaive', CronNaive)
   await setupStore(app)
   await setupNaiveDiscreteApi()
   await setupPanel().then(() => {

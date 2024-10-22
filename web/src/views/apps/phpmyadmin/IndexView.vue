@@ -76,7 +76,7 @@ onMounted(() => {
             </n-alert>
           </n-card>
           <n-card title="修改端口" rounded-10>
-            <n-input-number v-model:value="newPort" min="1" />
+            <n-input-number v-model:value="newPort" :min="1" :max="65535" />
             修改 phpMyAdmin 访问端口
           </n-card>
         </n-space>

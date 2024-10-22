@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"time"
 
@@ -54,10 +53,6 @@ func (r *cronRepo) Get(id uint) (*biz.Cron, error) {
 }
 
 func (r *cronRepo) Create(req *request.CronCreate) error {
-	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(req.Time) {
-		return errors.New("时间格式错误")
-	}
-
 	var script string
 	if req.Type == "backup" {
 		if req.BackupType == "website" {
@@ -134,10 +129,6 @@ func (r *cronRepo) Update(req *request.CronUpdate) error {
 	cron, err := r.Get(req.ID)
 	if err != nil {
 		return err
-	}
-
-	if !regexp.MustCompile(`^((\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+)(,(\*|\d+|\d+-\d+|\d+/\d+|\d+-\d+/\d+|\*/\d+))*\s?){5}$`).MatchString(req.Time) {
-		return errors.New("时间格式错误")
 	}
 
 	if !cron.Status {

@@ -174,7 +174,7 @@ onMounted(async () => {
               :on-create="onCreateListen"
             >
               <template #default="{ value }">
-                <div flex items-center w-full>
+                <div    w-full flex items-center >
                   <n-input v-model:value="value.address" clearable />
                   <n-checkbox v-model:checked="value.https" ml-20 mr-20 w-120> HTTPS </n-checkbox>
                   <n-checkbox v-model:checked="value.quic" w-200> QUIC(HTTP3) </n-checkbox>

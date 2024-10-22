@@ -15,8 +15,6 @@ export default {
     request.put('/cron/' + id, { name, time, script }),
   // 删除任务
   delete: (id: number): Promise<AxiosResponse<any>> => request.delete('/cron/' + id),
-  // 获取任务日志
-  log: (id: number): Promise<AxiosResponse<any>> => request.get('/cron/' + id + '/log'),
   // 修改任务状态
   status: (id: number, status: boolean): Promise<AxiosResponse<any>> =>
     request.post('/cron/' + id + '/status', { status })

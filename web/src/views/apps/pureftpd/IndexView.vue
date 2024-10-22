@@ -279,7 +279,7 @@ onMounted(() => {
             </n-space>
           </n-card>
           <n-card title="端口设置" rounded-10>
-            <n-input-number v-model:value="port" min="1" />
+            <n-input-number v-model:value="port" :min="1" :max="65535" />
             修改 Pure-Ftpd 监听端口
           </n-card>
         </n-space>

@@ -3,17 +3,16 @@ package service
 import (
 	"bufio"
 	"context"
+	"github.com/TheTNB/panel/internal/http/request"
 	"net/http"
 	"sync"
-
-	"github.com/gorilla/websocket"
-	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/ssh"
+	"github.com/gorilla/websocket"
 )
 
 type WsService struct {
@@ -27,11 +26,17 @@ func NewWsService() *WsService {
 }
 
 func (s *WsService) Session(w http.ResponseWriter, r *http.Request) {
-	info, err := s.sshRepo.GetInfo()
+	req, err := Bind[request.ID](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+	info, err := s.sshRepo.Get(req.ID)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
+
 	ws, err := s.upgrade(w, r)
 	if err != nil {
 		ErrorSystem(w)
@@ -39,12 +44,7 @@ func (s *WsService) Session(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	config := ssh.ClientConfigPassword(
-		cast.ToString(info["host"])+":"+cast.ToString(info["port"]),
-		cast.ToString(info["user"]),
-		cast.ToString(info["password"]),
-	)
-	client, err := ssh.NewSSHClient(config)
+	client, err := ssh.NewSSHClient(info.Config)
 	if err != nil {
 		_ = ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, err.Error()))
 		return

@@ -281,8 +281,8 @@ const handleTest = async () => {
         :disabled="inTest"
         :loading="inTest"
         @click="handleTest"
-        w-200
         mt-40
+        w-200
       >
         {{ inTest ? '跑分中...' : '开始跑分' }}
       </n-button>

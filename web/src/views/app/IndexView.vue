@@ -244,7 +244,7 @@ onMounted(() => {
   <common-page show-footer>
     <template #action>
       <div flex items-center>
-        <n-button class="ml-16" type="primary" @click="handleUpdateCache">
+        <n-button type="primary" @click="handleUpdateCache">
           <TheIcon :size="18" icon="material-symbols:refresh" />
           {{ $t('appIndex.buttons.updateCache') }}
         </n-button>

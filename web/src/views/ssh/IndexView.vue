@@ -3,7 +3,13 @@ defineOptions({
   name: 'ssh-index'
 })
 
+import ssh from '@/api/panel/ssh'
 import ws from '@/api/ws'
+import TheIcon from '@/components/custom/TheIcon.vue'
+import CreateModal from '@/views/ssh/CreateModal.vue'
+import UpdateModal from '@/views/ssh/UpdateModal.vue'
+import '@fontsource/jetbrains-mono/400-italic.css'
+import '@fontsource/jetbrains-mono/400.css'
 import { AttachAddon } from '@xterm/addon-attach'
 import { ClipboardAddon } from '@xterm/addon-clipboard'
 import { FitAddon } from '@xterm/addon-fit'
@@ -11,18 +17,8 @@ import { WebLinksAddon } from '@xterm/addon-web-links'
 import { WebglAddon } from '@xterm/addon-webgl'
 import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
-import { useI18n } from 'vue-i18n'
-
-import ssh from '@/api/panel/ssh'
-
-const { t } = useI18n()
-
-const model = ref({
-  host: '',
-  port: 22,
-  user: '',
-  password: ''
-})
+import type { MenuOption } from 'naive-ui'
+import { NButton, NFlex, NPopconfirm } from 'naive-ui'
 
 const terminal = ref<HTMLElement | null>(null)
 const term = ref()
@@ -30,30 +26,112 @@ let sshWs: WebSocket | null = null
 const fitAddon = new FitAddon()
 const webglAddon = new WebglAddon()
 
-const handleSave = () => {
-  ssh
-    .saveInfo(model.value.host, model.value.port, model.value.user, model.value.password)
-    .then(() => {
-      window.$message.success(t('sshIndex.alerts.save'))
+const current = ref(0)
+const collapsed = ref(true)
+const createModal = ref(false)
+const updateModal = ref(false)
+const updateId = ref(0)
+
+const list = ref<MenuOption[]>([])
+
+const fetchData = async () => {
+  list.value = []
+  const { data } = await ssh.list(1, 10000)
+  if (data.items.length === 0) {
+    window.$message.info('请先创建主机')
+    return
+  }
+  data.items.forEach((item: any) => {
+    list.value.push({
+      label: item.name === '' ? item.host : item.name,
+      key: item.id,
+      extra: () => {
+        return h(
+          NFlex,
+          {
+            size: 'small',
+            style: 'float: right'
+          },
+          {
+            default: () => [
+              h(
+                NButton,
+                {
+                  type: 'primary',
+                  size: 'small',
+                  onClick: () => {
+                    updateModal.value = true
+                    updateId.value = item.id
+                  }
+                },
+                {
+                  default: () => {
+                    return '编辑'
+                  }
+                }
+              ),
+              h(
+                NPopconfirm,
+                {
+                  onPositiveClick: () => handleDelete(item.id)
+                },
+                {
+                  default: () => {
+                    return '确定删除主机吗？'
+                  },
+                  trigger: () => {
+                    return h(
+                      NButton,
+                      {
+                        size: 'small',
+                        type: 'error'
+                      },
+                      {
+                        default: () => {
+                          return '删除'
+                        }
+                      }
+                    )
+                  }
+                }
+              )
+            ]
+          }
+        )
+      }
     })
-}
-
-const getInfo = () => {
-  ssh.info().then((res) => {
-    model.value.host = res.data.host
-    model.value.port = res.data.port
-    model.value.user = res.data.user
-    model.value.password = res.data.password
   })
+  await openSession(updateId.value === 0 ? Number(list.value[0].key) : updateId.value)
 }
 
-const openSession = () => {
-  ws.ssh().then((ws) => {
+const handleDelete = async (id: number) => {
+  await ssh.delete(id)
+  list.value = list.value.filter((item: any) => item.key !== id)
+  if (current.value === id) {
+    if (list.value.length > 0) {
+      await openSession(Number(list.value[0].key))
+    } else {
+      term.value.dispose()
+    }
+    if (list.value.length === 0) {
+      createModal.value = true
+    }
+  }
+}
+
+const handleChange = (key: number) => {
+  console.log(key)
+  openSession(key)
+}
+
+const openSession = async (id: number) => {
+  closeSession()
+  await ws.ssh(id).then((ws) => {
     sshWs = ws
     term.value = new Terminal({
       lineHeight: 1.2,
       fontSize: 14,
-      fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+      fontFamily: 'JetBrains Mono',
       cursorBlink: true,
       cursorStyle: 'underline',
       tabStopWidth: 4,
@@ -68,24 +146,17 @@ const openSession = () => {
     webglAddon.onContextLoss(() => {
       webglAddon.dispose()
     })
-
     term.value.open(terminal.value!)
+
     fitAddon.fit()
     term.value.focus()
-    window.addEventListener(
-      'resize',
-      () => {
-        fitAddon.fit()
-      },
-      false
-    )
+    window.addEventListener('resize', onResize, false)
+    current.value = id
 
     ws.onclose = () => {
       term.value.write('\r\n连接已关闭，请刷新重试。')
       term.value.write('\r\nConnection closed. Please refresh.')
-      window.removeEventListener('resize', () => {
-        fitAddon.fit()
-      })
+      window.removeEventListener('resize', onResize)
     }
 
     ws.onerror = (event) => {
@@ -94,19 +165,31 @@ const openSession = () => {
       console.error(event)
       ws.close()
     }
-
-    term.value.onResize(({ cols, rows }: { cols: number; rows: number }) => {
-      if (ws.readyState === 1) {
-        ws.send(
-          JSON.stringify({
-            resize: true,
-            columns: cols,
-            rows: rows
-          })
-        )
-      }
-    })
   })
+}
+
+const closeSession = () => {
+  try {
+    term.value.dispose()
+    sshWs?.close()
+  } catch {
+    /* empty */
+  }
+  terminal.value!.innerHTML = ''
+}
+
+const onResize = () => {
+  fitAddon.fit()
+  if (sshWs != null && sshWs.readyState === 1) {
+    const { cols, rows } = term.value
+    sshWs.send(
+      JSON.stringify({
+        resize: true,
+        columns: cols,
+        rows: rows
+      })
+    )
+  }
 }
 
 const onTermWheel = (event: WheelEvent) => {
@@ -123,63 +206,99 @@ const onTermWheel = (event: WheelEvent) => {
   }
 }
 
+watch(createModal, () => {
+  if (!createModal.value) fetchData()
+})
+
+watch(updateModal, () => {
+  if (!updateModal.value) {
+    fetchData()
+    updateId.value = 0
+  }
+})
+
 onMounted(() => {
-  getInfo()
-  openSession()
+  // https://github.com/xtermjs/xterm.js/pull/5178
+  document.fonts.ready.then((fontFaceSet: any) =>
+    Promise.all(Array.from(fontFaceSet).map((el: any) => el.load())).then(fetchData)
+  )
 })
 
 onUnmounted(() => {
-  if (sshWs) {
-    sshWs.close()
-  }
+  closeSession()
 })
 </script>
 
 <template>
   <common-page show-footer>
-    <n-space vertical>
-      <n-form inline>
-        <n-form-item :label="$t('sshIndex.save.fields.host.label')">
-          <n-input
-            v-model:value="model.host"
-            :placeholder="$t('sshIndex.save.fields.host.placeholder')"
-            clearable
-            size="small"
-          />
-        </n-form-item>
-        <n-form-item :label="$t('sshIndex.save.fields.port.label')">
-          <n-input-number
-            v-model:value="model.port"
-            :placeholder="$t('sshIndex.save.fields.port.placeholder')"
-            clearable
-            size="small"
-          />
-        </n-form-item>
-        <n-form-item :label="$t('sshIndex.save.fields.username.label')">
-          <n-input
-            v-model:value="model.user"
-            :placeholder="$t('sshIndex.save.fields.username.placeholder')"
-            clearable
-            size="small"
-          />
-        </n-form-item>
-        <n-form-item :label="$t('sshIndex.save.fields.password.label')">
-          <n-input
-            v-model:value="model.password"
-            :placeholder="$t('sshIndex.save.fields.password.placeholder')"
-            clearable
-            size="small"
-          />
-        </n-form-item>
-        <n-form-item>
-          <n-button type="primary" size="small" @click="handleSave">
-            {{ $t('sshIndex.save.actions.submit') }}
-          </n-button>
-        </n-form-item>
-      </n-form>
-      <n-card>
-        <div ref="terminal" @wheel="onTermWheel" h-600></div>
-      </n-card>
-    </n-space>
+    <template #action>
+      <div flex items-center>
+        <n-button type="primary" @click="createModal = true">
+          <TheIcon :size="18" icon="material-symbols:add" />
+          创建主机
+        </n-button>
+      </div>
+    </template>
+    <n-layout has-sider sider-placement="right">
+      <n-layout content-style="overflow: visible">
+        <div ref="terminal" @wheel="onTermWheel" h-75vh></div>
+      </n-layout>
+      <n-layout-sider
+        bordered
+        :collapsed-width="0"
+        :collapsed="collapsed"
+        show-trigger
+        :native-scrollbar="false"
+        @collapse="collapsed = true"
+        @expand="collapsed = false"
+        @after-enter="onResize"
+        @after-leave="onResize"
+      >
+        <n-menu
+          v-model:value="current"
+          :collapsed="collapsed"
+          :collapsed-width="0"
+          :collapsed-icon-size="0"
+          :options="list"
+          @update-value="handleChange"
+        />
+      </n-layout-sider>
+    </n-layout>
   </common-page>
+  <CreateModal v-model:show="createModal" />
+  <UpdateModal v-if="updateModal" v-model:show="updateModal" v-model:id="updateId" />
 </template>
+
+<style scoped lang="scss">
+:deep(.xterm) {
+  padding: 4rem !important;
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar) {
+  border-radius: 0.4rem;
+  height: 6px;
+  width: 8px;
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar-thumb) {
+  background-color: #666;
+  border-radius: 0.4rem;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 1s;
+}
+
+:deep(.xterm .xterm-viewport:hover::-webkit-scrollbar-thumb) {
+  background-color: #aaa;
+}
+
+:deep(.xterm .xterm-viewport::-webkit-scrollbar-track) {
+  background-color: #111;
+  border-radius: 0.4rem;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  transition: all 1s;
+}
+
+:deep(.xterm .xterm-viewport:hover::-webkit-scrollbar-track) {
+  background-color: #444;
+}
+</style>

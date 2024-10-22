@@ -42,4 +42,17 @@ func init() {
 			)
 		},
 	})
+	Migrations = append(Migrations, &gormigrate.Migration{
+		ID: "20241022-ssh",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(
+				&biz.SSH{},
+			)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable(
+				&biz.SSH{},
+			)
+		},
+	})
 }

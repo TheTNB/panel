@@ -17,10 +17,6 @@ const (
 	SettingKeyBackupPath        SettingKey = "backup_path"
 	SettingKeyWebsitePath       SettingKey = "website_path"
 	SettingKeyMySQLRootPassword SettingKey = "mysql_root_password"
-	SettingKeySshHost           SettingKey = "ssh_host"
-	SettingKeySshPort           SettingKey = "ssh_port"
-	SettingKeySshUser           SettingKey = "ssh_user"
-	SettingKeySshPassword       SettingKey = "ssh_password"
 	SettingKeyOfflineMode       SettingKey = "offline_mode"
 )
 

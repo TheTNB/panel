@@ -158,8 +158,11 @@ func Http(r chi.Router) {
 		r.Route("/ssh", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			ssh := service.NewSSHService()
-			r.Get("/info", ssh.GetInfo)
-			r.Post("/info", ssh.UpdateInfo)
+			r.Get("/", ssh.List)
+			r.Post("/", ssh.Create)
+			r.Put("/{id}", ssh.Update)
+			r.Get("/{id}", ssh.Get)
+			r.Delete("/{id}", ssh.Delete)
 		})
 
 		r.Route("/container", func(r chi.Router) {
