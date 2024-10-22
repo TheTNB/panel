@@ -120,7 +120,6 @@ const handleDelete = async (id: number) => {
 }
 
 const handleChange = (key: number) => {
-  console.log(key)
   openSession(key)
 }
 
