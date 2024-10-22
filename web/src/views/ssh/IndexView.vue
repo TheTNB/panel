@@ -13,11 +13,11 @@ import '@fontsource/jetbrains-mono/400.css'
 import { AttachAddon } from '@xterm/addon-attach'
 import { ClipboardAddon } from '@xterm/addon-clipboard'
 import { FitAddon } from '@xterm/addon-fit'
+import { Unicode11Addon } from '@xterm/addon-unicode11'
 import { WebLinksAddon } from '@xterm/addon-web-links'
 import { WebglAddon } from '@xterm/addon-webgl'
 import { Terminal } from '@xterm/xterm'
 import '@xterm/xterm/css/xterm.css'
-import type { MenuOption } from 'naive-ui'
 import { NButton, NFlex, NPopconfirm } from 'naive-ui'
 
 const terminal = ref<HTMLElement | null>(null)
@@ -32,7 +32,7 @@ const create = ref(false)
 const update = ref(false)
 const updateId = ref(0)
 
-const list = ref<MenuOption[]>([])
+const list = ref<any[]>([])
 
 const fetchData = async () => {
   list.value = []
@@ -129,6 +129,7 @@ const openSession = async (id: number) => {
   await ws.ssh(id).then((ws) => {
     sshWs = ws
     term.value = new Terminal({
+      allowProposedApi: true,
       lineHeight: 1.2,
       fontSize: 14,
       fontFamily: 'JetBrains Mono',
@@ -142,6 +143,8 @@ const openSession = async (id: number) => {
     term.value.loadAddon(fitAddon)
     term.value.loadAddon(new ClipboardAddon())
     term.value.loadAddon(new WebLinksAddon())
+    term.value.loadAddon(new Unicode11Addon())
+    term.value.unicode.activeVersion = '11'
     term.value.loadAddon(webglAddon)
     webglAddon.onContextLoss(() => {
       webglAddon.dispose()
