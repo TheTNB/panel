@@ -31,7 +31,7 @@ const handleSubmit = async () => {
     })
 }
 
-onMounted(() => {
+watch(show, () => {
   if (id.value > 0) {
     ssh.get(id.value).then((res) => {
       model.value.name = res.data.name

@@ -265,8 +265,8 @@ onUnmounted(() => {
       </n-layout-sider>
     </n-layout>
   </common-page>
-  <create-modal v-if="create" v-model:show="create" />
-  <update-modal v-if="update" v-model:show="update" v-model:id="updateId" />
+  <create-modal v-model:show="create" />
+  <update-modal v-model:show="update" v-model:id="updateId" />
 </template>
 
 <style scoped lang="scss">

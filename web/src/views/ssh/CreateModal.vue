@@ -24,6 +24,16 @@ const handleSubmit = async () => {
       window.$message.success('创建成功')
       loading.value = false
       show.value = false
+      model.value = {
+        name: '',
+        host: '127.0.0.1',
+        port: 22,
+        auth_method: 'password',
+        user: 'root',
+        password: '',
+        key: '',
+        remark: ''
+      }
     })
     .catch(() => {
       loading.value = false
