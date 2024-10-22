@@ -242,7 +242,7 @@ onUnmounted(() => {
       </div>
     </template>
     <n-layout has-sider sider-placement="right">
-      <n-layout content-style="overflow: visible">
+      <n-layout content-style="overflow: visible" bg-hex-111>
         <div ref="terminal" @wheel="onTermWheel" h-75vh></div>
       </n-layout>
       <n-layout-sider
