@@ -28,8 +28,8 @@ const webglAddon = new WebglAddon()
 
 const current = ref(0)
 const collapsed = ref(true)
-const createModal = ref(false)
-const updateModal = ref(false)
+const create = ref(false)
+const update = ref(false)
 const updateId = ref(0)
 
 const list = ref<MenuOption[]>([])
@@ -60,7 +60,7 @@ const fetchData = async () => {
                   type: 'primary',
                   size: 'small',
                   onClick: () => {
-                    updateModal.value = true
+                    update.value = true
                     updateId.value = item.id
                   }
                 },
@@ -114,7 +114,7 @@ const handleDelete = async (id: number) => {
       term.value.dispose()
     }
     if (list.value.length === 0) {
-      createModal.value = true
+      create.value = true
     }
   }
 }
@@ -172,10 +172,10 @@ const closeSession = () => {
   try {
     term.value.dispose()
     sshWs?.close()
+    terminal.value!.innerHTML = ''
   } catch {
     /* empty */
   }
-  terminal.value!.innerHTML = ''
 }
 
 const onResize = () => {
@@ -206,12 +206,12 @@ const onTermWheel = (event: WheelEvent) => {
   }
 }
 
-watch(createModal, () => {
-  if (!createModal.value) fetchData()
+watch(create, () => {
+  if (!create.value) fetchData()
 })
 
-watch(updateModal, () => {
-  if (!updateModal.value) {
+watch(update, () => {
+  if (!update.value) {
     fetchData()
     updateId.value = 0
   }
@@ -233,7 +233,7 @@ onUnmounted(() => {
   <common-page show-footer>
     <template #action>
       <div flex items-center>
-        <n-button type="primary" @click="createModal = true">
+        <n-button type="primary" @click="create = true">
           <TheIcon :size="18" icon="material-symbols:add" />
           创建主机
         </n-button>
@@ -265,8 +265,8 @@ onUnmounted(() => {
       </n-layout-sider>
     </n-layout>
   </common-page>
-  <CreateModal v-model:show="createModal" />
-  <UpdateModal v-if="updateModal" v-model:show="updateModal" v-model:id="updateId" />
+  <create-modal v-if="create" v-model:show="create" />
+  <update-modal v-if="update" v-model:show="update" v-model:id="updateId" />
 </template>
 
 <style scoped lang="scss">

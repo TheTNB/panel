@@ -8,13 +8,14 @@ import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NSwitch, NTag } from '
 import cron from '@/api/panel/cron'
 import file from '@/api/panel/file'
 import { formatDateTime, renderIcon } from '@/utils'
+import CreateModal from '@/views/task/CreateModal.vue'
 import type { CronTask } from '@/views/task/types'
 import { CronNaive } from '@vue-js-cron/naive-ui'
 
 const logPath = ref('')
 const logModal = ref(false)
 const editModal = ref(false)
-const createModal = ref(false)
+const create = ref(false)
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
@@ -231,7 +232,7 @@ const saveTaskEdit = async () => {
     })
 }
 
-watch(createModal, () => {
+watch(create, () => {
   onPageChange(pagination.page)
 })
 
@@ -243,7 +244,7 @@ onMounted(() => {
 <template>
   <n-flex vertical>
     <n-card flex-1 rounded-10>
-      <n-button type="primary" @click="createModal = true">创建计划任务</n-button>
+      <n-button type="primary" @click="create = true">创建计划任务</n-button>
     </n-card>
     <n-card flex-1 rounded-10>
       <n-data-table
@@ -261,7 +262,6 @@ onMounted(() => {
       />
     </n-card>
   </n-flex>
-  <create-modal v-model:show="createModal" />
   <realtime-log-modal v-model:show="logModal" :path="logPath" />
   <n-modal
     v-model:show="editModal"
@@ -294,4 +294,5 @@ onMounted(() => {
       }"
     />
   </n-modal>
+  <create-modal v-model:show="create" />
 </template>

@@ -7,6 +7,13 @@ var (
 	OperationRemove Operation = "remove" // 移除
 )
 
+type Type string
+
+var (
+	TypeRich   Type = "rich"   // rich
+	TypeNormal Type = "normal" // normal
+)
+
 type Protocol string
 
 var (
@@ -31,6 +38,7 @@ var (
 )
 
 type FireInfo struct {
+	Type      Type      `json:"type"`       // rich or normal
 	Family    string    `json:"family"`     // ipv4 ipv6
 	Address   string    `json:"address"`    // 源地址或目标地址
 	PortStart uint      `json:"port_start"` // 1-65535

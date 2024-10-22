@@ -78,6 +78,7 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 
 	fw := firewall.NewFirewall()
 	err = fw.Port(firewall.FireInfo{
+		Type:      firewall.TypeNormal,
 		PortStart: req.Port,
 		PortEnd:   req.Port,
 		Direction: firewall.DirectionIn,

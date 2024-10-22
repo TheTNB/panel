@@ -5,6 +5,7 @@ type FirewallStatus struct {
 }
 
 type FirewallRule struct {
+	Type      string `json:"type"`
 	Family    string `json:"family" validate:"required,oneof=ipv4 ipv6"`
 	PortStart uint   `json:"port_start" validate:"required,gte=1,lte=65535"`
 	PortEnd   uint   `json:"port_end" validate:"required,gte=1,lte=65535"`

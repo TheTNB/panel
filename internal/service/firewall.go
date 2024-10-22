@@ -86,6 +86,7 @@ func (s *FirewallService) GetRules(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		filledRules = append(filledRules, map[string]any{
+			"type":       rule.Type,
 			"family":     rule.Family,
 			"port_start": rule.PortStart,
 			"port_end":   rule.PortEnd,
@@ -113,7 +114,7 @@ func (s *FirewallService) CreateRule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.firewall.Port(firewall.FireInfo{
-		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
+		Type: firewall.Type(req.Type), Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
 	}, firewall.OperationAdd); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -130,7 +131,7 @@ func (s *FirewallService) DeleteRule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.firewall.Port(firewall.FireInfo{
-		Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
+		Type: firewall.Type(req.Type), Family: req.Family, PortStart: req.PortStart, PortEnd: req.PortEnd, Protocol: firewall.Protocol(req.Protocol), Address: req.Address, Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
 	}, firewall.OperationRemove); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

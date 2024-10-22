@@ -54,6 +54,7 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 				continue
 			}
 			var item FireInfo
+			item.Type = TypeNormal
 			if strings.Contains(port, "/") {
 				ruleItem := strings.Split(port, "/")
 				portItem := strings.Split(ruleItem[0], "-")
@@ -82,6 +83,32 @@ func (r *Firewall) ListRule() ([]FireInfo, error) {
 	}()
 
 	wg.Wait()
+
+	slices.SortFunc(data, func(a FireInfo, b FireInfo) int {
+		if a.PortStart != b.PortStart {
+			return int(a.PortStart - b.PortStart)
+		}
+		if a.PortEnd != b.PortEnd {
+			return int(a.PortEnd - b.PortEnd)
+		}
+		if a.Protocol != b.Protocol {
+			return strings.Compare(string(a.Protocol), string(b.Protocol))
+		}
+		if a.Family != b.Family {
+			return strings.Compare(a.Family, b.Family)
+		}
+		if a.Strategy != b.Strategy {
+			return strings.Compare(string(a.Strategy), string(b.Strategy))
+		}
+		if a.Direction != b.Direction {
+			return strings.Compare(string(a.Direction), string(b.Direction))
+		}
+		if a.Type != b.Type {
+			return strings.Compare(string(a.Type), string(b.Type))
+		}
+		return 0
+	})
+
 	return data, nil
 }
 
@@ -112,6 +139,22 @@ func (r *Firewall) ListForward() ([]FireForwardInfo, error) {
 			})
 		}
 	}
+
+	slices.SortFunc(data, func(a FireForwardInfo, b FireForwardInfo) int {
+		if a.Port != b.Port {
+			return int(a.Port - b.Port)
+		}
+		if a.TargetPort != b.TargetPort {
+			return int(a.TargetPort - b.TargetPort)
+		}
+		if a.Protocol != b.Protocol {
+			return strings.Compare(string(a.Protocol), string(b.Protocol))
+		}
+		if a.TargetIP != b.TargetIP {
+			return strings.Compare(a.TargetIP, b.TargetIP)
+		}
+		return 0
+	})
 
 	return data, nil
 }
@@ -144,7 +187,7 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 		return fmt.Errorf("invalid port range: %d-%d", rule.PortStart, rule.PortEnd)
 	}
 	// 不支持的切换使用rich rules
-	if (rule.Family != "" && rule.Family != "ipv4") || rule.Direction != "in" || rule.Address != "" || rule.Strategy != "accept" {
+	if (rule.Family != "" && rule.Family != "ipv4") || rule.Direction != "in" || rule.Address != "" || rule.Strategy != "accept" || rule.Type == TypeRich {
 		return r.RichRules(rule, operation)
 	}
 
@@ -245,6 +288,7 @@ func (r *Firewall) parseRichRule(line string) (FireInfo, error) {
 	}
 
 	fireInfo := FireInfo{
+		Type:     TypeRich,
 		Family:   match[1],
 		Address:  match[3],
 		Protocol: Protocol(match[5]),

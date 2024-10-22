@@ -286,7 +286,7 @@ onMounted(() => {
     <n-data-table
       striped
       remote
-      :scroll-x="1200"
+      :scroll-x="1400"
       :loading="false"
       :columns="columns"
       :data="data"
