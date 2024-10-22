@@ -19,8 +19,8 @@ const init = async () => {
       ws.onmessage = (event) => {
         log.value += event.data + '\n'
         const lines = log.value.split('\n')
-        if (lines.length > 2000) {
-          log.value = lines.slice(lines.length - 2000).join('\n')
+        if (lines.length > 1000) {
+          log.value = lines.slice(lines.length - 1000).join('\n')
         }
       }
     })
