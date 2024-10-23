@@ -12,7 +12,7 @@ const logRef = ref<LogInst | null>(null)
 let logWs: WebSocket | null = null
 
 const init = async () => {
-  const cmd = `tail -n 40 -f '${props.path}'`
+  const cmd = `tail -n 200 -f '${props.path}'`
   ws.exec(cmd)
     .then((ws: WebSocket) => {
       logWs = ws
@@ -36,14 +36,12 @@ const handleClose = () => {
   log.value = ''
 }
 
-watch(
-  () => props.path,
-  () => {
-    handleClose()
+watch([() => props.path, () => show.value], () => {
+  handleClose()
+  if (show.value) {
     init()
   }
-)
-
+})
 watchEffect(() => {
   if (log.value) {
     nextTick(() => {

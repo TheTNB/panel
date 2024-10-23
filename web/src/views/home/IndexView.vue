@@ -441,7 +441,7 @@ if (import.meta.hot) {
                   <p>负载状态</p>
                   <n-progress
                     type="dashboard"
-                    :percentage="formatPercent((realtime.load.load1 / cores) * 100)"
+                    :percentage="Math.round(formatPercent((realtime.load.load1 / cores) * 100))"
                     :color="statusColor((realtime.load.load1 / cores) * 100)"
                   >
                   </n-progress>
