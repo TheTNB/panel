@@ -418,7 +418,7 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	if !found497 && httpRedirect {
 		directives = append(directives, &config.Directive{
 			Name:       "error_page",
-			Parameters: []string{"497", "=307", "https://$host:$server_port$request_uri"},
+			Parameters: []string{"497", "=308", "https://$host:$server_port$request_uri"},
 		})
 	}
 
