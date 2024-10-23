@@ -116,7 +116,7 @@ importers:
         version: 5.1.4(vite@5.4.10(@types/node@20.16.14)(sass@1.80.3)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))
       '@vue/eslint-config-prettier':
         specifier: ^10.0.0
-        version: 10.0.0(eslint@8.57.1)(prettier@3.3.3)
+        version: 10.1.0(eslint@8.57.1)(prettier@3.3.3)
       '@vue/eslint-config-typescript':
         specifier: ^13.0.0
         version: 13.0.0(eslint-plugin-vue@9.29.1(eslint@8.57.1))(eslint@8.57.1)(typescript@5.6.3)
@@ -1266,8 +1266,8 @@ packages:
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
-  '@vue/eslint-config-prettier@10.0.0':
-    resolution: {integrity: sha512-iDEjsfT+UXQTJfe+4mstb/B5BSZ5RpL6FO3F97XxElIXdD04gkH+F7PR4fBMEVyJi4892G4LQVPQ8oXxVyp8Dw==}
+  '@vue/eslint-config-prettier@10.1.0':
+    resolution: {integrity: sha512-J6wV91y2pXc0Phha01k0WOHBTPsoSTf4xlmMjoKaeSxBpAdsgTppGF5RZRdOHM7OA74zAXD+VLANrtYXpiPKkQ==}
     peerDependencies:
       eslint: '>= 8.21.0'
       prettier: '>= 3.0.0'
@@ -4587,7 +4587,7 @@ snapshots:
 
   '@vue/devtools-api@6.6.4': {}
 
-  '@vue/eslint-config-prettier@10.0.0(eslint@8.57.1)(prettier@3.3.3)':
+  '@vue/eslint-config-prettier@10.1.0(eslint@8.57.1)(prettier@3.3.3)':
     dependencies:
       eslint: 8.57.1
       eslint-config-prettier: 9.1.0(eslint@8.57.1)
