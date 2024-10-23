@@ -21,7 +21,7 @@ const updateDNSModel = ref<any>({
 const updateDNSModal = ref(false)
 const updateDNS = ref<any>()
 
-const dnsColumns: any = [
+const columns: any = [
   {
     title: '备注名称',
     key: 'name',
@@ -93,7 +93,7 @@ const dnsColumns: any = [
             onPositiveClick: async () => {
               await cert.dnsDelete(row.id)
               window.$message.success('删除成功')
-              onDnsPageChange(1)
+              onPageChange(1)
             }
           },
           {
@@ -119,9 +119,10 @@ const dnsColumns: any = [
     }
   }
 ]
-const dnsData = ref<DNS[]>([] as DNS[])
 
-const dnsPagination = reactive({
+const data = ref<DNS[]>([] as DNS[])
+
+const pagination = reactive({
   page: 1,
   pageCount: 1,
   pageSize: 20,
@@ -131,18 +132,18 @@ const dnsPagination = reactive({
   pageSizes: [20, 50, 100, 200]
 })
 
-const onDnsPageChange = (page: number) => {
-  dnsPagination.page = page
-  getDnsList(page, dnsPagination.pageSize).then((res) => {
-    dnsData.value = res.items
-    dnsPagination.itemCount = res.total
-    dnsPagination.pageCount = res.total / dnsPagination.pageSize + 1
+const onPageChange = (page: number) => {
+  pagination.page = page
+  getDnsList(page, pagination.pageSize).then((res) => {
+    data.value = res.items
+    pagination.itemCount = res.total
+    pagination.pageCount = res.total / pagination.pageSize + 1
   })
 }
 
-const onDnsPageSizeChange = (pageSize: number) => {
-  dnsPagination.pageSize = pageSize
-  onDnsPageChange(1)
+const onPageSizeChange = (pageSize: number) => {
+  pagination.pageSize = pageSize
+  onPageChange(1)
 }
 
 const getDnsList = async (page: number, limit: number) => {
@@ -154,14 +155,21 @@ const handleUpdateDNS = async () => {
   await cert.dnsUpdate(updateDNS.value, updateDNSModel.value)
   window.$message.success('更新成功')
   updateDNSModal.value = false
-  onDnsPageChange(1)
+  onPageChange(1)
   updateDNSModel.value.data.ak = ''
   updateDNSModel.value.data.sk = ''
   updateDNSModel.value.name = ''
 }
 
 onMounted(async () => {
-  onDnsPageChange(1)
+  onPageChange(pagination.page)
+  window.$bus.on('cert:refresh-dns', () => {
+    onPageChange(pagination.page)
+  })
+})
+
+onUnmounted(() => {
+  window.$bus.off('cert:refresh-dns')
 })
 </script>
 
@@ -172,12 +180,12 @@ onMounted(async () => {
       remote
       :scroll-x="1000"
       :loading="false"
-      :columns="dnsColumns"
-      :data="dnsData"
+      :columns="columns"
+      :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="dnsPagination"
-      @update:page="onDnsPageChange"
-      @update:page-size="onDnsPageSizeChange"
+      :pagination="pagination"
+      @update:page="onPageChange"
+      @update:page-size="onPageSizeChange"
     />
   </n-space>
   <n-modal

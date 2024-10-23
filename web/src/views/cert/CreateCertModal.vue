@@ -24,6 +24,7 @@ const model = ref<any>({
 
 const handleCreateCert = async () => {
   await cert.certCreate(model.value)
+  show.value = false
   window.$message.success('创建成功')
   model.value = false
   model.value.domains = []
@@ -32,6 +33,7 @@ const handleCreateCert = async () => {
   model.value.account_id = 0
   model.value.website_id = 0
   model.value.auto_renew = true
+  window.$bus.emit('cert:refresh-cert')
 }
 </script>
 

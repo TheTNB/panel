@@ -37,7 +37,7 @@ const deployCertModel = ref<any>({
   website_id: 0
 })
 
-const certColumns: any = [
+const columns: any = [
   {
     title: '域名',
     key: 'domains',
@@ -221,7 +221,7 @@ const certColumns: any = [
                           .obtain(row.id)
                           .then(() => {
                             window.$message.success('签发成功')
-                            onCertPageChange(1)
+                            onPageChange(1)
                           })
                           .finally(() => {
                             d.loading = false
@@ -234,7 +234,7 @@ const certColumns: any = [
                       .obtain(row.id)
                       .then(() => {
                         window.$message.success('签发成功')
-                        onCertPageChange(1)
+                        onPageChange(1)
                       })
                       .finally(() => {
                         messageReactive.destroy()
@@ -282,7 +282,7 @@ const certColumns: any = [
                   await cert.renew(row.id)
                   messageReactive.destroy()
                   window.$message.success('续签成功')
-                  onCertPageChange(1)
+                  onPageChange(1)
                 }
               },
               {
@@ -335,7 +335,7 @@ const certColumns: any = [
             onPositiveClick: async () => {
               await cert.certDelete(row.id)
               window.$message.success('删除成功')
-              onCertPageChange(1)
+              onPageChange(1)
             }
           },
           {
@@ -361,9 +361,9 @@ const certColumns: any = [
     }
   }
 ]
-const certData = ref<Cert[]>([] as Cert[])
+const data = ref<Cert[]>([] as Cert[])
 
-const certPagination = reactive({
+const pagination = reactive({
   page: 1,
   pageCount: 1,
   pageSize: 20,
@@ -373,18 +373,18 @@ const certPagination = reactive({
   pageSizes: [20, 50, 100, 200]
 })
 
-const onCertPageChange = (page: number) => {
-  certPagination.page = page
-  getCertList(page, certPagination.pageSize).then((res) => {
-    certData.value = res.items
-    certPagination.itemCount = res.total
-    certPagination.pageCount = res.total / certPagination.pageSize + 1
+const onPageChange = (page: number) => {
+  pagination.page = page
+  getCertList(page, pagination.pageSize).then((res) => {
+    data.value = res.items
+    pagination.itemCount = res.total
+    pagination.pageCount = res.total / pagination.pageSize + 1
   })
 }
 
-const onCertPageSizeChange = (pageSize: number) => {
-  certPagination.pageSize = pageSize
-  onCertPageChange(1)
+const onPageSizeChange = (pageSize: number) => {
+  pagination.pageSize = pageSize
+  onPageChange(1)
 }
 
 const getCertList = async (page: number, limit: number) => {
@@ -396,7 +396,7 @@ const handleUpdateCert = async () => {
   await cert.certUpdate(updateCert.value, updateCertModel.value)
   window.$message.success('更新成功')
   updateCertModal.value = false
-  onCertPageChange(1)
+  onPageChange(1)
   updateCertModel.value.domains = []
   updateCertModel.value.dns_id = 0
   updateCertModel.value.type = 'P256'
@@ -411,7 +411,7 @@ const handleDeployCert = async () => {
   deployCertModal.value = false
   deployCertModel.value.id = 0
   deployCertModel.value.website_id = 0
-  onCertPageChange(1)
+  onPageChange(1)
 }
 
 const handleShowModalClose = () => {
@@ -420,7 +420,14 @@ const handleShowModalClose = () => {
 }
 
 onMounted(() => {
-  onCertPageChange(1)
+  onPageChange(pagination.page)
+  window.$bus.on('cert:refresh-cert', () => {
+    onPageChange(pagination.page)
+  })
+})
+
+onUnmounted(() => {
+  window.$bus.off('cert:refresh-cert')
 })
 </script>
 
@@ -431,12 +438,12 @@ onMounted(() => {
       remote
       :scroll-x="1000"
       :loading="false"
-      :columns="certColumns"
-      :data="certData"
+      :columns="columns"
+      :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="certPagination"
-      @update:page="onCertPageChange"
-      @update:page-size="onCertPageSizeChange"
+      :pagination="pagination"
+      @update:page="onPageChange"
+      @update:page-size="onPageSizeChange"
     />
   </n-space>
   <n-modal

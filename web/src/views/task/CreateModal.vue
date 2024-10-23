@@ -67,6 +67,7 @@ const handleSubmit = async () => {
     .create(createModel.value)
     .then(() => {
       window.$message.success('创建成功')
+      window.$bus.emit('task:refresh-cron')
       loading.value = false
       show.value = false
     })

@@ -208,26 +208,17 @@ const onTermWheel = (event: WheelEvent) => {
   }
 }
 
-watch(create, () => {
-  if (!create.value) fetchData()
-})
-
-watch(update, () => {
-  if (!update.value) {
-    fetchData()
-    updateId.value = 0
-  }
-})
-
 onMounted(() => {
   // https://github.com/xtermjs/xterm.js/pull/5178
   document.fonts.ready.then((fontFaceSet: any) =>
     Promise.all(Array.from(fontFaceSet).map((el: any) => el.load())).then(fetchData)
   )
+  window.$bus.on('ssh:refresh', fetchData)
 })
 
 onUnmounted(() => {
   closeSession()
+  window.$bus.off('ssh:refresh')
 })
 </script>
 

@@ -232,6 +232,13 @@ const saveTaskEdit = async () => {
 
 onMounted(() => {
   onPageChange(pagination.page)
+  window.$bus.on('task:refresh-cron', () => {
+    onPageChange(pagination.page)
+  })
+})
+
+onUnmounted(() => {
+  window.$bus.off('task:refresh-cron')
 })
 </script>
 

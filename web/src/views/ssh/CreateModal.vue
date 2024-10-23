@@ -22,6 +22,7 @@ const handleSubmit = async () => {
     .create(model.value)
     .then(() => {
       window.$message.success('创建成功')
+      window.$bus.emit('ssh:refresh')
       loading.value = false
       show.value = false
       model.value = {

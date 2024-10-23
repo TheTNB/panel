@@ -23,8 +23,10 @@ const handleSubmit = async () => {
     .update(id.value, model.value)
     .then(() => {
       window.$message.success('更新成功')
+      id.value = 0
       loading.value = false
       show.value = false
+      window.$bus.emit('ssh:refresh')
     })
     .catch(() => {
       loading.value = false

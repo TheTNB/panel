@@ -13,18 +13,12 @@ const createModel = ref({
   target: '',
   path: ''
 })
-const oldTab = ref('')
 
 const handleCreate = () => {
   backup.create(currentTab.value, createModel.value.target, createModel.value.path).then(() => {
     createModal.value = false
     window.$message.success('创建成功')
-    // 有点low，但是没找到更好的办法
-    oldTab.value = currentTab.value
-    currentTab.value = ''
-    setTimeout(() => {
-      currentTab.value = oldTab.value
-    }, 0)
+    window.$bus.emit('backup:refresh')
   })
 }
 </script>

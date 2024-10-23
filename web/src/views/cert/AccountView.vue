@@ -31,7 +31,7 @@ const updateAccountModel = ref<any>({
 const updateAccountModal = ref(false)
 const updateAccount = ref<any>()
 
-const accountColumns: any = [
+const columns: any = [
   {
     title: '邮箱',
     key: 'email',
@@ -100,7 +100,7 @@ const accountColumns: any = [
             onPositiveClick: async () => {
               await cert.accountDelete(row.id)
               window.$message.success('删除成功')
-              onAccountPageChange(1)
+              onPageChange(1)
             }
           },
           {
@@ -126,9 +126,9 @@ const accountColumns: any = [
     }
   }
 ]
-const accountData = ref<Account[]>([] as Account[])
+const data = ref<Account[]>([] as Account[])
 
-const accountPagination = reactive({
+const pagination = reactive({
   page: 1,
   pageCount: 1,
   pageSize: 20,
@@ -138,18 +138,18 @@ const accountPagination = reactive({
   pageSizes: [20, 50, 100, 200]
 })
 
-const onAccountPageChange = (page: number) => {
-  accountPagination.page = page
-  getAccountList(page, accountPagination.pageSize).then((res) => {
-    accountData.value = res.items
-    accountPagination.itemCount = res.total
-    accountPagination.pageCount = res.total / accountPagination.pageSize + 1
+const onPageChange = (page: number) => {
+  pagination.page = page
+  getAccountList(page, pagination.pageSize).then((res) => {
+    data.value = res.items
+    pagination.itemCount = res.total
+    pagination.pageCount = res.total / pagination.pageSize + 1
   })
 }
 
-const onAccountPageSizeChange = (pageSize: number) => {
-  accountPagination.pageSize = pageSize
-  onAccountPageChange(1)
+const onPageSizeChange = (pageSize: number) => {
+  pagination.pageSize = pageSize
+  onPageChange(1)
 }
 
 const getAccountList = async (page: number, limit: number) => {
@@ -165,14 +165,21 @@ const handleUpdateAccount = async () => {
   messageReactive.destroy()
   window.$message.success('更新成功')
   updateAccountModal.value = false
-  onAccountPageChange(1)
+  onPageChange(1)
   updateAccountModel.value.email = ''
   updateAccountModel.value.hmac_encoded = ''
   updateAccountModel.value.kid = ''
 }
 
 onMounted(() => {
-  onAccountPageChange(1)
+  onPageChange(pagination.page)
+  window.$bus.on('cert:refresh-account', () => {
+    onPageChange(pagination.page)
+  })
+})
+
+onUnmounted(() => {
+  window.$bus.off('cert:refresh-account')
 })
 </script>
 
@@ -183,12 +190,12 @@ onMounted(() => {
       remote
       :scroll-x="1000"
       :loading="false"
-      :columns="accountColumns"
-      :data="accountData"
+      :columns="columns"
+      :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="accountPagination"
-      @update:page="onAccountPageChange"
-      @update:page-size="onAccountPageSizeChange"
+      :pagination="pagination"
+      @update:page="onPageChange"
+      @update:page-size="onPageSizeChange"
     />
   </n-space>
   <n-modal

@@ -33,6 +33,7 @@ const handleCreateAccount = async () => {
   cert
     .accountCreate(model.value)
     .then(() => {
+      show.value = false
       window.$message.success('创建成功')
       model.value.email = ''
       model.value.hmac_encoded = ''
@@ -40,6 +41,7 @@ const handleCreateAccount = async () => {
     })
     .finally(() => {
       messageReactive?.destroy()
+      window.$bus.emit('cert:refresh-account')
     })
 }
 </script>

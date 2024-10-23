@@ -145,6 +145,13 @@ const handleDelete = async (file: string) => {
 
 onMounted(() => {
   onPageChange(pagination.page)
+  window.$bus.on('backup:refresh', () => {
+    onPageChange(pagination.page)
+  })
+})
+
+onUnmounted(() => {
+  window.$bus.off('backup:refresh')
 })
 </script>
 
