@@ -18,8 +18,8 @@ const isEnabled = ref(false)
 const config = ref('')
 const processLog = ref('')
 
-const addProcessModal = ref(false)
-const addProcessModel = ref({
+const createProcessModal = ref(false)
+const createProcessModel = ref({
   name: '',
   user: 'www',
   path: '',
@@ -293,16 +293,10 @@ const handleRestart = async () => {
   await getStatus()
 }
 
-const handleReload = async () => {
-  await systemctl.reload(serviceName.value)
-  window.$message.success('重载成功')
-  await getStatus()
-}
-
-const handleAddProcess = async () => {
-  await supervisor.createProcess(addProcessModel.value)
+const handleCreateProcess = async () => {
+  await supervisor.createProcess(createProcessModel.value)
   window.$message.success('添加成功')
-  addProcessModal.value = false
+  createProcessModal.value = false
   onPageChange(1)
 }
 
@@ -384,7 +378,7 @@ onUnmounted(() => {
         v-if="currentTab == 'processes'"
         class="ml-16"
         type="primary"
-        @click="addProcessModal = true"
+        @click="createProcessModal = true"
       >
         <TheIcon :size="18" icon="material-symbols:add" />
         添加进程
@@ -425,10 +419,6 @@ onUnmounted(() => {
                 <n-button type="warning" @click="handleRestart">
                   <TheIcon :size="18" icon="material-symbols:replay-rounded" />
                   重启
-                </n-button>
-                <n-button type="primary" @click="handleReload">
-                  <TheIcon :size="20" icon="material-symbols:refresh-rounded" />
-                  重载
                 </n-button>
               </n-space>
             </n-space>
@@ -475,19 +465,19 @@ onUnmounted(() => {
     </n-tabs>
   </common-page>
   <n-modal
-    v-model:show="addProcessModal"
+    v-model:show="createProcessModal"
     preset="card"
     title="添加进程"
     style="width: 60vw"
     size="huge"
     :bordered="false"
     :segmented="false"
-    @close="addProcessModal = false"
+    @close="createProcessModal = false"
   >
-    <n-form :model="addProcessModel">
+    <n-form :model="createProcessModel">
       <n-form-item path="name" label="名称">
         <n-input
-          v-model:value="addProcessModel.name"
+          v-model:value="createProcessModel.name"
           type="text"
           @keydown.enter.prevent
           placeholder="名称禁止使用中文"
@@ -495,7 +485,7 @@ onUnmounted(() => {
       </n-form-item>
       <n-form-item path="command" label="启动命令">
         <n-input
-          v-model:value="addProcessModel.command"
+          v-model:value="createProcessModel.command"
           type="text"
           @keydown.enter.prevent
           placeholder="启动命令中的文件请填写绝对路径"
@@ -503,7 +493,7 @@ onUnmounted(() => {
       </n-form-item>
       <n-form-item path="path" label="运行目录">
         <n-input
-          v-model:value="addProcessModel.path"
+          v-model:value="createProcessModel.path"
           type="text"
           @keydown.enter.prevent
           placeholder="运行目录请填写绝对路径"
@@ -511,19 +501,19 @@ onUnmounted(() => {
       </n-form-item>
       <n-form-item path="user" label="启动用户">
         <n-input
-          v-model:value="addProcessModel.user"
+          v-model:value="createProcessModel.user"
           type="text"
           @keydown.enter.prevent
           placeholder="一般情况下填写www即可"
         />
       </n-form-item>
       <n-form-item path="num" label="进程数量">
-        <n-input-number v-model:value="addProcessModel.num" :min="1" />
+        <n-input-number v-model:value="createProcessModel.num" :min="1" />
       </n-form-item>
     </n-form>
     <n-row :gutter="[0, 24]">
       <n-col :span="24">
-        <n-button type="info" block @click="handleAddProcess">提交</n-button>
+        <n-button type="info" block @click="handleCreateProcess">提交</n-button>
       </n-col>
     </n-row>
   </n-modal>
