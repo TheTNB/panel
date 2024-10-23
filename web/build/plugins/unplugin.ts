@@ -1,14 +1,14 @@
 import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
 
 /**
  * * unplugin-icons应用，自动引入iconify图标
  * usage: https://github.com/antfu/unplugin-icons
  * 图标库: https://icones.js.org/
  */
-import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
+import Icons from 'unplugin-icons/vite'
 
 export default [
   AutoImport({
@@ -26,7 +26,7 @@ export default [
   Components({
     resolvers: [
       NaiveUiResolver(),
-      IconsResolver({ customCollections: ['custom'], componentPrefix: 'icon' })
+      IconsResolver({ customCollections: ['custom'], prefix: 'icon' })
     ],
     dts: 'types/components.d.ts'
   })

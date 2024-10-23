@@ -56,15 +56,15 @@ const columns: any = [
     ellipsis: { tooltip: true }
   },
   {
-    title: 'SSL',
-    key: 'ssl',
+    title: 'HTTPS',
+    key: 'https',
     width: 150,
     align: 'center',
     render(row: any) {
       return h(NSwitch, {
         size: 'small',
         rubberBand: false,
-        value: row.ssl,
+        value: row.https,
         onClick: () => handleEdit(row)
       })
     }
