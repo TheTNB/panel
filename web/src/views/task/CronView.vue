@@ -3,19 +3,17 @@ import cronstrue from 'cronstrue'
 import 'cronstrue/locales/zh_CN'
 
 import Editor from '@guolao/vue-monaco-editor'
-import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NSwitch, NTag } from 'naive-ui'
+import { NButton, NDataTable, NInput, NPopconfirm, NSwitch, NTag } from 'naive-ui'
 
 import cron from '@/api/panel/cron'
 import file from '@/api/panel/file'
 import { formatDateTime, renderIcon } from '@/utils'
-import CreateModal from '@/views/task/CreateModal.vue'
 import type { CronTask } from '@/views/task/types'
 import { CronNaive } from '@vue-js-cron/naive-ui'
 
 const logPath = ref('')
 const logModal = ref(false)
 const editModal = ref(false)
-const create = ref(false)
 
 const columns: any = [
   { type: 'selection', fixed: 'left' },
@@ -232,36 +230,27 @@ const saveTaskEdit = async () => {
     })
 }
 
-watch(create, () => {
-  onPageChange(pagination.page)
-})
-
 onMounted(() => {
   onPageChange(pagination.page)
 })
 </script>
 
 <template>
-  <n-flex vertical>
-    <n-card flex-1 rounded-10>
-      <n-button type="primary" @click="create = true">创建计划任务</n-button>
-    </n-card>
-    <n-card flex-1 rounded-10>
-      <n-data-table
-        striped
-        remote
-        :scroll-x="1300"
-        :data="data"
-        :columns="columns"
-        :row-key="(row: any) => row.id"
-        :pagination="pagination"
-        :bordered="false"
-        :loading="false"
-        @update:page="onPageChange"
-        @update:page-size="onPageSizeChange"
-      />
-    </n-card>
-  </n-flex>
+  <n-card flex-1 rounded-10>
+    <n-data-table
+      striped
+      remote
+      :scroll-x="1300"
+      :data="data"
+      :columns="columns"
+      :row-key="(row: any) => row.id"
+      :pagination="pagination"
+      :bordered="false"
+      :loading="false"
+      @update:page="onPageChange"
+      @update:page-size="onPageSizeChange"
+    />
+  </n-card>
   <realtime-log-modal v-model:show="logModal" :path="logPath" />
   <n-modal
     v-model:show="editModal"
@@ -294,5 +283,4 @@ onMounted(() => {
       }"
     />
   </n-modal>
-  <create-modal v-model:show="create" />
 </template>

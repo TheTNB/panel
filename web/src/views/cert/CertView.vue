@@ -2,20 +2,20 @@
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
 
-import app from '@/api/panel/app'
 import cert from '@/api/panel/cert'
-import website from '@/api/panel/website'
 import type { Cert } from '@/views/cert/types'
 
-let messageReactive: any
-const addCertModel = ref<any>({
-  domains: [],
-  dns_id: 0,
-  type: 'P256',
-  account_id: null,
-  website_id: 0,
-  auto_renew: true
+const props = defineProps({
+  algorithms: Array<any>,
+  websites: Array<any>,
+  accounts: Array<any>,
+  dns: Array<any>
 })
+
+const { algorithms, websites, accounts, dns } = toRefs(props)
+
+let messageReactive: any
+
 const updateCertModel = ref<any>({
   domains: [],
   dns_id: 0,
@@ -24,7 +24,6 @@ const updateCertModel = ref<any>({
   website_id: 0,
   auto_renew: true
 })
-const addCertModal = ref(false)
 const updateCertModal = ref(false)
 const updateCert = ref<any>()
 const showModal = ref(false)
@@ -37,11 +36,6 @@ const deployCertModel = ref<any>({
   id: 0,
   website_id: 0
 })
-
-const algorithms = ref<any>([])
-const websites = ref<any>([])
-const dns = ref<any>([])
-const accounts = ref<any>([])
 
 const certColumns: any = [
   {
@@ -398,20 +392,6 @@ const getCertList = async (page: number, limit: number) => {
   return data
 }
 
-const handleAddCert = async () => {
-  await cert.certAdd(addCertModel.value)
-  window.$message.success('添加成功')
-  addCertModal.value = false
-  onCertPageChange(1)
-  addCertModel.value.domains = []
-  addCertModel.value.dns_id = 0
-  addCertModel.value.type = 'P256'
-  addCertModel.value.account_id = 0
-  addCertModel.value.website_id = 0
-  addCertModel.value.auto_renew = true
-  await getAsyncData()
-}
-
 const handleUpdateCert = async () => {
   await cert.certUpdate(updateCert.value, updateCertModel.value)
   window.$message.success('更新成功')
@@ -423,7 +403,6 @@ const handleUpdateCert = async () => {
   updateCertModel.value.account_id = 0
   updateCertModel.value.website_id = 0
   updateCertModel.value.auto_renew = true
-  await getAsyncData()
 }
 
 const handleDeployCert = async () => {
@@ -435,68 +414,18 @@ const handleDeployCert = async () => {
   onCertPageChange(1)
 }
 
-const getAsyncData = async () => {
-  const { data: algorithmData } = await cert.algorithms()
-  algorithms.value = algorithmData
-
-  websites.value = []
-  websites.value.push({
-    label: '无',
-    value: 0
-  })
-  app.isInstalled('nginx').then(async (res) => {
-    if (res.data.installed) {
-      const { data: websiteData } = await website.list(1, 10000)
-      for (const item of websiteData.items) {
-        websites.value.push({
-          label: item.name,
-          value: item.id
-        })
-      }
-    }
-  })
-
-  const { data: dnsData } = await cert.dns(1, 10000)
-  dns.value = []
-  dns.value.push({
-    label: '无',
-    value: 0
-  })
-  for (const item of dnsData.items) {
-    dns.value.push({
-      label: item.name,
-      value: item.id
-    })
-  }
-
-  const { data: accountData } = await cert.accounts(1, 10000)
-  accounts.value = []
-  for (const item of accountData.items) {
-    accounts.value.push({
-      label: item.email,
-      value: item.id
-    })
-  }
-}
-
 const handleShowModalClose = () => {
   showCertModel.value.cert = ''
   showCertModel.value.key = ''
 }
 
 onMounted(() => {
-  getAsyncData()
   onCertPageChange(1)
 })
 </script>
 
 <template>
   <n-space vertical size="large">
-    <n-card rounded-10>
-      <n-space>
-        <n-button type="primary" @click="addCertModal = true"> 添加证书 </n-button>
-      </n-space>
-    </n-card>
     <n-data-table
       striped
       remote
@@ -510,65 +439,6 @@ onMounted(() => {
       @update:page-size="onCertPageSizeChange"
     />
   </n-space>
-  <n-modal
-    v-model:show="addCertModal"
-    preset="card"
-    title="添加证书"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
-    <n-space vertical>
-      <n-alert type="info">
-        可以通过选择网站 / DNS 中的任意一项来自动签发和部署证书，也可以手动输入域名并设置 DNS
-        解析来签发证书
-      </n-alert>
-      <n-form :model="addCertModel">
-        <n-form-item label="域名">
-          <n-dynamic-input
-            v-model:value="addCertModel.domains"
-            placeholder="example.com"
-            :min="1"
-            show-sort-button
-          />
-        </n-form-item>
-        <n-form-item path="type" label="密钥类型">
-          <n-select
-            v-model:value="addCertModel.type"
-            placeholder="选择密钥类型"
-            clearable
-            :options="algorithms"
-          />
-        </n-form-item>
-        <n-form-item path="website_id" label="网站">
-          <n-select
-            v-model:value="addCertModel.website_id"
-            placeholder="选择用于部署证书的网站"
-            clearable
-            :options="websites"
-          />
-        </n-form-item>
-        <n-form-item path="account_id" label="账号">
-          <n-select
-            v-model:value="addCertModel.account_id"
-            placeholder="选择用于签发证书的账号"
-            clearable
-            :options="accounts"
-          />
-        </n-form-item>
-        <n-form-item path="account_id" label="DNS">
-          <n-select
-            v-model:value="addCertModel.dns_id"
-            placeholder="选择用于签发证书的DNS"
-            clearable
-            :options="dns"
-          />
-        </n-form-item>
-      </n-form>
-      <n-button type="info" block @click="handleAddCert">提交</n-button>
-    </n-space>
-  </n-modal>
   <n-modal
     v-model:show="updateCertModal"
     preset="card"

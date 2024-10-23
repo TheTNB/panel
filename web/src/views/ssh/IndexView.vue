@@ -234,12 +234,10 @@ onUnmounted(() => {
 <template>
   <common-page show-footer>
     <template #action>
-      <div flex items-center>
-        <n-button type="primary" @click="create = true">
-          <TheIcon :size="18" icon="material-symbols:add" />
-          创建主机
-        </n-button>
-      </div>
+      <n-button type="primary" @click="create = true">
+        <TheIcon :size="18" icon="material-symbols:add" />
+        创建主机
+      </n-button>
     </template>
     <n-layout has-sider sider-placement="right">
       <n-layout content-style="overflow: visible" bg-hex-111>

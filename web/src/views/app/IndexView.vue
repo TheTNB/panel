@@ -243,12 +243,10 @@ onMounted(() => {
 <template>
   <common-page show-footer>
     <template #action>
-      <div flex items-center>
-        <n-button type="primary" @click="handleUpdateCache">
-          <TheIcon :size="18" icon="material-symbols:refresh" />
-          {{ $t('appIndex.buttons.updateCache') }}
-        </n-button>
-      </div>
+      <n-button type="primary" @click="handleUpdateCache">
+        <TheIcon :size="18" icon="material-symbols:refresh" />
+        {{ $t('appIndex.buttons.updateCache') }}
+      </n-button>
     </template>
     <n-flex vertical>
       <n-alert type="warning">{{ $t('appIndex.alerts.warning') }}</n-alert>

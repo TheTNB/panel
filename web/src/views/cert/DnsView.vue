@@ -4,14 +4,12 @@ import { NButton, NDataTable, NInput, NPopconfirm, NSpace, NTag } from 'naive-ui
 import cert from '@/api/panel/cert'
 import type { DNS } from '@/views/cert/types'
 
-const addDNSModel = ref<any>({
-  data: {
-    ak: '',
-    sk: ''
-  },
-  type: 'aliyun',
-  name: ''
+const props = defineProps({
+  dnsProviders: Array<any>
 })
+
+const { dnsProviders } = toRefs(props)
+
 const updateDNSModel = ref<any>({
   data: {
     ak: '',
@@ -20,11 +18,8 @@ const updateDNSModel = ref<any>({
   type: 'aliyun',
   name: ''
 })
-const addDNSModal = ref(false)
 const updateDNSModal = ref(false)
 const updateDNS = ref<any>()
-
-const dnsProviders = ref<any>([])
 
 const dnsColumns: any = [
   {
@@ -155,16 +150,6 @@ const getDnsList = async (page: number, limit: number) => {
   return data
 }
 
-const handleAddDNS = async () => {
-  await cert.dnsAdd(addDNSModel.value)
-  window.$message.success('添加成功')
-  addDNSModal.value = false
-  onDnsPageChange(1)
-  addDNSModel.value.data.ak = ''
-  addDNSModel.value.data.sk = ''
-  addDNSModel.value.name = ''
-}
-
 const handleUpdateDNS = async () => {
   await cert.dnsUpdate(updateDNS.value, updateDNSModel.value)
   window.$message.success('更新成功')
@@ -176,20 +161,12 @@ const handleUpdateDNS = async () => {
 }
 
 onMounted(async () => {
-  cert.dnsProviders().then((res) => {
-    dnsProviders.value = res.data
-  })
   onDnsPageChange(1)
 })
 </script>
 
 <template>
   <n-space vertical size="large">
-    <n-card rounded-10>
-      <n-space>
-        <n-button type="primary" @click="addDNSModal = true"> 添加 DNS </n-button>
-      </n-space>
-    </n-card>
     <n-data-table
       striped
       remote
@@ -203,93 +180,6 @@ onMounted(async () => {
       @update:page-size="onDnsPageSizeChange"
     />
   </n-space>
-  <n-modal
-    v-model:show="addDNSModal"
-    preset="card"
-    title="添加 DNS"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
-    <n-space vertical>
-      <n-form :model="addDNSModel">
-        <n-form-item path="name" label="备注名称">
-          <n-input
-            v-model:value="addDNSModel.name"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入备注名称"
-          />
-        </n-form-item>
-        <n-form-item path="type" label="DNS">
-          <n-select
-            v-model:value="addDNSModel.type"
-            placeholder="选择 DNS"
-            clearable
-            :options="dnsProviders"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="ak" label="Access Key">
-          <n-input
-            v-model:value="addDNSModel.data.ak"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入阿里云 Access Key"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'aliyun'" path="sk" label="Secret Key">
-          <n-input
-            v-model:value="addDNSModel.data.sk"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入阿里云 Secret Key"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'tencent'" path="ak" label="SecretId">
-          <n-input
-            v-model:value="addDNSModel.data.ak"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入腾讯云 SecretId"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'tencent'" path="sk" label="SecretKey">
-          <n-input
-            v-model:value="addDNSModel.data.sk"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入腾讯云 SecretKey"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'huawei'" path="ak" label="AccessKeyId">
-          <n-input
-            v-model:value="addDNSModel.data.ak"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入华为云 AccessKeyId"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'huawei'" path="sk" label="SecretAccessKey">
-          <n-input
-            v-model:value="addDNSModel.data.sk"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入华为云 SecretAccessKey"
-          />
-        </n-form-item>
-        <n-form-item v-if="addDNSModel.type == 'cloudflare'" path="ak" label="API Key">
-          <n-input
-            v-model:value="addDNSModel.data.ak"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入 Cloudflare API Key"
-          />
-        </n-form-item>
-      </n-form>
-      <n-button type="info" block @click="handleAddDNS">提交</n-button>
-    </n-space>
-  </n-modal>
   <n-modal
     v-model:show="updateDNSModal"
     preset="card"

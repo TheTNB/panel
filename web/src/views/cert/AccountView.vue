@@ -12,14 +12,15 @@ import {
 import cert from '@/api/panel/cert'
 import type { Account } from '@/views/cert/types'
 
-let messageReactive: MessageReactive | null = null
-const addAccountModel = ref<any>({
-  hmac_encoded: '',
-  email: '',
-  kid: '',
-  key_type: 'P256',
-  ca: 'googlecn'
+const props = defineProps({
+  caProviders: Array<any>,
+  algorithms: Array<any>
 })
+
+const { caProviders, algorithms } = toRefs(props)
+
+let messageReactive: MessageReactive | null = null
+
 const updateAccountModel = ref<any>({
   hmac_encoded: '',
   email: '',
@@ -27,16 +28,8 @@ const updateAccountModel = ref<any>({
   key_type: 'P256',
   ca: 'googlecn'
 })
-const addAccountModal = ref(false)
 const updateAccountModal = ref(false)
 const updateAccount = ref<any>()
-
-const showEAB = computed(() => {
-  return addAccountModel.value.ca === 'google' || addAccountModel.value.ca === 'sslcom'
-})
-
-const caProviders = ref<any>([])
-const algorithms = ref<any>([])
 
 const accountColumns: any = [
   {
@@ -61,7 +54,7 @@ const accountColumns: any = [
         },
         {
           default: () => {
-            return caProviders.value.find((item: any) => item.value === row.ca)?.label
+            return caProviders?.value?.find((item: any) => item.value === row.ca)?.label
           }
         }
       )
@@ -164,20 +157,6 @@ const getAccountList = async (page: number, limit: number) => {
   return data
 }
 
-const handleAddAccount = async () => {
-  messageReactive = window.$message.loading('正在向 CA 注册账号，请耐心等待', {
-    duration: 0
-  })
-  await cert.accountAdd(addAccountModel.value)
-  messageReactive.destroy()
-  window.$message.success('添加成功')
-  addAccountModal.value = false
-  onAccountPageChange(1)
-  addAccountModel.value.email = ''
-  addAccountModel.value.hmac_encoded = ''
-  addAccountModel.value.kid = ''
-}
-
 const handleUpdateAccount = async () => {
   messageReactive = window.$message.loading('正在向 CA 注册账号，请耐心等待', {
     duration: 0
@@ -193,23 +172,12 @@ const handleUpdateAccount = async () => {
 }
 
 onMounted(() => {
-  cert.caProviders().then((res) => {
-    caProviders.value = res.data
-  })
-  cert.algorithms().then((res) => {
-    algorithms.value = res.data
-  })
   onAccountPageChange(1)
 })
 </script>
 
 <template>
   <n-space vertical size="large">
-    <n-card rounded-10>
-      <n-space>
-        <n-button type="primary" @click="addAccountModal = true"> 添加账号 </n-button>
-      </n-space>
-    </n-card>
     <n-data-table
       striped
       remote
@@ -223,65 +191,6 @@ onMounted(() => {
       @update:page-size="onAccountPageSizeChange"
     />
   </n-space>
-  <n-modal
-    v-model:show="addAccountModal"
-    preset="card"
-    title="添加账号"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
-    <n-space vertical>
-      <n-alert type="info"> Google 和 SSL.com 需要先去官网获得 KID 和 HMAC 并填入 </n-alert>
-      <n-alert type="warning">
-        境内无法使用 Google，其他 CA 视网络情况而定，建议使用 GoogleCN 或 Let's Encrypt
-      </n-alert>
-      <n-form :model="addAccountModel">
-        <n-form-item path="ca" label="CA">
-          <n-select
-            v-model:value="addAccountModel.ca"
-            placeholder="选择 CA"
-            clearable
-            :options="caProviders"
-          />
-        </n-form-item>
-        <n-form-item path="key_type" label="密钥类型">
-          <n-select
-            v-model:value="addAccountModel.key_type"
-            placeholder="选择密钥类型"
-            clearable
-            :options="algorithms"
-          />
-        </n-form-item>
-        <n-form-item path="email" label="邮箱">
-          <n-input
-            v-model:value="addAccountModel.email"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入邮箱地址"
-          />
-        </n-form-item>
-        <n-form-item v-if="showEAB" path="kid" label="KID">
-          <n-input
-            v-model:value="addAccountModel.kid"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入 KID"
-          />
-        </n-form-item>
-        <n-form-item v-if="showEAB" path="hmac_encoded" label="HMAC">
-          <n-input
-            v-model:value="addAccountModel.hmac_encoded"
-            type="text"
-            @keydown.enter.prevent
-            placeholder="输入 HMAC"
-          />
-        </n-form-item>
-      </n-form>
-      <n-button type="info" block @click="handleAddAccount">提交</n-button>
-    </n-space>
-  </n-modal>
   <n-modal
     v-model:show="updateAccountModal"
     preset="card"

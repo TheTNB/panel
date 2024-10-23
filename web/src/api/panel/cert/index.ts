@@ -15,7 +15,7 @@ export default {
   // ACME 账号详情
   accountInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/account/${id}`),
   // ACME 账号添加
-  accountAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/account', data),
+  accountCreate: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/account', data),
   // ACME 账号更新
   accountUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
     request.put(`/cert/account/${id}`, data),
@@ -27,7 +27,7 @@ export default {
   // DNS 记录详情
   dnsInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/dns/${id}`),
   // DNS 记录添加
-  dnsAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/dns', data),
+  dnsCreate: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/dns', data),
   // DNS 记录更新
   dnsUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
     request.put(`/cert/dns/${id}`, data),
@@ -39,7 +39,7 @@ export default {
   // 证书详情
   certInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/cert/${id}`),
   // 证书添加
-  certAdd: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/cert', data),
+  certCreate: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/cert', data),
   // 证书更新
   certUpdate: (id: number, data: any): Promise<AxiosResponse<any>> =>
     request.put(`/cert/cert/${id}`, data),
