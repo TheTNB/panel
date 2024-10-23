@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import app from '@/api/panel/app'
 import cron from '@/api/panel/cron'
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
@@ -84,7 +85,11 @@ watch(createModel, (value) => {
 
 onMounted(() => {
   getPhpAndDb()
-  getWebsiteList(1, 10000)
+  app.isInstalled('nginx').then((res) => {
+    if (res.data.installed) {
+      getWebsiteList(1, 10000)
+    }
+  })
 })
 </script>
 

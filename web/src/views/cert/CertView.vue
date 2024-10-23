@@ -2,6 +2,7 @@
 import Editor from '@guolao/vue-monaco-editor'
 import { NButton, NDataTable, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
 
+import app from '@/api/panel/app'
 import cert from '@/api/panel/cert'
 import website from '@/api/panel/website'
 import type { Cert } from '@/views/cert/types'
@@ -438,18 +439,22 @@ const getAsyncData = async () => {
   const { data: algorithmData } = await cert.algorithms()
   algorithms.value = algorithmData
 
-  const { data: websiteData } = await website.list(1, 10000)
   websites.value = []
   websites.value.push({
     label: '无',
     value: 0
   })
-  for (const item of websiteData.items) {
-    websites.value.push({
-      label: item.name,
-      value: item.id
-    })
-  }
+  app.isInstalled('nginx').then(async (res) => {
+    if (res.data.installed) {
+      const { data: websiteData } = await website.list(1, 10000)
+      for (const item of websiteData.items) {
+        websites.value.push({
+          label: item.name,
+          value: item.id
+        })
+      }
+    }
+  })
 
   const { data: dnsData } = await cert.dns(1, 10000)
   dns.value = []

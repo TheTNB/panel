@@ -6,6 +6,7 @@ defineOptions({
 import { NButton, NDataTable, NInput, NPopconfirm, NSwitch } from 'naive-ui'
 
 import fail2ban from '@/api/apps/fail2ban'
+import app from '@/api/panel/app'
 import systemctl from '@/api/panel/systemctl'
 import website from '@/api/panel/website'
 import { renderIcon } from '@/utils'
@@ -303,7 +304,11 @@ onMounted(() => {
   getIsEnabled()
   getWhiteList()
   onPageChange(1)
-  getWebsiteList(1, 10000)
+  app.isInstalled('nginx').then((res) => {
+    if (res.data.installed) {
+      getWebsiteList(1, 10000)
+    }
+  })
 })
 </script>
 
