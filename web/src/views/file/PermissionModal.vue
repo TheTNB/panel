@@ -2,7 +2,6 @@
 import { NButton, NInput } from 'naive-ui'
 
 import file from '@/api/panel/file'
-import EventBus from '@/utils/event'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const selected = defineModel<string[]>('selected', { type: Array, required: true })
@@ -29,7 +28,7 @@ const handlePermission = async () => {
         window.$message.error(`修改 ${path} 失败`)
       })
   }
-  EventBus.emit('file:refresh')
+  window.$bus.emit('file:refresh')
 }
 
 const calculateOctal = (permissions: string[]) => {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import file from '@/api/panel/file'
-import EventBus from '@/utils/event'
 import { NButton, NPopconfirm, NSpace, NTag } from 'naive-ui'
 
 import type { DataTableColumns } from 'naive-ui'
@@ -75,7 +74,7 @@ const columns: DataTableColumns<RowData> = [
                 onPositiveClick: () => {
                   file.delete(row.full).then(() => {
                     window.$message.success('删除成功')
-                    EventBus.emit('file:refresh')
+                    window.$bus.emit('file:refresh')
                   })
                 },
                 onNegativeClick: () => {}

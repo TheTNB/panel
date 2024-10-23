@@ -2,7 +2,6 @@
 import type { UploadCustomRequestOptions } from 'naive-ui'
 
 import api from '@/api/panel/file'
-import EventBus from '@/utils/event'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const path = defineModel<string>('path', { type: String, required: true })
@@ -15,7 +14,7 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
     .upload(`${path.value}/${file.name}`, formData, onProgress)
     .then(() => {
       window.$message.success(`上传 ${file.name} 成功`)
-      EventBus.emit('file:refresh')
+      window.$bus.emit('file:refresh')
       onFinish()
     })
     .catch(() => {

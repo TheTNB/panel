@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { NButton, NSpace } from 'naive-ui'
-
 import file from '@/api/panel/file'
-import EventBus from '@/utils/event'
 import { checkName, lastDirectory } from '@/utils/file'
 import UploadModal from '@/views/file/UploadModal.vue'
 import type { Marked } from '@/views/file/types'
@@ -41,7 +38,7 @@ const handleCreate = () => {
   file.create(fullPath, createModel.value.dir).then(() => {
     create.value = false
     window.$message.success('创建成功')
-    EventBus.emit('file:refresh')
+    window.$bus.emit('file:refresh')
   })
 }
 
@@ -56,7 +53,7 @@ const handleDownload = () => {
     .then(() => {
       download.value = false
       window.$message.success('下载任务创建成功')
-      EventBus.emit('file:refresh')
+      window.$bus.emit('file:refresh')
     })
 }
 
@@ -97,12 +94,12 @@ const handlePaste = async () => {
     if (type === 'copy') {
       await file.copy(source, target).then(() => {
         window.$message.success(`复制 ${source} 到 ${target} 成功`)
-        EventBus.emit('file:refresh')
+        window.$bus.emit('file:refresh')
       })
     } else {
       await file.move(source, target).then(() => {
         window.$message.success(`移动 ${source} 到 ${target} 成功`)
-        EventBus.emit('file:refresh')
+        window.$bus.emit('file:refresh')
       })
     }
   }
@@ -119,7 +116,7 @@ const bulkDelete = () => {
   for (const path of selected.value) {
     file.delete(path).then(() => {
       window.$message.success(`删除 ${path} 成功`)
-      EventBus.emit('file:refresh')
+      window.$bus.emit('file:refresh')
     })
   }
 }

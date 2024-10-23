@@ -2,8 +2,8 @@
 import type { InputInst } from 'naive-ui'
 import { onUnmounted } from 'vue'
 
-import EventBus from '@/utils/event'
 import { checkPath } from '@/utils/file'
+import SearchModal from '@/views/file/SearchModal.vue'
 
 const path = defineModel<string>('path', { type: String, required: true })
 const isInput = ref(false)
@@ -13,7 +13,7 @@ const input = ref('www')
 const history: string[] = []
 let current = -1
 
-const searchModal = ref(false)
+const searchShow = ref(false)
 const search = ref({
   keyword: '',
   sub: false
@@ -38,7 +38,7 @@ const handleBlur = () => {
 }
 
 const handleRefresh = () => {
-  EventBus.emit('file:refresh')
+  window.$bus.emit('file:refresh')
 }
 
 const handleUp = () => {
@@ -90,7 +90,7 @@ const handlePushHistory = (path: string) => {
 }
 
 const handleSearch = () => {
-  searchModal.value = true
+  searchShow.value = true
 }
 
 watch(
@@ -102,11 +102,11 @@ watch(
 )
 
 onMounted(() => {
-  EventBus.on('push-history', handlePushHistory)
+  window.$bus.on('push-history', handlePushHistory)
 })
 
 onUnmounted(() => {
-  EventBus.off('push-history', handlePushHistory)
+  window.$bus.off('push-history', handlePushHistory)
 })
 </script>
 
@@ -158,7 +158,7 @@ onUnmounted(() => {
     </n-input-group>
   </n-flex>
   <search-modal
-    v-model:show="searchModal"
+    v-model:show="searchShow"
     v-model:path="path"
     v-model:keyword="search.keyword"
     v-model:sub="search.sub"

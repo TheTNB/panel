@@ -6,7 +6,6 @@ import type { RowData } from 'naive-ui/es/data-table/src/interface'
 
 import file from '@/api/panel/file'
 import TheIcon from '@/components/custom/TheIcon.vue'
-import EventBus from '@/utils/event'
 import { checkName, checkPath, getExt, getFilename, getIconByExt, isCompress } from '@/utils/file'
 import EditModal from '@/views/file/EditModal.vue'
 import type { Marked } from '@/views/file/types'
@@ -233,7 +232,7 @@ const columns: DataTableColumns<RowData> = [
                 onPositiveClick: () => {
                   file.delete(row.full).then(() => {
                     window.$message.success('删除成功')
-                    EventBus.emit('file:refresh')
+                    window.$bus.emit('file:refresh')
                   })
                 },
                 onNegativeClick: () => {}
@@ -389,7 +388,7 @@ const handleRename = () => {
   file.move(source, target).then(() => {
     window.$message.success('重命名成功')
     renameModal.value = false
-    EventBus.emit('file:refresh')
+    window.$bus.emit('file:refresh')
   })
 }
 
@@ -411,7 +410,7 @@ const handleUnCompress = () => {
       message?.destroy()
       window.$message.success('解压成功')
       unCompressModal.value = false
-      EventBus.emit('file:refresh')
+      window.$bus.emit('file:refresh')
     })
     .catch(() => {
       message?.destroy()
@@ -476,7 +475,7 @@ const handleSelect = (key: string) => {
     case 'delete':
       file.delete(selectedRow.value.full).then(() => {
         window.$message.success('删除成功')
-        EventBus.emit('file:refresh')
+        window.$bus.emit('file:refresh')
       })
       break
   }
@@ -517,15 +516,15 @@ onMounted(() => {
     path,
     () => {
       handlePageChange(1)
-      EventBus.emit('push-history', path.value)
+      window.$bus.emit('push-history', path.value)
     },
     { immediate: true }
   )
-  EventBus.on('file:refresh', handleRefresh)
+  window.$bus.on('file:refresh', handleRefresh)
 })
 
 onUnmounted(() => {
-  EventBus.off('file:refresh', handleRefresh)
+  window.$bus.off('file:refresh', handleRefresh)
 })
 </script>
 

@@ -3,7 +3,6 @@ import { NButton, NInput } from 'naive-ui'
 
 import api from '@/api/panel/file'
 import { generateRandomString, getBase } from '@/utils'
-import EventBus from '@/utils/event'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const path = defineModel<string>('path', { type: String, required: true })
@@ -43,7 +42,7 @@ const handleArchive = async () => {
     })
   message?.destroy()
   loading.value = false
-  EventBus.emit('file:refresh')
+  window.$bus.emit('file:refresh')
 }
 
 onMounted(() => {

@@ -1,4 +1,5 @@
 import { useThemeStore } from '@/store'
+import mitt from 'mitt'
 import * as NaiveUI from 'naive-ui'
 
 export async function setupNaiveDiscreteApi() {
@@ -16,4 +17,5 @@ export async function setupNaiveDiscreteApi() {
   window.$notification = notification
   window.$message = message
   window.$dialog = dialog
+  window.$bus = mitt()
 }
