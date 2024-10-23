@@ -26,7 +26,6 @@ const handleCreateCert = async () => {
   await cert.certCreate(model.value)
   show.value = false
   window.$message.success('创建成功')
-  model.value = false
   model.value.domains = []
   model.value.dns_id = 0
   model.value.type = 'P256'

@@ -474,42 +474,42 @@ onMounted(() => {
 
 <template>
   <common-page show-footer>
-    <n-card :segmented="true" size="small" flex items-center rounded-10>
+    <template #action>
+      <n-popconfirm @positive-click="handleClear">
+        <template #trigger>
+          <n-button type="error">
+            <TheIcon :size="18" icon="material-symbols:delete-outline" />
+            清除监控记录
+          </n-button>
+        </template>
+        确定要清空吗？
+      </n-popconfirm>
+    </template>
+    <n-card :segmented="true" flex items-center rounded-10>
       <n-form
         inline
         label-placement="left"
         label-width="auto"
         require-mark-placement="right-hanging"
       >
-        <n-grid cols="1 s:1 m:1 l:24 xl:24 2xl:24" item-responsive responsive="screen">
-          <n-form-item-gi :span="3" label="开启监控">
+        <n-flex items-center>
+          <n-form-item label="开启监控">
             <n-switch v-model:value="monitorSwitch" @update-value="handleUpdate" />
-          </n-form-item-gi>
-          <n-form-item-gi :span="6" label="保存天数">
+          </n-form-item>
+          <n-form-item label="保存天数">
             <n-input-number v-model:value="saveDay">
               <template #suffix> 天 </template>
             </n-input-number>
-          </n-form-item-gi>
-          <n-form-item-gi :span="2">
+          </n-form-item>
+          <n-form-item>
             <n-button type="primary" @click="handleUpdate">确定</n-button>
-          </n-form-item-gi>
-          <n-form-item-gi :span="9" label="时间选择">
+          </n-form-item>
+          <n-form-item label="时间选择">
             <n-date-picker v-model:value="start" type="datetime" />
             -
             <n-date-picker v-model:value="end" type="datetime" />
-          </n-form-item-gi>
-          <n-form-item-gi :span="4" label="操作">
-            <n-popconfirm @positive-click="handleClear">
-              <template #trigger>
-                <n-button type="error">
-                  <TheIcon :size="18" icon="material-symbols:delete-outline" />
-                  清除监控记录
-                </n-button>
-              </template>
-              确定要清空吗？
-            </n-popconfirm>
-          </n-form-item-gi>
-        </n-grid>
+          </n-form-item>
+        </n-flex>
       </n-form>
     </n-card>
     <n-grid cols="1 s:1 m:1 l:2 xl:2 2xl:2" item-responsive responsive="screen" pt-20>
