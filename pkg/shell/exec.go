@@ -8,15 +8,19 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 	"time"
 )
 
 // Execf 执行 shell 命令
 func Execf(shell string, args ...any) (string, error) {
-	var cmd *exec.Cmd
+	if !preCheckArg(args) {
+		return "", errors.New("command contains illegal characters")
+	}
+
 	_ = os.Setenv("LC_ALL", "C")
-	cmd = exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -32,9 +36,12 @@ func Execf(shell string, args ...any) (string, error) {
 
 // ExecfAsync 异步执行 shell 命令
 func ExecfAsync(shell string, args ...any) error {
-	var cmd *exec.Cmd
+	if !preCheckArg(args) {
+		return errors.New("command contains illegal characters")
+	}
+
 	_ = os.Setenv("LC_ALL", "C")
-	cmd = exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
 
 	err := cmd.Start()
 	if err != nil {
@@ -52,9 +59,12 @@ func ExecfAsync(shell string, args ...any) error {
 
 // ExecfWithTimeout 执行 shell 命令并设置超时时间
 func ExecfWithTimeout(timeout time.Duration, shell string, args ...any) (string, error) {
-	var cmd *exec.Cmd
+	if !preCheckArg(args) {
+		return "", errors.New("command contains illegal characters")
+	}
+
 	_ = os.Setenv("LC_ALL", "C")
-	cmd = exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -85,6 +95,10 @@ func ExecfWithTimeout(timeout time.Duration, shell string, args ...any) (string,
 
 // ExecfWithOutput 执行 shell 命令并输出到终端
 func ExecfWithOutput(shell string, args ...any) error {
+	if !preCheckArg(args) {
+		return errors.New("command contains illegal characters")
+	}
+
 	_ = os.Setenv("LC_ALL", "C")
 	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
 	cmd.Stdout = os.Stdout
@@ -95,8 +109,11 @@ func ExecfWithOutput(shell string, args ...any) error {
 
 // ExecfWithPipe 执行 shell 命令并返回管道
 func ExecfWithPipe(ctx context.Context, shell string, args ...any) (out io.ReadCloser, err error) {
-	_ = os.Setenv("LC_ALL", "C")
+	if !preCheckArg(args) {
+		return nil, errors.New("command contains illegal characters")
+	}
 
+	_ = os.Setenv("LC_ALL", "C")
 	cmd := exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf(shell, args...))
 
 	out, err = cmd.StdoutPipe()
@@ -107,4 +124,15 @@ func ExecfWithPipe(ctx context.Context, shell string, args ...any) (out io.ReadC
 	cmd.Stderr = cmd.Stdout
 	err = cmd.Start()
 	return
+}
+
+func preCheckArg(args []any) bool {
+	illegals := []any{`&`, `|`, `;`, `$`, `'`, `"`, "`", `(`, `)`, "\n", "\r", `>`, `<`}
+	for arg := range slices.Values(args) {
+		if slices.Contains(illegals, arg) {
+			return false
+		}
+	}
+
+	return true
 }
