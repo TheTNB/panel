@@ -31,7 +31,7 @@ func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 
 	paged, total := Paginate(r, images)
 
-	items := make([]any, len(paged))
+	items := make([]any, 0)
 	for _, item := range paged {
 		items = append(items, map[string]any{
 			"id":           item.ID,

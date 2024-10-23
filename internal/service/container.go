@@ -29,7 +29,7 @@ func (s *ContainerService) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paged, total := Paginate(r, containers)
-	items := make([]any, len(paged))
+	items := make([]any, 0)
 	for _, item := range paged {
 		var name string
 		if len(item.Names) > 0 {
