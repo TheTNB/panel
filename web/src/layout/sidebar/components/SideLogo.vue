@@ -8,10 +8,10 @@ const themeStore = useThemeStore()
 
 <template>
   <router-link class="h-60 f-c-c" to="/">
-    <n-image :src="logo" height="42" preview-disabled />
+    <n-image :src="logo" height="32" preview-disabled />
     <h2
       v-show="!themeStore.sider.collapsed"
-      class="ml-20 max-w-140 flex-shrink-0 text-18 font-bold"
+      class="ml-10 max-w-140 flex-shrink-0 text-18 font-bold"
     >
       {{ title }}
     </h2>
