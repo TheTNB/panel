@@ -25,13 +25,13 @@ func Mkdir(path string, permission os.FileMode) error {
 
 // Chmod 修改文件/目录权限
 func Chmod(path string, permission os.FileMode) error {
-	cmd := exec.Command("sudo", "chmod", "-R", fmt.Sprintf("%o", permission), path)
+	cmd := exec.Command("chmod", "-R", fmt.Sprintf("%o", permission), path)
 	return cmd.Run()
 }
 
 // Chown 修改文件或目录所有者
 func Chown(path, user, group string) error {
-	cmd := exec.Command("sudo", "chown", "-R", user+":"+group, path)
+	cmd := exec.Command("chown", "-R", user+":"+group, path)
 	return cmd.Run()
 }
 
