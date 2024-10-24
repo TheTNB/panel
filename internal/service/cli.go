@@ -122,10 +122,7 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	if app.Conf.Bool("http.tls") {
 		protocol = "https"
 	}
-	ip, err := tools.GetPublicIP()
-	if err != nil {
-		ip = "127.0.0.1"
-	}
+
 	port := app.Conf.String("http.port")
 	if port == "" {
 		return fmt.Errorf("端口获取失败")
@@ -139,7 +136,28 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	color.Greenln(fmt.Sprintf("密码: %s", password))
 	color.Greenln(fmt.Sprintf("端口: %s", port))
 	color.Greenln(fmt.Sprintf("入口: %s", entrance))
-	color.Greenln(fmt.Sprintf("地址: %s://%s:%s%s", protocol, ip, port, entrance))
+
+	lv4, err := tools.GetLocalIPv4()
+	if err == nil {
+		color.Greenln(fmt.Sprintf("本地IPv4地址: %s://%s:%s%s", protocol, lv4, port, entrance))
+	}
+	lv6, err := tools.GetLocalIPv6()
+	if err == nil {
+		color.Greenln(fmt.Sprintf("本地IPv6地址: %s://[%s]:%s%s", protocol, lv6, port, entrance))
+	}
+	rv4, err := tools.GetPublicIPv4()
+	if err == nil {
+		color.Greenln(fmt.Sprintf("公网IPv4地址: %s://%s:%s%s", protocol, rv4, port, entrance))
+	}
+	rv6, err := tools.GetPublicIPv6()
+	if err == nil {
+		color.Greenln(fmt.Sprintf("公网IPv6地址: %s://[%s]:%s%s", protocol, rv6, port, entrance))
+	}
+
+	color.Infoln(fmt.Sprintf("请根据自身网络情况自行选择合适的地址访问面板"))
+	color.Infoln(fmt.Sprintf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口", port))
+	color.Infoln(fmt.Sprintf("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS"))
+	color.Warnln(fmt.Sprintf("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作"))
 
 	return nil
 }

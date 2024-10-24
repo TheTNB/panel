@@ -2,7 +2,10 @@
 package tools
 
 import (
+	"context"
 	"errors"
+	stdnet "net"
+	"net/http"
 	"slices"
 	"strings"
 	"time"
@@ -86,8 +89,8 @@ func RestartPanel() {
 // IsChina 是否中国大陆
 func IsChina() bool {
 	client := resty.New()
-	client.SetTimeout(5 * time.Second)
-	client.SetRetryCount(2)
+	client.SetTimeout(3 * time.Second)
+	client.SetRetryCount(3)
 
 	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
@@ -101,16 +104,64 @@ func IsChina() bool {
 	return false
 }
 
-// GetPublicIP 获取公网IP
-func GetPublicIP() (string, error) {
+// GetPublicIPv4 获取公网IPv4
+func GetPublicIPv4() (string, error) {
 	client := resty.New()
-	client.SetTimeout(5 * time.Second)
-	client.SetRetryCount(2)
+	client.SetTimeout(3 * time.Second)
+	client.SetRetryCount(3)
+	client.SetTransport(&http.Transport{
+		DialContext: func(ctx context.Context, network string, addr string) (stdnet.Conn, error) {
+			return (&stdnet.Dialer{}).DialContext(ctx, "tcp4", addr)
+		},
+	})
 
 	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
-		return "", errors.New("获取公网IP失败")
+		return "", errors.New("failed to get public ipv4 address")
 	}
 
 	return strings.TrimPrefix(strings.Split(resp.String(), "\n")[2], "ip="), nil
+}
+
+// GetPublicIPv6 获取公网IPv6
+func GetPublicIPv6() (string, error) {
+	client := resty.New()
+	client.SetTimeout(3 * time.Second)
+	client.SetRetryCount(3)
+	client.SetTransport(&http.Transport{
+		DialContext: func(ctx context.Context, network string, addr string) (stdnet.Conn, error) {
+			return (&stdnet.Dialer{}).DialContext(ctx, "tcp6", addr)
+		},
+	})
+
+	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	if err != nil || !resp.IsSuccess() {
+		return "", errors.New("failed to get public ipv6 address")
+	}
+
+	return strings.TrimPrefix(strings.Split(resp.String(), "\n")[2], "ip="), nil
+}
+
+// GetLocalIPv4 获取本地IPv4
+func GetLocalIPv4() (string, error) {
+	conn, err := stdnet.Dial("udp", "119.29.29.29:53")
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+
+	local := conn.LocalAddr().(*stdnet.UDPAddr)
+	return local.IP.String(), nil
+}
+
+// GetLocalIPv6 获取本地IPv6
+func GetLocalIPv6() (string, error) {
+	conn, err := stdnet.Dial("udp", "[2402:4e00::]:53")
+	if err != nil {
+		return "", err
+	}
+	defer conn.Close()
+
+	local := conn.LocalAddr().(*stdnet.UDPAddr)
+	return local.IP.String(), nil
 }
