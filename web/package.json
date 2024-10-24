@@ -20,7 +20,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@fontsource/jetbrains-mono": "^5.1.1",
+    "@fontsource-variable/jetbrains-mono": "^5.1.1",
     "@guolao/vue-monaco-editor": "^1.5.4",
     "@vue-js-cron/naive-ui": "^2.0.5",
     "@vueuse/core": "^11.1.0",

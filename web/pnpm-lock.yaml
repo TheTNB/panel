@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@fontsource/jetbrains-mono':
+      '@fontsource-variable/jetbrains-mono':
         specifier: ^5.1.1
         version: 5.1.1
       '@guolao/vue-monaco-editor':
@@ -676,8 +676,8 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@fontsource/jetbrains-mono@5.1.1':
-    resolution: {integrity: sha512-5rwvmdQQpXev4LlBX1P+7h2dguu6iwW/9Npjde4+DEq+HgpVJI/7QY8DI1NVVFdvLtXZNP+vO2L/5BQED6FUhA==}
+  '@fontsource-variable/jetbrains-mono@5.1.1':
+    resolution: {integrity: sha512-V+1aRFRvuZ66PpO30s8l/2aADKzpV9VRsO3kSZE+rTMvi4vab3cUcPHMN2z+wAvjkYJO71Yf+g3/Y6pSMmQpVQ==}
 
   '@guolao/vue-monaco-editor@1.5.4':
     resolution: {integrity: sha512-eyBAqxJeDpV4mZYZSpNvh3xUgKCld5eEe0dBtjJhsy2+L0MB6PYFZ/FbPHNwskgp2RoIpfn1DLrIhXXE3lVbwQ==}
@@ -3851,7 +3851,7 @@ snapshots:
 
   '@eslint/js@8.57.1': {}
 
-  '@fontsource/jetbrains-mono@5.1.1': {}
+  '@fontsource-variable/jetbrains-mono@5.1.1': {}
 
   '@guolao/vue-monaco-editor@1.5.4(monaco-editor@0.52.0)(vue@3.5.12(typescript@5.6.3))':
     dependencies:

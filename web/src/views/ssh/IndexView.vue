@@ -8,8 +8,8 @@ import ws from '@/api/ws'
 import TheIcon from '@/components/custom/TheIcon.vue'
 import CreateModal from '@/views/ssh/CreateModal.vue'
 import UpdateModal from '@/views/ssh/UpdateModal.vue'
-import '@fontsource/jetbrains-mono/400-italic.css'
-import '@fontsource/jetbrains-mono/400.css'
+import '@fontsource-variable/jetbrains-mono/wght-italic.css'
+import '@fontsource-variable/jetbrains-mono/wght.css'
 import { AttachAddon } from '@xterm/addon-attach'
 import { ClipboardAddon } from '@xterm/addon-clipboard'
 import { FitAddon } from '@xterm/addon-fit'
@@ -131,7 +131,7 @@ const openSession = async (id: number) => {
       allowProposedApi: true,
       lineHeight: 1.2,
       fontSize: 14,
-      fontFamily: 'JetBrains Mono',
+      fontFamily: `'JetBrains Mono Variable', monospace`,
       cursorBlink: true,
       cursorStyle: 'underline',
       tabStopWidth: 4,
