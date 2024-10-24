@@ -28,10 +28,10 @@ func NewPostgres(username, password, address, hbaFile string, port uint) (*Postg
 	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("初始化Postgres连接失败: %w", err)
+		return nil, fmt.Errorf("init postgres connection failed: %w", err)
 	}
-	if db.Ping() != nil {
-		return nil, fmt.Errorf("连接Postgres失败: %w", err)
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("connect to postgres failed: %w", err)
 	}
 	return &Postgres{
 		db:       db,

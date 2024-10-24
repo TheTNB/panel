@@ -89,7 +89,7 @@
           "placeholder": "admin"
         },
         "email": {
-          "label": "Email (may be useful later)",
+          "label": "Certificate default email",
           "placeholder": "admin{'@'}example.com"
         },
         "port": {

@@ -124,40 +124,18 @@ func (s *DashboardService) CountInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
-	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
+	mysqlInstalled, _ := s.appRepo.IsInstalled("slug = ?", "mysql")
+	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug = ?", "postgresql")
 
-	type database struct {
-		Name string `json:"name"`
-	}
-	var databaseCount int64
+	var databaseCount int
 	if mysqlInstalled {
 		rootPassword, _ := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
-		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock")
+		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
 		if err == nil {
 			defer mysql.Close()
-			if err = mysql.Ping(); err != nil {
-				databaseCount = -1
-			} else {
-				rows, err := mysql.Query("SHOW DATABASES")
-				if err != nil {
-					databaseCount = -1
-				} else {
-					defer rows.Close()
-					var databases []database
-					for rows.Next() {
-						var d database
-						if err := rows.Scan(&d.Name); err != nil {
-							continue
-						}
-						if d.Name == "information_schema" || d.Name == "performance_schema" || d.Name == "mysql" || d.Name == "sys" {
-							continue
-						}
-
-						databases = append(databases, d)
-					}
-					databaseCount = int64(len(databases))
-				}
+			databases, err := mysql.Databases()
+			if err == nil {
+				databaseCount += len(databases)
 			}
 		}
 	}
@@ -165,38 +143,20 @@ func (s *DashboardService) CountInfo(w http.ResponseWriter, r *http.Request) {
 		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root), 5432)
 		if err == nil {
 			defer postgres.Close()
-			if err = postgres.Ping(); err != nil {
-				databaseCount = -1
-			} else {
-				rows, err := postgres.Query("SELECT datname FROM pg_database WHERE datistemplate = false")
-				if err != nil {
-					databaseCount = -1
-				} else {
-					defer rows.Close()
-					var databases []database
-					for rows.Next() {
-						var d database
-						if err = rows.Scan(&d.Name); err != nil {
-							continue
-						}
-						if d.Name == "postgres" || d.Name == "template0" || d.Name == "template1" {
-							continue
-						}
-						databases = append(databases, d)
-					}
-					databaseCount = int64(len(databases))
-				}
+			databases, err := postgres.Databases()
+			if err == nil {
+				databaseCount += len(databases)
 			}
 		}
 	}
 
-	var ftpCount int64
+	var ftpCount int
 	ftpInstalled, _ := s.appRepo.IsInstalled("slug = ?", "pureftpd")
 	if ftpInstalled {
 		listRaw, err := shell.Execf("pure-pw list")
 		if len(listRaw) != 0 && err == nil {
 			listArr := strings.Split(listRaw, "\n")
-			ftpCount = int64(len(listArr))
+			ftpCount = len(listArr)
 		}
 	}
 
@@ -214,8 +174,8 @@ func (s *DashboardService) CountInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *DashboardService) InstalledDbAndPhp(w http.ResponseWriter, r *http.Request) {
-	mysqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "mysql%")
-	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug like ?", "postgresql%")
+	mysqlInstalled, _ := s.appRepo.IsInstalled("slug = ?", "mysql")
+	postgresqlInstalled, _ := s.appRepo.IsInstalled("slug = ?", "postgresql")
 	php, _ := s.appRepo.GetInstalledAll("slug like ?", "php%")
 
 	var phpData []types.LVInt
