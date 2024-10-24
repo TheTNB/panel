@@ -106,8 +106,8 @@ onMounted(async () => {
             :maxlength="32"
             class="h-50 items-center pl-10 text-16"
             placeholder="密码"
-            show-password-on="mousedown"
             type="password"
+            show-password-on="click"
             @keydown.enter="handleLogin"
           />
         </div>

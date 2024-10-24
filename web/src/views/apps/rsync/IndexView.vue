@@ -446,7 +446,8 @@ onMounted(() => {
       <n-form-item path="secret" label="密码">
         <n-input
           v-model:value="editModuleModel.secret"
-          type="text"
+          type="password"
+          show-password-on="click"
           @keydown.enter.prevent
           placeholder="填写模块的密码"
         />

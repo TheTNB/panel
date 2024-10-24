@@ -315,7 +315,8 @@ onMounted(() => {
         <n-form-item path="password" label="密码">
           <n-input
             v-model:value="addUserModel.password"
-            type="text"
+            type="password"
+            show-password-on="click"
             @keydown.enter.prevent
             placeholder="建议使用生成器生成随机密码"
           />

@@ -83,7 +83,7 @@ const handleSubmit = async () => {
         <n-input v-model:value="model.user" placeholder="root" />
       </n-form-item>
       <n-form-item v-if="model.auth_method == 'password'" label="密码">
-        <n-input v-model:value="model.password" />
+        <n-input v-model:value="model.password" type="password" show-password-on="click" />
       </n-form-item>
       <n-form-item v-if="model.auth_method == 'publickey'" label="私钥">
         <n-input v-model:value="model.key" type="textarea" />

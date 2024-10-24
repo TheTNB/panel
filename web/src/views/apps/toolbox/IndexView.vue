@@ -191,7 +191,7 @@ onMounted(() => {
       <n-tab-pane name="root-password" tab="Root 密码">
         <n-form>
           <n-form-item label="Root 密码">
-            <n-input v-model:value="rootPassword" />
+            <n-input v-model:value="rootPassword" type="password" show-password-on="click" />
           </n-form-item>
         </n-form>
       </n-tab-pane>

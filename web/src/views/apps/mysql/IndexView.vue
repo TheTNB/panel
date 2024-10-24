@@ -226,7 +226,11 @@ onMounted(() => {
           </n-card>
           <n-card title="Root 密码" rounded-10>
             <n-space vertical>
-              <n-input v-model:value="rootPassword"></n-input>
+              <n-input
+                v-model:value="rootPassword"
+                type="password"
+                show-password-on="click"
+              ></n-input>
               <n-button type="primary" @click="handleSetRootPassword">保存修改</n-button>
             </n-space>
           </n-card>
