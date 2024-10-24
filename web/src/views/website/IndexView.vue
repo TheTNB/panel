@@ -303,6 +303,8 @@ const handleCreate = async () => {
   if (createModel.value.listens.length === 0) {
     createModel.value.listens.push('80')
   }
+  // 端口中去掉 443 端口，nginx 不允许在未配置证书下监听 443 端口
+  createModel.value.listens = createModel.value.listens.filter((item) => item !== '443')
   await website
     .create(createModel.value)
     .then(() => {
