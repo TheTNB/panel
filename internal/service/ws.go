@@ -5,7 +5,9 @@ import (
 	"context"
 	"github.com/TheTNB/panel/internal/http/request"
 	"net/http"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -100,10 +102,28 @@ func (s *WsService) Exec(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		scanner := bufio.NewScanner(out)
+		var batch []string
+		ticker := time.NewTicker(200 * time.Millisecond)
+		defer ticker.Stop()
+
+		go func() {
+			for range ticker.C {
+				if len(batch) > 0 {
+					_ = ws.WriteMessage(websocket.TextMessage, []byte(strings.Join(batch, "\n")))
+					batch = nil
+				}
+			}
+		}()
+
 		for scanner.Scan() {
 			line := scanner.Text()
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(line))
+			batch = append(batch, line)
 		}
+
+		if len(batch) > 0 {
+			_ = ws.WriteMessage(websocket.TextMessage, []byte(strings.Join(batch, "\n")))
+		}
+
 		if err = scanner.Err(); err != nil {
 			_ = ws.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "failed to read command output"))
 		}
