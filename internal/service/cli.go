@@ -154,10 +154,10 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		color.Greenln(fmt.Sprintf("公网IPv6地址: %s://[%s]:%s%s", protocol, rv6, port, entrance))
 	}
 
-	color.Infoln(fmt.Sprintf("请根据自身网络情况自行选择合适的地址访问面板"))
+	color.Infoln("请根据自身网络情况自行选择合适的地址访问面板")
 	color.Infoln(fmt.Sprintf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口", port))
-	color.Infoln(fmt.Sprintf("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS"))
-	color.Warnln(fmt.Sprintf("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作"))
+	color.Infoln("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS")
+	color.Warnln("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作")
 
 	return nil
 }
