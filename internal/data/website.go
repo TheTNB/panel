@@ -271,6 +271,14 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		return nil, err
 	}
 
+	// PHP 网站默认开启防跨站
+	if req.PHP > 0 {
+		userIni := filepath.Join(req.Path, ".user.ini")
+		_, _ = shell.Execf(`chattr -i '%s'`, userIni)
+		_ = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Path), 0644)
+		_, _ = shell.Execf(`chattr +i '%s'`, userIni)
+	}
+
 	// 创建面板网站
 	w := &biz.Website{
 		Name:   req.Name,
@@ -417,11 +425,6 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		if err = p.SetOCSP(req.OCSP); err != nil {
 			return err
 		}
-		if quic {
-			if err = p.SetAltSvc(`'h3=":$server_port"; ma=2592000'`); err != nil {
-				return err
-			}
-		}
 	} else {
 		if err = p.ClearSetHTTPS(); err != nil {
 			return err
@@ -435,6 +438,12 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		if err = p.SetOCSP(false); err != nil {
 			return err
 		}
+	}
+	if quic {
+		if err = p.SetAltSvc(`'h3=":$server_port"; ma=2592000'`); err != nil {
+			return err
+		}
+	} else {
 		if err = p.SetAltSvc(``); err != nil {
 			return err
 		}
