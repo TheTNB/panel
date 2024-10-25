@@ -80,6 +80,11 @@ const getAsyncData = async () => {
 
 onMounted(() => {
   getAsyncData()
+  window.$bus.on('cert:refresh-async', getAsyncData)
+})
+
+onUnmounted(() => {
+  window.$bus.off('cert:refresh-async')
 })
 </script>
 

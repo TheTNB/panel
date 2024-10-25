@@ -28,6 +28,7 @@ const handleCreateDNS = async () => {
   model.value.data.sk = ''
   model.value.name = ''
   window.$bus.emit('cert:refresh-dns')
+  window.$bus.emit('cert:refresh-async')
 }
 </script>
 

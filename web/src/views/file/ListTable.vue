@@ -524,7 +524,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.$bus.off('file:refresh', handleRefresh)
+  window.$bus.off('file:refresh')
 })
 </script>
 

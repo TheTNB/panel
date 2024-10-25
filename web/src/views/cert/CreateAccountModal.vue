@@ -42,6 +42,7 @@ const handleCreateAccount = async () => {
     .finally(() => {
       messageReactive?.destroy()
       window.$bus.emit('cert:refresh-account')
+      window.$bus.emit('cert:refresh-async')
     })
 }
 </script>

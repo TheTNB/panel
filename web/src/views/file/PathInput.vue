@@ -106,7 +106,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.$bus.off('push-history', handlePushHistory)
+  window.$bus.off('push-history')
 })
 </script>
 

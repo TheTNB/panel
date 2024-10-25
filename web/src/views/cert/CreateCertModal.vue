@@ -33,6 +33,7 @@ const handleCreateCert = async () => {
   model.value.website_id = 0
   model.value.auto_renew = true
   window.$bus.emit('cert:refresh-cert')
+  window.$bus.emit('cert:refresh-async')
 }
 </script>
 
