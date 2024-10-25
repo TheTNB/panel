@@ -2,12 +2,12 @@ package data
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/pkg/firewall"
 	"strings"
 
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
+	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
