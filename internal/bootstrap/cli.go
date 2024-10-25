@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gookit/color"
 	"github.com/urfave/cli/v3"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -46,6 +45,6 @@ func initCli() {
 		Commands: route.Cli(),
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		color.Redln(fmt.Sprintf("|-%v", err))
+		fmt.Println(fmt.Sprintf("|-%v", err))
 	}
 }

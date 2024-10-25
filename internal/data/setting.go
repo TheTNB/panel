@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
-	"github.com/gookit/color"
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 
@@ -243,13 +242,13 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 	name := filepath.Base(url)
 	if app.IsCli {
-		color.Greenln(fmt.Sprintf("|-目标版本：%s", version))
-		color.Greenln(fmt.Sprintf("|-下载链接：%s", url))
-		color.Greenln(fmt.Sprintf("|-文件名：%s", name))
+		fmt.Println(fmt.Sprintf("|-目标版本：%s", version))
+		fmt.Println(fmt.Sprintf("|-下载链接：%s", url))
+		fmt.Println(fmt.Sprintf("|-文件名：%s", name))
 	}
 
 	if app.IsCli {
-		color.Greenln("|-正在下载...")
+		fmt.Println("|-正在下载...")
 	}
 	if _, err := shell.Execf("wget -T 120 -t 3 -O /tmp/%s %s", name, url); err != nil {
 		return fmt.Errorf("下载失败：%w", err)
@@ -262,39 +261,39 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-校验下载文件...")
+		fmt.Println("|-校验下载文件...")
 	}
 	if check, err := shell.Execf("cd /tmp && sha256sum -c %s --ignore-missing", name+".sha256"); check != name+": OK" || err != nil {
 		return errors.New("下载文件校验失败")
 	}
 	if err := io.Remove(filepath.Join("/tmp", name+".sha256")); err != nil {
 		if app.IsCli {
-			color.Redln("|-清理校验文件失败：", err)
+			fmt.Println("|-清理校验文件失败：", err)
 		}
 		return fmt.Errorf("清理校验文件失败：%w", err)
 	}
 
 	if app.IsCli {
-		color.Greenln("|-前置检查...")
+		fmt.Println("|-前置检查...")
 	}
 	if io.Exists("/tmp/panel-storage.zip") {
 		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败所致，请运行 panel-cli fix 修复后重试")
 	}
 
 	if app.IsCli {
-		color.Greenln("|-备份面板数据...")
+		fmt.Println("|-备份面板数据...")
 	}
 	// 备份面板
 	backup := NewBackupRepo()
 	if err := backup.Create(biz.BackupTypePanel, ""); err != nil {
 		if app.IsCli {
-			color.Redln("|-备份面板失败：", err)
+			fmt.Println("|-备份面板失败：", err)
 		}
 		return fmt.Errorf("备份面板失败：%w", err)
 	}
 	if err := io.Compress([]string{filepath.Join(app.Root, "panel/storage")}, "/tmp/panel-storage.zip", io.Zip); err != nil {
 		if app.IsCli {
-			color.Redln("|-备份面板数据失败：", err)
+			fmt.Println("|-备份面板数据失败：", err)
 		}
 		return fmt.Errorf("备份面板数据失败：%w", err)
 	}
@@ -303,14 +302,14 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-清理旧版本...")
+		fmt.Println("|-清理旧版本...")
 	}
 	if _, err := shell.Execf("rm -rf %s/panel/*", app.Root); err != nil {
 		return fmt.Errorf("清理旧版本失败：%w", err)
 	}
 
 	if app.IsCli {
-		color.Greenln("|-解压新版本...")
+		fmt.Println("|-解压新版本...")
 	}
 	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel"), io.Zip); err != nil {
 		return fmt.Errorf("解压失败：%w", err)
@@ -320,7 +319,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-恢复面板数据...")
+		fmt.Println("|-恢复面板数据...")
 	}
 	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
 		return fmt.Errorf("恢复面板数据失败：%w", err)
@@ -330,7 +329,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-运行更新后脚本...")
+		fmt.Println("|-运行更新后脚本...")
 	}
 	if _, err := shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
 		return fmt.Errorf("运行面板更新后脚本失败：%w", err)
@@ -346,14 +345,14 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-设置关键文件权限...")
+		fmt.Println("|-设置关键文件权限...")
 	}
 	_ = io.Chmod("/usr/local/sbin/panel-cli", 0700)
 	_ = io.Chmod("/etc/systemd/system/panel.service", 0700)
 	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
 
 	if app.IsCli {
-		color.Greenln("|-更新完成")
+		fmt.Println("|-更新完成")
 	}
 
 	_, _ = shell.Execf("systemctl daemon-reload")
@@ -366,7 +365,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 func (r *settingRepo) FixPanel() error {
 	if app.IsCli {
-		color.Greenln("|-开始修复面板...")
+		fmt.Println("|-开始修复面板...")
 	}
 	// 检查关键文件是否正常
 	flag := false
@@ -393,7 +392,7 @@ func (r *settingRepo) FixPanel() error {
 				return fmt.Errorf("清理临时文件失败：%w", err)
 			}
 			if app.IsCli {
-				color.Greenln("已清理临时文件，请运行 panel-cli update 更新面板")
+				fmt.Println("已清理临时文件，请运行 panel-cli update 更新面板")
 			}
 			return nil
 		}
@@ -413,12 +412,12 @@ func (r *settingRepo) FixPanel() error {
 	}
 	latest := list[0]
 	if app.IsCli {
-		color.Greenln(fmt.Sprintf("|-使用备份文件：%s", latest.Name))
+		fmt.Println(fmt.Sprintf("|-使用备份文件：%s", latest.Name))
 	}
 
 	// 解压备份文件
 	if app.IsCli {
-		color.Greenln("|-解压备份文件...")
+		fmt.Println("|-解压备份文件...")
 	}
 	if err = io.Remove("/tmp/panel-fix"); err != nil {
 		return fmt.Errorf("清理临时目录失败：%w", err)
@@ -429,7 +428,7 @@ func (r *settingRepo) FixPanel() error {
 
 	// 移动文件到对应位置
 	if app.IsCli {
-		color.Greenln("|-移动备份文件...")
+		fmt.Println("|-移动备份文件...")
 	}
 	if io.Exists(filepath.Join("/tmp/panel-fix", "panel")) && io.IsDir(filepath.Join("/tmp/panel-fix", "panel")) {
 		if err = io.Remove(filepath.Join(app.Root, "panel")); err != nil {
@@ -452,7 +451,7 @@ func (r *settingRepo) FixPanel() error {
 
 	// tmp目录下如果有storage备份，则解压回去
 	if app.IsCli {
-		color.Greenln("|-恢复面板数据...")
+		fmt.Println("|-恢复面板数据...")
 	}
 	if io.Exists("/tmp/panel-storage.zip") {
 		if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
@@ -472,7 +471,7 @@ func (r *settingRepo) FixPanel() error {
 
 	// 处理权限
 	if app.IsCli {
-		color.Greenln("|-设置关键文件权限...")
+		fmt.Println("|-设置关键文件权限...")
 	}
 	if err = io.Chmod("/usr/local/etc/panel/config.yml", 0600); err != nil {
 		return err
@@ -488,7 +487,7 @@ func (r *settingRepo) FixPanel() error {
 	}
 
 	if app.IsCli {
-		color.Greenln("|-修复完成")
+		fmt.Println("|-修复完成")
 	}
 
 	tools.RestartPanel()

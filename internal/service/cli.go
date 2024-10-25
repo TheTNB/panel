@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-rat/utils/hash"
 	"github.com/goccy/go-yaml"
-	"github.com/gookit/color"
 	"github.com/spf13/cast"
 	"github.com/urfave/cli/v3"
 	"gorm.io/gorm"
@@ -56,7 +55,7 @@ func (s *CliService) Restart(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("面板服务已重启")
+	fmt.Println("面板服务已重启")
 	return nil
 }
 
@@ -65,7 +64,7 @@ func (s *CliService) Stop(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("面板服务已停止")
+	fmt.Println("面板服务已停止")
 	return nil
 }
 
@@ -74,7 +73,7 @@ func (s *CliService) Start(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("面板服务已启动")
+	fmt.Println("面板服务已启动")
 	return nil
 }
 
@@ -132,32 +131,32 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("入口获取失败")
 	}
 
-	color.Greenln(fmt.Sprintf("用户名: %s", user.Username))
-	color.Greenln(fmt.Sprintf("密码: %s", password))
-	color.Greenln(fmt.Sprintf("端口: %s", port))
-	color.Greenln(fmt.Sprintf("入口: %s", entrance))
+	fmt.Println(fmt.Sprintf("用户名: %s", user.Username))
+	fmt.Println(fmt.Sprintf("密码: %s", password))
+	fmt.Println(fmt.Sprintf("端口: %s", port))
+	fmt.Println(fmt.Sprintf("入口: %s", entrance))
 
 	lv4, err := tools.GetLocalIPv4()
 	if err == nil {
-		color.Greenln(fmt.Sprintf("本地IPv4地址: %s://%s:%s%s", protocol, lv4, port, entrance))
+		fmt.Println(fmt.Sprintf("本地IPv4地址: %s://%s:%s%s", protocol, lv4, port, entrance))
 	}
 	lv6, err := tools.GetLocalIPv6()
 	if err == nil {
-		color.Greenln(fmt.Sprintf("本地IPv6地址: %s://[%s]:%s%s", protocol, lv6, port, entrance))
+		fmt.Println(fmt.Sprintf("本地IPv6地址: %s://[%s]:%s%s", protocol, lv6, port, entrance))
 	}
 	rv4, err := tools.GetPublicIPv4()
 	if err == nil {
-		color.Greenln(fmt.Sprintf("公网IPv4地址: %s://%s:%s%s", protocol, rv4, port, entrance))
+		fmt.Println(fmt.Sprintf("公网IPv4地址: %s://%s:%s%s", protocol, rv4, port, entrance))
 	}
 	rv6, err := tools.GetPublicIPv6()
 	if err == nil {
-		color.Greenln(fmt.Sprintf("公网IPv6地址: %s://[%s]:%s%s", protocol, rv6, port, entrance))
+		fmt.Println(fmt.Sprintf("公网IPv6地址: %s://[%s]:%s%s", protocol, rv6, port, entrance))
 	}
 
-	color.Infoln("请根据自身网络情况自行选择合适的地址访问面板")
-	color.Infoln(fmt.Sprintf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口", port))
-	color.Infoln("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS")
-	color.Warnln("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作")
+	fmt.Println("请根据自身网络情况自行选择合适的地址访问面板")
+	fmt.Println(fmt.Sprintf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口", port))
+	fmt.Println("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS")
+	fmt.Println("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作")
 
 	return nil
 }
@@ -169,7 +168,7 @@ func (s *CliService) UserList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	for _, user := range users {
-		color.Greenln(fmt.Sprintf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05")))
+		fmt.Println(fmt.Sprintf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05")))
 	}
 
 	return nil
@@ -199,7 +198,7 @@ func (s *CliService) UserName(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("用户名修改失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("用户 %s 修改为 %s 成功", oldUsername, newUsername))
+	fmt.Println(fmt.Sprintf("用户 %s 修改为 %s 成功", oldUsername, newUsername))
 	return nil
 }
 
@@ -231,7 +230,7 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("密码修改失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("用户 %s 密码修改成功", username))
+	fmt.Println(fmt.Sprintf("用户 %s 密码修改成功", username))
 	return nil
 }
 
@@ -257,7 +256,7 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("已开启HTTPS")
+	fmt.Println("已开启HTTPS")
 	return s.Restart(ctx, cmd)
 }
 
@@ -283,7 +282,7 @@ func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("已关闭HTTPS")
+	fmt.Println("已关闭HTTPS")
 	return s.Restart(ctx, cmd)
 }
 
@@ -309,8 +308,8 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("已开启访问入口")
-	color.Greenln(fmt.Sprintf("访问入口：%s", config.HTTP.Entrance))
+	fmt.Println("已开启访问入口")
+	fmt.Println(fmt.Sprintf("访问入口：%s", config.HTTP.Entrance))
 	return s.Restart(ctx, cmd)
 }
 
@@ -336,7 +335,7 @@ func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("已关闭访问入口")
+	fmt.Println("已关闭访问入口")
 	return s.Restart(ctx, cmd)
 }
 
@@ -367,7 +366,7 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("已修改端口为 %d", port))
+	fmt.Println(fmt.Sprintf("已修改端口为 %d", port))
 	return s.Restart(ctx, cmd)
 }
 
@@ -386,7 +385,7 @@ func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("网站 %s 创建成功", website.Name))
+	fmt.Println(fmt.Sprintf("网站 %s 创建成功", website.Name))
 	return nil
 }
 
@@ -403,7 +402,7 @@ func (s *CliService) WebsiteRemove(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("网站 %s 移除成功", website.Name))
+	fmt.Println(fmt.Sprintf("网站 %s 移除成功", website.Name))
 	return nil
 }
 
@@ -422,7 +421,7 @@ func (s *CliService) WebsiteDelete(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	color.Greenln(fmt.Sprintf("网站 %s 删除成功", website.Name))
+	fmt.Println(fmt.Sprintf("网站 %s 删除成功", website.Name))
 	return nil
 }
 
@@ -432,47 +431,47 @@ func (s *CliService) WebsiteWrite(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error {
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln("|-备份类型：网站")
-	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println("|-备份类型：网站")
+	fmt.Println(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
 	if err := s.backupRepo.Create(biz.BackupTypeWebsite, cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupDatabase(ctx context.Context, cmd *cli.Command) error {
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln("|-备份类型：数据库")
-	color.Greenln(fmt.Sprintf("|-数据库：%s", cmd.String("type")))
-	color.Greenln(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println("|-备份类型：数据库")
+	fmt.Println(fmt.Sprintf("|-数据库：%s", cmd.String("type")))
+	fmt.Println(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
 	if err := s.backupRepo.Create(biz.BackupType(cmd.String("type")), cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln("|-备份类型：面板")
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println("|-备份类型：面板")
 	if err := s.backupRepo.Create(biz.BackupTypePanel, "", cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
@@ -485,18 +484,18 @@ func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
 		path = cmd.String("path")
 	}
 
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始清理 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
-	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
-	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始清理 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
+	fmt.Println(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
+	fmt.Println(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
 	if err = s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return fmt.Errorf("|-清理失败：%v", err)
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
@@ -510,17 +509,17 @@ func (s *CliService) CutoffWebsite(ctx context.Context, cmd *cli.Command) error 
 		path = cmd.String("path")
 	}
 
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始切割日志 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln("|-切割类型：网站")
-	color.Greenln(fmt.Sprintf("|-切割目标：%s", website.Name))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始切割日志 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println("|-切割类型：网站")
+	fmt.Println(fmt.Sprintf("|-切割目标：%s", website.Name))
 	if err = s.backupRepo.CutoffLog(path, filepath.Join(app.Root, "wwwlogs", website.Name+".log")); err != nil {
 		return err
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 切割成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 切割成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
@@ -533,18 +532,18 @@ func (s *CliService) CutoffClear(ctx context.Context, cmd *cli.Command) error {
 		path = cmd.String("path")
 	}
 
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("★ 开始清理切割日志 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
-	color.Greenln(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
-	color.Greenln(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("★ 开始清理切割日志 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
+	fmt.Println(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
+	fmt.Println(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
 	if err := s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return err
 	}
-	color.Greenln(s.hr)
-	color.Greenln(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
-	color.Greenln(s.hr)
+	fmt.Println(s.hr)
+	fmt.Println(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Println(s.hr)
 	return nil
 }
 
@@ -559,7 +558,7 @@ func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用安装失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("应用 %s 安装完成", slug))
+	fmt.Println(fmt.Sprintf("应用 %s 安装完成", slug))
 
 	return nil
 }
@@ -574,7 +573,7 @@ func (s *CliService) AppUnInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用卸载失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("应用 %s 卸载完成", slug))
+	fmt.Println(fmt.Sprintf("应用 %s 卸载完成", slug))
 
 	return nil
 }
@@ -589,7 +588,7 @@ func (s *CliService) AppUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用更新失败：%v", err)
 	}
 
-	color.Greenln(fmt.Sprintf("应用 %s 更新完成", slug))
+	fmt.Println(fmt.Sprintf("应用 %s 更新完成", slug))
 
 	return nil
 }
@@ -641,7 +640,7 @@ func (s *CliService) SyncTime(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	color.Greenln("时间同步成功")
+	fmt.Println("时间同步成功")
 	return nil
 }
 
@@ -653,7 +652,7 @@ func (s *CliService) ClearTask(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("任务清理失败：%v", err)
 	}
 
-	color.Greenln("任务清理成功")
+	fmt.Println("任务清理成功")
 	return nil
 }
 
