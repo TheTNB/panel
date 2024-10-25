@@ -106,7 +106,13 @@ onUnmounted(() => {
     </template>
     <n-tabs v-model:value="currentTab" type="line" animated>
       <n-tab-pane name="cert" tab="证书列表">
-        <cert-view :accounts="accounts" :algorithms="algorithms" :websites="websites" :dns="dns" />
+        <cert-view
+          :accounts="accounts"
+          :algorithms="algorithms"
+          :websites="websites"
+          :dns="dns"
+          :ca-providers="caProviders"
+        />
       </n-tab-pane>
       <n-tab-pane name="user" tab="账号列表">
         <account-view :ca-providers="caProviders" :algorithms="algorithms" />

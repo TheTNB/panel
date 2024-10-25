@@ -85,16 +85,16 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	default:
-		return nil, errors.New("CA 提供商不支持")
+		return nil, errors.New("unsupported CA")
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("注册账号失败：%v", err)
+		return nil, fmt.Errorf("failed to register account: %v", err)
 	}
 
 	privateKey, err := cert.EncodeKey(client.Account.PrivateKey)
 	if err != nil {
-		return nil, errors.New("获取私钥失败")
+		return nil, errors.New("failed to get private key")
 	}
 	account.PrivateKey = string(privateKey)
 
@@ -144,16 +144,16 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 	case "sslcom":
 		client, err = acme.NewRegisterAccount(context.Background(), account.Email, acme.CASSLcom, &acme.EAB{KeyID: account.Kid, MACKey: account.HmacEncoded}, acme.KeyType(account.KeyType))
 	default:
-		return errors.New("CA 提供商不支持")
+		return errors.New("unsupported CA")
 	}
 
 	if err != nil {
-		return errors.New("向 CA 注册账号失败，请检查参数是否正确")
+		return errors.New("failed to register account")
 	}
 
 	privateKey, err := cert.EncodeKey(client.Account.PrivateKey)
 	if err != nil {
-		return errors.New("获取私钥失败")
+		return errors.New("failed to get private key")
 	}
 	account.PrivateKey = string(privateKey)
 
@@ -177,13 +177,13 @@ func (r certAccountRepo) getGoogleEAB() (*acme.EAB, error) {
 	client.SetTimeout(5 * time.Second)
 	client.SetRetryCount(2)
 
-	resp, err := client.R().SetResult(&data{}).Get("https://panel.haozi.net/api/acme/googleEAB")
+	resp, err := client.R().SetResult(&data{}).Get("https://gts.rat.dev/eab")
 	if err != nil || !resp.IsSuccess() {
-		return &acme.EAB{}, errors.New("获取Google EAB失败")
+		return &acme.EAB{}, fmt.Errorf("failed to get Google EAB: %v", err)
 	}
 	eab := resp.Result().(*data)
 	if eab.Message != "success" {
-		return &acme.EAB{}, errors.New("获取Google EAB失败")
+		return &acme.EAB{}, fmt.Errorf("failed to get Google EAB: %s", eab.Message)
 	}
 
 	return &acme.EAB{KeyID: eab.Data.KeyId, MACKey: eab.Data.MacKey}, nil
@@ -204,11 +204,11 @@ func (r certAccountRepo) getZeroSSLEAB(email string) (*acme.EAB, error) {
 		"email": email,
 	}).SetResult(&data{}).Post("https://api.zerossl.com/acme/eab-credentials-email")
 	if err != nil || !resp.IsSuccess() {
-		return &acme.EAB{}, errors.New("获取ZeroSSL EAB失败")
+		return &acme.EAB{}, fmt.Errorf("failed to get ZeroSSL EAB: %v", err)
 	}
 	eab := resp.Result().(*data)
 	if !eab.Success {
-		return &acme.EAB{}, errors.New("获取ZeroSSL EAB失败")
+		return &acme.EAB{}, fmt.Errorf("failed to get ZeroSSL EAB")
 	}
 
 	return &acme.EAB{KeyID: eab.EabKid, MACKey: eab.EabHmacKey}, nil

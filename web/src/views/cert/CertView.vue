@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Editor from '@guolao/vue-monaco-editor'
-import { NButton, NDataTable, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
+import { NButton, NDataTable, NFlex, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
 
 import cert from '@/api/panel/cert'
 import type { Cert } from '@/views/cert/types'
@@ -9,10 +9,11 @@ const props = defineProps({
   algorithms: Array<any>,
   websites: Array<any>,
   accounts: Array<any>,
-  dns: Array<any>
+  dns: Array<any>,
+  caProviders: Array<any>
 })
 
-const { algorithms, websites, accounts, dns } = toRefs(props)
+const { algorithms, websites, accounts, dns, caProviders } = toRefs(props)
 
 let messageReactive: any
 
@@ -91,20 +92,19 @@ const columns: any = [
   {
     title: '关联账号',
     key: 'account_id',
-    minWidth: 150,
+    minWidth: 400,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
-      return h(
-        NTag,
-        {
-          type: row.account == null ? 'error' : 'success',
-          bordered: false
-        },
-        {
-          default: () => (row.account?.email == null ? '无' : row.account.email)
-        }
-      )
+      return h(NFlex, null, {
+        default: () => [
+          h(NTag, null, { default: () => (row.account?.email == null ? '无' : row.account.email) }),
+          h(NTag, null, {
+            default: () =>
+              caProviders?.value?.find((item: any) => item.value === row.account?.ca)?.label
+          })
+        ]
+      })
     }
   },
   {
@@ -436,7 +436,7 @@ onUnmounted(() => {
     <n-data-table
       striped
       remote
-      :scroll-x="1000"
+      :scroll-x="1400"
       :loading="false"
       :columns="columns"
       :data="data"
