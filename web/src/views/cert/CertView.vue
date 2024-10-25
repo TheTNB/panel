@@ -130,7 +130,7 @@ const columns: any = [
   {
     title: '关联DNS',
     key: 'dns_id',
-    minWidth: 150,
+    width: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -226,7 +226,7 @@ const columns: any = [
                           })
                           .finally(() => {
                             d.loading = false
-                            messageReactive.destroy()
+                            messageReactive?.destroy()
                           })
                       }
                     })
@@ -238,7 +238,7 @@ const columns: any = [
                         onPageChange(1)
                       })
                       .finally(() => {
-                        messageReactive.destroy()
+                        messageReactive?.destroy()
                       })
                   }
                 }
