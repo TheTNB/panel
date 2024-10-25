@@ -26,9 +26,7 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type websiteRepo struct {
-	settingRepo biz.SettingRepo
-}
+type websiteRepo struct{}
 
 func NewWebsiteRepo() biz.WebsiteRepo {
 	return &websiteRepo{}
@@ -290,7 +288,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	}
 
 	// 创建数据库
-	rootPassword, err := r.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
+	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
 	if err == nil && req.DB && req.DBType == "mysql" {
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
 		if err != nil {
@@ -352,6 +350,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	}
 	// 监听地址
 	var listens [][]string
+	quic := false
 	for _, listen := range req.Listens {
 		if !listen.HTTPS && !listen.QUIC {
 			listens = append(listens, []string{listen.Address})
@@ -360,6 +359,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 			listens = append(listens, []string{listen.Address, "ssl"})
 		}
 		if listen.QUIC {
+			quic = true
 			listens = append(listens, []string{listen.Address, "quic"})
 		}
 	}
@@ -417,7 +417,11 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		if err = p.SetOCSP(req.OCSP); err != nil {
 			return err
 		}
-
+		if quic {
+			if err = p.SetAltSvc(`'h3=":$server_port"; ma=2592000'`); err != nil {
+				return err
+			}
+		}
 	} else {
 		if err = p.ClearSetHTTPS(); err != nil {
 			return err
@@ -429,6 +433,9 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 			return err
 		}
 		if err = p.SetOCSP(false); err != nil {
+			return err
+		}
+		if err = p.SetAltSvc(``); err != nil {
 			return err
 		}
 	}
@@ -492,7 +499,7 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		_ = io.Remove(website.Path)
 	}
 	if req.DB {
-		rootPassword, err := r.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
+		rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
 		if err != nil {
 			return err
 		}
