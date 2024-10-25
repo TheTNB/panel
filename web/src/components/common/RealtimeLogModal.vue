@@ -12,15 +12,15 @@ const logRef = ref<LogInst | null>(null)
 let logWs: WebSocket | null = null
 
 const init = async () => {
-  const cmd = `tail -n 200 -f '${props.path}'`
+  const cmd = `tail -n 100 -f '${props.path}'`
   ws.exec(cmd)
     .then((ws: WebSocket) => {
       logWs = ws
       ws.onmessage = (event) => {
         log.value += event.data + '\n'
         const lines = log.value.split('\n')
-        if (lines.length > 1000) {
-          log.value = lines.slice(lines.length - 1000).join('\n')
+        if (lines.length > 500) {
+          log.value = lines.slice(lines.length - 500).join('\n')
         }
       }
     })
