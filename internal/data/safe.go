@@ -1,7 +1,8 @@
 package data
 
 import (
-	"errors"
+	"fmt"
+	"github.com/TheTNB/panel/pkg/firewall"
 	"strings"
 
 	"github.com/spf13/cast"
@@ -61,8 +62,8 @@ func (r *safeRepo) UpdateSSH(port uint, status bool) error {
 
 func (r *safeRepo) GetPingStatus() (bool, error) {
 	out, err := shell.Execf(`firewall-cmd --list-rich-rules`)
-	if err != nil {
-		return true, errors.New(out)
+	if err != nil { // 可能防火墙已关闭等
+		return true, nil
 	}
 
 	if !strings.Contains(out, `rule protocol value="icmp" drop`) {
@@ -73,7 +74,14 @@ func (r *safeRepo) GetPingStatus() (bool, error) {
 }
 
 func (r *safeRepo) UpdatePingStatus(status bool) error {
-	var err error
+	fw, err := firewall.NewFirewall().Status()
+	if err != nil {
+		return err
+	}
+	if !fw {
+		return fmt.Errorf("failed to update ping status: firewalld is not running")
+	}
+
 	if status {
 		_, err = shell.Execf(`firewall-cmd --permanent --remove-rich-rule='rule protocol value=icmp drop'`)
 	} else {
