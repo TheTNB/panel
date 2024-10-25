@@ -37,6 +37,12 @@ func (r *certRepo) Get(id uint) (*biz.Cert, error) {
 	return cert, err
 }
 
+func (r *certRepo) GetByWebsite(WebsiteID uint) (*biz.Cert, error) {
+	cert := new(biz.Cert)
+	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Where("website_id = ?", WebsiteID).First(cert).Error
+	return cert, err
+}
+
 func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 	cert := &biz.Cert{
 		AccountID: req.AccountID,

@@ -34,8 +34,13 @@ func (r certAccountRepo) GetDefault(userID uint) (*biz.CertAccount, error) {
 		return nil, err
 	}
 
+	account := new(biz.CertAccount)
+	if err = app.Orm.Model(&biz.CertAccount{}).Where("ca = ?", "googlecn").Where("email = ?", user.Email).First(account).Error; err == nil {
+		return account, nil
+	}
+
 	req := &request.CertAccountCreate{
-		CA:      acme.CAGoogleCN,
+		CA:      "googlecn",
 		Email:   user.Email,
 		KeyType: string(acme.KeyEC256),
 	}

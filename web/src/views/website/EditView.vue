@@ -4,11 +4,14 @@ defineOptions({
 })
 
 import Editor from '@guolao/vue-monaco-editor'
+import type { MessageReactive } from 'naive-ui'
 import { NButton } from 'naive-ui'
 
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
 import type { WebsiteListen, WebsiteSetting } from '@/views/website/types'
+
+let messageReactive: MessageReactive | null = null
 
 const current = ref('listen')
 const route = useRoute()
@@ -97,10 +100,18 @@ const handleReset = async () => {
 }
 
 const handleObtainCert = async () => {
-  await website.obtainCert(Number(id)).then(() => {
-    getWebsiteSetting()
-    window.$message.success('成功，请开启 HTTPS 并保存')
+  messageReactive = window.$message.loading('请稍后...', {
+    duration: 0
   })
+  await website
+    .obtainCert(Number(id))
+    .then(() => {
+      getWebsiteSetting()
+      window.$message.success('签发成功')
+    })
+    .finally(() => {
+      messageReactive?.destroy()
+    })
 }
 
 const clearLog = async () => {

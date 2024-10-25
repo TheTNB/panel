@@ -29,6 +29,7 @@ type Cert struct {
 type CertRepo interface {
 	List(page, limit uint) ([]*Cert, int64, error)
 	Get(id uint) (*Cert, error)
+	GetByWebsite(WebsiteID uint) (*Cert, error)
 	Create(req *request.CertCreate) (*Cert, error)
 	Update(req *request.CertUpdate) error
 	Delete(id uint) error

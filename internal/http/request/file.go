@@ -22,7 +22,7 @@ type FileCreate struct {
 
 type FileSave struct {
 	Path    string `form:"path" json:"path" validate:"required"`
-	Content string `form:"content" json:"content" validate:"required"`
+	Content string `form:"content" json:"content"`
 }
 
 type FileMove struct {

@@ -695,15 +695,18 @@ func (r *websiteRepo) ObtainCert(ctx context.Context, id uint) error {
 	}
 
 	cRepo := NewCertRepo()
-	newCert, err := cRepo.Create(&request.CertCreate{
-		Type:      string(acme.KeyEC256),
-		Domains:   website.Domains,
-		AutoRenew: true,
-		AccountID: account.ID,
-		WebsiteID: website.ID,
-	})
+	newCert, err := cRepo.GetByWebsite(website.ID)
 	if err != nil {
-		return err
+		newCert, err = cRepo.Create(&request.CertCreate{
+			Type:      string(acme.KeyEC256),
+			Domains:   website.Domains,
+			AutoRenew: true,
+			AccountID: account.ID,
+			WebsiteID: website.ID,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	_, err = cRepo.ObtainAuto(newCert.ID)

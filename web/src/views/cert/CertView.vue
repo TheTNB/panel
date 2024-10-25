@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Editor from '@guolao/vue-monaco-editor'
+import type { MessageReactive } from 'naive-ui'
 import { NButton, NDataTable, NFlex, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
 
 import cert from '@/api/panel/cert'
@@ -15,7 +16,7 @@ const props = defineProps({
 
 const { algorithms, websites, accounts, dns, caProviders } = toRefs(props)
 
-let messageReactive: any
+let messageReactive: MessageReactive | null = null
 
 const updateCertModel = ref<any>({
   domains: [],
