@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"context"
 	"time"
 
 	"github.com/TheTNB/panel/internal/http/request"
@@ -33,4 +34,5 @@ type WebsiteRepo interface {
 	UpdateRemark(id uint, remark string) error
 	ResetConfig(id uint) error
 	UpdateStatus(id uint, status bool) error
+	ObtainCert(ctx context.Context, id uint) error
 }

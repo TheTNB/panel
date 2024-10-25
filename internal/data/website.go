@@ -1,17 +1,21 @@
 package data
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/samber/lo"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
@@ -27,9 +31,7 @@ type websiteRepo struct {
 }
 
 func NewWebsiteRepo() biz.WebsiteRepo {
-	return &websiteRepo{
-		settingRepo: NewSettingRepo(),
-	}
+	return &websiteRepo{}
 }
 
 func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error {
@@ -483,6 +485,8 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost/acme", website.Name+".conf"))
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost/cert", website.Name+".pem"))
 	_ = io.Remove(filepath.Join(app.Root, "server/vhost/cert", website.Name+".key"))
+	_ = io.Remove(filepath.Join(app.Root, "wwwlogs", website.Name+".log"))
+	_ = io.Remove(filepath.Join(app.Root, "wwwlogs", website.Name+".error.log"))
 
 	if req.Path {
 		_ = io.Remove(website.Path)
@@ -493,11 +497,10 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 			return err
 		}
 		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
-		if err != nil {
-			return err
+		if err == nil {
+			_ = mysql.DatabaseDrop(website.Name)
+			_ = mysql.UserDrop(website.Name)
 		}
-		_ = mysql.DatabaseDrop(website.Name)
-		_ = mysql.UserDrop(website.Name)
 		_, _ = shell.Execf(`echo "DROP DATABASE IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
 		_, _ = shell.Execf(`echo "DROP USER IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
 	}
@@ -668,4 +671,38 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 	}
 
 	return nil
+}
+
+func (r *websiteRepo) ObtainCert(ctx context.Context, id uint) error {
+	website, err := r.Get(id)
+	if err != nil {
+		return err
+	}
+	if slices.Contains(website.Domains, "*") {
+		return errors.New("cannot one-key obtain wildcard certificate")
+	}
+
+	account, err := NewCertAccountRepo().GetDefault(cast.ToUint(ctx.Value("user_id")))
+	if err != nil {
+		return err
+	}
+
+	cRepo := NewCertRepo()
+	newCert, err := cRepo.Create(&request.CertCreate{
+		Type:      string(acme.KeyEC256),
+		Domains:   website.Domains,
+		AutoRenew: true,
+		AccountID: account.ID,
+		WebsiteID: website.ID,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = cRepo.ObtainAuto(newCert.ID)
+	if err != nil {
+		return err
+	}
+
+	return cRepo.Deploy(newCert.ID, website.ID)
 }

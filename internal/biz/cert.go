@@ -12,7 +12,7 @@ type Cert struct {
 	AccountID uint      `gorm:"not null" json:"account_id"` // 关联的 ACME 账户 ID
 	WebsiteID uint      `gorm:"not null" json:"website_id"` // 关联的网站 ID
 	DNSID     uint      `gorm:"not null" json:"dns_id"`     // 关联的 DNS ID
-	Type      string    `gorm:"not null" json:"type"`       // 证书类型 (P256, P384, 2048, 4096)
+	Type      string    `gorm:"not null" json:"type"`       // 证书类型 (P256, P384, 2048, 3072, 4096)
 	Domains   []string  `gorm:"not null;serializer:json" json:"domains"`
 	AutoRenew bool      `gorm:"not null" json:"auto_renew"` // 自动续签
 	CertURL   string    `gorm:"not null" json:"cert_url"`   // 证书 URL (续签时使用)

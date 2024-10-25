@@ -13,7 +13,7 @@ type CertAccount struct {
 	Kid         string    `gorm:"not null" json:"kid"`
 	HmacEncoded string    `gorm:"not null" json:"hmac_encoded"`
 	PrivateKey  string    `gorm:"not null" json:"private_key"`
-	KeyType     string    `gorm:"not null" json:"key_type"`
+	KeyType     string    `gorm:"not null" json:"key_type"` // 密钥类型 (P256, P384, 2048, 3072, 4096)
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 
@@ -22,6 +22,7 @@ type CertAccount struct {
 
 type CertAccountRepo interface {
 	List(page, limit uint) ([]*CertAccount, int64, error)
+	GetDefault(userID uint) (*CertAccount, error)
 	Get(id uint) (*CertAccount, error)
 	Create(req *request.CertAccountCreate) (*CertAccount, error)
 	Update(req *request.CertAccountUpdate) error

@@ -3,18 +3,19 @@ package service
 import (
 	"bufio"
 	"context"
-	"github.com/TheTNB/panel/internal/http/request"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/gorilla/websocket"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/ssh"
-	"github.com/gorilla/websocket"
 )
 
 type WsService struct {

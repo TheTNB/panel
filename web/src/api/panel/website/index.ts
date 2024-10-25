@@ -20,16 +20,18 @@ export default {
   config: (id: number): Promise<AxiosResponse<any>> => request.get('/website/' + id),
   // 保存网站配置
   saveConfig: (id: number, data: any): Promise<AxiosResponse<any>> =>
-    request.put('/website/' + id, data),
+    request.put(`/website/${id}`, data),
   // 清空日志
   clearLog: (id: number): Promise<AxiosResponse<any>> => request.delete('/website/' + id + '/log'),
   // 更新备注
   updateRemark: (id: number, remark: string): Promise<AxiosResponse<any>> =>
-    request.post('/website/' + id + '/updateRemark', { remark }),
+    request.post(`/website/${id}` + '/updateRemark', { remark }),
   // 重置配置
   resetConfig: (id: number): Promise<AxiosResponse<any>> =>
-    request.post('/website/' + id + '/resetConfig'),
+    request.post(`/website/${id}/resetConfig`),
   // 修改状态
   status: (id: number, status: boolean): Promise<AxiosResponse<any>> =>
-    request.post('/website/' + id + '/status', { status })
+    request.post(`/website/${id}/status`, { status }),
+  // 签发证书
+  obtainCert: (id: number): Promise<AxiosResponse<any>> => request.post(`/website/${id}/obtainCert`)
 }

@@ -17,14 +17,11 @@ import (
 )
 
 type certRepo struct {
-	client      *acme.Client
-	websiteRepo biz.WebsiteRepo
+	client *acme.Client
 }
 
 func NewCertRepo() biz.CertRepo {
-	return &certRepo{
-		websiteRepo: NewWebsiteRepo(),
-	}
+	return &certRepo{}
 }
 
 func (r *certRepo) List(page, limit uint) ([]*biz.Cert, int64, error) {
@@ -231,7 +228,7 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 		return errors.New("该证书没有签发成功，无法部署")
 	}
 
-	website, err := r.websiteRepo.Get(WebsiteID)
+	website, err := NewWebsiteRepo().Get(WebsiteID)
 	if err != nil {
 		return err
 	}

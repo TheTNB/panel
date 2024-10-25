@@ -1,8 +1,9 @@
 package service
 
 import (
-	"github.com/go-rat/chix"
 	"net/http"
+
+	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"

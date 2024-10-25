@@ -96,6 +96,13 @@ const handleReset = async () => {
   })
 }
 
+const handleObtainCert = async () => {
+  await website.obtainCert(Number(id)).then(() => {
+    getWebsiteSetting()
+    window.$message.success('成功，请开启 HTTPS 并保存')
+  })
+}
+
 const clearLog = async () => {
   await website.clearLog(Number(id)).then(() => {
     getWebsiteSetting()
@@ -140,6 +147,10 @@ onMounted(async () => {
           </template>
           确定要重置配置吗？
         </n-popconfirm>
+        <n-button v-if="current === 'https'" class="ml-16" type="success" @click="handleObtainCert">
+          <TheIcon :size="18" icon="material-symbols:done-rounded" />
+          一键签发证书
+        </n-button>
         <n-button v-if="current !== 'log'" class="ml-16" type="primary" @click="handleSave">
           <TheIcon :size="18" icon="material-symbols:save-outline" />
           保存
@@ -174,7 +185,7 @@ onMounted(async () => {
               :on-create="onCreateListen"
             >
               <template #default="{ value }">
-                <div    w-full flex items-center >
+                <div w-full flex items-center>
                   <n-input v-model:value="value.address" clearable />
                   <n-checkbox v-model:checked="value.https" ml-20 mr-20 w-120> HTTPS </n-checkbox>
                   <n-checkbox v-model:checked="value.quic" w-200> QUIC(HTTP3) </n-checkbox>

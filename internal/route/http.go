@@ -60,6 +60,7 @@ func Http(r chi.Router) {
 			r.Post("/{id}/updateRemark", website.UpdateRemark)
 			r.Post("/{id}/resetConfig", website.ResetConfig)
 			r.Post("/{id}/status", website.UpdateStatus)
+			r.Post("/{id}/obtainCert", website.ObtainCert)
 		})
 
 		r.Route("/backup", func(r chi.Router) {

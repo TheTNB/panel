@@ -28,6 +28,21 @@ func (r certAccountRepo) List(page, limit uint) ([]*biz.CertAccount, int64, erro
 	return accounts, total, err
 }
 
+func (r certAccountRepo) GetDefault(userID uint) (*biz.CertAccount, error) {
+	user, err := NewUserRepo().Get(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	req := &request.CertAccountCreate{
+		CA:      acme.CAGoogleCN,
+		Email:   user.Email,
+		KeyType: string(acme.KeyEC256),
+	}
+
+	return r.Create(req)
+}
+
 func (r certAccountRepo) Get(id uint) (*biz.CertAccount, error) {
 	account := new(biz.CertAccount)
 	err := app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).First(account).Error

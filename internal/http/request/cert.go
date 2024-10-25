@@ -1,7 +1,7 @@
 package request
 
 type CertCreate struct {
-	Type      string   `form:"type" json:"type" validate:"required"`
+	Type      string   `form:"type" json:"type" validate:"required,oneof=P256 P384 2048 3072 4096"`
 	Domains   []string `form:"domains" json:"domains" validate:"min=1,dive,required"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
 	AccountID uint     `form:"account_id" json:"account_id"`
@@ -11,7 +11,7 @@ type CertCreate struct {
 
 type CertUpdate struct {
 	ID        uint     `form:"id" json:"id" validate:"required,exists=certs id"`
-	Type      string   `form:"type" json:"type" validate:"required"`
+	Type      string   `form:"type" json:"type" validate:"required,oneof=P256 P384 2048 3072 4096"`
 	Domains   []string `form:"domains" json:"domains" validate:"min=1,dive,required"`
 	AutoRenew bool     `form:"auto_renew" json:"auto_renew"`
 	AccountID uint     `form:"account_id" json:"account_id"`
