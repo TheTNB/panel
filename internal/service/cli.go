@@ -131,30 +131,30 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("入口获取失败")
 	}
 
-	fmt.Println(fmt.Sprintf("用户名: %s", user.Username))
-	fmt.Println(fmt.Sprintf("密码: %s", password))
-	fmt.Println(fmt.Sprintf("端口: %s", port))
-	fmt.Println(fmt.Sprintf("入口: %s", entrance))
+	fmt.Printf("用户名: %s\n", user.Username)
+	fmt.Printf("密码: %s\n", password)
+	fmt.Printf("端口: %s\n", port)
+	fmt.Printf("入口: %s\n", entrance)
 
 	lv4, err := tools.GetLocalIPv4()
 	if err == nil {
-		fmt.Println(fmt.Sprintf("本地IPv4地址: %s://%s:%s%s", protocol, lv4, port, entrance))
+		fmt.Printf("本地IPv4地址: %s://%s:%s%s\n", protocol, lv4, port, entrance)
 	}
 	lv6, err := tools.GetLocalIPv6()
 	if err == nil {
-		fmt.Println(fmt.Sprintf("本地IPv6地址: %s://[%s]:%s%s", protocol, lv6, port, entrance))
+		fmt.Printf("本地IPv6地址: %s://[%s]:%s%s\n", protocol, lv6, port, entrance)
 	}
 	rv4, err := tools.GetPublicIPv4()
 	if err == nil {
-		fmt.Println(fmt.Sprintf("公网IPv4地址: %s://%s:%s%s", protocol, rv4, port, entrance))
+		fmt.Printf("公网IPv4地址: %s://%s:%s%s\n", protocol, rv4, port, entrance)
 	}
 	rv6, err := tools.GetPublicIPv6()
 	if err == nil {
-		fmt.Println(fmt.Sprintf("公网IPv6地址: %s://[%s]:%s%s", protocol, rv6, port, entrance))
+		fmt.Printf("公网IPv6地址: %s://[%s]:%s%s\n", protocol, rv6, port, entrance)
 	}
 
 	fmt.Println("请根据自身网络情况自行选择合适的地址访问面板")
-	fmt.Println(fmt.Sprintf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口", port))
+	fmt.Printf("如无法访问，请检查服务器运营商安全组和防火墙是否放行%s端口\n", port)
 	fmt.Println("若仍无法访问，可尝试运行 panel-cli https off 关闭面板HTTPS")
 	fmt.Println("警告：关闭面板HTTPS后，面板安全性将大大降低，请谨慎操作")
 
@@ -168,7 +168,7 @@ func (s *CliService) UserList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	for _, user := range users {
-		fmt.Println(fmt.Sprintf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05")))
+		fmt.Printf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s\n", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05"))
 	}
 
 	return nil
@@ -198,7 +198,7 @@ func (s *CliService) UserName(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("用户名修改失败：%v", err)
 	}
 
-	fmt.Println(fmt.Sprintf("用户 %s 修改为 %s 成功", oldUsername, newUsername))
+	fmt.Printf("用户 %s 修改为 %s 成功\n", oldUsername, newUsername)
 	return nil
 }
 
@@ -230,7 +230,7 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("密码修改失败：%v", err)
 	}
 
-	fmt.Println(fmt.Sprintf("用户 %s 密码修改成功", username))
+	fmt.Printf("用户 %s 密码修改成功\n", username)
 	return nil
 }
 
@@ -309,7 +309,7 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	fmt.Println("已开启访问入口")
-	fmt.Println(fmt.Sprintf("访问入口：%s", config.HTTP.Entrance))
+	fmt.Printf("访问入口：%s\n", config.HTTP.Entrance)
 	return s.Restart(ctx, cmd)
 }
 
@@ -366,7 +366,7 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("已修改端口为 %d", port))
+	fmt.Printf("已修改端口为 %d\n", port)
 	return s.Restart(ctx, cmd)
 }
 
@@ -385,7 +385,7 @@ func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("网站 %s 创建成功", website.Name))
+	fmt.Printf("网站 %s 创建成功\n", website.Name)
 	return nil
 }
 
@@ -402,7 +402,7 @@ func (s *CliService) WebsiteRemove(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("网站 %s 移除成功", website.Name))
+	fmt.Printf("网站 %s 移除成功\n", website.Name)
 	return nil
 }
 
@@ -421,7 +421,7 @@ func (s *CliService) WebsiteDelete(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	fmt.Println(fmt.Sprintf("网站 %s 删除成功", website.Name))
+	fmt.Printf("网站 %s 删除成功\n", website.Name)
 	return nil
 }
 
@@ -432,45 +432,45 @@ func (s *CliService) WebsiteWrite(ctx context.Context, cmd *cli.Command) error {
 
 func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始备份 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	fmt.Println("|-备份类型：网站")
-	fmt.Println(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	fmt.Printf("|-备份目标：%s\n", cmd.String("name"))
 	if err := s.backupRepo.Create(biz.BackupTypeWebsite, cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupDatabase(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始备份 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	fmt.Println("|-备份类型：数据库")
-	fmt.Println(fmt.Sprintf("|-数据库：%s", cmd.String("type")))
-	fmt.Println(fmt.Sprintf("|-备份目标：%s", cmd.String("name")))
+	fmt.Printf("|-数据库：%s\n", cmd.String("type"))
+	fmt.Printf("|-备份目标：%s\n", cmd.String("name"))
 	if err := s.backupRepo.Create(biz.BackupType(cmd.String("type")), cmd.String("name"), cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
 
 func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始备份 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始备份 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	fmt.Println("|-备份类型：面板")
 	if err := s.backupRepo.Create(biz.BackupTypePanel, "", cmd.String("path")); err != nil {
 		return fmt.Errorf("|-备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 备份成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
@@ -485,16 +485,16 @@ func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始清理 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始清理 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
-	fmt.Println(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
-	fmt.Println(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	fmt.Printf("|-清理类型：%s\n", cmd.String("type"))
+	fmt.Printf("|-清理目标：%s\n", cmd.String("file"))
+	fmt.Printf("|-保留份数：%d\n", cmd.Int("save"))
 	if err = s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return fmt.Errorf("|-清理失败：%v", err)
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 清理成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
@@ -510,15 +510,15 @@ func (s *CliService) CutoffWebsite(ctx context.Context, cmd *cli.Command) error 
 	}
 
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始切割日志 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始切割日志 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	fmt.Println("|-切割类型：网站")
-	fmt.Println(fmt.Sprintf("|-切割目标：%s", website.Name))
+	fmt.Printf("|-切割目标：%s\n", website.Name)
 	if err = s.backupRepo.CutoffLog(path, filepath.Join(app.Root, "wwwlogs", website.Name+".log")); err != nil {
 		return err
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 切割成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 切割成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
@@ -533,16 +533,16 @@ func (s *CliService) CutoffClear(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("★ 开始清理切割日志 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("★ 开始清理切割日志 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("|-清理类型：%s", cmd.String("type")))
-	fmt.Println(fmt.Sprintf("|-清理目标：%s", cmd.String("file")))
-	fmt.Println(fmt.Sprintf("|-保留份数：%d", cmd.Int("save")))
+	fmt.Printf("|-清理类型：%s\n", cmd.String("type"))
+	fmt.Printf("|-清理目标：%s\n", cmd.String("file"))
+	fmt.Printf("|-保留份数：%d\n", cmd.Int("save"))
 	if err := s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
 		return err
 	}
 	fmt.Println(s.hr)
-	fmt.Println(fmt.Sprintf("☆ 清理成功 [%s]", time.Now().Format(time.DateTime)))
+	fmt.Printf("☆ 清理成功 [%s]\n", time.Now().Format(time.DateTime))
 	fmt.Println(s.hr)
 	return nil
 }
@@ -558,7 +558,7 @@ func (s *CliService) AppInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用安装失败：%v", err)
 	}
 
-	fmt.Println(fmt.Sprintf("应用 %s 安装完成", slug))
+	fmt.Printf("应用 %s 安装完成\n", slug)
 
 	return nil
 }
@@ -573,7 +573,7 @@ func (s *CliService) AppUnInstall(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用卸载失败：%v", err)
 	}
 
-	fmt.Println(fmt.Sprintf("应用 %s 卸载完成", slug))
+	fmt.Printf("应用 %s 卸载完成\n", slug)
 
 	return nil
 }
@@ -588,7 +588,7 @@ func (s *CliService) AppUpdate(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("应用更新失败：%v", err)
 	}
 
-	fmt.Println(fmt.Sprintf("应用 %s 更新完成", slug))
+	fmt.Printf("应用 %s 更新完成\n", slug)
 
 	return nil
 }

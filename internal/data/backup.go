@@ -181,11 +181,11 @@ func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 	for _, file := range toDelete {
 		filePath := filepath.Join(path, file.Name())
 		if app.IsCli {
-			fmt.Println(fmt.Sprintf("|-清理过期文件：%s", filePath))
+			fmt.Printf("|-清理过期文件：%s\n", filePath)
 		}
 		if err = os.Remove(filePath); err != nil {
 			if app.IsCli {
-				fmt.Println(fmt.Sprintf("|-清理失败：%v", err))
+				fmt.Printf("|-清理失败：%v\n", err)
 			} else {
 				return fmt.Errorf("清理失败：%v", err)
 			}
@@ -242,8 +242,8 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-		fmt.Println(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+		fmt.Printf("|-备份耗时：%s\n", time.Since(start).String())
+		fmt.Printf("|-已备份至文件：%s\n", filepath.Base(backup))
 	}
 	return nil
 }
@@ -289,8 +289,8 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-		fmt.Println(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+		fmt.Printf("|-备份耗时：%s\n", time.Since(start).String())
+		fmt.Printf("|-已备份至文件：%s\n", filepath.Base(backup+".zip"))
 	}
 	return nil
 }
@@ -326,8 +326,8 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-		fmt.Println(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup+".zip")))
+		fmt.Printf("|-备份耗时：%s\n", time.Since(start).String())
+		fmt.Printf("|-已备份至文件：%s\n", filepath.Base(backup+".zip"))
 	}
 	return nil
 }
@@ -353,8 +353,8 @@ func (r *backupRepo) createPanel(to string) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-备份耗时：%s", time.Since(start).String()))
-		fmt.Println(fmt.Sprintf("|-已备份至文件：%s", filepath.Base(backup)))
+		fmt.Printf("|-备份耗时：%s\n", time.Since(start).String())
+		fmt.Printf("|-已备份至文件：%s\n", filepath.Base(backup))
 	}
 	return nil
 }
@@ -477,10 +477,10 @@ func (r *backupRepo) preCheckPath(to, path string) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
-		fmt.Println(fmt.Sprintf("|-目标文件数：%d", files))
-		fmt.Println(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
-		fmt.Println(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+		fmt.Printf("|-目标大小：%s\n", str.FormatBytes(float64(size)))
+		fmt.Printf("|-目标文件数：%d\n", files)
+		fmt.Printf("|-备份目录可用空间：%s\n", str.FormatBytes(float64(usage.Free)))
+		fmt.Printf("|-备份目录可用Inode：%d\n", usage.InodesFree)
 	}
 
 	if uint64(size) > usage.Free {
@@ -503,9 +503,9 @@ func (r *backupRepo) preCheckDB(to string, size int64) error {
 	}
 
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-目标大小：%s", str.FormatBytes(float64(size))))
-		fmt.Println(fmt.Sprintf("|-备份目录可用空间：%s", str.FormatBytes(float64(usage.Free))))
-		fmt.Println(fmt.Sprintf("|-备份目录可用Inode：%d", usage.InodesFree))
+		fmt.Printf("|-目标大小：%s\n", str.FormatBytes(float64(size)))
+		fmt.Printf("|-备份目录可用空间：%s\n", str.FormatBytes(float64(usage.Free)))
+		fmt.Printf("|-备份目录可用Inode：%d\n", usage.InodesFree)
 	}
 
 	if uint64(size) > usage.Free {

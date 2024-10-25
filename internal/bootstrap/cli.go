@@ -45,6 +45,6 @@ func initCli() {
 		Commands: route.Cli(),
 	}
 	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		fmt.Println(fmt.Sprintf("|-%v", err))
+		fmt.Printf("|-%v\n", err)
 	}
 }

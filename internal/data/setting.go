@@ -242,9 +242,9 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 
 	name := filepath.Base(url)
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-目标版本：%s", version))
-		fmt.Println(fmt.Sprintf("|-下载链接：%s", url))
-		fmt.Println(fmt.Sprintf("|-文件名：%s", name))
+		fmt.Printf("|-目标版本：%s\n", version)
+		fmt.Printf("|-下载链接：%s\n", url)
+		fmt.Printf("|-文件名：%s\n", name)
 	}
 
 	if app.IsCli {
@@ -412,7 +412,7 @@ func (r *settingRepo) FixPanel() error {
 	}
 	latest := list[0]
 	if app.IsCli {
-		fmt.Println(fmt.Sprintf("|-使用备份文件：%s", latest.Name))
+		fmt.Printf("|-使用备份文件：%s\n", latest.Name)
 	}
 
 	// 解压备份文件
