@@ -183,6 +183,21 @@ func (p *Parser) GetHTTPSRedirect() bool {
 	return false
 }
 
+func (p *Parser) GetAltSvc() string {
+	directive, err := p.FindOne("server.add_header")
+	if err != nil {
+		return ""
+	}
+
+	for i, param := range directive.GetParameters() {
+		if strings.HasPrefix(param, "Alt-Svc") && i+1 < len(directive.GetParameters()) {
+			return directive.GetParameters()[i+1]
+		}
+	}
+
+	return ""
+}
+
 func (p *Parser) GetAccessLog() (string, error) {
 	directive, err := p.FindOne("server.access_log")
 	if err != nil {

@@ -198,6 +198,17 @@ func (s *NginxTestSuite) TestHTTPSRedirect() {
 	s.False(parser.GetHTTPSRedirect())
 }
 
+func (s *NginxTestSuite) TestAltSvc() {
+	parser, err := NewParser()
+	s.NoError(err)
+	s.NoError(parser.SetHTTPS("/www/server/vhost/cert/default.pem", "/www/server/vhost/cert/default.key"))
+	s.Equal("", parser.GetAltSvc())
+	s.NoError(parser.SetAltSvc(`'h3=":$server_port"; ma=2592000'`))
+	s.Equal(`'h3=":$server_port"; ma=2592000'`, parser.GetAltSvc())
+	s.NoError(parser.SetAltSvc(""))
+	s.Equal("", parser.GetAltSvc())
+}
+
 func (s *NginxTestSuite) TestAccessLog() {
 	parser, err := NewParser()
 	s.NoError(err)

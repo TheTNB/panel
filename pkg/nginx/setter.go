@@ -425,6 +425,44 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	return p.Set("server", directives)
 }
 
+func (p *Parser) SetAltSvc(altSvc string) error {
+	old, err := p.Find("server.add_header")
+	if err != nil {
+		return err
+	}
+	if err = p.Clear("server.add_header"); err != nil {
+		return err
+	}
+
+	var directives []*config.Directive
+	var foundFlag bool
+	for _, dir := range old {
+		if slices.Contains(dir.GetParameters(), "Alt-Svc") {
+			foundFlag = true
+			directives = append(directives, &config.Directive{
+				Name:       dir.GetName(),
+				Parameters: []string{"Alt-Svc", altSvc},
+				Comment:    dir.GetComment(),
+			})
+		} else {
+			directives = append(directives, &config.Directive{
+				Name:       dir.GetName(),
+				Parameters: dir.GetParameters(),
+				Comment:    dir.GetComment(),
+			})
+		}
+	}
+
+	if !foundFlag && altSvc != "" {
+		directives = append(directives, &config.Directive{
+			Name:       "add_header",
+			Parameters: []string{"Alt-Svc", altSvc},
+		})
+	}
+
+	return p.Set("server", directives)
+}
+
 func (p *Parser) SetAccessLog(accessLog string) error {
 	if err := p.Clear("server.access_log"); err != nil {
 		return err
