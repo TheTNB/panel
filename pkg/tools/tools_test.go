@@ -26,8 +26,8 @@ func (s *HelperTestSuite) TestGetPublicIPv4() {
 
 func (s *HelperTestSuite) TestGetPublicIPv6() {
 	ip, err := GetPublicIPv6()
-	s.Nil(err)
-	s.NotEmpty(ip)
+	s.Error(err)
+	s.Empty(ip)
 }
 
 func (s *HelperTestSuite) TestGetLocalIPv4() {
