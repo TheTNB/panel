@@ -439,11 +439,13 @@ func (p *Parser) SetAltSvc(altSvc string) error {
 	for _, dir := range old {
 		if slices.Contains(dir.GetParameters(), "Alt-Svc") {
 			foundFlag = true
-			directives = append(directives, &config.Directive{
-				Name:       dir.GetName(),
-				Parameters: []string{"Alt-Svc", altSvc},
-				Comment:    dir.GetComment(),
-			})
+			if altSvc != "" { // 为空表示要删除
+				directives = append(directives, &config.Directive{
+					Name:       dir.GetName(),
+					Parameters: []string{"Alt-Svc", altSvc},
+					Comment:    dir.GetComment(),
+				})
+			}
 		} else {
 			directives = append(directives, &config.Directive{
 				Name:       dir.GetName(),
