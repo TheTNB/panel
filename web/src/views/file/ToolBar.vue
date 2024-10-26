@@ -107,6 +107,10 @@ const handlePaste = async () => {
   marked.value = []
 }
 
+const handleCancel = () => {
+  marked.value = []
+}
+
 const bulkDelete = () => {
   if (!selected.value.length) {
     window.$message.error('请选择要删除的文件/文件夹')
@@ -154,6 +158,9 @@ watch(
     <n-button @click="download = true"> 远程下载 </n-button>
     <div ml-auto>
       <n-flex>
+        <n-button v-if="marked.length" secondary type="error" @click="handleCancel">
+          取消
+        </n-button>
         <n-button v-if="marked.length" secondary type="primary" @click="handlePaste">
           粘贴
         </n-button>

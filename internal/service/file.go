@@ -72,11 +72,11 @@ func (s *FileService) Content(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if fileInfo.IsDir() {
-		Error(w, http.StatusInternalServerError, "目标路径不是文件")
+		Error(w, http.StatusInternalServerError, "target is a directory")
 		return
 	}
 	if fileInfo.Size() > 10*1024*1024 {
-		Error(w, http.StatusInternalServerError, "文件大小超过 10 M，不支持在线编辑")
+		Error(w, http.StatusInternalServerError, "file is too large, please download it")
 		return
 	}
 
@@ -135,17 +135,17 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	path := r.FormValue("path")
 	_, handler, err := r.FormFile("file")
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "上传文件失败：%v", err)
+		Error(w, http.StatusInternalServerError, "upload file error: %v", err)
 		return
 	}
 	if io.Exists(path) {
-		Error(w, http.StatusForbidden, "目标路径 %s 已存在", path)
+		Error(w, http.StatusForbidden, "target path %s already exists", path)
 		return
 	}
 
 	if !io.Exists(filepath.Dir(path)) {
 		if err = io.Mkdir(filepath.Dir(path), 0755); err != nil {
-			Error(w, http.StatusInternalServerError, "创建文件夹失败：%v", err)
+			Error(w, http.StatusInternalServerError, "create directory error: %v", err)
 			return
 		}
 	}
@@ -153,12 +153,12 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	src, _ := handler.Open()
 	out, err := stdos.OpenFile(path, stdos.O_CREATE|stdos.O_RDWR|stdos.O_TRUNC, 0644)
 	if err != nil {
-		Error(w, http.StatusInternalServerError, "打开文件失败：%v", err)
+		Error(w, http.StatusInternalServerError, "open file error: %v", err)
 		return
 	}
 
 	if _, err = stdio.Copy(out, src); err != nil {
-		Error(w, http.StatusInternalServerError, "写入文件失败：%v", err)
+		Error(w, http.StatusInternalServerError, "write file error: %v", err)
 		return
 	}
 
@@ -175,12 +175,12 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径 %s 已存在", req.Target)
+		Error(w, http.StatusForbidden, "target path %s already exists", req.Target)
 		return
 	}
 
 	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
-		Error(w, http.StatusForbidden, "你不能这样做，会玩坏的")
+		Error(w, http.StatusForbidden, "you can't do this, it will be broken")
 		return
 	}
 
@@ -200,12 +200,12 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "目标路径 %s 已存在", req.Target)
+		Error(w, http.StatusForbidden, "target path %s already exists", req.Target)
 		return
 	}
 
 	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
-		Error(w, http.StatusForbidden, "你不能这样做，会玩坏的")
+		Error(w, http.StatusForbidden, "you can't do this, it will be broken")
 		return
 	}
 
@@ -230,7 +230,7 @@ func (s *FileService) Download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if info.IsDir() {
-		Error(w, http.StatusInternalServerError, "不能下载目录")
+		Error(w, http.StatusInternalServerError, "can't download a directory")
 		return
 	}
 
