@@ -224,6 +224,21 @@ func (s *CertService) ObtainManual(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
+func (s *CertService) ObtainSelfSigned(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.ID](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if err = s.certRepo.ObtainSelfSigned(req.ID); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, nil)
+}
+
 func (s *CertService) Renew(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {

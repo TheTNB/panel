@@ -13,8 +13,9 @@ const model = ref({
 })
 
 const options = [
-  { label: '自动验证', value: 'auto' },
-  { label: '手动 DNS 验证', value: 'manual' }
+  { label: '自动', value: 'auto' },
+  { label: '手动', value: 'manual' },
+  { label: '自签名', value: 'self-signed' }
 ]
 
 const handleSubmit = async () => {
@@ -33,7 +34,7 @@ const handleSubmit = async () => {
         window.$bus.emit('cert:refresh-cert')
         window.$bus.emit('cert:refresh-async')
       })
-  } else {
+  } else if (model.value.type == 'manual') {
     const { data } = await cert.manualDNS(id.value)
     messageReactive.destroy()
     window.$message.info('请先前往域名处设置 DNS 解析，再继续签发')
@@ -78,6 +79,18 @@ const handleSubmit = async () => {
           })
       }
     })
+  } else {
+    await cert
+      .obtainSelfSigned(id.value)
+      .then(() => {
+        window.$message.success('签发成功')
+        show.value = false
+      })
+      .finally(() => {
+        messageReactive?.destroy()
+        window.$bus.emit('cert:refresh-cert')
+        window.$bus.emit('cert:refresh-async')
+      })
   }
 }
 </script>

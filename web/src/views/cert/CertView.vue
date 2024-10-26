@@ -181,7 +181,7 @@ const columns: any = [
     resizable: true,
     render(row: any) {
       return [
-        row.type != 'upload' && row.account_id != 0 && row.cert == '' && row.key == ''
+        row.type != 'upload' && row.cert == '' && row.key == ''
           ? h(
               NButton,
               {

@@ -207,6 +207,30 @@ func (r *certRepo) ObtainManual(id uint) (*acme.Certificate, error) {
 	return &ssl, nil
 }
 
+func (r *certRepo) ObtainSelfSigned(id uint) error {
+	cert, err := r.Get(id)
+	if err != nil {
+		return err
+	}
+
+	crt, key, err := pkgcert.GenerateSelfSigned(cert.Domains)
+	if err != nil {
+		return err
+	}
+
+	cert.Cert = string(crt)
+	cert.Key = string(key)
+	if err = app.Orm.Save(cert).Error; err != nil {
+		return err
+	}
+
+	if cert.Website != nil {
+		return r.Deploy(cert.ID, cert.WebsiteID)
+	}
+
+	return nil
+}
+
 func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 	cert, err := r.Get(id)
 	if err != nil {

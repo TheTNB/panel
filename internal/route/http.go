@@ -88,6 +88,7 @@ func Http(r chi.Router) {
 				r.Delete("/{id}", cert.Delete)
 				r.Post("/{id}/obtainAuto", cert.ObtainAuto)
 				r.Post("/{id}/obtainManual", cert.ObtainManual)
+				r.Post("/{id}/obtainSelfSigned", cert.ObtainSelfSigned)
 				r.Post("/{id}/renew", cert.Renew)
 				r.Post("/{id}/manualDNS", cert.ManualDNS)
 				r.Post("/{id}/deploy", cert.Deploy)

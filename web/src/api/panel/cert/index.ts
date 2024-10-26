@@ -53,6 +53,9 @@ export default {
   // 证书手动签发
   obtainManual: (id: number): Promise<AxiosResponse<any>> =>
     request.post(`/cert/cert/${id}/obtainManual`, { id }),
+  // 证书自签名签发
+  obtainSelfSigned: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/obtainSelfSigned`, { id }),
   // 续签
   renew: (id: number): Promise<AxiosResponse<any>> =>
     request.post(`/cert/cert/${id}/renew`, { id }),
