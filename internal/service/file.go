@@ -175,7 +175,7 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "target path %s already exists", req.Target)
+		Error(w, http.StatusForbidden, "target path already exists") // no translate, frontend will use it to determine whether to continue
 		return
 	}
 
@@ -200,7 +200,7 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "target path %s already exists", req.Target)
+		Error(w, http.StatusForbidden, "target path already exists") // no translate, frontend will use it to determine whether to continue
 		return
 	}
 

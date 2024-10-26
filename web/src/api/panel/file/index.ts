@@ -1,6 +1,7 @@
 import type { AxiosResponse } from 'axios'
 
 import { request } from '@/utils'
+import type { RequestConfig } from '~/types/axios'
 
 export default {
   // 创建文件/文件夹
@@ -25,11 +26,11 @@ export default {
     })
   },
   // 移动文件
-  move: (source: string, target: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/move', { source, target }),
+  move: (source: string, target: string, force: boolean): Promise<AxiosResponse<any>> =>
+    request.post('/file/move', { source, target, force }, { noNeedTip: true } as RequestConfig),
   // 复制文件
-  copy: (source: string, target: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/copy', { source, target }),
+  copy: (source: string, target: string, force: boolean): Promise<AxiosResponse<any>> =>
+    request.post('/file/copy', { source, target, force }, { noNeedTip: true } as RequestConfig),
   // 远程下载
   remoteDownload: (path: string, url: string): Promise<AxiosResponse<any>> =>
     request.post('/file/remoteDownload', { path, url }),

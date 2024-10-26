@@ -83,6 +83,10 @@ const handleMove = () => {
   window.$message.success('标记成功，请前往目标路径粘贴')
 }
 
+const handleCancel = () => {
+  marked.value = []
+}
+
 const handlePaste = async () => {
   if (!marked.value.length) {
     window.$message.error('请先标记需要复制或移动的文件/文件夹')
@@ -92,22 +96,72 @@ const handlePaste = async () => {
   for (const { name, source, type } of marked.value) {
     const target = path.value + '/' + name
     if (type === 'copy') {
-      await file.copy(source, target).then(() => {
-        window.$message.success(`复制 ${source} 到 ${target} 成功`)
-        window.$bus.emit('file:refresh')
-      })
+      file
+        .copy(source, target, false)
+        .then(() => {
+          window.$message.success(`复制 ${source} 到 ${target} 成功`)
+        })
+        .catch((err) => {
+          if (err.message == 'target path already exists') {
+            window.$dialog.warning({
+              title: '警告',
+              content: `目标 ${target} 已存在，是否覆盖？`,
+              positiveText: '覆盖',
+              negativeText: '取消',
+              onPositiveClick: () => {
+                file
+                  .copy(source, target, true)
+                  .then(() => {
+                    window.$message.success(`复制 ${source} 到 ${target} 成功`)
+                  })
+                  .catch((err) => {
+                    window.$message.error(err.message)
+                  })
+              },
+              onNegativeClick: () => {
+                handleCancel()
+              }
+            })
+          }
+        })
+        .finally(() => {
+          window.$bus.emit('file:refresh')
+        })
     } else {
-      await file.move(source, target).then(() => {
-        window.$message.success(`移动 ${source} 到 ${target} 成功`)
-        window.$bus.emit('file:refresh')
-      })
+      file
+        .move(source, target, false)
+        .then(() => {
+          window.$message.success(`移动 ${source} 到 ${target} 成功`)
+        })
+        .catch((err) => {
+          if (err.message == 'target path already exists') {
+            window.$dialog.warning({
+              title: '警告',
+              content: `目标 ${target} 已存在，是否覆盖？`,
+              positiveText: '覆盖',
+              negativeText: '取消',
+              onPositiveClick: () => {
+                file
+                  .move(source, target, true)
+                  .then(() => {
+                    window.$message.success(`移动 ${source} 到 ${target} 成功`)
+                  })
+                  .catch((err) => {
+                    window.$message.error(err.message)
+                  })
+              },
+              onNegativeClick: () => {
+                handleCancel()
+              }
+            })
+          }
+        })
+        .finally(() => {
+          window.$bus.emit('file:refresh')
+        })
     }
   }
 
-  marked.value = []
-}
-
-const handleCancel = () => {
   marked.value = []
 }
 

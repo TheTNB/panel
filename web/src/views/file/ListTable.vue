@@ -38,7 +38,7 @@ const unCompressModel = ref({
 
 const options = computed<DropdownOption[]>(() => {
   if (selectedRow.value == null) return []
-  return [
+  let options = [
     {
       label: selectedRow.value.dir ? '打开' : '编辑',
       key: selectedRow.value.dir ? 'open' : 'edit'
@@ -59,6 +59,14 @@ const options = computed<DropdownOption[]>(() => {
     { label: '重命名', key: 'rename' },
     { label: () => h('span', { style: { color: 'red' } }, '删除'), key: 'delete' }
   ]
+  if (marked.value.length) {
+    options.unshift({
+      label: '粘贴',
+      key: 'paste'
+    })
+  }
+
+  return options
 })
 
 const columns: DataTableColumns<RowData> = [
@@ -385,11 +393,43 @@ const handleRename = () => {
     return
   }
 
-  file.move(source, target).then(() => {
-    window.$message.success('重命名成功')
-    renameModal.value = false
-    window.$bus.emit('file:refresh')
-  })
+  file
+    .move(source, target, false)
+    .then(() => {
+      window.$message.success(
+        `重命名 ${renameModel.value.source} 为 ${renameModel.value.target} 成功`
+      )
+      renameModal.value = false
+      window.$bus.emit('file:refresh')
+    })
+    .catch((err) => {
+      if (err.message == 'target path already exists') {
+        window.$dialog.warning({
+          title: '警告',
+          content: `存在同名项，是否强制覆盖？`,
+          positiveText: '覆盖',
+          negativeText: '取消',
+          onPositiveClick: () => {
+            file
+              .move(source, target, true)
+              .then(() => {
+                window.$message.success(
+                  `重命名 ${renameModel.value.source} 为 ${renameModel.value.target} 成功`
+                )
+                renameModal.value = false
+                window.$bus.emit('file:refresh')
+              })
+              .catch((err) => {
+                window.$message.error(err.message)
+              })
+          },
+          onNegativeClick: () => {
+            renameModal.value = false
+            window.$bus.emit('file:refresh')
+          }
+        })
+      }
+    })
 }
 
 const handleUnCompress = () => {
@@ -422,8 +462,89 @@ const onChecked = (rowKeys: any) => {
   selected.value = rowKeys
 }
 
+const handlePaste = async () => {
+  if (!marked.value.length) {
+    window.$message.error('请先标记需要复制或移动的文件/文件夹')
+    return
+  }
+
+  for (const { name, source, type } of marked.value) {
+    const target = path.value + '/' + name
+    if (type === 'copy') {
+      file
+        .copy(source, target, false)
+        .then(() => {
+          window.$message.success(`复制 ${source} 到 ${target} 成功`)
+        })
+        .catch((err) => {
+          if (err.message == 'target path already exists') {
+            window.$dialog.warning({
+              title: '警告',
+              content: `目标 ${target} 已存在，是否覆盖？`,
+              positiveText: '覆盖',
+              negativeText: '取消',
+              onPositiveClick: () => {
+                file
+                  .copy(source, target, true)
+                  .then(() => {
+                    window.$message.success(`复制 ${source} 到 ${target} 成功`)
+                  })
+                  .catch((err) => {
+                    window.$message.error(err.message)
+                  })
+              },
+              onNegativeClick: () => {
+                marked.value = []
+              }
+            })
+          }
+        })
+        .finally(() => {
+          window.$bus.emit('file:refresh')
+        })
+    } else {
+      file
+        .move(source, target, false)
+        .then(() => {
+          window.$message.success(`移动 ${source} 到 ${target} 成功`)
+        })
+        .catch((err) => {
+          if (err.message == 'target path already exists') {
+            window.$dialog.warning({
+              title: '警告',
+              content: `目标 ${target} 已存在，是否覆盖？`,
+              positiveText: '覆盖',
+              negativeText: '取消',
+              onPositiveClick: () => {
+                file
+                  .move(source, target, true)
+                  .then(() => {
+                    window.$message.success(`移动 ${source} 到 ${target} 成功`)
+                  })
+                  .catch((err) => {
+                    window.$message.error(err.message)
+                  })
+              },
+              onNegativeClick: () => {
+                marked.value = []
+              }
+            })
+          }
+        })
+        .finally(() => {
+          window.$bus.emit('file:refresh')
+        })
+    }
+  }
+
+  marked.value = []
+}
+
 const handleSelect = (key: string) => {
   switch (key) {
+    case 'paste':
+      handlePaste()
+      break
     case 'open':
       path.value = selectedRow.value.full
       break
