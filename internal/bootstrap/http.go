@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/bddjr/hlfhr"
 	"github.com/go-chi/chi/v5"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -26,11 +27,14 @@ func initHttp() {
 	route.Ws(app.Http)
 	apps.Boot(app.Http)
 
-	srv := &http.Server{
+	srv := hlfhr.New(&http.Server{
 		Addr:           fmt.Sprintf(":%d", app.Conf.MustInt("http.port")),
 		Handler:        http.AllowQuerySemicolons(app.Http),
 		MaxHeaderBytes: 2048 << 20,
-	}
+	})
+	srv.HttpOnHttpsPortErrorHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hlfhr.RedirectToHttps(w, r, http.StatusTemporaryRedirect)
+	})
 
 	if app.Conf.Bool("http.tls") {
 		srv.TLSConfig = &tls.Config{
