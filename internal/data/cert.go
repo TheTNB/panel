@@ -108,10 +108,7 @@ func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 
 func (r *certRepo) Update(req *request.CertUpdate) error {
 	info, err := pkgcert.ParseCert(req.Cert)
-	if err != nil {
-		return err
-	}
-	if req.Type == "upload" {
+	if err == nil && req.Type == "upload" {
 		req.Domains = info.DNSNames
 	}
 
@@ -147,11 +144,11 @@ func (r *certRepo) ObtainAuto(id uint) (*acme.Certificate, error) {
 		client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
 	} else {
 		if cert.Website == nil {
-			return nil, errors.New("该证书没有关联网站，无法自动签发")
+			return nil, errors.New("this certificate is not associated with a website and cannot be signed. You can try to sign it manually")
 		} else {
 			for _, domain := range cert.Domains {
 				if strings.Contains(domain, "*") {
-					return nil, errors.New("通配符域名无法使用 HTTP 验证")
+					return nil, errors.New("wildcard domains cannot use HTTP verification")
 				}
 			}
 			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
@@ -185,7 +182,7 @@ func (r *certRepo) ObtainManual(id uint) (*acme.Certificate, error) {
 	}
 
 	if r.client == nil {
-		return nil, errors.New("请重新获取 DNS 解析记录")
+		return nil, errors.New("please retry the manual obtain operation")
 	}
 
 	ssl, err := r.client.ObtainCertificateManual()
@@ -219,18 +216,18 @@ func (r *certRepo) Renew(id uint) (*acme.Certificate, error) {
 	}
 
 	if cert.CertURL == "" {
-		return nil, errors.New("该证书没有签发成功，无法续签")
+		return nil, errors.New("this certificate has not been signed successfully and cannot be renewed")
 	}
 
 	if cert.DNS != nil {
 		client.UseDns(acme.DnsType(cert.DNS.Type), cert.DNS.Data)
 	} else {
 		if cert.Website == nil {
-			return nil, errors.New("该证书没有关联网站，无法续签，可以尝试手动签发")
+			return nil, errors.New("this certificate is not associated with a website and cannot be signed. You can try to sign it manually")
 		} else {
 			for _, domain := range cert.Domains {
 				if strings.Contains(domain, "*") {
-					return nil, errors.New("通配符域名无法使用 HTTP 验证")
+					return nil, errors.New("wildcard domains cannot use HTTP verification")
 				}
 			}
 			conf := fmt.Sprintf("%s/server/vhost/acme/%s.conf", app.Root, cert.Website.Name)
@@ -290,7 +287,7 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 	}
 
 	if cert.Cert == "" || cert.Key == "" {
-		return errors.New("该证书没有签发成功，无法部署")
+		return errors.New("this certificate has not been signed successfully and cannot be deployed")
 	}
 
 	website, err := NewWebsiteRepo().Get(WebsiteID)
@@ -314,7 +311,7 @@ func (r *certRepo) Deploy(ID, WebsiteID uint) error {
 
 func (r *certRepo) getClient(cert *biz.Cert) (*acme.Client, error) {
 	if cert.Account == nil {
-		return nil, errors.New("该证书没有关联账号，无法签发")
+		return nil, errors.New("this certificate is not associated with an ACME account and cannot be signed")
 	}
 
 	var ca string

@@ -47,9 +47,12 @@ export default {
     request.put(`/cert/cert/${id}`, data),
   // 证书删除
   certDelete: (id: number): Promise<AxiosResponse<any>> => request.delete(`/cert/cert/${id}`),
-  // 签发
-  obtain: (id: number): Promise<AxiosResponse<any>> =>
-    request.post(`/cert/cert/${id}/obtain`, { id }),
+  // 证书自动签发
+  obtainAuto: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/obtainAuto`, { id }),
+  // 证书手动签发
+  obtainManual: (id: number): Promise<AxiosResponse<any>> =>
+    request.post(`/cert/cert/${id}/obtainManual`, { id }),
   // 续签
   renew: (id: number): Promise<AxiosResponse<any>> =>
     request.post(`/cert/cert/${id}/renew`, { id }),

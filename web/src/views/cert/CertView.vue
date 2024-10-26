@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Editor from '@guolao/vue-monaco-editor'
 import type { MessageReactive } from 'naive-ui'
-import { NButton, NDataTable, NFlex, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
+import { NButton, NDataTable, NFlex, NPopconfirm, NSpace, NSwitch, NTag } from 'naive-ui'
 
 import cert from '@/api/panel/cert'
 import { formatDateTime } from '@/utils'
+import ObtainModal from '@/views/cert/ObtainModal.vue'
 import type { Cert } from '@/views/cert/types'
 
 const props = defineProps({
@@ -40,37 +41,37 @@ const deployModel = ref<any>({
   id: null,
   websites: []
 })
+const obtain = ref(false)
+const obtainCert = ref(0)
 
 const columns: any = [
   {
     title: '域名',
     key: 'domains',
-    minWidth: 150,
+    minWidth: 200,
     resizable: true,
-    ellipsis: { tooltip: true },
     render(row: any) {
-      return h(
-        'span',
-        {
-          type: row.status == 'active' ? 'success' : 'error'
-        },
-        {
-          default: () => {
-            if (row.domains == null || row.domains.length == 0) {
-              return '无'
-            }
-            return row.domains.join(', ')
-          }
-        }
-      )
+      if (row.domains == null || row.domains.length == 0) {
+        return h(NTag, null, { default: () => '无' })
+      }
+      return h(NFlex, null, {
+        default: () =>
+          row.domains.map((domain: any) =>
+            h(
+              NTag,
+              { type: 'primary' },
+              {
+                default: () => domain
+              }
+            )
+          )
+      })
     }
   },
   {
     title: '类型',
     key: 'type',
     width: 100,
-    resizable: true,
-    ellipsis: { tooltip: true },
     render(row: any) {
       return h(
         NTag,
@@ -122,31 +123,38 @@ const columns: any = [
   {
     title: '颁发者',
     key: 'issuer',
-    minWidth: 100,
-    resizable: true,
+    width: 150,
+    ellipsis: { tooltip: true },
     render(row: any) {
-      return h(
-        NTag,
-        {
-          type: 'info',
-          bordered: false
-        },
-        {
-          default: () => {
-            return row.issuer == '' ? '无' : row.issuer
-          }
-        }
-      )
+      return row.issuer == '' ? '无' : row.issuer
     }
   },
   {
     title: '过期时间',
     key: 'not_after',
     width: 200,
-    resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
       return formatDateTime(row.not_after)
+    }
+  },
+  {
+    title: 'OCSP',
+    key: 'ocsp_server',
+    minWidth: 200,
+    resizable: true,
+    render(row: any) {
+      if (row.ocsp_server == null || row.ocsp_server.length == 0) {
+        return h(NTag, null, { default: () => '无' })
+      }
+      return h(NFlex, null, {
+        default: () =>
+          row.ocsp_server.map((server: any) =>
+            h(NTag, null, {
+              default: () => server
+            })
+          )
+      })
     }
   },
   {
@@ -173,7 +181,7 @@ const columns: any = [
     resizable: true,
     render(row: any) {
       return [
-        row.cert_url == ''
+        row.type != 'upload' && row.account_id != 0 && row.cert == '' && row.key == ''
           ? h(
               NButton,
               {
@@ -181,69 +189,8 @@ const columns: any = [
                 type: 'info',
                 style: 'margin-left: 15px;',
                 onClick: async () => {
-                  messageReactive = window.$message.loading('请稍后...', {
-                    duration: 0
-                  })
-                  // 没有设置 DNS 接口和网站则获取解析记录
-                  if (row.dns_id == 0 && row.website_id == 0) {
-                    const { data } = await cert.manualDNS(row.id)
-                    messageReactive.destroy()
-                    window.$message.info('请先前往域名处设置 DNS 解析，再继续签发')
-                    const d = window.$dialog.info({
-                      style: 'width: 60vw',
-                      title: '待设置DNS 记录列表',
-                      content: () => {
-                        return h(NTable, [
-                          h('thead', [
-                            h('tr', [
-                              h('th', '域名'),
-                              h('th', '类型'),
-                              h('th', '主机记录'),
-                              h('th', '记录值')
-                            ])
-                          ]),
-                          h(
-                            'tbody',
-                            data.map((item: any) =>
-                              h('tr', [
-                                h('td', item?.domain),
-                                h('td', 'TXT'),
-                                h('td', item?.name),
-                                h('td', item?.value)
-                              ])
-                            )
-                          )
-                        ])
-                      },
-                      positiveText: '签发',
-                      onPositiveClick: async () => {
-                        d.loading = true
-                        messageReactive = window.$message.loading('请稍后...', {
-                          duration: 0
-                        })
-                        cert
-                          .obtain(row.id)
-                          .then(() => {
-                            window.$message.success('签发成功')
-                            onPageChange(1)
-                          })
-                          .finally(() => {
-                            d.loading = false
-                            messageReactive?.destroy()
-                          })
-                      }
-                    })
-                  } else {
-                    cert
-                      .obtain(row.id)
-                      .then(() => {
-                        window.$message.success('签发成功')
-                        onPageChange(1)
-                      })
-                      .finally(() => {
-                        messageReactive?.destroy()
-                      })
-                  }
+                  obtain.value = true
+                  obtainCert.value = row.id
                 }
               },
               {
@@ -443,7 +390,7 @@ onUnmounted(() => {
     <n-data-table
       striped
       remote
-      :scroll-x="1400"
+      :scroll-x="1600"
       :loading="false"
       :columns="columns"
       :data="data"
@@ -463,7 +410,7 @@ onUnmounted(() => {
     :segmented="false"
   >
     <n-space vertical>
-      <n-alert type="info">
+      <n-alert v-if="updateModel.type != 'upload'" type="info">
         可以通过选择网站 / DNS 中的任意一项来自动签发和部署证书，也可以手动输入域名并设置 DNS
         解析来签发证书
       </n-alert>
@@ -587,6 +534,7 @@ onUnmounted(() => {
       </n-tab-pane>
     </n-tabs>
   </n-modal>
+  <obtain-modal v-model:id="obtainCert" v-model:show="obtain" />
 </template>
 
 <style scoped lang="scss"></style>

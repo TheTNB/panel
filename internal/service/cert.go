@@ -194,26 +194,29 @@ func (s *CertService) Delete(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *CertService) Obtain(w http.ResponseWriter, r *http.Request) {
+func (s *CertService) ObtainAuto(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
-	cert, err := s.certRepo.Get(req.ID)
-	if err != nil {
+	if _, err = s.certRepo.ObtainAuto(req.ID); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	if cert.DNS != nil || cert.Website != nil {
-		_, err = s.certRepo.ObtainAuto(req.ID)
-	} else {
-		_, err = s.certRepo.ObtainManual(req.ID)
+	Success(w, nil)
+}
+
+func (s *CertService) ObtainManual(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.ID](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
 	}
 
-	if err != nil {
+	if _, err = s.certRepo.ObtainManual(req.ID); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
