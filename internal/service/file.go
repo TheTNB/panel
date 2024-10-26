@@ -179,6 +179,11 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
+		Error(w, http.StatusForbidden, "你不能这样做，会玩坏的")
+		return
+	}
+
 	if err = io.Mv(req.Source, req.Target); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -196,6 +201,11 @@ func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
 
 	if io.Exists(req.Target) && !req.Force {
 		Error(w, http.StatusForbidden, "目标路径 %s 已存在", req.Target)
+		return
+	}
+
+	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
+		Error(w, http.StatusForbidden, "你不能这样做，会玩坏的")
 		return
 	}
 
