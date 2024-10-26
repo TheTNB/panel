@@ -307,10 +307,10 @@ const net = ref<any>({
   xAxis: [{ type: 'category', boundaryGap: false, data: data.value.times }],
   yAxis: [
     {
-      name: '单位 Mb',
+      name: '单位 MB',
       type: 'value',
       axisLabel: {
-        formatter: '{value} Mb'
+        formatter: '{value} MB'
       }
     }
   ],
