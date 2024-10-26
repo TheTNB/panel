@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { NButton, NInput, NPopconfirm, NPopselect, NSpace, NTag } from 'naive-ui'
+import { NButton, NEllipsis, NFlex, NInput, NPopconfirm, NPopselect, NTag } from 'naive-ui'
 
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
@@ -89,7 +89,7 @@ const columns: DataTableColumns<RowData> = [
       }
 
       return h(
-        NSpace,
+        NFlex,
         {
           class: 'table-name',
           onClick: () => {
@@ -103,7 +103,7 @@ const columns: DataTableColumns<RowData> = [
         },
         () => [
           h(TheIcon, { icon, size: 24, color: `var(--primary-color)` }),
-          h('span', null, {
+          h(NEllipsis, null, {
             default: () => {
               if (row.symlink) {
                 return row.name + ' -> ' + row.link
@@ -166,7 +166,7 @@ const columns: DataTableColumns<RowData> = [
     width: 340,
     render(row) {
       return h(
-        NSpace,
+        NFlex,
         {},
         {
           default: () => [
