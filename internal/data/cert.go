@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -11,9 +12,11 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
+	pkgcert "github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type certRepo struct {
@@ -24,11 +27,37 @@ func NewCertRepo() biz.CertRepo {
 	return &certRepo{}
 }
 
-func (r *certRepo) List(page, limit uint) ([]*biz.Cert, int64, error) {
+func (r *certRepo) List(page, limit uint) ([]*types.CertList, int64, error) {
 	var certs []*biz.Cert
 	var total int64
 	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
-	return certs, total, err
+
+	var list []*types.CertList
+	for cert := range slices.Values(certs) {
+		item := &types.CertList{
+			ID:        cert.ID,
+			AccountID: cert.AccountID,
+			WebsiteID: cert.WebsiteID,
+			DNSID:     cert.DNSID,
+			Type:      cert.Type,
+			Domains:   cert.Domains,
+			AutoRenew: cert.AutoRenew,
+			Cert:      cert.Cert,
+			Key:       cert.Key,
+			CreatedAt: cert.CreatedAt,
+			UpdatedAt: cert.UpdatedAt,
+		}
+		if decode, err := pkgcert.ParseCert(cert.Cert); err == nil {
+			item.NotBefore = decode.NotBefore
+			item.NotAfter = decode.NotAfter
+			item.Issuer = decode.Issuer.CommonName
+			item.OCSPServer = decode.OCSPServer
+			item.DNSNames = decode.DNSNames
+		}
+		list = append(list, item)
+	}
+
+	return list, total, err
 }
 
 func (r *certRepo) Get(id uint) (*biz.Cert, error) {
@@ -41,6 +70,25 @@ func (r *certRepo) GetByWebsite(WebsiteID uint) (*biz.Cert, error) {
 	cert := new(biz.Cert)
 	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Where("website_id = ?", WebsiteID).First(cert).Error
 	return cert, err
+}
+
+func (r *certRepo) Upload(req *request.CertUpload) (*biz.Cert, error) {
+	info, err := pkgcert.ParseCert(req.Cert)
+	if err != nil {
+		return nil, err
+	}
+
+	cert := &biz.Cert{
+		Type:    "upload",
+		Domains: info.DNSNames,
+		Cert:    req.Cert,
+		Key:     req.Key,
+	}
+	if err = app.Orm.Create(cert).Error; err != nil {
+		return nil, err
+	}
+
+	return cert, nil
 }
 
 func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
@@ -59,12 +107,22 @@ func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 }
 
 func (r *certRepo) Update(req *request.CertUpdate) error {
+	info, err := pkgcert.ParseCert(req.Cert)
+	if err != nil {
+		return err
+	}
+	if req.Type == "upload" {
+		req.Domains = info.DNSNames
+	}
+
 	return app.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Select("*").Updates(&biz.Cert{
 		ID:        req.ID,
 		AccountID: req.AccountID,
 		WebsiteID: req.WebsiteID,
 		DNSID:     req.DNSID,
 		Type:      req.Type,
+		Cert:      req.Cert,
+		Key:       req.Key,
 		Domains:   req.Domains,
 		AutoRenew: req.AutoRenew,
 	}).Error

@@ -82,6 +82,7 @@ func Http(r chi.Router) {
 			r.Route("/cert", func(r chi.Router) {
 				r.Get("/", cert.List)
 				r.Post("/", cert.Create)
+				r.Post("/upload", cert.Upload)
 				r.Put("/{id}", cert.Update)
 				r.Get("/{id}", cert.Get)
 				r.Delete("/{id}", cert.Delete)

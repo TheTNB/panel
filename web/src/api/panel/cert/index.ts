@@ -38,6 +38,8 @@ export default {
     request.get('/cert/cert', { params: { page, limit } }),
   // 证书详情
   certInfo: (id: number): Promise<AxiosResponse<any>> => request.get(`/cert/cert/${id}`),
+  // 证书上传
+  certUpload: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/cert/upload', data),
   // 证书添加
   certCreate: (data: any): Promise<AxiosResponse<any>> => request.post('/cert/cert', data),
   // 证书更新

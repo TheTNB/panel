@@ -115,6 +115,22 @@ func (s *CertService) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *CertService) Upload(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.CertUpload](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	cert, err := s.certRepo.Upload(req)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, cert)
+}
+
 func (s *CertService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.CertCreate](r)
 	if err != nil {

@@ -46,13 +46,13 @@ func Now(address ...string) (time.Time, error) {
 	return now, nil
 }
 
-func UpdateSystemTime(time time.Time) error {
-	_, err := shell.Execf(`date -s '%s'`, time.Format("2006-01-02 15:04:05"))
+func UpdateSystemTime(t time.Time) error {
+	_, err := shell.Execf(`date -s '%s'`, t.Format(time.DateTime))
 	return err
 }
 
-func UpdateSystemTimeZone(timezone string) error {
-	_, err := shell.Execf(`timedatectl set-timezone '%s'`, timezone)
+func UpdateSystemTimeZone(tz string) error {
+	_, err := shell.Execf(`timedatectl set-timezone '%s'`, tz)
 	return err
 }
 

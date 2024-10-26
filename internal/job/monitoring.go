@@ -61,7 +61,7 @@ func (r *Monitoring) Run() {
 	if day <= 0 || app.Status != app.StatusNormal {
 		return
 	}
-	if err = app.Orm.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format("2006-01-02 15:04:05")).Delete(&biz.Monitor{}).Error; err != nil {
+	if err = app.Orm.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format(time.DateTime)).Delete(&biz.Monitor{}).Error; err != nil {
 		app.Logger.Error("删除过期系统监控失败", zap.Error(err))
 		return
 	}

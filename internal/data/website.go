@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
@@ -137,8 +138,8 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	setting.SSLCertificateKey = key
 	// 解析证书信息
 	if decode, err := cert.ParseCert(crt); err == nil {
-		setting.SSLNotBefore = decode.NotBefore.Format("2006-01-02 15:04:05")
-		setting.SSLNotAfter = decode.NotAfter.Format("2006-01-02 15:04:05")
+		setting.SSLNotBefore = decode.NotBefore.Format(time.DateTime)
+		setting.SSLNotAfter = decode.NotAfter.Format(time.DateTime)
 		setting.SSLIssuer = decode.Issuer.CommonName
 		setting.SSLOCSPServer = decode.OCSPServer
 		setting.SSLDNSNames = decode.DNSNames

@@ -168,7 +168,7 @@ func (s *CliService) UserList(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	for _, user := range users {
-		fmt.Printf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s\n", user.ID, user.Username, user.Email, user.CreatedAt.Format("2006-01-02 15:04:05"))
+		fmt.Printf("ID: %d, 用户名: %s, 邮箱: %s, 创建日期: %s\n", user.ID, user.Username, user.Email, user.CreatedAt.Format(time.DateTime))
 	}
 
 	return nil

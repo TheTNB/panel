@@ -4,37 +4,39 @@ import type { MessageReactive } from 'naive-ui'
 import { NButton, NDataTable, NFlex, NPopconfirm, NSpace, NSwitch, NTable, NTag } from 'naive-ui'
 
 import cert from '@/api/panel/cert'
+import { formatDateTime } from '@/utils'
 import type { Cert } from '@/views/cert/types'
 
 const props = defineProps({
   algorithms: Array<any>,
   websites: Array<any>,
   accounts: Array<any>,
-  dns: Array<any>,
-  caProviders: Array<any>
+  dns: Array<any>
 })
 
-const { algorithms, websites, accounts, dns, caProviders } = toRefs(props)
+const { algorithms, websites, accounts, dns } = toRefs(props)
 
 let messageReactive: MessageReactive | null = null
 
-const updateCertModel = ref<any>({
+const updateModel = ref<any>({
   domains: [],
   type: 'P256',
   dns_id: null,
   account_id: null,
   website_id: null,
-  auto_renew: true
-})
-const updateCertModal = ref(false)
-const updateCert = ref<any>()
-const showModal = ref(false)
-const showCertModel = ref<any>({
+  auto_renew: true,
   cert: '',
   key: ''
 })
-const deployCertModal = ref(false)
-const deployCertModel = ref<any>({
+const updateModal = ref(false)
+const updateCert = ref<any>()
+const showModal = ref(false)
+const showModel = ref<any>({
+  cert: '',
+  key: ''
+})
+const deployModal = ref(false)
+const deployModel = ref<any>({
   id: null,
   websites: []
 })
@@ -43,7 +45,7 @@ const columns: any = [
   {
     title: '域名',
     key: 'domains',
-    minWidth: 200,
+    minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -53,7 +55,12 @@ const columns: any = [
           type: row.status == 'active' ? 'success' : 'error'
         },
         {
-          default: () => row.domains.join(', ')
+          default: () => {
+            if (row.domains == null || row.domains.length == 0) {
+              return '无'
+            }
+            return row.domains.join(', ')
+          }
         }
       )
     }
@@ -83,7 +90,7 @@ const columns: any = [
               case '4096':
                 return 'RSA 4096'
               default:
-                return '未知'
+                return '上传'
             }
           }
         }
@@ -93,7 +100,7 @@ const columns: any = [
   {
     title: '关联账号',
     key: 'account_id',
-    minWidth: 400,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
@@ -102,51 +109,44 @@ const columns: any = [
       }
       return h(NFlex, null, {
         default: () => [
-          h(NTag, null, { default: () => (row.account?.email == null ? '无' : row.account.email) }),
           h(NTag, null, {
             default: () =>
-              caProviders?.value?.find((item: any) => item.value === row.account?.ca)?.label
+              row.account_id == 0
+                ? '无'
+                : accounts?.value?.find((item: any) => item.value === row.account_id)?.label
           })
         ]
       })
     }
   },
   {
-    title: '关联网站',
-    key: 'website_id',
-    minWidth: 150,
+    title: '颁发者',
+    key: 'issuer',
+    minWidth: 100,
     resizable: true,
-    ellipsis: { tooltip: true },
     render(row: any) {
       return h(
         NTag,
         {
-          type: row.website == null ? 'error' : 'success',
+          type: 'info',
           bordered: false
         },
         {
-          default: () => (row.website?.name == null ? '无' : row.website.name)
+          default: () => {
+            return row.issuer == '' ? '无' : row.issuer
+          }
         }
       )
     }
   },
   {
-    title: '关联DNS',
-    key: 'dns_id',
-    width: 150,
+    title: '过期时间',
+    key: 'not_after',
+    width: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
-      return h(
-        NTag,
-        {
-          type: row.dns == null ? 'error' : 'success',
-          bordered: false
-        },
-        {
-          default: () => (row.dns?.name == null ? '无' : row.dns.name)
-        }
-      )
+      return formatDateTime(row.not_after)
     }
   },
   {
@@ -258,11 +258,11 @@ const columns: any = [
                 size: 'small',
                 type: 'info',
                 onClick: () => {
-                  deployCertModel.value.id = row.id
+                  deployModel.value.id = row.id
                   if (row.website_id != 0) {
-                    deployCertModel.value.websites.push(row.website_id)
+                    deployModel.value.websites.push(row.website_id)
                   }
-                  deployCertModal.value = true
+                  deployModal.value = true
                 }
               },
               {
@@ -270,7 +270,7 @@ const columns: any = [
               }
             )
           : null,
-        row.cert != '' && row.key != ''
+        row.cert != '' && row.key != '' && row.type != 'upload'
           ? h(
               NButton,
               {
@@ -300,8 +300,8 @@ const columns: any = [
                 type: 'tertiary',
                 style: 'margin-left: 15px;',
                 onClick: () => {
-                  showCertModel.value.cert = row.cert
-                  showCertModel.value.key = row.key
+                  showModel.value.cert = row.cert
+                  showModel.value.key = row.key
                   showModal.value = true
                 }
               },
@@ -318,13 +318,15 @@ const columns: any = [
             style: 'margin-left: 15px;',
             onClick: () => {
               updateCert.value = row.id
-              updateCertModel.value.domains = row.domains
-              updateCertModel.value.type = row.type
-              updateCertModel.value.dns_id = row.dns_id == 0 ? null : row.dns_id
-              updateCertModel.value.account_id = row.account_id == 0 ? null : row.account_id
-              updateCertModel.value.website_id = row.website_id == 0 ? null : row.website_id
-              updateCertModel.value.auto_renew = row.auto_renew
-              updateCertModal.value = true
+              updateModel.value.domains = row.domains
+              updateModel.value.type = row.type
+              updateModel.value.dns_id = row.dns_id == 0 ? null : row.dns_id
+              updateModel.value.account_id = row.account_id == 0 ? null : row.account_id
+              updateModel.value.website_id = row.website_id == 0 ? null : row.website_id
+              updateModel.value.auto_renew = row.auto_renew
+              updateModel.value.cert = row.cert
+              updateModel.value.key = row.key
+              updateModal.value = true
             }
           },
           {
@@ -395,31 +397,33 @@ const getCertList = async (page: number, limit: number) => {
 }
 
 const handleUpdateCert = async () => {
-  await cert.certUpdate(updateCert.value, updateCertModel.value)
+  await cert.certUpdate(updateCert.value, updateModel.value)
   window.$message.success('更新成功')
-  updateCertModal.value = false
+  updateModal.value = false
   onPageChange(1)
-  updateCertModel.value.domains = []
-  updateCertModel.value.type = 'P256'
-  updateCertModel.value.dns_id = null
-  updateCertModel.value.account_id = null
-  updateCertModel.value.website_id = null
-  updateCertModel.value.auto_renew = true
+  updateModel.value.domains = []
+  updateModel.value.type = 'P256'
+  updateModel.value.dns_id = null
+  updateModel.value.account_id = null
+  updateModel.value.website_id = null
+  updateModel.value.auto_renew = true
+  updateModel.value.cert = ''
+  updateModel.value.key = ''
 }
 
 const handleDeployCert = async () => {
-  for (const website of deployCertModel.value.websites) {
-    await cert.deploy(deployCertModel.value.id, website)
+  for (const website of deployModel.value.websites) {
+    await cert.deploy(deployModel.value.id, website)
   }
   window.$message.success('部署成功')
-  deployCertModal.value = false
-  deployCertModel.value.id = null
-  deployCertModel.value.websites = []
+  deployModal.value = false
+  deployModel.value.id = null
+  deployModel.value.websites = []
 }
 
 const handleShowModalClose = () => {
-  showCertModel.value.cert = ''
-  showCertModel.value.key = ''
+  showModel.value.cert = ''
+  showModel.value.key = ''
 }
 
 onMounted(() => {
@@ -450,7 +454,7 @@ onUnmounted(() => {
     />
   </n-space>
   <n-modal
-    v-model:show="updateCertModal"
+    v-model:show="updateModal"
     preset="card"
     title="修改证书"
     style="width: 60vw"
@@ -463,18 +467,18 @@ onUnmounted(() => {
         可以通过选择网站 / DNS 中的任意一项来自动签发和部署证书，也可以手动输入域名并设置 DNS
         解析来签发证书
       </n-alert>
-      <n-form :model="updateCertModel">
-        <n-form-item label="域名">
+      <n-form :model="updateModel">
+        <n-form-item v-if="updateModel.type != 'upload'" path="domains" label="域名">
           <n-dynamic-input
-            v-model:value="updateCertModel.domains"
+            v-model:value="updateModel.domains"
             placeholder="example.com"
             :min="1"
             show-sort-button
           />
         </n-form-item>
-        <n-form-item path="type" label="密钥类型">
+        <n-form-item v-if="updateModel.type != 'upload'" path="type" label="密钥类型">
           <n-select
-            v-model:value="updateCertModel.type"
+            v-model:value="updateModel.type"
             placeholder="选择密钥类型"
             clearable
             :options="algorithms"
@@ -482,26 +486,40 @@ onUnmounted(() => {
         </n-form-item>
         <n-form-item path="website_id" label="网站">
           <n-select
-            v-model:value="updateCertModel.website_id"
+            v-model:value="updateModel.website_id"
             placeholder="选择用于部署证书的网站"
             clearable
             :options="websites"
           />
         </n-form-item>
-        <n-form-item path="account_id" label="账号">
+        <n-form-item v-if="updateModel.type != 'upload'" path="account_id" label="账号">
           <n-select
-            v-model:value="updateCertModel.account_id"
+            v-model:value="updateModel.account_id"
             placeholder="选择用于签发证书的账号"
             clearable
             :options="accounts"
           />
         </n-form-item>
-        <n-form-item path="account_id" label="DNS">
+        <n-form-item v-if="updateModel.type != 'upload'" path="account_id" label="DNS">
           <n-select
-            v-model:value="updateCertModel.dns_id"
+            v-model:value="updateModel.dns_id"
             placeholder="选择用于签发证书的DNS"
             clearable
             :options="dns"
+          />
+        </n-form-item>
+        <n-form-item v-if="updateModel.type == 'upload'" path="cert" label="证书">
+          <n-input
+            v-model:value="updateModel.cert"
+            type="textarea"
+            placeholder="输入 PEM 证书文件的内容"
+          />
+        </n-form-item>
+        <n-form-item v-if="updateModel.type == 'upload'" path="key" label="私钥">
+          <n-input
+            v-model:value="updateModel.key"
+            type="textarea"
+            placeholder="输入 KEY 私钥文件的内容"
           />
         </n-form-item>
       </n-form>
@@ -509,7 +527,7 @@ onUnmounted(() => {
     </n-space>
   </n-modal>
   <n-modal
-    v-model:show="deployCertModal"
+    v-model:show="deployModal"
     preset="card"
     title="部署证书"
     style="width: 60vw"
@@ -518,10 +536,10 @@ onUnmounted(() => {
     :segmented="false"
   >
     <n-space vertical>
-      <n-form :model="deployCertModel">
+      <n-form :model="deployModel">
         <n-form-item path="website_id" label="网站">
           <n-select
-            v-model:value="deployCertModel.websites"
+            v-model:value="deployModel.websites"
             placeholder="选择需要部署证书的网站"
             clearable
             multiple
@@ -545,7 +563,7 @@ onUnmounted(() => {
     <n-tabs type="line" animated>
       <n-tab-pane name="cert" tab="证书">
         <Editor
-          v-model:value="showCertModel.cert"
+          v-model:value="showModel.cert"
           theme="vs-dark"
           height="60vh"
           mt-8
@@ -557,7 +575,7 @@ onUnmounted(() => {
       </n-tab-pane>
       <n-tab-pane name="key" tab="密钥">
         <Editor
-          v-model:value="showCertModel.key"
+          v-model:value="showModel.key"
           theme="vs-dark"
           height="60vh"
           mt-8

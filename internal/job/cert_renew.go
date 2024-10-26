@@ -34,7 +34,7 @@ func (r *CertRenew) Run() {
 	}
 
 	for _, cert := range certs {
-		if !cert.AutoRenew {
+		if cert.Type == "upload" || !cert.AutoRenew {
 			continue
 		}
 
