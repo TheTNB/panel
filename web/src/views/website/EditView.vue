@@ -7,8 +7,10 @@ import Editor from '@guolao/vue-monaco-editor'
 import type { MessageReactive } from 'naive-ui'
 import { NButton } from 'naive-ui'
 
+import cert from '@/api/panel/cert'
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
+import type { Cert } from '@/views/cert/types'
 import type { WebsiteListen, WebsiteSetting } from '@/views/website/types'
 
 let messageReactive: MessageReactive | null = null
@@ -56,16 +58,36 @@ const installedDbAndPhp = ref({
     }
   ]
 })
+const certs = ref<Cert[]>([] as Cert[])
 
-const getPhpAndDb = async () => {
+const title = computed(() => {
+  if (setting.value) {
+    return `编辑网站 - ${setting.value.name}`
+  }
+  return '编辑网站 - 加载中...'
+})
+const certOptions = computed(() => {
+  return certs.value.map((item) => ({
+    label: item.domains.join(', '),
+    value: item.id
+  }))
+})
+const selectedCert = ref(null)
+
+const fetchPhpAndDb = async () => {
   const { data } = await dashboard.installedDbAndPhp()
   installedDbAndPhp.value = data
 }
 
-const getWebsiteSetting = async () => {
+const fetchWebsiteSetting = async () => {
   await website.config(Number(id)).then((res) => {
     setting.value = res.data
   })
+}
+
+const fetchCertList = async () => {
+  const { data } = await cert.certs(1, 10000)
+  certs.value = data.items
 }
 
 const handleSave = async () => {
@@ -87,14 +109,14 @@ const handleSave = async () => {
   }
 
   await website.saveConfig(Number(id), setting.value).then(() => {
-    getWebsiteSetting()
+    fetchWebsiteSetting()
     window.$message.success('保存成功')
   })
 }
 
 const handleReset = async () => {
   await website.resetConfig(Number(id)).then(() => {
-    getWebsiteSetting()
+    fetchWebsiteSetting()
     window.$message.success('重置成功')
   })
 }
@@ -106,7 +128,7 @@ const handleObtainCert = async () => {
   await website
     .obtainCert(Number(id))
     .then(() => {
-      getWebsiteSetting()
+      fetchWebsiteSetting()
       window.$message.success('签发成功')
     })
     .finally(() => {
@@ -114,19 +136,20 @@ const handleObtainCert = async () => {
     })
 }
 
+const handleSelectCert = (value: number) => {
+  const cert = certs.value.find((item) => item.id === value)
+  if (cert) {
+    setting.value.ssl_certificate = cert.cert
+    setting.value.ssl_certificate_key = cert.key
+  }
+}
+
 const clearLog = async () => {
   await website.clearLog(Number(id)).then(() => {
-    getWebsiteSetting()
+    fetchWebsiteSetting()
     window.$message.success('清空成功')
   })
 }
-
-const title = computed(() => {
-  if (setting.value) {
-    return `编辑网站 - ${setting.value.name}`
-  }
-  return '编辑网站 - 加载中...'
-})
 
 const onCreateListen = () => {
   return {
@@ -137,8 +160,9 @@ const onCreateListen = () => {
 }
 
 onMounted(async () => {
-  await getWebsiteSetting()
-  await getPhpAndDb()
+  await fetchWebsiteSetting()
+  await fetchPhpAndDb()
+  await fetchCertList()
 })
 </script>
 
@@ -270,9 +294,18 @@ onMounted(async () => {
             </n-descriptions>
           </n-card>
           <n-form>
-            <n-form-item label="总开关（只有打开了总开关，下面的设置才会生效！）">
-              <n-switch v-model:value="setting.https" />
-            </n-form-item>
+            <n-grid :cols="24" :x-gap="24">
+              <n-form-item-gi :span="12" label="总开关（只有打开了总开关，下面的设置才会生效！）">
+                <n-switch v-model:value="setting.https" />
+              </n-form-item-gi>
+              <n-form-item-gi v-if="setting.https" :span="12" label="使用已有证书">
+                <n-select
+                  v-model:value="selectedCert"
+                  :options="certOptions"
+                  @update-value="handleSelectCert"
+                />
+              </n-form-item-gi>
+            </n-grid>
           </n-form>
           <n-form inline>
             <n-form-item label="HSTS">
@@ -290,14 +323,14 @@ onMounted(async () => {
               <n-input
                 v-model:value="setting.ssl_certificate"
                 type="textarea"
-                placeholder="输入pem证书文件的内容"
+                placeholder="输入 PEM 证书文件的内容"
               />
             </n-form-item>
             <n-form-item label="私钥">
               <n-input
                 v-model:value="setting.ssl_certificate_key"
                 type="textarea"
-                placeholder="输入key私钥文件的内容"
+                placeholder="输入 KEY 私钥文件的内容"
               />
             </n-form-item>
           </n-form>
