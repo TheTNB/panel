@@ -53,7 +53,7 @@ func Empty(path string) bool {
 
 func Mv(src, dst string) error {
 	if err := os.Rename(src, dst); err != nil {
-		// 在不同的文件系统中无法使用os.Rename
+		// 在不同的文件系统中无法使用 os.Rename
 		if _, err = shell.Execf(`mv -f '%s' '%s'`, src, dst); err != nil {
 			return err
 		}
