@@ -75,7 +75,10 @@ func (r *certRepo) GetByWebsite(WebsiteID uint) (*biz.Cert, error) {
 func (r *certRepo) Upload(req *request.CertUpload) (*biz.Cert, error) {
 	info, err := pkgcert.ParseCert(req.Cert)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to parse certificate: %v", err)
+	}
+	if _, err = pkgcert.ParseKey(req.Key); err != nil {
+		return nil, fmt.Errorf("failed to parse private key: %v", err)
 	}
 
 	cert := &biz.Cert{

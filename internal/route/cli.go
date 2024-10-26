@@ -74,6 +74,11 @@ func Cli() []*cli.Command {
 					Usage:  "关闭HTTPS",
 					Action: cliService.HTTPSOff,
 				},
+				{
+					Name:   "generate",
+					Usage:  "生成HTTPS证书",
+					Action: cliService.HTTPSGenerate,
+				},
 			},
 		},
 		{

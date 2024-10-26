@@ -15,6 +15,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -177,6 +178,12 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 			return false, errors.New("后台任务正在运行，禁止修改部分设置，请稍后再试")
 		}
 		restartFlag = true
+	}
+	if _, err := cert.ParseCert(setting.Cert); err != nil {
+		return false, fmt.Errorf("failed to parse certificate: %w", err)
+	}
+	if _, err := cert.ParseKey(setting.Key); err != nil {
+		return false, fmt.Errorf("failed to parse private key: %w", err)
 	}
 	if err := io.Write(filepath.Join(app.Root, "panel/storage/cert.pem"), setting.Cert, 0644); err != nil {
 		return false, err

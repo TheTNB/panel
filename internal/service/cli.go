@@ -18,6 +18,7 @@ import (
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
+	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/ntp"
 	"github.com/TheTNB/panel/pkg/str"
@@ -283,6 +284,37 @@ func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	fmt.Println("已关闭HTTPS")
+	return s.Restart(ctx, cmd)
+}
+
+func (s *CliService) HTTPSGenerate(ctx context.Context, cmd *cli.Command) error {
+	var names []string
+	if lv4, err := tools.GetLocalIPv4(); err == nil {
+		names = append(names, lv4)
+	}
+	if lv6, err := tools.GetLocalIPv6(); err == nil {
+		names = append(names, lv6)
+	}
+	if rv4, err := tools.GetPublicIPv4(); err == nil {
+		names = append(names, rv4)
+	}
+	if rv6, err := tools.GetPublicIPv6(); err == nil {
+		names = append(names, rv6)
+	}
+
+	crt, key, err := cert.GenerateSelfSigned(names)
+	if err != nil {
+		return err
+	}
+
+	if err = io.Write(filepath.Join(app.Root, "panel/storage/cert.pem"), string(crt), 0644); err != nil {
+		return err
+	}
+	if err = io.Write(filepath.Join(app.Root, "panel/storage/cert.key"), string(key), 0644); err != nil {
+		return err
+	}
+
+	fmt.Println("已生成HTTPS证书")
 	return s.Restart(ctx, cmd)
 }
 
@@ -736,6 +768,10 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	user := data.NewUserRepo()
 	_, err = user.Create("admin", value)
 	if err != nil {
+		return fmt.Errorf("初始化失败：%v", err)
+	}
+
+	if err = s.HTTPSGenerate(ctx, cmd); err != nil {
 		return fmt.Errorf("初始化失败：%v", err)
 	}
 
