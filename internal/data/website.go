@@ -717,6 +717,10 @@ func (r *websiteRepo) ObtainCert(ctx context.Context, id uint) error {
 			return err
 		}
 	}
+	newCert.Domains = website.Domains
+	if err = app.Orm.Save(newCert).Error; err != nil {
+		return err
+	}
 
 	_, err = cRepo.ObtainAuto(newCert.ID)
 	if err != nil {
