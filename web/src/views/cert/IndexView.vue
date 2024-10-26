@@ -33,10 +33,6 @@ const getAsyncData = async () => {
   algorithms.value = algorithmData
 
   websites.value = []
-  websites.value.push({
-    label: '无',
-    value: 0
-  })
   app.isInstalled('nginx').then(async (res) => {
     if (res.data.installed) {
       const { data: websiteData } = await website.list(1, 10000)
@@ -51,10 +47,6 @@ const getAsyncData = async () => {
 
   const { data: dnsData } = await cert.dns(1, 10000)
   dns.value = []
-  dns.value.push({
-    label: '无',
-    value: 0
-  })
   for (const item of dnsData.items) {
     dns.value.push({
       label: item.name,

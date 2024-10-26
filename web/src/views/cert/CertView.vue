@@ -20,10 +20,10 @@ let messageReactive: MessageReactive | null = null
 
 const updateCertModel = ref<any>({
   domains: [],
-  dns_id: 0,
   type: 'P256',
+  dns_id: null,
   account_id: null,
-  website_id: 0,
+  website_id: null,
   auto_renew: true
 })
 const updateCertModal = ref(false)
@@ -35,8 +35,8 @@ const showCertModel = ref<any>({
 })
 const deployCertModal = ref(false)
 const deployCertModel = ref<any>({
-  id: 0,
-  website_id: 0
+  id: null,
+  websites: []
 })
 
 const columns: any = [
@@ -97,6 +97,9 @@ const columns: any = [
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any) {
+      if (row.account_id == 0) {
+        return h(NTag, null, { default: () => '无' })
+      }
       return h(NFlex, null, {
         default: () => [
           h(NTag, null, { default: () => (row.account?.email == null ? '无' : row.account.email) }),
@@ -255,12 +258,10 @@ const columns: any = [
                 size: 'small',
                 type: 'info',
                 onClick: () => {
-                  if (row.website_id != 0) {
-                    deployCertModel.value.website_id = row.website_id
-                  } else {
-                    deployCertModel.value.website_id = 0
-                  }
                   deployCertModel.value.id = row.id
+                  if (row.website_id != 0) {
+                    deployCertModel.value.websites.push(row.website_id)
+                  }
                   deployCertModal.value = true
                 }
               },
@@ -318,10 +319,10 @@ const columns: any = [
             onClick: () => {
               updateCert.value = row.id
               updateCertModel.value.domains = row.domains
-              updateCertModel.value.dns_id = row.dns_id
               updateCertModel.value.type = row.type
-              updateCertModel.value.account_id = row.account_id
-              updateCertModel.value.website_id = row.website_id
+              updateCertModel.value.dns_id = row.dns_id == 0 ? null : row.dns_id
+              updateCertModel.value.account_id = row.account_id == 0 ? null : row.account_id
+              updateCertModel.value.website_id = row.website_id == 0 ? null : row.website_id
               updateCertModel.value.auto_renew = row.auto_renew
               updateCertModal.value = true
             }
@@ -399,20 +400,21 @@ const handleUpdateCert = async () => {
   updateCertModal.value = false
   onPageChange(1)
   updateCertModel.value.domains = []
-  updateCertModel.value.dns_id = 0
   updateCertModel.value.type = 'P256'
-  updateCertModel.value.account_id = 0
-  updateCertModel.value.website_id = 0
+  updateCertModel.value.dns_id = null
+  updateCertModel.value.account_id = null
+  updateCertModel.value.website_id = null
   updateCertModel.value.auto_renew = true
 }
 
 const handleDeployCert = async () => {
-  await cert.deploy(deployCertModel.value.id, deployCertModel.value.website_id)
+  for (const website of deployCertModel.value.websites) {
+    await cert.deploy(deployCertModel.value.id, website)
+  }
   window.$message.success('部署成功')
   deployCertModal.value = false
-  deployCertModel.value.id = 0
-  deployCertModel.value.website_id = 0
-  onPageChange(1)
+  deployCertModel.value.id = null
+  deployCertModel.value.websites = []
 }
 
 const handleShowModalClose = () => {
@@ -519,9 +521,10 @@ onUnmounted(() => {
       <n-form :model="deployCertModel">
         <n-form-item path="website_id" label="网站">
           <n-select
-            v-model:value="deployCertModel.website_id"
+            v-model:value="deployCertModel.websites"
             placeholder="选择需要部署证书的网站"
             clearable
+            multiple
             :options="websites"
           />
         </n-form-item>

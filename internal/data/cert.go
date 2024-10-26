@@ -59,7 +59,8 @@ func (r *certRepo) Create(req *request.CertCreate) (*biz.Cert, error) {
 }
 
 func (r *certRepo) Update(req *request.CertUpdate) error {
-	return app.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Updates(&biz.Cert{
+	return app.Orm.Model(&biz.Cert{}).Where("id = ?", req.ID).Select("*").Updates(&biz.Cert{
+		ID:        req.ID,
 		AccountID: req.AccountID,
 		WebsiteID: req.WebsiteID,
 		DNSID:     req.DNSID,

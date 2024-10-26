@@ -81,7 +81,7 @@ func (r *sshRepo) Update(req *request.SSHUpdate) error {
 		Remark: req.Remark,
 	}
 
-	return app.Orm.Model(ssh).Updates(ssh).Error
+	return app.Orm.Model(ssh).Where("id = ?", req.ID).Select("*").Updates(ssh).Error
 }
 
 func (r *sshRepo) Delete(id uint) error {

@@ -15,10 +15,10 @@ const { algorithms, websites, accounts, dns } = toRefs(props)
 
 const model = ref<any>({
   domains: [],
-  dns_id: 0,
+  dns_id: null,
   type: 'P256',
   account_id: null,
-  website_id: 0,
+  website_id: null,
   auto_renew: true
 })
 
@@ -29,8 +29,8 @@ const handleCreateCert = async () => {
   model.value.domains = []
   model.value.dns_id = 0
   model.value.type = 'P256'
-  model.value.account_id = 0
-  model.value.website_id = 0
+  model.value.account_id = null
+  model.value.website_id = null
   model.value.auto_renew = true
   window.$bus.emit('cert:refresh-cert')
   window.$bus.emit('cert:refresh-async')
