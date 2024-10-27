@@ -59,7 +59,7 @@ func (s *IOTestSuite) TestCompress() {
 	err = Write(src[1], "File 2", 0644)
 	s.NoError(err)
 
-	err = Compress(src, "testdata/compress_test.zip", Zip)
+	err = Compress("testdata", src, "testdata/compress_test.zip")
 	s.NoError(err)
 }
 
@@ -70,10 +70,10 @@ func (s *IOTestSuite) TestUnCompress() {
 	err = Write(src[1], "File 2", 0644)
 	s.NoError(err)
 
-	err = Compress(src, "testdata/uncompress_test.zip", Zip)
+	err = Compress("testdata", src, "testdata/uncompress_test.zip")
 	s.NoError(err)
 
-	err = UnCompress("testdata/uncompress_test.zip", "testdata/uncompressed", Zip)
+	err = UnCompress("testdata/uncompress_test.zip", "testdata/uncompressed")
 	s.NoError(err)
 
 	data, err := Read("testdata/uncompressed/uncompress_test1.txt")
