@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
@@ -35,18 +34,6 @@ func (r *containerImageRepo) List() ([]image.Summary, error) {
 	return r.client.ImageList(context.Background(), image.ListOptions{
 		All: true,
 	})
-}
-
-// Exist 判断镜像是否存在
-func (r *containerImageRepo) Exist(id string) (bool, error) {
-	var options image.ListOptions
-	options.Filters = filters.NewArgs(filters.Arg("reference", id))
-	images, err := r.client.ImageList(context.Background(), options)
-	if err != nil {
-		return false, err
-	}
-
-	return len(images) > 0, nil
 }
 
 // Pull 拉取镜像
@@ -88,10 +75,4 @@ func (r *containerImageRepo) Remove(id string) error {
 func (r *containerImageRepo) Prune() error {
 	_, err := r.client.ImagesPrune(context.Background(), filters.NewArgs())
 	return err
-}
-
-// Inspect 查看镜像
-func (r *containerImageRepo) Inspect(id string) (types.ImageInspect, error) {
-	img, _, err := r.client.ImageInspectWithRaw(context.Background(), id)
-	return img, err
 }

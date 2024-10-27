@@ -17,11 +17,8 @@ type ContainerRepo interface {
 	Restart(id string) error
 	Pause(id string) error
 	Unpause(id string) error
-	Inspect(id string) (types.ContainerJSON, error)
 	Kill(id string) error
 	Rename(id string, newName string) error
-	Stats(id string) (container.StatsResponseReader, error)
-	Exist(name string) (bool, error)
 	Update(id string, config container.UpdateConfig) error
 	Logs(id string) (string, error)
 	Prune() error

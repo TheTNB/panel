@@ -175,22 +175,6 @@ func (s *ContainerService) Unpause(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *ContainerService) Inspect(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	container, err := s.containerRepo.Inspect(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, container)
-}
-
 func (s *ContainerService) Kill(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerID](r)
 	if err != nil {
@@ -219,38 +203,6 @@ func (s *ContainerService) Rename(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Success(w, nil)
-}
-
-func (s *ContainerService) Stats(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	stats, err := s.containerRepo.Stats(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, stats)
-}
-
-func (s *ContainerService) Exist(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	exist, err := s.containerRepo.Exist(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, exist)
 }
 
 func (s *ContainerService) Logs(w http.ResponseWriter, r *http.Request) {
