@@ -27,7 +27,10 @@ func Compress(dir string, src []string, dst string) error {
 	}
 	// 去掉路径前缀，减少压缩包内文件夹层级
 	for i, s := range src {
-		src[i] = strings.TrimPrefix(s, dir)
+		if strings.HasPrefix(s, dir) {
+			s = strings.TrimPrefix(s, dir)
+			src[i] = strings.TrimPrefix(s, "/")
+		}
 		if src[i] == "" {
 			src[i] = "."
 		}
