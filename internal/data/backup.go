@@ -337,7 +337,6 @@ func (r *backupRepo) createPanel(to string) error {
 	if err != nil {
 		return err
 	}
-	defer io.Remove(temp)
 
 	if err = io.Cp(filepath.Join(app.Root, "panel"), temp); err != nil {
 		return err
@@ -361,7 +360,8 @@ func (r *backupRepo) createPanel(to string) error {
 		fmt.Printf("|-备份耗时：%s\n", time.Since(start).String())
 		fmt.Printf("|-已备份至文件：%s\n", filepath.Base(backup))
 	}
-	return nil
+
+	return io.Remove(temp)
 }
 
 // restoreWebsite 恢复网站备份
