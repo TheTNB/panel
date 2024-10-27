@@ -11,10 +11,9 @@ type FormatArchive string
 
 const (
 	Zip      FormatArchive = "zip"
-	Gz       FormatArchive = "gz"
 	Bz2      FormatArchive = "bz2"
 	Tar      FormatArchive = "tar"
-	TarGz    FormatArchive = "tar.gz"
+	TGz      FormatArchive = "tgz"
 	Xz       FormatArchive = "xz"
 	SevenZip FormatArchive = "7z"
 )
@@ -49,7 +48,7 @@ func Compress(dir string, src []string, dst string) error {
 	switch format {
 	case Zip:
 		cmd = exec.Command("zip", append([]string{"-qr", "-o", dst}, src...)...)
-	case Gz, TarGz:
+	case TGz:
 		cmd = exec.Command("tar", append([]string{"-czf", dst}, src...)...)
 	case Bz2:
 		cmd = exec.Command("tar", append([]string{"-cjf", dst}, src...)...)
@@ -86,7 +85,7 @@ func UnCompress(src string, dst string) error {
 	switch format {
 	case Zip:
 		cmd = exec.Command("unzip", "-qo", src, "-d", dst)
-	case Gz, TarGz:
+	case TGz:
 		cmd = exec.Command("tar", "-xzf", src, "-C", dst)
 	case Bz2:
 		cmd = exec.Command("tar", "-xjf", src, "-C", dst)
@@ -108,14 +107,12 @@ func formatArchiveByPath(path string) (FormatArchive, error) {
 	switch filepath.Ext(path) {
 	case ".zip":
 		return Zip, nil
-	case ".gz":
-		return Gz, nil
 	case ".bz2":
 		return Bz2, nil
 	case ".tar":
 		return Tar, nil
-	case ".tar.gz", ".tgz":
-		return TarGz, nil
+	case ".gz", ".tar.gz", ".tgz":
+		return TGz, nil
 	case ".xz":
 		return Xz, nil
 	case ".7z":
