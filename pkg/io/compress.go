@@ -2,7 +2,6 @@ package io
 
 import (
 	"errors"
-	"github.com/go-rat/utils/debug"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -50,15 +49,12 @@ func Compress(dir string, src []string, dst string) error {
 	switch format {
 	case Zip:
 		cmd = exec.Command("zip", append([]string{"-qr", "-o", dst}, src...)...)
-		debug.Dump(append([]string{"-qr", "-o", dst}, src...))
-	case Gz:
+	case Gz, TarGz:
 		cmd = exec.Command("tar", append([]string{"-czf", dst}, src...)...)
 	case Bz2:
 		cmd = exec.Command("tar", append([]string{"-cjf", dst}, src...)...)
 	case Tar:
 		cmd = exec.Command("tar", append([]string{"-cf", dst}, src...)...)
-	case TarGz:
-		cmd = exec.Command("tar", append([]string{"-czf", dst}, src...)...)
 	case Xz:
 		cmd = exec.Command("tar", append([]string{"-cJf", dst}, src...)...)
 	case SevenZip:
@@ -67,10 +63,7 @@ func Compress(dir string, src []string, dst string) error {
 		return errors.New("unsupported format")
 	}
 
-	out, err := cmd.CombinedOutput()
-	debug.Dump(string(out))
-
-	return err
+	return cmd.Run()
 }
 
 // UnCompress 解压文件
@@ -78,14 +71,18 @@ func UnCompress(src string, dst string) error {
 	if !filepath.IsAbs(src) || !filepath.IsAbs(dst) {
 		return errors.New("src and dst must be absolute path")
 	}
-
-	var cmd *exec.Cmd
+	if !Exists(dst) {
+		if err := Mkdir(dst, 0755); err != nil {
+			return err
+		}
+	}
 
 	format, err := formatArchiveByPath(src)
 	if err != nil {
 		return err
 	}
 
+	var cmd *exec.Cmd
 	switch format {
 	case Zip:
 		cmd = exec.Command("unzip", "-qo", src, "-d", dst)
