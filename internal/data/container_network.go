@@ -1,97 +1,57 @@
 package data
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"time"
 
-	"github.com/spf13/cast"
+	"github.com/go-resty/resty/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/types/docker/network"
 )
 
 type containerNetworkRepo struct {
-	cmd string
+	client *resty.Client
 }
 
-func NewContainerNetworkRepo(cmd ...string) biz.ContainerNetworkRepo {
-	if len(cmd) == 0 {
-		cmd = append(cmd, "docker")
+func NewContainerNetworkRepo(sock ...string) biz.ContainerNetworkRepo {
+	if len(sock) == 0 {
+		sock = append(sock, "/var/run/docker.sock")
 	}
+	client := resty.New()
+	client.SetTimeout(1 * time.Minute)
+	client.SetRetryCount(2)
+	client.SetTransport(&http.Transport{
+		DialContext: func(ctx context.Context, _ string, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", sock[0])
+		},
+	})
+	client.SetBaseURL("http://d/v1.40")
+
 	return &containerNetworkRepo{
-		cmd: cmd[0],
+		client: client,
 	}
 }
 
 // List 列出网络
 func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
-	output, err := shell.ExecfWithTimeout(10*time.Second, "%s network ls --format json", r.cmd)
+	var resp []network.Network
+	_, err := r.client.R().SetResult(&resp).Get("/networks")
 	if err != nil {
 		return nil, err
 	}
-	lines := strings.Split(output, "\n")
 
 	var networks []types.ContainerNetwork
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		var item struct {
-			CreatedAt string `json:"CreatedAt"`
-			Driver    string `json:"Driver"`
-			ID        string `json:"ID"`
-			IPv6      string `json:"IPv6"`
-			Internal  string `json:"Internal"`
-			Labels    string `json:"Labels"`
-			Name      string `json:"Name"`
-			Scope     string `json:"Scope"`
-		}
-		if err = json.Unmarshal([]byte(line), &item); err != nil {
-			return nil, fmt.Errorf("unmarshal failed: %w", err)
-		}
-
-		output, err = shell.ExecfWithTimeout(10*time.Second, "%s network inspect %s", r.cmd, item.ID)
-		if err != nil {
-			return nil, fmt.Errorf("inspect failed: %w", err)
-		}
-		var inspect []struct {
-			Name       string    `json:"Name"`
-			Id         string    `json:"Id"`
-			Created    time.Time `json:"Created"`
-			Scope      string    `json:"Scope"`
-			Driver     string    `json:"Driver"`
-			EnableIPv6 bool      `json:"EnableIPv6"`
-			IPAM       struct {
-				Driver  string            `json:"Driver"`
-				Options map[string]string `json:"Options"`
-				Config  []struct {
-					Subnet     string            `json:"Subnet"`
-					IPRange    string            `json:"IPRange"`
-					Gateway    string            `json:"Gateway"`
-					AuxAddress map[string]string `json:"AuxiliaryAddresses"`
-				} `json:"Config"`
-			} `json:"IPAM"`
-			Internal   bool              `json:"Internal"`
-			Attachable bool              `json:"Attachable"`
-			Ingress    bool              `json:"Ingress"`
-			ConfigOnly bool              `json:"ConfigOnly"`
-			Options    map[string]string `json:"Options"`
-			Labels     map[string]string `json:"Labels"`
-		}
-		if err = json.Unmarshal([]byte(output), &inspect); err != nil {
-			return nil, fmt.Errorf("unmarshal inspect failed: %w", err)
-		}
-		if len(inspect) == 0 {
-			return nil, fmt.Errorf("inspect empty")
-		}
-
-		var ipamConfigs []types.ContainerNetworkIPAMConfig
-		for _, ipam := range inspect[0].IPAM.Config {
+	for _, item := range resp {
+		ipamConfigs := make([]types.ContainerNetworkIPAMConfig, 0)
+		for _, ipam := range item.IPAM.Config {
 			ipamConfigs = append(ipamConfigs, types.ContainerNetworkIPAMConfig{
 				Subnet:     ipam.Subnet,
 				IPRange:    ipam.IPRange,
@@ -99,25 +59,23 @@ func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
 				AuxAddress: ipam.AuxAddress,
 			})
 		}
-
-		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
 		networks = append(networks, types.ContainerNetwork{
 			ID:         item.ID,
 			Name:       item.Name,
 			Driver:     item.Driver,
-			IPv6:       cast.ToBool(item.IPv6),
-			Internal:   cast.ToBool(item.Internal),
-			Attachable: cast.ToBool(inspect[0].Attachable),
-			Ingress:    cast.ToBool(inspect[0].Ingress),
+			IPv6:       item.EnableIPv6,
+			Internal:   item.Internal,
+			Attachable: item.Attachable,
+			Ingress:    item.Ingress,
 			Scope:      item.Scope,
-			CreatedAt:  createdAt,
+			CreatedAt:  item.Created,
 			IPAM: types.ContainerNetworkIPAM{
-				Driver:  inspect[0].IPAM.Driver,
-				Options: types.MapToKV(inspect[0].IPAM.Options),
+				Driver:  item.IPAM.Driver,
+				Options: types.MapToKV(item.IPAM.Options),
 				Config:  ipamConfigs,
 			},
-			Options: types.MapToKV(inspect[0].Options),
-			Labels:  types.SliceToKV(strings.Split(item.Labels, ",")),
+			Options: types.MapToKV(item.Options),
+			Labels:  types.MapToKV(item.Labels),
 		})
 	}
 
@@ -128,7 +86,7 @@ func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
 func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (string, error) {
 	var sb strings.Builder
 
-	sb.WriteString(fmt.Sprintf("%s network create --driver %s", r.cmd, req.Driver))
+	sb.WriteString(fmt.Sprintf("docker network create --driver %s", req.Driver))
 	sb.WriteString(fmt.Sprintf(" %s", req.Name))
 
 	if req.Ipv4.Enabled {
@@ -152,17 +110,17 @@ func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (stri
 		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
 	}
 
-	return shell.ExecfWithTimeout(10*time.Second, "%s", sb.String()) // nolint: govet
+	return shell.ExecfWithTimeout(30*time.Second, sb.String()) // nolint: govet
 }
 
 // Remove 删除网络
 func (r *containerNetworkRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network rm -f %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker network rm -f %s", id)
 	return err
 }
 
 // Prune 清理未使用的网络
 func (r *containerNetworkRepo) Prune() error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network prune -f", r.cmd)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker network prune -f")
 	return err
 }

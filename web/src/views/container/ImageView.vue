@@ -2,6 +2,7 @@
 import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NTag } from 'naive-ui'
 
 import container from '@/api/panel/container'
+import { formatDateTime } from '@/utils'
 import type { ImageList } from '@/views/container/types'
 
 const pullModel = ref({
@@ -62,10 +63,12 @@ const columns: any = [
   },
   {
     title: '创建时间',
-    key: 'created',
+    key: 'created_at',
     width: 200,
     resizable: true,
-    ellipsis: { tooltip: true }
+    render(row: any) {
+      return formatDateTime(row.created_at)
+    }
   },
   {
     title: '操作',

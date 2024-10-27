@@ -2,13 +2,14 @@
 import { NButton, NDataTable, NFlex, NInput, NPopconfirm, NTag } from 'naive-ui'
 
 import container from '@/api/panel/container'
+import { formatDateTime } from '@/utils'
 import type { NetworkList } from '@/views/container/types'
 
 const createModel = ref({
   name: '',
   driver: 'bridge',
   ipv4: {
-    enabled: true,
+    enabled: false,
     subnet: '',
     gateway: '',
     ip_range: ''
@@ -101,10 +102,12 @@ const columns: any = [
   },
   {
     title: '创建时间',
-    key: 'created',
+    key: 'created_at',
     width: 200,
     resizable: true,
-    ellipsis: { tooltip: true }
+    render(row: any) {
+      return formatDateTime(row.created_at)
+    }
   },
   {
     title: '操作',

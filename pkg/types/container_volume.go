@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type ContainerVolume struct {
 	Name       string    `json:"name"`
@@ -10,4 +12,6 @@ type ContainerVolume struct {
 	CreatedAt  time.Time `json:"created_at"`
 	Labels     []KV      `json:"labels"`
 	Options    []KV      `json:"options"`
+	RefCount   int64     `json:"ref_count"`
+	Size       string    `json:"size"`
 }

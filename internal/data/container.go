@@ -1,79 +1,78 @@
 package data
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"regexp"
+	"net"
+	"net/http"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/spf13/cast"
+	"github.com/go-resty/resty/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/types/docker/container"
 )
 
 type containerRepo struct {
-	cmd string
+	client *resty.Client
 }
 
-func NewContainerRepo(cmd ...string) biz.ContainerRepo {
-	if len(cmd) == 0 {
-		cmd = append(cmd, "docker")
+func NewContainerRepo(sock ...string) biz.ContainerRepo {
+	if len(sock) == 0 {
+		sock = append(sock, "/var/run/docker.sock")
 	}
+	client := resty.New()
+	client.SetTimeout(1 * time.Minute)
+	client.SetRetryCount(2)
+	client.SetTransport(&http.Transport{
+		DialContext: func(ctx context.Context, _ string, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", sock[0])
+		},
+	})
+	client.SetBaseURL("http://d/v1.40")
+
 	return &containerRepo{
-		cmd: cmd[0],
+		client: client,
 	}
 }
 
 // ListAll 列出所有容器
 func (r *containerRepo) ListAll() ([]types.Container, error) {
-	output, err := shell.ExecfWithTimeout(10*time.Second, "%s ps -a --format json", r.cmd)
+	var resp []container.Container
+	_, err := r.client.R().SetResult(&resp).SetQueryParam("all", "true").Get("/containers/json")
 	if err != nil {
 		return nil, err
 	}
-	lines := strings.Split(output, "\n")
 
 	var containers []types.Container
-	for _, line := range lines {
-		if line == "" {
-			continue
+	for _, item := range resp {
+		ports := make([]types.ContainerPort, 0)
+		for _, port := range item.Ports {
+			ports = append(ports, types.ContainerPort{
+				ContainerStart: uint(port.PrivatePort),
+				ContainerEnd:   uint(port.PublicPort),
+				HostStart:      uint(port.PublicPort),
+				HostEnd:        uint(port.PublicPort),
+				Protocol:       port.Type,
+				Host:           port.IP,
+			})
 		}
-
-		var item struct {
-			Command      string `json:"Command"`
-			CreatedAt    string `json:"CreatedAt"`
-			ID           string `json:"ID"`
-			Image        string `json:"Image"`
-			Labels       string `json:"Labels"`
-			LocalVolumes string `json:"LocalVolumes"`
-			Mounts       string `json:"Mounts"`
-			Names        string `json:"Names"`
-			Networks     string `json:"Networks"`
-			Ports        string `json:"Ports"`
-			RunningFor   string `json:"RunningFor"`
-			Size         string `json:"Size"`
-			State        string `json:"State"`
-			Status       string `json:"Status"`
-		}
-		if err = json.Unmarshal([]byte(line), &item); err != nil {
-			return nil, fmt.Errorf("unmarshal failed: %w", err)
-		}
-
-		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
 		containers = append(containers, types.Container{
 			ID:        item.ID,
-			Name:      item.Names,
+			Name:      item.Names[0],
 			Image:     item.Image,
+			ImageID:   item.ImageID,
 			Command:   item.Command,
-			CreatedAt: createdAt,
-			Ports:     r.parsePorts(item.Ports),
-			Labels:    types.SliceToKV(strings.Split(item.Labels, ",")),
+			CreatedAt: time.Unix(item.Created, 0),
 			State:     item.State,
 			Status:    item.Status,
+			Ports:     ports,
+			Labels:    types.MapToKV(item.Labels),
 		})
 	}
 
@@ -97,10 +96,21 @@ func (r *containerRepo) ListByName(names string) ([]types.Container, error) {
 // Create 创建容器
 func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("%s create --name %s --image %s", r.cmd, req.Name, req.Image))
-
-	for _, port := range req.Ports {
-		sb.WriteString(fmt.Sprintf(" -p %s:%d-%d:%d-%d/%s", port.Host, port.HostStart, port.HostEnd, port.ContainerStart, port.ContainerEnd, port.Protocol))
+	sb.WriteString(fmt.Sprintf("docker run --name %s", req.Name))
+	if req.PublishAllPorts {
+		sb.WriteString(" -P")
+	} else {
+		for _, port := range req.Ports {
+			sb.WriteString(" -p ")
+			if port.Host != "" {
+				sb.WriteString(fmt.Sprintf("%s:", port.Host))
+			}
+			if port.HostStart == port.HostEnd || port.ContainerStart == port.ContainerEnd {
+				sb.WriteString(fmt.Sprintf("%d:%d/%s", port.HostStart, port.ContainerStart, port.Protocol))
+			} else {
+				sb.WriteString(fmt.Sprintf("%d-%d:%d-%d/%s", port.HostStart, port.HostEnd, port.ContainerStart, port.ContainerEnd, port.Protocol))
+			}
+		}
 	}
 	if req.Network != "" {
 		sb.WriteString(fmt.Sprintf(" --network %s", req.Network))
@@ -132,9 +142,6 @@ func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
 	if req.OpenStdin {
 		sb.WriteString(" -i")
 	}
-	if req.PublishAllPorts {
-		sb.WriteString(" -P")
-	}
 	if req.Tty {
 		sb.WriteString(" -t")
 	}
@@ -148,94 +155,65 @@ func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
 		sb.WriteString(fmt.Sprintf(" --memory %d", req.Memory))
 	}
 
-	return shell.ExecfWithTimeout(10*time.Second, sb.String()) // nolint: govet
+	sb.WriteString(" %s")
+	return shell.Execf(sb.String(), req.Image)
 }
 
 // Remove 移除容器
 func (r *containerRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s rm -f %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker rm -f %s", id)
 	return err
 }
 
 // Start 启动容器
 func (r *containerRepo) Start(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s start %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker start %s", id)
 	return err
 }
 
 // Stop 停止容器
 func (r *containerRepo) Stop(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s stop %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker stop %s", id)
 	return err
 }
 
 // Restart 重启容器
 func (r *containerRepo) Restart(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s restart %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker restart %s", id)
 	return err
 }
 
 // Pause 暂停容器
 func (r *containerRepo) Pause(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s pause %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker pause %s", id)
 	return err
 }
 
 // Unpause 恢复容器
 func (r *containerRepo) Unpause(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s unpause %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker unpause %s", id)
 	return err
 }
 
 // Kill 杀死容器
 func (r *containerRepo) Kill(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s kill %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker kill %s", id)
 	return err
 }
 
 // Rename 重命名容器
 func (r *containerRepo) Rename(id string, newName string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s rename %s %s", r.cmd, id, newName)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker rename %s %s", id, newName)
 	return err
 }
 
 // Logs 查看容器日志
 func (r *containerRepo) Logs(id string) (string, error) {
-	return shell.ExecfWithTimeout(10*time.Second, "%s logs %s", r.cmd, id)
+	return shell.ExecfWithTimeout(30*time.Second, "docker logs %s", id)
 }
 
 // Prune 清理未使用的容器
 func (r *containerRepo) Prune() error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s container prune -f", r.cmd)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker container prune -f")
 	return err
-}
-
-func (r *containerRepo) parsePorts(ports string) []types.ContainerPort {
-	var portList []types.ContainerPort
-
-	re := regexp.MustCompile(`(?P<host>[\d.:]+)?:(?P<public>\d+)->(?P<private>\d+)/(?P<protocol>\w+)`)
-
-	entries := strings.Split(ports, ", ") // 0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp
-	for _, entry := range entries {
-		matches := re.FindStringSubmatch(entry)
-		if len(matches) == 0 {
-			continue
-		}
-
-		host := matches[1]
-		public := matches[2]
-		private := matches[3]
-		protocol := matches[4]
-
-		portList = append(portList, types.ContainerPort{
-			Host:           host,
-			HostStart:      cast.ToUint(public),
-			HostEnd:        cast.ToUint(public),
-			ContainerStart: cast.ToUint(private),
-			ContainerEnd:   cast.ToUint(private),
-			Protocol:       protocol,
-		})
-	}
-
-	return portList
 }

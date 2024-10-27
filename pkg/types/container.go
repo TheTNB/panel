@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type Container struct {
 	ID        string          `json:"id"`
@@ -8,11 +10,11 @@ type Container struct {
 	Image     string          `json:"image"`
 	ImageID   string          `json:"image_id"`
 	Command   string          `json:"command"`
+	State     string          `json:"state"`
+	Status    string          `json:"status"`
 	CreatedAt time.Time       `json:"created_at"`
 	Ports     []ContainerPort `json:"ports"`
-	Labels    []KV
-	State     string
-	Status    string
+	Labels    []KV            `json:"labels"`
 }
 
 type ContainerPort struct {

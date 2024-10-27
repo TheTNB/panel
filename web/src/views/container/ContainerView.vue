@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Editor from '@guolao/vue-monaco-editor'
-import { NButton, NDataTable, NDropdown, NInput, NSwitch } from 'naive-ui'
+import { NButton, NDataTable, NDropdown, NFlex, NInput, NSwitch, NTag } from 'naive-ui'
 
 import container from '@/api/panel/container'
 import ContainerCreate from '@/views/container/ContainerCreate.vue'
@@ -52,19 +52,32 @@ const columns: any = [
       })
     }
   },
-  { title: '镜像', key: 'image', minWidth: 300, resizable: true, ellipsis: { tooltip: true } },
+  {
+    title: '镜像',
+    key: 'image',
+    minWidth: 300,
+    resizable: true,
+    render(row: any): any {
+      return h(NTag, null, {
+        default: () => row.image
+      })
+    }
+  },
   {
     title: '端口（主机->容器）',
     key: 'ports',
-    width: 100,
+    minWidth: 200,
     resizable: true,
-    ellipsis: { tooltip: true },
-    render(row: any) {
-      return row.ports
-        .map((port: any) => {
-          return `${port.IP ? port.IP + ':' : ''}${port.PublicPort}->${port.PrivatePort}/${port.Type}`
-        })
-        .join(', ')
+    render(row: any): any {
+      return h(NFlex, null, {
+        default: () =>
+          row.ports.map((port: any) =>
+            h(NTag, null, {
+              default: () =>
+                `${port.host ? port.host + ':' : ''}${port.container_start}->${port.host_start}/${port.protocol}`
+            })
+          )
+      })
     }
   },
   {
