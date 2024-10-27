@@ -1,10 +1,8 @@
 package io
 
 import (
-	"bytes"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -24,14 +22,14 @@ func Mkdir(path string, permission os.FileMode) error {
 
 // Chmod 修改文件/目录权限
 func Chmod(path string, permission os.FileMode) error {
-	cmd := exec.Command("chmod", "-R", fmt.Sprintf("%o", permission), path)
-	return cmd.Run()
+	_, err := shell.Execf("chmod -R '%o' '%s'", permission, path)
+	return err
 }
 
 // Chown 修改文件或目录所有者
 func Chown(path, user, group string) error {
-	cmd := exec.Command("chown", "-R", user+":"+group, path)
-	return cmd.Run()
+	_, err := shell.Execf("chown -R '%s:%s' '%s'", user, group, path)
+	return err
 }
 
 // Exists 判断路径是否存在
@@ -97,12 +95,12 @@ func IsDir(path string) bool {
 
 // SizeX 获取路径大小（du命令）
 func SizeX(path string) (int64, error) {
-	out, err := exec.Command("du", "-sb", path).Output()
+	out, err := shell.Execf("du -sb '%s'", path)
 	if err != nil {
 		return 0, err
 	}
 
-	parts := strings.Fields(string(out))
+	parts := strings.Fields(out)
 	if len(parts) == 0 {
 		return 0, fmt.Errorf("无法解析 du 输出")
 	}
@@ -112,12 +110,12 @@ func SizeX(path string) (int64, error) {
 
 // CountX 统计目录下文件数
 func CountX(path string) (int64, error) {
-	out, err := exec.Command("find", path, "-printf", ".").Output()
+	out, err := shell.Execf("find '%s' -printf '.'", path)
 	if err != nil {
 		return 0, err
 	}
 
-	count := len(string(out))
+	count := len(out)
 	return int64(count), nil
 }
 
@@ -146,20 +144,18 @@ func Search(path, keyword string, sub bool) (map[string]os.FileInfo, error) {
 func SearchX(path, keyword string, sub bool) (map[string]os.FileInfo, error) {
 	paths := make(map[string]os.FileInfo)
 
-	var cmd *exec.Cmd
+	var out string
+	var err error
 	if sub {
-		cmd = exec.Command("find", path, "-name", "*"+keyword+"*")
+		out, err = shell.Execf("find '%s' -name '*%s*'", path, keyword)
 	} else {
-		cmd = exec.Command("find", path, "-maxdepth", "1", "-name", "*"+keyword+"*")
+		out, err = shell.Execf("find '%s' -maxdepth 1 -name '*%s*'", path, keyword)
 	}
-	var out bytes.Buffer
-	cmd.Stdout = &out
-
-	if err := cmd.Run(); err != nil {
+	if err != nil {
 		return nil, err
 	}
 
-	lines := strings.Split(out.String(), "\n")
+	lines := strings.Split(out, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" {
