@@ -2,8 +2,7 @@ package systemctl
 
 import (
 	"errors"
-	"os/exec"
-	"strings"
+	"fmt"
 
 	"github.com/TheTNB/panel/pkg/shell"
 )
@@ -16,23 +15,24 @@ func Status(name string) (bool, error) {
 
 // IsEnabled 服务是否启用
 func IsEnabled(name string) (bool, error) {
-	cmd := exec.Command("systemctl", "is-enabled", name)
-	output, _ := cmd.CombinedOutput()
-	status := strings.TrimSpace(string(output))
+	out, err := shell.Execf("systemctl is-enabled '%s'", name)
+	if err != nil {
+		return false, fmt.Errorf("failed to check service status: %w", err)
+	}
 
-	switch status {
+	switch out {
 	case "enabled":
 		return true, nil
 	case "disabled":
 		return false, nil
 	case "masked":
-		return false, errors.New("服务已被屏蔽")
+		return false, errors.New("service is masked")
 	case "static":
-		return false, errors.New("服务已被静态启用")
+		return false, errors.New("service is statically enabled")
 	case "indirect":
-		return false, errors.New("服务已被间接启用")
+		return false, errors.New("service is indirectly enabled")
 	default:
-		return false, errors.New("无法确定服务状态")
+		return false, errors.New("unknown service status")
 	}
 }
 
