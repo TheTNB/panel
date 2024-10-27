@@ -75,22 +75,6 @@ func (s *ContainerVolumeService) Create(w http.ResponseWriter, r *http.Request) 
 
 }
 
-func (s *ContainerVolumeService) Exist(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerVolumeID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	exist, err := s.containerVolumeRepo.Exist(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, exist)
-}
-
 func (s *ContainerVolumeService) Remove(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ContainerVolumeID](r)
 	if err != nil {
@@ -104,22 +88,6 @@ func (s *ContainerVolumeService) Remove(w http.ResponseWriter, r *http.Request) 
 	}
 
 	Success(w, nil)
-}
-
-func (s *ContainerVolumeService) Inspect(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerVolumeID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	volume, err := s.containerVolumeRepo.Inspect(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, volume)
 }
 
 func (s *ContainerVolumeService) Prune(w http.ResponseWriter, r *http.Request) {

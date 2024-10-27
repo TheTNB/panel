@@ -98,68 +98,6 @@ func (s *ContainerNetworkService) Remove(w http.ResponseWriter, r *http.Request)
 	Success(w, nil)
 }
 
-func (s *ContainerNetworkService) Exist(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerNetworkID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	exist, err := s.containerNetworkRepo.Exist(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, exist)
-}
-
-func (s *ContainerNetworkService) Inspect(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerNetworkID](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	network, err := s.containerNetworkRepo.Inspect(req.ID)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, network)
-}
-
-func (s *ContainerNetworkService) Connect(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerNetworkConnect](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	if err = s.containerNetworkRepo.Connect(req.Network, req.Container); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, nil)
-}
-
-func (s *ContainerNetworkService) Disconnect(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ContainerNetworkConnect](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	if err = s.containerNetworkRepo.Disconnect(req.Network, req.Container); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, nil)
-}
-
 func (s *ContainerNetworkService) Prune(w http.ResponseWriter, r *http.Request) {
 	if err := s.containerNetworkRepo.Prune(); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)

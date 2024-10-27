@@ -45,23 +45,6 @@ func (r *containerVolumeRepo) Create(req *request.ContainerVolumeCreate) (volume
 	})
 }
 
-// Exist 判断存储卷是否存在
-func (r *containerVolumeRepo) Exist(id string) (bool, error) {
-	var options volume.ListOptions
-	options.Filters = filters.NewArgs(filters.Arg("name", id))
-	volumes, err := r.client.VolumeList(context.Background(), options)
-	if err != nil {
-		return false, err
-	}
-
-	return len(volumes.Volumes) > 0, nil
-}
-
-// Inspect 查看存储卷
-func (r *containerVolumeRepo) Inspect(id string) (volume.Volume, error) {
-	return r.client.VolumeInspect(context.Background(), id)
-}
-
 // Remove 删除存储卷
 func (r *containerVolumeRepo) Remove(id string) error {
 	return r.client.VolumeRemove(context.Background(), id, true)

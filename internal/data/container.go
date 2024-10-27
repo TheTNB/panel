@@ -170,11 +170,6 @@ func (r *containerRepo) Unpause(id string) error {
 	return r.client.ContainerUnpause(context.Background(), id)
 }
 
-// Inspect 查看容器
-func (r *containerRepo) Inspect(id string) (types.ContainerJSON, error) {
-	return r.client.ContainerInspect(context.Background(), id)
-}
-
 // Kill 杀死容器
 func (r *containerRepo) Kill(id string) error {
 	return r.client.ContainerKill(context.Background(), id, "KILL")
@@ -183,23 +178,6 @@ func (r *containerRepo) Kill(id string) error {
 // Rename 重命名容器
 func (r *containerRepo) Rename(id string, newName string) error {
 	return r.client.ContainerRename(context.Background(), id, newName)
-}
-
-// Stats 查看容器状态
-func (r *containerRepo) Stats(id string) (container.StatsResponseReader, error) {
-	return r.client.ContainerStats(context.Background(), id, false)
-}
-
-// Exist 判断容器是否存在
-func (r *containerRepo) Exist(name string) (bool, error) {
-	var options container.ListOptions
-	options.Filters = filters.NewArgs(filters.Arg("name", name))
-	containers, err := r.client.ContainerList(context.Background(), options)
-	if err != nil {
-		return false, err
-	}
-
-	return len(containers) > 0, nil
 }
 
 // Update 更新容器
