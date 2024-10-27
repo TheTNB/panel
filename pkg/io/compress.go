@@ -89,14 +89,12 @@ func UnCompress(src string, dst string) error {
 	switch format {
 	case Zip:
 		cmd = exec.Command("unzip", "-qo", src, "-d", dst)
-	case Gz:
+	case Gz, TarGz:
 		cmd = exec.Command("tar", "-xzf", src, "-C", dst)
 	case Bz2:
 		cmd = exec.Command("tar", "-xjf", src, "-C", dst)
 	case Tar:
 		cmd = exec.Command("tar", "-xf", src, "-C", dst)
-	case TarGz:
-		cmd = exec.Command("tar", "-xzf", src, "-C", dst)
 	case Xz:
 		cmd = exec.Command("tar", "-xJf", src, "-C", dst)
 	case SevenZip:
@@ -119,7 +117,7 @@ func formatArchiveByPath(path string) (FormatArchive, error) {
 		return Bz2, nil
 	case ".tar":
 		return Tar, nil
-	case ".tar.gz":
+	case ".tar.gz", ".tgz":
 		return TarGz, nil
 	case ".xz":
 		return Xz, nil
