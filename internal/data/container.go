@@ -1,213 +1,259 @@
 package data
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
-	"io"
-	"strconv"
+	"regexp"
+	"slices"
+	"strings"
+	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
-	"github.com/docker/go-connections/nat"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
-	paneltypes "github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type containerRepo struct {
-	client *client.Client
+	cmd string
 }
 
-func NewContainerRepo(sock ...string) biz.ContainerRepo {
-	if len(sock) == 0 {
-		sock = append(sock, "/run/podman/podman.sock")
+func NewContainerRepo(cmd ...string) biz.ContainerRepo {
+	if len(cmd) == 0 {
+		cmd = append(cmd, "docker")
 	}
-	cli, _ := client.NewClientWithOpts(client.WithHost("unix://"+sock[0]), client.WithAPIVersionNegotiation())
 	return &containerRepo{
-		client: cli,
+		cmd: cmd[0],
 	}
 }
 
 // ListAll 列出所有容器
 func (r *containerRepo) ListAll() ([]types.Container, error) {
-	containers, err := r.client.ContainerList(context.Background(), container.ListOptions{
-		All: true,
-	})
+	output, err := shell.ExecfWithTimeout(10*time.Second, "%s ps -a --format '{{json .}}'", r.cmd)
 	if err != nil {
 		return nil, err
+	}
+	lines := strings.Split(output, "\n")
+
+	var containers []types.Container
+	for _, line := range lines {
+		if line == "" {
+			continue // 跳过空行
+		}
+
+		var item struct {
+			Command      string `json:"Command"`
+			CreatedAt    string `json:"CreatedAt"`
+			ID           string `json:"ID"`
+			Image        string `json:"Image"`
+			Labels       string `json:"Labels"`
+			LocalVolumes string `json:"LocalVolumes"`
+			Mounts       string `json:"Mounts"`
+			Names        string `json:"Names"`
+			Networks     string `json:"Networks"`
+			Ports        string `json:"Ports"`
+			RunningFor   string `json:"RunningFor"`
+			Size         string `json:"Size"`
+			State        string `json:"State"`
+			Status       string `json:"Status"`
+		}
+		if err = json.Unmarshal([]byte(line), &item); err != nil {
+			return nil, err
+		}
+
+		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
+
+		containers = append(containers, types.Container{
+			ID:        item.ID,
+			Name:      item.Names,
+			Image:     item.Image,
+			Command:   item.Command,
+			CreatedAt: createdAt,
+			Ports:     r.parsePorts(item.Ports),
+			Labels:    r.parseLabels(item.Labels),
+			State:     item.State,
+			Status:    item.Status,
+		})
 	}
 
 	return containers, nil
 }
 
-// ListByNames 根据名称列出容器
-func (r *containerRepo) ListByNames(names []string) ([]types.Container, error) {
-	var options container.ListOptions
-	options.All = true
-	if len(names) > 0 {
-		var array []filters.KeyValuePair
-		for _, n := range names {
-			array = append(array, filters.Arg("name", n))
-		}
-		options.Filters = filters.NewArgs(array...)
-	}
-	containers, err := r.client.ContainerList(context.Background(), options)
+// ListByName 根据名称搜索容器
+func (r *containerRepo) ListByName(names string) ([]types.Container, error) {
+	containers, err := r.ListAll()
 	if err != nil {
 		return nil, err
 	}
+
+	containers = slices.DeleteFunc(containers, func(item types.Container) bool {
+		return !strings.Contains(item.Name, names)
+	})
 
 	return containers, nil
 }
 
 // Create 创建容器
 func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
-	var hostConf container.HostConfig
-	var networkConf network.NetworkingConfig
+	sb := strings.Builder{}
+	sb.WriteString(fmt.Sprintf("%s create --name %s --image %s", r.cmd, req.Name, req.Image))
 
-	portMap := make(nat.PortMap)
 	for _, port := range req.Ports {
-		if port.ContainerStart-port.ContainerEnd != port.HostStart-port.HostEnd {
-			return "", fmt.Errorf("容器端口和主机端口数量不匹配（容器: %d 主机: %d）", port.ContainerStart-port.ContainerEnd, port.HostStart-port.HostEnd)
-		}
-		if port.ContainerStart > port.ContainerEnd || port.HostStart > port.HostEnd || port.ContainerStart < 1 || port.HostStart < 1 {
-			return "", fmt.Errorf("端口范围不正确")
-		}
-
-		count := 0
-		for host := port.HostStart; host <= port.HostEnd; host++ {
-			bindItem := nat.PortBinding{HostPort: strconv.Itoa(host), HostIP: port.Host}
-			portMap[nat.Port(fmt.Sprintf("%d/%s", port.ContainerStart+count, port.Protocol))] = []nat.PortBinding{bindItem}
-			count++
-		}
+		sb.WriteString(fmt.Sprintf(" -p %s:%d", port.Host, port.ContainerStart))
 	}
-
-	exposed := make(nat.PortSet)
-	for port := range portMap {
-		exposed[port] = struct{}{}
-	}
-
 	if req.Network != "" {
-		switch req.Network {
-		case "host", "none", "bridge":
-			hostConf.NetworkMode = container.NetworkMode(req.Network)
-		}
-		networkConf.EndpointsConfig = map[string]*network.EndpointSettings{req.Network: {}}
-	} else {
-		networkConf = network.NetworkingConfig{}
+		sb.WriteString(fmt.Sprintf(" --network %s", req.Network))
+	}
+	for _, volume := range req.Volumes {
+		sb.WriteString(fmt.Sprintf(" -v %s:%s:%s", volume.Host, volume.Container, volume.Mode))
+	}
+	for _, label := range req.Labels {
+		sb.WriteString(fmt.Sprintf(" --label %s=%s", label.Key, label.Value))
+	}
+	for _, env := range req.Env {
+		sb.WriteString(fmt.Sprintf(" -e %s=%s", env.Key, env.Value))
+	}
+	if len(req.Entrypoint) > 0 {
+		sb.WriteString(fmt.Sprintf(" --entrypoint '%s'", strings.Join(req.Entrypoint, " ")))
+	}
+	if len(req.Command) > 0 {
+		sb.WriteString(fmt.Sprintf(" '%s'", strings.Join(req.Command, " ")))
+	}
+	if req.RestartPolicy != "" {
+		sb.WriteString(fmt.Sprintf(" --restart %s", req.RestartPolicy))
+	}
+	if req.AutoRemove {
+		sb.WriteString(" --rm")
+	}
+	if req.Privileged {
+		sb.WriteString(" --privileged")
+	}
+	if req.OpenStdin {
+		sb.WriteString(" -i")
+	}
+	if req.PublishAllPorts {
+		sb.WriteString(" -P")
+	}
+	if req.Tty {
+		sb.WriteString(" -t")
+	}
+	if req.CPUShares > 0 {
+		sb.WriteString(fmt.Sprintf(" --cpu-shares %d", req.CPUShares))
+	}
+	if req.CPUs > 0 {
+		sb.WriteString(fmt.Sprintf(" --cpus %d", req.CPUs))
+	}
+	if req.Memory > 0 {
+		sb.WriteString(fmt.Sprintf(" --memory %d", req.Memory))
 	}
 
-	hostConf.Privileged = req.Privileged
-	hostConf.AutoRemove = req.AutoRemove
-	hostConf.CPUShares = req.CPUShares
-	hostConf.PublishAllPorts = req.PublishAllPorts
-	hostConf.RestartPolicy = container.RestartPolicy{Name: container.RestartPolicyMode(req.RestartPolicy)}
-	if req.RestartPolicy == "on-failure" {
-		hostConf.RestartPolicy.MaximumRetryCount = 5
-	}
-	hostConf.NanoCPUs = req.CPUs * 1000000000
-	hostConf.Memory = req.Memory * 1024 * 1024
-	hostConf.MemorySwap = 0
-	hostConf.PortBindings = portMap
-	hostConf.Binds = []string{}
-
-	volumes := make(map[string]struct{})
-	for _, v := range req.Volumes {
-		volumes[v.Container] = struct{}{}
-		hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", v.Host, v.Container, v.Mode))
-	}
-
-	resp, err := r.client.ContainerCreate(context.Background(), &container.Config{
-		Image:        req.Image,
-		Env:          paneltypes.KVToSlice(req.Env),
-		Entrypoint:   req.Entrypoint,
-		Cmd:          req.Command,
-		Labels:       paneltypes.KVToMap(req.Labels),
-		ExposedPorts: exposed,
-		OpenStdin:    req.OpenStdin,
-		Tty:          req.Tty,
-		Volumes:      volumes,
-	}, &hostConf, &networkConf, nil, req.Name)
-	if err != nil {
-		return "", err
-	}
-
-	return resp.ID, err
+	return shell.ExecfWithTimeout(10*time.Second, sb.String()) // nolint: govet
 }
 
 // Remove 移除容器
 func (r *containerRepo) Remove(id string) error {
-	return r.client.ContainerRemove(context.Background(), id, container.RemoveOptions{
-		Force: true,
-	})
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s rm -f %s", r.cmd, id)
+	return err
 }
 
 // Start 启动容器
 func (r *containerRepo) Start(id string) error {
-	return r.client.ContainerStart(context.Background(), id, container.StartOptions{})
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s start %s", r.cmd, id)
+	return err
 }
 
 // Stop 停止容器
 func (r *containerRepo) Stop(id string) error {
-	return r.client.ContainerStop(context.Background(), id, container.StopOptions{})
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s stop %s", r.cmd, id)
+	return err
 }
 
 // Restart 重启容器
 func (r *containerRepo) Restart(id string) error {
-	return r.client.ContainerRestart(context.Background(), id, container.StopOptions{})
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s restart %s", r.cmd, id)
+	return err
 }
 
 // Pause 暂停容器
 func (r *containerRepo) Pause(id string) error {
-	return r.client.ContainerPause(context.Background(), id)
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s pause %s", r.cmd, id)
+	return err
 }
 
 // Unpause 恢复容器
 func (r *containerRepo) Unpause(id string) error {
-	return r.client.ContainerUnpause(context.Background(), id)
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s unpause %s", r.cmd, id)
+	return err
 }
 
 // Kill 杀死容器
 func (r *containerRepo) Kill(id string) error {
-	return r.client.ContainerKill(context.Background(), id, "KILL")
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s kill %s", r.cmd, id)
+	return err
 }
 
 // Rename 重命名容器
 func (r *containerRepo) Rename(id string, newName string) error {
-	return r.client.ContainerRename(context.Background(), id, newName)
-}
-
-// Update 更新容器
-func (r *containerRepo) Update(id string, config container.UpdateConfig) error {
-	_, err := r.client.ContainerUpdate(context.Background(), id, config)
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s rename %s %s", r.cmd, id, newName)
 	return err
 }
 
 // Logs 查看容器日志
 func (r *containerRepo) Logs(id string) (string, error) {
-	options := container.LogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-	}
-	reader, err := r.client.ContainerLogs(context.Background(), id, options)
-	if err != nil {
-		return "", err
-	}
-	defer reader.Close()
-
-	data, err := io.ReadAll(reader)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
+	return shell.ExecfWithTimeout(10*time.Second, "%s logs %s", r.cmd, id)
 }
 
 // Prune 清理未使用的容器
 func (r *containerRepo) Prune() error {
-	_, err := r.client.ContainersPrune(context.Background(), filters.NewArgs())
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s container prune -f", r.cmd)
 	return err
+}
+
+func (r *containerRepo) parseLabels(labels string) []types.KV {
+	var result []types.KV
+	if labels == "" {
+		return result
+	}
+
+	pairs := strings.Split(labels, ",")
+	for _, pair := range pairs {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) == 2 {
+			result = append(result, types.KV{
+				Key:   strings.TrimSpace(kv[0]),
+				Value: strings.TrimSpace(kv[1]),
+			})
+		}
+	}
+	return result
+}
+
+func (r *containerRepo) parsePorts(ports string) []types.ContainerPort {
+	var portList []types.ContainerPort
+
+	re := regexp.MustCompile(`(?P<host>[\d.:]+)?:(?P<public>\d+)->(?P<private>\d+)/(?P<protocol>\w+)`)
+
+	entries := strings.Split(ports, ", ") // 0.0.0.0:3306->3306/tcp, :::3306->3306/tcp, 33060/tcp
+	for _, entry := range entries {
+		matches := re.FindStringSubmatch(entry)
+		if len(matches) == 0 {
+			continue
+		}
+
+		host := matches[1]
+		public := matches[2]
+		private := matches[3]
+		protocol := matches[4]
+
+		portList = append(portList, types.ContainerPort{
+			IP:          host,
+			PublicPort:  cast.ToUint(public),
+			PrivatePort: cast.ToUint(private),
+			Type:        protocol,
+		})
+	}
+
+	return portList
 }

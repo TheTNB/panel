@@ -6,7 +6,6 @@ require (
 	github.com/bddjr/hlfhr v1.1.2
 	github.com/beevik/ntp v1.4.3
 	github.com/docker/docker v27.3.1+incompatible
-	github.com/docker/go-connections v0.5.0
 	github.com/expr-lang/expr v1.16.9
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
@@ -63,6 +62,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/devhaozi/huaweicloud-sdk-go-v3 v0.0.0-20241018211007-bbebb6de5db7 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
+	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

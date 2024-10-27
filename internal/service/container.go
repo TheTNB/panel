@@ -2,8 +2,6 @@ package service
 
 import (
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/go-rat/chix"
 
@@ -31,21 +29,16 @@ func (s *ContainerService) List(w http.ResponseWriter, r *http.Request) {
 	paged, total := Paginate(r, containers)
 	items := make([]any, 0)
 	for _, item := range paged {
-		var name string
-		if len(item.Names) > 0 {
-			name = item.Names[0]
-		}
 		items = append(items, map[string]any{
-			"id":       item.ID,
-			"name":     strings.TrimLeft(name, "/"),
-			"image":    item.Image,
-			"image_id": item.ImageID,
-			"command":  item.Command,
-			"created":  time.Unix(item.Created, 0).Format(time.DateTime),
-			"ports":    item.Ports,
-			"labels":   item.Labels,
-			"state":    item.State,
-			"status":   item.Status,
+			"id":         item.ID,
+			"name":       item.Name,
+			"image":      item.Image,
+			"command":    item.Command,
+			"created_at": item.CreatedAt,
+			"ports":      item.Ports,
+			"labels":     item.Labels,
+			"state":      item.State,
+			"status":     item.Status,
 		})
 	}
 
@@ -56,8 +49,7 @@ func (s *ContainerService) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ContainerService) Search(w http.ResponseWriter, r *http.Request) {
-	name := strings.Fields(r.FormValue("name"))
-	containers, err := s.containerRepo.ListByNames(name)
+	containers, err := s.containerRepo.ListByName(r.FormValue("name"))
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
