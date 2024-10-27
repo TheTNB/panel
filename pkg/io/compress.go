@@ -30,21 +30,18 @@ func Compress(dir string, src []string, dst string) error {
 	for i, s := range src {
 		if strings.HasPrefix(s, dir) {
 			s = strings.TrimPrefix(s, dir)
-			src[i] = strings.TrimPrefix(s, "/")
-		}
-		if src[i] == "" {
-			src[i] = "."
+			if s != "" && s[0] == '/' {
+				src[i] = strings.TrimPrefix(s, "/")
+			}
 		}
 	}
-
-	cmd := new(exec.Cmd)
-	cmd.Dir = dir
 
 	format, err := formatArchiveByPath(dst)
 	if err != nil {
 		return err
 	}
 
+	cmd := new(exec.Cmd)
 	switch format {
 	case Zip:
 		cmd = exec.Command("zip", append([]string{"-qr", "-o", dst}, src...)...)
@@ -62,6 +59,7 @@ func Compress(dir string, src []string, dst string) error {
 		return errors.New("unsupported format")
 	}
 
+	cmd.Dir = dir
 	return cmd.Run()
 }
 

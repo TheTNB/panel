@@ -464,7 +464,7 @@ func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error 
 	fmt.Println("|-备份类型：网站")
 	fmt.Printf("|-备份目标：%s\n", cmd.String("name"))
 	if err := s.backupRepo.Create(biz.BackupTypeWebsite, cmd.String("name"), cmd.String("path")); err != nil {
-		return fmt.Errorf("|-备份失败：%v", err)
+		return fmt.Errorf("备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
 	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
@@ -480,7 +480,7 @@ func (s *CliService) BackupDatabase(ctx context.Context, cmd *cli.Command) error
 	fmt.Printf("|-数据库：%s\n", cmd.String("type"))
 	fmt.Printf("|-备份目标：%s\n", cmd.String("name"))
 	if err := s.backupRepo.Create(biz.BackupType(cmd.String("type")), cmd.String("name"), cmd.String("path")); err != nil {
-		return fmt.Errorf("|-备份失败：%v", err)
+		return fmt.Errorf("备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
 	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
@@ -494,7 +494,7 @@ func (s *CliService) BackupPanel(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println(s.hr)
 	fmt.Println("|-备份类型：面板")
 	if err := s.backupRepo.Create(biz.BackupTypePanel, "", cmd.String("path")); err != nil {
-		return fmt.Errorf("|-备份失败：%v", err)
+		return fmt.Errorf("备份失败：%v", err)
 	}
 	fmt.Println(s.hr)
 	fmt.Printf("☆ 备份成功 [%s]\n", time.Now().Format(time.DateTime))
@@ -518,7 +518,7 @@ func (s *CliService) BackupClear(ctx context.Context, cmd *cli.Command) error {
 	fmt.Printf("|-清理目标：%s\n", cmd.String("file"))
 	fmt.Printf("|-保留份数：%d\n", cmd.Int("save"))
 	if err = s.backupRepo.ClearExpired(path, cmd.String("file"), int(cmd.Int("save"))); err != nil {
-		return fmt.Errorf("|-清理失败：%v", err)
+		return fmt.Errorf("清理失败：%v", err)
 	}
 	fmt.Println(s.hr)
 	fmt.Printf("☆ 清理成功 [%s]\n", time.Now().Format(time.DateTime))
