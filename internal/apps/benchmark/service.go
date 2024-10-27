@@ -2,6 +2,7 @@ package benchmark
 
 import (
 	"bytes"
+	"compress/gzip"
 	"crypto/aes"
 	"crypto/cipher"
 	cryptorand "crypto/rand"
@@ -19,8 +20,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/klauspost/compress/zstd"
 
 	"github.com/TheTNB/panel/internal/service"
 )
@@ -351,9 +350,9 @@ func (s *Service) compressionTestTask(numThreads int) {
 				end = len(data)
 			}
 			var buf bytes.Buffer
-			zw, _ := zstd.NewWriter(&buf)
-			_, _ = zw.Write(data[start:end])
-			_ = zw.Close()
+			w := gzip.NewWriter(&buf)
+			_, _ = w.Write(data[start:end])
+			_ = w.Close()
 			compressedChunks[i] = buf
 		}(i)
 	}
@@ -365,15 +364,15 @@ func (s *Service) compressionTestTask(numThreads int) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			zr, err := zstd.NewReader(&compressedChunks[i])
+			r, err := gzip.NewReader(&compressedChunks[i])
 			if err != nil {
 				return
 			}
-			_, err = io.Copy(io.Discard, zr)
+			_, err = io.Copy(io.Discard, r)
 			if err != nil {
 				return
 			}
-			zr.Close()
+			_ = r.Close()
 		}(i)
 	}
 
