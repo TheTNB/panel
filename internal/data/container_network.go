@@ -1,104 +1,131 @@
 package data
 
 import (
-	"context"
+	"encoding/json"
+	"fmt"
+	"strings"
+	"time"
 
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/client"
+	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
 type containerNetworkRepo struct {
-	client *client.Client
+	cmd string
 }
 
-func NewContainerNetworkRepo(sock ...string) biz.ContainerNetworkRepo {
-	if len(sock) == 0 {
-		sock = append(sock, "/run/podman/podman.sock")
+func NewContainerNetworkRepo(cmd ...string) biz.ContainerNetworkRepo {
+	if len(cmd) == 0 {
+		cmd = append(cmd, "docker")
 	}
-	cli, _ := client.NewClientWithOpts(client.WithHost("unix://"+sock[0]), client.WithAPIVersionNegotiation())
 	return &containerNetworkRepo{
-		client: cli,
+		cmd: cmd[0],
 	}
 }
 
 // List 列出网络
-func (r *containerNetworkRepo) List() ([]network.Inspect, error) {
-	return r.client.NetworkList(context.Background(), network.ListOptions{})
+func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
+	output, err := shell.ExecfWithTimeout(10*time.Second, "%s network ls --format json", r.cmd)
+	if err != nil {
+		return nil, err
+	}
+	lines := strings.Split(output, "\n")
+
+	var networks []types.ContainerNetwork
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+
+		var item struct {
+			CreatedAt string `json:"CreatedAt"`
+			Driver    string `json:"Driver"`
+			ID        string `json:"ID"`
+			IPv6      string `json:"IPv6"`
+			Internal  string `json:"Internal"`
+			Labels    string `json:"Labels"`
+			Name      string `json:"Name"`
+			Scope     string `json:"Scope"`
+		}
+		if err = json.Unmarshal([]byte(line), &item); err != nil {
+			return nil, fmt.Errorf("unmarshal failed: %w", err)
+		}
+
+		output, err = shell.ExecfWithTimeout(10*time.Second, "%s network inspect %s", r.cmd, item.ID)
+		if err != nil {
+			return nil, fmt.Errorf("inspect failed: %w", err)
+		}
+		var inspect []types.ContainerNetworkInspect
+		if err = json.Unmarshal([]byte(output), &inspect); err != nil {
+			return nil, fmt.Errorf("unmarshal inspect failed: %w", err)
+		}
+		if len(inspect) == 0 {
+			return nil, fmt.Errorf("inspect empty")
+		}
+
+		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
+		networks = append(networks, types.ContainerNetwork{
+			ID:         item.ID,
+			Name:       item.Name,
+			Driver:     item.Driver,
+			IPv6:       cast.ToBool(item.IPv6),
+			Internal:   cast.ToBool(item.Internal),
+			Attachable: cast.ToBool(inspect[0].Attachable),
+			Ingress:    cast.ToBool(inspect[0].Ingress),
+			Scope:      item.Scope,
+			CreatedAt:  createdAt,
+			IPAM:       inspect[0].IPAM,
+			Options:    types.MapToKV(inspect[0].Options),
+			Labels:     types.SliceToKV(strings.Split(item.Labels, ",")),
+		})
+	}
+
+	return networks, nil
 }
 
 // Create 创建网络
 func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (string, error) {
-	var ipamConfigs []network.IPAMConfig
-	if req.Ipv4.Enabled {
-		ipamConfigs = append(ipamConfigs, network.IPAMConfig{
-			Subnet:  req.Ipv4.Subnet,
-			Gateway: req.Ipv4.Gateway,
-			IPRange: req.Ipv4.IPRange,
-		})
-	}
-	if req.Ipv6.Enabled {
-		ipamConfigs = append(ipamConfigs, network.IPAMConfig{
-			Subnet:  req.Ipv6.Subnet,
-			Gateway: req.Ipv6.Gateway,
-			IPRange: req.Ipv6.IPRange,
-		})
-	}
+	var sb strings.Builder
 
-	options := network.CreateOptions{
-		EnableIPv6: &req.Ipv6.Enabled,
-		Driver:     req.Driver,
-		Options:    types.KVToMap(req.Options),
-		Labels:     types.KVToMap(req.Labels),
-	}
-	if len(ipamConfigs) > 0 {
-		options.IPAM = &network.IPAM{
-			Config: ipamConfigs,
+	sb.WriteString(fmt.Sprintf("%s network create --driver %s", r.cmd, req.Driver))
+	sb.WriteString(fmt.Sprintf(" %s", req.Name))
+
+	if req.Ipv4.Enabled {
+		sb.WriteString(fmt.Sprintf(" --subnet %s", req.Ipv4.Subnet))
+		sb.WriteString(fmt.Sprintf(" --gateway %s", req.Ipv4.Gateway))
+		if req.Ipv4.IPRange != "" {
+			sb.WriteString(fmt.Sprintf(" --ip-range %s", req.Ipv4.IPRange))
 		}
 	}
+	if req.Ipv6.Enabled {
+		sb.WriteString(fmt.Sprintf(" --subnet %s", req.Ipv6.Subnet))
+		sb.WriteString(fmt.Sprintf(" --gateway %s", req.Ipv6.Gateway))
+		if req.Ipv6.IPRange != "" {
+			sb.WriteString(fmt.Sprintf(" --ip-range %s", req.Ipv6.IPRange))
+		}
+	}
+	for _, label := range req.Labels {
+		sb.WriteString(fmt.Sprintf(" --label %s=%s", label.Key, label.Value))
+	}
+	for _, option := range req.Options {
+		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
+	}
 
-	resp, err := r.client.NetworkCreate(context.Background(), req.Name, options)
-	return resp.ID, err
+	return shell.ExecfWithTimeout(10*time.Second, "%s", sb.String()) // nolint: govet
 }
 
 // Remove 删除网络
 func (r *containerNetworkRepo) Remove(id string) error {
-	return r.client.NetworkRemove(context.Background(), id)
-}
-
-// Exist 判断网络是否存在
-func (r *containerNetworkRepo) Exist(name string) (bool, error) {
-	var options network.ListOptions
-	options.Filters = filters.NewArgs(filters.Arg("name", name))
-	networks, err := r.client.NetworkList(context.Background(), options)
-	if err != nil {
-		return false, err
-	}
-
-	return len(networks) > 0, nil
-}
-
-// Inspect 查看网络
-func (r *containerNetworkRepo) Inspect(id string) (network.Inspect, error) {
-	return r.client.NetworkInspect(context.Background(), id, network.InspectOptions{})
-}
-
-// Connect 连接网络
-func (r *containerNetworkRepo) Connect(networkID string, containerID string) error {
-	return r.client.NetworkConnect(context.Background(), networkID, containerID, nil)
-}
-
-// Disconnect 断开网络
-func (r *containerNetworkRepo) Disconnect(networkID string, containerID string) error {
-	return r.client.NetworkDisconnect(context.Background(), networkID, containerID, true)
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network rm %s", r.cmd, id)
+	return err
 }
 
 // Prune 清理未使用的网络
 func (r *containerNetworkRepo) Prune() error {
-	_, err := r.client.NetworksPrune(context.Background(), filters.NewArgs())
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network prune -f", r.cmd)
 	return err
 }

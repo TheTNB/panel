@@ -29,7 +29,7 @@ func NewContainerImageRepo(cmd ...string) biz.ContainerImageRepo {
 
 // List 列出镜像
 func (r *containerImageRepo) List() ([]types.ContainerImage, error) {
-	output, err := shell.ExecfWithTimeout(10*time.Second, "%s images -a --format '{{json .}}'", r.cmd)
+	output, err := shell.ExecfWithTimeout(10*time.Second, "%s images -a --format json", r.cmd)
 	if err != nil {
 		return nil, err
 	}
