@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/go-rat/utils/hash"
-	"github.com/goccy/go-yaml"
 	"github.com/spf13/cast"
 	"github.com/urfave/cli/v3"
+	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -237,18 +237,17 @@ func (s *CliService) UserPassword(ctx context.Context, cmd *cli.Command) error {
 
 func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.HTTP.TLS = true
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
@@ -263,18 +262,17 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 
 func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.HTTP.TLS = false
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
@@ -320,18 +318,17 @@ func (s *CliService) HTTPSGenerate(ctx context.Context, cmd *cli.Command) error 
 
 func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.HTTP.Entrance = "/" + str.RandomString(6)
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
@@ -347,18 +344,17 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 
 func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.HTTP.Entrance = "/"
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
@@ -378,18 +374,17 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.HTTP.Port = port
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
@@ -776,19 +771,18 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
 	}
 
 	config.App.Key = str.RandomString(32)
 	config.HTTP.Entrance = "/" + str.RandomString(6)
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}

@@ -8,8 +8,8 @@ import (
 	"slices"
 
 	"github.com/go-rat/utils/hash"
-	"github.com/goccy/go-yaml"
 	"github.com/spf13/cast"
+	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -194,12 +194,11 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 
 	// 面板主配置
 	config := new(types.PanelConfig)
-	cm := yaml.CommentMap{}
 	raw, err := io.Read("/usr/local/etc/panel/config.yml")
 	if err != nil {
 		return false, err
 	}
-	if err = yaml.UnmarshalWithOptions([]byte(raw), config, yaml.CommentToMap(cm)); err != nil {
+	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return false, err
 	}
 
@@ -221,7 +220,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 		return false, err
 	}
 
-	encoded, err := yaml.MarshalWithOptions(config, yaml.WithComment(cm))
+	encoded, err := yaml.Marshal(config)
 	if err != nil {
 		return false, err
 	}
