@@ -1,5 +1,3 @@
-# 警告：未经指导私自修改此配置文件可能导致严重后果
-# Warning: Modifying this configuration file without guidance may cause serious consequences
 app:
   debug: false
   key: a-long-string-with-32-characters
