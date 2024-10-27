@@ -126,6 +126,28 @@ func ExecfWithPipe(ctx context.Context, shell string, args ...any) (out io.ReadC
 	return
 }
 
+// ExecfWithDir 在指定目录下执行 shell 命令
+func ExecfWithDir(dir, shell string, args ...any) (string, error) {
+	if !preCheckArg(args) {
+		return "", errors.New("command contains illegal characters")
+	}
+
+	_ = os.Setenv("LC_ALL", "C")
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(shell, args...))
+	cmd.Dir = dir
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return strings.TrimSpace(stdout.String()), errors.New(strings.TrimSpace(stderr.String()))
+	}
+
+	return strings.TrimSpace(stdout.String()), err
+}
+
 func preCheckArg(args []any) bool {
 	illegals := []any{`&`, `|`, `;`, `$`, `'`, `"`, "`", `(`, `)`, "\n", "\r", `>`, `<`}
 	for arg := range slices.Values(args) {

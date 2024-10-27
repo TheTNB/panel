@@ -2,7 +2,7 @@ package io
 
 import (
 	"errors"
-	"os/exec"
+	"github.com/TheTNB/panel/pkg/shell"
 	"path/filepath"
 	"strings"
 )
@@ -41,26 +41,24 @@ func Compress(dir string, src []string, dst string) error {
 		return err
 	}
 
-	cmd := new(exec.Cmd)
 	switch format {
 	case Zip:
-		cmd = exec.Command("zip", append([]string{"-qr", "-o", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "zip -qr -o %s %s", dst, strings.Join(src, " "))
 	case TGz:
-		cmd = exec.Command("tar", append([]string{"-czf", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "tar -czf %s %s", dst, strings.Join(src, " "))
 	case Bz2:
-		cmd = exec.Command("tar", append([]string{"-cjf", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "tar -cjf %s %s", dst, strings.Join(src, " "))
 	case Tar:
-		cmd = exec.Command("tar", append([]string{"-cf", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "tar -cf %s %s", dst, strings.Join(src, " "))
 	case Xz:
-		cmd = exec.Command("tar", append([]string{"-cJf", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "tar -cJf %s %s", dst, strings.Join(src, " "))
 	case SevenZip:
-		cmd = exec.Command("7z", append([]string{"a", "-y", dst}, src...)...)
+		_, err = shell.ExecfWithDir(dir, "7z a -y %s %s", dst, strings.Join(src, " "))
 	default:
 		return errors.New("unsupported format")
 	}
 
-	cmd.Dir = dir
-	return cmd.Run()
+	return err
 }
 
 // UnCompress 解压文件
@@ -79,25 +77,24 @@ func UnCompress(src string, dst string) error {
 		return err
 	}
 
-	var cmd *exec.Cmd
 	switch format {
 	case Zip:
-		cmd = exec.Command("unzip", "-qo", src, "-d", dst)
+		_, err = shell.Execf("unzip -qo '%s' -d '%s'", src, dst)
 	case TGz:
-		cmd = exec.Command("tar", "-xzf", src, "-C", dst)
+		_, err = shell.Execf("tar -xzf '%s' -C '%s'", src, dst)
 	case Bz2:
-		cmd = exec.Command("tar", "-xjf", src, "-C", dst)
+		_, err = shell.Execf("tar -xjf '%s' -C '%s'", src, dst)
 	case Tar:
-		cmd = exec.Command("tar", "-xf", src, "-C", dst)
+		_, err = shell.Execf("tar -xf '%s' -C '%s'", src, dst)
 	case Xz:
-		cmd = exec.Command("tar", "-xJf", src, "-C", dst)
+		_, err = shell.Execf("tar -xJf '%s' -C '%s'", src, dst)
 	case SevenZip:
-		cmd = exec.Command("7z", "x", "-y", src, "-o"+dst)
+		_, err = shell.Execf("7z x -y '%s' -o'%s'", src, dst)
 	default:
 		return errors.New("unsupported format")
 	}
 
-	return cmd.Run()
+	return err
 }
 
 // formatArchiveByPath 根据文件后缀获取压缩格式

@@ -32,10 +32,12 @@ const getIconByExt = (ext: string) => {
     case 'ape':
       return 'bi:file-earmark-music'
     case 'zip':
-    case 'rar':
-    case '7z':
+    case 'bz2':
     case 'tar':
     case 'gz':
+    case 'tgz':
+    case 'xz':
+    case '7z':
       return 'bi:file-earmark-zip'
     case 'doc':
     case 'docx':
@@ -288,7 +290,7 @@ const getFilename = (path: string) => {
 
 const isCompress = (name: string) => {
   const ext = getExt(name)
-  return ['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)
+  return ['zip', 'bz2', 'tar', 'gz', 'tgz', 'xz', '7z'].includes(ext)
 }
 
 const formatPercent = (num: any) => {
