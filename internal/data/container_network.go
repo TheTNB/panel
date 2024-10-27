@@ -59,12 +59,45 @@ func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
 		if err != nil {
 			return nil, fmt.Errorf("inspect failed: %w", err)
 		}
-		var inspect []types.ContainerNetworkInspect
+		var inspect []struct {
+			Name       string    `json:"Name"`
+			Id         string    `json:"Id"`
+			Created    time.Time `json:"Created"`
+			Scope      string    `json:"Scope"`
+			Driver     string    `json:"Driver"`
+			EnableIPv6 bool      `json:"EnableIPv6"`
+			IPAM       struct {
+				Driver  string            `json:"Driver"`
+				Options map[string]string `json:"Options"`
+				Config  []struct {
+					Subnet     string            `json:"Subnet"`
+					IPRange    string            `json:"IPRange"`
+					Gateway    string            `json:"Gateway"`
+					AuxAddress map[string]string `json:"AuxiliaryAddresses"`
+				} `json:"Config"`
+			} `json:"IPAM"`
+			Internal   bool              `json:"Internal"`
+			Attachable bool              `json:"Attachable"`
+			Ingress    bool              `json:"Ingress"`
+			ConfigOnly bool              `json:"ConfigOnly"`
+			Options    map[string]string `json:"Options"`
+			Labels     map[string]string `json:"Labels"`
+		}
 		if err = json.Unmarshal([]byte(output), &inspect); err != nil {
 			return nil, fmt.Errorf("unmarshal inspect failed: %w", err)
 		}
 		if len(inspect) == 0 {
 			return nil, fmt.Errorf("inspect empty")
+		}
+
+		var ipamConfigs []types.ContainerNetworkIPAMConfig
+		for _, ipam := range inspect[0].IPAM.Config {
+			ipamConfigs = append(ipamConfigs, types.ContainerNetworkIPAMConfig{
+				Subnet:     ipam.Subnet,
+				IPRange:    ipam.IPRange,
+				Gateway:    ipam.Gateway,
+				AuxAddress: ipam.AuxAddress,
+			})
 		}
 
 		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
@@ -78,9 +111,13 @@ func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
 			Ingress:    cast.ToBool(inspect[0].Ingress),
 			Scope:      item.Scope,
 			CreatedAt:  createdAt,
-			IPAM:       inspect[0].IPAM,
-			Options:    types.MapToKV(inspect[0].Options),
-			Labels:     types.SliceToKV(strings.Split(item.Labels, ",")),
+			IPAM: types.ContainerNetworkIPAM{
+				Driver:  inspect[0].IPAM.Driver,
+				Options: types.MapToKV(inspect[0].IPAM.Options),
+				Config:  ipamConfigs,
+			},
+			Options: types.MapToKV(inspect[0].Options),
+			Labels:  types.SliceToKV(strings.Split(item.Labels, ",")),
 		})
 	}
 
@@ -120,7 +157,7 @@ func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (stri
 
 // Remove 删除网络
 func (r *containerNetworkRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network rm %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(10*time.Second, "%s network rm -f %s", r.cmd, id)
 	return err
 }
 

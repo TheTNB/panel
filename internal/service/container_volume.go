@@ -8,7 +8,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/str"
 )
 
 type ContainerVolumeService struct {
@@ -30,31 +29,9 @@ func (s *ContainerVolumeService) List(w http.ResponseWriter, r *http.Request) {
 
 	paged, total := Paginate(r, volumes)
 
-	items := make([]any, 0)
-	for _, item := range paged {
-		var usage any
-		if item.UsageData != nil {
-			usage = map[string]any{
-				"ref_count": item.UsageData.RefCount,
-				"size":      str.FormatBytes(float64(item.UsageData.Size)),
-			}
-		}
-		items = append(items, map[string]any{
-			"id":      item.Name,
-			"created": item.CreatedAt,
-			"driver":  item.Driver,
-			"mount":   item.Mountpoint,
-			"labels":  item.Labels,
-			"options": item.Options,
-			"scope":   item.Scope,
-			"status":  item.Status,
-			"usage":   usage,
-		})
-	}
-
 	Success(w, chix.M{
 		"total": total,
-		"items": items,
+		"items": paged,
 	})
 }
 
@@ -65,13 +42,13 @@ func (s *ContainerVolumeService) Create(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	volume, err := s.containerVolumeRepo.Create(req)
+	name, err := s.containerVolumeRepo.Create(req)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	Success(w, volume.Name)
+	Success(w, name)
 
 }
 
