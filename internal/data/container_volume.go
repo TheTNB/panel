@@ -1,88 +1,66 @@
 package data
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/types"
+	"github.com/TheTNB/panel/pkg/types/docker/volume"
 )
 
 type containerVolumeRepo struct {
-	cmd string
+	client *resty.Client
 }
 
-func NewContainerVolumeRepo(cmd ...string) biz.ContainerVolumeRepo {
-	if len(cmd) == 0 {
-		cmd = append(cmd, "docker")
+func NewContainerVolumeRepo(sock ...string) biz.ContainerVolumeRepo {
+	if len(sock) == 0 {
+		sock = append(sock, "/var/run/docker.sock")
 	}
+	client := resty.New()
+	client.SetTimeout(1 * time.Minute)
+	client.SetRetryCount(2)
+	client.SetTransport(&http.Transport{
+		DialContext: func(ctx context.Context, _ string, _ string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "unix", sock[0])
+		},
+	})
+	client.SetBaseURL("http://d/v1.40")
+
 	return &containerVolumeRepo{
-		cmd: cmd[0],
+		client: client,
 	}
 }
 
 // List 列出存储卷
 func (r *containerVolumeRepo) List() ([]types.ContainerVolume, error) {
-	output, err := shell.ExecfWithTimeout(10*time.Second, "%s volume ls --format json", r.cmd)
+	var resp volume.ListResponse
+	_, err := r.client.R().SetResult(&resp).Get("/volumes")
 	if err != nil {
 		return nil, err
 	}
-	lines := strings.Split(output, "\n")
 
 	var volumes []types.ContainerVolume
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-
-		var item struct {
-			Availability string `json:"Availability"`
-			Driver       string `json:"Driver"`
-			Group        string `json:"Group"`
-			Labels       string `json:"Labels"`
-			Links        string `json:"Links"`
-			Mountpoint   string `json:"Mountpoint"`
-			Name         string `json:"Name"`
-			Scope        string `json:"Scope"`
-			Size         string `json:"Size"`
-			Status       string `json:"Status"`
-		}
-		if err = json.Unmarshal([]byte(line), &item); err != nil {
-			return nil, fmt.Errorf("unmarshal failed: %w", err)
-		}
-
-		output, err = shell.ExecfWithTimeout(10*time.Second, "%s volume inspect %s", r.cmd, item.Name)
-		if err != nil {
-			return nil, fmt.Errorf("inspect failed: %w", err)
-		}
-		var inspect []struct {
-			CreatedAt  time.Time         `json:"CreatedAt"`
-			Driver     string            `json:"Driver"`
-			Labels     map[string]string `json:"Labels"`
-			Mountpoint string            `json:"Mountpoint"`
-			Name       string            `json:"Name"`
-			Options    map[string]string `json:"Options"`
-			Scope      string            `json:"Scope"`
-		}
-		if err = json.Unmarshal([]byte(output), &inspect); err != nil {
-			return nil, fmt.Errorf("unmarshal inspect failed: %w", err)
-		}
-		if len(inspect) == 0 {
-			return nil, fmt.Errorf("inspect empty")
-		}
-
+	for _, item := range resp.Volumes {
 		volumes = append(volumes, types.ContainerVolume{
 			Name:       item.Name,
 			Driver:     item.Driver,
 			Scope:      item.Scope,
 			MountPoint: item.Mountpoint,
-			CreatedAt:  inspect[0].CreatedAt,
-			Options:    types.MapToKV(inspect[0].Options),
-			Labels:     types.SliceToKV(strings.Split(item.Labels, ",")),
+			CreatedAt:  item.CreatedAt,
+			Labels:     types.MapToKV(item.Labels),
+			Options:    types.MapToKV(item.Options),
+			RefCount:   item.UsageData.RefCount,
+			Size:       str.FormatBytes(float64(item.UsageData.Size)),
 		})
 	}
 
@@ -91,17 +69,32 @@ func (r *containerVolumeRepo) List() ([]types.ContainerVolume, error) {
 
 // Create 创建存储卷
 func (r *containerVolumeRepo) Create(req *request.ContainerVolumeCreate) (string, error) {
-	return "", nil
+	var sb strings.Builder
+	sb.WriteString("docker volume create")
+	sb.WriteString(fmt.Sprintf(" %s", req.Name))
+
+	if req.Driver != "" {
+		sb.WriteString(fmt.Sprintf(" --driver %s", req.Driver))
+	}
+	for _, label := range req.Labels {
+		sb.WriteString(fmt.Sprintf(" --label %s=%s", label.Key, label.Value))
+	}
+
+	for _, option := range req.Options {
+		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
+	}
+
+	return shell.ExecfWithTimeout(30*time.Second, sb.String()) // nolint: govet
 }
 
 // Remove 删除存储卷
 func (r *containerVolumeRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s volume rm -f %s", r.cmd, id)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker volume rm -f %s", id)
 	return err
 }
 
 // Prune 清理未使用的存储卷
 func (r *containerVolumeRepo) Prune() error {
-	_, err := shell.ExecfWithTimeout(10*time.Second, "%s volume prune -f", r.cmd)
+	_, err := shell.ExecfWithTimeout(30*time.Second, "docker volume prune -f")
 	return err
 }

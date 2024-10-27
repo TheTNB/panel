@@ -34,7 +34,7 @@ func KVToMap(kvs []KV) map[string]string {
 
 // MapToKV 将 map 转换为 key-value 切片
 func MapToKV(m map[string]string) []KV {
-	var kvs []KV
+	kvs := make([]KV, 0)
 	for k, v := range m {
 		kvs = append(kvs, KV{Key: k, Value: v})
 	}
@@ -44,7 +44,7 @@ func MapToKV(m map[string]string) []KV {
 
 // KVToSlice 将 key-value 切片转换为 key=value 切片
 func KVToSlice(kvs []KV) []string {
-	var s []string
+	s := make([]string, 0)
 	for _, item := range kvs {
 		s = append(s, item.Key+"="+item.Value)
 	}
@@ -54,7 +54,7 @@ func KVToSlice(kvs []KV) []string {
 
 // SliceToKV 将 key=value 切片转换为 key-value 切片
 func SliceToKV(s []string) []KV {
-	var kvs []KV
+	kvs := make([]KV, 0)
 	for _, item := range s {
 		kv := strings.SplitN(item, "=", 2)
 		if len(kv) == 2 {

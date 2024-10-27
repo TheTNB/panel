@@ -19,9 +19,9 @@ type ContainerNetwork struct {
 
 // ContainerNetworkIPAM represents IP Address Management
 type ContainerNetworkIPAM struct {
-	Driver  string
-	Options []KV
-	Config  []ContainerNetworkIPAMConfig
+	Driver  string                       `json:"driver"`
+	Options []KV                         `json:"options"`
+	Config  []ContainerNetworkIPAMConfig `json:"config"`
 }
 
 // ContainerNetworkIPAMConfig represents IPAM configurations

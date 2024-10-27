@@ -2,6 +2,7 @@
 import { NButton, NDataTable, NInput, NPopconfirm } from 'naive-ui'
 
 import container from '@/api/panel/container'
+import { formatDateTime } from '@/utils'
 import type { VolumeList } from '@/views/container/types'
 
 const createModel = ref({
@@ -27,7 +28,7 @@ const columns: any = [
   { type: 'selection', fixed: 'left' },
   {
     title: '名称',
-    key: 'id',
+    key: 'name',
     minWidth: 150,
     resizable: true,
     ellipsis: { tooltip: true }
@@ -48,17 +49,19 @@ const columns: any = [
   },
   {
     title: '挂载点',
-    key: 'mount',
+    key: 'mount_point',
     resizable: true,
     minWidth: 150,
     ellipsis: { tooltip: true }
   },
   {
     title: '创建时间',
-    key: 'created',
+    key: 'created_at',
     width: 200,
     resizable: true,
-    ellipsis: { tooltip: true }
+    render(row: any) {
+      return formatDateTime(row.created_at)
+    }
   },
   {
     title: '操作',
