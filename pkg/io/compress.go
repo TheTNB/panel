@@ -22,6 +22,9 @@ const (
 
 // Compress 压缩文件
 func Compress(dir string, src []string, dst string) error {
+	if !filepath.IsAbs(dir) || !filepath.IsAbs(dst) {
+		return errors.New("dir and dst must be absolute path")
+	}
 	if len(src) == 0 {
 		src = append(src, ".")
 	}
@@ -72,6 +75,10 @@ func Compress(dir string, src []string, dst string) error {
 
 // UnCompress 解压文件
 func UnCompress(src string, dst string) error {
+	if !filepath.IsAbs(src) || !filepath.IsAbs(dst) {
+		return errors.New("src and dst must be absolute path")
+	}
+
 	var cmd *exec.Cmd
 
 	format, err := formatArchiveByPath(src)

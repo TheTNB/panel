@@ -53,27 +53,31 @@ func (s *IOTestSuite) TestWriteAppendAppendsToFile() {
 }
 
 func (s *IOTestSuite) TestCompress() {
-	src := []string{"testdata/compress_test1.txt", "testdata/compress_test2.txt"}
+	src := []string{"compress_test1.txt", "compress_test2.txt"}
 	err := Write(src[0], "File 1", 0644)
 	s.NoError(err)
 	err = Write(src[1], "File 2", 0644)
 	s.NoError(err)
 
-	err = Compress("testdata", src, "testdata/compress_test.zip")
+	abs, err := filepath.Abs("testdata")
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "compress_test.zip"))
 	s.NoError(err)
 }
 
 func (s *IOTestSuite) TestUnCompress() {
-	src := []string{"testdata/uncompress_test1.txt", "testdata/uncompress_test2.txt"}
+	src := []string{"compress_test1.txt", "compress_test2.txt"}
 	err := Write(src[0], "File 1", 0644)
 	s.NoError(err)
 	err = Write(src[1], "File 2", 0644)
 	s.NoError(err)
 
-	err = Compress("testdata", src, "testdata/uncompress_test.zip")
+	abs, err := filepath.Abs("testdata")
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "compress_test.zip"))
 	s.NoError(err)
 
-	err = UnCompress("testdata/uncompress_test.zip", "testdata/uncompressed")
+	err = UnCompress(filepath.Join(abs, "compress_test.zip"), filepath.Join(abs, "uncompressed"))
 	s.NoError(err)
 
 	data, err := Read("testdata/uncompressed/uncompress_test1.txt")
