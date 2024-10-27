@@ -1,6 +1,7 @@
 package io
 
 import (
+	"github.com/go-rat/utils/debug"
 	"os"
 	"path/filepath"
 	"testing"
@@ -80,6 +81,9 @@ func (s *IOTestSuite) TestUnCompress() {
 	err = UnCompress(filepath.Join(abs, "compress_test.zip"), filepath.Join(abs, "uncompressed"))
 	s.NoError(err)
 
+	debug.Dump(ReadDir("testdata"))
+	debug.Dump(ReadDir(abs))
+	debug.Dump(ReadDir(filepath.Join(abs, "uncompressed")))
 	data, err := Read("testdata/uncompressed/uncompress_test1.txt")
 	s.NoError(err)
 	s.Equal("File 1", data)
