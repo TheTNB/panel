@@ -67,7 +67,7 @@ func (s *IOTestSuite) TestCompress() {
 }
 
 func (s *IOTestSuite) TestUnCompress() {
-	src := []string{"compress_test1.txt", "compress_test2.txt"}
+	src := []string{"uncompress_test1.txt", "uncompress_test2.txt"}
 	err := Write(src[0], "File 1", 0644)
 	s.NoError(err)
 	err = Write(src[1], "File 2", 0644)
@@ -75,10 +75,10 @@ func (s *IOTestSuite) TestUnCompress() {
 
 	abs, err := filepath.Abs("testdata")
 	s.NoError(err)
-	err = Compress(abs, src, filepath.Join(abs, "compress_test.zip"))
+	err = Compress(abs, src, filepath.Join(abs, "uncompress_test.zip"))
 	s.NoError(err)
 
-	err = UnCompress(filepath.Join(abs, "compress_test.zip"), filepath.Join(abs, "uncompressed"))
+	err = UnCompress(filepath.Join(abs, "uncompress_test.zip"), filepath.Join(abs, "uncompressed"))
 	s.NoError(err)
 
 	debug.Dump(ReadDir("testdata"))
