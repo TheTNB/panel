@@ -14,10 +14,3 @@ type IPAMConfig struct {
 	Gateway    string            `json:",omitempty"`
 	AuxAddress map[string]string `json:"AuxiliaryAddresses,omitempty"`
 }
-
-type ipFamily string
-
-const (
-	ip4 ipFamily = "IPv4"
-	ip6 ipFamily = "IPv6"
-)
