@@ -109,7 +109,7 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 		return nil, err
 	}
 
-	cert, err := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
+	crt, err := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 		Email:       user.Email,
 		Port:        app.Conf.Int("http.port"),
 		HTTPS:       app.Conf.Bool("http.tls"),
-		Cert:        cert,
+		Cert:        crt,
 		Key:         key,
 	}, nil
 }
@@ -297,7 +297,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 		}
 		return fmt.Errorf("备份面板失败：%w", err)
 	}
-	if err := io.Compress([]string{filepath.Join(app.Root, "panel/storage")}, "/tmp/panel-storage.zip", io.Zip); err != nil {
+	if err := io.Compress(filepath.Join(app.Root, "panel/storage"), nil, "/tmp/panel-storage.zip"); err != nil {
 		if app.IsCli {
 			fmt.Println("|-备份面板数据失败：", err)
 		}
@@ -317,7 +317,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if app.IsCli {
 		fmt.Println("|-解压新版本...")
 	}
-	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel")); err != nil {
 		return fmt.Errorf("解压失败：%w", err)
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
@@ -327,7 +327,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if app.IsCli {
 		fmt.Println("|-恢复面板数据...")
 	}
-	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel")); err != nil {
 		return fmt.Errorf("恢复面板数据失败：%w", err)
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
@@ -428,7 +428,7 @@ func (r *settingRepo) FixPanel() error {
 	if err = io.Remove("/tmp/panel-fix"); err != nil {
 		return fmt.Errorf("清理临时目录失败：%w", err)
 	}
-	if err = io.UnCompress(latest.Path, "/tmp/panel-fix", io.Zip); err != nil {
+	if err = io.UnCompress(latest.Path, "/tmp/panel-fix"); err != nil {
 		return fmt.Errorf("解压备份文件失败：%w", err)
 	}
 
@@ -460,7 +460,7 @@ func (r *settingRepo) FixPanel() error {
 		fmt.Println("|-恢复面板数据...")
 	}
 	if io.Exists("/tmp/panel-storage.zip") {
-		if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel"), io.Zip); err != nil {
+		if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel")); err != nil {
 			return fmt.Errorf("恢复面板数据失败：%w", err)
 		}
 		if err = io.Remove("/tmp/panel-storage.zip"); err != nil {

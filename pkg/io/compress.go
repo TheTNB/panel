@@ -20,20 +20,24 @@ const (
 )
 
 // Compress 压缩文件
-func Compress(src []string, dst string, format FormatArchive) error {
+func Compress(dir string, src []string, dst string) error {
 	if len(src) == 0 {
-		return errors.New("source is empty")
+		src = append(src, ".")
+	}
+	// 去掉路径前缀，减少压缩包内文件夹层级
+	for i, s := range src {
+		src[i] = strings.TrimPrefix(s, dir)
+		if src[i] == "" {
+			src[i] = "."
+		}
 	}
 
 	cmd := new(exec.Cmd)
-	cmd.Dir = filepath.Dir(src[0])
+	cmd.Dir = dir
 
-	// 取相对路径，避免压缩包内多一层目录
-	for i, item := range src {
-		if !strings.HasPrefix(item, cmd.Dir) {
-			continue
-		}
-		src[i] = filepath.Base(item)
+	format, err := formatArchiveByPath(dst)
+	if err != nil {
+		return err
 	}
 
 	switch format {
@@ -59,8 +63,13 @@ func Compress(src []string, dst string, format FormatArchive) error {
 }
 
 // UnCompress 解压文件
-func UnCompress(src string, dst string, format FormatArchive) error {
+func UnCompress(src string, dst string) error {
 	var cmd *exec.Cmd
+
+	format, err := formatArchiveByPath(src)
+	if err != nil {
+		return err
+	}
 
 	switch format {
 	case Zip:
@@ -76,7 +85,7 @@ func UnCompress(src string, dst string, format FormatArchive) error {
 	case Xz:
 		cmd = exec.Command("tar", "-xJf", src, "-C", dst)
 	case SevenZip:
-		cmd = exec.Command("7z", "x", "-y", src, "-o", dst)
+		cmd = exec.Command("7z", "x", "-y", src, "-o"+dst)
 	default:
 		return errors.New("unsupported format")
 	}
@@ -84,8 +93,8 @@ func UnCompress(src string, dst string, format FormatArchive) error {
 	return cmd.Run()
 }
 
-// FormatArchiveByPath 根据文件后缀获取压缩格式
-func FormatArchiveByPath(path string) (FormatArchive, error) {
+// formatArchiveByPath 根据文件后缀获取压缩格式
+func formatArchiveByPath(path string) (FormatArchive, error) {
 	switch filepath.Ext(path) {
 	case ".zip":
 		return Zip, nil
