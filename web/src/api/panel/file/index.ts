@@ -45,8 +45,8 @@ export default {
     group: string
   ): Promise<AxiosResponse<any>> => request.post('/file/permission', { path, mode, owner, group }),
   // 压缩文件
-  compress: (paths: string[], file: string): Promise<AxiosResponse<any>> =>
-    request.post('/file/compress', { paths, file }),
+  compress: (dir: string, paths: string[], file: string): Promise<AxiosResponse<any>> =>
+    request.post('/file/compress', { dir, paths, file }),
   // 解压文件
   unCompress: (file: string, path: string): Promise<AxiosResponse<any>> =>
     request.post('/file/unCompress', { file, path }),

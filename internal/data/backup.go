@@ -134,7 +134,7 @@ func (r *backupRepo) CutoffLog(path, target string) error {
 	}
 
 	to := filepath.Join(path, fmt.Sprintf("%s_%s.zip", time.Now().Format("20060102150405"), filepath.Base(target)))
-	if err := io.Compress(filepath.Dir(target), []string{target}, to); err != nil {
+	if err := io.Compress(filepath.Dir(target), []string{filepath.Base(target)}, to); err != nil {
 		return err
 	}
 
@@ -272,7 +272,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 		return err
 	}
 
-	if err = io.Compress(filepath.Dir(backup), []string{backup}, backup+".zip"); err != nil {
+	if err = io.Compress(filepath.Dir(backup), []string{filepath.Base(backup)}, backup+".zip"); err != nil {
 		return err
 	}
 	if err = io.Remove(backup); err != nil {
@@ -309,7 +309,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
-	if err = io.Compress(filepath.Dir(backup), []string{backup}, backup+".zip"); err != nil {
+	if err = io.Compress(filepath.Dir(backup), []string{filepath.Base(backup)}, backup+".zip"); err != nil {
 		return err
 	}
 	if err = io.Remove(backup); err != nil {
