@@ -327,7 +327,7 @@ func (r *settingRepo) UpdatePanel(version, url, checksum string) error {
 	if app.IsCli {
 		fmt.Println("|-恢复面板数据...")
 	}
-	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel")); err != nil {
+	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel", "storage")); err != nil {
 		return fmt.Errorf("恢复面板数据失败：%w", err)
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
@@ -455,7 +455,7 @@ func (r *settingRepo) FixPanel() error {
 		}
 	}
 
-	// tmp目录下如果有storage备份，则解压回去
+	// tmp 目录下如果有 storage 备份，则解压回去
 	if app.IsCli {
 		fmt.Println("|-恢复面板数据...")
 	}

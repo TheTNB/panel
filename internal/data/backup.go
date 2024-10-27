@@ -332,14 +332,28 @@ func (r *backupRepo) createPanel(to string) error {
 	}
 
 	start := time.Now()
-	if err := io.Compress(filepath.Dir(filepath.Join(app.Root, "panel")), []string{
-		".",
-		"/usr/local/sbin/panel-cli",
-		"/usr/local/etc/panel/config.yml",
-	}, backup); err != nil {
+
+	temp, err := io.TempDir("panel-backup")
+	if err != nil {
 		return err
 	}
-	if err := io.Chmod(backup, 0600); err != nil {
+	defer io.Remove(temp)
+
+	if err = io.Cp(filepath.Join(app.Root, "panel"), temp); err != nil {
+		return err
+	}
+	if err = io.Cp("/usr/local/sbin/panel-cli", temp); err != nil {
+		return err
+	}
+	if err = io.Cp("/usr/local/etc/panel/config.yml", temp); err != nil {
+		return err
+	}
+
+	_ = io.Chmod(temp, 0600)
+	if err = io.Compress(temp, nil, backup); err != nil {
+		return err
+	}
+	if err = io.Chmod(backup, 0600); err != nil {
 		return err
 	}
 

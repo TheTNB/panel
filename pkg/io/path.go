@@ -3,7 +3,6 @@ package io
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -52,79 +51,14 @@ func Empty(path string) bool {
 }
 
 func Mv(src, dst string) error {
-	if err := os.Rename(src, dst); err != nil {
-		// 在不同的文件系统中无法使用 os.Rename
-		if _, err = shell.Execf(`mv -f '%s' '%s'`, src, dst); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	_, err := shell.Execf(`mv -f '%s' '%s'`, src, dst)
+	return err
 }
 
 // Cp 复制文件或目录
 func Cp(src, dst string) error {
-	srcInfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	if srcInfo.IsDir() {
-		return copyDir(src, dst)
-	}
-	return copyFile(src, dst)
-}
-
-func copyFile(src, dst string) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-
-	_, err = io.Copy(dstFile, srcFile)
+	_, err := shell.Execf(`cp -rf '%s' '%s'`, src, dst)
 	return err
-}
-
-func copyDir(src, dst string) error {
-	srcInfo, err := os.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	err = os.MkdirAll(dst, srcInfo.Mode())
-	if err != nil {
-		return err
-	}
-
-	entries, err := os.ReadDir(src)
-	if err != nil {
-		return err
-	}
-
-	for _, entry := range entries {
-		srcPath := filepath.Join(src, entry.Name())
-		dstPath := filepath.Join(dst, entry.Name())
-
-		if entry.IsDir() {
-			err = copyDir(srcPath, dstPath)
-			if err != nil {
-				return err
-			}
-		} else {
-			err = copyFile(srcPath, dstPath)
-			if err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 // Size 获取路径大小
