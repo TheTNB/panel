@@ -3,7 +3,7 @@ module github.com/TheTNB/panel
 go 1.23
 
 require (
-	github.com/bddjr/hlfhr v1.1.2
+	github.com/bddjr/hlfhr v1.1.3
 	github.com/beevik/ntp v1.4.3
 	github.com/expr-lang/expr v1.16.9
 	github.com/glebarez/sqlite v1.11.0
