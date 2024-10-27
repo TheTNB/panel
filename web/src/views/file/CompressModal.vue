@@ -30,8 +30,9 @@ const handleArchive = async () => {
   const message = window.$message.loading('正在压缩中...', {
     duration: 0
   })
+  const paths = selected.value.map((item) => item.replace(path.value, '').replace(/^\//, ''))
   await api
-    .compress(selected.value, file.value)
+    .compress(path.value, paths, file.value)
     .then(() => {
       window.$message.success('压缩成功')
       show.value = false

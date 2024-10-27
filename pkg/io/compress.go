@@ -26,15 +26,6 @@ func Compress(dir string, src []string, dst string) error {
 	if len(src) == 0 {
 		src = append(src, ".")
 	}
-	// 去掉路径前缀，减少压缩包内文件夹层级
-	for i, s := range src {
-		if strings.HasPrefix(s, dir) {
-			s = strings.TrimPrefix(s, dir)
-			if s != "" && s[0] == '/' {
-				src[i] = strings.TrimPrefix(s, "/")
-			}
-		}
-	}
 
 	format, err := formatArchiveByPath(dst)
 	if err != nil {

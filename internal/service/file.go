@@ -317,7 +317,7 @@ func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Compress(filepath.Dir(req.Paths[0]), req.Paths, req.File); err != nil {
+	if err = io.Compress(req.Dir, req.Paths, req.File); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
