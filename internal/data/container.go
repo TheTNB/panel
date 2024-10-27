@@ -101,7 +101,7 @@ func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
 	sb.WriteString(fmt.Sprintf("%s create --name %s --image %s", r.cmd, req.Name, req.Image))
 
 	for _, port := range req.Ports {
-		sb.WriteString(fmt.Sprintf(" -p %s:%d", port.Host, port.ContainerStart))
+		sb.WriteString(fmt.Sprintf(" -p %s:%d-%d:%d-%d/%s", port.Host, port.HostStart, port.HostEnd, port.ContainerStart, port.ContainerEnd, port.Protocol))
 	}
 	if req.Network != "" {
 		sb.WriteString(fmt.Sprintf(" --network %s", req.Network))
@@ -248,10 +248,12 @@ func (r *containerRepo) parsePorts(ports string) []types.ContainerPort {
 		protocol := matches[4]
 
 		portList = append(portList, types.ContainerPort{
-			IP:          host,
-			PublicPort:  cast.ToUint(public),
-			PrivatePort: cast.ToUint(private),
-			Type:        protocol,
+			Host:           host,
+			HostStart:      cast.ToUint(public),
+			HostEnd:        cast.ToUint(public),
+			ContainerStart: cast.ToUint(private),
+			ContainerEnd:   cast.ToUint(private),
+			Protocol:       protocol,
 		})
 	}
 

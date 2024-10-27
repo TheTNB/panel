@@ -2,13 +2,6 @@ package types
 
 import "time"
 
-type ContainerPort struct {
-	IP          string `json:"ip,omitempty"`
-	PrivatePort uint   `json:"private_port"`
-	PublicPort  uint   `json:"public_port,omitempty"`
-	Type        string `json:"type"`
-}
-
 type Container struct {
 	ID        string          `json:"id"`
 	Name      string          `json:"name"`
@@ -22,12 +15,12 @@ type Container struct {
 	Status    string
 }
 
-type ContainerCreatePort struct {
-	ContainerStart int    `form:"container_start" json:"container_start"`
-	ContainerEnd   int    `form:"container_end" json:"container_end"`
+type ContainerPort struct {
+	ContainerStart uint   `form:"container_start" json:"container_start"`
+	ContainerEnd   uint   `form:"container_end" json:"container_end"`
 	Host           string `form:"host" json:"host"`
-	HostStart      int    `form:"host_start" json:"host_start"`
-	HostEnd        int    `form:"host_end" json:"host_end"`
+	HostStart      uint   `form:"host_start" json:"host_start"`
+	HostEnd        uint   `form:"host_end" json:"host_end"`
 	Protocol       string `form:"protocol" json:"protocol"`
 }
 
