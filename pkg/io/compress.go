@@ -2,6 +2,7 @@ package io
 
 import (
 	"errors"
+	"github.com/go-rat/utils/debug"
 	"os/exec"
 	"path/filepath"
 	"strings"
@@ -59,7 +60,10 @@ func Compress(dir string, src []string, dst string) error {
 		return errors.New("unsupported format")
 	}
 
-	return cmd.Run()
+	out, err := cmd.CombinedOutput()
+	debug.Dump(string(out))
+
+	return err
 }
 
 // UnCompress 解压文件
