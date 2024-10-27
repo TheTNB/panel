@@ -1,14 +1,13 @@
 package biz
 
 import (
-	"github.com/docker/docker/api/types/volume"
-
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/types"
 )
 
 type ContainerVolumeRepo interface {
-	List() ([]*volume.Volume, error)
-	Create(req *request.ContainerVolumeCreate) (volume.Volume, error)
+	List() ([]types.ContainerVolume, error)
+	Create(req *request.ContainerVolumeCreate) (string, error)
 	Remove(id string) error
 	Prune() error
 }
