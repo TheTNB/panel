@@ -1,15 +1,12 @@
 package service
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/go-rat/chix"
+	"net/http"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/str"
 )
 
 type ContainerImageService struct {
@@ -31,22 +28,9 @@ func (s *ContainerImageService) List(w http.ResponseWriter, r *http.Request) {
 
 	paged, total := Paginate(r, images)
 
-	items := make([]any, 0)
-	for _, item := range paged {
-		items = append(items, map[string]any{
-			"id":           item.ID,
-			"created":      time.Unix(item.Created, 0).Format(time.DateTime),
-			"containers":   item.Containers,
-			"size":         str.FormatBytes(float64(item.Size)),
-			"labels":       item.Labels,
-			"repo_tags":    item.RepoTags,
-			"repo_digests": item.RepoDigests,
-		})
-	}
-
 	Success(w, chix.M{
 		"total": total,
-		"items": items,
+		"items": paged,
 	})
 }
 

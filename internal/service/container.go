@@ -27,24 +27,10 @@ func (s *ContainerService) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	paged, total := Paginate(r, containers)
-	items := make([]any, 0)
-	for _, item := range paged {
-		items = append(items, map[string]any{
-			"id":         item.ID,
-			"name":       item.Name,
-			"image":      item.Image,
-			"command":    item.Command,
-			"created_at": item.CreatedAt,
-			"ports":      item.Ports,
-			"labels":     item.Labels,
-			"state":      item.State,
-			"status":     item.Status,
-		})
-	}
 
 	Success(w, chix.M{
 		"total": total,
-		"items": items,
+		"items": paged,
 	})
 }
 

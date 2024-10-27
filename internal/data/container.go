@@ -40,7 +40,7 @@ func (r *containerRepo) ListAll() ([]types.Container, error) {
 	var containers []types.Container
 	for _, line := range lines {
 		if line == "" {
-			continue // 跳过空行
+			continue
 		}
 
 		var item struct {
@@ -60,11 +60,10 @@ func (r *containerRepo) ListAll() ([]types.Container, error) {
 			Status       string `json:"Status"`
 		}
 		if err = json.Unmarshal([]byte(line), &item); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("unmarshal failed: %w", err)
 		}
 
 		createdAt, _ := time.Parse("2006-01-02 15:04:05 -0700 MST", item.CreatedAt)
-
 		containers = append(containers, types.Container{
 			ID:        item.ID,
 			Name:      item.Names,
@@ -97,7 +96,7 @@ func (r *containerRepo) ListByName(names string) ([]types.Container, error) {
 
 // Create 创建容器
 func (r *containerRepo) Create(req *request.ContainerCreate) (string, error) {
-	sb := strings.Builder{}
+	var sb strings.Builder
 	sb.WriteString(fmt.Sprintf("%s create --name %s --image %s", r.cmd, req.Name, req.Image))
 
 	for _, port := range req.Ports {
