@@ -44,6 +44,7 @@ func Compress(dir string, src []string, dst string) error {
 	switch format {
 	case Zip:
 		cmd = exec.Command("zip", append([]string{"-qr", "-o", dst}, src...)...)
+		debug.Dump(append([]string{"-qr", "-o", dst}, src...))
 	case Gz:
 		cmd = exec.Command("tar", append([]string{"-czf", dst}, src...)...)
 	case Bz2:
