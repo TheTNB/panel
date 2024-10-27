@@ -2,7 +2,6 @@ package service
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-rat/chix"
 
@@ -30,40 +29,9 @@ func (s *ContainerNetworkService) List(w http.ResponseWriter, r *http.Request) {
 
 	paged, total := Paginate(r, networks)
 
-	items := make([]any, 0)
-	for _, item := range paged {
-		var ipamConfig []any
-		for _, v := range item.IPAM.Config {
-			ipamConfig = append(ipamConfig, map[string]any{
-				"subnet":      v.Subnet,
-				"gateway":     v.Gateway,
-				"ip_range":    v.IPRange,
-				"aux_address": v.AuxAddress,
-			})
-		}
-		items = append(items, map[string]any{
-			"id":         item.ID,
-			"name":       item.Name,
-			"driver":     item.Driver,
-			"ipv6":       item.EnableIPv6,
-			"scope":      item.Scope,
-			"internal":   item.Internal,
-			"attachable": item.Attachable,
-			"ingress":    item.Ingress,
-			"labels":     item.Labels,
-			"options":    item.Options,
-			"ipam": map[string]any{
-				"config":  ipamConfig,
-				"driver":  item.IPAM.Driver,
-				"options": item.IPAM.Options,
-			},
-			"created": item.Created.Format(time.DateTime),
-		})
-	}
-
 	Success(w, chix.M{
 		"total": total,
-		"items": items,
+		"items": paged,
 	})
 }
 

@@ -31,7 +31,7 @@ func NewContainerRepo(cmd ...string) biz.ContainerRepo {
 
 // ListAll 列出所有容器
 func (r *containerRepo) ListAll() ([]types.Container, error) {
-	output, err := shell.ExecfWithTimeout(10*time.Second, "%s ps -a --format '{{json .}}'", r.cmd)
+	output, err := shell.ExecfWithTimeout(10*time.Second, "%s ps -a --format json", r.cmd)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (r *containerRepo) ListAll() ([]types.Container, error) {
 			Command:   item.Command,
 			CreatedAt: createdAt,
 			Ports:     r.parsePorts(item.Ports),
-			Labels:    r.parseLabels(item.Labels),
+			Labels:    types.SliceToKV(strings.Split(item.Labels, ",")),
 			State:     item.State,
 			Status:    item.Status,
 		})
@@ -208,25 +208,6 @@ func (r *containerRepo) Logs(id string) (string, error) {
 func (r *containerRepo) Prune() error {
 	_, err := shell.ExecfWithTimeout(10*time.Second, "%s container prune -f", r.cmd)
 	return err
-}
-
-func (r *containerRepo) parseLabels(labels string) []types.KV {
-	var result []types.KV
-	if labels == "" {
-		return result
-	}
-
-	pairs := strings.Split(labels, ",")
-	for _, pair := range pairs {
-		kv := strings.SplitN(pair, "=", 2)
-		if len(kv) == 2 {
-			result = append(result, types.KV{
-				Key:   strings.TrimSpace(kv[0]),
-				Value: strings.TrimSpace(kv[1]),
-			})
-		}
-	}
-	return result
 }
 
 func (r *containerRepo) parsePorts(ports string) []types.ContainerPort {

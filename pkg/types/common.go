@@ -1,5 +1,7 @@
 package types
 
+import "strings"
+
 type NV struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
@@ -30,6 +32,16 @@ func KVToMap(kvs []KV) map[string]string {
 	return m
 }
 
+// MapToKV 将 map 转换为 key-value 切片
+func MapToKV(m map[string]string) []KV {
+	var kvs []KV
+	for k, v := range m {
+		kvs = append(kvs, KV{Key: k, Value: v})
+	}
+
+	return kvs
+}
+
 // KVToSlice 将 key-value 切片转换为 key=value 切片
 func KVToSlice(kvs []KV) []string {
 	var s []string
@@ -38,4 +50,17 @@ func KVToSlice(kvs []KV) []string {
 	}
 
 	return s
+}
+
+// SliceToKV 将 key=value 切片转换为 key-value 切片
+func SliceToKV(s []string) []KV {
+	var kvs []KV
+	for _, item := range s {
+		kv := strings.SplitN(item, "=", 2)
+		if len(kv) == 2 {
+			kvs = append(kvs, KV{Key: kv[0], Value: kv[1]})
+		}
+	}
+
+	return kvs
 }

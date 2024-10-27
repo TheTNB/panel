@@ -24,13 +24,13 @@ type ContainerPort struct {
 	Protocol       string `form:"protocol" json:"protocol"`
 }
 
-type ContainerVolume struct {
+type ContainerContainerVolume struct {
 	Host      string `form:"host" json:"host"`
 	Container string `form:"container" json:"container"`
 	Mode      string `form:"mode" json:"mode"`
 }
 
-type ContainerNetwork struct {
+type ContainerContainerNetwork struct {
 	Enabled bool   `form:"enabled" json:"enabled"`
 	Gateway string `form:"gateway" json:"gateway"`
 	IPRange string `form:"ip_range" json:"ip_range"`
