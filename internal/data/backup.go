@@ -134,7 +134,7 @@ func (r *backupRepo) CutoffLog(path, target string) error {
 	}
 
 	to := filepath.Join(path, fmt.Sprintf("%s_%s.zip", time.Now().Format("20060102150405"), filepath.Base(target)))
-	if err := io.Compress([]string{target}, to, io.Zip); err != nil {
+	if err := io.Compress(filepath.Dir(target), []string{target}, to); err != nil {
 		return err
 	}
 
@@ -226,18 +226,9 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 		return err
 	}
 
-	var paths []string
-	dirs, err := io.ReadDir(website.Path)
-	if err != nil {
-		return err
-	}
-	for _, item := range dirs {
-		paths = append(paths, filepath.Join(website.Path, item.Name()))
-	}
-
 	start := time.Now()
 	backup := filepath.Join(to, fmt.Sprintf("%s_%s.zip", website.Name, time.Now().Format("20060102150405")))
-	if err = io.Compress(paths, backup, io.Zip); err != nil {
+	if err = io.Compress(website.Path, nil, backup); err != nil {
 		return err
 	}
 
@@ -281,7 +272,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 		return err
 	}
 
-	if err = io.Compress([]string{backup}, backup+".zip", io.Zip); err != nil {
+	if err = io.Compress(filepath.Dir(backup), []string{backup}, backup+".zip"); err != nil {
 		return err
 	}
 	if err = io.Remove(backup); err != nil {
@@ -318,7 +309,7 @@ func (r *backupRepo) createPostgres(to string, name string) error {
 		return err
 	}
 
-	if err = io.Compress([]string{backup}, backup+".zip", io.Zip); err != nil {
+	if err = io.Compress(filepath.Dir(backup), []string{backup}, backup+".zip"); err != nil {
 		return err
 	}
 	if err = io.Remove(backup); err != nil {
@@ -341,11 +332,11 @@ func (r *backupRepo) createPanel(to string) error {
 	}
 
 	start := time.Now()
-	if err := io.Compress([]string{
-		filepath.Join(app.Root, "panel"),
+	if err := io.Compress(filepath.Dir(filepath.Join(app.Root, "panel")), []string{
+		".",
 		"/usr/local/sbin/panel-cli",
 		"/usr/local/etc/panel/config.yml",
-	}, backup, io.Zip); err != nil {
+	}, backup); err != nil {
 		return err
 	}
 	if err := io.Chmod(backup, 0600); err != nil {
@@ -369,15 +360,11 @@ func (r *backupRepo) restoreWebsite(backup, target string) error {
 	if err != nil {
 		return err
 	}
-	format, err := io.FormatArchiveByPath(backup)
-	if err != nil {
-		return err
-	}
 
 	if err = io.Remove(website.Path); err != nil {
 		return err
 	}
-	if err = io.UnCompress(backup, website.Path, format); err != nil {
+	if err = io.UnCompress(backup, website.Path); err != nil {
 		return err
 	}
 	if err = io.Chmod(website.Path, 0755); err != nil {
@@ -522,11 +509,7 @@ func (r *backupRepo) autoUnCompressSQL(backup string) (string, error) {
 		return "", err
 	}
 
-	format, err := io.FormatArchiveByPath(backup)
-	if err != nil {
-		return "", err
-	}
-	if err = io.UnCompress(backup, temp, format); err != nil {
+	if err = io.UnCompress(backup, temp); err != nil {
 		return "", err
 	}
 

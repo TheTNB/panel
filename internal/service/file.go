@@ -317,13 +317,7 @@ func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	format, err := io.FormatArchiveByPath(req.File)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	if err = io.Compress(req.Paths, req.File, format); err != nil {
+	if err = io.Compress(filepath.Dir(req.Paths[0]), req.Paths, req.File); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
@@ -339,13 +333,7 @@ func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	format, err := io.FormatArchiveByPath(req.File)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	if err = io.UnCompress(req.File, req.Path, format); err != nil {
+	if err = io.UnCompress(req.File, req.Path); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

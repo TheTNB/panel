@@ -283,7 +283,7 @@ func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.Compress(req.Paths, req.File, io.Zip); err != nil {
+	if err = io.Compress(filepath.Dir(req.Paths[0]), req.Paths, req.File); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
@@ -299,7 +299,7 @@ func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = io.UnCompress(req.File, req.Path, io.Zip); err != nil {
+	if err = io.UnCompress(req.File, req.Path); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
