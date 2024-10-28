@@ -17,11 +17,17 @@
   ],
   "packageRules": [
     {
+      "groupName": "all dependencies",
+      "groupSlug": "all",
       "description": "Automerge updates",
+      "matchPackageNames": [
+        "*"
+      ],
       "matchUpdateTypes": [
-        "major",
+        "digest",
+        "patch",
         "minor",
-        "patch"
+        "major"
       ],
       "automerge": true
     }
