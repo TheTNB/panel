@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import logo from '@/assets/images/logo.png'
-import { title } from '@/main'
 import { useThemeStore } from '@/store'
 
 const themeStore = useThemeStore()
@@ -13,7 +12,7 @@ const themeStore = useThemeStore()
       v-show="!themeStore.sider.collapsed"
       class="ml-10 max-w-140 flex-shrink-0 text-18 font-bold"
     >
-      {{ title }}
+      {{ themeStore.name }}
     </h2>
   </router-link>
 </template>

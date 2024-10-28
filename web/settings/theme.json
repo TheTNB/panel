@@ -21,5 +21,6 @@
     "warning": "#F0A020",
     "error": "#D03050"
   },
-  "locale": "zh_CN"
+  "locale": "zh_CN",
+  "name": "耗子面板"
 }

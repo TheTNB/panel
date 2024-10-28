@@ -31,7 +31,8 @@ export function defaultSettings(): Theme.Setting {
     error: '#f5222d'
   }
   const locale = themeSetting.locale || 'zh_CN'
-  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, locale }
+  const name = themeSetting.name || import.meta.env.VITE_APP_TITLE
+  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, locale, name }
 }
 
 /** 获取naive的主题颜色 */

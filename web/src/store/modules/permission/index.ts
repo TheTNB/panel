@@ -1,5 +1,4 @@
 import { asyncRoutes, basicRoutes } from '@/router/routes'
-import { defineStore } from 'pinia'
 import type { RoutesType } from '~/types/router'
 import { filterAsyncRoutes } from './helpers'
 

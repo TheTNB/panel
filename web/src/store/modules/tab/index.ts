@@ -1,5 +1,4 @@
 import { router } from '@/router'
-import { defineStore } from 'pinia'
 
 export const WITHOUT_TAB_PATHS = ['/404', '/login']
 
