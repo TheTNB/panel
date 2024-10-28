@@ -14,6 +14,8 @@ export function setupI18n(app: App) {
     legacy: false,
     globalInjection: true,
     locale: themeStore.locale,
+    missingWarn: false, // TODO 完成 i18n 之后需要去除
+    fallbackWarn: false, // TODO 完成 i18n 之后需要去除
     fallbackLocale: 'zh_CN',
     messages: {
       en: en,

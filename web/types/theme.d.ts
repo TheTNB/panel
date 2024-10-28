@@ -46,5 +46,7 @@ declare namespace Theme {
     otherColor: OtherColor
     /** 语言 */
     locale: string
+    /** 名称 */
+    name: string
   }
 }

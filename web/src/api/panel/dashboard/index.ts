@@ -1,4 +1,4 @@
-import { request } from '@/utils'
+import { http, request } from '@/utils'
 
 import type { AxiosResponse } from 'axios'
 import type { RequestConfig } from '~/types/axios'
@@ -28,3 +28,7 @@ export default {
   // 重启面板
   restart: (): Promise<AxiosResponse<any>> => request.post('/dashboard/restart')
 }
+
+export const panel = () => http.Get('/dashboard/panel')
+export const current = (nets: string[], disks: string[]) =>
+  http.Post('/dashboard/current', { nets, disks }, { meta: { noAlert: true } })

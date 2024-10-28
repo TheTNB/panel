@@ -52,8 +52,8 @@ func (s *DashboardService) Panel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Success(w, chix.M{
-		"name":     name,
-		"language": app.Conf.MustString("app.locale"),
+		"name":   name,
+		"locale": app.Conf.MustString("app.locale"),
 	})
 }
 

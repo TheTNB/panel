@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useThemeStore } from '@/store'
-import { useCssVar } from '@vueuse/core'
 import { kebabCase } from 'lodash-es'
 import type { GlobalThemeOverrides } from 'naive-ui'
 

@@ -1,15 +1,7 @@
-import {
-  darkTheme,
-  dateEnUS,
-  dateZhCN,
-  enUS,
-  type GlobalThemeOverrides,
-  type NDateLocale,
-  type NLocale,
-  zhCN
-} from 'naive-ui'
+import type { GlobalThemeOverrides, NDateLocale, NLocale } from 'naive-ui'
+import { darkTheme, dateEnUS, dateZhCN, enUS, zhCN } from 'naive-ui'
 import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface'
-import { defineStore } from 'pinia'
+
 import { defaultSettings, getNaiveThemeOverrides } from './helpers'
 
 type ThemeState = Theme.Setting
@@ -65,6 +57,10 @@ export const useThemeStore = defineStore('theme', {
     /** 设置语言 */
     setLocale(locale: string) {
       this.locale = locale
+    },
+    /** 设置名称 */
+    setName(name: string) {
+      this.name = name
     }
   },
   persist: true

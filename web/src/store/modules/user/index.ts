@@ -1,7 +1,6 @@
 import { resetRouter } from '@/router'
 import { usePermissionStore, useTabStore } from '@/store'
 import { toLogin } from '@/utils'
-import { defineStore } from 'pinia'
 
 export interface UserInfo {
   id?: string

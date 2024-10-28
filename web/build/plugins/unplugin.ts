@@ -12,11 +12,39 @@ import Icons from 'unplugin-icons/vite'
 
 export default [
   AutoImport({
-    imports: ['vue', 'vue-router'],
+    imports: [
+      'vue',
+      'vue-router',
+      'pinia',
+      '@vueuse/core',
+      {
+        'alova/client': [
+          'actionDelegationMiddleware',
+          'accessAction',
+          'createClientTokenAuthentication',
+          'createServerTokenAuthentication',
+          'updateState',
+          'useAutoRequest',
+          'useCaptcha',
+          'useFetcher',
+          'useForm',
+          'usePagination',
+          'useRequest',
+          'useRetriable',
+          'useSQRequest',
+          'useSSE',
+          'useSerialRequest',
+          'useSerialWatcher',
+          'useWatcher'
+        ]
+      }
+    ],
     dts: 'types/auto-imports.d.ts',
     eslintrc: {
       enabled: true
-    }
+    },
+    vueTemplate: true,
+    viteOptimizeDeps: true
   }),
   Icons({
     compiler: 'vue3',
