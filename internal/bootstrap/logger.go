@@ -1,10 +1,12 @@
 package bootstrap
 
 import (
+	"log/slog"
 	"path/filepath"
 	"time"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/exp/zapslog"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -13,16 +15,15 @@ import (
 
 func initLogger() {
 	writeSyncer := zapcore.AddSync(&lumberjack.Logger{
-		Filename:   filepath.Join(app.Root, "panel/storage/logs/app.log"),
-		MaxSize:    10,
-		MaxBackups: 10,
-		MaxAge:     30,
-		Compress:   true,
+		Filename: filepath.Join(app.Root, "panel/storage/logs/app.log"),
+		MaxSize:  10,
+		MaxAge:   30,
+		Compress: true,
 	})
 
-	level := zapcore.InfoLevel
+	level := zap.InfoLevel
 	if app.Conf.Bool("app.debug") {
-		level = zapcore.DebugLevel
+		level = zap.DebugLevel
 	}
 
 	config := zap.NewProductionEncoderConfig()
@@ -34,8 +35,6 @@ func initLogger() {
 	)
 
 	logger := zap.New(core)
-	defer func(logger *zap.Logger) {
-		_ = logger.Sync()
-	}(logger)
-	app.Logger = logger
+	zap.ReplaceGlobals(logger)
+	app.Logger = slog.New(zapslog.NewHandler(logger.Core()))
 }
