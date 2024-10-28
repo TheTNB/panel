@@ -2,9 +2,10 @@ package io
 
 import (
 	"errors"
-	"github.com/TheTNB/panel/pkg/shell"
 	"path/filepath"
 	"strings"
+
+	"github.com/TheTNB/panel/pkg/shell"
 )
 
 type FormatArchive string

@@ -6,25 +6,16 @@ import (
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-gormigrate/gormigrate/v2"
+	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
-	"moul.io/zapgorm2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/migration"
 )
 
 func initOrm() {
-	logLevel := logger.Error
-	if app.Conf.Bool("database.debug") {
-		logLevel = logger.Info
-	}
-	zapLogger := zapgorm2.New(app.Logger)
-	zapLogger.LogMode(logLevel)
-	zapLogger.SetAsDefault()
-
 	db, err := gorm.Open(sqlite.Open(filepath.Join(app.Root, "panel/storage/app.db")), &gorm.Config{
-		Logger:                                   zapLogger,
+		Logger:                                   slogGorm.New(slogGorm.WithHandler(app.Logger.Handler())),
 		SkipDefaultTransaction:                   true,
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})

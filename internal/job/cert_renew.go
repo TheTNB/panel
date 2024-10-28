@@ -1,9 +1,8 @@
 package job
 
 import (
+	"log/slog"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -29,7 +28,7 @@ func (r *CertRenew) Run() {
 
 	var certs []biz.Cert
 	if err := app.Orm.Preload("Website").Preload("Account").Preload("DNS").Find(&certs).Error; err != nil {
-		app.Logger.Error("获取证书失败", zap.Error(err))
+		app.Logger.Warn("获取证书失败", slog.Any("err", err))
 		return
 	}
 
@@ -51,7 +50,7 @@ func (r *CertRenew) Run() {
 
 		_, err = r.certRepo.Renew(cert.ID)
 		if err != nil {
-			app.Logger.Error("续签证书失败", zap.Error(err))
+			app.Logger.Warn("续签证书失败", slog.Any("err", err))
 		}
 	}
 }

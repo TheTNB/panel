@@ -1,10 +1,10 @@
 package job
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/spf13/cast"
-	"go.uber.org/zap"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -48,7 +48,7 @@ func (r *Monitoring) Run() {
 	}
 
 	if err = app.Orm.Create(&biz.Monitor{Info: info}).Error; err != nil {
-		app.Logger.Error("记录系统监控失败", zap.Error(err))
+		app.Logger.Warn("记录系统监控失败", slog.Any("err", err))
 		return
 	}
 
@@ -62,7 +62,7 @@ func (r *Monitoring) Run() {
 		return
 	}
 	if err = app.Orm.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format(time.DateTime)).Delete(&biz.Monitor{}).Error; err != nil {
-		app.Logger.Error("删除过期系统监控失败", zap.Error(err))
+		app.Logger.Warn("删除过期系统监控失败", slog.Any("err", err))
 		return
 	}
 }

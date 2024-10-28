@@ -18,6 +18,7 @@ require (
 	github.com/go-rat/utils v1.0.3
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/go-sql-driver/mysql v1.8.1
+	github.com/golang-cz/httplog v0.0.0-20241002114323-98e09d6f537a
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0
@@ -30,6 +31,7 @@ require (
 	github.com/libdns/libdns v0.2.2
 	github.com/libdns/tencentcloud v1.0.0
 	github.com/mholt/acmez/v2 v2.0.3
+	github.com/orandin/slog-gorm v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.47.0
 	github.com/sethvargo/go-limiter v1.0.0
@@ -39,12 +41,12 @@ require (
 	github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8
 	github.com/urfave/cli/v3 v3.0.0-alpha9.1
 	go.uber.org/zap v1.27.0
+	go.uber.org/zap/exp v0.3.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/net v0.30.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.25.12
-	moul.io/zapgorm2 v1.3.0
 )
 
 require (

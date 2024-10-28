@@ -1,9 +1,8 @@
 package data
 
 import (
+	"log/slog"
 	"sync"
-
-	"go.uber.org/zap"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -64,7 +63,7 @@ func (r *taskRepo) DispatchWaiting() {
 
 	var tasks []biz.Task
 	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
-		app.Logger.Error("获取待处理任务失败", zap.Error(err))
+		app.Logger.Warn("获取待处理任务失败", slog.Any("err", err))
 		return
 	}
 
@@ -72,7 +71,7 @@ func (r *taskRepo) DispatchWaiting() {
 		if err := app.Queue.Push(queuejob.NewProcessTask(r), []any{
 			task.ID,
 		}); err != nil {
-			app.Logger.Error("推送任务失败", zap.Error(err))
+			app.Logger.Warn("推送任务失败", slog.Any("err", err))
 			return
 		}
 	}
