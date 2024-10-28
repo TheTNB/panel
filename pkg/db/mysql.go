@@ -94,7 +94,7 @@ func (m *MySQL) DatabaseExists(name string) (bool, error) {
 
 func (m *MySQL) DatabaseSize(name string) (int64, error) {
 	var size int64
-	err := m.QueryRow(fmt.Sprintf("SELECT SUM(data_length + index_length) FROM information_schema.tables WHERE table_schema = '%s'", name)).Scan(&size)
+	err := m.QueryRow(fmt.Sprintf("SELECT COALESCE(SUM(data_length) + SUM(index_length), 0) FROM information_schema.tables WHERE table_schema = '%s'", name)).Scan(&size)
 	return size, err
 }
 
