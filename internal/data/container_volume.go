@@ -84,17 +84,17 @@ func (r *containerVolumeRepo) Create(req *request.ContainerVolumeCreate) (string
 		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
 	}
 
-	return shell.ExecfWithTimeout(30*time.Second, sb.String()) // nolint: govet
+	return shell.ExecfWithTimeout(120*time.Second, sb.String()) // nolint: govet
 }
 
 // Remove 删除存储卷
 func (r *containerVolumeRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(30*time.Second, "docker volume rm -f %s", id)
+	_, err := shell.ExecfWithTimeout(120*time.Second, "docker volume rm -f %s", id)
 	return err
 }
 
 // Prune 清理未使用的存储卷
 func (r *containerVolumeRepo) Prune() error {
-	_, err := shell.ExecfWithTimeout(30*time.Second, "docker volume prune -f")
+	_, err := shell.ExecfWithTimeout(120*time.Second, "docker volume prune -f")
 	return err
 }

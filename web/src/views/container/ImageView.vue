@@ -26,7 +26,7 @@ const columns: any = [
   {
     title: 'ID',
     key: 'id',
-    width: 150,
+    minWidth: 400,
     resizable: true,
     ellipsis: { tooltip: true }
   },
@@ -40,7 +40,7 @@ const columns: any = [
   {
     title: '镜像',
     key: 'repo_tags',
-    minWidth: 300,
+    minWidth: 200,
     resizable: true,
     ellipsis: { tooltip: true },
     render(row: any): any {

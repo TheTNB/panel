@@ -110,17 +110,17 @@ func (r *containerNetworkRepo) Create(req *request.ContainerNetworkCreate) (stri
 		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
 	}
 
-	return shell.ExecfWithTimeout(30*time.Second, sb.String()) // nolint: govet
+	return shell.ExecfWithTimeout(120*time.Second, sb.String()) // nolint: govet
 }
 
 // Remove 删除网络
 func (r *containerNetworkRepo) Remove(id string) error {
-	_, err := shell.ExecfWithTimeout(30*time.Second, "docker network rm -f %s", id)
+	_, err := shell.ExecfWithTimeout(120*time.Second, "docker network rm -f %s", id)
 	return err
 }
 
 // Prune 清理未使用的网络
 func (r *containerNetworkRepo) Prune() error {
-	_, err := shell.ExecfWithTimeout(30*time.Second, "docker network prune -f")
+	_, err := shell.ExecfWithTimeout(120*time.Second, "docker network prune -f")
 	return err
 }

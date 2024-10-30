@@ -197,9 +197,8 @@ func (r *Firewall) Port(rule FireInfo, operation Operation) error {
 	}
 	protocols := strings.Split(string(rule.Protocol), "/")
 	for protocol := range slices.Values(protocols) {
-		stdout, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d-%d/%s --permanent", operation, rule.PortStart, rule.PortEnd, protocol)
-		if err != nil {
-			return fmt.Errorf("%s port %d-%d/%s failed, err: %s", operation, rule.PortStart, rule.PortEnd, protocol, stdout)
+		if _, err := shell.Execf("firewall-cmd --zone=public --%s-port=%d-%d/%s --permanent", operation, rule.PortStart, rule.PortEnd, protocol); err != nil {
+			return err
 		}
 	}
 
@@ -243,7 +242,7 @@ func (r *Firewall) RichRules(rule FireInfo, operation Operation) error {
 		ruleBuilder.WriteString(string(rule.Strategy))
 		_, err := shell.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleBuilder.String())
 		if err != nil {
-			return fmt.Errorf("%s rich rules (%s) failed, err: %v", operation, ruleBuilder.String(), err)
+			return err
 		}
 	}
 
@@ -269,7 +268,7 @@ func (r *Firewall) Forward(rule Forward, operation Operation) error {
 
 		_, err := shell.Execf(ruleBuilder.String()) // nolint: govet
 		if err != nil {
-			return fmt.Errorf("%s port forward failed, err: %v", operation, err)
+			return err
 		}
 	}
 

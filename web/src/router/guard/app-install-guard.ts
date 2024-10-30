@@ -24,12 +24,23 @@ export function createAppInstallGuard(router: Router) {
     }
     // 容器
     if (to.path.startsWith('/container')) {
-      await app.isInstalled('podman').then((res) => {
-        if (!res.data.installed) {
-          window.$message.error(`容器引擎 ${res.data.name} 未安装`)
-          return router.push({ name: 'app-index' })
+      let flag = false
+      await app.isInstalled('docker').then((res) => {
+        if (res.data.installed) {
+          flag = true
         }
       })
+      if (!flag) {
+        await app.isInstalled('podman').then((res) => {
+          if (res.data.installed) {
+            flag = true
+          }
+        })
+      }
+      if (!flag) {
+        window.$message.error(`容器引擎 Docker / Podman 未安装`)
+        return router.push({ name: 'app-index' })
+      }
     }
   })
 }

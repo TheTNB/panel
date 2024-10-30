@@ -1,4 +1,4 @@
-package podman
+package docker
 
 import (
 	"net/http"
