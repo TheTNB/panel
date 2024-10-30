@@ -198,8 +198,8 @@ const onPageSizeChange = (pageSize: number) => {
 
 const handleStatusChange = async (row: any) => {
   cron.status(row.id, !row.status).then(() => {
-    row.status = !row.status
     window.$message.success('修改成功')
+    row.status = !row.status
   })
 }
 
@@ -218,8 +218,8 @@ const handleEdit = async (row: any) => {
 const handleDelete = async (id: number) => {
   await cron.delete(id).then(() => {
     window.$message.success('删除成功')
+    window.$bus.emit('task:refresh-cron')
   })
-  onPageChange(pagination.page)
 }
 
 const saveTaskEdit = async () => {
@@ -227,6 +227,7 @@ const saveTaskEdit = async () => {
     .update(editTask.value.id, editTask.value.name, editTask.value.time, editTask.value.script)
     .then(() => {
       window.$message.success('修改成功')
+      window.$bus.emit('task:refresh-cron')
     })
 }
 
