@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	_ "github.com/TheTNB/panel/internal/apps/benchmark"
+	_ "github.com/TheTNB/panel/internal/apps/docker"
 	_ "github.com/TheTNB/panel/internal/apps/fail2ban"
 	_ "github.com/TheTNB/panel/internal/apps/frp"
 	_ "github.com/TheTNB/panel/internal/apps/gitea"
