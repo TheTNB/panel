@@ -19,9 +19,7 @@ body:
       options:
         - label: 我已经搜索了现有的 Issues, Discussions 和 Google (I've searched the existing Issues, Discussions and Google)
           required: true
-        - label: 我已经阅读了 README 中除版本记录以外的所有内容 (I've read everything in the README except the version notes)
-          required: true
-        - label: 我在提问题之前至少花费了 5 分钟来思考和准备 (I spend at least 5 minutes thinking and preparing before asking a question)
+        - label: 我已经阅读了文档中除版本记录以外的所有内容 (I've read everything in the documentation except the version notes)
           required: true
         - label: 我没有改动过面板及系统的任何文件 (I have not changed any files of the panel and system)
           required: false
@@ -37,9 +35,10 @@ body:
         请提供安装面板的操作系统。
         Please provide the operating system on which the panel is installed.
       options:
-        - RockyLinux
-        - AlmaLinux
         - Debian
+        - Ubuntu
+        - AlmaLinux
+        - RockyLinux
         - Other
     validations:
       required: true
@@ -50,7 +49,7 @@ body:
       description: |
         请提供操作系统的版本号。
         Please provide the version number of the operating system.
-      placeholder: "9.0"
+      placeholder: "12"
     validations:
       required: true
   - type: input
@@ -60,7 +59,7 @@ body:
       description: |
         请提供面板的版本号。
         Please provide the version number of the panel.
-      placeholder: "2.0.0"
+      placeholder: "2.3.0"
     validations:
       required: true
   - type: textarea
