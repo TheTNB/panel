@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -61,6 +62,10 @@ func (r *containerImageRepo) List() ([]types.ContainerImage, error) {
 			CreatedAt:   time.Unix(item.Created, 0),
 		})
 	}
+
+	slices.SortFunc(images, func(a types.ContainerImage, b types.ContainerImage) int {
+		return strings.Compare(a.ID, b.ID)
+	})
 
 	return images, nil
 }

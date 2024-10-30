@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -78,6 +79,10 @@ func (r *containerNetworkRepo) List() ([]types.ContainerNetwork, error) {
 			Labels:  types.MapToKV(item.Labels),
 		})
 	}
+
+	slices.SortFunc(networks, func(a types.ContainerNetwork, b types.ContainerNetwork) int {
+		return strings.Compare(a.Name, b.Name)
+	})
 
 	return networks, nil
 }

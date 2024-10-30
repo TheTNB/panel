@@ -5,6 +5,7 @@ go 1.23
 require (
 	github.com/bddjr/hlfhr v1.1.3
 	github.com/beevik/ntp v1.4.3
+	github.com/creack/pty v1.1.23
 	github.com/expr-lang/expr v1.16.9
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.1.0
@@ -51,7 +52,6 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/creack/pty v1.1.23 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/devhaozi/huaweicloud-sdk-go-v3 v0.0.0-20241018211007-bbebb6de5db7 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

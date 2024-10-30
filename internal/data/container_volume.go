@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -63,6 +64,10 @@ func (r *containerVolumeRepo) List() ([]types.ContainerVolume, error) {
 			Size:       str.FormatBytes(float64(item.UsageData.Size)),
 		})
 	}
+
+	slices.SortFunc(volumes, func(a types.ContainerVolume, b types.ContainerVolume) int {
+		return strings.Compare(a.Name, b.Name)
+	})
 
 	return volumes, nil
 }

@@ -79,6 +79,10 @@ func (r *containerRepo) ListAll() ([]types.Container, error) {
 		})
 	}
 
+	slices.SortFunc(containers, func(a types.Container, b types.Container) int {
+		return strings.Compare(a.Name, b.Name)
+	})
+
 	return containers, nil
 }
 
