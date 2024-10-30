@@ -152,8 +152,8 @@ github.com/tklauser/numcpus v0.8.0 h1:Mx4Wwe/FjZLeQsK/6kt2EOepwwSl7SmJrK5bV/dXYg
 github.com/tklauser/numcpus v0.8.0/go.mod h1:ZJZlAY+dmR4eut8epnzf0u/VwodKmryxR8txiloSqBE=
 github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8 h1:7yw1yHkylDcu/CwY4hEEe8MycDLo7B9LjcqwhoL8NrM=
 github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8/go.mod h1:itu4KWRgrfEwGcfNka+rV4houuirUau53i0diN4lG5g=
-github.com/urfave/cli/v3 v3.0.0-alpha9.1 h1:1fJU+bltkwN8lF4Sni/X0i1d8XwPIrS82ivZ8qsp/q4=
-github.com/urfave/cli/v3 v3.0.0-alpha9.1/go.mod h1:FnIeEMYu+ko8zP1F9Ypr3xkZMIDqW3DR92yUtY39q1Y=
+github.com/urfave/cli/v3 v3.0.0-alpha9.2 h1:CL8llQj3dGRLVQQzHxS+ZYRLanOuhyK1fXgLKD+qV+Y=
+github.com/urfave/cli/v3 v3.0.0-alpha9.2/go.mod h1:FnIeEMYu+ko8zP1F9Ypr3xkZMIDqW3DR92yUtY39q1Y=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo0=
 github.com/yusufpapurcu/wmi v1.2.4/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
