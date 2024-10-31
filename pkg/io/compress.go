@@ -2,7 +2,6 @@ package io
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -104,10 +103,7 @@ func ListCompress(src string) ([]string, error) {
 	case TGz, Bz2, Tar, Xz:
 		out, err = shell.Execf("tar -tf '%s'", src)
 	case SevenZip:
-		out, err = shell.Execf(`7z l -slt '%s'`, src)
-		fmt.Println(out)
-		out, err = shell.Execf(`7z l -slt '%s' | grep "^Path = " | sed 's/^Path = //'`, src)
-		fmt.Println(out)
+		out, err = shell.Execf(`7z l -ba -slt '%s' | grep "^Path = " | sed 's/^Path = //'`, src)
 	default:
 		return nil, errors.New("unsupported format")
 	}
