@@ -2,6 +2,7 @@ package io
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 	"strings"
 
@@ -33,6 +34,7 @@ func Compress(dir string, src []string, dst string) error {
 		return err
 	}
 
+	var out string
 	switch format {
 	case Zip:
 		_, err = shell.ExecfWithDir(dir, "zip -qr -o %s %s", dst, strings.Join(src, " "))
@@ -45,7 +47,8 @@ func Compress(dir string, src []string, dst string) error {
 	case Xz:
 		_, err = shell.ExecfWithDir(dir, "tar -cJf %s %s", dst, strings.Join(src, " "))
 	case SevenZip:
-		_, err = shell.ExecfWithDir(dir, "7z a -y %s %s", dst, strings.Join(src, " "))
+		out, err = shell.ExecfWithDir(dir, "7z a -y %s %s", dst, strings.Join(src, " "))
+		fmt.Println(out)
 	default:
 		return errors.New("unsupported format")
 	}
@@ -104,6 +107,7 @@ func ListCompress(src string) ([]string, error) {
 		out, err = shell.Execf("tar -tf '%s'", src)
 	case SevenZip:
 		out, err = shell.Execf(`7z l -slt '%s' | grep "^Path = " | sed 's/^Path = //'`, src)
+		fmt.Println(out)
 	default:
 		return nil, errors.New("unsupported format")
 	}
