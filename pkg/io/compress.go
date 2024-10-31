@@ -34,7 +34,6 @@ func Compress(dir string, src []string, dst string) error {
 		return err
 	}
 
-	var out string
 	switch format {
 	case Zip:
 		_, err = shell.ExecfWithDir(dir, "zip -qr -o %s %s", dst, strings.Join(src, " "))
