@@ -16,7 +16,7 @@ importers:
         version: 1.5.4(monaco-editor@0.52.0)(vue@3.5.12(typescript@5.6.3))
       '@vue-js-cron/naive-ui':
         specifier: ^2.0.5
-        version: 2.0.5
+        version: 2.0.7
       '@vueuse/core':
         specifier: ^11.1.0
         version: 11.2.0(vue@3.5.12(typescript@5.6.3))
@@ -1247,11 +1247,11 @@ packages:
   '@volar/typescript@2.4.8':
     resolution: {integrity: sha512-6xkIYJ5xxghVBhVywMoPMidDDAFT1OoQeXwa27HSgJ6AiIKRe61RXLoik+14Z7r0JvnblXVsjsRLmCr42SGzqg==}
 
-  '@vue-js-cron/core@5.2.0':
-    resolution: {integrity: sha512-Vc7Xbj6K/7D4M2yjO+lipeTBeE4OYXCf6FdDDIYKKMjbdGFG+Fs+V7W+6bvnH31lTZ8xSmSgqPF68/JhIfytZQ==}
+  '@vue-js-cron/core@5.3.1':
+    resolution: {integrity: sha512-goOZAsz9pgqzSESa5Axo+LxMc4bqzQyGrdzcwuKxx4rtguAiQM0gLViV4K1X/K+GneFtU+uSPFv+GceLIqFWoQ==}
 
-  '@vue-js-cron/naive-ui@2.0.5':
-    resolution: {integrity: sha512-ngNsoRmkX5YpzAXJoP3vwvwRkDUMoe18iMEGYWz5txaNtR/0JUu+AanhIqmsOnmqhu7IDW+Mc11ceRbEc4R0mA==}
+  '@vue-js-cron/naive-ui@2.0.7':
+    resolution: {integrity: sha512-jteg+dHq2MqpVjyfn2TChrx9jzugKn+EEK/LEL99aNFq7bg66EYOdFN/YF6NkWfkI3bH2V6f4+XOzQ5EWC+qdQ==}
 
   '@vue/compiler-core@3.5.12':
     resolution: {integrity: sha512-ISyBTRMmMYagUxhcpyEH0hpXRd/KqDU4ymofPgl2XAkY9ZhQ+h0ovEZJIiPop13UmR/54oA2cgMDjgroRelaEw==}
@@ -4518,13 +4518,13 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.0.8
 
-  '@vue-js-cron/core@5.2.0':
+  '@vue-js-cron/core@5.3.1':
     dependencies:
       mustache: 4.2.0
 
-  '@vue-js-cron/naive-ui@2.0.5':
+  '@vue-js-cron/naive-ui@2.0.7':
     dependencies:
-      '@vue-js-cron/core': 5.2.0
+      '@vue-js-cron/core': 5.3.1
 
   '@vue/compiler-core@3.5.12':
     dependencies:
