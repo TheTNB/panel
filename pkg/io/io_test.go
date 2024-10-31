@@ -175,6 +175,60 @@ func (s *IOTestSuite) TestUnCompress() {
 	s.NoError(Remove("testdata"))
 }
 
+func (s *IOTestSuite) TestListCompress() {
+	abs, err := filepath.Abs("testdata")
+	s.NoError(err)
+	src := []string{"list_archive_test1.txt", "list_archive_test2.txt"}
+	err = Write(filepath.Join(abs, src[0]), "File 1", 0644)
+	s.NoError(err)
+	err = Write(filepath.Join(abs, src[1]), "File 2", 0644)
+	s.NoError(err)
+
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.zip"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.bz2"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.tar"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.gz"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.tar.gz"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.tgz"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.xz"))
+	s.NoError(err)
+	err = Compress(abs, src, filepath.Join(abs, "list_archive_test.7z"))
+	s.NoError(err)
+
+	list, err := ListCompress(filepath.Join(abs, "list_archive_test.zip"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.bz2"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.tar"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.gz"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.tar.gz"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.tgz"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.xz"))
+	s.NoError(err)
+	s.Len(list, 2)
+	list, err = ListCompress(filepath.Join(abs, "list_archive_test.7z"))
+	s.NoError(err)
+	s.Len(list, 2)
+
+	s.NoError(Remove("testdata"))
+}
+
 func (s *IOTestSuite) TestRemoveDeletesFileOrDirectory() {
 	path := "testdata/remove_test"
 	s.NoError(Mkdir(path, 0755))

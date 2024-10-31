@@ -89,6 +89,31 @@ func UnCompress(src string, dst string) error {
 	return err
 }
 
+// ListCompress 获取压缩包内文件列表
+func ListCompress(src string) ([]string, error) {
+	format, err := formatArchiveByPath(src)
+	if err != nil {
+		return nil, err
+	}
+
+	var out string
+	switch format {
+	case Zip:
+		out, err = shell.Execf("unzip -Z1 '%s'", src)
+	case TGz, Bz2, Tar, Xz:
+		out, err = shell.Execf("tar -tf '%s'", src)
+	case SevenZip:
+		out, err = shell.Execf(`7z l -slt '%s' | grep "^Path = " | sed 's/^Path = //'`, src)
+	default:
+		return nil, errors.New("unsupported format")
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(out, "\n"), nil
+}
+
 // formatArchiveByPath 根据文件后缀获取压缩格式
 func formatArchiveByPath(path string) (FormatArchive, error) {
 	switch filepath.Ext(path) {

@@ -332,28 +332,19 @@ func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oldList, err := io.ReadDir(req.Path)
-	if err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
 	if err = io.UnCompress(req.File, req.Path); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	currentList, err := io.ReadDir(req.Path)
+	list, err := io.ListCompress(req.File)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	// 取新增的设置权限
-	for _, currentDir := range currentList {
-		if !slices.Contains(oldList, currentDir) {
-			s.setPermission(filepath.Join(req.Path, currentDir.Name()), 0755, "www", "www")
-		}
+	for item := range slices.Values(list) {
+		s.setPermission(filepath.Join(req.Path, item), 0755, "www", "www")
 	}
 
 	Success(w, nil)
