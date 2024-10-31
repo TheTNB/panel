@@ -48,7 +48,6 @@ func Compress(dir string, src []string, dst string) error {
 		_, err = shell.ExecfWithDir(dir, "tar -cJf %s %s", dst, strings.Join(src, " "))
 	case SevenZip:
 		out, err = shell.ExecfWithDir(dir, "7z a -y %s %s", dst, strings.Join(src, " "))
-		fmt.Println(out)
 	default:
 		return errors.New("unsupported format")
 	}
@@ -106,6 +105,8 @@ func ListCompress(src string) ([]string, error) {
 	case TGz, Bz2, Tar, Xz:
 		out, err = shell.Execf("tar -tf '%s'", src)
 	case SevenZip:
+		out, err = shell.Execf(`7z l -slt '%s'`, src)
+		fmt.Println(out)
 		out, err = shell.Execf(`7z l -slt '%s' | grep "^Path = " | sed 's/^Path = //'`, src)
 		fmt.Println(out)
 	default:
