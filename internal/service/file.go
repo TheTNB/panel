@@ -166,51 +166,77 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
+func (s *FileService) Exist(w http.ResponseWriter, r *http.Request) {
+	binder := chix.NewBind(r)
+	defer binder.Release()
+
+	var paths []string
+	if err := binder.Body(&paths); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	var results []bool
+	for item := range slices.Values(paths) {
+		results = append(results, io.Exists(item))
+	}
+
+	Success(w, results)
+}
+
 func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FileMove](r)
-	if err != nil {
+	binder := chix.NewBind(r)
+	defer binder.Release()
+
+	var req []request.FileControl
+	if err := binder.Body(&req); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "target path already exists") // no translate, frontend will use it to determine whether to continue
-		return
-	}
+	for item := range slices.Values(req) {
+		if io.Exists(item.Target) && !item.Force {
+			continue
+		}
 
-	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
-		Error(w, http.StatusForbidden, "you can't do this, it will be broken")
-		return
-	}
+		if io.IsDir(item.Source) && strings.HasPrefix(item.Target, item.Source) {
+			Error(w, http.StatusForbidden, "you can't do this, it will be broken")
+			return
+		}
 
-	if err = io.Mv(req.Source, req.Target); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
+		if err := io.Mv(item.Source, item.Target); err != nil {
+			Error(w, http.StatusInternalServerError, "%v", err)
+			return
+		}
 	}
 
 	Success(w, nil)
 }
 
 func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FileCopy](r)
-	if err != nil {
+	binder := chix.NewBind(r)
+	defer binder.Release()
+
+	var req []request.FileControl
+	if err := binder.Body(&req); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	if io.Exists(req.Target) && !req.Force {
-		Error(w, http.StatusForbidden, "target path already exists") // no translate, frontend will use it to determine whether to continue
-		return
-	}
+	for item := range slices.Values(req) {
+		if io.Exists(item.Target) && !item.Force {
+			continue
+		}
 
-	if io.IsDir(req.Source) && strings.HasPrefix(req.Target, req.Source) {
-		Error(w, http.StatusForbidden, "you can't do this, it will be broken")
-		return
-	}
+		if io.IsDir(item.Source) && strings.HasPrefix(item.Target, item.Source) {
+			Error(w, http.StatusForbidden, "you can't do this, it will be broken")
+			return
+		}
 
-	if err = io.Cp(req.Source, req.Target); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
+		if err := io.Cp(item.Source, item.Target); err != nil {
+			Error(w, http.StatusInternalServerError, "%v", err)
+			return
+		}
 	}
 
 	Success(w, nil)
@@ -415,7 +441,7 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 // formatDir 格式化目录信息
 func (s *FileService) formatDir(base string, entries []stdos.DirEntry) []any {
 	var paths []any
-	for _, file := range entries {
+	for file := range slices.Values(entries) {
 		info, err := file.Info()
 		if err != nil {
 			continue

@@ -33,21 +33,24 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
     :bordered="false"
     :segmented="false"
   >
-    <n-upload
-      ref="upload"
-      directory-dnd
-      multiple
-      action="/api/panel/file/upload"
-      :custom-request="uploadRequest"
-    >
-      <n-upload-dragger>
-        <div style="margin-bottom: 12px">
-          <the-icon :size="48" icon="bi:arrow-up-square" />
-        </div>
-        <NText style="font-size: 16px"> 点击或者拖动文件到该区域来上传</NText>
-        <NP depth="3" style="margin: 8px 0 0 0"> 不支持断点续传，大文件建议使用 FTP 上传 </NP>
-      </n-upload-dragger>
-    </n-upload>
+    <n-flex vertical>
+      <n-alert type="info">若上传报网络错误，请开启面板 HTTPS 后重试</n-alert>
+      <n-upload
+        ref="upload"
+        directory-dnd
+        multiple
+        action="/api/panel/file/upload"
+        :custom-request="uploadRequest"
+      >
+        <n-upload-dragger>
+          <div style="margin-bottom: 12px">
+            <the-icon :size="48" icon="bi:arrow-up-square" />
+          </div>
+          <NText text-18> 点击或者拖动文件到该区域来上传</NText>
+          <NP depth="3" m-10> 大文件建议使用 SFTP 上传 </NP>
+        </n-upload-dragger>
+      </n-upload>
+    </n-flex>
   </n-modal>
 </template>
 

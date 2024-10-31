@@ -25,13 +25,7 @@ type FileSave struct {
 	Content string `form:"content" json:"content"`
 }
 
-type FileMove struct {
-	Source string `form:"source" json:"source" validate:"required"`
-	Target string `form:"target" json:"target" validate:"required"`
-	Force  bool   `form:"force" json:"force"`
-}
-
-type FileCopy struct {
+type FileControl struct {
 	Source string `form:"source" json:"source" validate:"required"`
 	Target string `form:"target" json:"target" validate:"required"`
 	Force  bool   `form:"force" json:"force"`

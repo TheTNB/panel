@@ -17,17 +17,12 @@ const checkbox = ref({
 
 const handlePermission = async () => {
   for (const path of selected.value) {
-    await file
-      .permission(path, `0${mode.value}`, owner.value, group.value)
-      .then(() => {
-        window.$message.success(`修改 ${path} 成功`)
-        show.value = false
-        selected.value = []
-      })
-      .catch(() => {
-        window.$message.error(`修改 ${path} 失败`)
-      })
+    await file.permission(path, `0${mode.value}`, owner.value, group.value).then(() => {
+      window.$message.success(`修改 ${path} 成功`)
+    })
   }
+  show.value = false
+  selected.value = []
   window.$bus.emit('file:refresh')
 }
 

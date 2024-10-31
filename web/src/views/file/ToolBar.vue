@@ -7,6 +7,7 @@ import type { Marked } from '@/views/file/types'
 const path = defineModel<string>('path', { type: String, required: true })
 const selected = defineModel<string[]>('selected', { type: Array, default: () => [] })
 const marked = defineModel<Marked[]>('marked', { type: Array, default: () => [] })
+const markedType = defineModel<string>('markedType', { type: String, required: true })
 const compress = defineModel<boolean>('compress', { type: Boolean, required: true })
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 
@@ -62,11 +63,13 @@ const handleCopy = () => {
     window.$message.error('请选择要复制的文件/文件夹')
     return
   }
+  markedType.value = 'copy'
   marked.value = selected.value.map((path) => ({
     name: lastDirectory(path),
     source: path,
-    type: 'copy'
+    force: false
   }))
+  selected.value = []
   window.$message.success('标记成功，请前往目标路径粘贴')
 }
 
@@ -75,11 +78,13 @@ const handleMove = () => {
     window.$message.error('请选择要移动的文件/文件夹')
     return
   }
+  markedType.value = 'move'
   marked.value = selected.value.map((path) => ({
     name: lastDirectory(path),
     source: path,
-    type: 'move'
+    force: false
   }))
+  selected.value = []
   window.$message.success('标记成功，请前往目标路径粘贴')
 }
 
@@ -93,90 +98,82 @@ const handlePaste = async () => {
     return
   }
 
-  for (const { name, source, type } of marked.value) {
-    const target = path.value + '/' + name
-    if (type === 'copy') {
-      file
-        .copy(source, target, false)
-        .then(() => {
-          window.$message.success(`复制 ${source} 到 ${target} 成功`)
-        })
-        .catch((err) => {
-          if (err.message == 'target path already exists') {
-            window.$dialog.warning({
-              title: '警告',
-              content: `目标 ${target} 已存在，是否覆盖？`,
-              positiveText: '覆盖',
-              negativeText: '取消',
-              onPositiveClick: () => {
-                file
-                  .copy(source, target, true)
-                  .then(() => {
-                    window.$message.success(`复制 ${source} 到 ${target} 成功`)
-                  })
-                  .catch((err) => {
-                    window.$message.error(err.message)
-                  })
-              },
-              onNegativeClick: () => {
-                handleCancel()
-              }
-            })
-          }
-        })
-        .finally(() => {
-          window.$bus.emit('file:refresh')
-        })
-    } else {
-      file
-        .move(source, target, false)
-        .then(() => {
-          window.$message.success(`移动 ${source} 到 ${target} 成功`)
-        })
-        .catch((err) => {
-          if (err.message == 'target path already exists') {
-            window.$dialog.warning({
-              title: '警告',
-              content: `目标 ${target} 已存在，是否覆盖？`,
-              positiveText: '覆盖',
-              negativeText: '取消',
-              onPositiveClick: () => {
-                file
-                  .move(source, target, true)
-                  .then(() => {
-                    window.$message.success(`移动 ${source} 到 ${target} 成功`)
-                  })
-                  .catch((err) => {
-                    window.$message.error(err.message)
-                  })
-              },
-              onNegativeClick: () => {
-                handleCancel()
-              }
-            })
-          }
-        })
-        .finally(() => {
-          window.$bus.emit('file:refresh')
-        })
+  // 查重
+  let flag = false
+  let paths = marked.value.map((item) => {
+    return {
+      name: item.name,
+      source: item.source,
+      target: path.value + '/' + item.name,
+      force: false
     }
-  }
-
-  marked.value = []
+  })
+  const sources = paths.map((item: any) => item.target)
+  await file.exist(sources).then(async (res) => {
+    for (let i = 0; i < res.data.length; i++) {
+      if (res.data[i]) {
+        flag = true
+        paths[i].force = true
+      }
+    }
+    if (flag) {
+      window.$dialog.warning({
+        title: '警告',
+        content: `存在同名项
+      ${paths
+        .filter((item) => item.force)
+        .map((item) => item.name)
+        .join(', ')} 是否覆盖？`,
+        positiveText: '覆盖',
+        negativeText: '取消',
+        onPositiveClick: async () => {
+          if (markedType.value == 'copy') {
+            await file.copy(paths).then(() => {
+              window.$message.success('复制成功')
+            })
+          } else {
+            await file.move(paths).then(() => {
+              window.$message.success('移动成功')
+            })
+          }
+          marked.value = []
+          window.$bus.emit('file:refresh')
+        },
+        onNegativeClick: () => {
+          marked.value = []
+          window.$message.info('已取消')
+        }
+      })
+    } else {
+      if (markedType.value == 'copy') {
+        await file.copy(paths).then(() => {
+          window.$message.success('复制成功')
+        })
+      } else {
+        await file.move(paths).then(() => {
+          window.$message.success('移动成功')
+        })
+      }
+      marked.value = []
+      window.$bus.emit('file:refresh')
+    }
+  })
 }
 
-const bulkDelete = () => {
+const bulkDelete = async () => {
   if (!selected.value.length) {
     window.$message.error('请选择要删除的文件/文件夹')
     return
   }
 
   for (const path of selected.value) {
-    file.delete(path).then(() => {
+    await file.delete(path).then(() => {
       window.$message.success(`删除 ${path} 成功`)
       window.$bus.emit('file:refresh')
     })
   }
+
+  selected.value = []
 }
 
 // 自动填充下载文件名

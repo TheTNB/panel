@@ -15,6 +15,7 @@ const sort = ref<string>('')
 const path = defineModel<string>('path', { type: String, required: true })
 const selected = defineModel<any[]>('selected', { type: Array, default: () => [] })
 const marked = defineModel<Marked[]>('marked', { type: Array, default: () => [] })
+const markedType = defineModel<string>('markedType', { type: String, required: true })
 const compress = defineModel<boolean>('compress', { type: Boolean, required: true })
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 const editorModal = ref(false)
@@ -275,21 +276,23 @@ const columns: DataTableColumns<RowData> = [
                 onUpdateValue: (value) => {
                   switch (value) {
                     case 'copy':
+                      markedType.value = 'copy'
                       marked.value = [
                         {
                           name: row.name,
                           source: row.full,
-                          type: 'copy'
+                          force: false
                         }
                       ]
                       window.$message.success('标记成功，请前往目标路径粘贴')
                       break
                     case 'move':
+                      markedType.value = 'move'
                       marked.value = [
                         {
                           name: row.name,
                           source: row.full,
-                          type: 'move'
+                          force: false
                         }
                       ]
                       window.$message.success('标记成功，请前往目标路径粘贴')
@@ -385,7 +388,7 @@ const getList = async (path: string, page: number, limit: number) => {
   })
 }
 
-const handleRename = () => {
+const handleRename = async () => {
   const source = path.value + '/' + renameModel.value.source
   const target = path.value + '/' + renameModel.value.target
   if (!checkName(renameModel.value.source) || !checkName(renameModel.value.target)) {
@@ -393,43 +396,30 @@ const handleRename = () => {
     return
   }
 
-  file
-    .move(source, target, false)
-    .then(() => {
+  await file.exist([source]).then(async (res) => {
+    if (res.data[0]) {
+      window.$dialog.warning({
+        title: '警告',
+        content: `存在同名项，是否强制覆盖？`,
+        positiveText: '覆盖',
+        negativeText: '取消',
+        onPositiveClick: async () => {
+          await file.move([{ source, target, force: true }])
+          window.$message.success(
+            `重命名 ${renameModel.value.source} 为 ${renameModel.value.target} 成功`
+          )
+        }
+      })
+    } else {
+      await file.move([{ source, target, force: true }])
       window.$message.success(
         `重命名 ${renameModel.value.source} 为 ${renameModel.value.target} 成功`
       )
-      renameModal.value = false
-      window.$bus.emit('file:refresh')
-    })
-    .catch((err) => {
-      if (err.message == 'target path already exists') {
-        window.$dialog.warning({
-          title: '警告',
-          content: `存在同名项，是否强制覆盖？`,
-          positiveText: '覆盖',
-          negativeText: '取消',
-          onPositiveClick: () => {
-            file
-              .move(source, target, true)
-              .then(() => {
-                window.$message.success(
-                  `重命名 ${renameModel.value.source} 为 ${renameModel.value.target} 成功`
-                )
-                renameModal.value = false
-                window.$bus.emit('file:refresh')
-              })
-              .catch((err) => {
-                window.$message.error(err.message)
-              })
-          },
-          onNegativeClick: () => {
-            renameModal.value = false
-            window.$bus.emit('file:refresh')
-          }
-        })
-      }
-    })
+    }
+  })
+
+  renameModal.value = false
+  window.$bus.emit('file:refresh')
 }
 
 const handleUnCompress = () => {
@@ -468,76 +458,66 @@ const handlePaste = async () => {
     return
   }
 
-  for (const { name, source, type } of marked.value) {
-    const target = path.value + '/' + name
-    if (type === 'copy') {
-      file
-        .copy(source, target, false)
-        .then(() => {
-          window.$message.success(`复制 ${source} 到 ${target} 成功`)
-        })
-        .catch((err) => {
-          if (err.message == 'target path already exists') {
-            window.$dialog.warning({
-              title: '警告',
-              content: `目标 ${target} 已存在，是否覆盖？`,
-              positiveText: '覆盖',
-              negativeText: '取消',
-              onPositiveClick: () => {
-                file
-                  .copy(source, target, true)
-                  .then(() => {
-                    window.$message.success(`复制 ${source} 到 ${target} 成功`)
-                  })
-                  .catch((err) => {
-                    window.$message.error(err.message)
-                  })
-              },
-              onNegativeClick: () => {
-                marked.value = []
-              }
-            })
-          }
-        })
-        .finally(() => {
-          window.$bus.emit('file:refresh')
-        })
-    } else {
-      file
-        .move(source, target, false)
-        .then(() => {
-          window.$message.success(`移动 ${source} 到 ${target} 成功`)
-        })
-        .catch((err) => {
-          if (err.message == 'target path already exists') {
-            window.$dialog.warning({
-              title: '警告',
-              content: `目标 ${target} 已存在，是否覆盖？`,
-              positiveText: '覆盖',
-              negativeText: '取消',
-              onPositiveClick: () => {
-                file
-                  .move(source, target, true)
-                  .then(() => {
-                    window.$message.success(`移动 ${source} 到 ${target} 成功`)
-                  })
-                  .catch((err) => {
-                    window.$message.error(err.message)
-                  })
-              },
-              onNegativeClick: () => {
-                marked.value = []
-              }
-            })
-          }
-        })
-        .finally(() => {
-          window.$bus.emit('file:refresh')
-        })
+  // 查重
+  let flag = false
+  let paths = marked.value.map((item) => {
+    return {
+      name: item.name,
+      source: item.source,
+      target: path.value + '/' + item.name,
+      force: false
     }
-  }
-
-  marked.value = []
+  })
+  const sources = paths.map((item: any) => item.target)
+  await file.exist(sources).then(async (res) => {
+    for (let i = 0; i < res.data.length; i++) {
+      if (res.data[i]) {
+        flag = true
+        paths[i].force = true
+      }
+    }
+    if (flag) {
+      window.$dialog.warning({
+        title: '警告',
+        content: `存在同名项
+      ${paths
+        .filter((item) => item.force)
+        .map((item) => item.name)
+        .join(', ')} 是否覆盖？`,
+        positiveText: '覆盖',
+        negativeText: '取消',
+        onPositiveClick: async () => {
+          if (markedType.value == 'copy') {
+            await file.copy(paths).then(() => {
+              window.$message.success('复制成功')
+            })
+          } else {
+            await file.move(paths).then(() => {
+              window.$message.success('移动成功')
+            })
+          }
+          marked.value = []
+          window.$bus.emit('file:refresh')
+        },
+        onNegativeClick: () => {
+          marked.value = []
+          window.$message.info('已取消')
+        }
+      })
+    } else {
+      if (markedType.value == 'copy') {
+        await file.copy(paths).then(() => {
+          window.$message.success('复制成功')
+        })
+      } else {
+        await file.move(paths).then(() => {
+          window.$message.success('移动成功')
+        })
+      }
+      marked.value = []
+      window.$bus.emit('file:refresh')
+    }
+  })
 }
 
 const handleSelect = (key: string) => {
@@ -553,21 +533,23 @@ const handleSelect = (key: string) => {
       editorModal.value = true
       break
     case 'copy':
+      markedType.value = 'copy'
       marked.value = [
         {
           name: selectedRow.value.name,
           source: selectedRow.value.full,
-          type: 'copy'
+          force: false
         }
       ]
       window.$message.success('标记成功，请前往目标路径粘贴')
       break
     case 'move':
+      markedType.value = 'move'
       marked.value = [
         {
           name: selectedRow.value.name,
           source: selectedRow.value.full,
-          type: 'move'
+          force: false
         }
       ]
       window.$message.success('标记成功，请前往目标路径粘贴')

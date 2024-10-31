@@ -13,6 +13,7 @@ import type { Marked } from '@/views/file/types'
 const path = ref('/www')
 const selected = ref<string[]>([])
 const marked = ref<Marked[]>([])
+const markedType = ref<string>('copy')
 
 const compress = ref(false)
 const permission = ref(false)
@@ -26,6 +27,7 @@ const permission = ref(false)
         v-model:path="path"
         v-model:selected="selected"
         v-model:marked="marked"
+        v-model:markedType="markedType"
         v-model:compress="compress"
         v-model:permission="permission"
       />
@@ -33,6 +35,7 @@ const permission = ref(false)
         v-model:path="path"
         v-model:selected="selected"
         v-model:marked="marked"
+        v-model:markedType="markedType"
         v-model:compress="compress"
         v-model:permission="permission"
       />

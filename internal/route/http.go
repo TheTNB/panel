@@ -218,6 +218,7 @@ func Http(r chi.Router) {
 			r.Post("/save", file.Save)
 			r.Post("/delete", file.Delete)
 			r.Post("/upload", file.Upload)
+			r.Post("/exist", file.Exist)
 			r.Post("/move", file.Move)
 			r.Post("/copy", file.Copy)
 			r.Get("/download", file.Download)
