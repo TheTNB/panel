@@ -152,17 +152,19 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 
 This project owes its existence to all those who have contributed. To contribute, please check the contributed code section first.
 
-<a href="https://github.com/TheTNB/panel/graphs/contributors">
-  <img alt="contributors" src="https://contrib.rocks/image?repo=TheTNB/panel"/>
+<a href="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors?repo_id=572922963&limit=30" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=572922963&limit=30&image_size=auto&color_scheme=dark" width="655" height="auto">
+    <img alt="Active Contributors of TheTNB/panel - Last 28 days" src="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=572922963&limit=30&image_size=auto&color_scheme=light" width="655" height="auto">
+  </picture>
 </a>
 
 ## Star History
 
-<a href="https://star-history.com/#TheTNB/panel&Date">
+<a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=572922963" target="_blank" style="display: block" align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=572922963&image_size=auto&color_scheme=dark" width="721" height="auto">
+    <img alt="Star History of TheTNB/panel" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=572922963&image_size=auto&color_scheme=light" width="721" height="auto">
   </picture>
 </a>
 

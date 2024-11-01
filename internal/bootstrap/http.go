@@ -38,7 +38,7 @@ func initHttp() {
 
 	if app.Conf.Bool("http.tls") {
 		srv.TLSConfig = &tls.Config{
-			MinVersion: tls.VersionTLS12,
+			MinVersion: tls.VersionTLS13,
 		}
 
 		cert := filepath.Join(app.Root, "panel/storage/cert.pem")
