@@ -37,4 +37,5 @@ func initLogger() {
 	logger := zap.New(core)
 	zap.ReplaceGlobals(logger)
 	app.Logger = slog.New(zapslog.NewHandler(logger.Core()))
+	slog.SetDefault(app.Logger)
 }
