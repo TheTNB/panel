@@ -28,7 +28,7 @@ const handleSave = () => {
         <n-button type="primary" @click="handleSave"> 保存 </n-button>
       </n-flex>
     </template>
-    <code-editor ref="editor" :path="file" />
+    <code-editor ref="editor" :path="file" :read-only="false" />
   </n-modal>
 </template>
 
