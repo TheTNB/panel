@@ -2,7 +2,9 @@ package queuejob
 
 import (
 	"errors"
+	"log/slog"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/shell"
 )
@@ -36,7 +38,7 @@ func (r *ProcessTask) Handle(args ...any) error {
 		return err
 	}
 
-	if _, err = shell.Execf(task.Shell); err != nil { // nolint: govet
+	if _, err = shell.Exec(task.Shell); err != nil {
 		return err
 	}
 
@@ -48,5 +50,6 @@ func (r *ProcessTask) Handle(args ...any) error {
 }
 
 func (r *ProcessTask) ErrHandle(err error) {
+	app.Logger.Warn("background task failed", slog.Any("task_id", r.taskID), slog.Any("err", err))
 	_ = r.taskRepo.UpdateStatus(r.taskID, biz.TaskStatusFailed)
 }

@@ -76,7 +76,7 @@ func (r *containerImageRepo) Pull(req *request.ContainerImagePull) error {
 
 	if req.Auth {
 		sb.WriteString(fmt.Sprintf("docker login -u %s -p %s", req.Username, req.Password))
-		if _, err := shell.ExecfWithTimeout(1*time.Minute, sb.String()); err != nil { // nolint: govet
+		if _, err := shell.Exec(sb.String()); err != nil {
 			return fmt.Errorf("login failed: %w", err)
 		}
 		sb.Reset()
@@ -84,7 +84,7 @@ func (r *containerImageRepo) Pull(req *request.ContainerImagePull) error {
 
 	sb.WriteString(fmt.Sprintf("docker pull %s", req.Name))
 
-	if _, err := shell.Execf(sb.String()); err != nil { // nolint: govet
+	if _, err := shell.Exec(sb.String()); err != nil {
 		return err
 	}
 

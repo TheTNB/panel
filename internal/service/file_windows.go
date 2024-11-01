@@ -162,8 +162,26 @@ func (s *FileService) Upload(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
+func (s *FileService) Exist(w http.ResponseWriter, r *http.Request) {
+	binder := chix.NewBind(r)
+	defer binder.Release()
+
+	var paths []string
+	if err := binder.Body(&paths); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	var results []bool
+	for item := range slices.Values(paths) {
+		results = append(results, io.Exists(item))
+	}
+
+	Success(w, results)
+}
+
 func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FileMove](r)
+	req, err := Bind[request.FileControl](r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -183,7 +201,7 @@ func (s *FileService) Move(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *FileService) Copy(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.FileCopy](r)
+	req, err := Bind[request.FileControl](r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

@@ -89,7 +89,7 @@ func (r *containerVolumeRepo) Create(req *request.ContainerVolumeCreate) (string
 		sb.WriteString(fmt.Sprintf(" --opt %s=%s", option.Key, option.Value))
 	}
 
-	return shell.ExecfWithTimeout(120*time.Second, sb.String()) // nolint: govet
+	return shell.Exec(sb.String())
 }
 
 // Remove 删除存储卷

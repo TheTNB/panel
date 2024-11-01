@@ -266,7 +266,7 @@ func (r *Firewall) Forward(rule Forward, operation Operation) error {
 		}
 		ruleBuilder.WriteString(" --permanent")
 
-		_, err := shell.Execf(ruleBuilder.String()) // nolint: govet
+		_, err := shell.Exec(ruleBuilder.String())
 		if err != nil {
 			return err
 		}

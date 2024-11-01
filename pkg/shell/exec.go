@@ -16,7 +16,23 @@ import (
 	"github.com/creack/pty"
 )
 
-// Execf 执行 shell 命令
+// Exec 执行 shell 命令
+func Exec(shell string) (string, error) {
+	_ = os.Setenv("LC_ALL", "C")
+	cmd := exec.Command("bash", "-c", shell)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return strings.TrimSpace(stdout.String()), fmt.Errorf("run %s failed, err: %s", shell, strings.TrimSpace(stderr.String()))
+	}
+
+	return strings.TrimSpace(stdout.String()), nil
+}
+
+// Execf 安全执行 shell 命令
 func Execf(shell string, args ...any) (string, error) {
 	if !preCheckArg(args) {
 		return "", errors.New("command contains illegal characters")
