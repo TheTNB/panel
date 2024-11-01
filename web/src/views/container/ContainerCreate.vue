@@ -2,7 +2,10 @@
 import container from '@/api/panel/container'
 
 const props = defineProps({
-  show: Boolean
+  show: {
+    type: Boolean,
+    required: true
+  }
 })
 
 const { show } = toRefs(props)

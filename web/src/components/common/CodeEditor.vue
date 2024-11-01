@@ -4,8 +4,14 @@ import { languageByPath } from '@/utils/file'
 import Editor from '@guolao/vue-monaco-editor'
 
 const props = defineProps({
-  path: String,
-  readOnly: Boolean
+  path: {
+    type: String,
+    required: true
+  },
+  readOnly: {
+    type: Boolean,
+    required: true
+  }
 })
 
 const disabled = ref(false) // 在出现错误的情况下禁用保存
@@ -13,7 +19,7 @@ const data = ref('')
 
 const get = async () => {
   await file
-    .content(props.path!)
+    .content(props.path)
     .then((res) => {
       data.value = res.data
       window.$message.success('获取成功')
@@ -28,7 +34,7 @@ const save = async () => {
     window.$message.error('当前状态下不可保存')
     return
   }
-  await file.save(props.path!, data.value)
+  await file.save(props.path, data.value)
   window.$message.success('保存成功')
 }
 
@@ -45,7 +51,7 @@ defineExpose({
 <template>
   <Editor
     v-model:value="data"
-    :language="languageByPath(props.path!)"
+    :language="languageByPath(props.path)"
     theme="vs-dark"
     height="60vh"
     :options="{

@@ -13,8 +13,14 @@ import cert from '@/api/panel/cert'
 import type { Account } from '@/views/cert/types'
 
 const props = defineProps({
-  caProviders: Array<any>,
-  algorithms: Array<any>
+  caProviders: {
+    type: Array<any>,
+    required: true
+  },
+  algorithms: {
+    type: Array<any>,
+    required: true
+  }
 })
 
 const { caProviders, algorithms } = toRefs(props)
@@ -54,7 +60,7 @@ const columns: any = [
         },
         {
           default: () => {
-            return caProviders?.value?.find((item: any) => item.value === row.ca)?.label
+            return caProviders.value?.find((item: any) => item.value === row.ca)?.label
           }
         }
       )

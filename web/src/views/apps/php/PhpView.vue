@@ -7,7 +7,10 @@ import systemctl from '@/api/panel/systemctl'
 import { renderIcon } from '@/utils'
 
 const props = defineProps({
-  version: Number
+  version: {
+    type: Number,
+    required: true
+  }
 })
 
 const { version } = toRefs(props)

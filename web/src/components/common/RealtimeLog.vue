@@ -3,7 +3,10 @@ import ws from '@/api/ws'
 import type { LogInst } from 'naive-ui'
 
 const props = defineProps({
-  path: String
+  path: {
+    type: String,
+    required: true
+  }
 })
 
 const log = ref('')

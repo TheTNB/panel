@@ -9,10 +9,22 @@ import ObtainModal from '@/views/cert/ObtainModal.vue'
 import type { Cert } from '@/views/cert/types'
 
 const props = defineProps({
-  algorithms: Array<any>,
-  websites: Array<any>,
-  accounts: Array<any>,
-  dns: Array<any>
+  algorithms: {
+    type: Array<any>,
+    required: true
+  },
+  websites: {
+    type: Array<any>,
+    required: true
+  },
+  accounts: {
+    type: Array<any>,
+    required: true
+  },
+  dns: {
+    type: Array<any>,
+    required: true
+  }
 })
 
 const { algorithms, websites, accounts, dns } = toRefs(props)
@@ -114,7 +126,7 @@ const columns: any = [
             default: () =>
               row.account_id == 0
                 ? '无'
-                : accounts?.value?.find((item: any) => item.value === row.account_id)?.label
+                : accounts.value?.find((item: any) => item.value === row.account_id)?.label
           })
         ]
       })

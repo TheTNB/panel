@@ -5,7 +5,10 @@ import cert from '@/api/panel/cert'
 import type { DNS } from '@/views/cert/types'
 
 const props = defineProps({
-  dnsProviders: Array<any>
+  dnsProviders: {
+    type: Array<any>,
+    required: true
+  }
 })
 
 const { dnsProviders } = toRefs(props)

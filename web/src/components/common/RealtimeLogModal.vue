@@ -4,7 +4,10 @@ import type { LogInst } from 'naive-ui'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps({
-  path: String
+  path: {
+    type: String,
+    required: true
+  }
 })
 
 const log = ref('')

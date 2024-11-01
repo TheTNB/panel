@@ -5,10 +5,22 @@ import { NButton, NSpace } from 'naive-ui'
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 
 const props = defineProps({
-  algorithms: Array<any>,
-  websites: Array<any>,
-  accounts: Array<any>,
-  dns: Array<any>
+  algorithms: {
+    type: Array<any>,
+    required: true
+  },
+  websites: {
+    type: Array<any>,
+    required: true
+  },
+  accounts: {
+    type: Array<any>,
+    required: true
+  },
+  dns: {
+    type: Array<any>,
+    required: true
+  }
 })
 
 const { algorithms, websites, accounts, dns } = toRefs(props)

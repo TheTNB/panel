@@ -6,8 +6,14 @@ import { NButton, NInput, NSpace } from 'naive-ui'
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 
 const props = defineProps({
-  caProviders: Array<any>,
-  algorithms: Array<any>
+  caProviders: {
+    type: Array<any>,
+    required: true
+  },
+  algorithms: {
+    type: Array<any>,
+    required: true
+  }
 })
 
 const { caProviders, algorithms } = toRefs(props)
