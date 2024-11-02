@@ -79,94 +79,96 @@ const columns: any = [
         {
           justify: 'center'
         },
-        [
-          row.installed && row.update_exist
-            ? h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => handleUpdate(row.slug)
-                },
-                {
-                  default: () => {
-                    return t('appIndex.confirm.update', { app: row.name })
+        {
+          default: () => [
+            row.installed && row.update_exist
+              ? h(
+                  NPopconfirm,
+                  {
+                    onPositiveClick: () => handleUpdate(row.slug)
                   },
-                  trigger: () => {
-                    return h(
-                      NButton,
-                      {
-                        size: 'small',
-                        type: 'warning'
-                      },
-                      {
-                        default: () => t('appIndex.buttons.update'),
-                        icon: renderIcon('material-symbols:arrow-circle-up-outline-rounded', {
-                          size: 14
-                        })
-                      }
-                    )
+                  {
+                    default: () => {
+                      return t('appIndex.confirm.update', { app: row.name })
+                    },
+                    trigger: () => {
+                      return h(
+                        NButton,
+                        {
+                          size: 'small',
+                          type: 'warning'
+                        },
+                        {
+                          default: () => t('appIndex.buttons.update'),
+                          icon: renderIcon('material-symbols:arrow-circle-up-outline-rounded', {
+                            size: 14
+                          })
+                        }
+                      )
+                    }
                   }
-                }
-              )
-            : null,
-          row.installed
-            ? h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'success',
-                  onClick: () => handleManage(row.slug)
-                },
-                {
-                  default: () => t('appIndex.buttons.manage'),
-                  icon: renderIcon('material-symbols:settings-outline', { size: 14 })
-                }
-              )
-            : null,
-          row.installed
-            ? h(
-                NPopconfirm,
-                {
-                  onPositiveClick: () => handleUninstall(row.slug)
-                },
-                {
-                  default: () => {
-                    return t('appIndex.confirm.uninstall', { app: row.name })
+                )
+              : null,
+            row.installed
+              ? h(
+                  NButton,
+                  {
+                    size: 'small',
+                    type: 'success',
+                    onClick: () => handleManage(row.slug)
                   },
-                  trigger: () => {
-                    return h(
-                      NButton,
-                      {
-                        size: 'small',
-                        type: 'error'
-                      },
-                      {
-                        default: () => t('appIndex.buttons.uninstall'),
-                        icon: renderIcon('material-symbols:delete-outline', { size: 14 })
-                      }
-                    )
+                  {
+                    default: () => t('appIndex.buttons.manage'),
+                    icon: renderIcon('material-symbols:settings-outline', { size: 14 })
                   }
-                }
-              )
-            : null,
-          !row.installed
-            ? h(
-                NButton,
-                {
-                  size: 'small',
-                  type: 'info',
-                  onClick: () => {
-                    versionModalShow.value = true
-                    versionModalOperation.value = '安装'
-                    versionModalInfo.value = row
+                )
+              : null,
+            row.installed
+              ? h(
+                  NPopconfirm,
+                  {
+                    onPositiveClick: () => handleUninstall(row.slug)
+                  },
+                  {
+                    default: () => {
+                      return t('appIndex.confirm.uninstall', { app: row.name })
+                    },
+                    trigger: () => {
+                      return h(
+                        NButton,
+                        {
+                          size: 'small',
+                          type: 'error'
+                        },
+                        {
+                          default: () => t('appIndex.buttons.uninstall'),
+                          icon: renderIcon('material-symbols:delete-outline', { size: 14 })
+                        }
+                      )
+                    }
                   }
-                },
-                {
-                  default: () => t('appIndex.buttons.install'),
-                  icon: renderIcon('material-symbols:download-rounded', { size: 14 })
-                }
-              )
-            : null
-        ]
+                )
+              : null,
+            !row.installed
+              ? h(
+                  NButton,
+                  {
+                    size: 'small',
+                    type: 'info',
+                    onClick: () => {
+                      versionModalShow.value = true
+                      versionModalOperation.value = '安装'
+                      versionModalInfo.value = row
+                    }
+                  },
+                  {
+                    default: () => t('appIndex.buttons.install'),
+                    icon: renderIcon('material-symbols:download-rounded', { size: 14 })
+                  }
+                )
+              : null
+          ]
+        }
       )
     }
   }
