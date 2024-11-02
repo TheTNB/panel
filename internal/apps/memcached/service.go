@@ -47,7 +47,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if matches := re.FindStringSubmatch(line); matches != nil && len(matches) == 3 {
+		if matches := re.FindStringSubmatch(line); len(matches) == 3 {
 			data = append(data, types.NV{
 				Name:  matches[1],
 				Value: matches[2],
