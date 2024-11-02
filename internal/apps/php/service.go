@@ -234,9 +234,14 @@ func (s *Service) getExtensions() []Extension {
 			Description: "OPcache 通过将 PHP 脚本预编译的字节码存储到共享内存中来提升 PHP 的性能，存储预编译字节码可以省去每次加载和解析 PHP 脚本的开销",
 		},
 		{
-			Name:        "PhpRedis",
+			Name:        "Redis",
 			Slug:        "redis",
 			Description: "PhpRedis 是一个用 C 语言编写的 PHP 模块，用来连接并操作 Redis 数据库上的数据",
+		},
+		{
+			Name:        "Memcached",
+			Slug:        "memcached",
+			Description: "Memcached 使用 libmemcached 库连接 Memcached 服务器",
 		},
 		{
 			Name:        "ImageMagick",
