@@ -55,16 +55,27 @@ const extensionColumns: any = [
       return [
         !row.installed
           ? h(
-              NButton,
+              NPopconfirm,
               {
-                size: 'small',
-                type: 'primary',
-                secondary: true,
-                onClick: () => handleInstallExtension(row.slug)
+                onPositiveClick: () => handleInstallExtension(row.slug)
               },
               {
-                default: () => '安装',
-                icon: renderIcon('material-symbols:download-rounded', { size: 14 })
+                default: () => {
+                  return '确定安装 ' + row.name + ' 吗？'
+                },
+                trigger: () => {
+                  return h(
+                    NButton,
+                    {
+                      size: 'small',
+                      type: 'info'
+                    },
+                    {
+                      default: () => '安装',
+                      icon: renderIcon('material-symbols:download-rounded', { size: 14 })
+                    }
+                  )
+                }
               }
             )
           : null,
@@ -76,7 +87,7 @@ const extensionColumns: any = [
               },
               {
                 default: () => {
-                  return '确定卸载' + row.name + '吗？'
+                  return '确定卸载 ' + row.name + ' 吗？'
                 },
                 trigger: () => {
                   return h(
