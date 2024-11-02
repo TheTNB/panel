@@ -63,10 +63,7 @@ For other systems not listed in the table below, you can try to install them by 
 
 As system versions are constantly updated, we may also terminate support for some older systems to ensure the robustness of the panel.
 
-## Install Panel
-
-> **Warning**
-> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. We are not recommended for users with zero basic knowledge to install and use Rat Panel.
+## Mount Disk
 
 If your server has an unmounted data disk, you can run the following command as the `root` user to automatically mount it before installation. The panel does not support cross-directory migration after installation.
 
@@ -74,9 +71,12 @@ If your server has an unmounted data disk, you can run the following command as 
 curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
 ```
 
-After you are ready, log in to the server as the `root` user and run the following command to install the panel:
+## Install Panel
 
-**Current v2.3.x is a test version, welcome to help us test compatibility on different operating systems.**
+> **Warning**
+> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. We are not recommended for users with zero basic knowledge to install and use Rat Panel.
+
+Login to the server as the `root` user and run the following command to install the panel:
 
 ```shell
 curl -fsLm 10 -o install.sh https://dl.cdn.haozi.net/panel/install.sh && bash install.sh

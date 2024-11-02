@@ -63,10 +63,7 @@ QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制
 
 随着系统版本的不断更新，我们亦可能会终止部分过于老旧的系统的支持，以保证面板的健壮性。
 
-## 安装面板
-
-> **Warning**
-> 安装面板前，您需要了解 LNMP 环境的基本知识，以及如何处理常见的 LNMP 环境问题，我们不建议 0 基础的用户安装和使用耗子面板。
+## 挂载硬盘
 
 如果您的服务器有未挂载的数据盘，可在安装前以`root`用户登录服务器运行以下命令自动挂载，面板安装后不支持跨目录迁移。
 
@@ -74,9 +71,12 @@ QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制
 curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
 ```
 
-准备就绪后，请以`root`用户登录服务器，运行以下命令安装面板：
+## 安装面板
 
-**当前 v2.3.x 为测试版本，欢迎帮助我们测试在不同操作系统下的兼容性。**
+> **Warning**
+> 安装面板前，您需要了解 LNMP 环境的基本知识，以及如何处理常见的 LNMP 环境问题，我们不建议 0 基础的用户安装和使用耗子面板。
+
+以`root`用户登录服务器，运行以下命令安装面板：
 
 ```shell
 curl -fsLm 10 -o install.sh https://dl.cdn.haozi.net/panel/install.sh && bash install.sh
