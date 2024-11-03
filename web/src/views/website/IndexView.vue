@@ -542,19 +542,15 @@ onMounted(() => {
         />
       </n-form-item>
     </n-form>
-    <n-row :gutter="[0, 24]">
-      <n-col :span="24">
-        <n-button
-          type="info"
-          block
-          :loading="buttonLoading"
-          :disabled="buttonDisabled"
-          @click="handleCreate"
-        >
-          {{ $t('websiteIndex.create.actions.submit') }}
-        </n-button>
-      </n-col>
-    </n-row>
+    <n-button
+      type="info"
+      block
+      :loading="buttonLoading"
+      :disabled="buttonDisabled"
+      @click="handleCreate"
+    >
+      {{ $t('websiteIndex.create.actions.submit') }}
+    </n-button>
   </n-modal>
   <n-modal
     v-model:show="editDefaultPageModal"

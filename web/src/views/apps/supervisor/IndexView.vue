@@ -511,11 +511,7 @@ onUnmounted(() => {
         <n-input-number v-model:value="createProcessModel.num" :min="1" />
       </n-form-item>
     </n-form>
-    <n-row :gutter="[0, 24]">
-      <n-col :span="24">
-        <n-button type="info" block @click="handleCreateProcess">提交</n-button>
-      </n-col>
-    </n-row>
+    <n-button type="info" block @click="handleCreateProcess">提交</n-button>
   </n-modal>
   <realtime-log-modal v-model:show="processLogModal" :path="processLog" />
   <n-modal

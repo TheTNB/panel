@@ -410,11 +410,7 @@ onMounted(() => {
         />
       </n-form-item>
     </n-form>
-    <n-row :gutter="[0, 24]">
-      <n-col :span="24">
-        <n-button type="info" block @click="handleModelAdd">提交</n-button>
-      </n-col>
-    </n-row>
+    <n-button type="info" block @click="handleModelAdd">提交</n-button>
   </n-modal>
   <n-modal
     v-model:show="editModuleModal"

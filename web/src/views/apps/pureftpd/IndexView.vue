@@ -330,11 +330,7 @@ onMounted(() => {
           />
         </n-form-item>
       </n-form>
-      <n-row :gutter="[0, 24]">
-        <n-col :span="24">
-          <n-button type="info" block @click="handleAddUser">提交</n-button>
-        </n-col>
-      </n-row>
+      <n-button type="info" block @click="handleAddUser">提交</n-button>
     </n-card>
   </n-modal>
   <n-modal v-model:show="changePasswordModal">
@@ -354,11 +350,7 @@ onMounted(() => {
           />
         </n-form-item>
       </n-form>
-      <n-row :gutter="[0, 24]">
-        <n-col :span="24">
-          <n-button type="info" block @click="handleChangePassword">提交</n-button>
-        </n-col>
-      </n-row>
+      <n-button type="info" block @click="handleChangePassword">提交</n-button>
     </n-card>
   </n-modal>
 </template>

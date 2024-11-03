@@ -398,7 +398,7 @@ func (r *settingRepo) FixPanel() error {
 				return fmt.Errorf("清理临时文件失败：%w", err)
 			}
 			if app.IsCli {
-				fmt.Println("已清理临时文件，请运行 panel-cli update 更新面板")
+				fmt.Println("|-已清理临时文件，请运行 panel-cli update 更新面板")
 			}
 			return nil
 		}

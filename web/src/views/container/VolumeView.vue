@@ -227,12 +227,8 @@ onMounted(() => {
         />
       </n-form-item>
     </n-form>
-    <n-row :gutter="[0, 24]">
-      <n-col :span="24">
-        <n-button type="info" :loading="loading" :disabled="loading" block @click="handleCreate">
-          提交
-        </n-button>
-      </n-col>
-    </n-row>
+    <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
+      提交
+    </n-button>
   </n-modal>
 </template>
