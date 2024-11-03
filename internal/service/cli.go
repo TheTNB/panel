@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/go-rat/utils/collect"
 	"github.com/go-rat/utils/hash"
+	"github.com/go-rat/utils/str"
 	"github.com/spf13/cast"
 	"github.com/urfave/cli/v3"
 	"gopkg.in/yaml.v3"
@@ -21,7 +23,6 @@ import (
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/ntp"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
@@ -84,7 +85,7 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("获取最新版本失败：%v", err)
 	}
 
-	download := str.FirstElement(panel.Downloads)
+	download := collect.First(panel.Downloads)
 	if download == nil {
 		return fmt.Errorf("下载地址为空")
 	}
@@ -103,15 +104,15 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("获取管理员信息失败：%v", err)
 	}
 
-	password := str.RandomString(16)
+	password := str.Random(16)
 	hashed, err := s.hash.Make(password)
 	if err != nil {
 		return fmt.Errorf("密码生成失败：%v", err)
 	}
-	user.Username = str.RandomString(8)
+	user.Username = str.Random(8)
 	user.Password = hashed
 	if user.Email == "" {
-		user.Email = str.RandomString(8) + "@example.com"
+		user.Email = str.Random(8) + "@example.com"
 	}
 
 	if err = app.Orm.Save(user).Error; err != nil {
@@ -326,7 +327,7 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	config.HTTP.Entrance = "/" + str.RandomString(6)
+	config.HTTP.Entrance = "/" + str.Random(6)
 
 	encoded, err := yaml.Marshal(config)
 	if err != nil {
@@ -755,7 +756,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("初始化失败：%v", err)
 	}
 
-	value, err := hash.NewArgon2id().Make(str.RandomString(32))
+	value, err := hash.NewArgon2id().Make(str.Random(32))
 	if err != nil {
 		return fmt.Errorf("初始化失败：%v", err)
 	}
@@ -779,8 +780,8 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	config.App.Key = str.RandomString(32)
-	config.HTTP.Entrance = "/" + str.RandomString(6)
+	config.App.Key = str.Random(32)
+	config.HTTP.Entrance = "/" + str.Random(6)
 
 	encoded, err := yaml.Marshal(config)
 	if err != nil {

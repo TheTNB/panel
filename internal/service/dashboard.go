@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/go-rat/chix"
+	"github.com/go-rat/utils/collect"
 	"github.com/hashicorp/go-version"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
@@ -20,7 +21,6 @@ import (
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -295,7 +295,7 @@ func (s *DashboardService) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	download := str.FirstElement(panel.Downloads)
+	download := collect.First(panel.Downloads)
 	if download == nil {
 		Error(w, http.StatusInternalServerError, "获取下载链接失败")
 		return

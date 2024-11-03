@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/go-rat/chix"
+	"github.com/go-rat/utils/str"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -16,7 +17,6 @@ import (
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 )
 
 type Service struct {

@@ -7,13 +7,14 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-rat/utils/str"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
@@ -99,7 +100,7 @@ panel-cli cutoff clear -t website -f %s -s %d -p %s
 	if !io.Exists(shellLogDir) {
 		return errors.New("计划任务日志目录不存在")
 	}
-	shellFile := strconv.Itoa(int(time.Now().Unix())) + str.RandomString(16)
+	shellFile := strconv.Itoa(int(time.Now().Unix())) + str.Random(16)
 	if err := io.Write(filepath.Join(shellDir, shellFile+".sh"), script, 0700); err != nil {
 		return errors.New(err.Error())
 	}

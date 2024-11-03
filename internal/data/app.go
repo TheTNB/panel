@@ -15,7 +15,6 @@ import (
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/apploader"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 )
 
 type appRepo struct {
@@ -65,7 +64,7 @@ func (r *appRepo) UpdateExist(slug string) bool {
 
 	for channel := range slices.Values(item.Channels) {
 		if channel.Slug == installed.Channel {
-			current := str.FirstElement(channel.Subs)
+			current := collect.First(channel.Subs)
 			if current != nil && current.Version != installed.Version {
 				return true
 			}
@@ -168,7 +167,7 @@ func (r *appRepo) Install(channel, slug string) error {
 			}
 			shellUrl = ch.Install
 			shellChannel = ch.Slug
-			shellVersion = str.FirstElement(ch.Subs).Version
+			shellVersion = collect.First(ch.Subs).Version
 			break
 		}
 	}
@@ -278,7 +277,7 @@ func (r *appRepo) Update(slug string) error {
 			}
 			shellUrl = ch.Update
 			shellChannel = ch.Slug
-			shellVersion = str.FirstElement(ch.Subs).Version
+			shellVersion = collect.First(ch.Subs).Version
 			break
 		}
 	}
