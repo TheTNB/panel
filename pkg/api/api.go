@@ -5,10 +5,9 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-rat/utils/copier"
 	"github.com/go-resty/resty/v2"
 	"github.com/shirou/gopsutil/host"
-
-	"github.com/TheTNB/panel/pkg/copier"
 )
 
 type API struct {

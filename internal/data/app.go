@@ -7,6 +7,7 @@ import (
 	"slices"
 
 	"github.com/expr-lang/expr"
+	"github.com/go-rat/utils/collect"
 	"github.com/hashicorp/go-version"
 	"github.com/spf13/cast"
 

@@ -15,8 +15,8 @@ import (
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -123,7 +123,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		if len(matches) > 1 {
 			d := map[string]string{"name": expression.name, "value": matches[1]}
 			if expression.name == "发送" || expression.name == "接收" {
-				d["value"] = str.FormatBytes(cast.ToFloat64(matches[1]))
+				d["value"] = tools.FormatBytes(cast.ToFloat64(matches[1]))
 			}
 
 			load = append(load, d)

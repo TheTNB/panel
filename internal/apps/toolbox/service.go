@@ -14,7 +14,7 @@ import (
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/ntp"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -77,7 +77,7 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		size = file.Size() / 1024 / 1024
-		total = str.FormatBytes(float64(file.Size()))
+		total = tools.FormatBytes(float64(file.Size()))
 	} else {
 		size = 0
 		total = "0.00 B"
@@ -91,8 +91,8 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 
 	match := regexp.MustCompile(`Swap:\s+(\d+)\s+(\d+)\s+(\d+)`).FindStringSubmatch(raw)
 	if len(match) >= 4 {
-		used = str.FormatBytes(cast.ToFloat64(match[2]) * 1024)
-		free = str.FormatBytes(cast.ToFloat64(match[3]) * 1024)
+		used = tools.FormatBytes(cast.ToFloat64(match[2]) * 1024)
+		free = tools.FormatBytes(cast.ToFloat64(match[3]) * 1024)
 	}
 
 	service.Success(w, chix.M{
@@ -134,7 +134,7 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if cast.ToInt64(free)*1024 < req.Size*1024*1024 {
-			service.Error(w, http.StatusInternalServerError, "硬盘空间不足，当前剩余%s", str.FormatBytes(cast.ToFloat64(free)))
+			service.Error(w, http.StatusInternalServerError, "硬盘空间不足，当前剩余%s", tools.FormatBytes(cast.ToFloat64(free)))
 			return
 		}
 

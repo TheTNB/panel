@@ -13,8 +13,8 @@ import (
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
 	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -95,7 +95,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 		service.Error(w, http.StatusInternalServerError, "获取负载失败")
 		return
 	}
-	mem := str.FormatBytes(cast.ToFloat64(out))
+	mem := tools.FormatBytes(cast.ToFloat64(out))
 	data = append(data, types.NV{
 		Name:  "内存占用",
 		Value: mem,

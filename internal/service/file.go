@@ -23,7 +23,7 @@ import (
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/tools"
 )
 
 type FileService struct {
@@ -301,7 +301,7 @@ func (s *FileService) Info(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, chix.M{
 		"name":     info.Name(),
-		"size":     str.FormatBytes(float64(info.Size())),
+		"size":     tools.FormatBytes(float64(info.Size())),
 		"mode_str": info.Mode().String(),
 		"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
 		"dir":      info.IsDir(),
@@ -451,7 +451,7 @@ func (s *FileService) formatDir(base string, entries []stdos.DirEntry) []any {
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
 			"full":     filepath.Join(base, info.Name()),
-			"size":     str.FormatBytes(float64(info.Size())),
+			"size":     tools.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
 			"owner":    os.GetUser(stat.Uid),
@@ -477,7 +477,7 @@ func (s *FileService) formatInfo(infos map[string]stdos.FileInfo) []map[string]a
 		paths = append(paths, map[string]any{
 			"name":     info.Name(),
 			"full":     path,
-			"size":     str.FormatBytes(float64(info.Size())),
+			"size":     tools.FormatBytes(float64(info.Size())),
 			"mode_str": info.Mode().String(),
 			"mode":     fmt.Sprintf("%04o", info.Mode().Perm()),
 			"owner":    os.GetUser(stat.Uid),

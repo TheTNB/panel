@@ -14,7 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 	"github.com/TheTNB/panel/pkg/types/docker/volume"
 )
@@ -61,7 +61,7 @@ func (r *containerVolumeRepo) List() ([]types.ContainerVolume, error) {
 			Labels:     types.MapToKV(item.Labels),
 			Options:    types.MapToKV(item.Options),
 			RefCount:   item.UsageData.RefCount,
-			Size:       str.FormatBytes(float64(item.UsageData.Size)),
+			Size:       tools.FormatBytes(float64(item.UsageData.Size)),
 		})
 	}
 

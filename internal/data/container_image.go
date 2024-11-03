@@ -14,7 +14,7 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 	"github.com/TheTNB/panel/pkg/types/docker/image"
 )
@@ -57,7 +57,7 @@ func (r *containerImageRepo) List() ([]types.ContainerImage, error) {
 			Containers:  item.Containers,
 			RepoTags:    item.RepoTags,
 			RepoDigests: item.RepoDigests,
-			Size:        str.FormatBytes(float64(item.Size)),
+			Size:        tools.FormatBytes(float64(item.Size)),
 			Labels:      types.MapToKV(item.Labels),
 			CreatedAt:   time.Unix(item.Created, 0),
 		})

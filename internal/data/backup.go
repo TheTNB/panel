@@ -16,7 +16,7 @@ import (
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/str"
+	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
@@ -53,7 +53,7 @@ func (r *backupRepo) List(typ biz.BackupType) ([]*types.BackupFile, error) {
 		list = append(list, &types.BackupFile{
 			Name: file.Name(),
 			Path: filepath.Join(path, file.Name()),
-			Size: str.FormatBytes(float64(info.Size())),
+			Size: tools.FormatBytes(float64(info.Size())),
 			Time: info.ModTime(),
 		})
 	}
@@ -478,9 +478,9 @@ func (r *backupRepo) preCheckPath(to, path string) error {
 	}
 
 	if app.IsCli {
-		fmt.Printf("|-目标大小：%s\n", str.FormatBytes(float64(size)))
+		fmt.Printf("|-目标大小：%s\n", tools.FormatBytes(float64(size)))
 		fmt.Printf("|-目标文件数：%d\n", files)
-		fmt.Printf("|-备份目录可用空间：%s\n", str.FormatBytes(float64(usage.Free)))
+		fmt.Printf("|-备份目录可用空间：%s\n", tools.FormatBytes(float64(usage.Free)))
 		fmt.Printf("|-备份目录可用Inode：%d\n", usage.InodesFree)
 	}
 
@@ -504,8 +504,8 @@ func (r *backupRepo) preCheckDB(to string, size int64) error {
 	}
 
 	if app.IsCli {
-		fmt.Printf("|-目标大小：%s\n", str.FormatBytes(float64(size)))
-		fmt.Printf("|-备份目录可用空间：%s\n", str.FormatBytes(float64(usage.Free)))
+		fmt.Printf("|-目标大小：%s\n", tools.FormatBytes(float64(size)))
+		fmt.Printf("|-备份目录可用空间：%s\n", tools.FormatBytes(float64(usage.Free)))
 		fmt.Printf("|-备份目录可用Inode：%d\n", usage.InodesFree)
 	}
 

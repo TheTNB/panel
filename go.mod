@@ -16,7 +16,7 @@ require (
 	github.com/go-rat/chix v1.1.4
 	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.11
-	github.com/go-rat/utils v1.0.6
+	github.com/go-rat/utils v1.0.7
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-cz/httplog v0.0.0-20241002114323-98e09d6f537a
@@ -80,6 +80,7 @@ require (
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
