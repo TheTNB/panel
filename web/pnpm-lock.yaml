@@ -43,7 +43,7 @@ importers:
         version: 5.5.0
       alova:
         specifier: ^3.1.1
-        version: 3.2.0
+        version: 3.2.1
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -1374,8 +1374,8 @@ packages:
   alien-signals@0.2.0:
     resolution: {integrity: sha512-StlonZhBBrsPPwrDjiPAiVTf/rolxffLxVPT60Qv/t88BZ81BvUVzHgGqEFvJ1ii8HXtm1+zU2Icr59tfWEcag==}
 
-  alova@3.2.0:
-    resolution: {integrity: sha512-lHUBCgbKRuR4iuu/WTvknfQb/O0GreKNnuYwUSXSojYdY0h+f7Kvkj2XAgYrggO394W9E435wd4oFfaWh+L0EQ==}
+  alova@3.2.1:
+    resolution: {integrity: sha512-MA6QE8akeALobBOV9yMqJrwNaqxXodoI28lGkmtJsIEmTYvZMe7Ya+qFwJtOM/1rOQoD7I2Uu1wVrlvVAwrVtw==}
     engines: {node: '>= 18.0.0'}
 
   ansi-regex@5.0.1:
@@ -4685,7 +4685,7 @@ snapshots:
 
   alien-signals@0.2.0: {}
 
-  alova@3.2.0:
+  alova@3.2.1:
     dependencies:
       '@alova/shared': 1.1.0
       rate-limiter-flexible: 5.0.4
