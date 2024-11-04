@@ -8,6 +8,6 @@ import (
 )
 
 func initQueue() {
-	app.Queue = queue.New(40)
+	app.Queue = queue.New(100)
 	go app.Queue.Run(context.Background())
 }

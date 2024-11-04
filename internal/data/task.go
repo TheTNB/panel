@@ -1,6 +1,7 @@
 package data
 
 import (
+	"fmt"
 	"log/slog"
 	"sync"
 
@@ -47,9 +48,18 @@ func (r *taskRepo) UpdateStatus(id uint, status biz.TaskStatus) error {
 }
 
 func (r *taskRepo) Push(task *biz.Task) error {
+	var count int64
+	if err := app.Orm.Model(&biz.Task{}).Where("shell = ? and (status = ? or status = ?)", task.Shell, biz.TaskStatusWaiting, biz.TaskStatusRunning).Count(&count).Error; err != nil {
+		return err
+	}
+	if count > 0 {
+		return fmt.Errorf("任务重复提交，请等待上一个任务完成")
+	}
+
 	if err := app.Orm.Create(task).Error; err != nil {
 		return err
 	}
+
 	return app.Queue.Push(queuejob.NewProcessTask(r), []any{
 		task.ID,
 	})
