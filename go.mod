@@ -30,7 +30,7 @@ require (
 	github.com/libdns/cloudflare v0.1.1
 	github.com/libdns/huaweicloud v0.2.2
 	github.com/libdns/libdns v0.2.2
-	github.com/libdns/tencentcloud v1.0.0
+	github.com/libdns/tencentcloud v1.1.0
 	github.com/mholt/acmez/v2 v2.0.3
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -75,7 +75,8 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.597 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1033 // indirect
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.1033 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect

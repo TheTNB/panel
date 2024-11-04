@@ -106,8 +106,8 @@ github.com/libdns/huaweicloud v0.2.2/go.mod h1:F9vNIca+Cq1ZJiMCSkHQUdvXEGY6UbLoa
 github.com/libdns/libdns v0.2.0/go.mod h1:yQCXzk1lEZmmCPa857bnk4TsOiqYasqpyOEeSObbb40=
 github.com/libdns/libdns v0.2.2 h1:O6ws7bAfRPaBsgAYt8MDe2HcNBGC29hkZ9MX2eUSX3s=
 github.com/libdns/libdns v0.2.2/go.mod h1:4Bj9+5CQiNMVGf87wjX4CY3HQJypUHRuLvlsfsZqLWQ=
-github.com/libdns/tencentcloud v1.0.0 h1:u4LXnYu/lu/9P5W+MCVPeSDnwI+6w+DxYhQ1wSnQOuU=
-github.com/libdns/tencentcloud v1.0.0/go.mod h1:NlCgPumzUsZWSOo1+Q/Hfh8G6TNRAaTUeWQdg6LbtUI=
+github.com/libdns/tencentcloud v1.1.0 h1:UvrU9HR3Cc87vIkj/FrTGkaZigGcRyZFdLCYqKDac1c=
+github.com/libdns/tencentcloud v1.1.0/go.mod h1:PuP62hTGHSI3OqSUsrzuvsCWMD+9BlPtVjKasOrAtJ4=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/mitchellh/copystructure v1.2.0 h1:vpKXTN4ewci03Vljg/q9QvCGUDttBOGBIa15WveJJGw=
@@ -144,8 +144,10 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.597 h1:C0GHdLTfikLVoEzfhgPfrZ7LwlG0xiCmk6iwNKE+xs0=
-github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.597/go.mod h1:7sCQWVkxcsR38nffDW057DRGk8mUjK1Ing/EFOK8s8Y=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1033 h1:g263/dapUpOAZJa1Y9x07WgfOl7Yy+FM5Mrf4WyttS8=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1033/go.mod h1:r5r4xbfxSaeR04b166HGsBa/R4U3SueirEUpXGuw+Q0=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.1033 h1:bRCo+X6i/6B+5Q/G4+rexcMRxpSq+9XS/8+Usn6OcOA=
+github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.1033/go.mod h1:ta9FOsQP/SvQAhDD6IhVhYWyY+eboPEbPWq7zpiNwZA=
 github.com/tklauser/go-sysconf v0.3.14 h1:g5vzr9iPFFz24v2KZXs/pvpvh8/V9Fw6vQK5ZZb78yU=
 github.com/tklauser/go-sysconf v0.3.14/go.mod h1:1ym4lWMLUOhuBOPGtRcJm7tEGX4SCYNEEEtghGG/8uY=
 github.com/tklauser/numcpus v0.8.0 h1:Mx4Wwe/FjZLeQsK/6kt2EOepwwSl7SmJrK5bV/dXYgY=
