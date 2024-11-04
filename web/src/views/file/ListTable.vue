@@ -618,6 +618,7 @@ onMounted(() => {
   watch(
     path,
     () => {
+      selected.value = []
       handlePageChange(1)
       window.$bus.emit('push-history', path.value)
     },
