@@ -71,6 +71,11 @@ func (r *taskRepo) DispatchWaiting() {
 		return
 	}
 
+	if err := app.Orm.Model(&biz.Task{}).Where("status = ?", biz.TaskStatusRunning).Update("status", biz.TaskStatusFailed).Error; err != nil {
+		app.Logger.Warn("failed to mark running tasks as failed", slog.Any("err", err))
+		return
+	}
+
 	var tasks []biz.Task
 	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
 		app.Logger.Warn("failed to get pending tasks", slog.Any("err", err))
