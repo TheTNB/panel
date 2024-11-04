@@ -53,7 +53,7 @@ func (r *taskRepo) Push(task *biz.Task) error {
 		return err
 	}
 	if count > 0 {
-		return fmt.Errorf("任务重复提交，请等待上一个任务完成")
+		return fmt.Errorf("duplicate submission, please wait for the previous task to end")
 	}
 
 	if err := app.Orm.Create(task).Error; err != nil {
@@ -73,7 +73,7 @@ func (r *taskRepo) DispatchWaiting() {
 
 	var tasks []biz.Task
 	if err := app.Orm.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
-		app.Logger.Warn("获取待处理任务失败", slog.Any("err", err))
+		app.Logger.Warn("failed to get pending tasks", slog.Any("err", err))
 		return
 	}
 
@@ -81,7 +81,7 @@ func (r *taskRepo) DispatchWaiting() {
 		if err := app.Queue.Push(queuejob.NewProcessTask(r), []any{
 			task.ID,
 		}); err != nil {
-			app.Logger.Warn("推送任务失败", slog.Any("err", err))
+			app.Logger.Warn("failed to push task", slog.Any("err", err))
 			return
 		}
 	}
