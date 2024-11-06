@@ -3,8 +3,8 @@ import { NButton, NDataTable, NPopconfirm, NTag } from 'naive-ui'
 
 import firewall from '@/api/panel/firewall'
 import { renderIcon } from '@/utils'
-import CreateModal from '@/views/safe/CreateModal.vue'
-import type { FirewallRule } from '@/views/safe/types'
+import CreateForwardModal from '@/views/firewall/CreateForwardModal.vue'
+import type { FirewallRule } from '@/views/firewall/types'
 
 const createModalShow = ref(false)
 
@@ -28,122 +28,51 @@ const columns: any = [
     }
   },
   {
-    title: '网络协议',
-    key: 'family',
-    width: 150,
-    resizable: true,
-    ellipsis: { tooltip: true },
-    render(row: any): any {
-      return h(NTag, null, {
-        default: () => {
-          if (row.family !== '') {
-            return row.family
-          }
-          return '无'
-        }
-      })
-    }
-  },
-  {
     title: '端口',
     key: 'port',
-    width: 250,
-    resizable: true,
-    ellipsis: { tooltip: true },
-    render(row: any): any {
-      if (row.port_start == row.port_end) {
-        return row.port_start
-      }
-      return `${row.port_start}-${row.port_end}`
-    }
-  },
-  {
-    title: '状态',
-    key: 'in_use',
     width: 150,
-    render(row: any): any {
-      return h(
-        NTag,
-        {
-          type: row.in_use ? 'success' : 'default'
-        },
-        {
-          default: () => {
-            if (row.in_use) {
-              return '使用中'
-            }
-            return '未使用'
-          }
-        }
-      )
-    }
-  },
-  {
-    title: '策略',
-    key: 'strategy',
-    width: 150,
-    render(row: any): any {
-      return h(
-        NTag,
-        {
-          type:
-            row.strategy === 'accept' ? 'success' : row.strategy === 'drop' ? 'warning' : 'error'
-        },
-        {
-          default: () => {
-            switch (row.strategy) {
-              case 'accept':
-                return '接受'
-              case 'drop':
-                return '丢弃'
-              case 'reject':
-                return '拒绝'
-              default:
-                return '未知'
-            }
-          }
-        }
-      )
-    }
-  },
-  {
-    title: '方向',
-    key: 'direction',
-    width: 150,
-    render(row: any): any {
-      return h(
-        NTag,
-        {
-          type: row.direction === 'in' ? 'info' : 'default'
-        },
-        {
-          default: () => {
-            switch (row.direction) {
-              case 'in':
-                return '传入'
-              case 'out':
-                return '传出'
-              default:
-                return '未知'
-            }
-          }
-        }
-      )
-    }
-  },
-  {
-    title: '目标',
-    key: 'address',
-    minWidth: 200,
     render(row: any): any {
       return h(NTag, null, {
         default: () => {
-          if (row.address === '') {
-            return '所有'
-          }
-          return row.address
+          return row.port
         }
       })
+    }
+  },
+  {
+    title: '目标 IP',
+    key: 'target_ip',
+    minWidth: 200,
+    render(row: any): any {
+      return h(
+        NTag,
+        {
+          type: 'info'
+        },
+        {
+          default: () => {
+            return row.target_ip
+          }
+        }
+      )
+    }
+  },
+  {
+    title: '目标端口',
+    key: 'target_port',
+    width: 150,
+    render(row: any): any {
+      return h(
+        NTag,
+        {
+          type: 'info'
+        },
+        {
+          default: () => {
+            return row.target_port
+          }
+        }
+      )
     }
   },
   {
@@ -199,18 +128,18 @@ const pagination = reactive({
 const selectedRowKeys = ref<any>([])
 
 const handleDelete = async (row: any) => {
-  await firewall.deleteRule(row).then(() => {
+  await firewall.deleteForward(row).then(() => {
     window.$message.success('删除成功')
   })
-  fetchFirewallRules(pagination.page, pagination.pageSize).then((res) => {
+  fetchFirewallForwards(pagination.page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
   })
 }
 
-const fetchFirewallRules = async (page: number, limit: number) => {
-  const { data } = await firewall.rules(page, limit)
+const fetchFirewallForwards = async (page: number, limit: number) => {
+  const { data } = await firewall.forwards(page, limit)
   return data
 }
 
@@ -223,14 +152,12 @@ const batchDelete = async () => {
   for (const key of selectedRowKeys.value) {
     // 解析json
     const rule = JSON.parse(key)
-    await firewall.deleteRule(rule).then(() => {
-      let port =
-        rule.port_start == rule.port_end ? rule.port_start : `${rule.port_start}-${rule.port_end}`
-      window.$message.success(`${rule.family} 规则 ${port}/${rule.protocol} 删除成功`)
+    await firewall.deleteForward(rule).then(() => {
+      window.$message.success(`${rule.protocol} ${rule.target_ip}:${rule.target_port} 删除成功`)
     })
   }
 
-  fetchFirewallRules(pagination.page, pagination.pageSize).then((res) => {
+  fetchFirewallForwards(pagination.page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
@@ -243,7 +170,7 @@ const onChecked = (rowKeys: any) => {
 
 const onPageChange = (page: number) => {
   pagination.page = page
-  fetchFirewallRules(page, pagination.pageSize).then((res) => {
+  fetchFirewallForwards(page, pagination.pageSize).then((res) => {
     data.value = res.items
     pagination.itemCount = res.total
     pagination.pageCount = res.total / pagination.pageSize + 1
@@ -270,7 +197,7 @@ onMounted(() => {
       <n-flex items-center>
         <n-button type="primary" @click="createModalShow = true">
           <TheIcon :size="18" icon="material-symbols:add" />
-          创建规则
+          创建转发
         </n-button>
         <n-popconfirm @positive-click="batchDelete">
           <template #trigger>
@@ -286,7 +213,7 @@ onMounted(() => {
     <n-data-table
       striped
       remote
-      :scroll-x="1400"
+      :scroll-x="1000"
       :loading="false"
       :columns="columns"
       :data="data"
@@ -297,7 +224,7 @@ onMounted(() => {
       @update:page-size="onPageSizeChange"
     />
   </n-flex>
-  <create-modal v-model:show="createModalShow" />
+  <create-forward-modal v-model:show="createModalShow" />
 </template>
 
 <style scoped lang="scss"></style>

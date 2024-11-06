@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'safe-index'
+  name: 'firewall-index'
 })
 
-import ForwardView from '@/views/safe/ForwardView.vue'
-import IpRuleView from '@/views/safe/IpRuleView.vue'
-import RuleView from '@/views/safe/RuleView.vue'
-import SettingView from '@/views/safe/SettingView.vue'
+import ForwardView from '@/views/firewall/ForwardView.vue'
+import IpRuleView from '@/views/firewall/IpRuleView.vue'
+import RuleView from '@/views/firewall/RuleView.vue'
+import SettingView from '@/views/firewall/SettingView.vue'
 
 const currentTab = ref('rule')
 </script>

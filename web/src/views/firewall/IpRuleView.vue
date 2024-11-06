@@ -3,8 +3,8 @@ import { NButton, NDataTable, NPopconfirm, NTag } from 'naive-ui'
 
 import firewall from '@/api/panel/firewall'
 import { renderIcon } from '@/utils'
-import CreateIpModal from '@/views/safe/CreateIpModal.vue'
-import type { FirewallRule } from '@/views/safe/types'
+import CreateIpModal from '@/views/firewall/CreateIpModal.vue'
+import type { FirewallRule } from '@/views/firewall/types'
 
 const createModalShow = ref(false)
 

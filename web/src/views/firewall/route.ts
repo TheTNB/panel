@@ -3,19 +3,19 @@ import type { RouteType } from '~/types/router'
 const Layout = () => import('@/layout/IndexView.vue')
 
 export default {
-  name: 'safe',
-  path: '/safe',
+  name: 'firewall',
+  path: '/firewall',
   component: Layout,
   meta: {
     order: 30
   },
   children: [
     {
-      name: 'safe-index',
+      name: 'firewall-index',
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: '安全',
+        title: '防火墙',
         icon: 'mdi:shield-check-outline',
         role: ['admin'],
         requireAuth: true
