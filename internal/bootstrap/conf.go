@@ -25,6 +25,10 @@ func initConf() {
 }
 
 func initGlobal() {
+	app.Key = app.Conf.MustString("app.key")
+	if len(app.Key) != 32 {
+		log.Fatalf("app key must be 32 characters")
+	}
 	app.Root = app.Conf.MustString("app.root")
 	app.Version = "2.3.17"
 	app.Locale = app.Conf.MustString("app.locale")

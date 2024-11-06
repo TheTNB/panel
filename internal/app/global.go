@@ -37,6 +37,7 @@ const (
 
 // 面板全局变量
 var (
+	Key     string
 	Root    string
 	Version string
 	Locale  string

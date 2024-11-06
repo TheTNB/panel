@@ -3,6 +3,10 @@ package biz
 import (
 	"time"
 
+	"github.com/go-rat/utils/crypt"
+	"gorm.io/gorm"
+
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/ssh"
 )
@@ -16,6 +20,43 @@ type SSH struct {
 	Remark    string           `gorm:"not null" json:"remark"`
 	CreatedAt time.Time        `json:"created_at"`
 	UpdatedAt time.Time        `json:"updated_at"`
+}
+
+func (r *SSH) BeforeSave(tx *gorm.DB) error {
+	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
+	if err != nil {
+		return err
+	}
+
+	r.Config.Key, err = crypter.Encrypt([]byte(r.Config.Key))
+	if err != nil {
+		return err
+	}
+	r.Config.Password, err = crypter.Encrypt([]byte(r.Config.Password))
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func (r *SSH) AfterFind(tx *gorm.DB) error {
+	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
+	if err != nil {
+		return err
+	}
+
+	key, err := crypter.Decrypt(r.Config.Key)
+	if err == nil {
+		r.Config.Key = string(key)
+	}
+	password, err := crypter.Decrypt(r.Config.Password)
+	if err == nil {
+		r.Config.Password = string(password)
+	}
+
+	return nil
 }
 
 type SSHRepo interface {

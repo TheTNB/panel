@@ -12,7 +12,7 @@ import (
 func initSession() {
 	// initialize session manager
 	manager, err := sessions.NewManager(&sessions.ManagerOptions{
-		Key:                  app.Conf.String("app.key"),
+		Key:                  app.Key,
 		Lifetime:             120,
 		GcInterval:           30,
 		DisableDefaultDriver: true,
