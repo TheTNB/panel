@@ -16,5 +16,5 @@ type ChangePassword struct {
 }
 
 type UpdatePort struct {
-	Port uint `form:"port" json:"port" validate:"required"`
+	Port uint `form:"port" json:"port" validate:"required,number,gte=1,lte=65535"`
 }

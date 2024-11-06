@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/http/request"
 )
 
 type DatabaseStatus string
@@ -17,17 +18,17 @@ const (
 )
 
 type Database struct {
-	ID         uint           `gorm:"primaryKey" json:"id"`
-	DatabaseID uint           `gorm:"not null" json:"database_id"`
-	Name       string         `gorm:"not null" json:"name"`
-	Status     DatabaseStatus `gorm:"not null" json:"status"`
-	Username   string         `gorm:"not null" json:"username"`
-	Password   string         `gorm:"not null" json:"password"`
-	Remark     string         `gorm:"not null" json:"remark"`
-	CreatedAt  time.Time      `json:"created_at"`
-	UpdatedAt  time.Time      `json:"updated_at"`
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	ServerID  uint           `gorm:"not null" json:"server_id"`
+	Name      string         `gorm:"not null" json:"name"`
+	Status    DatabaseStatus `gorm:"not null" json:"status"`
+	Username  string         `gorm:"not null" json:"username"`
+	Password  string         `gorm:"not null" json:"password"`
+	Remark    string         `gorm:"not null" json:"remark"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 
-	DatabaseServer *DatabaseServer `json:"database_server"`
+	Server *DatabaseServer `gorm:"foreignKey:ServerID" json:"server"`
 }
 
 func (r *Database) BeforeSave(tx *gorm.DB) error {
@@ -56,4 +57,13 @@ func (r *Database) AfterFind(tx *gorm.DB) error {
 	}
 
 	return nil
+}
+
+type DatabaseRepo interface {
+	Count() (int64, error)
+	List(page, limit uint) ([]*Database, int64, error)
+	Get(id uint) (*Database, error)
+	Create(req *request.DatabaseCreate) error
+	Update(req *request.DatabaseUpdate) error
+	Delete(id uint) error
 }
