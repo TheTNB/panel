@@ -43,7 +43,7 @@ importers:
         version: 5.5.0
       alova:
         specifier: ^3.1.1
-        version: 3.2.1
+        version: 3.2.2
       axios:
         specifier: ^1.7.7
         version: 1.7.7
@@ -167,7 +167,7 @@ importers:
         version: 0.18.3(@nuxt/kit@3.13.2(rollup@4.24.3))(@vueuse/core@11.2.0(vue@3.5.12(typescript@5.6.3)))(rollup@4.24.3)
       unplugin-icons:
         specifier: ^0.20.0
-        version: 0.20.0(@vue/compiler-sfc@3.5.12)
+        version: 0.20.1(@vue/compiler-sfc@3.5.12)
       unplugin-vue-components:
         specifier: ^0.27.4
         version: 0.27.4(@babel/parser@7.26.2)(@nuxt/kit@3.13.2(rollup@4.24.3))(rollup@4.24.3)(vue@3.5.12(typescript@5.6.3))
@@ -1374,8 +1374,8 @@ packages:
   alien-signals@0.2.0:
     resolution: {integrity: sha512-StlonZhBBrsPPwrDjiPAiVTf/rolxffLxVPT60Qv/t88BZ81BvUVzHgGqEFvJ1ii8HXtm1+zU2Icr59tfWEcag==}
 
-  alova@3.2.1:
-    resolution: {integrity: sha512-MA6QE8akeALobBOV9yMqJrwNaqxXodoI28lGkmtJsIEmTYvZMe7Ya+qFwJtOM/1rOQoD7I2Uu1wVrlvVAwrVtw==}
+  alova@3.2.2:
+    resolution: {integrity: sha512-f3xG3w7yMFIh3+F4gQRasIUzvQ/CR2jW6x5eRcRa79w5iqarp/1uq6kBJC4VmErKahbPWO1dYlmoXw0ihP16lA==}
     engines: {node: '>= 18.0.0'}
 
   ansi-regex@5.0.1:
@@ -3017,8 +3017,8 @@ packages:
       '@vueuse/core':
         optional: true
 
-  unplugin-icons@0.20.0:
-    resolution: {integrity: sha512-817iCV6AMADLHHcs9R15XII5Jaz++thnaQRzXbd0IZDcxi43iekoKENpuxqZN3k3+aOqJfqxcZ6I8POJ35UCEA==}
+  unplugin-icons@0.20.1:
+    resolution: {integrity: sha512-0z5sYGx07Q69ZrJB4kjmx7a5LYLNSWwyq95Ox9OuSG2y/sbhJaHUapRPOJcKmKhOAyToDVRdy9P7gxJ05lYipw==}
     peerDependencies:
       '@svgr/core': '>=7.0.0'
       '@svgx/core': ^1.0.1
@@ -4687,7 +4687,7 @@ snapshots:
 
   alien-signals@0.2.0: {}
 
-  alova@3.2.1:
+  alova@3.2.2:
     dependencies:
       '@alova/shared': 1.1.0
       rate-limiter-flexible: 5.0.4
@@ -6520,7 +6520,7 @@ snapshots:
       - rollup
       - webpack-sources
 
-  unplugin-icons@0.20.0(@vue/compiler-sfc@3.5.12):
+  unplugin-icons@0.20.1(@vue/compiler-sfc@3.5.12):
     dependencies:
       '@antfu/install-pkg': 0.4.1
       '@antfu/utils': 0.7.10
