@@ -17,7 +17,6 @@ func init() {
 				&biz.CertDNS{},
 				&biz.CertAccount{},
 				&biz.Cron{},
-				&biz.Database{},
 				&biz.Monitor{},
 				&biz.App{},
 				&biz.Setting{},
@@ -32,7 +31,6 @@ func init() {
 				&biz.CertDNS{},
 				&biz.CertAccount{},
 				&biz.Cron{},
-				&biz.Database{},
 				&biz.Monitor{},
 				&biz.App{},
 				&biz.Setting{},
@@ -56,15 +54,18 @@ func init() {
 		},
 	})
 	Migrations = append(Migrations, &gormigrate.Migration{
-		ID: "20241107-database-item",
+		ID: "20241107-database",
 		Migrate: func(tx *gorm.DB) error {
+			_ = tx.Migrator().DropTable(&biz.Database{})
 			return tx.AutoMigrate(
-				&biz.DatabaseItem{},
+				&biz.DatabaseServer{},
+				&biz.Database{},
 			)
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable(
-				&biz.DatabaseItem{},
+				&biz.DatabaseServer{},
+				&biz.Database{},
 			)
 		},
 	})
