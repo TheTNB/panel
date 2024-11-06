@@ -5,8 +5,8 @@ type DatabaseServerCreate struct {
 	Type     string `form:"type" json:"type" validate:"required,oneof=mysql postgresql redis"`
 	Host     string `form:"host" json:"host" validate:"required"`
 	Port     uint   `form:"port" json:"port" validate:"required,number,gte=1,lte=65535"`
-	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
+	Username string `form:"username" json:"username"`
+	Password string `form:"password" json:"password"`
 	Remark   string `form:"remark" json:"remark"`
 }
 
@@ -16,7 +16,7 @@ type DatabaseServerUpdate struct {
 	Type     string `form:"type" json:"type" validate:"required,oneof=mysql postgresql redis"`
 	Host     string `form:"host" json:"host" validate:"required"`
 	Port     uint   `form:"port" json:"port" validate:"required,number,gte=1,lte=65535"`
-	Username string `form:"username" json:"username" validate:"required"`
-	Password string `form:"password" json:"password" validate:"required"`
+	Username string `form:"username" json:"username"`
+	Password string `form:"password" json:"password"`
 	Remark   string `form:"remark" json:"remark"`
 }
