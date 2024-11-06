@@ -24,7 +24,7 @@ require (
 	github.com/hashicorp/go-version v1.7.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0
 	github.com/knadh/koanf/providers/file v1.1.2
-	github.com/knadh/koanf/v2 v2.1.1
+	github.com/knadh/koanf/v2 v2.1.2
 	github.com/lib/pq v1.10.9
 	github.com/libdns/alidns v1.0.3
 	github.com/libdns/cloudflare v0.1.1
@@ -60,7 +60,7 @@ require (
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-rat/securecookie v1.0.1 // indirect
-	github.com/go-viper/mapstructure/v2 v2.0.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/gofiber/schema v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jaevor/go-nanoid v1.4.0 // indirect
