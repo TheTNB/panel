@@ -55,4 +55,17 @@ func init() {
 			)
 		},
 	})
+	Migrations = append(Migrations, &gormigrate.Migration{
+		ID: "20241107-database-item",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(
+				&biz.DatabaseItem{},
+			)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Migrator().DropTable(
+				&biz.DatabaseItem{},
+			)
+		},
+	})
 }

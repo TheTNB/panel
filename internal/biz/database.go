@@ -1,6 +1,7 @@
 package biz
 
 import (
+	"errors"
 	"time"
 
 	"github.com/go-rat/utils/crypt"
@@ -20,6 +21,8 @@ type Database struct {
 	Remark    string    `gorm:"not null" json:"remark"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+
+	DatabaseItems []*DatabaseItem `json:"-"`
 }
 
 func (r *Database) BeforeSave(tx *gorm.DB) error {
@@ -46,6 +49,20 @@ func (r *Database) AfterFind(tx *gorm.DB) error {
 	password, err := crypter.Decrypt(r.Password)
 	if err == nil {
 		r.Password = string(password)
+	}
+
+	return nil
+}
+
+func (r *Database) BeforeDelete(tx *gorm.DB) error {
+	if r.Name == "local_mysql" && !app.IsCli {
+		return errors.New("can't delete local_mysql, if you must delete it, please uninstall mysql")
+	}
+	if r.Name == "local_postgresql" && !app.IsCli {
+		return errors.New("can't delete local_postgresql, if you must delete it, please uninstall postgresql")
+	}
+	if r.Name == "local_redis" && !app.IsCli {
+		return errors.New("can't delete local_redis, if you must delete it, please uninstall redis")
 	}
 
 	return nil
