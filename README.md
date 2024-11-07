@@ -16,7 +16,7 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-耗子面板是使用 Golang + Vue 开发的开源轻量 Linux 服务器运维管理面板。
+耗子面板是新一代全能服务器运维管理面板。简单轻量，高效运维。
 
 QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe) | 赞助：[爱发电](https://afdian.com/a/TheTNB)
 
@@ -138,6 +138,12 @@ panel-cli
 </a>
 <a href="https://scdn.ddunyun.com/">
   <img height="80" src=".github/assets/ddunyun.png" alt="盾云SCDN">
+</a>
+
+### 合作伙伴
+
+<a href="https://1ms.run">
+  <img height="80" src=".github/assets/1ms.svg" alt="毫秒镜像提供经过审核的 Docker 镜像加速服务">
 </a>
 
 ### 赞助商们

@@ -16,7 +16,7 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-The Rat Panel is an open source lightweight Linux server operation and maintenance management panel developed using Golang and Vue.
+Rat Panel is a new generation of all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
 
 QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
 
@@ -138,6 +138,12 @@ If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollecti
 </a>
 <a href="https://scdn.ddunyun.com/">
   <img height="80" src=".github/assets/ddunyun.png" alt="盾云SCDN">
+</a>
+
+### Partners
+
+<a href="https://1ms.run">
+  <img height="80" src=".github/assets/1ms.svg" alt="毫秒镜像提供经过审核的 Docker 镜像加速服务">
 </a>
 
 ### Sponsors
