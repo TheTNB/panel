@@ -182,7 +182,7 @@ importers:
         version: 3.0.2(esbuild@0.23.1)(mockjs@1.1.0)(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))
       vite-plugin-static-copy:
         specifier: ^2.0.0
-        version: 2.0.0(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))
+        version: 2.1.0(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))
       vue-tsc:
         specifier: ^2.1.6
         version: 2.1.10(typescript@5.6.3)
@@ -3100,8 +3100,8 @@ packages:
       mockjs: '>=1.1.0'
       vite: '>=4.0.0'
 
-  vite-plugin-static-copy@2.0.0:
-    resolution: {integrity: sha512-b/quFjTUa/RY9t3geIyeeT2GtWEoRI0GawYFFjys5iMLGgVP638NTGu0RoMjwmi8MoZZ3BQw4OQvb1GpVcXZDA==}
+  vite-plugin-static-copy@2.1.0:
+    resolution: {integrity: sha512-n8lEOIVM00Y/zronm0RG8RdPyFd0SAAFR0sii3NWmgG3PSCyYMsvUNRQTlb3onp1XeMrKIDwCrPGxthKvqX9OQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0
@@ -6623,7 +6623,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-static-copy@2.0.0(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0)):
+  vite-plugin-static-copy@2.1.0(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0)):
     dependencies:
       chokidar: 3.6.0
       fast-glob: 3.3.2
