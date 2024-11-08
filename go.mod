@@ -20,6 +20,7 @@ require (
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-cz/httplog v0.0.0-20241002114323-98e09d6f537a
+	github.com/gomodule/redigo v1.9.2
 	github.com/gorilla/websocket v1.5.3
 	github.com/hashicorp/go-version v1.7.0
 	github.com/knadh/koanf/parsers/yaml v0.1.0

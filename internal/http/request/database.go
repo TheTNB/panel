@@ -1,7 +1,7 @@
 package request
 
 type DatabaseCreate struct {
-	ServerID string `form:"server_id" json:"server_id" validate:"required,exists=database_servers id"`
+	ServerID uint   `form:"server_id" json:"server_id" validate:"required,exists=database_servers id"`
 	Name     string `form:"name" json:"name" validate:"required"`
 	Username string `form:"username" json:"username"`
 	Password string `form:"password" json:"password"`
