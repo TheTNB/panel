@@ -97,7 +97,7 @@ func IsChina() bool {
 	client.SetTimeout(3 * time.Second)
 	client.SetRetryCount(3)
 
-	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	resp, err := client.R().Get("https://www.qualcomm.cn/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
 		return false
 	}
@@ -123,7 +123,7 @@ func GetPublicIPv4() (string, error) {
 		},
 	})
 
-	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	resp, err := client.R().Get("https://www.qualcomm.cn/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
 		return "", errors.New("failed to get public ipv4 address")
 	}
@@ -145,7 +145,7 @@ func GetPublicIPv6() (string, error) {
 		},
 	})
 
-	resp, err := client.R().Get("https://www.cloudflare-cn.com/cdn-cgi/trace")
+	resp, err := client.R().Get("https://www.qualcomm.cn/cdn-cgi/trace")
 	if err != nil || !resp.IsSuccess() {
 		return "", errors.New("failed to get public ipv6 address")
 	}
