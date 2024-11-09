@@ -1,6 +1,10 @@
 package data
 
 import (
+	"errors"
+	"slices"
+	"strings"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -66,5 +70,14 @@ func (d databaseServerRepo) Update(req *request.DatabaseServerCreate) error {
 }
 
 func (d databaseServerRepo) Delete(id uint) error {
+	ds := new(biz.DatabaseServer)
+	if err := app.Orm.Where("id = ?", id).First(ds).Error; err != nil {
+		return err
+	}
+
+	if slices.Contains([]string{"local_mysql", "local_postgresql", "local_redis"}, ds.Name) && !app.IsCli {
+		return errors.New("can't delete " + ds.Name + ", if you must delete it, please uninstall " + strings.TrimPrefix(ds.Name, "local_"))
+	}
+
 	return app.Orm.Delete(&biz.DatabaseServer{}, id).Error
 }

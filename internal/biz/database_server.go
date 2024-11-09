@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"errors"
 	"time"
 
 	"github.com/go-rat/utils/crypt"
@@ -58,21 +57,6 @@ func (r *DatabaseServer) AfterFind(tx *gorm.DB) error {
 	password, err := crypter.Decrypt(r.Password)
 	if err == nil {
 		r.Password = string(password)
-	}
-
-	return nil
-}
-
-// TODO 检查放到业务层
-func (r *DatabaseServer) BeforeDelete(tx *gorm.DB) error {
-	if r.Name == "local_mysql" && !app.IsCli {
-		return errors.New("can't delete local_mysql, if you must delete it, please uninstall mysql")
-	}
-	if r.Name == "local_postgresql" && !app.IsCli {
-		return errors.New("can't delete local_postgresql, if you must delete it, please uninstall postgresql")
-	}
-	if r.Name == "local_redis" && !app.IsCli {
-		return errors.New("can't delete local_redis, if you must delete it, please uninstall redis")
 	}
 
 	return nil
