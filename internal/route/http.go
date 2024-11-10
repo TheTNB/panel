@@ -64,6 +64,24 @@ func Http(r chi.Router) {
 			r.Post("/{id}/obtainCert", website.ObtainCert)
 		})
 
+		r.Route("/database", func(r chi.Router) {
+			r.Use(middleware.MustLogin)
+			database := service.NewDatabaseService()
+			r.Get("/", database.List)
+			r.Post("/", database.Create)
+			r.Put("/{id}", database.Update)
+			r.Delete("/{id}", database.Delete)
+		})
+
+		r.Route("/databaseServer", func(r chi.Router) {
+			r.Use(middleware.MustLogin)
+			database := service.NewDatabaseService()
+			r.Get("/", database.List)
+			r.Post("/", database.Create)
+			r.Put("/{id}", database.Update)
+			r.Delete("/{id}", database.Delete)
+		})
+
 		r.Route("/backup", func(r chi.Router) {
 			r.Use(middleware.MustLogin)
 			backup := service.NewBackupService()

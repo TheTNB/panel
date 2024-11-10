@@ -21,7 +21,7 @@ type Postgres struct {
 	port     uint
 }
 
-func NewPostgres(username, password, address, hbaFile string, port uint) (*Postgres, error) {
+func NewPostgres(username, password, address string, port uint, hbaFile string) (*Postgres, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable", address, port, username, password)
 	if password == "" {
 		dsn = fmt.Sprintf("host=%s port=%d user=%s dbname=postgres sslmode=disable", address, port, username)

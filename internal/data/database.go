@@ -58,7 +58,7 @@ func (d databaseRepo) Update(req *request.DatabaseUpdate) error {
 		Remark:   req.Remark,
 	}
 
-	return app.Orm.Model(database).Where("id = ?", req.ID).Updates(database).Error
+	return app.Orm.Model(database).Where("id = ?", req.ID).Omit("ServerID").Updates(database).Error
 }
 
 func (d databaseRepo) Delete(id uint) error {

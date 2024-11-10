@@ -2,12 +2,14 @@ package data
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"strings"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/TheTNB/panel/pkg/db"
 )
 
 type databaseServerRepo struct{}
@@ -42,6 +44,22 @@ func (d databaseServerRepo) Get(id uint) (*biz.DatabaseServer, error) {
 }
 
 func (d databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
+	switch biz.DatabaseType(req.Type) {
+	case biz.DatabaseTypeMysql:
+		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
+			return err
+		}
+	case biz.DatabaseTypePostgresql:
+		if _, err := db.NewPostgres(req.Username, req.Password, req.Host, req.Port, ""); err != nil {
+			return err
+		}
+	case biz.DatabaseTypeRedis:
+		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
+			return err
+		}
+
+	}
+
 	databaseServer := &biz.DatabaseServer{
 		Name:     req.Name,
 		Type:     biz.DatabaseType(req.Type),
@@ -55,8 +73,24 @@ func (d databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
 	return app.Orm.Create(databaseServer).Error
 }
 
-func (d databaseServerRepo) Update(req *request.DatabaseServerCreate) error {
-	databaseServer := &biz.DatabaseServer{
+func (d databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
+	switch biz.DatabaseType(req.Type) {
+	case biz.DatabaseTypeMysql:
+		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
+			return err
+		}
+	case biz.DatabaseTypePostgresql:
+		if _, err := db.NewPostgres(req.Username, req.Password, req.Host, req.Port, ""); err != nil {
+			return err
+		}
+	case biz.DatabaseTypeRedis:
+		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
+			return err
+		}
+
+	}
+
+	return app.Orm.Model(&biz.DatabaseServer{}).Where("id = ?", req.ID).Select("*").Updates(&biz.DatabaseServer{
 		Name:     req.Name,
 		Type:     biz.DatabaseType(req.Type),
 		Host:     req.Host,
@@ -64,9 +98,7 @@ func (d databaseServerRepo) Update(req *request.DatabaseServerCreate) error {
 		Username: req.Username,
 		Password: req.Password,
 		Remark:   req.Remark,
-	}
-
-	return app.Orm.Save(databaseServer).Error
+	}).Error
 }
 
 func (d databaseServerRepo) Delete(id uint) error {

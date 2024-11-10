@@ -67,6 +67,6 @@ type DatabaseServerRepo interface {
 	List(page, limit uint) ([]*DatabaseServer, int64, error)
 	Get(id uint) (*DatabaseServer, error)
 	Create(req *request.DatabaseServerCreate) error
-	Update(req *request.DatabaseServerCreate) error
+	Update(req *request.DatabaseServerUpdate) error
 	Delete(id uint) error
 }
