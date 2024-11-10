@@ -60,7 +60,7 @@
     "@vitejs/plugin-vue": "^5.1.4",
     "@vue/eslint-config-prettier": "^10.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
-    "@vue/tsconfig": "^0.5.1",
+    "@vue/tsconfig": "^0.6.0",
     "colord": "^2.9.3",
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^9.29.0",
