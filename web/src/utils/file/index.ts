@@ -280,7 +280,7 @@ const checkName = (name: string) => {
 }
 
 const checkPath = (path: string) => {
-  return /^(?!\/)(?!.*\/$)(?!.*\/\/)(?!.*\s).*$/.test(path)
+  return /^(?!\/)(?!.*\/$)(?!.*\/\/).*$/.test(path)
 }
 
 const getFilename = (path: string) => {

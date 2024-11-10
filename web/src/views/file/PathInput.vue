@@ -27,6 +27,7 @@ const handleInput = () => {
 }
 
 const handleBlur = () => {
+  input.value = input.value.replace(/(^\/)|(\/$)/g, '')
   if (!checkPath(input.value)) {
     window.$message.error('路径不合法')
     return
