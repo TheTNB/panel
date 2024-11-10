@@ -175,6 +175,11 @@ const getFPMConfig = async () => {
   })
 }
 
+const handleSetCli = async () => {
+  await php.setCli(version.value)
+  window.$message.success('设置成功')
+}
+
 const handleSaveConfig = async () => {
   await php.saveConfig(version.value, config.value)
   window.$message.success('保存成功')
@@ -262,6 +267,9 @@ onMounted(() => {
 <template>
   <common-page show-footer>
     <template #action>
+      <n-button v-if="currentTab == 'status'" class="ml-16" type="info" @click="handleSetCli">
+        设为 CLI 默认版本
+      </n-button>
       <n-button
         v-if="currentTab == 'config'"
         class="ml-16"

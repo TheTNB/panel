@@ -3,8 +3,9 @@ import type { AxiosResponse } from 'axios'
 import { request } from '@/utils'
 
 export default {
-  // 负载状态
-  load: (version: number): Promise<AxiosResponse<any>> => request.get(`/apps/php${version}/load`),
+  // 设为 CLI 版本
+  setCli: (version: number): Promise<AxiosResponse<any>> =>
+    request.post(`/apps/php${version}/setCli`),
   // 获取配置
   config: (version: number): Promise<AxiosResponse<any>> =>
     request.get(`/apps/php${version}/config`),
@@ -17,6 +18,8 @@ export default {
   // 保存FPM配置
   saveFPMConfig: (version: number, config: string): Promise<AxiosResponse<any>> =>
     request.post(`/apps/php${version}/fpmConfig`, { config }),
+  // 负载状态
+  load: (version: number): Promise<AxiosResponse<any>> => request.get(`/apps/php${version}/load`),
   // 获取错误日志
   errorLog: (version: number): Promise<AxiosResponse<any>> =>
     request.get(`/apps/php${version}/errorLog`),

@@ -33,6 +33,15 @@ func NewService(version uint) *Service {
 	}
 }
 
+func (s *Service) SetCli(w http.ResponseWriter, r *http.Request) {
+	if _, err := shell.Execf("ln -sf %s/server/php/%d/bin/php /usr/bin/php", app.Root, s.version); err != nil {
+		service.Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	service.Success(w, nil)
+}
+
 func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/php/%d/etc/php.ini", app.Root, s.version))
 	if err != nil {
