@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/TheTNB/panel/internal/apps"
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/service"
@@ -258,6 +259,11 @@ func Http(r chi.Router) {
 			r.Post("/reload", systemctl.Reload)
 			r.Post("/start", systemctl.Start)
 			r.Post("/stop", systemctl.Stop)
+		})
+
+		r.Route("/apps", func(r chi.Router) {
+			r.Use(middleware.MustLogin)
+			apps.Boot(r)
 		})
 	})
 

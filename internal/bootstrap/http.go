@@ -11,7 +11,6 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/apps"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/route"
 )
@@ -25,7 +24,6 @@ func initHttp() {
 	// add route
 	route.Http(app.Http)
 	route.Ws(app.Http)
-	apps.Boot(app.Http)
 
 	srv := hlfhr.New(&http.Server{
 		Addr:           fmt.Sprintf(":%d", app.Conf.MustInt("http.port")),
