@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/TheTNB/panel/pkg/chattr"
 )
 
 // Write 写入文件
@@ -12,9 +14,31 @@ func Write(path string, data string, permission os.FileMode) error {
 		return err
 	}
 
-	err := os.WriteFile(path, []byte(data), permission)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, permission)
 	if err != nil {
 		return err
+	}
+	defer file.Close()
+
+	iFlag, _ := chattr.IsAttr(file, chattr.FS_IMMUTABLE_FL)
+	aFlag, _ := chattr.IsAttr(file, chattr.FS_APPEND_FL)
+	if iFlag {
+		_ = chattr.UnsetAttr(file, chattr.FS_IMMUTABLE_FL)
+	}
+	if aFlag {
+		_ = chattr.UnsetAttr(file, chattr.FS_APPEND_FL)
+	}
+
+	_, err = file.WriteString(data)
+	if err != nil {
+		return err
+	}
+
+	if iFlag {
+		_ = chattr.SetAttr(file, chattr.FS_IMMUTABLE_FL)
+	}
+	if aFlag {
+		_ = chattr.SetAttr(file, chattr.FS_APPEND_FL)
 	}
 
 	return nil
@@ -22,15 +46,24 @@ func Write(path string, data string, permission os.FileMode) error {
 
 // WriteAppend 追加写入文件
 func WriteAppend(path string, data string) error {
-	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
+	iFlag, _ := chattr.IsAttr(file, chattr.FS_IMMUTABLE_FL)
+	if iFlag {
+		_ = chattr.UnsetAttr(file, chattr.FS_IMMUTABLE_FL)
+	}
+
 	_, err = file.WriteString(data)
 	if err != nil {
 		return err
+	}
+
+	if iFlag {
+		_ = chattr.SetAttr(file, chattr.FS_IMMUTABLE_FL)
 	}
 
 	return nil

@@ -12,6 +12,7 @@ import (
 
 // Remove 删除文件/目录
 func Remove(path string) error {
+	_, _ = shell.Execf("chattr -R -ia '%s'", path)
 	return os.RemoveAll(path)
 }
 

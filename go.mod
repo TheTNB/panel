@@ -57,6 +57,7 @@ require (
 	github.com/devhaozi/huaweicloud-sdk-go-v3 v0.0.0-20241018211007-bbebb6de5db7 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/g0rbe/go-chattr v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
