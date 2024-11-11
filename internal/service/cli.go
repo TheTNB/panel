@@ -21,6 +21,7 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/cert"
+	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/ntp"
 	"github.com/TheTNB/panel/pkg/systemctl"
@@ -386,6 +387,19 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 	config.HTTP.Port = port
 
 	encoded, err := yaml.Marshal(config)
+	if err != nil {
+		return err
+	}
+
+	// 放行端口
+	fw := firewall.NewFirewall()
+	err = fw.Port(firewall.FireInfo{
+		Type:      firewall.TypeNormal,
+		PortStart: uint(config.HTTP.Port),
+		PortEnd:   uint(config.HTTP.Port),
+		Direction: firewall.DirectionIn,
+		Strategy:  firewall.StrategyAccept,
+	}, firewall.OperationAdd)
 	if err != nil {
 		return err
 	}

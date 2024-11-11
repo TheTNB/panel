@@ -151,7 +151,7 @@ func (r *Redis) Data(page, pageSize int) ([]RedisKV, error) {
 			continue
 		}
 		if kv.Length > 500 {
-			value = fmt.Sprintf("data is too long, can't display")
+			value = "data is too long, can't display"
 		}
 
 		if str, ok := value.(string); ok {
