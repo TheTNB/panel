@@ -169,3 +169,8 @@ func (r *Redis) Data(page, pageSize int) ([]RedisKV, error) {
 
 	return result, nil
 }
+
+func (r *Redis) Clear() error {
+	_, err := r.conn.Do("FLUSHDB")
+	return err
+}
