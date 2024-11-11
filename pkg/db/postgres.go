@@ -136,7 +136,7 @@ func (m *Postgres) PrivilegesRevoke(user, database string) error {
 
 func (m *Postgres) HostAdd(database, user, host string) error {
 	config := fmt.Sprintf("host    %s    %s    %s    scram-sha-256", database, user, host)
-	if err := io.WriteAppend(m.hbaFile, config); err != nil {
+	if err := io.WriteAppend(m.hbaFile, config, 0644); err != nil {
 		return err
 	}
 

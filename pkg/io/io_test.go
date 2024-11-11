@@ -45,7 +45,7 @@ func (s *IOTestSuite) TestWriteAppendAppendsToFile() {
 	appendData := ", World!"
 
 	s.NoError(Write(path, initialData, 0644))
-	s.NoError(WriteAppend(path, appendData))
+	s.NoError(WriteAppend(path, appendData, 0644))
 
 	content, err := Read(path)
 	s.NoError(err)

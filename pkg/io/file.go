@@ -14,11 +14,10 @@ func Write(path string, data string, permission os.FileMode) error {
 		return err
 	}
 
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, permission)
+	file, err := os.OpenFile(path, os.O_RDONLY, permission)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
 	iFlag, _ := chattr.IsAttr(file, chattr.FS_IMMUTABLE_FL)
 	aFlag, _ := chattr.IsAttr(file, chattr.FS_APPEND_FL)
@@ -28,6 +27,16 @@ func Write(path string, data string, permission os.FileMode) error {
 	if aFlag {
 		_ = chattr.UnsetAttr(file, chattr.FS_APPEND_FL)
 	}
+
+	// 关闭文件重新以写入方式打开
+	if err = file.Close(); err != nil {
+		return err
+	}
+	file, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, permission)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
 	_, err = file.WriteString(data)
 	if err != nil {
@@ -45,17 +54,26 @@ func Write(path string, data string, permission os.FileMode) error {
 }
 
 // WriteAppend 追加写入文件
-func WriteAppend(path string, data string) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+func WriteAppend(path string, data string, permission os.FileMode) error {
+	file, err := os.OpenFile(path, os.O_RDONLY, permission)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
 	iFlag, _ := chattr.IsAttr(file, chattr.FS_IMMUTABLE_FL)
 	if iFlag {
 		_ = chattr.UnsetAttr(file, chattr.FS_IMMUTABLE_FL)
 	}
+
+	// 关闭文件重新以写入方式打开
+	if err = file.Close(); err != nil {
+		return err
+	}
+	file, err = os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, permission)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
 	_, err = file.WriteString(data)
 	if err != nil {
