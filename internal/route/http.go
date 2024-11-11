@@ -21,25 +21,24 @@ func Http(r chi.Router) {
 			r.With(middleware.Throttle(5, time.Minute)).Post("/login", user.Login)
 			r.Post("/logout", user.Logout)
 			r.Get("/isLogin", user.IsLogin)
-			r.With(middleware.MustLogin).Get("/info", user.Info)
+			r.Get("/info", user.Info)
 		})
 
 		r.Route("/dashboard", func(r chi.Router) {
 			dashboard := service.NewDashboardService()
 			r.Get("/panel", dashboard.Panel)
-			r.With(middleware.MustLogin).Get("/homeApps", dashboard.HomeApps)
-			r.With(middleware.MustLogin).Post("/current", dashboard.Current)
-			r.With(middleware.MustLogin).Get("/systemInfo", dashboard.SystemInfo)
-			r.With(middleware.MustLogin).Get("/countInfo", dashboard.CountInfo)
-			r.With(middleware.MustLogin).Get("/installedDbAndPhp", dashboard.InstalledDbAndPhp)
-			r.With(middleware.MustLogin).Get("/checkUpdate", dashboard.CheckUpdate)
-			r.With(middleware.MustLogin).Get("/updateInfo", dashboard.UpdateInfo)
-			r.With(middleware.MustLogin).Post("/update", dashboard.Update)
-			r.With(middleware.MustLogin).Post("/restart", dashboard.Restart)
+			r.Get("/homeApps", dashboard.HomeApps)
+			r.Post("/current", dashboard.Current)
+			r.Get("/systemInfo", dashboard.SystemInfo)
+			r.Get("/countInfo", dashboard.CountInfo)
+			r.Get("/installedDbAndPhp", dashboard.InstalledDbAndPhp)
+			r.Get("/checkUpdate", dashboard.CheckUpdate)
+			r.Get("/updateInfo", dashboard.UpdateInfo)
+			r.Post("/update", dashboard.Update)
+			r.Post("/restart", dashboard.Restart)
 		})
 
 		r.Route("/task", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			task := service.NewTaskService()
 			r.Get("/status", task.Status)
 			r.Get("/", task.List)
@@ -48,7 +47,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/website", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			website := service.NewWebsiteService()
 			r.Get("/defaultConfig", website.GetDefaultConfig)
 			r.Post("/defaultConfig", website.UpdateDefaultConfig)
@@ -65,7 +63,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/database", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			database := service.NewDatabaseService()
 			r.Get("/", database.List)
 			r.Post("/", database.Create)
@@ -74,7 +71,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/databaseServer", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			database := service.NewDatabaseService()
 			r.Get("/", database.List)
 			r.Post("/", database.Create)
@@ -83,7 +79,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/backup", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			backup := service.NewBackupService()
 			r.Get("/{type}", backup.List)
 			r.Post("/{type}", backup.Create)
@@ -93,7 +88,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/cert", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			cert := service.NewCertService()
 			r.Get("/caProviders", cert.CAProviders)
 			r.Get("/dnsProviders", cert.DNSProviders)
@@ -131,7 +125,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/app", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			app := service.NewAppService()
 			r.Get("/list", app.List)
 			r.Post("/install", app.Install)
@@ -143,7 +136,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/cron", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			cron := service.NewCronService()
 			r.Get("/", cron.List)
 			r.Post("/", cron.Create)
@@ -154,7 +146,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/safe", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			safe := service.NewSafeService()
 			r.Get("/ssh", safe.GetSSH)
 			r.Post("/ssh", safe.UpdateSSH)
@@ -163,7 +154,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/firewall", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			firewall := service.NewFirewallService()
 			r.Get("/status", firewall.GetStatus)
 			r.Post("/status", firewall.UpdateStatus)
@@ -179,7 +169,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/ssh", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			ssh := service.NewSSHService()
 			r.Get("/", ssh.List)
 			r.Post("/", ssh.Create)
@@ -189,7 +178,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/container", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			r.Route("/container", func(r chi.Router) {
 				container := service.NewContainerService()
 				r.Get("/", container.List)
@@ -230,7 +218,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/file", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			file := service.NewFileService()
 			r.Post("/create", file.Create)
 			r.Get("/content", file.Content)
@@ -251,7 +238,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/monitor", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			monitor := service.NewMonitorService()
 			r.Get("/setting", monitor.GetSetting)
 			r.Post("/setting", monitor.UpdateSetting)
@@ -260,14 +246,12 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/setting", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			setting := service.NewSettingService()
 			r.Get("/", setting.Get)
 			r.Post("/", setting.Update)
 		})
 
 		r.Route("/systemctl", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			systemctl := service.NewSystemctlService()
 			r.Get("/status", systemctl.Status)
 			r.Get("/isEnabled", systemctl.IsEnabled)
@@ -280,7 +264,6 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/apps", func(r chi.Router) {
-			r.Use(middleware.MustLogin)
 			apps.Boot(r)
 		})
 	})

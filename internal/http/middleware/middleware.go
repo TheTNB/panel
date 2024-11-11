@@ -24,8 +24,9 @@ func GlobalMiddleware() []func(http.Handler) http.Handler {
 			LogRequestHeaders: []string{"User-Agent"},
 		}),
 		middleware.Recoverer,
-		Entrance,
 		Status,
+		Entrance,
+		MustLogin,
 		MustInstall,
 	}
 }
