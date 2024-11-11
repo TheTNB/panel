@@ -109,7 +109,7 @@ func (r *appRepo) GetHomeShow() ([]map[string]string, error) {
 		return nil, err
 	}
 
-	var filtered []map[string]string
+	filtered := make([]map[string]string, 0)
 	for item := range slices.Values(apps) {
 		loaded, err := r.Get(item.Slug)
 		if err != nil {

@@ -39,7 +39,7 @@ const tabStore = useTabStore()
 const realtime = ref<Realtime | null>(null)
 const systemInfo = ref<SystemInfo | null>(null)
 const homeApps = ref<HomeApp[] | null>(null)
-const homeAppsLoading = ref(false)
+const homeAppsLoading = ref(true)
 const countInfo = ref<CountInfo>({
   website: 0,
   database: 0,
@@ -603,7 +603,7 @@ if (import.meta.hot) {
                 </tr>
               </n-table>
             </n-popover>
-            <n-popover v-for="item in realtime?.disk_usage" :key="item.path" trigger="hover">
+            <n-popover v-for="item in realtime.disk_usage" :key="item.path" trigger="hover">
               <template #trigger>
                 <n-flex vertical flex items-center p-20 pl-40 pr-40>
                   <p>{{ item.path }}</p>
