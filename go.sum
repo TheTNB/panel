@@ -21,8 +21,6 @@ github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHk
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
-github.com/g0rbe/go-chattr v1.0.1 h1:CHwYB+WKB46hkzt6Jxyvkyrz7u9njghUOFvmx2gir84=
-github.com/g0rbe/go-chattr v1.0.1/go.mod h1:yQc6VPJfpDDC1g+W2t47+yYmzBNioax/GLiyJ25/IOs=
 github.com/gabriel-vasile/mimetype v1.4.6 h1:3+PzJTKLkvgjeTbts6msPJt4DixhT4YtFNf1gtGe3zc=
 github.com/gabriel-vasile/mimetype v1.4.6/go.mod h1:JX1qVKqZd40hUPpAfiNTe0Sne7hdfKSbOqqmkq8GCXc=
 github.com/glebarez/go-sqlite v1.22.0 h1:uAcMJhaA6r3LHMTFgP0SifzgXg46yJkgxqyuyec+ruQ=
@@ -53,8 +51,8 @@ github.com/go-rat/sessions v1.0.11 h1:2eTUvhEBtymrAtwv71LlGHNylz+Ad2SgY3jg/sSUbo
 github.com/go-rat/sessions v1.0.11/go.mod h1:Ray/GCbuhm4U9xpjFFSCfOTCEn91puEhAXX5creHE9g=
 github.com/go-rat/utils v1.0.7 h1:hZUe+n1W/tvF3j+oP/TeAHX3AF98SjVB1FuF11zkCAI=
 github.com/go-rat/utils v1.0.7/go.mod h1:b0S/vd2bXWvPUQpw8z6RmJrUG7G7BkMuNSrsz6JRBHs=
-github.com/go-resty/resty/v2 v2.15.3 h1:bqff+hcqAflpiF591hhJzNdkRsFhlB96CYfBwSFvql8=
-github.com/go-resty/resty/v2 v2.15.3/go.mod h1:0fHAoK7JoBy/Ch36N8VFeMsK7xQOHhvWaC3iOktwmIU=
+github.com/go-resty/resty/v2 v2.16.0 h1:qpKalHWI2bpp9BIKlyT8TYWEJXOk1NuKbfiT3RRnzWc=
+github.com/go-resty/resty/v2 v2.16.0/go.mod h1:0fHAoK7JoBy/Ch36N8VFeMsK7xQOHhvWaC3iOktwmIU=
 github.com/go-sql-driver/mysql v1.8.1 h1:LedoTUt/eveggdHS9qUFC1EFSa8bU2+1pZjSRpvNJ1Y=
 github.com/go-sql-driver/mysql v1.8.1/go.mod h1:wEBSXgmK//2ZFJyE+qWnIsVGmvmEKlqwuVSjsCm7DZg=
 github.com/go-viper/mapstructure/v2 v2.2.1 h1:ZAaOCxANMuZx5RCeg0mBdEZk7DZasvvZIxtHqx8aGss=

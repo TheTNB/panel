@@ -116,7 +116,7 @@ importers:
         version: 0.64.0(eslint@8.57.1)(typescript@5.6.3)
       '@vitejs/plugin-vue':
         specifier: ^5.1.4
-        version: 5.1.4(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))
+        version: 5.1.5(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))
       '@vue/eslint-config-prettier':
         specifier: ^10.0.0
         version: 10.1.0(eslint@8.57.1)(prettier@3.3.3)
@@ -1237,8 +1237,8 @@ packages:
   '@vavt/util@2.1.0':
     resolution: {integrity: sha512-YIfAvArSFVXmWvoF+DEGD0FhkhVNcCtVWWkfYtj76eSrwHh/wuEEFhiEubg1XLNM3tChO8FH8xJCT/hnizjgFQ==}
 
-  '@vitejs/plugin-vue@5.1.4':
-    resolution: {integrity: sha512-N2XSI2n3sQqp5w7Y/AN/L2XDjBIRGqXko+eDp42sydYSBeJuSm5a1sLf8zakmo8u7tA8NmBgoDLA1HeOESjp9A==}
+  '@vitejs/plugin-vue@5.1.5':
+    resolution: {integrity: sha512-dlnib73G05CDBAUR/YpuZcQQ47fpjihnnNouAAqN62z+oqSsWJ+kh52GRzIxpkgFG3q11eXK7Di7RMmoCwISZA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     peerDependencies:
       vite: ^5.0.0
@@ -4528,7 +4528,7 @@ snapshots:
 
   '@vavt/util@2.1.0': {}
 
-  '@vitejs/plugin-vue@5.1.4(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))':
+  '@vitejs/plugin-vue@5.1.5(vite@5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0))(vue@3.5.12(typescript@5.6.3))':
     dependencies:
       vite: 5.4.10(@types/node@22.9.0)(sass@1.80.6)(terser@5.36.0)
       vue: 3.5.12(typescript@5.6.3)

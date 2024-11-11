@@ -17,7 +17,7 @@ require (
 	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.11
 	github.com/go-rat/utils v1.0.7
-	github.com/go-resty/resty/v2 v2.15.3
+	github.com/go-resty/resty/v2 v2.16.0
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-cz/httplog v0.0.0-20241002114323-98e09d6f537a
 	github.com/gomodule/redigo v1.9.2
@@ -57,7 +57,6 @@ require (
 	github.com/devhaozi/huaweicloud-sdk-go-v3 v0.0.0-20241018211007-bbebb6de5db7 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/g0rbe/go-chattr v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.6 // indirect
 	github.com/glebarez/go-sqlite v1.22.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
