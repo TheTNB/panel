@@ -315,13 +315,22 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		}
 	}
 	if req.DB && req.DBType == "postgresql" {
-		_, _ = shell.Execf(`echo "CREATE DATABASE '%s';" | su - postgres -c "psql"`, req.DBName)
-		_, _ = shell.Execf(`echo "CREATE USER '%s' WITH PASSWORD '%s';" | su - postgres -c "psql"`, req.DBUser, req.DBPassword)
-		_, _ = shell.Execf(`echo "ALTER DATABASE '%s' OWNER TO '%s';" | su - postgres -c "psql"`, req.DBName, req.DBUser)
-		_, _ = shell.Execf(`echo "GRANT ALL PRIVILEGES ON DATABASE '%s' TO '%s';" | su - postgres -c "psql"`, req.DBName, req.DBUser)
-		userConfig := "host    " + req.DBName + "    " + req.DBUser + "    127.0.0.1/32    scram-sha-256"
-		_, _ = shell.Execf(`echo "`+userConfig+`" >> %s/server/postgresql/data/pg_hba.conf`, app.Root)
-		_ = systemctl.Reload("postgresql")
+		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432, fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
+		if err != nil {
+			return nil, err
+		}
+		if err = postgres.DatabaseCreate(req.DBName); err != nil {
+			return nil, err
+		}
+		if err = postgres.UserCreate(req.DBUser, req.DBPassword); err != nil {
+			return nil, err
+		}
+		if err = postgres.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
+			return nil, err
+		}
+		if err = postgres.HostAdd(req.DBName, req.DBUser, "127.0.0.1/32"); err != nil {
+			return nil, err
+		}
 	}
 
 	return w, nil
