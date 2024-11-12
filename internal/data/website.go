@@ -286,6 +286,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		Status: true,
 		Path:   req.Path,
 		Https:  false,
+		Remark: req.Remark,
 	}
 	if err = app.Orm.Create(w).Error; err != nil {
 		return nil, err

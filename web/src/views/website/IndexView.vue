@@ -183,15 +183,15 @@ const buttonLoading = ref(false)
 const buttonDisabled = ref(false)
 const createModel = ref({
   name: '',
-  domains: [] as Array<string>,
   listens: [] as Array<string>,
+  domains: [] as Array<string>,
+  path: '',
   php: 0,
   db: false,
   db_type: '0',
   db_name: '',
   db_user: '',
   db_password: '',
-  path: '',
   remark: ''
 })
 const deleteModel = ref({
