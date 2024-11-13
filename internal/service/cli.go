@@ -24,6 +24,7 @@ import (
 	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/ntp"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
@@ -370,7 +371,7 @@ func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
-	port := cast.ToInt(cmd.Args().First())
+	port := cast.ToUint(cmd.Args().First())
 	if port < 1 || port > 65535 {
 		return fmt.Errorf("端口范围错误")
 	}
@@ -382,6 +383,12 @@ func (s *CliService) Port(ctx context.Context, cmd *cli.Command) error {
 	}
 	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return err
+	}
+
+	if port != config.HTTP.Port {
+		if os.TCPPortInUse(port) {
+			return errors.New("端口已被占用")
+		}
 	}
 
 	config.HTTP.Port = port

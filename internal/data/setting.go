@@ -18,6 +18,7 @@ import (
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/firewall"
 	"github.com/TheTNB/panel/pkg/io"
+	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/tools"
 	"github.com/TheTNB/panel/pkg/types"
@@ -127,7 +128,7 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 		BackupPath:  backupPath,
 		Username:    user.Username,
 		Email:       user.Email,
-		Port:        app.Conf.Int("http.port"),
+		Port:        uint(app.Conf.Int("http.port")),
 		HTTPS:       app.Conf.Bool("http.tls"),
 		Cert:        crt,
 		Key:         key,
@@ -200,6 +201,12 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	}
 	if err = yaml.Unmarshal([]byte(raw), config); err != nil {
 		return false, err
+	}
+
+	if setting.Port != config.HTTP.Port {
+		if os.TCPPortInUse(setting.Port) {
+			return false, errors.New("端口已被占用")
+		}
 	}
 
 	config.App.Locale = setting.Locale

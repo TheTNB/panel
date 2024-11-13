@@ -17,7 +17,7 @@ type PanelAppConfig struct {
 
 type PanelHTTPConfig struct {
 	Debug    bool   `yaml:"debug"`
-	Port     int    `yaml:"port"`
+	Port     uint   `yaml:"port"`
 	Entrance string `yaml:"entrance"`
 	TLS      bool   `yaml:"tls"`
 }
