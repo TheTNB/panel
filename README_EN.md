@@ -16,7 +16,7 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-Rat Panel is a new generation of all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
+Rat Panel is a new generation of enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
 
 QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe) | Sponsor: [Open Collective](https://opencollective.com/tnb)
 
