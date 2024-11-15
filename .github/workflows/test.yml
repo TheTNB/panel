@@ -23,7 +23,7 @@ jobs:
       - name: Run tests
         run: sudo go test -v -coverprofile="coverage.out" ./...
       - name: Upload coverage report to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           file: ./coverage.out
           token: ${{ secrets.CODECOV }}
