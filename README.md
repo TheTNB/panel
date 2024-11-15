@@ -169,14 +169,13 @@ panel-cli
 
 ## Star 历史
 
-<p align="center">
-  <a href="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history?repo_id=572922963" target="_blank">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=572922963&image_size=auto&color_scheme=dark" width="721" height="auto">
-      <img alt="Star History of TheTNB/panel" src="https://next.ossinsight.io/widgets/official/analyze-repo-stars-history/thumbnail.png?repo_id=572922963&image_size=auto&color_scheme=light" width="721" height="auto">
-    </picture>
-  </a>
-</p>
+<a href="https://star-history.com/#TheTNB/panel&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+ </picture>
+</a>
 
 ## 免责声明
 
