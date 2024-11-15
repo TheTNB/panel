@@ -154,8 +154,8 @@ github.com/tklauser/go-sysconf v0.3.14 h1:g5vzr9iPFFz24v2KZXs/pvpvh8/V9Fw6vQK5ZZ
 github.com/tklauser/go-sysconf v0.3.14/go.mod h1:1ym4lWMLUOhuBOPGtRcJm7tEGX4SCYNEEEtghGG/8uY=
 github.com/tklauser/numcpus v0.8.0 h1:Mx4Wwe/FjZLeQsK/6kt2EOepwwSl7SmJrK5bV/dXYgY=
 github.com/tklauser/numcpus v0.8.0/go.mod h1:ZJZlAY+dmR4eut8epnzf0u/VwodKmryxR8txiloSqBE=
-github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8 h1:7yw1yHkylDcu/CwY4hEEe8MycDLo7B9LjcqwhoL8NrM=
-github.com/tufanbarisyildirim/gonginx v0.0.0-20241013191809-e73b7dd454e8/go.mod h1:itu4KWRgrfEwGcfNka+rV4houuirUau53i0diN4lG5g=
+github.com/tufanbarisyildirim/gonginx v0.0.0-20241115180907-128af6df1765 h1:nnw6RpVhgrUvV6BLysdedhxaALJY1JqRFr3S85XXpF4=
+github.com/tufanbarisyildirim/gonginx v0.0.0-20241115180907-128af6df1765/go.mod h1:itu4KWRgrfEwGcfNka+rV4houuirUau53i0diN4lG5g=
 github.com/urfave/cli/v3 v3.0.0-alpha9.3 h1:RfQlgUHMRxDMwEEmGsrHd+mXYJpWpXlcJM8w86cpjGs=
 github.com/urfave/cli/v3 v3.0.0-alpha9.3/go.mod h1:FnIeEMYu+ko8zP1F9Ypr3xkZMIDqW3DR92yUtY39q1Y=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
