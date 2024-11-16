@@ -248,7 +248,7 @@ const columns: DataTableColumns<RowData> = [
               },
               {
                 default: () => {
-                  return '确定删除吗？'
+                  return `确定删除 ${row.name} 吗？`
                 },
                 trigger: () => {
                   return h(
