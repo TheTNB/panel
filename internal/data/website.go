@@ -275,8 +275,11 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	// PHP 网站默认开启防跨站
 	if req.PHP > 0 {
 		userIni := filepath.Join(req.Path, ".user.ini")
-		_, _ = shell.Execf(`chattr -i '%s'`, userIni)
-		_ = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Path), 0644)
+		if !io.Exists(userIni) {
+			if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Path), 0644); err != nil {
+				return nil, err
+			}
+		}
 		_, _ = shell.Execf(`chattr +i '%s'`, userIni)
 	}
 
@@ -465,14 +468,14 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	}
 	userIni := filepath.Join(req.Root, ".user.ini")
 	if req.OpenBasedir {
-		_, _ = shell.Execf(`chattr -i '%s'`, userIni)
-		if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Root), 0644); err != nil {
-			return err
+		if !io.Exists(userIni) {
+			if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Root), 0644); err != nil {
+				return err
+			}
 		}
 		_, _ = shell.Execf(`chattr +i '%s'`, userIni)
 	} else {
 		if io.Exists(userIni) {
-			_, _ = shell.Execf(`chattr -i '%s'`, userIni)
 			if err = io.Remove(userIni); err != nil {
 				return err
 			}
