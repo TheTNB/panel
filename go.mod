@@ -12,7 +12,7 @@ require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.3
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
-	github.com/go-playground/validator/v10 v10.22.1
+	github.com/go-playground/validator/v10 v10.23.0
 	github.com/go-rat/chix v1.1.4
 	github.com/go-rat/gormstore v1.0.6
 	github.com/go-rat/sessions v1.0.11
