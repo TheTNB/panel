@@ -2,8 +2,10 @@ package job
 
 import (
 	"log/slog"
+	"math/rand/v2"
 	"runtime"
 	"runtime/debug"
+	"time"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -52,11 +54,13 @@ func (r *PanelTask) Run() {
 	}
 
 	// 更新商店缓存
-	if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
-		if err = r.appRepo.UpdateCache(); err != nil {
-			app.Logger.Warn("更新商店缓存失败", slog.Any("err", err))
+	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
+		if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
+			if err = r.appRepo.UpdateCache(); err != nil {
+				app.Logger.Warn("更新商店缓存失败", slog.Any("err", err))
+			}
 		}
-	}
+	})
 
 	// 回收内存
 	runtime.GC()
