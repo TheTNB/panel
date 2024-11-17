@@ -32,7 +32,7 @@ func (r *certRepo) List(page, limit uint) ([]*types.CertList, int64, error) {
 	var total int64
 	err := app.Orm.Model(&biz.Cert{}).Preload("Website").Preload("Account").Preload("DNS").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&certs).Error
 
-	var list []*types.CertList
+	list := make([]*types.CertList, 0)
 	for cert := range slices.Values(certs) {
 		item := &types.CertList{
 			ID:        cert.ID,
