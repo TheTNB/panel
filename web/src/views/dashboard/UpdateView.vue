@@ -12,7 +12,7 @@ import { useI18n } from 'vue-i18n'
 import dashboard from '@/api/panel/dashboard'
 import { router } from '@/router'
 import { formatDateTime } from '@/utils'
-import type { Version } from '@/views/home/types'
+import type { Version } from '@/views/dashboard/types'
 
 const { t } = useI18n()
 const versions = ref<Version[] | null>(null)
