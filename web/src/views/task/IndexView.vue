@@ -27,7 +27,7 @@ const create = ref(false)
       <n-tab-pane name="cron" tab="计划任务">
         <cron-view />
       </n-tab-pane>
-      <n-tab-pane name="task" tab="后台任务">
+      <n-tab-pane name="task" tab="面板任务">
         <task-view />
       </n-tab-pane>
     </n-tabs>

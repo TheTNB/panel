@@ -15,7 +15,7 @@ export default {
       path: '',
       component: () => import('./IndexView.vue'),
       meta: {
-        title: 'appIndex.title',
+        title: '应用中心',
         icon: 'mdi:apps',
         role: ['admin'],
         requireAuth: true
