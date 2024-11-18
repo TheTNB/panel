@@ -17,6 +17,7 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -114,6 +115,12 @@ func (s *FileService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.FilePath](r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	banned := []string{"/", app.Root, filepath.Join(app.Root, "server"), filepath.Join(app.Root, "panel")}
+	if slices.Contains(banned, req.Path) {
+		Error(w, http.StatusForbidden, "please don't do this")
 		return
 	}
 
