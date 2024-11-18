@@ -26,12 +26,10 @@ const handleCreate = () => {
 <template>
   <common-page show-footer>
     <template #action>
-      <div flex items-center>
-        <n-button class="ml-16" type="primary" @click="createModal = true">
-          <TheIcon :size="18" icon="material-symbols:add" />
-          创建备份
-        </n-button>
-      </div>
+      <n-button type="primary" @click="createModal = true">
+        <TheIcon :size="18" icon="material-symbols:add" />
+        创建备份
+      </n-button>
     </template>
     <n-flex vertical>
       <n-alert type="info">此处仅显示面板默认备份目录的文件。</n-alert>
