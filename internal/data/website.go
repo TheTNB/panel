@@ -469,7 +469,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	userIni := filepath.Join(req.Root, ".user.ini")
 	if req.OpenBasedir {
 		if !io.Exists(userIni) {
-			if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Root), 0644); err != nil {
+			if err = io.Write(userIni, fmt.Sprintf("open_basedir=%s:/tmp/", req.Path), 0644); err != nil {
 				return err
 			}
 		}
