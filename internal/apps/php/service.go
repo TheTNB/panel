@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -93,26 +92,25 @@ func (s *Service) UpdateFPMConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
+	var raw map[string]any
 	client := resty.New().SetTimeout(10 * time.Second)
-	resp, err := client.R().Get(fmt.Sprintf("http://127.0.0.1/phpfpm_status/%d", s.version))
-	if err != nil || !resp.IsSuccess() {
+	_, err := client.R().SetResult(&raw).Get(fmt.Sprintf("http://127.0.0.1/phpfpm_status/%d?json", s.version))
+	if err != nil {
 		service.Success(w, []types.NV{})
 		return
 	}
 
-	raw := resp.String()
 	dataKeys := []string{"应用池", "工作模式", "启动时间", "接受连接", "监听队列", "最大监听队列", "监听队列长度", "空闲进程数量", "活动进程数量", "总进程数量", "最大活跃进程数量", "达到进程上限次数", "慢请求"}
-	regexKeys := []string{"pool", "process manager", "start time", "accepted conn", "listen queue", "max listen queue", "listen queue len", "idle processes", "active processes", "total processes", "max active processes", "max children reached", "slow requests"}
+	rawKeys := []string{"pool", "process manager", "start time", "accepted conn", "listen queue", "max listen queue", "listen queue len", "idle processes", "active processes", "total processes", "max active processes", "max children reached", "slow requests"}
 
-	loads := make([]types.NV, len(dataKeys))
+	loads := make([]types.NV, 0)
 	for i := range dataKeys {
-		loads[i].Name = dataKeys[i]
-
-		r := regexp.MustCompile(fmt.Sprintf("%s:\\s+(.*)", regexKeys[i]))
-		match := r.FindStringSubmatch(raw)
-
-		if len(match) > 1 {
-			loads[i].Value = strings.TrimSpace(match[1])
+		v, ok := raw[rawKeys[i]]
+		if ok {
+			loads = append(loads, types.NV{
+				Name:  dataKeys[i],
+				Value: cast.ToString(v),
+			})
 		}
 	}
 
