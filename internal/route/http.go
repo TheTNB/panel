@@ -71,7 +71,7 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/databaseServer", func(r chi.Router) {
-			database := service.NewDatabaseService()
+			database := service.NewDatabaseServerService()
 			r.Get("/", database.List)
 			r.Post("/", database.Create)
 			r.Put("/{id}", database.Update)

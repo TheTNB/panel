@@ -24,6 +24,8 @@ export const request = createAxios({
 })
 
 export const http = createAlova({
+  id: 'panel',
+  cacheFor: null,
   statesHook: VueHook,
   requestAdapter: adapterFetch(),
   baseURL: import.meta.env.VITE_BASE_API,

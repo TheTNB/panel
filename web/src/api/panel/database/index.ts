@@ -11,11 +11,11 @@ export default {
   delete: (id: number) => http.Delete(`/database/${id}`),
   // 获取数据库服务器列表
   serverList: (page: number, limit: number) =>
-    http.Get('/database/serverList', { params: { page, limit } }),
+    http.Get('/databaseServer', { params: { page, limit } }),
   // 创建数据库服务器
-  createServer: (data: any) => http.Post('/database/server', data),
+  createServer: (data: any) => http.Post('/databaseServer', data),
   // 更新数据库服务器
-  updateServer: (id: number, data: any) => http.Put(`/database/server/${id}`, data),
+  updateServer: (id: number, data: any) => http.Put(`/databaseServer/${id}`, data),
   // 删除数据库服务器
-  deleteServer: (id: number) => http.Delete(`/database/server/${id}`)
+  deleteServer: (id: number) => http.Delete(`/databaseServer/${id}`)
 }

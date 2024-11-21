@@ -140,7 +140,7 @@ func (s *DashboardService) CountInfo(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if postgresqlInstalled {
-		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432, fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
+		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
 		if err == nil {
 			defer postgres.Close()
 			databases, err := postgres.Databases()

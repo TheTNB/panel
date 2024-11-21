@@ -6,8 +6,6 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -17,13 +15,15 @@ type Postgres struct {
 	username string
 	password string
 	address  string
-	hbaFile  string
 	port     uint
 }
 
-func NewPostgres(username, password, address string, port uint, hbaFile string) (*Postgres, error) {
+func NewPostgres(username, password, address string, port uint) (*Postgres, error) {
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable", address, port, username, password)
 	if password == "" {
+		if username == "" {
+			username = "postgres"
+		}
 		dsn = fmt.Sprintf("host=%s port=%d user=%s dbname=postgres sslmode=disable", address, port, username)
 	}
 	db, err := sql.Open("postgres", dsn)
@@ -38,7 +38,6 @@ func NewPostgres(username, password, address string, port uint, hbaFile string) 
 		username: username,
 		password: password,
 		address:  address,
-		hbaFile:  hbaFile,
 		port:     port,
 	}, nil
 }
@@ -109,7 +108,6 @@ func (m *Postgres) UserDrop(user string) error {
 		return err
 	}
 
-	_, _ = shell.Execf(`sed -i '/%s/d' %s`, user, m.hbaFile)
 	return systemctl.Reload("postgresql")
 }
 
@@ -132,24 +130,6 @@ func (m *Postgres) PrivilegesGrant(user, database string) error {
 func (m *Postgres) PrivilegesRevoke(user, database string) error {
 	_, err := m.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON DATABASE %s FROM %s", database, user))
 	return err
-}
-
-func (m *Postgres) HostAdd(database, user, host string) error {
-	config := fmt.Sprintf("host    %s    %s    %s    scram-sha-256", database, user, host)
-	if err := io.WriteAppend(m.hbaFile, config, 0644); err != nil {
-		return err
-	}
-
-	return systemctl.Reload("postgresql")
-}
-
-func (m *Postgres) HostRemove(database, user, host string) error {
-	regex := fmt.Sprintf(`host\s+%s\s+%s\s+%s`, database, user, host)
-	if _, err := shell.Execf(`sed -i '/%s/d' %s`, regex, m.hbaFile); err != nil {
-		return err
-	}
-
-	return systemctl.Reload("postgresql")
 }
 
 func (m *Postgres) Users() ([]types.PostgresUser, error) {

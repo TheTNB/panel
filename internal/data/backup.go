@@ -288,7 +288,7 @@ func (r *backupRepo) createMySQL(to string, name string) error {
 
 // createPostgres 创建 PostgreSQL 备份
 func (r *backupRepo) createPostgres(to string, name string) error {
-	postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432, fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
+	postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
 	if err != nil {
 		return err
 	}
@@ -436,7 +436,7 @@ func (r *backupRepo) restorePostgres(backup, target string) error {
 		return errors.New("备份文件不存在")
 	}
 
-	postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432, fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
+	postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
 	if err != nil {
 		return err
 	}

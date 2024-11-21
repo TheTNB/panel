@@ -307,10 +307,10 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err = mysql.DatabaseCreate(req.DBName); err != nil {
+		if err = mysql.UserCreate(req.DBUser, req.DBPassword); err != nil {
 			return nil, err
 		}
-		if err = mysql.UserCreate(req.DBUser, req.DBPassword); err != nil {
+		if err = mysql.DatabaseCreate(req.DBName); err != nil {
 			return nil, err
 		}
 		if err = mysql.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
@@ -318,20 +318,17 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		}
 	}
 	if req.DB && req.DBType == "postgresql" {
-		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432, fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
+		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
 		if err != nil {
-			return nil, err
-		}
-		if err = postgres.DatabaseCreate(req.DBName); err != nil {
 			return nil, err
 		}
 		if err = postgres.UserCreate(req.DBUser, req.DBPassword); err != nil {
 			return nil, err
 		}
-		if err = postgres.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
+		if err = postgres.DatabaseCreate(req.DBName); err != nil {
 			return nil, err
 		}
-		if err = postgres.HostAdd(req.DBName, req.DBUser, "127.0.0.1/32"); err != nil {
+		if err = postgres.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
 			return nil, err
 		}
 	}
@@ -526,13 +523,14 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		if err != nil {
 			return err
 		}
-		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
-		if err == nil {
-			_ = mysql.DatabaseDrop(website.Name)
+		if mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix"); err == nil {
 			_ = mysql.UserDrop(website.Name)
+			_ = mysql.DatabaseDrop(website.Name)
 		}
-		_, _ = shell.Execf(`echo "DROP DATABASE IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
-		_, _ = shell.Execf(`echo "DROP USER IF EXISTS '%s';" | su - postgres -c "psql"`, website.Name)
+		if postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432); err == nil {
+			_ = postgres.UserDrop(website.Name)
+			_ = postgres.DatabaseDrop(website.Name)
+		}
 	}
 
 	if err := app.Orm.Delete(website).Error; err != nil {
