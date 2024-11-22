@@ -3,20 +3,18 @@ package data
 import (
 	"fmt"
 
+	"github.com/samber/do/v2"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
 )
 
-type databaseRepo struct {
-	databaseServer biz.DatabaseServerRepo
-}
+type databaseRepo struct{}
 
 func NewDatabaseRepo() biz.DatabaseRepo {
-	return &databaseRepo{
-		databaseServer: NewDatabaseServerRepo(),
-	}
+	return do.MustInvoke[biz.DatabaseRepo](injector)
 }
 
 func (r databaseRepo) Count() (int64, error) {
@@ -45,7 +43,7 @@ func (r databaseRepo) Get(id uint) (*biz.Database, error) {
 }
 
 func (r databaseRepo) Create(req *request.DatabaseCreate) error {
-	server, err := r.databaseServer.Get(req.ServerID)
+	server, err := NewDatabaseServerRepo().Get(req.ServerID)
 	if err != nil {
 		return err
 	}
@@ -106,4 +104,16 @@ func (r databaseRepo) Update(req *request.DatabaseUpdate) error {
 
 func (r databaseRepo) Delete(id uint) error {
 	return app.Orm.Delete(&biz.Database{}, id).Error
+}
+
+func (r databaseRepo) Add(serverID uint, name string) error {
+	database := &biz.Database{
+		Name:     name,
+		Username: name,
+		ServerID: serverID,
+		Status:   biz.DatabaseStatusNormal,
+		Remark:   "sync from server",
+	}
+
+	return app.Orm.Create(database).Error
 }

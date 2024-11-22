@@ -3,20 +3,18 @@ package data
 import (
 	"fmt"
 
+	"github.com/samber/do/v2"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	pkgssh "github.com/TheTNB/panel/pkg/ssh"
 )
 
-type sshRepo struct {
-	settingRepo biz.SettingRepo
-}
+type sshRepo struct{}
 
 func NewSSHRepo() biz.SSHRepo {
-	return &sshRepo{
-		settingRepo: NewSettingRepo(),
-	}
+	return do.MustInvoke[biz.SSHRepo](injector)
 }
 
 func (r *sshRepo) List(page, limit uint) ([]*biz.SSH, int64, error) {

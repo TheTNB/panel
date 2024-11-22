@@ -53,7 +53,13 @@ const columns: any = [
         NTag,
         {
           type:
-            row.strategy === 'accept' ? 'success' : row.strategy === 'drop' ? 'warning' : 'error'
+            row.strategy === 'accept'
+              ? 'success'
+              : row.strategy === 'drop'
+                ? 'warning'
+                : row.strategy === 'reject'
+                  ? 'error'
+                  : 'default'
         },
         {
           default: () => {
@@ -64,6 +70,8 @@ const columns: any = [
                 return '丢弃'
               case 'reject':
                 return '拒绝'
+              case 'mark':
+                return '标记'
               default:
                 return '未知'
             }

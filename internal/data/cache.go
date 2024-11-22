@@ -3,6 +3,7 @@ package data
 import (
 	"errors"
 
+	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -12,7 +13,7 @@ import (
 type cacheRepo struct{}
 
 func NewCacheRepo() biz.CacheRepo {
-	return &cacheRepo{}
+	return do.MustInvoke[biz.CacheRepo](injector)
 }
 
 func (r *cacheRepo) Get(key biz.CacheKey, defaultValue ...string) (string, error) {

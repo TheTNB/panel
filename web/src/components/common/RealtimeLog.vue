@@ -5,7 +5,11 @@ import type { LogInst } from 'naive-ui'
 const props = defineProps({
   path: {
     type: String,
-    required: true
+    required: false
+  },
+  service: {
+    type: String,
+    required: false
   }
 })
 
@@ -14,7 +18,15 @@ const logRef = ref<LogInst | null>(null)
 let logWs: WebSocket | null = null
 
 const init = async () => {
-  const cmd = `tail -n 100 -f '${props.path}'`
+  let cmd = ''
+  if (props.path) {
+    cmd = `tail -n 100 -f '${props.path}'`
+  } else if (props.service) {
+    cmd = `journalctl -u '${props.service}' -f`
+  } else {
+    window.$message.error('path 或 service 不能为空')
+    return
+  }
   ws.exec(cmd)
     .then((ws: WebSocket) => {
       logWs = ws

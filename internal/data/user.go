@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/go-rat/utils/hash"
+	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -15,9 +16,7 @@ type userRepo struct {
 }
 
 func NewUserRepo() biz.UserRepo {
-	return &userRepo{
-		hasher: hash.NewArgon2id(),
-	}
+	return do.MustInvoke[biz.UserRepo](injector)
 }
 
 func (r *userRepo) Create(username, password string) (*biz.User, error) {

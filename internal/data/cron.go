@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-rat/utils/str"
+	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -18,14 +19,10 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type cronRepo struct {
-	settingRepo biz.SettingRepo
-}
+type cronRepo struct{}
 
 func NewCronRepo() biz.CronRepo {
-	return &cronRepo{
-		settingRepo: NewSettingRepo(),
-	}
+	return do.MustInvoke[biz.CronRepo](injector)
 }
 
 func (r *cronRepo) Count() (int64, error) {

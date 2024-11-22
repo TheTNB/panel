@@ -35,6 +35,7 @@ require (
 	github.com/mholt/acmez/v2 v2.0.3
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
+	github.com/samber/do/v2 v2.0.0-beta.7
 	github.com/samber/lo v1.47.0
 	github.com/sethvargo/go-limiter v1.0.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
@@ -76,6 +77,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/samber/go-type-to-string v1.4.0 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.0.1033 // indirect
 	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/dnspod v1.0.1033 // indirect
 	github.com/tklauser/go-sysconf v0.3.14 // indirect

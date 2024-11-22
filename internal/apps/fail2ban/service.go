@@ -15,7 +15,6 @@ import (
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
@@ -55,7 +54,6 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		jailEnabled := strings.Contains(jailRaw, "enabled = true")
-		jailLogPath := regexp.MustCompile(`logpath = (.*)`).FindStringSubmatch(jailRaw)
 		jailMaxRetry := regexp.MustCompile(`maxretry = (.*)`).FindStringSubmatch(jailRaw)
 		jailFindTime := regexp.MustCompile(`findtime = (.*)`).FindStringSubmatch(jailRaw)
 		jailBanTime := regexp.MustCompile(`bantime = (.*)`).FindStringSubmatch(jailRaw)
@@ -63,7 +61,6 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 		jails = append(jails, Jail{
 			Name:     jailName,
 			Enabled:  jailEnabled,
-			LogPath:  jailLogPath[1],
 			MaxRetry: cast.ToInt(jailMaxRetry[1]),
 			FindTime: cast.ToInt(jailFindTime[1]),
 			BanTime:  cast.ToInt(jailBanTime[1]),
@@ -128,7 +125,6 @@ port = ` + ports + `
 maxretry = ` + jailMaxRetry + `
 findtime = ` + jailFindTime + `
 bantime = ` + jailBanTime + `
-action = %(action_mwl)s
 logpath = ` + app.Root + `/wwwlogs/` + website.Name + `.log
 # ` + jailWebsiteName + `-` + jailWebsiteMode + `-END
 `
@@ -158,25 +154,17 @@ ignoreregex =
 		}
 
 	case "service":
-		var logPath string
 		var filter string
 		var port string
 		var err error
 		switch jailName {
 		case "ssh":
-			if os.IsDebian() || os.IsUbuntu() {
-				logPath = "/var/log/auth.log"
-			} else {
-				logPath = "/var/log/secure"
-			}
 			filter = "sshd"
 			port, err = shell.Execf("cat /etc/ssh/sshd_config | grep 'Port ' | awk '{print $2}'")
 		case "mysql":
-			logPath = app.Root + "/server/mysql/mysql-error.log"
 			filter = "mysqld-auth"
 			port, err = shell.Execf("cat %s/server/mysql/conf/my.cnf | grep 'port' | head -n 1 | awk '{print $3}'", app.Root)
 		case "pure-ftpd":
-			logPath = "/var/log/messages"
 			filter = "pure-ftpd"
 			port, err = shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, app.Root)
 		default:
@@ -197,8 +185,6 @@ port = ` + port + `
 maxretry = ` + jailMaxRetry + `
 findtime = ` + jailFindTime + `
 bantime = ` + jailBanTime + `
-action = %(action_mwl)s
-logpath = ` + logPath + `
 # ` + jailName + `-END
 `
 		raw += rule
@@ -208,7 +194,7 @@ logpath = ` + logPath + `
 		}
 	}
 
-	if _, err := shell.Execf("fail2ban-client reload"); err != nil {
+	if _, err = shell.Execf("fail2ban-client reload"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "重载配置失败")
 		return
 	}

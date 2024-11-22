@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/do/v2"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -24,7 +26,7 @@ type certRepo struct {
 }
 
 func NewCertRepo() biz.CertRepo {
-	return &certRepo{}
+	return do.MustInvoke[biz.CertRepo](injector)
 }
 
 func (r *certRepo) List(page, limit uint) ([]*types.CertList, int64, error) {

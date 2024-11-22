@@ -15,7 +15,6 @@ func init() {
 			r.Get("/load", service.Load)
 			r.Get("/config", service.GetConfig)
 			r.Post("/config", service.UpdateConfig)
-			r.Get("/errorLog", service.ErrorLog)
 			r.Post("/clearErrorLog", service.ClearErrorLog)
 			r.Get("/slowLog", service.SlowLog)
 			r.Post("/clearSlowLog", service.ClearSlowLog)

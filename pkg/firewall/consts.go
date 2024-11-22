@@ -28,6 +28,7 @@ var (
 	StrategyAccept Strategy = "accept" // 接受
 	StrategyDrop   Strategy = "drop"   // 丢弃
 	StrategyReject Strategy = "reject" // 拒绝
+	StrategyMark   Strategy = "mark"   // 标记
 )
 
 type Direction string
@@ -44,7 +45,7 @@ type FireInfo struct {
 	PortStart uint      `json:"port_start"` // 1-65535
 	PortEnd   uint      `json:"port_end"`   // 1-65535
 	Protocol  Protocol  `json:"protocol"`   // tcp udp tcp/udp
-	Strategy  Strategy  `json:"strategy"`   // accept drop reject
+	Strategy  Strategy  `json:"strategy"`   // accept drop reject mark
 	Direction Direction `json:"direction"`  // in out 入站或出站
 }
 

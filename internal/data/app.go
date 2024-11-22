@@ -9,6 +9,7 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/go-rat/utils/collect"
 	"github.com/hashicorp/go-version"
+	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -19,21 +20,15 @@ import (
 )
 
 type appRepo struct {
-	cacheRepo biz.CacheRepo
-	taskRepo  biz.TaskRepo
-	api       *api.API
+	api *api.API
 }
 
 func NewAppRepo() biz.AppRepo {
-	return &appRepo{
-		cacheRepo: NewCacheRepo(),
-		taskRepo:  NewTaskRepo(),
-		api:       api.NewAPI(app.Version),
-	}
+	return do.MustInvoke[biz.AppRepo](injector)
 }
 
 func (r *appRepo) All() api.Apps {
-	cached, err := r.cacheRepo.Get(biz.CacheKeyApps)
+	cached, err := NewCacheRepo().Get(biz.CacheKeyApps)
 	if err != nil {
 		return nil
 	}
@@ -190,7 +185,7 @@ func (r *appRepo) Install(channel, slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return r.taskRepo.Push(task)
+	return NewTaskRepo().Push(task)
 }
 
 func (r *appRepo) UnInstall(slug string) error {
@@ -245,7 +240,7 @@ func (r *appRepo) UnInstall(slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return r.taskRepo.Push(task)
+	return NewTaskRepo().Push(task)
 }
 
 func (r *appRepo) Update(slug string) error {
@@ -300,7 +295,7 @@ func (r *appRepo) Update(slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return r.taskRepo.Push(task)
+	return NewTaskRepo().Push(task)
 }
 
 func (r *appRepo) UpdateShow(slug string, show bool) error {
@@ -331,7 +326,7 @@ func (r *appRepo) UpdateCache() error {
 		return err
 	}
 
-	return r.cacheRepo.Set(biz.CacheKeyApps, string(encoded))
+	return NewCacheRepo().Set(biz.CacheKeyApps, string(encoded))
 }
 
 func (r *appRepo) preCheck(app *api.App) error {

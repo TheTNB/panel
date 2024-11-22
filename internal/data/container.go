@@ -1,15 +1,13 @@
 package data
 
 import (
-	"context"
 	"fmt"
-	"net"
-	"net/http"
 	"slices"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -22,23 +20,8 @@ type containerRepo struct {
 	client *resty.Client
 }
 
-func NewContainerRepo(sock ...string) biz.ContainerRepo {
-	if len(sock) == 0 {
-		sock = append(sock, "/var/run/docker.sock")
-	}
-	client := resty.New()
-	client.SetTimeout(1 * time.Minute)
-	client.SetRetryCount(2)
-	client.SetTransport(&http.Transport{
-		DialContext: func(ctx context.Context, _ string, _ string) (net.Conn, error) {
-			return (&net.Dialer{}).DialContext(ctx, "unix", sock[0])
-		},
-	})
-	client.SetBaseURL("http://d/v1.40")
-
-	return &containerRepo{
-		client: client,
-	}
+func NewContainerRepo() biz.ContainerRepo {
+	return do.MustInvoke[biz.ContainerRepo](injector)
 }
 
 // ListAll 列出所有容器

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -18,7 +19,7 @@ import (
 type certAccountRepo struct{}
 
 func NewCertAccountRepo() biz.CertAccountRepo {
-	return &certAccountRepo{}
+	return do.MustInvoke[biz.CertAccountRepo](injector)
 }
 
 func (r certAccountRepo) List(page, limit uint) ([]*biz.CertAccount, int64, error) {

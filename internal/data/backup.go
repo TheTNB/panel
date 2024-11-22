@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/do/v2"
 	"github.com/shirou/gopsutil/disk"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -20,16 +21,10 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type backupRepo struct {
-	setting biz.SettingRepo
-	website biz.WebsiteRepo
-}
+type backupRepo struct{}
 
 func NewBackupRepo() biz.BackupRepo {
-	return &backupRepo{
-		setting: NewSettingRepo(),
-		website: NewWebsiteRepo(),
-	}
+	return do.MustInvoke[biz.BackupRepo](injector)
 }
 
 // List 备份列表
@@ -197,7 +192,7 @@ func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 
 // GetPath 获取备份路径
 func (r *backupRepo) GetPath(typ biz.BackupType) (string, error) {
-	backupPath, err := r.setting.Get(biz.SettingKeyBackupPath)
+	backupPath, err := NewSettingRepo().Get(biz.SettingKeyBackupPath)
 	if err != nil {
 		return "", err
 	}
@@ -217,7 +212,7 @@ func (r *backupRepo) GetPath(typ biz.BackupType) (string, error) {
 
 // createWebsite 创建网站备份
 func (r *backupRepo) createWebsite(to string, name string) error {
-	website, err := r.website.GetByName(name)
+	website, err := NewWebsiteRepo().GetByName(name)
 	if err != nil {
 		return err
 	}
@@ -241,7 +236,7 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 
 // createMySQL 创建 MySQL 备份
 func (r *backupRepo) createMySQL(to string, name string) error {
-	rootPassword, err := r.setting.Get(biz.SettingKeyMySQLRootPassword)
+	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		return err
 	}
@@ -370,7 +365,7 @@ func (r *backupRepo) restoreWebsite(backup, target string) error {
 		return errors.New("备份文件不存在")
 	}
 
-	website, err := r.website.GetByName(target)
+	website, err := NewWebsiteRepo().GetByName(target)
 	if err != nil {
 		return err
 	}
@@ -397,7 +392,7 @@ func (r *backupRepo) restoreMySQL(backup, target string) error {
 		return errors.New("备份文件不存在")
 	}
 
-	rootPassword, err := r.setting.Get(biz.SettingKeyMySQLRootPassword)
+	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		return err
 	}

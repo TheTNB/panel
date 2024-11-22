@@ -1,6 +1,8 @@
 package data
 
 import (
+	"github.com/samber/do/v2"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -9,7 +11,7 @@ import (
 type certDNSRepo struct{}
 
 func NewCertDNSRepo() biz.CertDNSRepo {
-	return &certDNSRepo{}
+	return do.MustInvoke[biz.CertDNSRepo](injector)
 }
 
 func (r certDNSRepo) List(page, limit uint) ([]*biz.CertDNS, int64, error) {

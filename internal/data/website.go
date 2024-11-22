@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/samber/do/v2"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 
@@ -30,7 +31,7 @@ import (
 type websiteRepo struct{}
 
 func NewWebsiteRepo() biz.WebsiteRepo {
-	return &websiteRepo{}
+	return do.MustInvoke[biz.WebsiteRepo](injector)
 }
 
 func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error {

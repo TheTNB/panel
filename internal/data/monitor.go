@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -11,22 +12,19 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
-type monitorRepo struct {
-	settingRepo biz.SettingRepo
-}
+type monitorRepo struct{}
 
 func NewMonitorRepo() biz.MonitorRepo {
-	return &monitorRepo{
-		settingRepo: NewSettingRepo(),
-	}
+	return do.MustInvoke[biz.MonitorRepo](injector)
 }
 
 func (r monitorRepo) GetSetting() (*request.MonitorSetting, error) {
-	monitor, err := r.settingRepo.Get(biz.SettingKeyMonitor)
+	repo := NewSettingRepo()
+	monitor, err := repo.Get(biz.SettingKeyMonitor)
 	if err != nil {
 		return nil, err
 	}
-	monitorDays, err := r.settingRepo.Get(biz.SettingKeyMonitorDays)
+	monitorDays, err := repo.Get(biz.SettingKeyMonitorDays)
 	if err != nil {
 		return nil, err
 	}
@@ -39,10 +37,11 @@ func (r monitorRepo) GetSetting() (*request.MonitorSetting, error) {
 }
 
 func (r monitorRepo) UpdateSetting(setting *request.MonitorSetting) error {
-	if err := r.settingRepo.Set(biz.SettingKeyMonitor, cast.ToString(setting.Enabled)); err != nil {
+	repo := NewSettingRepo()
+	if err := repo.Set(biz.SettingKeyMonitor, cast.ToString(setting.Enabled)); err != nil {
 		return err
 	}
-	if err := r.settingRepo.Set(biz.SettingKeyMonitorDays, cast.ToString(setting.Days)); err != nil {
+	if err := repo.Set(biz.SettingKeyMonitorDays, cast.ToString(setting.Days)); err != nil {
 		return err
 	}
 

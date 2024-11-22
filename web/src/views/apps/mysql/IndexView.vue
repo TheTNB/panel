@@ -13,7 +13,6 @@ const currentTab = ref('status')
 const status = ref(false)
 const isEnabled = ref(false)
 const config = ref('')
-const errorLog = ref('')
 const slowLog = ref('')
 const rootPassword = ref('')
 
@@ -63,11 +62,6 @@ const getRootPassword = async () => {
   await mysql.rootPassword().then((res: any) => {
     rootPassword.value = res.data
   })
-}
-
-const getErrorLog = async () => {
-  const { data } = await mysql.errorLog()
-  return data
 }
 
 const getSlowLog = async () => {
@@ -141,9 +135,6 @@ onMounted(() => {
   getRootPassword()
   getLoad().then((res) => {
     load.value = res
-  })
-  getErrorLog().then((res) => {
-    errorLog.value = res
   })
   getSlowLog().then((res) => {
     slowLog.value = res
@@ -266,7 +257,7 @@ onMounted(() => {
         />
       </n-tab-pane>
       <n-tab-pane name="error-log" tab="错误日志">
-        <realtime-log :path="errorLog" />
+        <realtime-log service="mysqld" />
       </n-tab-pane>
       <n-tab-pane name="slow-log" tab="慢查询日志">
         <realtime-log :path="slowLog" />

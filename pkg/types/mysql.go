@@ -5,7 +5,3 @@ type MySQLUser struct {
 	Host   string   `json:"host"`
 	Grants []string `json:"grants"`
 }
-
-type MySQLDatabase struct {
-	Name string `json:"name"`
-}

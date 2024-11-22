@@ -1,15 +1,13 @@
 package data
 
 import (
-	"context"
 	"fmt"
-	"net"
-	"net/http"
 	"slices"
 	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -22,23 +20,8 @@ type containerNetworkRepo struct {
 	client *resty.Client
 }
 
-func NewContainerNetworkRepo(sock ...string) biz.ContainerNetworkRepo {
-	if len(sock) == 0 {
-		sock = append(sock, "/var/run/docker.sock")
-	}
-	client := resty.New()
-	client.SetTimeout(1 * time.Minute)
-	client.SetRetryCount(2)
-	client.SetTransport(&http.Transport{
-		DialContext: func(ctx context.Context, _ string, _ string) (net.Conn, error) {
-			return (&net.Dialer{}).DialContext(ctx, "unix", sock[0])
-		},
-	})
-	client.SetBaseURL("http://d/v1.40")
-
-	return &containerNetworkRepo{
-		client: client,
-	}
+func NewContainerNetworkRepo() biz.ContainerNetworkRepo {
+	return do.MustInvoke[biz.ContainerNetworkRepo](injector)
 }
 
 // List 列出网络

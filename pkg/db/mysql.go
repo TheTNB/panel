@@ -156,14 +156,14 @@ func (m *MySQL) Users() ([]types.MySQLUser, error) {
 	return users, nil
 }
 
-func (m *MySQL) Databases() ([]types.MySQLDatabase, error) {
+func (m *MySQL) Databases() ([]string, error) {
 	rows, err := m.Query("SHOW DATABASES")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var databases []types.MySQLDatabase
+	var databases []string
 	for rows.Next() {
 		var database string
 		if err := rows.Scan(&database); err != nil {
@@ -172,9 +172,7 @@ func (m *MySQL) Databases() ([]types.MySQLDatabase, error) {
 		if slices.Contains([]string{"information_schema", "performance_schema", "mysql", "sys"}, database) {
 			continue
 		}
-		databases = append(databases, types.MySQLDatabase{
-			Name: database,
-		})
+		databases = append(databases, database)
 	}
 	return databases, nil
 }

@@ -3,21 +3,18 @@ package data
 import (
 	"fmt"
 	"log/slog"
-	"sync"
+
+	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/queuejob"
 )
 
-var taskDispatchOnce sync.Once
-
 type taskRepo struct{}
 
 func NewTaskRepo() biz.TaskRepo {
-	task := &taskRepo{}
-	taskDispatchOnce.Do(task.DispatchWaiting)
-	return &taskRepo{}
+	return do.MustInvoke[biz.TaskRepo](injector)
 }
 
 func (r *taskRepo) HasRunningTask() bool {

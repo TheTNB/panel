@@ -66,4 +66,5 @@ type DatabaseRepo interface {
 	Create(req *request.DatabaseCreate) error
 	Update(req *request.DatabaseUpdate) error
 	Delete(id uint) error
+	Add(serverID uint, name string) error
 }

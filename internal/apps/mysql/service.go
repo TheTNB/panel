@@ -142,14 +142,9 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, load)
 }
 
-// ErrorLog 获取错误日志
-func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
-	service.Success(w, fmt.Sprintf("%s/server/mysql/mysql-error.log", app.Root))
-}
-
 // ClearErrorLog 清空错误日志
 func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
-	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-error.log", app.Root); err != nil {
+	if err := systemctl.LogsClear("mysqld"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

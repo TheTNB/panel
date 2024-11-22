@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/firewall"
-	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
@@ -18,16 +18,7 @@ type safeRepo struct {
 }
 
 func NewSafeRepo() biz.SafeRepo {
-	var ssh string
-	if os.IsRHEL() {
-		ssh = "sshd"
-	} else {
-		ssh = "ssh"
-	}
-
-	return &safeRepo{
-		ssh: ssh,
-	}
+	return do.MustInvoke[biz.SafeRepo](injector)
 }
 
 func (r *safeRepo) GetSSH() (uint, bool, error) {

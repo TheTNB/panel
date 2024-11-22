@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	"github.com/go-rat/utils/hash"
+	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
@@ -24,14 +25,10 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type settingRepo struct {
-	taskRepo biz.TaskRepo
-}
+type settingRepo struct{}
 
 func NewSettingRepo() biz.SettingRepo {
-	return &settingRepo{
-		taskRepo: NewTaskRepo(),
-	}
+	return do.MustInvoke[biz.SettingRepo](injector)
 }
 
 func (r *settingRepo) Get(key biz.SettingKey, defaultValue ...string) (string, error) {
@@ -170,12 +167,13 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 	}
 
 	// 下面是需要需要重启的设置
+	task := NewTaskRepo()
 	// 面板HTTPS
 	restartFlag := false
 	oldCert, _ := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
 	oldKey, _ := io.Read(filepath.Join(app.Root, "panel/storage/cert.key"))
 	if oldCert != setting.Cert || oldKey != setting.Key {
-		if r.taskRepo.HasRunningTask() {
+		if task.HasRunningTask() {
 			return false, errors.New("后台任务正在运行，禁止修改部分设置，请稍后再试")
 		}
 		restartFlag = true
@@ -232,7 +230,7 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 		return false, err
 	}
 	if raw != string(encoded) {
-		if r.taskRepo.HasRunningTask() {
+		if task.HasRunningTask() {
 			return false, errors.New("后台任务正在运行，禁止修改部分设置，请稍后再试")
 		}
 		restartFlag = true

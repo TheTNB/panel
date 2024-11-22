@@ -6,16 +6,20 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/samber/do/v2"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
 )
 
-type databaseServerRepo struct{}
+type databaseServerRepo struct {
+	database biz.DatabaseRepo
+}
 
 func NewDatabaseServerRepo() biz.DatabaseServerRepo {
-	return &databaseServerRepo{}
+	return do.MustInvoke[biz.DatabaseServerRepo](injector)
 }
 
 func (r databaseServerRepo) Count() (int64, error) {
@@ -115,11 +119,12 @@ func (r databaseServerRepo) Delete(id uint) error {
 }
 
 func (r databaseServerRepo) Sync(id uint) error {
-	/*server, err := r.Get(id)
+	server, err := r.Get(id)
 	if err != nil {
 		return err
 	}
 
+	dbRepo := NewDatabaseRepo()
 	switch server.Type {
 	case biz.DatabaseTypeMysql:
 		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
@@ -131,18 +136,10 @@ func (r databaseServerRepo) Sync(id uint) error {
 			return err
 		}
 		for database := range slices.Values(databases) {
-			db := &biz.Database{
-				Name:     database.Name,
-				Username: server.Username,
-				Password: server.Password,
-				ServerID: server.ID,
-				Status:   biz.DatabaseStatusInvalid,
-			}
-			if err := app.Orm.Where("name = ? AND server_id = ?", database.Name, server.ID).First(db).Error; err != nil {
-				app.Orm.Create(db)
+			if err = dbRepo.Add(id, database); err != nil {
+				return err
 			}
 		}
-
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
@@ -152,7 +149,12 @@ func (r databaseServerRepo) Sync(id uint) error {
 		if err != nil {
 			return err
 		}
-	}*/
+		for database := range slices.Values(databases) {
+			if err = dbRepo.Add(id, database.Name); err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }

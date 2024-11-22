@@ -71,3 +71,22 @@ func Disable(name string) error {
 	_, err := shell.Execf("systemctl disable %s", name)
 	return err
 }
+
+// Logs 获取服务日志
+func Logs(name string) (string, error) {
+	return shell.Execf("journalctl -u %s", name)
+}
+
+// LogsTail 获取服务日志
+func LogsTail(name string, lines int) (string, error) {
+	return shell.Execf("journalctl -u %s --lines %d", name, lines)
+}
+
+// LogsClear 清空服务日志
+func LogsClear(name string) error {
+	if _, err := shell.Execf("journalctl --rotate -u %s", name); err != nil {
+		return err
+	}
+	_, err := shell.Execf("journalctl --vacuum-time=1s -u %s", name)
+	return err
+}
