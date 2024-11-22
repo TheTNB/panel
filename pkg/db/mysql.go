@@ -122,6 +122,30 @@ func (m *MySQL) PrivilegesGrant(user, database string) error {
 	return err
 }
 
+func (m *MySQL) UserPrivileges(user, host string) (map[string][]string, error) {
+	rows, err := m.Query(fmt.Sprintf("SHOW GRANTS FOR '%s'@'%s'", user, host))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	privileges := make(map[string][]string)
+	for rows.Next() {
+		var grant string
+		if err := rows.Scan(&grant); err != nil {
+			continue
+		}
+
+		var db string
+		var privs []string
+		if _, err := fmt.Sscanf(grant, "GRANT %s ON %s TO", &privs, &db); err == nil {
+			privileges[db] = append(privileges[db], privs...)
+		}
+	}
+
+	return privileges, nil
+}
+
 func (m *MySQL) PrivilegesRevoke(user, database string) error {
 	_, err := m.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON %s.* FROM '%s'@'localhost'", database, user))
 	m.flushPrivileges()

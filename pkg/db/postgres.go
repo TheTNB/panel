@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	_ "github.com/lib/pq"
 
@@ -114,6 +115,40 @@ func (m *Postgres) UserDrop(user string) error {
 func (m *Postgres) UserPassword(user, password string) error {
 	_, err := m.Exec(fmt.Sprintf("ALTER USER %s WITH PASSWORD '%s'", user, password))
 	return err
+}
+
+func (p *Postgres) UserPrivileges(user string) (map[string][]string, error) {
+	query := `
+		SELECT 
+			table_catalog as database_name,
+			string_agg(DISTINCT privilege_type, ',') as privileges
+		FROM information_schema.role_database_privileges 
+		WHERE grantee = $1
+		GROUP BY table_catalog`
+
+	rows, err := p.Query(query, user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query database privileges: %w", err)
+	}
+	defer rows.Close()
+
+	privileges := make(map[string][]string)
+
+	for rows.Next() {
+		var dbName, privilegeStr string
+		if err := rows.Scan(&dbName, &privilegeStr); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+
+		key := fmt.Sprintf("%s.*", dbName)
+		privileges[key] = strings.Split(privilegeStr, ",")
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating rows: %w", err)
+	}
+
+	return privileges, nil
 }
 
 func (m *Postgres) PrivilegesGrant(user, database string) error {
