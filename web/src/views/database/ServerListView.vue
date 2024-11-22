@@ -129,7 +129,7 @@ const { loading, data, page, total, pageSize, pageCount, refresh } = usePaginati
 )
 
 const handleDelete = async (id: number) => {
-  await database.deleteServer(id).then(() => {
+  await database.serverDelete(id).then(() => {
     window.$message.success('删除成功')
     refresh()
   })

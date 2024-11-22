@@ -14,9 +14,7 @@ import (
 	"github.com/TheTNB/panel/pkg/db"
 )
 
-type databaseServerRepo struct {
-	database biz.DatabaseRepo
-}
+type databaseServerRepo struct{}
 
 func NewDatabaseServerRepo() biz.DatabaseServerRepo {
 	return do.MustInvoke[biz.DatabaseServerRepo](injector)
@@ -80,7 +78,7 @@ func (r databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
 func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
 	switch biz.DatabaseType(req.Type) {
 	case biz.DatabaseTypeMysql:
-		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%r", req.Host, req.Port)); err != nil {
+		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
 			return err
 		}
 	case biz.DatabaseTypePostgresql:
@@ -88,7 +86,7 @@ func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
 			return err
 		}
 	case biz.DatabaseTypeRedis:
-		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%r", req.Host, req.Port)); err != nil {
+		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
 			return err
 		}
 

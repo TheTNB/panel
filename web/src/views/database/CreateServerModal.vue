@@ -19,7 +19,7 @@ const databaseType = [
 ]
 
 const handleCreate = () => {
-  useRequest(() => database.createServer(createModel.value)).onSuccess(() => {
+  useRequest(() => database.serverCreate(createModel.value)).onSuccess(() => {
     show.value = false
     window.$message.success('添加成功')
     window.$bus.emit('database:refresh')

@@ -13,9 +13,11 @@ export default {
   serverList: (page: number, limit: number) =>
     http.Get('/databaseServer', { params: { page, limit } }),
   // 创建数据库服务器
-  createServer: (data: any) => http.Post('/databaseServer', data),
+  serverCreate: (data: any) => http.Post('/databaseServer', data),
   // 更新数据库服务器
-  updateServer: (id: number, data: any) => http.Put(`/databaseServer/${id}`, data),
+  serverUpdate: (id: number, data: any) => http.Put(`/databaseServer/${id}`, data),
   // 删除数据库服务器
-  deleteServer: (id: number) => http.Delete(`/databaseServer/${id}`)
+  serverDelete: (id: number) => http.Delete(`/databaseServer/${id}`),
+  // 同步数据库
+  serverSync: (id: number) => http.Post(`/databaseServer/${id}/sync`)
 }
