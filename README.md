@@ -14,7 +14,7 @@
 
 耗子面板是新一代企业级全能服务器运维管理面板。简单轻量，高效运维。
 
-QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe) | 赞助：[爱发电](https://afdian.com/a/TheTNB)
+**赞助：[爱发电](https://afdian.com/a/TheTNB)** | QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe)
 
 ## 优势
 
