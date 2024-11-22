@@ -3,6 +3,7 @@ package service
 import (
 	"net/http"
 	"slices"
+	"strings"
 
 	"github.com/go-rat/chix"
 
@@ -177,11 +178,15 @@ func (s *FirewallService) CreateIPRule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.firewall.RichRules(firewall.FireInfo{
-		Family: req.Family, Address: req.Address, Protocol: firewall.Protocol(req.Protocol), Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
-	}, firewall.OperationAdd); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
+	// rich rule 下，address 不支持多个地址，需要单独添加
+	addresses := strings.Split(req.Address, ",")
+	for address := range slices.Values(addresses) {
+		if err = s.firewall.RichRules(firewall.FireInfo{
+			Family: req.Family, Address: address, Protocol: firewall.Protocol(req.Protocol), Strategy: firewall.Strategy(req.Strategy), Direction: firewall.Direction(req.Direction),
+		}, firewall.OperationAdd); err != nil {
+			Error(w, http.StatusInternalServerError, "%v", err)
+			return
+		}
 	}
 
 	Success(w, nil)
