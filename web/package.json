@@ -71,7 +71,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "sass": "^1.81.0",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "unocss": "^0.64.1",
     "unplugin-auto-import": "^0.18.5",
     "unplugin-icons": "^0.20.1",
