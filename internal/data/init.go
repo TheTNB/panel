@@ -65,6 +65,9 @@ func init() {
 	do.Provide(injector, func(i do.Injector) (biz.DatabaseServerRepo, error) {
 		return &databaseServerRepo{}, nil
 	})
+	do.Provide(injector, func(i do.Injector) (biz.DatabaseUserRepo, error) {
+		return nil, nil // TODO
+	})
 	do.Provide(injector, func(i do.Injector) (biz.DatabaseRepo, error) {
 		return &databaseRepo{}, nil
 	})

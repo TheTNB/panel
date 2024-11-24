@@ -1,10 +1,7 @@
 package data
 
 import (
-	"errors"
 	"fmt"
-	"slices"
-	"strings"
 
 	"github.com/samber/do/v2"
 
@@ -109,50 +106,5 @@ func (r databaseServerRepo) Delete(id uint) error {
 		return err
 	}
 
-	if slices.Contains([]string{"local_mysql", "local_postgresql", "local_redis"}, ds.Name) && !app.IsCli {
-		return errors.New("can't delete " + ds.Name + ", if you must delete it, please uninstall " + strings.TrimPrefix(ds.Name, "local_"))
-	}
-
 	return app.Orm.Delete(&biz.DatabaseServer{}, id).Error
-}
-
-func (r databaseServerRepo) Sync(id uint) error {
-	server, err := r.Get(id)
-	if err != nil {
-		return err
-	}
-
-	dbRepo := NewDatabaseRepo()
-	switch server.Type {
-	case biz.DatabaseTypeMysql:
-		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
-		if err != nil {
-			return err
-		}
-		databases, err := mysql.Databases()
-		if err != nil {
-			return err
-		}
-		for database := range slices.Values(databases) {
-			if err = dbRepo.Add(id, database); err != nil {
-				return err
-			}
-		}
-	case biz.DatabaseTypePostgresql:
-		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
-		if err != nil {
-			return err
-		}
-		databases, err := postgres.Databases()
-		if err != nil {
-			return err
-		}
-		for database := range slices.Values(databases) {
-			if err = dbRepo.Add(id, database.Name); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
 }

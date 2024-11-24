@@ -56,16 +56,25 @@ func init() {
 	Migrations = append(Migrations, &gormigrate.Migration{
 		ID: "20241107-database",
 		Migrate: func(tx *gorm.DB) error {
-			_ = tx.Migrator().DropTable(&biz.Database{})
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return nil
+		},
+	})
+	Migrations = append(Migrations, &gormigrate.Migration{
+		ID: "20241124-database",
+		Migrate: func(tx *gorm.DB) error {
+			_ = tx.Migrator().DropTable("databases")
 			return tx.AutoMigrate(
 				&biz.DatabaseServer{},
-				&biz.Database{},
+				&biz.DatabaseUser{},
 			)
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable(
 				&biz.DatabaseServer{},
-				&biz.Database{},
+				&biz.DatabaseUser{},
 			)
 		},
 	})

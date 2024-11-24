@@ -29,8 +29,6 @@ type DatabaseServer struct {
 	Remark    string       `gorm:"not null" json:"remark"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
-
-	Databases []*Database `gorm:"foreignKey:ServerID" json:"-"`
 }
 
 func (r *DatabaseServer) BeforeSave(tx *gorm.DB) error {
@@ -69,5 +67,4 @@ type DatabaseServerRepo interface {
 	Create(req *request.DatabaseServerCreate) error
 	Update(req *request.DatabaseServerUpdate) error
 	Delete(id uint) error
-	Sync(id uint) error
 }

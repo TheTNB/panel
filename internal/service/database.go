@@ -54,29 +54,14 @@ func (s *Database) Create(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *Database) Update(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.DatabaseUpdate](r)
-	if err != nil {
-		Error(w, http.StatusUnprocessableEntity, "%v", err)
-		return
-	}
-
-	if err = s.databaseRepo.Update(req); err != nil {
-		Error(w, http.StatusInternalServerError, "%v", err)
-		return
-	}
-
-	Success(w, nil)
-}
-
 func (s *Database) Delete(w http.ResponseWriter, r *http.Request) {
-	req, err := Bind[request.ID](r)
+	req, err := Bind[request.DatabaseDelete](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
 		return
 	}
 
-	if err = s.databaseRepo.Delete(req.ID); err != nil {
+	if err = s.databaseRepo.Delete(req.ServerID, req.Name); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

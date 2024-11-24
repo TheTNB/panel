@@ -66,7 +66,6 @@ func Http(r chi.Router) {
 			database := service.NewDatabaseService()
 			r.Get("/", database.List)
 			r.Post("/", database.Create)
-			r.Put("/{id}", database.Update)
 			r.Delete("/{id}", database.Delete)
 		})
 
@@ -76,7 +75,6 @@ func Http(r chi.Router) {
 			r.Post("/", database.Create)
 			r.Put("/{id}", database.Update)
 			r.Delete("/{id}", database.Delete)
-			r.Post("/{id}/sync", database.Sync)
 		})
 
 		r.Route("/backup", func(r chi.Router) {
