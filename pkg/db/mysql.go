@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"slices"
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -134,7 +133,7 @@ func (m *MySQL) UserPrivileges(user, host string) (map[string][]string, error) {
 	for rows.Next() {
 		var grant string
 		if err = rows.Scan(&grant); err != nil {
-			return nil, fmt.Errorf("failed to scan grant: %w", err)
+			return nil, err
 		}
 		if !strings.HasPrefix(grant, "GRANT ") {
 			continue
@@ -199,24 +198,35 @@ func (m *MySQL) Users() ([]types.MySQLUser, error) {
 	return users, nil
 }
 
-func (m *MySQL) Databases() ([]string, error) {
-	rows, err := m.Query("SHOW DATABASES")
+func (m *MySQL) Databases() ([]types.MySQLDatabase, error) {
+	query := `
+        SELECT 
+            SCHEMA_NAME,
+            DEFAULT_CHARACTER_SET_NAME,
+            DEFAULT_COLLATION_NAME
+        FROM INFORMATION_SCHEMA.SCHEMATA
+        WHERE SCHEMA_NAME NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+    `
+
+	rows, err := m.Query(query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var databases []string
+	var databases []types.MySQLDatabase
 	for rows.Next() {
-		var database string
-		if err := rows.Scan(&database); err != nil {
-			continue
+		var db types.MySQLDatabase
+		if err = rows.Scan(&db.Name, &db.CharSet, &db.Collation); err != nil {
+			return nil, err
 		}
-		if slices.Contains([]string{"information_schema", "performance_schema", "mysql", "sys"}, database) {
-			continue
-		}
-		databases = append(databases, database)
+		databases = append(databases, db)
 	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return databases, nil
 }
 

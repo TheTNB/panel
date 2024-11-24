@@ -5,8 +5,8 @@ defineOptions({
 
 import CreateDatabaseModal from '@/views/database/CreateDatabaseModal.vue'
 import CreateDatabaseServerModal from '@/views/database/CreateServerModal.vue'
-import DatabaseListView from '@/views/database/DatabaseListView.vue'
-import ServerListView from '@/views/database/ServerListView.vue'
+import DatabaseListView from '@/views/database/DatabaseList.vue'
+import ServerListView from '@/views/database/ServerList.vue'
 import { NButton } from 'naive-ui'
 
 const currentTab = ref('database')

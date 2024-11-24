@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"slices"
 	"strings"
 
 	_ "github.com/lib/pq"
@@ -128,7 +129,7 @@ func (r *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 
 	rows, err := r.Query(query, user)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query database privileges: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -136,8 +137,8 @@ func (r *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 
 	for rows.Next() {
 		var db, privilegeStr string
-		if err := rows.Scan(&db, &privilegeStr); err != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", err)
+		if err = rows.Scan(&db, &privilegeStr); err != nil {
+			return nil, err
 		}
 
 		privileges[db] = strings.Split(privilegeStr, ",")
@@ -235,6 +236,9 @@ func (r *Postgres) Databases() ([]types.PostgresDatabase, error) {
 		var db types.PostgresDatabase
 		if err := rows.Scan(&db.Name, &db.Owner, &db.Encoding); err != nil {
 			return nil, err
+		}
+		if slices.Contains([]string{"template0", "template1", "postgres"}, db.Name) {
+			continue
 		}
 		databases = append(databases, db)
 	}

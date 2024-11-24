@@ -120,7 +120,7 @@ const columns: any = [
 ]
 
 const { loading, data, page, total, pageSize, pageCount, refresh } = usePagination(
-  (page, pageSize) => database.serverList(page, pageSize),
+  (page, pageSize) => database.list(page, pageSize),
   {
     initialData: { total: 0, list: [] },
     total: (res: any) => res.total,

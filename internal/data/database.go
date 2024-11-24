@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/samber/do/v2"
 
@@ -30,11 +31,11 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 			mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
 			if err == nil {
 				if databases, err := mysql.Databases(); err == nil {
-					for _, name := range databases {
+					for item := range slices.Values(databases) {
 						database = append(database, &biz.Database{
-							Name:     name,
-							ServerID: server.ID,
-							Status:   biz.DatabaseStatusValid,
+							Name:     item.Name,
+							Server:   server.Name,
+							Encoding: item.CharSet,
 						})
 					}
 				}
@@ -43,11 +44,11 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 			postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 			if err == nil {
 				if databases, err := postgres.Databases(); err == nil {
-					for _, item := range databases {
+					for item := range slices.Values(databases) {
 						database = append(database, &biz.Database{
 							Name:     item.Name,
-							ServerID: server.ID,
-							Status:   biz.DatabaseStatusValid,
+							Server:   server.Name,
+							Encoding: item.Encoding,
 						})
 					}
 				}
