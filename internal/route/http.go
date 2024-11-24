@@ -70,11 +70,20 @@ func Http(r chi.Router) {
 		})
 
 		r.Route("/databaseServer", func(r chi.Router) {
-			database := service.NewDatabaseServerService()
-			r.Get("/", database.List)
-			r.Post("/", database.Create)
-			r.Put("/{id}", database.Update)
-			r.Delete("/{id}", database.Delete)
+			server := service.NewDatabaseServerService()
+			r.Get("/", server.List)
+			r.Post("/", server.Create)
+			r.Put("/{id}", server.Update)
+			r.Delete("/{id}", server.Delete)
+			r.Delete("/{id}/sync", server.Sync)
+		})
+
+		r.Route("/databaseUser", func(r chi.Router) {
+			user := service.NewDatabaseUserService()
+			r.Get("/", user.List)
+			r.Post("/", user.Create)
+			r.Put("/{id}", user.Update)
+			r.Delete("/{id}", user.Delete)
 		})
 
 		r.Route("/backup", func(r chi.Router) {

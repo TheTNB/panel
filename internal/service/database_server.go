@@ -27,7 +27,7 @@ func (s *DatabaseServer) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	certs, total, err := s.databaseServerRepo.List(req.Page, req.Limit)
+	servers, total, err := s.databaseServerRepo.List(req.Page, req.Limit)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -35,7 +35,7 @@ func (s *DatabaseServer) List(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, chix.M{
 		"total": total,
-		"items": certs,
+		"items": servers,
 	})
 }
 
@@ -77,6 +77,21 @@ func (s *DatabaseServer) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = s.databaseServerRepo.Delete(req.ID); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, nil)
+}
+
+func (s *DatabaseServer) Sync(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.ID](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if err = s.databaseServerRepo.Sync(req.ID); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

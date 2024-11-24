@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/samber/do/v2"
 
@@ -30,6 +31,11 @@ func (r databaseServerRepo) List(page, limit uint) ([]*biz.DatabaseServer, int64
 	var databaseServer []*biz.DatabaseServer
 	var total int64
 	err := app.Orm.Model(&biz.DatabaseServer{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&databaseServer).Error
+
+	for server := range slices.Values(databaseServer) {
+		r.checkServer(server)
+	}
+
 	return databaseServer, total, err
 }
 
@@ -39,26 +45,12 @@ func (r databaseServerRepo) Get(id uint) (*biz.DatabaseServer, error) {
 		return nil, err
 	}
 
+	r.checkServer(databaseServer)
+
 	return databaseServer, nil
 }
 
 func (r databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
-	switch biz.DatabaseType(req.Type) {
-	case biz.DatabaseTypeMysql:
-		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
-			return err
-		}
-	case biz.DatabaseTypePostgresql:
-		if _, err := db.NewPostgres(req.Username, req.Password, req.Host, req.Port); err != nil {
-			return err
-		}
-	case biz.DatabaseTypeRedis:
-		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
-			return err
-		}
-
-	}
-
 	databaseServer := &biz.DatabaseServer{
 		Name:     req.Name,
 		Type:     biz.DatabaseType(req.Type),
@@ -69,42 +61,125 @@ func (r databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
 		Remark:   req.Remark,
 	}
 
+	if !r.checkServer(databaseServer) {
+		return fmt.Errorf("check server connection failed")
+	}
+
 	return app.Orm.Create(databaseServer).Error
 }
 
 func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
-	switch biz.DatabaseType(req.Type) {
-	case biz.DatabaseTypeMysql:
-		if _, err := db.NewMySQL(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
-			return err
-		}
-	case biz.DatabaseTypePostgresql:
-		if _, err := db.NewPostgres(req.Username, req.Password, req.Host, req.Port); err != nil {
-			return err
-		}
-	case biz.DatabaseTypeRedis:
-		if _, err := db.NewRedis(req.Username, req.Password, fmt.Sprintf("%s:%d", req.Host, req.Port)); err != nil {
-			return err
-		}
-
-	}
-
-	return app.Orm.Model(&biz.DatabaseServer{}).Where("id = ?", req.ID).Select("*").Updates(&biz.DatabaseServer{
-		Name:     req.Name,
-		Type:     biz.DatabaseType(req.Type),
-		Host:     req.Host,
-		Port:     req.Port,
-		Username: req.Username,
-		Password: req.Password,
-		Remark:   req.Remark,
-	}).Error
-}
-
-func (r databaseServerRepo) Delete(id uint) error {
-	ds := new(biz.DatabaseServer)
-	if err := app.Orm.Where("id = ?", id).First(ds).Error; err != nil {
+	server, err := r.Get(req.ID)
+	if err != nil {
 		return err
 	}
 
-	return app.Orm.Delete(&biz.DatabaseServer{}, id).Error
+	server.Name = req.Name
+	server.Host = req.Host
+	server.Port = req.Port
+	server.Username = req.Username
+	server.Password = req.Password
+	server.Remark = req.Remark
+
+	if !r.checkServer(server) {
+		return fmt.Errorf("check server connection failed")
+	}
+
+	return app.Orm.Save(server).Error
+}
+
+func (r databaseServerRepo) Delete(id uint) error {
+	// 删除服务器下的所有用户
+	if err := NewDatabaseUserRepo().DeleteByServerID(id); err != nil {
+		return err
+	}
+
+	return app.Orm.Where("id = ?", id).Delete(&biz.DatabaseServer{}).Error
+}
+
+func (r databaseServerRepo) Sync(id uint) error {
+	server, err := r.Get(id)
+	if err != nil {
+		return err
+	}
+
+	users := make([]*biz.DatabaseUser, 0)
+	if err = app.Orm.Where("server_id = ?", id).Find(&users).Error; err != nil {
+		return err
+	}
+
+	switch server.Type {
+	case biz.DatabaseTypeMysql:
+		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		if err != nil {
+			return err
+		}
+		allUsers, err := mysql.Users()
+		if err != nil {
+			return err
+		}
+		for user := range slices.Values(allUsers) {
+			if !slices.ContainsFunc(users, func(a *biz.DatabaseUser) bool {
+				return a.Username == user.User && a.Host == user.Host
+			}) {
+				newUser := &biz.DatabaseUser{
+					ServerID: id,
+					Username: user.User,
+					Host:     user.Host,
+					Remark:   fmt.Sprintf("sync from server %s", server.Name),
+				}
+				app.Orm.Create(newUser)
+			}
+		}
+	case biz.DatabaseTypePostgresql:
+		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
+		if err != nil {
+			return err
+		}
+		allUsers, err := postgres.Users()
+		if err != nil {
+			return err
+		}
+		for user := range slices.Values(allUsers) {
+			if !slices.ContainsFunc(users, func(a *biz.DatabaseUser) bool {
+				return a.Username == user.Role
+			}) {
+				newUser := &biz.DatabaseUser{
+					ServerID: id,
+					Username: user.Role,
+					Remark:   fmt.Sprintf("sync from server %s", server.Name),
+				}
+				app.Orm.Create(newUser)
+			}
+		}
+	}
+
+	return nil
+}
+
+// checkServer 检查服务器连接
+func (r databaseServerRepo) checkServer(server *biz.DatabaseServer) bool {
+	switch server.Type {
+	case biz.DatabaseTypeMysql:
+		_, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		if err == nil {
+			server.Status = biz.DatabaseServerStatusValid
+			return true
+		}
+	case biz.DatabaseTypePostgresql:
+		_, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
+		if err == nil {
+			server.Status = biz.DatabaseServerStatusValid
+			return true
+		}
+	case biz.DatabaseTypeRedis:
+		_, err := db.NewRedis(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		if err == nil {
+			server.Status = biz.DatabaseServerStatusValid
+			return true
+		}
+	}
+
+	server.Status = biz.DatabaseServerStatusInvalid
+	return false
 }

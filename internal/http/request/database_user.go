@@ -9,8 +9,7 @@ type DatabaseUserCreate struct {
 }
 
 type DatabaseUserUpdate struct {
-	ID         string   `form:"id" json:"id" validate:"required,exists=database_users id"`
-	Username   string   `form:"username" json:"username"`
+	ID         uint     `form:"id" json:"id" validate:"required,exists=database_users id"`
 	Password   string   `form:"password" json:"password"`
 	Privileges []string `form:"privileges" json:"privileges"`
 	Remark     string   `form:"remark" json:"remark"`

@@ -27,7 +27,7 @@ func (s *Database) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	certs, total, err := s.databaseRepo.List(req.Page, req.Limit)
+	databases, total, err := s.databaseRepo.List(req.Page, req.Limit)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -35,7 +35,7 @@ func (s *Database) List(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, chix.M{
 		"total": total,
-		"items": certs,
+		"items": databases,
 	})
 }
 

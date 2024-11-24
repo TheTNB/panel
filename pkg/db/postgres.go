@@ -43,59 +43,59 @@ func NewPostgres(username, password, address string, port uint) (*Postgres, erro
 	}, nil
 }
 
-func (m *Postgres) Close() error {
-	return m.db.Close()
+func (r *Postgres) Close() error {
+	return r.db.Close()
 }
 
-func (m *Postgres) Ping() error {
-	return m.db.Ping()
+func (r *Postgres) Ping() error {
+	return r.db.Ping()
 }
 
-func (m *Postgres) Query(query string, args ...any) (*sql.Rows, error) {
-	return m.db.Query(query, args...)
+func (r *Postgres) Query(query string, args ...any) (*sql.Rows, error) {
+	return r.db.Query(query, args...)
 }
 
-func (m *Postgres) QueryRow(query string, args ...any) *sql.Row {
-	return m.db.QueryRow(query, args...)
+func (r *Postgres) QueryRow(query string, args ...any) *sql.Row {
+	return r.db.QueryRow(query, args...)
 }
 
-func (m *Postgres) Exec(query string, args ...any) (sql.Result, error) {
-	return m.db.Exec(query, args...)
+func (r *Postgres) Exec(query string, args ...any) (sql.Result, error) {
+	return r.db.Exec(query, args...)
 }
 
-func (m *Postgres) Prepare(query string) (*sql.Stmt, error) {
-	return m.db.Prepare(query)
+func (r *Postgres) Prepare(query string) (*sql.Stmt, error) {
+	return r.db.Prepare(query)
 }
 
-func (m *Postgres) DatabaseCreate(name string) error {
-	_, err := m.Exec(fmt.Sprintf("CREATE DATABASE %s", name))
+func (r *Postgres) DatabaseCreate(name string) error {
+	_, err := r.Exec(fmt.Sprintf("CREATE DATABASE %s", name))
 	return err
 }
 
-func (m *Postgres) DatabaseDrop(name string) error {
-	_, err := m.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", name))
+func (r *Postgres) DatabaseDrop(name string) error {
+	_, err := r.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", name))
 	return err
 }
 
-func (m *Postgres) DatabaseExist(name string) (bool, error) {
+func (r *Postgres) DatabaseExist(name string) (bool, error) {
 	var count int
-	if err := m.QueryRow("SELECT COUNT(*) FROM pg_database WHERE datname = $1", name).Scan(&count); err != nil {
+	if err := r.QueryRow("SELECT COUNT(*) FROM pg_database WHERE datname = $1", name).Scan(&count); err != nil {
 		return false, err
 	}
 	return count > 0, nil
 }
 
-func (m *Postgres) DatabaseSize(name string) (int64, error) {
+func (r *Postgres) DatabaseSize(name string) (int64, error) {
 	query := fmt.Sprintf("SELECT pg_database_size('%s')", name)
 	var size int64
-	if err := m.QueryRow(query).Scan(&size); err != nil {
+	if err := r.QueryRow(query).Scan(&size); err != nil {
 		return 0, err
 	}
 	return size, nil
 }
 
-func (m *Postgres) UserCreate(user, password string) error {
-	_, err := m.Exec(fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", user, password))
+func (r *Postgres) UserCreate(user, password string) error {
+	_, err := r.Exec(fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", user, password))
 	if err != nil {
 		return err
 	}
@@ -103,8 +103,8 @@ func (m *Postgres) UserCreate(user, password string) error {
 	return nil
 }
 
-func (m *Postgres) UserDrop(user string) error {
-	_, err := m.Exec(fmt.Sprintf("DROP USER IF EXISTS %s", user))
+func (r *Postgres) UserDrop(user string) error {
+	_, err := r.Exec(fmt.Sprintf("DROP USER IF EXISTS %s", user))
 	if err != nil {
 		return err
 	}
@@ -112,12 +112,12 @@ func (m *Postgres) UserDrop(user string) error {
 	return systemctl.Reload("postgresql")
 }
 
-func (m *Postgres) UserPassword(user, password string) error {
-	_, err := m.Exec(fmt.Sprintf("ALTER USER %s WITH PASSWORD '%s'", user, password))
+func (r *Postgres) UserPassword(user, password string) error {
+	_, err := r.Exec(fmt.Sprintf("ALTER USER %s WITH PASSWORD '%s'", user, password))
 	return err
 }
 
-func (p *Postgres) UserPrivileges(user string) (map[string][]string, error) {
+func (r *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 	query := `
 		SELECT 
 			table_catalog as database_name,
@@ -126,7 +126,7 @@ func (p *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 		WHERE grantee = $1
 		GROUP BY table_catalog`
 
-	rows, err := p.Query(query, user)
+	rows, err := r.Query(query, user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query database privileges: %w", err)
 	}
@@ -135,39 +135,38 @@ func (p *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 	privileges := make(map[string][]string)
 
 	for rows.Next() {
-		var dbName, privilegeStr string
-		if err := rows.Scan(&dbName, &privilegeStr); err != nil {
+		var db, privilegeStr string
+		if err := rows.Scan(&db, &privilegeStr); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		key := fmt.Sprintf("%s.*", dbName)
-		privileges[key] = strings.Split(privilegeStr, ",")
+		privileges[db] = strings.Split(privilegeStr, ",")
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating rows: %w", err)
+		return nil, err
 	}
 
 	return privileges, nil
 }
 
-func (m *Postgres) PrivilegesGrant(user, database string) error {
-	if _, err := m.Exec(fmt.Sprintf("ALTER DATABASE %s OWNER TO %s", database, user)); err != nil {
+func (r *Postgres) PrivilegesGrant(user, database string) error {
+	if _, err := r.Exec(fmt.Sprintf("ALTER DATABASE %s OWNER TO %s", database, user)); err != nil {
 		return err
 	}
-	if _, err := m.Exec(fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s", database, user)); err != nil {
+	if _, err := r.Exec(fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE %s TO %s", database, user)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Postgres) PrivilegesRevoke(user, database string) error {
-	_, err := m.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON DATABASE %s FROM %s", database, user))
+func (r *Postgres) PrivilegesRevoke(user, database string) error {
+	_, err := r.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON DATABASE %s FROM %s", database, user))
 	return err
 }
 
-func (m *Postgres) Users() ([]types.PostgresUser, error) {
+func (r *Postgres) Users() ([]types.PostgresUser, error) {
 	query := `
         SELECT rolname,
                rolsuper,
@@ -178,7 +177,7 @@ func (m *Postgres) Users() ([]types.PostgresUser, error) {
         FROM pg_roles
         WHERE rolcanlogin = true;
     `
-	rows, err := m.Query(query)
+	rows, err := r.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -212,16 +211,20 @@ func (m *Postgres) Users() ([]types.PostgresUser, error) {
 		users = append(users, user)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return users, nil
 }
 
-func (m *Postgres) Databases() ([]types.PostgresDatabase, error) {
+func (r *Postgres) Databases() ([]types.PostgresDatabase, error) {
 	query := `
         SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba), pg_catalog.pg_encoding_to_char(d.encoding)
         FROM pg_catalog.pg_database d
         WHERE datistemplate = false;
     `
-	rows, err := m.Query(query)
+	rows, err := r.Query(query)
 	if err != nil {
 		return nil, err
 	}

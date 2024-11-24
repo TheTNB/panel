@@ -9,14 +9,24 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
+type DatabaseUserStatus string
+
+const (
+	DatabaseUserStatusValid   DatabaseUserStatus = "valid"
+	DatabaseUserStatusInvalid DatabaseUserStatus = "invalid"
+)
+
 type DatabaseUser struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	ServerID  uint      `gorm:"not null" json:"server_id"`
-	Username  string    `gorm:"not null" json:"username"`
-	Password  string    `gorm:"not null" json:"password"`
-	Remark    string    `gorm:"not null" json:"remark"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         uint                `gorm:"primaryKey" json:"id"`
+	ServerID   uint                `gorm:"not null" json:"server_id"`
+	Username   string              `gorm:"not null" json:"username"`
+	Password   string              `gorm:"not null" json:"password"`
+	Host       string              `gorm:"not null" json:"host"`    // 仅 mysql
+	Status     DatabaseUserStatus  `gorm:"-:all" json:"status"`     // 仅显示
+	Privileges map[string][]string `gorm:"-:all" json:"privileges"` // 仅显示
+	Remark     string              `gorm:"not null" json:"remark"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
 }
 
 func (r *DatabaseUser) BeforeSave(tx *gorm.DB) error {
@@ -46,5 +56,5 @@ type DatabaseUserRepo interface {
 	Create(req *request.DatabaseUserCreate) error
 	Update(req *request.DatabaseUserUpdate) error
 	Delete(id uint) error
-	Sync(id uint) error
+	DeleteByServerID(serverID uint) error
 }

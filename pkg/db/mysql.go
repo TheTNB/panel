@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"slices"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 
@@ -132,15 +133,33 @@ func (m *MySQL) UserPrivileges(user, host string) (map[string][]string, error) {
 	privileges := make(map[string][]string)
 	for rows.Next() {
 		var grant string
-		if err := rows.Scan(&grant); err != nil {
+		if err = rows.Scan(&grant); err != nil {
+			return nil, fmt.Errorf("failed to scan grant: %w", err)
+		}
+		if !strings.HasPrefix(grant, "GRANT ") {
 			continue
 		}
 
-		var db string
-		var privs []string
-		if _, err := fmt.Sscanf(grant, "GRANT %s ON %s TO", &privs, &db); err == nil {
-			privileges[db] = append(privileges[db], privs...)
+		parts := strings.Split(grant, " ON ")
+		if len(parts) < 2 {
+			continue
 		}
+
+		privList := strings.TrimPrefix(parts[0], "GRANT ")
+		privs := strings.Split(privList, ", ")
+
+		dbPart := strings.Split(parts[1], " TO")[0]
+		// *.* 表示全局权限
+		if dbPart == "*.*" {
+			dbPart = "*"
+		}
+
+		dbPart = strings.Trim(dbPart, "`")
+		privileges[dbPart] = append(privileges[dbPart], privs...)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return privileges, nil

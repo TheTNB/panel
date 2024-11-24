@@ -9,7 +9,6 @@ import (
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
-	"github.com/TheTNB/panel/pkg/types"
 )
 
 type databaseRepo struct{}
@@ -18,22 +17,13 @@ func NewDatabaseRepo() biz.DatabaseRepo {
 	return do.MustInvoke[biz.DatabaseRepo](injector)
 }
 
-func (r databaseRepo) Count() (int64, error) {
-	var count int64
-	if err := app.Orm.Model(&types.Database{}).Count(&count).Error; err != nil {
-		return 0, err
-	}
-
-	return count, nil
-}
-
-func (r databaseRepo) List(page, limit uint) ([]types.Database, int64, error) {
+func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 	var databaseServer []*biz.DatabaseServer
 	if err := app.Orm.Model(&biz.DatabaseServer{}).Order("id desc").Find(&databaseServer).Error; err != nil {
 		return nil, 0, err
 	}
 
-	database := make([]types.Database, 0)
+	database := make([]*biz.Database, 0)
 	for _, server := range databaseServer {
 		switch server.Type {
 		case biz.DatabaseTypeMysql:
@@ -41,10 +31,10 @@ func (r databaseRepo) List(page, limit uint) ([]types.Database, int64, error) {
 			if err == nil {
 				if databases, err := mysql.Databases(); err == nil {
 					for _, name := range databases {
-						database = append(database, types.Database{
+						database = append(database, &biz.Database{
 							Name:     name,
 							ServerID: server.ID,
-							Status:   types.DatabaseStatusValid,
+							Status:   biz.DatabaseStatusValid,
 						})
 					}
 				}
@@ -54,10 +44,10 @@ func (r databaseRepo) List(page, limit uint) ([]types.Database, int64, error) {
 			if err == nil {
 				if databases, err := postgres.Databases(); err == nil {
 					for _, item := range databases {
-						database = append(database, types.Database{
+						database = append(database, &biz.Database{
 							Name:     item.Name,
 							ServerID: server.ID,
-							Status:   types.DatabaseStatusValid,
+							Status:   biz.DatabaseStatusValid,
 						})
 					}
 				}

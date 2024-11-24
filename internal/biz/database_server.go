@@ -14,20 +14,30 @@ type DatabaseType string
 const (
 	DatabaseTypeMysql      DatabaseType = "mysql"
 	DatabaseTypePostgresql DatabaseType = "postgresql"
+	DatabaseTypeMongoDB    DatabaseType = "mongodb"
+	DatabaseSQLite         DatabaseType = "sqlite"
 	DatabaseTypeRedis      DatabaseType = "redis"
 )
 
+type DatabaseServerStatus string
+
+const (
+	DatabaseServerStatusValid   DatabaseServerStatus = "valid"
+	DatabaseServerStatusInvalid DatabaseServerStatus = "invalid"
+)
+
 type DatabaseServer struct {
-	ID        uint         `gorm:"primaryKey" json:"id"`
-	Name      string       `gorm:"not null;unique" json:"name"`
-	Type      DatabaseType `gorm:"not null" json:"type"`
-	Host      string       `gorm:"not null" json:"host"`
-	Port      uint         `gorm:"not null" json:"port"`
-	Username  string       `gorm:"not null" json:"username"`
-	Password  string       `gorm:"not null" json:"password"`
-	Remark    string       `gorm:"not null" json:"remark"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	ID        uint                 `gorm:"primaryKey" json:"id"`
+	Name      string               `gorm:"not null;unique" json:"name"`
+	Type      DatabaseType         `gorm:"not null" json:"type"`
+	Host      string               `gorm:"not null" json:"host"`
+	Port      uint                 `gorm:"not null" json:"port"`
+	Username  string               `gorm:"not null" json:"username"`
+	Password  string               `gorm:"not null" json:"password"`
+	Status    DatabaseServerStatus `gorm:"-:all" json:"status"`
+	Remark    string               `gorm:"not null" json:"remark"`
+	CreatedAt time.Time            `json:"created_at"`
+	UpdatedAt time.Time            `json:"updated_at"`
 }
 
 func (r *DatabaseServer) BeforeSave(tx *gorm.DB) error {
@@ -57,4 +67,5 @@ type DatabaseServerRepo interface {
 	Create(req *request.DatabaseServerCreate) error
 	Update(req *request.DatabaseServerUpdate) error
 	Delete(id uint) error
+	Sync(id uint) error
 }
