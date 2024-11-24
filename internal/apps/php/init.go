@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	php := []uint{74, 80, 81, 82, 83}
+	php := []uint{74, 80, 81, 82, 83, 84}
 	for _, version := range php {
 		apploader.Register(&types.App{
 			Slug: fmt.Sprintf("php%d", version),

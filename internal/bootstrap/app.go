@@ -18,6 +18,7 @@ func boot() {
 	initLogger()
 	initOrm()
 	runMigrate()
+	bootCrypter()
 }
 
 func BootWeb() {

@@ -3,7 +3,6 @@ package biz
 import (
 	"time"
 
-	"github.com/go-rat/utils/crypt"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -21,12 +20,8 @@ type DatabaseUser struct {
 }
 
 func (r *DatabaseUser) BeforeSave(tx *gorm.DB) error {
-	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
-	if err != nil {
-		return err
-	}
-
-	r.Password, err = crypter.Encrypt([]byte(r.Password))
+	var err error
+	r.Password, err = app.Crypter.Encrypt([]byte(r.Password))
 	if err != nil {
 		return err
 	}
@@ -36,12 +31,7 @@ func (r *DatabaseUser) BeforeSave(tx *gorm.DB) error {
 }
 
 func (r *DatabaseUser) AfterFind(tx *gorm.DB) error {
-	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
-	if err != nil {
-		return err
-	}
-
-	password, err := crypter.Decrypt(r.Password)
+	password, err := app.Crypter.Decrypt(r.Password)
 	if err == nil {
 		r.Password = string(password)
 	}

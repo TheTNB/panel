@@ -7,6 +7,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-rat/sessions"
+	"github.com/go-rat/utils/crypt"
 	"github.com/knadh/koanf/v2"
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
@@ -24,6 +25,7 @@ var (
 	Cron       *cron.Cron
 	Queue      *queue.Queue
 	Logger     *slog.Logger
+	Crypter    crypt.Crypter
 )
 
 // 定义面板状态常量
