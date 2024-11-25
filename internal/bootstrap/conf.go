@@ -31,7 +31,7 @@ func initGlobal() {
 	}
 
 	app.Root = app.Conf.MustString("app.root")
-	app.Version = "2.3.19"
+	app.Version = "2.3.20"
 	app.Locale = app.Conf.MustString("app.locale")
 
 	// 初始化时区
