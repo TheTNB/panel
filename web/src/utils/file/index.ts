@@ -276,7 +276,7 @@ const languageByPath = (path: string) => {
 }
 
 const checkName = (name: string) => {
-  return /^[a-zA-Z0-9_.@#$%\-\s[\]()]+$/.test(name)
+  return /^[\p{L}\p{N}\p{P}\s]+$/u.test(name)
 }
 
 const checkPath = (path: string) => {
