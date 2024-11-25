@@ -33,8 +33,6 @@
     }
   ],
   "ignoreDeps": [
-    "eslint",
-    "@vue/eslint-config-typescript",
     "typescript"
   ]
 }

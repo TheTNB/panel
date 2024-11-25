@@ -1,30 +1,15 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": [
-    "env.d.ts",
-    "src/**/*",
-    "types/**/*.d.ts",
-    "src/**/*.vue"
-  ],
-  "exclude": [
-    "src/**/__tests__/*"
-  ],
   "compilerOptions": {
     "composite": true,
-    "baseUrl": ".",
-    "module": "ESNext",
     "target": "ESNext",
     "lib": [
       "DOM",
       "ESNext"
     ],
-    "strict": true,
-    "esModuleInterop": true,
+    "baseUrl": ".",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
     "paths": {
       "~/*": [
         "./*"
@@ -33,10 +18,25 @@
         "./src/*"
       ]
     },
+    "resolveJsonModule": true,
     "types": [
       "node",
       "vite/client",
       "unplugin-icons/types/vue"
-    ]
-  }
+    ],
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "types/**/*.d.ts",
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "src/**/__tests__/*"
+  ]
 }
