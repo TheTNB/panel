@@ -174,6 +174,51 @@ func Cli() []*cli.Command {
 			},
 		},
 		{
+			Name:  "database",
+			Usage: "数据库管理",
+			Commands: []*cli.Command{
+				{
+					Name:   "add-server",
+					Usage:  "添加数据库服务器",
+					Action: cliService.DatabaseAddServer,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "type",
+							Usage:    "服务器类型",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:     "name",
+							Usage:    "服务器名称",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:     "host",
+							Usage:    "服务器地址",
+							Required: true,
+						},
+						&cli.UintFlag{
+							Name:     "port",
+							Usage:    "服务器端口",
+							Required: true,
+						},
+						&cli.StringFlag{
+							Name:  "username",
+							Usage: "服务器用户名",
+						},
+						&cli.StringFlag{
+							Name:  "password",
+							Usage: "服务器密码",
+						},
+						&cli.StringFlag{
+							Name:  "remark",
+							Usage: "服务器备注",
+						},
+					},
+				},
+			},
+		},
+		{
 			Name:  "backup",
 			Usage: "数据备份",
 			Commands: []*cli.Command{

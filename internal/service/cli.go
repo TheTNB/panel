@@ -31,26 +31,28 @@ import (
 )
 
 type CliService struct {
-	hr          string
-	api         *api.API
-	appRepo     biz.AppRepo
-	userRepo    biz.UserRepo
-	settingRepo biz.SettingRepo
-	backupRepo  biz.BackupRepo
-	websiteRepo biz.WebsiteRepo
-	hash        hash.Hasher
+	hr                 string
+	api                *api.API
+	appRepo            biz.AppRepo
+	userRepo           biz.UserRepo
+	settingRepo        biz.SettingRepo
+	backupRepo         biz.BackupRepo
+	websiteRepo        biz.WebsiteRepo
+	databaseServerRepo biz.DatabaseServerRepo
+	hash               hash.Hasher
 }
 
 func NewCliService() *CliService {
 	return &CliService{
-		hr:          `+----------------------------------------------------`,
-		api:         api.NewAPI(app.Version),
-		appRepo:     data.NewAppRepo(),
-		userRepo:    data.NewUserRepo(),
-		settingRepo: data.NewSettingRepo(),
-		backupRepo:  data.NewBackupRepo(),
-		websiteRepo: data.NewWebsiteRepo(),
-		hash:        hash.NewArgon2id(),
+		hr:                 `+----------------------------------------------------`,
+		api:                api.NewAPI(app.Version),
+		appRepo:            data.NewAppRepo(),
+		userRepo:           data.NewUserRepo(),
+		settingRepo:        data.NewSettingRepo(),
+		backupRepo:         data.NewBackupRepo(),
+		websiteRepo:        data.NewWebsiteRepo(),
+		databaseServerRepo: data.NewDatabaseServerRepo(),
+		hash:               hash.NewArgon2id(),
 	}
 }
 
@@ -476,6 +478,25 @@ func (s *CliService) WebsiteDelete(ctx context.Context, cmd *cli.Command) error 
 
 func (s *CliService) WebsiteWrite(ctx context.Context, cmd *cli.Command) error {
 	println("not support")
+	return nil
+}
+
+func (s *CliService) DatabaseAddServer(ctx context.Context, cmd *cli.Command) error {
+	req := &request.DatabaseServerCreate{
+		Type:     cmd.String("type"),
+		Name:     cmd.String("name"),
+		Host:     cmd.String("host"),
+		Port:     uint(cmd.Uint("port")),
+		Username: cmd.String("username"),
+		Password: cmd.String("password"),
+		Remark:   cmd.String("remark"),
+	}
+
+	if err := s.databaseServerRepo.Create(req); err != nil {
+		return err
+	}
+
+	fmt.Printf("数据库服务器 %s 添加成功\n", cmd.String("name"))
 	return nil
 }
 
