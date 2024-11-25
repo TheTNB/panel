@@ -3,15 +3,8 @@ import unocss from '@unocss/eslint-config/flat'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import vueTsEslintConfig from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname
-})
+const compat = new FlatCompat()
 
 export default [
   ...pluginVue.configs['flat/essential'],

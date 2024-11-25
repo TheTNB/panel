@@ -1,4 +1,4 @@
-const proxyConfigMappings: Record<ProxyType, ProxyConfig> = {
+const proxyConfigMappings: Record<ProxyType, ProxyConfig[]> = {
   dev: [
     {
       prefix: '/api/ws',

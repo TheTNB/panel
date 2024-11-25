@@ -16,5 +16,9 @@ interface ProxyConfig {
   /** 代理目标地址，后端真实接口地址 */
   target: string
   /** 是否校验https证书 */
-  secure: boolean
+  secure?: boolean
+  /** 是否修改请求头中的host */
+  changeOrigin?: boolean
+  /** 是否代理websocket */
+  ws?: boolean
 }
