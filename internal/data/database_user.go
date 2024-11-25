@@ -30,7 +30,7 @@ func (r databaseUserRepo) Count() (int64, error) {
 func (r databaseUserRepo) List(page, limit uint) ([]*biz.DatabaseUser, int64, error) {
 	var user []*biz.DatabaseUser
 	var total int64
-	err := app.Orm.Model(&biz.DatabaseUser{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&user).Error
+	err := app.Orm.Model(&biz.DatabaseUser{}).Preload("Server").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&user).Error
 
 	for u := range slices.Values(user) {
 		r.fillUser(u)
@@ -41,7 +41,7 @@ func (r databaseUserRepo) List(page, limit uint) ([]*biz.DatabaseUser, int64, er
 
 func (r databaseUserRepo) Get(id uint) (*biz.DatabaseUser, error) {
 	user := new(biz.DatabaseUser)
-	if err := app.Orm.Where("id = ?", id).First(user).Error; err != nil {
+	if err := app.Orm.Preload("Server").Where("id = ?", id).First(user).Error; err != nil {
 		return nil, err
 	}
 
@@ -62,11 +62,11 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 		if err != nil {
 			return err
 		}
-		if err = mysql.UserCreate(req.Username, req.Password); err != nil {
+		if err = mysql.UserCreate(req.Username, req.Password, req.Host); err != nil {
 			return err
 		}
 		for name := range slices.Values(req.Privileges) {
-			if err = mysql.PrivilegesGrant(req.Username, name); err != nil {
+			if err = mysql.PrivilegesGrant(req.Username, name, req.Host); err != nil {
 				return err
 			}
 		}
@@ -89,6 +89,7 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 		ServerID: req.ServerID,
 		Username: req.Username,
 		Password: req.Password,
+		Host:     req.Host,
 		Remark:   req.Remark,
 	}
 
@@ -113,12 +114,12 @@ func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
 			return err
 		}
 		if req.Password != "" {
-			if err = mysql.UserPassword(user.Username, req.Password); err != nil {
+			if err = mysql.UserPassword(user.Username, req.Password, user.Host); err != nil {
 				return err
 			}
 		}
 		for name := range slices.Values(req.Privileges) {
-			if err = mysql.PrivilegesGrant(user.Username, name); err != nil {
+			if err = mysql.PrivilegesGrant(user.Username, name, user.Host); err != nil {
 				return err
 			}
 		}

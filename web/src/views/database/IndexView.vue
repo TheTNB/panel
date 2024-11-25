@@ -5,6 +5,7 @@ defineOptions({
 
 import CreateDatabaseModal from '@/views/database/CreateDatabaseModal.vue'
 import CreateServerModal from '@/views/database/CreateServerModal.vue'
+import CreateUserModal from '@/views/database/CreateUserModal.vue'
 import DatabaseList from '@/views/database/DatabaseList.vue'
 import ServerList from '@/views/database/ServerList.vue'
 import UserList from '@/views/database/UserList.vue'
@@ -28,10 +29,10 @@ const createServerModalShow = ref(false)
         <TheIcon :size="18" icon="material-symbols:add" />
         创建数据库
       </n-button>
-      <n-button v-if="currentTab === 'user'" type="primary" @click="createUserModalShow = true">
+      <!--<n-button v-if="currentTab === 'user'" type="primary" @click="createUserModalShow = true">
         <TheIcon :size="18" icon="material-symbols:add" />
         创建用户
-      </n-button>
+      </n-button>-->
       <n-button v-if="currentTab === 'server'" type="primary" @click="createServerModalShow = true">
         <TheIcon :size="18" icon="material-symbols:add" />
         添加服务器

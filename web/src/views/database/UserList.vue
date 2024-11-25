@@ -7,6 +7,29 @@ import { formatDateTime } from '@/utils'
 
 const columns: any = [
   {
+    title: '类型',
+    key: 'type',
+    width: 150,
+    render(row: any) {
+      return h(
+        NTag,
+        { type: 'info' },
+        {
+          default: () => {
+            switch (row.server.type) {
+              case 'mysql':
+                return 'MySQL'
+              case 'postgresql':
+                return 'PostgreSQL'
+              default:
+                return row.server.type
+            }
+          }
+        }
+      )
+    }
+  },
+  {
     title: '用户名',
     key: 'username',
     minWidth: 100,
@@ -27,7 +50,8 @@ const columns: any = [
             value: row.password,
             type: 'password',
             showPasswordOn: 'click',
-            readonly: true
+            readonly: true,
+            placeholder: '未保存'
           })
         ]
       })
@@ -36,11 +60,19 @@ const columns: any = [
   {
     title: '主机',
     key: 'host',
-    width: 200,
+    width: 150,
     render(row: any) {
       return h(NTag, null, {
         default: () => row.host
       })
+    }
+  },
+  {
+    title: '服务器',
+    key: 'server',
+    width: 150,
+    render(row: any) {
+      return row.server.name
     }
   },
   {
@@ -138,7 +170,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="1200"
+    :scroll-x="1400"
     :loading="loading"
     :columns="columns"
     :data="data"

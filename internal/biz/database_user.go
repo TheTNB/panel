@@ -27,6 +27,8 @@ type DatabaseUser struct {
 	Remark     string              `gorm:"not null" json:"remark"`
 	CreatedAt  time.Time           `json:"created_at"`
 	UpdatedAt  time.Time           `json:"updated_at"`
+
+	Server *DatabaseServer `gorm:"foreignKey:ServerID;references:ID" json:"server"`
 }
 
 func (r *DatabaseUser) BeforeSave(tx *gorm.DB) error {

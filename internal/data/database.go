@@ -33,6 +33,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 				if databases, err := mysql.Databases(); err == nil {
 					for item := range slices.Values(databases) {
 						database = append(database, &biz.Database{
+							Type:     biz.DatabaseTypeMysql,
 							Name:     item.Name,
 							Server:   server.Name,
 							ServerID: server.ID,
@@ -47,6 +48,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 				if databases, err := postgres.Databases(); err == nil {
 					for item := range slices.Values(databases) {
 						database = append(database, &biz.Database{
+							Type:     biz.DatabaseTypePostgresql,
 							Name:     item.Name,
 							Server:   server.Name,
 							ServerID: server.ID,
@@ -73,28 +75,36 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 		if err != nil {
 			return err
 		}
-		if err = mysql.UserCreate(req.Username, req.Password); err != nil {
-			return err
+		if req.CreateUser {
+			if err = mysql.UserCreate(req.Username, req.Password, req.Host); err != nil {
+				return err
+			}
 		}
 		if err = mysql.DatabaseCreate(req.Name); err != nil {
 			return err
 		}
-		if err = mysql.PrivilegesGrant(req.Username, req.Name); err != nil {
-			return err
+		if req.Username != "" {
+			if err = mysql.PrivilegesGrant(req.Username, req.Name, req.Host); err != nil {
+				return err
+			}
 		}
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
 			return err
 		}
-		if err = postgres.UserCreate(req.Username, req.Password); err != nil {
-			return err
+		if req.CreateUser {
+			if err = postgres.UserCreate(req.Username, req.Password); err != nil {
+				return err
+			}
 		}
 		if err = postgres.DatabaseCreate(req.Name); err != nil {
 			return err
 		}
-		if err = postgres.PrivilegesGrant(req.Username, req.Name); err != nil {
-			return err
+		if req.Username != "" {
+			if err = postgres.PrivilegesGrant(req.Username, req.Name); err != nil {
+				return err
+			}
 		}
 	}
 

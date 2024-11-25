@@ -308,13 +308,13 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err = mysql.UserCreate(req.DBUser, req.DBPassword); err != nil {
+		if err = mysql.UserCreate(req.DBUser, req.DBPassword, "localhost"); err != nil {
 			return nil, err
 		}
 		if err = mysql.DatabaseCreate(req.DBName); err != nil {
 			return nil, err
 		}
-		if err = mysql.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
+		if err = mysql.PrivilegesGrant(req.DBUser, req.DBName, "localhost"); err != nil {
 			return nil, err
 		}
 	}

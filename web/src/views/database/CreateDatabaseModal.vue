@@ -4,11 +4,15 @@ import { NButton, NInput } from 'naive-ui'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const createModel = ref({
-  database: '',
+  server_id: null,
+  name: '',
+  create_user: false,
   username: '',
   password: '',
   host: 'localhost'
 })
+
+const servers = ref<{ label: string; value: string }[]>([])
 
 const hostType = [
   { label: '本地（localhost）', value: 'localhost' },
@@ -23,6 +27,17 @@ const handleCreate = () => {
     window.$bus.emit('database:refresh')
   })
 }
+
+onMounted(() => {
+  database.serverList(1, 10000).then((data: any) => {
+    for (const server of data.items) {
+      servers.value.push({
+        label: server.name,
+        value: server.id
+      })
+    }
+  })
+})
 </script>
 
 <template>
@@ -37,15 +52,34 @@ const handleCreate = () => {
     @close="show = false"
   >
     <n-form :model="createModel">
+      <n-form-item path="server_id" label="服务器">
+        <n-select
+          v-model:value="createModel.server_id"
+          @keydown.enter.prevent
+          placeholder="选择服务器"
+          :options="servers"
+        />
+      </n-form-item>
       <n-form-item path="database" label="数据库名">
         <n-input
-          v-model:value="createModel.database"
+          v-model:value="createModel.name"
           type="text"
           @keydown.enter.prevent
           placeholder="输入数据库名称"
         />
       </n-form-item>
-      <n-form-item path="username" label="用户名">
+      <n-form-item path="create_user" label="创建用户">
+        <n-switch v-model:value="createModel.create_user" />
+      </n-form-item>
+      <n-form-item v-if="!createModel.create_user" path="username" label="授权用户">
+        <n-input
+          v-model:value="createModel.username"
+          type="text"
+          @keydown.enter.prevent
+          placeholder="输入授权用户名"
+        />
+      </n-form-item>
+      <n-form-item v-if="createModel.create_user" path="username" label="用户名">
         <n-input
           v-model:value="createModel.username"
           type="text"
@@ -53,7 +87,7 @@ const handleCreate = () => {
           placeholder="输入用户名"
         />
       </n-form-item>
-      <n-form-item path="password" label="密码">
+      <n-form-item v-if="createModel.create_user" path="password" label="密码">
         <n-input
           v-model:value="createModel.password"
           type="password"
@@ -61,7 +95,7 @@ const handleCreate = () => {
           placeholder="输入密码"
         />
       </n-form-item>
-      <n-form-item path="host-select" label="主机">
+      <n-form-item v-if="createModel.create_user" path="host-select" label="主机">
         <n-select
           v-model:value="createModel.host"
           @keydown.enter.prevent
@@ -69,7 +103,11 @@ const handleCreate = () => {
           :options="hostType"
         />
       </n-form-item>
-      <n-form-item v-if="createModel.host === ''" path="host" label="指定主机">
+      <n-form-item
+        v-if="createModel.create_user && createModel.host === ''"
+        path="host"
+        label="指定主机"
+      >
         <n-input
           v-model:value="createModel.host"
           type="text"

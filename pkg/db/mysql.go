@@ -98,8 +98,8 @@ func (m *MySQL) DatabaseSize(name string) (int64, error) {
 	return size, err
 }
 
-func (m *MySQL) UserCreate(user, password string) error {
-	_, err := m.Exec(fmt.Sprintf("CREATE USER IF NOT EXISTS '%s'@'localhost' IDENTIFIED BY '%s'", user, password))
+func (m *MySQL) UserCreate(user, password, host string) error {
+	_, err := m.Exec(fmt.Sprintf("CREATE USER IF NOT EXISTS '%s'@'%s' IDENTIFIED BY '%s'", user, host, password))
 	m.flushPrivileges()
 	return err
 }
@@ -110,14 +110,14 @@ func (m *MySQL) UserDrop(user string) error {
 	return err
 }
 
-func (m *MySQL) UserPassword(user, password string) error {
-	_, err := m.Exec(fmt.Sprintf("ALTER USER '%s'@'localhost' IDENTIFIED BY '%s'", user, password))
+func (m *MySQL) UserPassword(user, password, host string) error {
+	_, err := m.Exec(fmt.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED BY '%s'", user, host, password))
 	m.flushPrivileges()
 	return err
 }
 
-func (m *MySQL) PrivilegesGrant(user, database string) error {
-	_, err := m.Exec(fmt.Sprintf("GRANT ALL PRIVILEGES ON %s.* TO '%s'@'localhost'", database, user))
+func (m *MySQL) PrivilegesGrant(user, database, host string) error {
+	_, err := m.Exec(fmt.Sprintf("GRANT ALL PRIVILEGES ON %s.* TO '%s'@'%s'", database, user, host))
 	m.flushPrivileges()
 	return err
 }
@@ -164,8 +164,8 @@ func (m *MySQL) UserPrivileges(user, host string) (map[string][]string, error) {
 	return privileges, nil
 }
 
-func (m *MySQL) PrivilegesRevoke(user, database string) error {
-	_, err := m.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON %s.* FROM '%s'@'localhost'", database, user))
+func (m *MySQL) PrivilegesRevoke(user, database, host string) error {
+	_, err := m.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON %s.* FROM '%s'@'%s'", database, user, host))
 	m.flushPrivileges()
 	return err
 }

@@ -4,13 +4,22 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
-type DatabaseStatus string
+type DatabaseType string
+
+const (
+	DatabaseTypeMysql      DatabaseType = "mysql"
+	DatabaseTypePostgresql DatabaseType = "postgresql"
+	DatabaseTypeMongoDB    DatabaseType = "mongodb"
+	DatabaseSQLite         DatabaseType = "sqlite"
+	DatabaseTypeRedis      DatabaseType = "redis"
+)
 
 type Database struct {
-	Name     string `json:"name"`
-	Server   string `json:"server"`
-	ServerID uint   `json:"server_id"`
-	Encoding string `json:"encoding"`
+	Type     DatabaseType `json:"type"`
+	Name     string       `json:"name"`
+	Server   string       `json:"server"`
+	ServerID uint         `json:"server_id"`
+	Encoding string       `json:"encoding"`
 }
 
 type DatabaseRepo interface {

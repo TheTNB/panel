@@ -199,7 +199,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		if err = mysql.UserPassword("root", req.Password); err != nil {
+		if err = mysql.UserPassword("root", req.Password, "localhost"); err != nil {
 			service.Error(w, http.StatusInternalServerError, "%v", err)
 			return
 		}

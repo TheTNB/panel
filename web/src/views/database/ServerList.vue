@@ -7,13 +7,6 @@ import { formatDateTime } from '@/utils'
 
 const columns: any = [
   {
-    title: '名称',
-    key: 'name',
-    minWidth: 100,
-    resizable: true,
-    ellipsis: { tooltip: true }
-  },
-  {
     title: '类型',
     key: 'type',
     width: 150,
@@ -37,6 +30,13 @@ const columns: any = [
     }
   },
   {
+    title: '名称',
+    key: 'name',
+    minWidth: 100,
+    resizable: true,
+    ellipsis: { tooltip: true }
+  },
+  {
     title: '用户名',
     key: 'username',
     width: 150,
@@ -48,7 +48,7 @@ const columns: any = [
   {
     title: '密码',
     key: 'password',
-    width: 200,
+    width: 150,
     render(row: any) {
       return h(NInputGroup, null, {
         default: () => [
@@ -66,7 +66,7 @@ const columns: any = [
   {
     title: '主机',
     key: 'host',
-    width: 200,
+    width: 150,
     render(row: any) {
       return h(NTag, null, {
         default: () => `${row.host}:${row.port}`

@@ -6,6 +6,29 @@ import database from '@/api/panel/database'
 
 const columns: any = [
   {
+    title: '类型',
+    key: 'type',
+    width: 150,
+    render(row: any) {
+      return h(
+        NTag,
+        { type: 'info' },
+        {
+          default: () => {
+            switch (row.type) {
+              case 'mysql':
+                return 'MySQL'
+              case 'postgresql':
+                return 'PostgreSQL'
+              default:
+                return row.type
+            }
+          }
+        }
+      )
+    }
+  },
+  {
     title: '数据库名',
     key: 'name',
     minWidth: 100,
@@ -15,12 +38,12 @@ const columns: any = [
   {
     title: '服务器',
     key: 'server',
-    width: 300
+    width: 150
   },
   {
     title: '编码',
     key: 'encoding',
-    width: 200,
+    width: 150,
     render(row: any) {
       return h(NTag, null, {
         default: () => row.encoding
@@ -96,7 +119,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="1200"
+    :scroll-x="800"
     :loading="loading"
     :columns="columns"
     :data="data"

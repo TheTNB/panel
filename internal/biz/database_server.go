@@ -9,16 +9,6 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
-type DatabaseType string
-
-const (
-	DatabaseTypeMysql      DatabaseType = "mysql"
-	DatabaseTypePostgresql DatabaseType = "postgresql"
-	DatabaseTypeMongoDB    DatabaseType = "mongodb"
-	DatabaseSQLite         DatabaseType = "sqlite"
-	DatabaseTypeRedis      DatabaseType = "redis"
-)
-
 type DatabaseServerStatus string
 
 const (
