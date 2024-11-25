@@ -56,7 +56,8 @@ const columns: any = [
             value: row.password,
             type: 'password',
             showPasswordOn: 'click',
-            readonly: true
+            readonly: true,
+            placeholder: '无'
           })
         ]
       })
@@ -89,6 +90,35 @@ const columns: any = [
     hideInExcel: true,
     render(row: any) {
       return [
+        h(
+          NPopconfirm,
+          {
+            onPositiveClick: async () => {
+              await database.serverSync(row.id).then(() => {
+                window.$message.success('同步成功')
+                refresh()
+              })
+            }
+          },
+          {
+            default: () => {
+              return '确定同步数据库用户（不包括密码）到面板？'
+            },
+            trigger: () => {
+              return h(
+                NButton,
+                {
+                  size: 'small',
+                  type: 'success'
+                },
+                {
+                  default: () => '同步',
+                  icon: renderIcon('material-symbols:sync', { size: 14 })
+                }
+              )
+            }
+          }
+        ),
         h(
           NPopconfirm,
           {
@@ -136,13 +166,13 @@ const handleDelete = async (id: number) => {
 }
 
 onMounted(() => {
-  window.$bus.on('database:refresh', () => {
+  window.$bus.on('database-server:refresh', () => {
     refresh()
   })
 })
 
 onUnmounted(() => {
-  window.$bus.off('database:refresh')
+  window.$bus.off('database-server:refresh')
 })
 </script>
 

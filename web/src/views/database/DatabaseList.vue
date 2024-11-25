@@ -1,84 +1,30 @@
 <script setup lang="ts">
 import { renderIcon } from '@/utils'
-import { NButton, NInput, NInputGroup, NPopconfirm, NTag } from 'naive-ui'
+import { NButton, NPopconfirm, NTag } from 'naive-ui'
 
 import database from '@/api/panel/database'
-import { formatDateTime } from '@/utils'
 
 const columns: any = [
   {
-    title: '名称',
+    title: '数据库名',
     key: 'name',
     minWidth: 100,
     resizable: true,
     ellipsis: { tooltip: true }
   },
   {
-    title: '类型',
-    key: 'type',
-    width: 150,
-    render(row: any) {
-      return h(
-        NTag,
-        { type: 'info' },
-        {
-          default: () => {
-            switch (row.type) {
-              case 'mysql':
-                return 'MySQL'
-              case 'postgresql':
-                return 'PostgreSQL'
-              default:
-                return row.type
-            }
-          }
-        }
-      )
-    }
+    title: '服务器',
+    key: 'server',
+    width: 300
   },
   {
-    title: '用户名',
-    key: 'username',
-    width: 150,
-    ellipsis: { tooltip: true },
-    render(row: any) {
-      return row.username || '无'
-    }
-  },
-  {
-    title: '密码',
-    key: 'password',
-    width: 200,
-    render(row: any) {
-      return h(NInputGroup, null, {
-        default: () => [
-          h(NInput, {
-            value: row.password,
-            type: 'password',
-            showPasswordOn: 'click',
-            readonly: true
-          })
-        ]
-      })
-    }
-  },
-  {
-    title: '主机',
-    key: 'host',
+    title: '编码',
+    key: 'encoding',
     width: 200,
     render(row: any) {
       return h(NTag, null, {
-        default: () => `${row.host}:${row.port}`
+        default: () => row.encoding
       })
-    }
-  },
-  {
-    title: '更新日期',
-    key: 'updated_at',
-    width: 200,
-    ellipsis: { tooltip: true },
-    render(row: any) {
-      return formatDateTime(row.updated_at)
     }
   },
   {
@@ -92,11 +38,11 @@ const columns: any = [
         h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete(row.id)
+            onPositiveClick: () => handleDelete(row.server_id, row.name)
           },
           {
             default: () => {
-              return '确定删除服务器吗？'
+              return '确定删除数据库吗？'
             },
             trigger: () => {
               return h(
@@ -128,8 +74,8 @@ const { loading, data, page, total, pageSize, pageCount, refresh } = usePaginati
   }
 )
 
-const handleDelete = async (id: number) => {
-  await database.delete(id).then(() => {
+const handleDelete = async (serverID: number, name: string) => {
+  await database.delete(serverID, name).then(() => {
     window.$message.success('删除成功')
     refresh()
   })

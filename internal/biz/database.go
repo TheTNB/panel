@@ -9,6 +9,7 @@ type DatabaseStatus string
 type Database struct {
 	Name     string `json:"name"`
 	Server   string `json:"server"`
+	ServerID uint   `json:"server_id"`
 	Encoding string `json:"encoding"`
 }
 

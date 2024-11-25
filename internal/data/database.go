@@ -35,6 +35,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 						database = append(database, &biz.Database{
 							Name:     item.Name,
 							Server:   server.Name,
+							ServerID: server.ID,
 							Encoding: item.CharSet,
 						})
 					}
@@ -48,6 +49,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 						database = append(database, &biz.Database{
 							Name:     item.Name,
 							Server:   server.Name,
+							ServerID: server.ID,
 							Encoding: item.Encoding,
 						})
 					}

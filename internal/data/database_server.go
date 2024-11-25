@@ -2,6 +2,7 @@ package data
 
 import (
 	"fmt"
+	"log/slog"
 	"slices"
 
 	"github.com/samber/do/v2"
@@ -121,14 +122,16 @@ func (r databaseServerRepo) Sync(id uint) error {
 		for user := range slices.Values(allUsers) {
 			if !slices.ContainsFunc(users, func(a *biz.DatabaseUser) bool {
 				return a.Username == user.User && a.Host == user.Host
-			}) {
+			}) && !slices.Contains([]string{"root", "mysql.sys", "mysql.session", "mysql.infoschema"}, user.User) {
 				newUser := &biz.DatabaseUser{
 					ServerID: id,
 					Username: user.User,
 					Host:     user.Host,
 					Remark:   fmt.Sprintf("sync from server %s", server.Name),
 				}
-				app.Orm.Create(newUser)
+				if err = app.Orm.Create(newUser).Error; err != nil {
+					app.Logger.Warn("sync database user failed", slog.Any("err", err))
+				}
 			}
 		}
 	case biz.DatabaseTypePostgresql:
@@ -143,7 +146,7 @@ func (r databaseServerRepo) Sync(id uint) error {
 		for user := range slices.Values(allUsers) {
 			if !slices.ContainsFunc(users, func(a *biz.DatabaseUser) bool {
 				return a.Username == user.Role
-			}) {
+			}) && !slices.Contains([]string{"postgres"}, user.Role) {
 				newUser := &biz.DatabaseUser{
 					ServerID: id,
 					Username: user.Role,

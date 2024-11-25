@@ -5,10 +5,8 @@ export default {
   list: (page: number, limit: number) => http.Get(`/database`, { params: { page, limit } }),
   // 创建数据库
   create: (data: any) => http.Post(`/database`, data),
-  // 更新数据库
-  update: (id: number, data: any) => http.Put(`/database/${id}`, data),
   // 删除数据库
-  delete: (id: number) => http.Delete(`/database/${id}`),
+  delete: (server_id: number, name: string) => http.Delete(`/database`, { server_id, name }),
   // 获取数据库服务器列表
   serverList: (page: number, limit: number) =>
     http.Get('/databaseServer', { params: { page, limit } }),
