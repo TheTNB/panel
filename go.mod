@@ -42,7 +42,7 @@ require (
 	github.com/spf13/cast v1.7.0
 	github.com/stretchr/testify v1.10.0
 	github.com/tufanbarisyildirim/gonginx v0.0.0-20241115180907-128af6df1765
-	github.com/urfave/cli/v3 v3.0.0-alpha9.5
+	github.com/urfave/cli/v3 v3.0.0-alpha9.6
 	go.uber.org/zap v1.27.0
 	go.uber.org/zap/exp v0.3.0
 	golang.org/x/crypto v0.29.0
