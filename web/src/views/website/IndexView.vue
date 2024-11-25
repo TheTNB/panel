@@ -345,7 +345,7 @@ const batchDelete = async () => {
 
   for (const id of selectedRowKeys.value) {
     await website.delete(id, true, false).then(() => {
-      let site = data.value.find((item) => item.id === id)
+      const site = data.value.find((item) => item.id === id)
       window.$message.success('网站 ' + site?.name + ' 删除成功')
     })
   }

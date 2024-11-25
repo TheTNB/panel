@@ -214,7 +214,7 @@ const fetchCurrent = async () => {
         }
       }
       // 计算实时数据
-      let time = current.time == 0 ? 3 : toTimestamp(data.time) - current.time
+      const time = current.time == 0 ? 3 : toTimestamp(data.time) - current.time
       let netTotalSentTemp = 0
       let netTotalRecvTemp = 0
       for (let i = 0; i < data.net.length; i++) {

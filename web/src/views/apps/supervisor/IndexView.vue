@@ -345,7 +345,7 @@ const handleSaveProcessConfig = async () => {
   window.$message.success('保存成功')
 }
 
-let timer: any = null
+const timer: any = null
 
 onMounted(async () => {
   await supervisor.service().then((res: any) => {

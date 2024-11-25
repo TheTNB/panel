@@ -317,7 +317,7 @@ const bulkStart = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerStart(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 启动成功`)
     })
   }
@@ -333,7 +333,7 @@ const bulkStop = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerStop(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 停止成功`)
     })
   }
@@ -349,7 +349,7 @@ const bulkRestart = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerRestart(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 重启成功`)
     })
   }
@@ -365,7 +365,7 @@ const bulkForceStop = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerKill(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 强制停止成功`)
     })
   }
@@ -381,7 +381,7 @@ const bulkDelete = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerRemove(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 删除成功`)
     })
   }
@@ -397,7 +397,7 @@ const bulkPause = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerPause(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 暂停成功`)
     })
   }
@@ -413,7 +413,7 @@ const bulkUnpause = async () => {
 
   for (const id of selectedRowKeys.value) {
     await container.containerUnpause(id).then(() => {
-      let container = data.value.find((item) => item.id === id)
+      const container = data.value.find((item) => item.id === id)
       window.$message.success(`${container?.name} 恢复成功`)
     })
   }

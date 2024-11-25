@@ -232,7 +232,7 @@ const batchDelete = async () => {
     // 解析json
     const rule = JSON.parse(key)
     await firewall.deleteRule(rule).then(() => {
-      let port =
+      const port =
         rule.port_start == rule.port_end ? rule.port_start : `${rule.port_start}-${rule.port_end}`
       window.$message.success(`${rule.family} 规则 ${port}/${rule.protocol} 删除成功`)
     })

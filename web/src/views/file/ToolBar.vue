@@ -100,7 +100,7 @@ const handlePaste = async () => {
 
   // 查重
   let flag = false
-  let paths = marked.value.map((item) => {
+  const paths = marked.value.map((item) => {
     return {
       name: item.name,
       source: item.source,

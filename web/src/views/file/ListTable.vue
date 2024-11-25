@@ -39,7 +39,7 @@ const unCompressModel = ref({
 
 const options = computed<DropdownOption[]>(() => {
   if (selectedRow.value == null) return []
-  let options = [
+  const options = [
     {
       label: selectedRow.value.dir ? '打开' : '编辑',
       key: selectedRow.value.dir ? 'open' : 'edit'
@@ -460,7 +460,7 @@ const handlePaste = async () => {
 
   // 查重
   let flag = false
-  let paths = marked.value.map((item) => {
+  const paths = marked.value.map((item) => {
     return {
       name: item.name,
       source: item.source,
