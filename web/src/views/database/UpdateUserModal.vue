@@ -13,7 +13,7 @@ const updateModel = ref({
 const handleUpdate = () => {
   useRequest(() => database.userUpdate(id.value, updateModel.value)).onSuccess(() => {
     show.value = false
-    window.$message.success('更新成功')
+    window.$message.success('修改成功')
     window.$bus.emit('database-user:refresh')
   })
 }
@@ -36,7 +36,7 @@ watch(
   <n-modal
     v-model:show="show"
     preset="card"
-    title="更新用户"
+    title="修改用户"
     style="width: 60vw"
     size="huge"
     :bordered="false"

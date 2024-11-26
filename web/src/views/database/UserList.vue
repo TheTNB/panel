@@ -151,8 +151,8 @@ const columns: any = [
             }
           },
           {
-            default: () => '编辑',
-            icon: renderIcon('material-symbols:edit', { size: 14 })
+            default: () => '修改',
+            icon: renderIcon('material-symbols:edit-outline', { size: 14 })
           }
         ),
         h(

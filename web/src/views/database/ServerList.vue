@@ -4,6 +4,10 @@ import { NButton, NInput, NInputGroup, NPopconfirm, NTag } from 'naive-ui'
 
 import database from '@/api/panel/database'
 import { formatDateTime } from '@/utils'
+import UpdateServerModal from '@/views/database/UpdateServerModal.vue'
+
+const updateModal = ref(false)
+const updateID = ref(0)
 
 const columns: any = [
   {
@@ -114,7 +118,7 @@ const columns: any = [
   {
     title: '操作',
     key: 'actions',
-    width: 200,
+    width: 300,
     align: 'center',
     hideInExcel: true,
     render(row: any) {
@@ -149,9 +153,32 @@ const columns: any = [
           }
         ),
         h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            style: 'margin-left: 15px;',
+            onClick: () => {
+              updateID.value = row.id
+              updateModal.value = true
+            }
+          },
+          {
+            default: () => '修改',
+            icon: renderIcon('material-symbols:edit-outline', { size: 14 })
+          }
+        ),
+        h(
           NPopconfirm,
           {
-            onPositiveClick: () => handleDelete(row.id)
+            onPositiveClick: () => {
+              // 防手贱
+              if (['local_mysql', 'local_postgresql'].includes(row.name)) {
+                window.$message.error('内置服务器不能删除，如需删除请卸载对应应用')
+                return
+              }
+              handleDelete(row.id)
+            }
           },
           {
             default: () => {
@@ -215,7 +242,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="1500"
+    :scroll-x="1600"
     :loading="loading"
     :columns="columns"
     :data="data"
@@ -232,6 +259,7 @@ onUnmounted(() => {
       pageSizes: [20, 50, 100, 200]
     }"
   />
+  <update-server-modal v-model:id="updateID" v-model:show="updateModal" />
 </template>
 
 <style scoped lang="scss"></style>
