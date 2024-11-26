@@ -54,15 +54,6 @@ func init() {
 		},
 	})
 	Migrations = append(Migrations, &gormigrate.Migration{
-		ID: "20241107-database",
-		Migrate: func(tx *gorm.DB) error {
-			return nil
-		},
-		Rollback: func(tx *gorm.DB) error {
-			return nil
-		},
-	})
-	Migrations = append(Migrations, &gormigrate.Migration{
 		ID: "20241124-database",
 		Migrate: func(tx *gorm.DB) error {
 			_ = tx.Migrator().DropTable("databases")

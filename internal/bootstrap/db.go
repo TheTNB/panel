@@ -27,8 +27,7 @@ func initOrm() {
 
 func runMigrate() {
 	migrator := gormigrate.New(app.Orm, &gormigrate.Options{
-		UseTransaction:            true, // Note: MySQL not support DDL transaction
-		ValidateUnknownMigrations: true,
+		UseTransaction: true, // Note: MySQL not support DDL transaction
 	}, migration.Migrations)
 	if err := migrator.Migrate(); err != nil {
 		log.Fatalf("failed to migrate database: %v", err)
