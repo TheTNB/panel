@@ -1,6 +1,6 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'home-update'
+  name: 'dashboard-update'
 })
 
 import { MdPreview } from 'md-editor-v3'
@@ -43,7 +43,7 @@ const handleUpdate = () => {
             setTimeout(() => {
               window.location.reload()
             }, 400)
-            router.push({ name: 'home-index' })
+            router.push({ name: 'dashboard-index' })
           }, 2500)
         })
         .catch(() => {

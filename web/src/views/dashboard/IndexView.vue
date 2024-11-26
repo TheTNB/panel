@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 defineOptions({
-  name: 'home-index'
+  name: 'dashboard-index'
 })
 
 import { LineChart } from 'echarts/charts'
@@ -322,7 +322,7 @@ const handleRestartPanel = () => {
 const handleUpdate = () => {
   dashboard.checkUpdate().then((res) => {
     if (res.data.update) {
-      router.push({ name: 'home-update' })
+      router.push({ name: 'dashboard-update' })
     } else {
       window.$message.success('当前已是最新版本')
     }
