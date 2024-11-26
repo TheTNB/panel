@@ -365,12 +365,18 @@ func (s *Service) getExtensions() []Extension {
 			Description: "Swoole 是一个用于构建高性能的异步并发服务器的 PHP 扩展",
 		})
 	}
-	// Swow 不支持 PHP 8.0 以下版本
-	if cast.ToUint(s.version) >= 80 {
+	// Swow 不支持 PHP 8.0 以下版本且目前不支持 PHP 8.4
+	if cast.ToUint(s.version) >= 80 && cast.ToUint(s.version) < 84 {
 		extensions = append(extensions, Extension{
 			Name:        "Swow",
 			Slug:        "Swow",
 			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展",
+		})
+	}
+	// PHP 8.4 移除了 pspell 和 imap 并且不再建议使用
+	if cast.ToUint(s.version) >= 84 {
+		extensions = slices.DeleteFunc(extensions, func(extension Extension) bool {
+			return extension.Slug == "pspell" || extension.Slug == "imap"
 		})
 	}
 
