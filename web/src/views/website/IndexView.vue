@@ -393,7 +393,7 @@ onMounted(() => {
         striped
         remote
         :loading="false"
-        :scroll-x="1000"
+        :scroll-x="1200"
         :columns="columns"
         :data="data"
         :row-key="(row: any) => row.id"

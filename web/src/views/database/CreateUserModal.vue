@@ -4,34 +4,47 @@ import { NButton, NInput } from 'naive-ui'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const createModel = ref({
-  name: '',
-  type: 'mysql',
-  host: '127.0.0.1',
-  port: 3306,
+  server_id: null,
   username: '',
   password: '',
+  host: 'localhost',
+  privileges: [],
   remark: ''
 })
 
-const databaseType = [
-  { label: 'MySQL', value: 'mysql' },
-  { label: 'PostgreSQL', value: 'postgresql' }
+const servers = ref<{ label: string; value: string }[]>([])
+
+const hostType = [
+  { label: '本地（localhost）', value: 'localhost' },
+  { label: '所有（%）', value: '%' },
+  { label: '指定', value: '' }
 ]
 
 const handleCreate = () => {
-  useRequest(() => database.serverCreate(createModel.value)).onSuccess(() => {
+  useRequest(() => database.userCreate(createModel.value)).onSuccess(() => {
     show.value = false
-    window.$message.success('添加成功')
-    window.$bus.emit('database:refresh')
+    window.$message.success('创建成功')
+    window.$bus.emit('database-user:refresh')
   })
 }
+
+onMounted(() => {
+  database.serverList(1, 10000).then((data: any) => {
+    for (const server of data.items) {
+      servers.value.push({
+        label: server.name,
+        value: server.id
+      })
+    }
+  })
+})
 </script>
 
 <template>
   <n-modal
     v-model:show="show"
     preset="card"
-    title="添加数据库服务器"
+    title="创建用户"
     style="width: 60vw"
     size="huge"
     :bordered="false"
@@ -39,51 +52,20 @@ const handleCreate = () => {
     @close="show = false"
   >
     <n-form :model="createModel">
-      <n-form-item path="name" label="名称">
-        <n-input
-          v-model:value="createModel.name"
-          type="text"
-          @keydown.enter.prevent
-          placeholder="输入数据库服务器名称"
-        />
-      </n-form-item>
-      <n-form-item path="type" label="类型">
+      <n-form-item path="server_id" label="服务器">
         <n-select
-          v-model:value="createModel.type"
+          v-model:value="createModel.server_id"
           @keydown.enter.prevent
-          placeholder="选择数据库类型"
-          :options="databaseType"
+          placeholder="选择服务器"
+          :options="servers"
         />
       </n-form-item>
-      <n-row :gutter="[0, 24]">
-        <n-col :span="15">
-          <n-form-item path="host" label="主机">
-            <n-input
-              v-model:value="createModel.host"
-              type="text"
-              @keydown.enter.prevent
-              placeholder="输入数据库服务器主机"
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="2"></n-col>
-        <n-col :span="7">
-          <n-form-item path="port" label="端口">
-            <n-input-number
-              w-full
-              v-model:value="createModel.port"
-              @keydown.enter.prevent
-              placeholder="输入数据库服务器端口"
-            />
-          </n-form-item>
-        </n-col>
-      </n-row>
       <n-form-item path="username" label="用户名">
         <n-input
           v-model:value="createModel.username"
           type="text"
           @keydown.enter.prevent
-          placeholder="输入数据库服务器用户名"
+          placeholder="输入用户名"
         />
       </n-form-item>
       <n-form-item path="password" label="密码">
@@ -91,15 +73,34 @@ const handleCreate = () => {
           v-model:value="createModel.password"
           type="password"
           @keydown.enter.prevent
-          placeholder="输入数据库服务器密码"
+          placeholder="输入密码"
         />
+      </n-form-item>
+      <n-form-item path="host-select" label="主机">
+        <n-select
+          v-model:value="createModel.host"
+          @keydown.enter.prevent
+          placeholder="选择主机"
+          :options="hostType"
+        />
+      </n-form-item>
+      <n-form-item v-if="createModel.host === ''" path="host" label="指定主机">
+        <n-input
+          v-model:value="createModel.host"
+          type="text"
+          @keydown.enter.prevent
+          placeholder="输入受支持的主机地址"
+        />
+      </n-form-item>
+      <n-form-item path="privileges" label="授权">
+        <n-dynamic-input v-model:value="createModel.privileges" placeholder="输入数据库名" />
       </n-form-item>
       <n-form-item path="remark" label="备注">
         <n-input
           v-model:value="createModel.remark"
           type="textarea"
           @keydown.enter.prevent
-          placeholder="输入数据库服务器备注"
+          placeholder="输入数据库用户备注"
         />
       </n-form-item>
     </n-form>

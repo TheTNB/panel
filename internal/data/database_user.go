@@ -88,12 +88,17 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 	user := &biz.DatabaseUser{
 		ServerID: req.ServerID,
 		Username: req.Username,
-		Password: req.Password,
 		Host:     req.Host,
-		Remark:   req.Remark,
 	}
 
-	return app.Orm.Create(user).Error
+	if err = app.Orm.FirstOrInit(user, user).Error; err != nil {
+		return err
+	}
+
+	user.Password = req.Password
+	user.Remark = req.Remark
+
+	return app.Orm.Save(user).Error
 }
 
 func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
@@ -141,6 +146,17 @@ func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
 	}
 
 	user.Password = req.Password
+	user.Remark = req.Remark
+
+	return app.Orm.Save(user).Error
+}
+
+func (r databaseUserRepo) UpdateRemark(req *request.DatabaseUserUpdateRemark) error {
+	user, err := r.Get(req.ID)
+	if err != nil {
+		return err
+	}
+
 	user.Remark = req.Remark
 
 	return app.Orm.Save(user).Error

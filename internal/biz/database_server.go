@@ -56,6 +56,7 @@ type DatabaseServerRepo interface {
 	Get(id uint) (*DatabaseServer, error)
 	Create(req *request.DatabaseServerCreate) error
 	Update(req *request.DatabaseServerUpdate) error
+	UpdateRemark(req *request.DatabaseServerUpdateRemark) error
 	Delete(id uint) error
 	Sync(id uint) error
 }

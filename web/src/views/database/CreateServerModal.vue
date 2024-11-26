@@ -18,6 +18,17 @@ const databaseType = [
   { label: 'PostgreSQL', value: 'postgresql' }
 ]
 
+watch(
+  () => createModel.value.type,
+  (value) => {
+    if (value === 'mysql') {
+      createModel.value.port = 3306
+    } else if (value === 'postgresql') {
+      createModel.value.port = 5432
+    }
+  }
+)
+
 const handleCreate = () => {
   useRequest(() => database.serverCreate(createModel.value)).onSuccess(() => {
     show.value = false
@@ -31,7 +42,7 @@ const handleCreate = () => {
   <n-modal
     v-model:show="show"
     preset="card"
-    title="添加数据库服务器"
+    title="添加服务器"
     style="width: 60vw"
     size="huge"
     :bordered="false"

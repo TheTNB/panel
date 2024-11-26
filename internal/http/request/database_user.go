@@ -15,3 +15,8 @@ type DatabaseUserUpdate struct {
 	Privileges []string `form:"privileges" json:"privileges"`
 	Remark     string   `form:"remark" json:"remark"`
 }
+
+type DatabaseUserUpdateRemark struct {
+	ID     uint   `form:"id" json:"id" validate:"required,exists=database_users id"`
+	Remark string `form:"remark" json:"remark"`
+}

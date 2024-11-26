@@ -76,7 +76,7 @@ onMounted(() => {
           v-model:value="createModel.username"
           type="text"
           @keydown.enter.prevent
-          placeholder="输入授权用户名"
+          placeholder="输入授权用户名（留空不授权）"
         />
       </n-form-item>
       <n-form-item v-if="createModel.create_user" path="username" label="用户名">

@@ -74,6 +74,35 @@ const columns: any = [
     }
   },
   {
+    title: '备注',
+    key: 'remark',
+    minWidth: 250,
+    resizable: true,
+    ellipsis: { tooltip: true },
+    render(row: any) {
+      return h(NInput, {
+        size: 'small',
+        value: row.remark,
+        onBlur: () => handleRemark(row),
+        onUpdateValue(v) {
+          row.remark = v
+        }
+      })
+    }
+  },
+  {
+    title: '状态',
+    key: 'status',
+    width: 100,
+    render(row: any) {
+      return h(
+        NTag,
+        { type: row.status === 'valid' ? 'success' : 'error' },
+        { default: () => (row.status === 'valid' ? '有效' : '无效') }
+      )
+    }
+  },
+  {
     title: '更新日期',
     key: 'updated_at',
     width: 200,
@@ -162,6 +191,12 @@ const handleDelete = async (id: number) => {
   await database.serverDelete(id).then(() => {
     window.$message.success('删除成功')
     refresh()
+  })
+}
+
+const handleRemark = (row: any) => {
+  database.serverRemark(row.id, row.remark).then(() => {
+    window.$message.success('修改成功')
   })
 }
 

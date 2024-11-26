@@ -57,6 +57,7 @@ type DatabaseUserRepo interface {
 	Get(id uint) (*DatabaseUser, error)
 	Create(req *request.DatabaseUserCreate) error
 	Update(req *request.DatabaseUserUpdate) error
+	UpdateRemark(req *request.DatabaseUserUpdateRemark) error
 	Delete(id uint) error
 	DeleteByServerID(serverID uint) error
 }

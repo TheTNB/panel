@@ -89,6 +89,10 @@ func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
 	return app.Orm.Save(server).Error
 }
 
+func (r databaseServerRepo) UpdateRemark(req *request.DatabaseServerUpdateRemark) error {
+	return app.Orm.Model(&biz.DatabaseServer{}).Where("id = ?", req.ID).Update("remark", req.Remark).Error
+}
+
 func (r databaseServerRepo) Delete(id uint) error {
 	// 删除服务器下的所有用户
 	if err := NewDatabaseUserRepo().DeleteByServerID(id); err != nil {

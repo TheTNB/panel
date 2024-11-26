@@ -18,6 +18,9 @@ export default {
   serverDelete: (id: number) => http.Delete(`/databaseServer/${id}`),
   // 同步数据库
   serverSync: (id: number) => http.Post(`/databaseServer/${id}/sync`),
+  // 更新服务器备注
+  serverRemark: (id: number, remark: string) =>
+    http.Put(`/databaseServer/${id}/remark`, { remark }),
   // 获取数据库用户列表
   userList: (page: number, limit: number) => http.Get('/databaseUser', { params: { page, limit } }),
   // 创建数据库用户
@@ -25,5 +28,7 @@ export default {
   // 更新数据库用户
   userUpdate: (id: number, data: any) => http.Put(`/databaseUser/${id}`, data),
   // 删除数据库用户
-  userDelete: (id: number) => http.Delete(`/databaseUser/${id}`)
+  userDelete: (id: number) => http.Delete(`/databaseUser/${id}`),
+  // 更新用户备注
+  userRemark: (id: number, remark: string) => http.Put(`/databaseUser/${id}/remark`, { remark })
 }

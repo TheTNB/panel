@@ -74,6 +74,7 @@ func Http(r chi.Router) {
 			r.Get("/", server.List)
 			r.Post("/", server.Create)
 			r.Put("/{id}", server.Update)
+			r.Put("/{id}/remark", server.UpdateRemark)
 			r.Delete("/{id}", server.Delete)
 			r.Post("/{id}/sync", server.Sync)
 		})
@@ -83,6 +84,7 @@ func Http(r chi.Router) {
 			r.Get("/", user.List)
 			r.Post("/", user.Create)
 			r.Put("/{id}", user.Update)
+			r.Put("/{id}/remark", user.UpdateRemark)
 			r.Delete("/{id}", user.Delete)
 		})
 

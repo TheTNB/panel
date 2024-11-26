@@ -19,3 +19,8 @@ type DatabaseServerUpdate struct {
 	Password string `form:"password" json:"password"`
 	Remark   string `form:"remark" json:"remark"`
 }
+
+type DatabaseServerUpdateRemark struct {
+	ID     uint   `form:"id" json:"id" validate:"required,exists=database_servers id"`
+	Remark string `form:"remark" json:"remark"`
+}

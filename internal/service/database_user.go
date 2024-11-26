@@ -69,6 +69,21 @@ func (s *DatabaseUser) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
+func (s *DatabaseUser) UpdateRemark(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.DatabaseUserUpdateRemark](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if err = s.databaseUserRepo.UpdateRemark(req); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, nil)
+}
+
 func (s *DatabaseUser) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
