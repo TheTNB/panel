@@ -350,24 +350,27 @@ func (s *Service) getExtensions() []Extension {
 			Slug:        "igbinary",
 			Description: "Igbinary 是一个用于序列化和反序列化数据的库",
 		},
-		{
+	}
+
+	// ionCube Swoole 不支持 PHP 8.4
+	if cast.ToUint(s.version) < 84 {
+		extensions = append(extensions, Extension{
 			Name:        "ionCube",
 			Slug:        "ionCube Loader",
 			Description: "ionCube 是一个专业级的 PHP 加密解密工具（需在 OPcache 之后安装）",
-		},
-		{
+		})
+		extensions = append(extensions, Extension{
 			Name:        "Swoole",
 			Slug:        "swoole",
 			Description: "Swoole 是一个用于构建高性能的异步并发服务器的 PHP 扩展",
-		},
+		})
 	}
-
 	// Swow 不支持 PHP 8.0 以下版本
 	if cast.ToUint(s.version) >= 80 {
 		extensions = append(extensions, Extension{
 			Name:        "Swow",
 			Slug:        "Swow",
-			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展。",
+			Description: "Swow 是一个用于构建高性能的异步并发服务器的 PHP 扩展",
 		})
 	}
 
