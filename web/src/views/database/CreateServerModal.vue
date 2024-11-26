@@ -33,7 +33,7 @@ const handleCreate = () => {
   useRequest(() => database.serverCreate(createModel.value)).onSuccess(() => {
     show.value = false
     window.$message.success('添加成功')
-    window.$bus.emit('database:refresh')
+    window.$bus.emit('database-server:refresh')
   })
 }
 </script>

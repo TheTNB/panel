@@ -51,6 +51,17 @@ func (r databaseServerRepo) Get(id uint) (*biz.DatabaseServer, error) {
 	return databaseServer, nil
 }
 
+func (r databaseServerRepo) GetByName(name string) (*biz.DatabaseServer, error) {
+	databaseServer := new(biz.DatabaseServer)
+	if err := app.Orm.Where("name = ?", name).First(databaseServer).Error; err != nil {
+		return nil, err
+	}
+
+	r.checkServer(databaseServer)
+
+	return databaseServer, nil
+}
+
 func (r databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
 	databaseServer := &biz.DatabaseServer{
 		Name:     req.Name,

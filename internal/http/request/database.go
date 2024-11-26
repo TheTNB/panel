@@ -7,7 +7,7 @@ type DatabaseCreate struct {
 	Username   string `form:"username" json:"username" validate:"required_if=CreateUser true"`
 	Password   string `form:"password" json:"password" validate:"required_if=CreateUser true"`
 	Host       string `form:"host" json:"host"`
-	Remark     string `form:"remark" json:"remark"`
+	Comment    string `form:"comment" json:"comment"`
 }
 
 type DatabaseDelete struct {

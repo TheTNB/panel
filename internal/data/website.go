@@ -302,34 +302,21 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	}
 
 	// 创建数据库
-	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
-	if err == nil && req.DB && req.DBType == "mysql" {
-		mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix")
+	name := "local_" + req.DBType
+	if req.DB {
+		server, err := NewDatabaseServerRepo().GetByName(name)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`create database: can't find %s database server, please add it first`, name)
 		}
-		if err = mysql.UserCreate(req.DBUser, req.DBPassword, "localhost"); err != nil {
-			return nil, err
-		}
-		if err = mysql.DatabaseCreate(req.DBName); err != nil {
-			return nil, err
-		}
-		if err = mysql.PrivilegesGrant(req.DBUser, req.DBName, "localhost"); err != nil {
-			return nil, err
-		}
-	}
-	if req.DB && req.DBType == "postgresql" {
-		postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432)
-		if err != nil {
-			return nil, err
-		}
-		if err = postgres.UserCreate(req.DBUser, req.DBPassword); err != nil {
-			return nil, err
-		}
-		if err = postgres.DatabaseCreate(req.DBName); err != nil {
-			return nil, err
-		}
-		if err = postgres.PrivilegesGrant(req.DBUser, req.DBName); err != nil {
+		if err = NewDatabaseRepo().Create(&request.DatabaseCreate{
+			ServerID:   server.ID,
+			Name:       req.DBName,
+			CreateUser: true,
+			Username:   req.DBUser,
+			Password:   req.DBPassword,
+			Host:       "localhost",
+			Comment:    fmt.Sprintf("website %s", req.Name),
+		}); err != nil {
 			return nil, err
 		}
 	}

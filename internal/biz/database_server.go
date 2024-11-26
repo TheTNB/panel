@@ -54,6 +54,7 @@ type DatabaseServerRepo interface {
 	Count() (int64, error)
 	List(page, limit uint) ([]*DatabaseServer, int64, error)
 	Get(id uint) (*DatabaseServer, error)
+	GetByName(name string) (*DatabaseServer, error)
 	Create(req *request.DatabaseServerCreate) error
 	Update(req *request.DatabaseServerUpdate) error
 	UpdateRemark(req *request.DatabaseServerUpdateRemark) error

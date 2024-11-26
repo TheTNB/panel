@@ -108,6 +108,9 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 				return err
 			}
 		}
+		if err = postgres.DatabaseComment(req.Name, req.Comment); err != nil {
+			return err
+		}
 	}
 
 	return nil

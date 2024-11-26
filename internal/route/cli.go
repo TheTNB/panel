@@ -216,6 +216,19 @@ func Cli() []*cli.Command {
 						},
 					},
 				},
+				{
+					Name:   "delete-server",
+					Usage:  "删除数据库服务器",
+					Action: cliService.DatabaseDeleteServer,
+					Flags: []cli.Flag{
+						&cli.StringFlag{
+							Name:     "name",
+							Usage:    "服务器名称",
+							Aliases:  []string{"n"},
+							Required: true,
+						},
+					},
+				},
 			},
 		},
 		{

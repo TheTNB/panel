@@ -500,6 +500,20 @@ func (s *CliService) DatabaseAddServer(ctx context.Context, cmd *cli.Command) er
 	return nil
 }
 
+func (s *CliService) DatabaseDeleteServer(ctx context.Context, cmd *cli.Command) error {
+	server, err := s.databaseServerRepo.GetByName(cmd.String("name"))
+	if err != nil {
+		return err
+	}
+
+	if err = s.databaseServerRepo.Delete(server.ID); err != nil {
+		return err
+	}
+
+	fmt.Printf("数据库服务器 %s 删除成功\n", server.Name)
+	return nil
+}
+
 func (s *CliService) BackupWebsite(ctx context.Context, cmd *cli.Command) error {
 	fmt.Println(s.hr)
 	fmt.Printf("★ 开始备份 [%s]\n", time.Now().Format(time.DateTime))
