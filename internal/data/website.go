@@ -525,7 +525,7 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 			return err
 		}
 		if mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix"); err == nil {
-			_ = mysql.UserDrop(website.Name)
+			_ = mysql.UserDrop(website.Name, "localhost")
 			_ = mysql.DatabaseDrop(website.Name)
 		}
 		if postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432); err == nil {

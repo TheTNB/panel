@@ -163,7 +163,7 @@ func (r databaseUserRepo) Delete(id uint) error {
 		if err != nil {
 			return err
 		}
-		_ = mysql.UserDrop(user.Username)
+		_ = mysql.UserDrop(user.Username, user.Host)
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
