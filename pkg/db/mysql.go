@@ -3,9 +3,10 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"regexp"
 	"slices"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/TheTNB/panel/pkg/types"
 )
