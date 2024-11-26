@@ -56,6 +56,7 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 		return err
 	}
 
+	user := new(biz.DatabaseUser)
 	switch server.Type {
 	case biz.DatabaseTypeMysql:
 		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
@@ -70,6 +71,11 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 				return err
 			}
 		}
+		user = &biz.DatabaseUser{
+			ServerID: req.ServerID,
+			Username: req.Username,
+			Host:     req.Host,
+		}
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
@@ -83,12 +89,10 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 				return err
 			}
 		}
-	}
-
-	user := &biz.DatabaseUser{
-		ServerID: req.ServerID,
-		Username: req.Username,
-		Host:     req.Host,
+		user = &biz.DatabaseUser{
+			ServerID: req.ServerID,
+			Username: req.Username,
+		}
 	}
 
 	if err = app.Orm.FirstOrInit(user, user).Error; err != nil {
@@ -191,6 +195,46 @@ func (r databaseUserRepo) Delete(id uint) error {
 	return app.Orm.Where("id = ?", id).Delete(&biz.DatabaseUser{}).Error
 }
 
+func (r databaseUserRepo) DeleteByNames(serverID uint, names []string) error {
+	server, err := NewDatabaseServerRepo().Get(serverID)
+	if err != nil {
+		return err
+	}
+
+	switch server.Type {
+	case biz.DatabaseTypeMysql:
+		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		if err != nil {
+			return err
+		}
+		users := make([]*biz.DatabaseUser, 0)
+		if err = app.Orm.Where("server_id = ? AND username IN ?", serverID, names).Find(&users).Error; err != nil {
+			return err
+		}
+		for name := range slices.Values(names) {
+			host := "localhost"
+			for u := range slices.Values(users) {
+				if u.Username == name {
+					host = u.Host
+					break
+				}
+			}
+			_ = mysql.UserDrop(name, host)
+		}
+	case biz.DatabaseTypePostgresql:
+		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
+		if err != nil {
+			return err
+		}
+		for name := range slices.Values(names) {
+			_ = postgres.UserDrop(name)
+		}
+	}
+
+	return app.Orm.Where("server_id = ? AND username IN ?", serverID, names).Delete(&biz.DatabaseUser{}).Error
+}
+
+// DeleteByServerID 删除指定服务器的所有用户，只是删除面板记录，不会实际删除
 func (r databaseUserRepo) DeleteByServerID(serverID uint) error {
 	return app.Orm.Where("server_id = ?", serverID).Delete(&biz.DatabaseUser{}).Error
 }
@@ -225,6 +269,6 @@ func (r databaseUserRepo) fillUser(user *biz.DatabaseUser) {
 	}
 	// 初始化，防止 nil
 	if user.Privileges == nil {
-		user.Privileges = make(map[string][]string)
+		user.Privileges = make([]string, 0)
 	}
 }

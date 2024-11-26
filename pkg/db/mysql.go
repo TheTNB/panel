@@ -3,9 +3,9 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"strings"
-
 	_ "github.com/go-sql-driver/mysql"
+	"regexp"
+	"slices"
 
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -122,52 +122,43 @@ func (r *MySQL) PrivilegesGrant(user, database, host string) error {
 	return err
 }
 
-func (r *MySQL) UserPrivileges(user, host string) (map[string][]string, error) {
+func (r *MySQL) PrivilegesRevoke(user, database, host string) error {
+	_, err := r.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON %s.* FROM '%s'@'%s'", database, user, host))
+	r.flushPrivileges()
+	return err
+}
+
+func (r *MySQL) UserPrivileges(user, host string) ([]string, error) {
 	rows, err := r.Query(fmt.Sprintf("SHOW GRANTS FOR '%s'@'%s'", user, host))
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	privileges := make(map[string][]string)
+	re := regexp.MustCompile(`GRANT\s+ALL PRIVILEGES\s+ON\s+[\x60'"]?([^\s\x60'"]+)[\x60'"]?\.\*\s+TO\s+`)
+	var databases []string
 	for rows.Next() {
 		var grant string
 		if err = rows.Scan(&grant); err != nil {
 			return nil, err
 		}
-		if !strings.HasPrefix(grant, "GRANT ") {
-			continue
+
+		// 使用正则表达式匹配
+		matches := re.FindStringSubmatch(grant)
+		if len(matches) == 2 {
+			dbName := matches[1]
+			if dbName != "*" {
+				databases = append(databases, dbName)
+			}
 		}
-
-		parts := strings.Split(grant, " ON ")
-		if len(parts) < 2 {
-			continue
-		}
-
-		privList := strings.TrimPrefix(parts[0], "GRANT ")
-		privs := strings.Split(privList, ", ")
-
-		dbPart := strings.Split(parts[1], " TO")[0]
-		// *.* 表示全局权限
-		if dbPart == "*.*" {
-			dbPart = "*"
-		}
-
-		dbPart = strings.Trim(dbPart, "`")
-		privileges[dbPart] = append(privileges[dbPart], privs...)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return privileges, nil
-}
-
-func (r *MySQL) PrivilegesRevoke(user, database, host string) error {
-	_, err := r.Exec(fmt.Sprintf("REVOKE ALL PRIVILEGES ON %s.* FROM '%s'@'%s'", database, user, host))
-	r.flushPrivileges()
-	return err
+	slices.Sort(databases)
+	return slices.Compact(databases), nil
 }
 
 func (r *MySQL) Users() ([]types.MySQLUser, error) {

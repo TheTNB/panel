@@ -28,16 +28,21 @@ const handleCreate = () => {
   })
 }
 
-onMounted(() => {
-  database.serverList(1, 10000).then((data: any) => {
-    for (const server of data.items) {
-      servers.value.push({
-        label: server.name,
-        value: server.id
+watch(
+  () => show.value,
+  (value) => {
+    if (value) {
+      database.serverList(1, 10000).then((data: any) => {
+        for (const server of data.items) {
+          servers.value.push({
+            label: server.name,
+            value: server.id
+          })
+        }
       })
     }
-  })
-})
+  }
+)
 </script>
 
 <template>
@@ -76,7 +81,7 @@ onMounted(() => {
           placeholder="输入密码"
         />
       </n-form-item>
-      <n-form-item path="host-select" label="主机">
+      <n-form-item path="host-select" label="主机（仅 MySQL）">
         <n-select
           v-model:value="createModel.host"
           @keydown.enter.prevent

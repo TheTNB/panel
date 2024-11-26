@@ -78,7 +78,12 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 			return err
 		}
 		if req.CreateUser {
-			if err = mysql.UserCreate(req.Username, req.Password, req.Host); err != nil {
+			if err = NewDatabaseUserRepo().Create(&request.DatabaseUserCreate{
+				ServerID: req.ServerID,
+				Username: req.Username,
+				Password: req.Password,
+				Host:     req.Host,
+			}); err != nil {
 				return err
 			}
 		}
@@ -96,7 +101,12 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 			return err
 		}
 		if req.CreateUser {
-			if err = postgres.UserCreate(req.Username, req.Password); err != nil {
+			if err = NewDatabaseUserRepo().Create(&request.DatabaseUserCreate{
+				ServerID: req.ServerID,
+				Username: req.Username,
+				Password: req.Password,
+				Host:     req.Host,
+			}); err != nil {
 				return err
 			}
 		}

@@ -19,7 +19,6 @@ import (
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/cert"
-	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/nginx"
 	"github.com/TheTNB/panel/pkg/punycode"
@@ -507,17 +506,14 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		_ = io.Remove(website.Path)
 	}
 	if req.DB {
-		rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
-		if err != nil {
-			return err
+		repo := NewDatabaseServerRepo()
+		if mysql, err := repo.GetByName("local_mysql"); err == nil {
+			_ = NewDatabaseUserRepo().DeleteByNames(mysql.ID, []string{website.Name})
+			_ = NewDatabaseRepo().Delete(mysql.ID, website.Name)
 		}
-		if mysql, err := db.NewMySQL("root", rootPassword, "/tmp/mysql.sock", "unix"); err == nil {
-			_ = mysql.UserDrop(website.Name, "localhost")
-			_ = mysql.DatabaseDrop(website.Name)
-		}
-		if postgres, err := db.NewPostgres("postgres", "", "127.0.0.1", 5432); err == nil {
-			_ = postgres.UserDrop(website.Name)
-			_ = postgres.DatabaseDrop(website.Name)
+		if postgres, err := repo.GetByName("local_postgresql"); err == nil {
+			_ = NewDatabaseUserRepo().DeleteByNames(postgres.ID, []string{website.Name})
+			_ = NewDatabaseRepo().Delete(postgres.ID, website.Name)
 		}
 	}
 

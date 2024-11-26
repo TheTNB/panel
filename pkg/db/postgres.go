@@ -3,10 +3,8 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	"slices"
-	"strings"
-
 	_ "github.com/lib/pq"
+	"slices"
 
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/types"
@@ -123,14 +121,16 @@ func (r *Postgres) UserPassword(user, password string) error {
 	return err
 }
 
-func (r *Postgres) UserPrivileges(user string) (map[string][]string, error) {
+func (r *Postgres) UserPrivileges(user string) ([]string, error) {
 	query := `
-		SELECT 
-			table_catalog as database_name,
-			string_agg(DISTINCT privilege_type, ',') as privileges
-		FROM information_schema.role_database_privileges 
-		WHERE grantee = $1
-		GROUP BY table_catalog`
+        SELECT d.datname
+        FROM pg_catalog.pg_database d
+        JOIN pg_catalog.pg_roles r ON d.datdba = r.oid
+        WHERE r.rolname = $1
+        AND d.datistemplate = false
+        AND d.datname NOT IN ('template0', 'template1', 'postgres')
+        ORDER BY d.datname;
+    `
 
 	rows, err := r.Query(query, user)
 	if err != nil {
@@ -138,22 +138,21 @@ func (r *Postgres) UserPrivileges(user string) (map[string][]string, error) {
 	}
 	defer rows.Close()
 
-	privileges := make(map[string][]string)
+	var databases []string
 
 	for rows.Next() {
-		var db, privilegeStr string
-		if err = rows.Scan(&db, &privilegeStr); err != nil {
+		var dbName string
+		if err = rows.Scan(&dbName); err != nil {
 			return nil, err
 		}
-
-		privileges[db] = strings.Split(privilegeStr, ",")
+		databases = append(databases, dbName)
 	}
 
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return privileges, nil
+	return databases, nil
 }
 
 func (r *Postgres) PrivilegesGrant(user, database string) error {

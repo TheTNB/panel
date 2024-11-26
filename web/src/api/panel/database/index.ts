@@ -15,6 +15,8 @@ export default {
     http.Get('/databaseServer', { params: { page, limit } }),
   // 创建数据库服务器
   serverCreate: (data: any) => http.Post('/databaseServer', data),
+  // 获取数据库服务器
+  serverGet: (id: number) => http.Get(`/databaseServer/${id}`),
   // 更新数据库服务器
   serverUpdate: (id: number, data: any) => http.Put(`/databaseServer/${id}`, data),
   // 删除数据库服务器
@@ -28,6 +30,8 @@ export default {
   userList: (page: number, limit: number) => http.Get('/databaseUser', { params: { page, limit } }),
   // 创建数据库用户
   userCreate: (data: any) => http.Post('/databaseUser', data),
+  // 获取数据库用户
+  userGet: (id: number) => http.Get(`/databaseUser/${id}`),
   // 更新数据库用户
   userUpdate: (id: number, data: any) => http.Put(`/databaseUser/${id}`, data),
   // 删除数据库用户

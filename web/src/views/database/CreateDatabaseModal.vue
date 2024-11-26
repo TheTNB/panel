@@ -28,16 +28,21 @@ const handleCreate = () => {
   })
 }
 
-onMounted(() => {
-  database.serverList(1, 10000).then((data: any) => {
-    for (const server of data.items) {
-      servers.value.push({
-        label: server.name,
-        value: server.id
+watch(
+  () => show.value,
+  (value) => {
+    if (value) {
+      database.serverList(1, 10000).then((data: any) => {
+        for (const server of data.items) {
+          servers.value.push({
+            label: server.name,
+            value: server.id
+          })
+        }
       })
     }
-  })
-})
+  }
+)
 </script>
 
 <template>

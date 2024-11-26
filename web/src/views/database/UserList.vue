@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { renderIcon } from '@/utils'
-import { NButton, NInput, NInputGroup, NPopconfirm, NTag } from 'naive-ui'
+import { NButton, NFlex, NInput, NInputGroup, NPopconfirm, NTag } from 'naive-ui'
 
 import database from '@/api/panel/database'
 import { formatDateTime } from '@/utils'
+import UpdateUserModal from '@/views/database/UpdateUserModal.vue'
+
+const updateModal = ref(false)
+const updateID = ref(0)
 
 const columns: any = [
   {
@@ -63,7 +67,7 @@ const columns: any = [
     width: 150,
     render(row: any) {
       return h(NTag, null, {
-        default: () => row.host
+        default: () => row.host || '无'
       })
     }
   },
@@ -73,6 +77,21 @@ const columns: any = [
     width: 150,
     render(row: any) {
       return row.server.name
+    }
+  },
+  {
+    title: '授权',
+    key: 'privileges',
+    width: 200,
+    render(row: any) {
+      return h(NFlex, null, {
+        default: () =>
+          row.privileges.map((privilege: string) =>
+            h(NTag, null, {
+              default: () => privilege
+            })
+          )
+      })
     }
   },
   {
@@ -122,13 +141,28 @@ const columns: any = [
     render(row: any) {
       return [
         h(
+          NButton,
+          {
+            size: 'small',
+            type: 'primary',
+            onClick: () => {
+              updateID.value = row.id
+              updateModal.value = true
+            }
+          },
+          {
+            default: () => '编辑',
+            icon: renderIcon('material-symbols:edit', { size: 14 })
+          }
+        ),
+        h(
           NPopconfirm,
           {
             onPositiveClick: () => handleDelete(row.id)
           },
           {
             default: () => {
-              return '确定删除服务器吗？'
+              return '确定删除用户吗？'
             },
             trigger: () => {
               return h(
@@ -188,7 +222,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="1500"
+    :scroll-x="1700"
     :loading="loading"
     :columns="columns"
     :data="data"
@@ -205,6 +239,7 @@ onUnmounted(() => {
       pageSizes: [20, 50, 100, 200]
     }"
   />
+  <update-user-modal v-model:id="updateID" v-model:show="updateModal" />
 </template>
 
 <style scoped lang="scss"></style>

@@ -54,6 +54,22 @@ func (s *DatabaseServer) Create(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
+func (s *DatabaseServer) Get(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.ID](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	server, err := s.databaseServerRepo.Get(req.ID)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, server)
+}
+
 func (s *DatabaseServer) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseServerUpdate](r)
 	if err != nil {
