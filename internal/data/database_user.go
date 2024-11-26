@@ -189,7 +189,7 @@ func (r databaseUserRepo) Delete(id uint) error {
 		if err != nil {
 			return err
 		}
-		_ = postgres.DatabaseDrop(user.Username)
+		_ = postgres.UserDrop(user.Username)
 	}
 
 	return app.Orm.Where("id = ?", id).Delete(&biz.DatabaseUser{}).Error
