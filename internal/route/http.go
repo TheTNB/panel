@@ -67,6 +67,7 @@ func Http(r chi.Router) {
 			r.Get("/", database.List)
 			r.Post("/", database.Create)
 			r.Delete("/", database.Delete)
+			r.Post("/comment", database.Comment)
 		})
 
 		r.Route("/databaseServer", func(r chi.Router) {

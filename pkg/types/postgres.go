@@ -9,4 +9,5 @@ type PostgresDatabase struct {
 	Name     string `json:"name"`
 	Owner    string `json:"owner"`
 	Encoding string `json:"encoding"`
+	Comment  string `json:"comment"`
 }

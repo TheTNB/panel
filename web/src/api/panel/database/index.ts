@@ -7,6 +7,9 @@ export default {
   create: (data: any) => http.Post(`/database`, data),
   // 删除数据库
   delete: (server_id: number, name: string) => http.Delete(`/database`, { server_id, name }),
+  // 更新评论
+  comment: (server_id: number, name: string, comment: string) =>
+    http.Post(`/database/comment`, { server_id, name, comment }),
   // 获取数据库服务器列表
   serverList: (page: number, limit: number) =>
     http.Get('/databaseServer', { params: { page, limit } }),

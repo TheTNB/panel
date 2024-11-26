@@ -20,10 +20,12 @@ type Database struct {
 	Server   string       `json:"server"`
 	ServerID uint         `json:"server_id"`
 	Encoding string       `json:"encoding"`
+	Comment  string       `json:"comment"`
 }
 
 type DatabaseRepo interface {
 	List(page, limit uint) ([]*Database, int64, error)
 	Create(req *request.DatabaseCreate) error
 	Delete(serverID uint, name string) error
+	Comment(req *request.DatabaseComment) error
 }

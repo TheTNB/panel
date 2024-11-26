@@ -39,6 +39,7 @@ func Success(w http.ResponseWriter, data any) {
 func Error(w http.ResponseWriter, code int, format string, args ...any) {
 	render := chix.NewRender(w)
 	defer render.Release()
+	render.Header(chix.HeaderContentType, chix.MIMEApplicationJSONCharsetUTF8) // must before Status()
 	render.Status(code)
 	render.JSON(&ErrorResponse{
 		Message: fmt.Sprintf(format, args...),
@@ -49,6 +50,7 @@ func Error(w http.ResponseWriter, code int, format string, args ...any) {
 func ErrorSystem(w http.ResponseWriter) {
 	render := chix.NewRender(w)
 	defer render.Release()
+	render.Header(chix.HeaderContentType, chix.MIMEApplicationJSONCharsetUTF8) // must before Status()
 	render.Status(http.StatusInternalServerError)
 	render.JSON(&ErrorResponse{
 		Message: "系统内部错误",

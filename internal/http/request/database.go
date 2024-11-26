@@ -14,3 +14,9 @@ type DatabaseDelete struct {
 	ServerID uint   `form:"server_id" json:"server_id" validate:"required,exists=database_servers id"`
 	Name     string `form:"name" json:"name" validate:"required"`
 }
+
+type DatabaseComment struct {
+	ServerID uint   `form:"server_id" json:"server_id" validate:"required,exists=database_servers id"`
+	Name     string `form:"name" json:"name" validate:"required"`
+	Comment  string `form:"comment" json:"comment"`
+}

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 
@@ -53,6 +54,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 							Server:   server.Name,
 							ServerID: server.ID,
 							Encoding: item.Encoding,
+							Comment:  item.Comment,
 						})
 					}
 				}
@@ -130,6 +132,26 @@ func (r databaseRepo) Delete(serverID uint, name string) error {
 			return err
 		}
 		return postgres.DatabaseDrop(name)
+	}
+
+	return nil
+}
+
+func (r databaseRepo) Comment(req *request.DatabaseComment) error {
+	server, err := NewDatabaseServerRepo().Get(req.ServerID)
+	if err != nil {
+		return err
+	}
+
+	switch server.Type {
+	case biz.DatabaseTypeMysql:
+		return errors.New("mysql not support database comment")
+	case biz.DatabaseTypePostgresql:
+		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
+		if err != nil {
+			return err
+		}
+		return postgres.DatabaseComment(req.Name, req.Comment)
 	}
 
 	return nil

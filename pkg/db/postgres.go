@@ -95,6 +95,11 @@ func (r *Postgres) DatabaseSize(name string) (int64, error) {
 	return size, nil
 }
 
+func (r *Postgres) DatabaseComment(name, comment string) error {
+	_, err := r.Exec(fmt.Sprintf("COMMENT ON DATABASE %s IS '%s'", name, comment))
+	return err
+}
+
 func (r *Postgres) UserCreate(user, password string) error {
 	_, err := r.Exec(fmt.Sprintf("CREATE USER %s WITH PASSWORD '%s'", user, password))
 	if err != nil {
@@ -221,7 +226,11 @@ func (r *Postgres) Users() ([]types.PostgresUser, error) {
 
 func (r *Postgres) Databases() ([]types.PostgresDatabase, error) {
 	query := `
-        SELECT d.datname, pg_catalog.pg_get_userbyid(d.datdba), pg_catalog.pg_encoding_to_char(d.encoding)
+        SELECT 
+            d.datname, 
+            pg_catalog.pg_get_userbyid(d.datdba), 
+            pg_catalog.pg_encoding_to_char(d.encoding),
+            COALESCE(pg_catalog.shobj_description(d.oid, 'pg_database'), '')
         FROM pg_catalog.pg_database d
         WHERE datistemplate = false;
     `
@@ -234,7 +243,7 @@ func (r *Postgres) Databases() ([]types.PostgresDatabase, error) {
 	var databases []types.PostgresDatabase
 	for rows.Next() {
 		var db types.PostgresDatabase
-		if err := rows.Scan(&db.Name, &db.Owner, &db.Encoding); err != nil {
+		if err := rows.Scan(&db.Name, &db.Owner, &db.Encoding, &db.Comment); err != nil {
 			return nil, err
 		}
 		if slices.Contains([]string{"template0", "template1", "postgres"}, db.Name) {

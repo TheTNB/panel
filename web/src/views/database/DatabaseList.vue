@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { renderIcon } from '@/utils'
-import { NButton, NPopconfirm, NTag } from 'naive-ui'
+import { NButton, NInput, NPopconfirm, NTag } from 'naive-ui'
 
 import database from '@/api/panel/database'
 
@@ -47,6 +47,23 @@ const columns: any = [
     render(row: any) {
       return h(NTag, null, {
         default: () => row.encoding
+      })
+    }
+  },
+  {
+    title: '备注',
+    key: 'comment',
+    minWidth: 250,
+    resizable: true,
+    ellipsis: { tooltip: true },
+    render(row: any) {
+      return h(NInput, {
+        size: 'small',
+        value: row.comment,
+        onBlur: () => handleComment(row),
+        onUpdateValue(v) {
+          row.comment = v
+        }
       })
     }
   },
@@ -104,6 +121,12 @@ const handleDelete = async (serverID: number, name: string) => {
   })
 }
 
+const handleComment = (row: any) => {
+  database.comment(row.server_id, row.name, row.comment).then(() => {
+    window.$message.success('修改成功')
+  })
+}
+
 onMounted(() => {
   window.$bus.on('database:refresh', () => {
     refresh()
@@ -119,7 +142,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="800"
+    :scroll-x="1000"
     :loading="loading"
     :columns="columns"
     :data="data"

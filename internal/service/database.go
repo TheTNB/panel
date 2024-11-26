@@ -68,3 +68,18 @@ func (s *Database) Delete(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, nil)
 }
+
+func (s *Database) Comment(w http.ResponseWriter, r *http.Request) {
+	req, err := Bind[request.DatabaseComment](r)
+	if err != nil {
+		Error(w, http.StatusUnprocessableEntity, "%v", err)
+		return
+	}
+
+	if err = s.databaseRepo.Comment(req); err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, nil)
+}
