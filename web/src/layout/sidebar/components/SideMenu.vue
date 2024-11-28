@@ -20,7 +20,7 @@ watch(currentRoute, async () => {
 })
 
 const menuOptions = computed(() => {
-  return permissionStore.menus.map((item) => getMenuItem(item)).sort((a, b) => a.order - b.order)
+  return permissionStore.menus.map((item) => getMenuItem(item))
 })
 
 function resolvePath(basePath: string, path: string) {
@@ -35,7 +35,6 @@ type MenuItem = MenuOption & {
   label: string
   key: string
   path: string
-  order: number
   children?: Array<MenuItem>
 }
 
@@ -44,8 +43,7 @@ function getMenuItem(route: RouteType, basePath = ''): MenuItem {
     label: t(route.meta?.title || route.name),
     key: route.name,
     path: resolvePath(basePath, route.path),
-    icon: getIcon(route.meta),
-    order: route.meta?.order || 0
+    icon: getIcon(route.meta)
   }
 
   const visibleChildren = route.children
@@ -61,8 +59,7 @@ function getMenuItem(route: RouteType, basePath = ''): MenuItem {
       label: t(singleRoute.meta?.title || singleRoute.name),
       key: singleRoute.name,
       path: resolvePath(menuItem.path, singleRoute.path),
-      icon: getIcon(singleRoute.meta),
-      order: menuItem.order
+      icon: getIcon(singleRoute.meta)
     }
     const visibleItems = singleRoute.children
       ? singleRoute.children.filter((item: RouteType) => item.name && !item.isHidden)
@@ -70,13 +67,9 @@ function getMenuItem(route: RouteType, basePath = ''): MenuItem {
 
     if (visibleItems.length === 1) menuItem = getMenuItem(visibleItems[0], menuItem.path)
     else if (visibleItems.length > 1)
-      menuItem.children = visibleItems
-        .map((item) => getMenuItem(item, menuItem.path))
-        .sort((a, b) => a.order - b.order)
+      menuItem.children = visibleItems.map((item) => getMenuItem(item, menuItem.path))
   } else {
-    menuItem.children = visibleChildren
-      .map((item) => getMenuItem(item, menuItem.path))
-      .sort((a, b) => a.order - b.order)
+    menuItem.children = visibleChildren.map((item) => getMenuItem(item, menuItem.path))
   }
 
   return menuItem

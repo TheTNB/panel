@@ -5,7 +5,8 @@ import { filterAsyncRoutes } from './helpers'
 export const usePermissionStore = defineStore('permission', {
   state() {
     return {
-      accessRoutes: <RoutesType>[]
+      accessRoutes: <RoutesType>[],
+      hiddenRoutes: <string[]>[]
     }
   },
   getters: {
@@ -13,7 +14,14 @@ export const usePermissionStore = defineStore('permission', {
       return basicRoutes.concat(this.accessRoutes)
     },
     menus(): RoutesType {
-      return this.routes.filter((route) => route.name && !route.isHidden)
+      return this.routes
+        .filter((route) => route.name && !route.isHidden && !this.hiddenRoutes.includes(route.name))
+        .sort((a, b) => (a.meta?.order || 0) - (b.meta?.order || 0))
+    },
+    allMenus(): RoutesType {
+      return this.routes
+        .filter((route) => route.name && !route.isHidden)
+        .sort((a, b) => (a.meta?.order || 0) - (b.meta?.order || 0))
     }
   },
   actions: {
@@ -25,5 +33,8 @@ export const usePermissionStore = defineStore('permission', {
     resetPermission() {
       this.$reset()
     }
+  },
+  persist: {
+    pick: ['hiddenRoutes']
   }
 })

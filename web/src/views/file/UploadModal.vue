@@ -37,8 +37,8 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
       <n-alert type="info">若上传报网络错误，请开启面板 HTTPS 后重试</n-alert>
       <n-upload
         ref="upload"
-        
-         multiple directory-dnd 
+        multiple
+        directory-dnd
         action="/api/panel/file/upload"
         :custom-request="uploadRequest"
       >
