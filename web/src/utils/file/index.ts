@@ -293,6 +293,25 @@ const isCompress = (name: string) => {
   return ['zip', 'bz2', 'tar', 'gz', 'tgz', 'xz', '7z'].includes(ext)
 }
 
+const isImage = (name: string) => {
+  const ext = getExt(name)
+  return [
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'bmp',
+    'ico',
+    'svg',
+    'webp',
+    'avif',
+    'tiff',
+    'heif',
+    'heic',
+    'jxl'
+  ].includes(ext)
+}
+
 const formatPercent = (num: any) => {
   num = Number(num)
   return Number(num.toFixed(2))
@@ -326,6 +345,7 @@ export {
   getFilename,
   getIconByExt,
   isCompress,
+  isImage,
   languageByPath,
   lastDirectory
 }

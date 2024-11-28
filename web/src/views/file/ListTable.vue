@@ -6,8 +6,17 @@ import type { RowData } from 'naive-ui/es/data-table/src/interface'
 
 import file from '@/api/panel/file'
 import TheIcon from '@/components/custom/TheIcon.vue'
-import { checkName, checkPath, getExt, getFilename, getIconByExt, isCompress } from '@/utils/file'
+import {
+  checkName,
+  checkPath,
+  getExt,
+  getFilename,
+  getIconByExt,
+  isCompress,
+  isImage
+} from '@/utils/file'
 import EditModal from '@/views/file/EditModal.vue'
+import PreviewModal from '@/views/file/PreviewModal.vue'
 import type { Marked } from '@/views/file/types'
 
 const loading = ref(false)
@@ -19,7 +28,8 @@ const markedType = defineModel<string>('markedType', { type: String, required: t
 const compress = defineModel<boolean>('compress', { type: Boolean, required: true })
 const permission = defineModel<boolean>('permission', { type: Boolean, required: true })
 const editorModal = ref(false)
-const editorFile = ref('')
+const previewModal = ref(false)
+const currentFile = ref('')
 
 const showDropdown = ref(false)
 const selectedRow = ref<any>()
@@ -41,8 +51,8 @@ const options = computed<DropdownOption[]>(() => {
   if (selectedRow.value == null) return []
   const options = [
     {
-      label: selectedRow.value.dir ? '打开' : '编辑',
-      key: selectedRow.value.dir ? 'open' : 'edit'
+      label: selectedRow.value.dir ? '打开' : isImage(selectedRow.value.name) ? '预览' : '编辑',
+      key: selectedRow.value.dir ? 'open' : isImage(selectedRow.value.name) ? 'preview' : 'edit'
     },
     { label: '复制', key: 'copy' },
     { label: '移动', key: 'move' },
@@ -97,7 +107,7 @@ const columns: DataTableColumns<RowData> = [
             if (row.dir) {
               path.value = row.full
             } else {
-              editorFile.value = row.full
+              currentFile.value = row.full
               editorModal.value = true
             }
           }
@@ -179,8 +189,12 @@ const columns: DataTableColumns<RowData> = [
                 tertiary: true,
                 onClick: () => {
                   if (!row.dir && !row.symlink) {
-                    editorFile.value = row.full
-                    editorModal.value = true
+                    currentFile.value = row.full
+                    if (isImage(row.name)) {
+                      previewModal.value = true
+                    } else {
+                      editorModal.value = true
+                    }
                   } else {
                     path.value = row.full
                   }
@@ -189,7 +203,7 @@ const columns: DataTableColumns<RowData> = [
               {
                 default: () => {
                   if (!row.dir && !row.symlink) {
-                    return '编辑'
+                    return isImage(row.name) ? '预览' : '编辑'
                   } else {
                     return '打开'
                   }
@@ -529,8 +543,12 @@ const handleSelect = (key: string) => {
       path.value = selectedRow.value.full
       break
     case 'edit':
-      editorFile.value = selectedRow.value.full
+      currentFile.value = selectedRow.value.full
       editorModal.value = true
+      break
+    case 'preview':
+      currentFile.value = selectedRow.value.full
+      previewModal.value = true
       break
     case 'copy':
       markedType.value = 'copy'
@@ -662,7 +680,8 @@ onUnmounted(() => {
     :on-clickoutside="onCloseDropdown"
     @select="handleSelect"
   />
-  <edit-modal v-model:show="editorModal" v-model:file="editorFile" />
+  <edit-modal v-model:show="editorModal" v-model:file="currentFile" />
+  <preview-modal v-model:show="previewModal" v-model:path="currentFile" />
   <n-modal
     v-model:show="renameModal"
     preset="card"

@@ -91,6 +91,11 @@ func Read(path string) (string, error) {
 	return string(data), err
 }
 
+// ReadBytes 读取文件
+func ReadBytes(path string) ([]byte, error) {
+	return os.ReadFile(path)
+}
+
 // FileInfo 获取文件大小
 func FileInfo(path string) (os.FileInfo, error) {
 	return os.Stat(path)

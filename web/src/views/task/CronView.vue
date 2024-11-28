@@ -209,7 +209,7 @@ const handleEdit = async (row: any) => {
       editTask.value.id = row.id
       editTask.value.name = row.name
       editTask.value.time = row.time
-      editTask.value.script = res.data
+      editTask.value.script = atob(res.data.content)
       editModal.value = true
     })
   })

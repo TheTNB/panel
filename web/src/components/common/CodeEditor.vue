@@ -21,7 +21,7 @@ const get = async () => {
   await file
     .content(props.path)
     .then((res) => {
-      data.value = res.data
+      data.value = atob(res.data.content)
       window.$message.success('获取成功')
     })
     .catch(() => {

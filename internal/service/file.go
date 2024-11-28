@@ -3,6 +3,7 @@
 package service
 
 import (
+	"encoding/base64"
 	"fmt"
 	stdio "io"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"time"
 
 	"github.com/go-rat/chix"
+	"github.com/go-rat/utils/file"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -81,13 +83,21 @@ func (s *FileService) Content(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, err := io.Read(req.Path)
+	content, err := io.ReadBytes(req.Path)
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+	mime, err := file.MimeType(req.Path)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	Success(w, content)
+	Success(w, chix.M{
+		"mime":    mime,
+		"content": base64.StdEncoding.EncodeToString(content),
+	})
 }
 
 func (s *FileService) Save(w http.ResponseWriter, r *http.Request) {
