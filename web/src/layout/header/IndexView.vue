@@ -14,8 +14,8 @@ const themeStore = useThemeStore()
 
 <template>
   <div w-full flex items-center justify-between>
-    <MenuCollapse />
-    <section v-if="!themeStore.isMobile && themeStore.tab.visible" w-0 flex-1 px-12>
+    <MenuCollapse v-if="themeStore.isMobile" />
+    <section v-if="!themeStore.isMobile && themeStore.tab.visible" w-0 flex-1 pr-12>
       <AppTab />
     </section>
     <span v-if="!themeStore.isMobile && themeStore.tab.visible" mx-6 opacity-20>|</span>

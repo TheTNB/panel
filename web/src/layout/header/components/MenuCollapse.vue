@@ -7,7 +7,7 @@ const themeStore = useThemeStore()
 <template>
   <n-tooltip trigger="hover">
     <template #trigger>
-      <n-icon cursor-pointer size="20" @click="themeStore.toggleCollapsed()">
+      <n-icon cursor-pointer size="22" @click="themeStore.toggleCollapsed()">
         <icon-mdi:format-indent-increase v-if="themeStore.sider.collapsed" />
         <icon-mdi:format-indent-decrease v-else />
       </n-icon>
