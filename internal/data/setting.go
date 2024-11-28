@@ -378,6 +378,7 @@ func (r *settingRepo) FixPanel() error {
 	if app.IsCli {
 		fmt.Println("|-开始修复面板...")
 	}
+
 	// 检查关键文件是否正常
 	flag := false
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {

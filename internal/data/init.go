@@ -20,15 +20,15 @@ var injector = do.New()
 
 func init() {
 	do.Provide(injector, func(i do.Injector) (biz.AppRepo, error) {
-		return &appRepo{
-			api: api.NewAPI(app.Version),
-		}, nil
+		return &appRepo{}, nil
 	})
 	do.Provide(injector, func(i do.Injector) (biz.BackupRepo, error) {
 		return &backupRepo{}, nil
 	})
 	do.Provide(injector, func(i do.Injector) (biz.CacheRepo, error) {
-		return &cacheRepo{}, nil
+		return &cacheRepo{
+			api: api.NewAPI(app.Version),
+		}, nil
 	})
 	do.Provide(injector, func(i do.Injector) (biz.CertRepo, error) {
 		return &certRepo{}, nil

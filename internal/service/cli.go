@@ -34,6 +34,7 @@ type CliService struct {
 	hr                 string
 	api                *api.API
 	appRepo            biz.AppRepo
+	cacheRepo          biz.CacheRepo
 	userRepo           biz.UserRepo
 	settingRepo        biz.SettingRepo
 	backupRepo         biz.BackupRepo
@@ -47,6 +48,7 @@ func NewCliService() *CliService {
 		hr:                 `+----------------------------------------------------`,
 		api:                api.NewAPI(app.Version),
 		appRepo:            data.NewAppRepo(),
+		cacheRepo:          data.NewCacheRepo(),
 		userRepo:           data.NewUserRepo(),
 		settingRepo:        data.NewSettingRepo(),
 		backupRepo:         data.NewBackupRepo(),
@@ -96,6 +98,18 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
 	return s.settingRepo.UpdatePanel(ver, url, checksum)
+}
+
+func (s *CliService) Sync(ctx context.Context, cmd *cli.Command) error {
+	if err := s.cacheRepo.UpdateApps(); err != nil {
+		return fmt.Errorf("同步应用数据失败：%v", err)
+	}
+	if err := s.cacheRepo.UpdateRewrites(); err != nil {
+		return fmt.Errorf("同步伪静态规则失败：%v", err)
+	}
+
+	fmt.Println("数据同步成功")
+	return nil
 }
 
 func (s *CliService) Fix(ctx context.Context, cmd *cli.Command) error {
@@ -847,6 +861,8 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	// 初始化应用中心缓存
-	return s.appRepo.UpdateCache()
+	// 初始化缓存
+	_ = s.cacheRepo.UpdateApps()
+	_ = s.cacheRepo.UpdateRewrites()
+	return nil
 }

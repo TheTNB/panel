@@ -25,6 +25,16 @@ func NewWebsiteService() *WebsiteService {
 	}
 }
 
+func (s *WebsiteService) GetRewrites(w http.ResponseWriter, r *http.Request) {
+	rewrites, err := s.websiteRepo.GetRewrites()
+	if err != nil {
+		Error(w, http.StatusInternalServerError, "%v", err)
+		return
+	}
+
+	Success(w, rewrites)
+}
+
 func (s *WebsiteService) GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 	index, err := io.Read(filepath.Join(app.Root, "server/nginx/html/index.html"))
 	if err != nil {

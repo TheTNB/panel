@@ -22,6 +22,7 @@ type Website struct {
 }
 
 type WebsiteRepo interface {
+	GetRewrites() (map[string]string, error)
 	UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error
 	Count() (int64, error)
 	Get(id uint) (*types.WebsiteSetting, error)

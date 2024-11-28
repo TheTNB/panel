@@ -30,6 +30,11 @@ func Cli() []*cli.Command {
 			Action: cliService.Update,
 		},
 		{
+			Name:   "sync",
+			Usage:  "同步数据",
+			Action: cliService.Sync,
+		},
+		{
 			Name:   "fix",
 			Usage:  "修复面板",
 			Action: cliService.Fix,

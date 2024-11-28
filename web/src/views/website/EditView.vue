@@ -59,6 +59,16 @@ const installedDbAndPhp = ref({
   ]
 })
 const certs = ref<Cert[]>([] as Cert[])
+const { data: rewrites }: { data: any } = useRequest(website.rewrites, {
+  initialData: {}
+})
+const rewriteOptions = computed(() => {
+  return Object.keys(rewrites.value).map((key) => ({
+    label: key,
+    value: key
+  }))
+})
+const rewriteValue = ref(null)
 
 const title = computed(() => {
   if (setting.value) {
@@ -119,6 +129,10 @@ const handleReset = async () => {
     fetchWebsiteSetting()
     window.$message.success('重置成功')
   })
+}
+
+const handleRewrite = (value: string) => {
+  setting.value.rewrite = rewrites.value[value] || ''
 }
 
 const handleObtainCert = async () => {
@@ -239,13 +253,13 @@ onMounted(async () => {
           <n-form-item label="运行目录">
             <n-input
               v-model:value="setting.root"
-              placeholder="输入运行目录（Laravel等程序需要）（绝对路径）"
+              placeholder="输入运行目录（Laravel 等程序需要）（绝对路径）"
             />
           </n-form-item>
           <n-form-item label="默认文档">
             <n-dynamic-tags v-model:value="setting.index" />
           </n-form-item>
-          <n-form-item label="PHP版本">
+          <n-form-item label="PHP 版本">
             <n-select
               v-model:value="setting.php"
               :default-value="0"
@@ -339,11 +353,16 @@ onMounted(async () => {
       </n-tab-pane>
       <n-tab-pane name="rewrite" tab="伪静态">
         <n-flex vertical>
-          <n-alert type="info" w-full>
-            设置伪静态规则，填入
-            <n-tag>location</n-tag>
-            部分即可
-          </n-alert>
+          <n-form label-placement="left" label-width="auto">
+            <n-form-item label="预设">
+              <n-select
+                v-model:value="rewriteValue"
+                clearable
+                :options="rewriteOptions"
+                @update-value="handleRewrite"
+              />
+            </n-form-item>
+          </n-form>
           <Editor
             v-if="setting"
             v-model:value="setting.rewrite"

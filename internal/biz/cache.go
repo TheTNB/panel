@@ -19,4 +19,6 @@ type Cache struct {
 type CacheRepo interface {
 	Get(key CacheKey, defaultValue ...string) (string, error)
 	Set(key CacheKey, value string) error
+	UpdateApps() error
+	UpdateRewrites() error
 }

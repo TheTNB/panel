@@ -30,5 +30,4 @@ type AppRepo interface {
 	UnInstall(slug string) error
 	Update(slug string) error
 	UpdateShow(slug string, show bool) error
-	UpdateCache() error
 }

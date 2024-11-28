@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -18,6 +19,7 @@ import (
 	"github.com/TheTNB/panel/internal/embed"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
+	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/cert"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/nginx"
@@ -31,6 +33,25 @@ type websiteRepo struct{}
 
 func NewWebsiteRepo() biz.WebsiteRepo {
 	return do.MustInvoke[biz.WebsiteRepo](injector)
+}
+
+func (r *websiteRepo) GetRewrites() (map[string]string, error) {
+	cached, err := NewCacheRepo().Get(biz.CacheKeyRewrites)
+	if err != nil {
+		return nil, err
+	}
+
+	var rewrites api.Rewrites
+	if err = json.Unmarshal([]byte(cached), &rewrites); err != nil {
+		return nil, err
+	}
+
+	rw := make(map[string]string)
+	for rewrite := range slices.Values(rewrites) {
+		rw[rewrite.Name] = rewrite.Content
+	}
+
+	return rw, nil
 }
 
 func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) error {

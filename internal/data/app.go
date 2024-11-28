@@ -15,13 +15,10 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/api"
-	"github.com/TheTNB/panel/pkg/apploader"
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
-type appRepo struct {
-	api *api.API
-}
+type appRepo struct{}
 
 func NewAppRepo() biz.AppRepo {
 	return do.MustInvoke[biz.AppRepo](injector)
@@ -307,26 +304,6 @@ func (r *appRepo) UpdateShow(slug string, show bool) error {
 	item.Show = show
 
 	return app.Orm.Save(item).Error
-}
-
-func (r *appRepo) UpdateCache() error {
-	remote, err := r.api.Apps()
-	if err != nil {
-		return err
-	}
-
-	// 去除本地不存在的应用
-	*remote = slices.Clip(slices.DeleteFunc(*remote, func(app *api.App) bool {
-		_, err = apploader.Get(app.Slug)
-		return err != nil
-	}))
-
-	encoded, err := json.Marshal(remote)
-	if err != nil {
-		return err
-	}
-
-	return NewCacheRepo().Set(biz.CacheKeyApps, string(encoded))
 }
 
 func (r *appRepo) preCheck(app *api.App) error {

@@ -1,6 +1,6 @@
 import type { AxiosResponse } from 'axios'
 
-import { request } from '@/utils'
+import { http, request } from '@/utils'
 
 export default {
   // 列表
@@ -11,6 +11,8 @@ export default {
   // 删除
   delete: (id: number, path: boolean, db: boolean): Promise<AxiosResponse<any>> =>
     request.delete(`/website/${id}`, { data: { path, db } }),
+  // 伪静态
+  rewrites: () => http.Get(`/website/rewrites`),
   // 获取默认配置
   defaultConfig: (): Promise<AxiosResponse<any>> => request.get('/website/defaultConfig'),
   // 保存默认配置

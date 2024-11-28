@@ -13,12 +13,14 @@ import (
 
 type AppService struct {
 	appRepo     biz.AppRepo
+	cacheRepo   biz.CacheRepo
 	settingRepo biz.SettingRepo
 }
 
 func NewAppService() *AppService {
 	return &AppService{
 		appRepo:     data.NewAppRepo(),
+		cacheRepo:   data.NewCacheRepo(),
 		settingRepo: data.NewSettingRepo(),
 	}
 }
@@ -170,7 +172,7 @@ func (s *AppService) UpdateCache(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.appRepo.UpdateCache(); err != nil {
+	if err := s.cacheRepo.UpdateApps(); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}

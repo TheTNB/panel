@@ -48,6 +48,7 @@ func Http(r chi.Router) {
 
 		r.Route("/website", func(r chi.Router) {
 			website := service.NewWebsiteService()
+			r.Get("/rewrites", website.GetRewrites)
 			r.Get("/defaultConfig", website.GetDefaultConfig)
 			r.Post("/defaultConfig", website.UpdateDefaultConfig)
 			r.Get("/", website.List)
