@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import file from '@/api/panel/file'
+import { decodeBase64 } from '@/utils'
 import { languageByPath } from '@/utils/file'
 import Editor from '@guolao/vue-monaco-editor'
 
@@ -21,7 +22,7 @@ const get = async () => {
   await file
     .content(props.path)
     .then((res) => {
-      data.value = atob(res.data.content)
+      data.value = decodeBase64(res.data.content)
       window.$message.success('获取成功')
     })
     .catch(() => {

@@ -1,3 +1,4 @@
+export * from './base64'
 export * from './color'
 export * from './common'
 export * from './icon'

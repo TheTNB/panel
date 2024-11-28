@@ -7,7 +7,7 @@ import { NButton, NDataTable, NInput, NPopconfirm, NSwitch, NTag } from 'naive-u
 
 import cron from '@/api/panel/cron'
 import file from '@/api/panel/file'
-import { formatDateTime, renderIcon } from '@/utils'
+import { decodeBase64, formatDateTime, renderIcon } from '@/utils'
 import type { CronTask } from '@/views/task/types'
 import { CronNaive } from '@vue-js-cron/naive-ui'
 
@@ -209,7 +209,7 @@ const handleEdit = async (row: any) => {
       editTask.value.id = row.id
       editTask.value.name = row.name
       editTask.value.time = row.time
-      editTask.value.script = atob(res.data.content)
+      editTask.value.script = decodeBase64(res.data.content)
       editModal.value = true
     })
   })
