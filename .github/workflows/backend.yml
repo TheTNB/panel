@@ -28,7 +28,7 @@ jobs:
           check-name: 'build (frontend)'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download frontend
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v7
         with:
           workflow: frontend.yml
           name: frontend
