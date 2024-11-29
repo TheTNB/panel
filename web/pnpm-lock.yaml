@@ -46,7 +46,7 @@ importers:
         version: 5.5.0
       alova:
         specifier: ^3.2.4
-        version: 3.2.5
+        version: 3.2.6
       axios:
         specifier: ^1.7.7
         version: 1.7.8
@@ -195,8 +195,8 @@ importers:
 
 packages:
 
-  '@alova/shared@1.1.0':
-    resolution: {integrity: sha512-sCX5cVKYGrYJ8hGZ9fxqyKAsNGXd2frB4/UG3SKTXqCgs4OyROz1SYhh16iaKT1NaKrQ3444bS2BS/7kTwFpVA==}
+  '@alova/shared@1.1.1':
+    resolution: {integrity: sha512-wYEpisfemAaKH9ODLzlFEcDN34tmc1eWrc++r/Axtdvxb4xpiokWQmQtqr+ODEJ90qG4TCuB5MkCCQBxgKf+fg==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -1510,8 +1510,8 @@ packages:
   alien-signals@0.2.2:
     resolution: {integrity: sha512-cZIRkbERILsBOXTQmMrxc9hgpxglstn69zm+F1ARf4aPAzdAFYd6sBq87ErO0Fj3DV94tglcyHG5kQz9nDC/8A==}
 
-  alova@3.2.5:
-    resolution: {integrity: sha512-K7mxDxqV7nQbcANpZ4nExSrNebz6CM0PihBdMskAG64JdiX1UJsq+/IesQiAH+PfTYq04OUltvUUEnXvx6ib8A==}
+  alova@3.2.6:
+    resolution: {integrity: sha512-PJFExNPfuoa9Bvmp2gbSpmJyqXnpT6kDFQ+UYvpyQjXqAbKW2wcw1KUcKMXdPHO9hkzkGdev1dlZRMYIMFYd8g==}
     engines: {node: '>= 18.0.0'}
 
   ansi-styles@4.3.0:
@@ -3581,7 +3581,7 @@ packages:
 
 snapshots:
 
-  '@alova/shared@1.1.0': {}
+  '@alova/shared@1.1.1': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -5142,9 +5142,9 @@ snapshots:
 
   alien-signals@0.2.2: {}
 
-  alova@3.2.5:
+  alova@3.2.6:
     dependencies:
-      '@alova/shared': 1.1.0
+      '@alova/shared': 1.1.1
       rate-limiter-flexible: 5.0.4
 
   ansi-styles@4.3.0:
