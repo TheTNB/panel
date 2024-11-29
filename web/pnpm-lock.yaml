@@ -67,7 +67,7 @@ importers:
         version: 3.5.0
       marked:
         specifier: ^15.0.2
-        version: 15.0.2
+        version: 15.0.3
       mitt:
         specifier: ^3.0.1
         version: 3.0.1
@@ -2569,8 +2569,8 @@ packages:
     resolution: {integrity: sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==}
     hasBin: true
 
-  marked@15.0.2:
-    resolution: {integrity: sha512-85RUkoYKIVB21PbMKrnD6aCl9ws+XKEyhJNMbLn206NyD3jbBo7Ec7Wi4Jrsn4dV1a2ng7K/jfkmIN0DNoS41w==}
+  marked@15.0.3:
+    resolution: {integrity: sha512-Ai0cepvl2NHnTcO9jYDtcOEtVBNVYR31XnEA3BndO7f5As1wzpcOceSUM8FDkNLJNIODcLpDTWay/qQhqbuMvg==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -6297,7 +6297,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  marked@15.0.2: {}
+  marked@15.0.3: {}
 
   md-editor-v3@5.0.2(@codemirror/view@6.35.0)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3)):
     dependencies:
