@@ -14,7 +14,7 @@
 
 Rat Panel is a new generation of enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
 
-**Sponsor: [Open Collective](https://opencollective.com/tnb)** | QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe)
+QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe)
 
 ## Advantages
 
@@ -108,9 +108,9 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 
 ## Sponsor
 
-If the Rat Panel is helpful to you, welcome to [sponsor us](https://opencollective.com/tnb), thanks to the following supporters/sponsors:
+If the Rat Panel is helpful to you, welcome to sponsor us, also thanks to the following supporters/sponsors:
 
-**Accept cloud resources and financial sponsorship, you can contact us through QQ group**
+![Alipay](https://github.com/user-attachments/assets/fec37fdd-e78a-4ab7-8210-61e33397fb2f) ![WeChat](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
 
 ### Financial
 

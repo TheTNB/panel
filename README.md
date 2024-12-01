@@ -14,7 +14,7 @@
 
 耗子面板是新一代企业级全能服务器运维管理面板。简单轻量，高效运维。
 
-**赞助：[爱发电](https://afdian.com/a/TheTNB)** | QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe)
+QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe)
 
 ## 优势
 
@@ -108,9 +108,9 @@ panel-cli
 
 ## 赞助商
 
-如果耗子面板对您有帮助，欢迎[赞助我们](https://afdian.com/a/TheTNB)，感谢以下支持者/赞助商的支持：
+如果耗子面板对您有帮助，欢迎赞助我们，同时感谢以下支持者/赞助商的支持：
 
-**同时接受云资源赞助，可通过QQ群咨询联系**
+![支付宝](https://github.com/user-attachments/assets/fec37fdd-e78a-4ab7-8210-61e33397fb2f) ![微信](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
 
 ### 资金
 
