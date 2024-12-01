@@ -146,7 +146,7 @@ importers:
         version: 0.52.0
       naive-ui:
         specifier: ^2.40.1
-        version: 2.40.2(vue@3.5.13(typescript@5.6.3))
+        version: 2.40.3(vue@3.5.13(typescript@5.6.3))
       npm-run-all2:
         specifier: ^7.0.1
         version: 7.0.1
@@ -2677,8 +2677,8 @@ packages:
     resolution: {integrity: sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ==}
     hasBin: true
 
-  naive-ui@2.40.2:
-    resolution: {integrity: sha512-iOpk9/SdAxOPnbFDiN9c0N6vzRJiyC+xgs8rqeaulLvxg0ix39xA3noordy9wyq0YUbqS3ID6jPdld/kW4KSEg==}
+  naive-ui@2.40.3:
+    resolution: {integrity: sha512-TpgYfOg0SNlG4HHhTdFnFcPc1trZiX3r10Pn6biyEgRoi6ZC5qbsY8xgKsqQuG4nWj2PHLT8pPVEkt2pKOlxag==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -6397,7 +6397,7 @@ snapshots:
 
   mustache@4.2.0: {}
 
-  naive-ui@2.40.2(vue@3.5.13(typescript@5.6.3)):
+  naive-ui@2.40.3(vue@3.5.13(typescript@5.6.3)):
     dependencies:
       '@css-render/plugin-bem': 0.15.14(css-render@0.15.14)
       '@css-render/vue3-ssr': 0.15.14(vue@3.5.13(typescript@5.6.3))
