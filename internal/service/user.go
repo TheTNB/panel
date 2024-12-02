@@ -93,9 +93,8 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if req.SafeLogin && !app.Conf.Bool("http.tls") {
-		ua := r.Header.Get("User-Agent")
 		sess.Put("safe_login", true)
-		sess.Put("safe_client", fmt.Sprintf("%x", sha3.Sum256([]byte(ip+"|"+ua))))
+		sess.Put("safe_client", fmt.Sprintf("%x", sha3.Sum256([]byte(ip))))
 	}
 
 	sess.Put("user_id", user.ID)

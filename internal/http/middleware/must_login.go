@@ -65,8 +65,7 @@ func MustLogin(next http.Handler) http.Handler {
 		if safeLogin {
 			safeClientHash := cast.ToString(sess.Get("safe_client"))
 			ip, _, _ := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
-			ua := r.Header.Get("User-Agent")
-			clientHash := fmt.Sprintf("%x", sha3.Sum256([]byte(ip+"|"+ua)))
+			clientHash := fmt.Sprintf("%x", sha3.Sum256([]byte(ip)))
 			if safeClientHash != clientHash || safeClientHash == "" {
 				render := chix.NewRender(w)
 				render.Status(http.StatusUnauthorized)

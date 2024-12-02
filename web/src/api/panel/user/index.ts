@@ -4,10 +4,11 @@ export default {
   // 公钥
   key: () => http.Get('/user/key'),
   // 登录
-  login: (username: string, password: string) =>
+  login: (username: string, password: string, safe_login: boolean) =>
     http.Post('/user/login', {
       username,
-      password
+      password,
+      safe_login
     }),
   // 登出
   logout: () => http.Post('/user/logout'),

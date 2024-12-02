@@ -36,7 +36,7 @@ const loging = ref<boolean>(false)
 const isRemember = useStorage('isRemember', false)
 
 async function handleLogin() {
-  const { username, password } = loginInfo.value
+  const { username, password, safe_login } = loginInfo.value
   if (!username || !password) {
     window.$message.warning('请输入用户名和密码')
     return
@@ -47,7 +47,11 @@ async function handleLogin() {
   }
   try {
     user
-      .login(rsaEncrypt(username, String(unref(key))), rsaEncrypt(password, String(unref(key))))
+      .login(
+        rsaEncrypt(username, String(unref(key))),
+        rsaEncrypt(password, String(unref(key))),
+        safe_login
+      )
       .then(async () => {
         loging.value = true
         window.$notification?.success({ title: '登录成功！', duration: 2500 })
