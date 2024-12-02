@@ -704,7 +704,7 @@ if (import.meta.hot) {
                 </n-text>
                 <n-skeleton v-if="homeAppsLoading" text :repeat="12" />
               </n-card>
-              <n-card :segmented="true" rounded-10 size="small" title="系统信息">
+              <n-card :segmented="true" rounded-10 size="small" title="环境信息">
                 <n-table v-if="systemInfo" :single-line="false">
                   <tr>
                     <th>系统主机名</th>
@@ -733,20 +733,24 @@ if (import.meta.hot) {
                   <tr>
                     <th>面板内部版本</th>
                     <td>
-                      {{ systemInfo?.commit_hash || '加载中...' }}
+                      {{
+                        systemInfo?.commit_hash +
+                          ' ' +
+                          systemInfo?.go_version +
+                          ' ' +
+                          systemInfo?.build_time || '加载中...'
+                      }}
                     </td>
                   </tr>
                   <tr>
                     <th>面板编译信息</th>
                     <td>
                       {{
-                        systemInfo?.go_version +
+                        systemInfo?.build_id +
+                          ' ' +
+                          systemInfo?.build_user +
                           '/' +
-                          systemInfo?.build_time +
-                          '/' +
-                          systemInfo?.build_host +
-                          '/' +
-                          systemInfo?.build_id || '加载中...'
+                          systemInfo?.build_host || '加载中...'
                       }}
                     </td>
                   </tr>
@@ -809,11 +813,11 @@ if (import.meta.hot) {
                   <n-tag>实时读写 {{ formatBytes(current.diskRWBytes) }}/s</n-tag>
                   <n-tag>读写延迟 {{ current.diskRWTime }}ms</n-tag>
                 </n-flex>
-                <n-card :bordered="false" h-497>
+                <n-card :bordered="false" h-530 pt-10>
                   <v-chart class="chart" :option="chartOptions" autoresize />
                 </n-card>
               </n-flex>
-              <n-skeleton v-else text :repeat="24" />
+              <n-skeleton v-else text :repeat="25" />
             </n-card>
           </n-gi>
         </n-grid>
