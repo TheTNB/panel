@@ -18,6 +18,7 @@ func Http(r chi.Router) {
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/user", func(r chi.Router) {
 			user := service.NewUserService()
+			r.Get("/key", user.GetKey)
 			r.With(middleware.Throttle(5, time.Minute)).Post("/login", user.Login)
 			r.Post("/logout", user.Logout)
 			r.Get("/isLogin", user.IsLogin)

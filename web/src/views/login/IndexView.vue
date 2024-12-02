@@ -4,19 +4,24 @@ import bgImg from '@/assets/images/login_bg.webp'
 import { addDynamicRoutes } from '@/router'
 import { useThemeStore, useUserStore } from '@/store'
 import { getLocal, removeLocal, setLocal } from '@/utils'
+import { rsaEncrypt } from '@/utils/encrypt'
 
 const router = useRouter()
 const route = useRoute()
 const query = route.query
+const { data: key, loading: isLoading } = useRequest(user.key, { initialData: '' })
+const { data: isLogin } = useRequest(user.isLogin, { initialData: false })
 
 interface LoginInfo {
   username: string
   password: string
+  safe_login: boolean
 }
 
 const loginInfo = ref<LoginInfo>({
   username: '',
-  password: ''
+  password: '',
+  safe_login: true
 })
 
 const localLoginInfo = getLocal('loginInfo') as LoginInfo
@@ -36,40 +41,49 @@ async function handleLogin() {
     window.$message.warning('请输入用户名和密码')
     return
   }
+  if (!key) {
+    window.$message.warning('获取加密公钥失败，请刷新页面重试')
+    return
+  }
   try {
-    user.login(username, password).then(async () => {
-      loging.value = true
-      window.$notification?.success({ title: '登录成功！', duration: 2500 })
-      if (isRemember.value) {
-        setLocal('loginInfo', { username, password })
-      } else {
-        removeLocal('loginInfo')
-      }
+    user
+      .login(rsaEncrypt(username, String(unref(key))), rsaEncrypt(password, String(unref(key))))
+      .then(async () => {
+        loging.value = true
+        window.$notification?.success({ title: '登录成功！', duration: 2500 })
+        if (isRemember.value) {
+          setLocal('loginInfo', { username, password })
+        } else {
+          removeLocal('loginInfo')
+        }
 
-      await addDynamicRoutes()
-      const { data } = await user.info()
-      userStore.set(data)
-      if (query.redirect) {
-        const path = query.redirect as string
-        Reflect.deleteProperty(query, 'redirect')
-        await router.push({ path, query })
-      } else {
-        await router.push('/')
-      }
-    })
+        await addDynamicRoutes()
+        await user.info().then((data: any) => {
+          userStore.set(data)
+        })
+        if (query.redirect) {
+          const path = query.redirect as string
+          Reflect.deleteProperty(query, 'redirect')
+          await router.push({ path, query })
+        } else {
+          await router.push('/')
+        }
+      })
   } catch (error) {
     console.error(error)
   }
   loging.value = false
 }
 
-onMounted(async () => {
-  // 已登录自动跳转
-  await user.isLogin().then(async (res) => {
-    if (res.data) {
+watch(
+  () => isLogin,
+  async () => {
+    if (isLogin) {
+      console.log(isLogin)
       await addDynamicRoutes()
-      const { data } = await user.info()
-      userStore.set(data)
+      await user.info().then((data: any) => {
+        userStore.set(data)
+      })
       if (query.redirect) {
         const path = query.redirect as string
         Reflect.deleteProperty(query, 'redirect')
@@ -78,8 +92,8 @@ onMounted(async () => {
         await router.push('/')
       }
     }
-  })
-})
+  }
+)
 </script>
 
 <template>
@@ -111,16 +125,16 @@ onMounted(async () => {
         </div>
 
         <div mt-20>
-          <n-checkbox
-            :checked="isRemember"
-            :on-update:checked="(val: boolean) => (isRemember = val)"
-            label="记住我"
-          />
+          <n-flex>
+            <n-checkbox v-model:checked="loginInfo.safe_login" label="安全登录" />
+            <n-checkbox v-model:checked="isRemember" label="记住我" />
+          </n-flex>
         </div>
 
         <div mt-20>
           <n-button
-            :loading="loging"
+            :loading="isLoading || loging"
+            :disabled="isLoading || loging"
             type="primary"
             h-50
             w-full

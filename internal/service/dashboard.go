@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/go-rat/chix"
 	"github.com/go-rat/utils/collect"
@@ -103,8 +102,6 @@ func (s *DashboardService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 			Label: fmt.Sprintf("%s (%s)", v.Device, v.Mountpoint),
 		})
 	}
-
-	time.Now().UTC()
 
 	Success(w, chix.M{
 		"procs":          hostInfo.Procs,

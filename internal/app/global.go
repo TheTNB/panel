@@ -48,7 +48,7 @@ var (
 
 // 自动注入
 var (
-	Version    string
+	Version    = "0.0.0"
 	BuildTime  string
 	CommitHash string
 	GoVersion  string

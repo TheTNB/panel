@@ -2,12 +2,15 @@ package middleware
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 	"slices"
 	"strings"
 
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
+	"golang.org/x/crypto/sha3"
 
 	"github.com/TheTNB/panel/internal/app"
 )
@@ -16,6 +19,7 @@ import (
 func MustLogin(next http.Handler) http.Handler {
 	// 白名单
 	whiteList := []string{
+		"/api/user/key",
 		"/api/user/login",
 		"/api/user/logout",
 		"/api/user/isLogin",
@@ -55,6 +59,22 @@ func MustLogin(next http.Handler) http.Handler {
 				"message": "会话无效，请重新登录",
 			})
 			return
+		}
+
+		safeLogin := cast.ToBool(sess.Get("safe_login"))
+		if safeLogin {
+			safeClientHash := cast.ToString(sess.Get("safe_client"))
+			ip, _, _ := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+			ua := r.Header.Get("User-Agent")
+			clientHash := fmt.Sprintf("%x", sha3.Sum256([]byte(ip+"|"+ua)))
+			if safeClientHash != clientHash || safeClientHash == "" {
+				render := chix.NewRender(w)
+				render.Status(http.StatusUnauthorized)
+				render.JSON(chix.M{
+					"message": "客户端IP/UA变化，请重新登录",
+				})
+				return
+			}
 		}
 
 		r = r.WithContext(context.WithValue(r.Context(), "user_id", userID)) // nolint:staticcheck

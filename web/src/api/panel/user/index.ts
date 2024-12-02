@@ -1,18 +1,18 @@
-import type { AxiosResponse } from 'axios'
-
-import { request } from '@/utils'
+import { http } from '@/utils'
 
 export default {
+  // 公钥
+  key: () => http.Get('/user/key'),
   // 登录
-  login: (username: string, password: string): Promise<AxiosResponse<any>> =>
-    request.post('/user/login', {
+  login: (username: string, password: string) =>
+    http.Post('/user/login', {
       username,
       password
     }),
   // 登出
-  logout: (): Promise<AxiosResponse<any>> => request.post('/user/logout'),
+  logout: () => http.Post('/user/logout'),
   // 是否登录
-  isLogin: (): Promise<AxiosResponse<any>> => request.get('/user/isLogin'),
+  isLogin: () => http.Get('/user/isLogin'),
   // 获取用户信息
-  info: (): Promise<AxiosResponse<any>> => request.get('/user/info')
+  info: () => http.Get('/user/info')
 }
