@@ -14,6 +14,13 @@ builds:
       - arm64
     ldflags:
       - -s -w --extldflags "-static"
+      - -X 'github.com/TheTNB/panel/internal/app.Version={{ .Version }}'
+      - -X 'github.com/TheTNB/panel/internal/app.BuildTime={{ .Now.Format "2006-01-02 15:04:05 MST" }}'
+      - -X 'github.com/TheTNB/panel/internal/app.CommitHash={{ .ShortCommit }}'
+      - -X 'github.com/TheTNB/panel/internal/app.GoVersion={{ .Env.GOVERSION }}'
+      - -X 'github.com/TheTNB/panel/internal/app.BuildID={{ .Env.GITHUB_RUN_ID }}'
+      - -X 'github.com/TheTNB/panel/internal/app.BuildUser={{ .Env.USER }}'
+      - -X 'github.com/TheTNB/panel/internal/app.BuildHost={{ .Env.HOSTNAME }}'
   - id: cli
     main: ./cmd/cli
     binary: cli

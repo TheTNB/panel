@@ -37,15 +37,14 @@ jobs:
           path: internal/embed/frontend
           check_artifacts: true
       - name: Set build info
-        id: build_info
         run: |
-          echo "version=$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0')" >> $GITHUB_OUTPUT
-          echo "build_time=$(date -u '+%F %T UTC')" >> $GITHUB_OUTPUT
-          echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "go_version=$(go version | cut -d' ' -f3)" >> $GITHUB_OUTPUT
-          echo "build_user=$(whoami)" >> $GITHUB_OUTPUT
-          echo "build_host=$(hostname)" >> $GITHUB_OUTPUT
-          echo "build_id=${{ github.run_id }}" >> $GITHUB_OUTPUT
+          echo "VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0')" >> $GITHUB_ENV
+          echo "BUILD_TIME=$(date -u '+%F %T UTC')" >> $GITHUB_ENV
+          echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GO_VERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
+          echo "BUILD_ID=${{ github.run_id }}" >> $GITHUB_ENV
+          echo "BUILD_USER=$(whoami)" >> $GITHUB_ENV
+          echo "BUILD_HOST=$(hostname)" >> $GITHUB_ENV
       - name: Build ${{ matrix.goarch }}
         env:
           CGO_ENABLED: 0
@@ -53,14 +52,13 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: |
           LDFLAGS="-s -w --extldflags '-static'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.Version=${{ steps.build_info.outputs.version }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildTime=${{ steps.build_info.outputs.build_time }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.CommitHash=${{ steps.build_info.outputs.commit_hash }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.GoVersion=${{ steps.build_info.outputs.go_version }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.Platform=${{ steps.build_info.outputs.platform }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildUser=${{ steps.build_info.outputs.build_user }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildHost=${{ steps.build_info.outputs.build_host }}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildID=${{ steps.build_info.outputs.build_id }}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.Version=${VERSION}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildTime=${BUILD_TIME}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.CommitHash=${COMMIT_HASH}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.GoVersion=${GO_VERSION}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildID=${BUILD_ID}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildUser=${BUILD_USER}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildHost=${BUILD_HOST}'"
           go build -ldflags "${LDFLAGS}" -o web-${{ matrix.goarch }} ./cmd/web
           go build -ldflags "${LDFLAGS}" -o cli-${{ matrix.goarch }} ./cmd/cli
       - name: Compress ${{ matrix.goarch }}

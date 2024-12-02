@@ -52,7 +52,7 @@ var (
 	BuildTime  string
 	CommitHash string
 	GoVersion  string
+	BuildID    string
 	BuildUser  string
 	BuildHost  string
-	BuildID    string
 )

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/go-rat/chix"
 	"github.com/go-rat/utils/collect"
@@ -103,15 +104,17 @@ func (s *DashboardService) SystemInfo(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+	time.Now().UTC()
+
 	Success(w, chix.M{
 		"procs":          hostInfo.Procs,
 		"hostname":       hostInfo.Hostname,
 		"panel_version":  app.Version,
 		"commit_hash":    app.CommitHash,
+		"build_id":       app.BuildID,
 		"build_time":     app.BuildTime,
 		"build_user":     app.BuildUser,
 		"build_host":     app.BuildHost,
-		"build_id":       app.BuildID,
 		"go_version":     app.GoVersion,
 		"kernel_arch":    hostInfo.KernelArch,
 		"kernel_version": hostInfo.KernelVersion,

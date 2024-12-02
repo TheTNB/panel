@@ -31,6 +31,9 @@ jobs:
           name: frontend
           path: internal/embed/frontend
           check_artifacts: true
+      - name: Set environment variables
+        run: |
+          echo "GOVERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:

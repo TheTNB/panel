@@ -157,10 +157,10 @@ export interface SystemInfo {
   hostname: string
   panel_version: string
   commit_hash: string
+  build_id: string
   build_time: string
   build_user: string
   build_host: string
-  build_id: string
   go_version: string
   kernel_arch: string
   kernel_version: string
