@@ -40,10 +40,9 @@ jobs:
         id: build_info
         run: |
           echo "version=$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0')" >> $GITHUB_OUTPUT
-          echo "build_time=$(date -u '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+          echo "build_time=$(date -u '+%F %T UTC')" >> $GITHUB_OUTPUT
           echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "go_version=$(go version | cut -d' ' -f3)" >> $GITHUB_OUTPUT
-          echo "platform=$(go version | cut -d' ' -f4)" >> $GITHUB_OUTPUT
           echo "build_user=$(whoami)" >> $GITHUB_OUTPUT
           echo "build_host=$(hostname)" >> $GITHUB_OUTPUT
           echo "build_id=${{ github.run_id }}" >> $GITHUB_OUTPUT

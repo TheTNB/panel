@@ -337,10 +337,6 @@ const toSponsor = () => {
   }
 }
 
-const toGit = () => {
-  window.open('https://github.com/TheTNB/panel')
-}
-
 const handleManageApp = (slug: string) => {
   router.push({ name: 'apps-' + slug + '-index' })
 }
@@ -425,10 +421,16 @@ if (import.meta.hot) {
             </n-grid>
             <template #title>耗子面板</template>
             <template #extra>
-              <n-space>
+              <n-flex>
                 <n-button type="primary" @click="toSponsor"> 赞助支持 </n-button>
-                <n-button @click="toGit">开源地址</n-button>
-              </n-space>
+                <n-popconfirm @positive-click="handleRestartPanel">
+                  <template #trigger>
+                    <n-button type="warning"> 重启 </n-button>
+                  </template>
+                  确定要重启面板吗？
+                </n-popconfirm>
+                <n-button type="success" @click="handleUpdate"> 更新 </n-button>
+              </n-flex>
             </template>
           </n-page-header>
         </n-card>
@@ -705,47 +707,47 @@ if (import.meta.hot) {
               <n-card :segmented="true" rounded-10 size="small" title="系统信息">
                 <n-table v-if="systemInfo" :single-line="false">
                   <tr>
-                    <th>主机名</th>
+                    <th>系统主机名</th>
                     <td>
                       {{ systemInfo?.hostname || '加载中...' }}
                     </td>
                   </tr>
                   <tr>
-                    <th>系统版本</th>
+                    <th>系统版本号</th>
                     <td>
                       {{ `${systemInfo?.os_name} ${systemInfo?.kernel_arch}` || '加载中...' }}
                     </td>
                   </tr>
                   <tr>
-                    <th>内核版本</th>
+                    <th>系统内核版本</th>
                     <td>
                       {{ systemInfo?.kernel_version || '加载中...' }}
                     </td>
                   </tr>
                   <tr>
-                    <th>运行时间</th>
+                    <th>系统运行时间</th>
                     <td>
                       {{ formatDuration(Number(systemInfo?.uptime)) || '加载中...' }}
                     </td>
                   </tr>
                   <tr>
-                    <th>操作</th>
+                    <th>面板内部版本</th>
                     <td>
-                      <n-space>
-                        <n-popconfirm @positive-click="handleRestartPanel">
-                          <template #trigger>
-                            <n-button type="warning" size="small">
-                              <TheIcon :size="20" icon="mdi:restart" />
-                              重启面板
-                            </n-button>
-                          </template>
-                          确定要重启面板吗？
-                        </n-popconfirm>
-                        <n-button type="success" @click="handleUpdate" size="small">
-                          <TheIcon :size="20" icon="mdi:arrow-up-bold-circle-outline" />
-                          检查更新
-                        </n-button>
-                      </n-space>
+                      {{ systemInfo?.commit_hash || '加载中...' }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>面板编译信息</th>
+                    <td>
+                      {{
+                        systemInfo?.go_version +
+                          '/' +
+                          systemInfo?.build_time +
+                          '/' +
+                          systemInfo?.build_host +
+                          '/' +
+                          systemInfo?.build_id || '加载中...'
+                      }}
                     </td>
                   </tr>
                 </n-table>

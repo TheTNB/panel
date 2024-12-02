@@ -52,7 +52,6 @@ var (
 	BuildTime  string
 	CommitHash string
 	GoVersion  string
-	Platform   string
 	BuildUser  string
 	BuildHost  string
 	BuildID    string
