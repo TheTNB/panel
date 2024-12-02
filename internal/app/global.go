@@ -28,7 +28,7 @@ var (
 	Crypter    crypt.Crypter
 )
 
-// 定义面板状态常量
+// 面板状态常量
 const (
 	StatusNormal = iota
 	StatusMaintain
@@ -39,10 +39,21 @@ const (
 
 // 面板全局变量
 var (
-	Key     string
-	Root    string
-	Version string
-	Locale  string
-	IsCli   bool
-	Status  = StatusNormal
+	Key    string
+	Root   string
+	Locale string
+	IsCli  bool
+	Status = StatusNormal
+)
+
+// 自动注入
+var (
+	Version    string
+	BuildTime  string
+	CommitHash string
+	GoVersion  string
+	Platform   string
+	BuildUser  string
+	BuildHost  string
+	BuildID    string
 )
