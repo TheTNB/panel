@@ -77,14 +77,14 @@ const menus = computed<TreeSelectOption[]>(() => {
         <n-flex vertical>
           <n-alert type="info"> 设置保存在浏览器，清空浏览器缓存后将会重置 </n-alert>
           <n-form-item label="自定义 Logo">
-            <n-input v-model:value="themeStore.logo" />
+            <n-input v-model:value="themeStore.logo" placeholder="请输入完整 URL" />
           </n-form-item>
           <n-form-item label="隐藏菜单">
             <n-tree-select
-              multiple
               cascade
               checkable
               clearable
+              multiple
               :options="menus"
               v-model:value="permissionStore.hiddenRoutes"
             ></n-tree-select>
