@@ -30,7 +30,9 @@ const themeStore = useThemeStore()
       placement="left"
       @mask-click="themeStore.setCollapsed(true)"
     >
-      <side-bar />
+      <n-scrollbar>
+        <side-bar />
+      </n-scrollbar>
     </n-drawer>
 
     <article flex-col flex-1 overflow-hidden>
