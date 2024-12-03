@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import user from '@/api/panel/user'
 import bgImg from '@/assets/images/login_bg.webp'
+import logoImg from '@/assets/images/logo.png'
 import { addDynamicRoutes } from '@/router'
 import { useThemeStore, useUserStore } from '@/store'
 import { getLocal, removeLocal, setLocal } from '@/utils'
@@ -34,6 +35,8 @@ const userStore = useUserStore()
 const themeStore = useThemeStore()
 const loging = ref<boolean>(false)
 const isRemember = useStorage('isRemember', false)
+
+const logo = computed(() => themeStore.logo || logoImg)
 
 async function handleLogin() {
   const { username, password, safe_login } = loginInfo.value
@@ -105,7 +108,7 @@ watch(
     <div m-auto min-w-345 f-c-c rounded-10 bg-white bg-opacity-60 p-15 card-shadow dark:bg-dark>
       <div w-480 flex-col px-20 py-35>
         <h5 color="#6a6a6a" f-c-c text-24 font-normal>
-          <img class="mr-10" height="50" src="@/assets/images/logo.png" />{{ themeStore.name }}
+          <n-image :src="logo" height="50" preview-disabled mr-10 />{{ themeStore.name }}
         </h5>
         <div mt-30>
           <n-input

@@ -48,6 +48,7 @@ watch(
         <n-input
           v-model:value="updateModel.password"
           type="password"
+          show-password-on="click"
           @keydown.enter.prevent
           placeholder="输入密码"
         />

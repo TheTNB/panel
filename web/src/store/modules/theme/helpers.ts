@@ -32,7 +32,8 @@ export function defaultSettings(): Theme.Setting {
   }
   const locale = themeSetting.locale || 'zh_CN'
   const name = themeSetting.name || import.meta.env.VITE_APP_TITLE
-  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, locale, name }
+  const logo = ''
+  return { isMobile, darkMode, sider, header, tab, primaryColor, otherColor, locale, name, logo }
 }
 
 /** 获取naive的主题颜色 */

@@ -41,13 +41,13 @@ const createServerModalShow = ref(false)
     <n-flex vertical>
       <n-tabs v-model:value="currentTab" type="line" animated>
         <n-tab-pane name="database" tab="数据库">
-          <database-list v-model:type="currentTab" />
+          <database-list />
         </n-tab-pane>
         <n-tab-pane name="user" tab="用户">
-          <user-list v-model:type="currentTab" />
+          <user-list />
         </n-tab-pane>
         <n-tab-pane name="server" tab="服务器">
-          <server-list v-model:type="currentTab" />
+          <server-list />
         </n-tab-pane>
       </n-tabs>
     </n-flex>

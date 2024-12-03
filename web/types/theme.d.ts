@@ -48,5 +48,7 @@ declare namespace Theme {
     locale: string
     /** 名称 */
     name: string
+    /** Logo */
+    logo: string
   }
 }

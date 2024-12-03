@@ -96,6 +96,7 @@ watch(
         <n-input
           v-model:value="createModel.password"
           type="password"
+          show-password-on="click"
           @keydown.enter.prevent
           placeholder="输入密码"
         />

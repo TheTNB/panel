@@ -93,6 +93,7 @@ watch(
         <n-input
           v-model:value="updateModel.password"
           type="password"
+          show-password-on="click"
           @keydown.enter.prevent
           placeholder="输入数据库服务器密码"
         />
