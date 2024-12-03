@@ -10,7 +10,7 @@
     height: 100%;
 }
 
-.loading-spin__container {
+.loading-spin-container {
     width: 56px;
     height: 56px;
     margin: 36px 0;
@@ -50,11 +50,9 @@
 
 @keyframes loadingSpin {
     from {
-        -webkit-transform: rotate(0deg);
         transform: rotate(0deg);
     }
     to {
-        -webkit-transform: rotate(360deg);
         transform: rotate(360deg);
     }
 }
@@ -85,7 +83,8 @@
 }
 
 .loading-title {
+    padding-top: 20px;
     font-size: 28px;
     font-weight: 500;
-    color: #6a6a6a;
+    color: #333;
 }
