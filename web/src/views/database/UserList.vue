@@ -46,7 +46,7 @@ const columns: any = [
   {
     title: '密码',
     key: 'password',
-    width: 200,
+    width: 250,
     render(row: any) {
       return h(NInputGroup, null, {
         default: () => [
@@ -56,7 +56,19 @@ const columns: any = [
             showPasswordOn: 'click',
             readonly: true,
             placeholder: '未保存'
-          })
+          }),
+          h(
+            NButton,
+            {
+              type: 'primary',
+              ghost: true,
+              onClick: () => {
+                navigator.clipboard.writeText(row.password)
+                window.$message.success('复制成功')
+              }
+            },
+            { default: () => '复制' }
+          )
         ]
       })
     }
@@ -222,7 +234,7 @@ onUnmounted(() => {
   <n-data-table
     striped
     remote
-    :scroll-x="1700"
+    :scroll-x="1800"
     :loading="loading"
     :columns="columns"
     :data="data"
