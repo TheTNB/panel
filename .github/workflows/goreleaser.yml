@@ -34,6 +34,7 @@ jobs:
       - name: Set environment variables
         run: |
           echo "GOVERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
+          echo "HOSTNAME=$(hostname)" >> $GITHUB_ENV
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
