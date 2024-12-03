@@ -160,6 +160,12 @@ func Http(r chi.Router) {
 			r.Post("/{id}/status", cron.Status)
 		})
 
+		r.Route("/process", func(r chi.Router) {
+			process := service.NewProcessService()
+			r.Get("/", process.List)
+			r.Post("/kill", process.Kill)
+		})
+
 		r.Route("/safe", func(r chi.Router) {
 			safe := service.NewSafeService()
 			r.Get("/ssh", safe.GetSSH)

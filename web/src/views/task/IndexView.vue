@@ -8,6 +8,7 @@ defineOptions({
 import TheIcon from '@/components/custom/TheIcon.vue'
 import CreateModal from '@/views/task/CreateModal.vue'
 import CronView from '@/views/task/CronView.vue'
+import SystemView from '@/views/task/SystemView.vue'
 import TaskView from '@/views/task/TaskView.vue'
 
 const current = ref('cron')
@@ -26,6 +27,9 @@ const create = ref(false)
     <n-tabs v-model:value="current" type="line" animated size="large">
       <n-tab-pane name="cron" tab="计划任务">
         <cron-view />
+      </n-tab-pane>
+      <n-tab-pane name="system" tab="系统进程">
+        <system-view />
       </n-tab-pane>
       <n-tab-pane name="task" tab="面板任务">
         <task-view />

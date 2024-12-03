@@ -330,11 +330,7 @@ const handleUpdate = () => {
 }
 
 const toSponsor = () => {
-  if (locale.value === 'en') {
-    window.open('https://opencollective.com/tnb')
-  } else {
-    window.open('https://afdian.com/a/TheTNB')
-  }
+  window.open('https://afdian.com/a/TheTNB')
 }
 
 const handleManageApp = (slug: string) => {
@@ -443,11 +439,7 @@ if (import.meta.hot) {
                   <p>负载状态</p>
                   <n-progress
                     type="dashboard"
-                    :percentage="
-                      Math.round(formatPercent((realtime.load.load1 / cores) * 100)) > 100
-                        ? 100
-                        : Math.round(formatPercent((realtime.load.load1 / cores) * 100))
-                    "
+                    :percentage="Math.round(formatPercent((realtime.load.load1 / cores) * 100))"
                     :color="statusColor((realtime.load.load1 / cores) * 100)"
                   >
                   </n-progress>
