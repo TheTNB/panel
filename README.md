@@ -14,7 +14,7 @@
 
 耗子面板是新一代企业级全能服务器运维管理面板。简单轻量，高效运维。
 
-QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[tom.moe](https://tom.moe)
+QQ群：[12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | 微信群：[复制此链接](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | 论坛：[bbs.haozi.net](https://bbs.haozi.net)
 
 ## 优势
 
@@ -98,11 +98,11 @@ curl -fsLm 10 -o uninstall.sh https://dl.cdn.haozi.net/panel/uninstall.sh && bas
 panel-cli
 ```
 
-在 [文档](https://tom.moe/docs?category=57) 中查看更多使用方法和技巧。
+在 [文档](https://bbs.haozi.net/docs?category=57) 中查看更多使用方法和技巧。
 
 ## 问题反馈
 
-使用类问题，可在 [Moe Tom](https://tom.moe) 提问或寻求 AI 帮助，亦可在群里寻求付费支持。
+使用类问题，可在 [Moe Tom](https://bbs.haozi.net) 提问或寻求 AI 帮助，亦可在群里寻求付费支持。
 
 面板自身问题，可在 GitHub 的`Issues`页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
 

@@ -35,7 +35,7 @@ func initCli() {
 	cli.SubcommandHelpTemplate = strings.ReplaceAll(cli.SubcommandHelpTemplate, "OPTIONS", "选项")
 
 	cli.RootCommandHelpTemplate += "\n官网：https://panel.haozi.net"
-	cli.RootCommandHelpTemplate += "\n论坛：https://tom.moe"
+	cli.RootCommandHelpTemplate += "\n论坛：https://bbs.haozi.net"
 	cli.RootCommandHelpTemplate += "\nQ群：12370907\n"
 
 	cmd := &cli.Command{

@@ -14,7 +14,7 @@
 
 Rat Panel is a new generation of enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
 
-QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [tom.moe](https://tom.moe)
+QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [bbs.haozi.net](https://bbs.haozi.net)
 
 ## Advantages
 
@@ -98,11 +98,11 @@ Use `panel-cli` command for daily maintenance:
 panel-cli
 ```
 
-See more usage methods and tips in [Document](https://tom.moe/docs?category=57).
+See more usage methods and tips in [Document](https://bbs.haozi.net/docs?category=57).
 
 ## Feedback
 
-For usage issues, you can ask questions in the [Moe Tom](https://tom.moe) or seek AI help. You can also seek paid support in the group.
+For usage issues, you can ask questions in the [Moe Tom](https://bbs.haozi.net) or seek AI help. You can also seek paid support in the group.
 
 For issues with the panel itself, you can submit feedback on the `Issues` page of GitHub. Please note [the wisdom of asking questions](http://www.catb.org/~esr/faqs/smart-questions.html).
 

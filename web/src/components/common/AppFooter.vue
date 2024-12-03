@@ -20,14 +20,14 @@
         Q群 12370907
       </a>
       <n-divider vertical />
-      <a hover="decoration-primary color-primary" target="_blank" href="https://tom.moe/docs">
+      <a hover="decoration-primary color-primary" target="_blank" href="https://bbs.haozi.net/docs">
         使用文档
       </a>
       <n-divider vertical />
       <a
         hover="decoration-primary color-primary"
         target="_blank"
-        href="https://tom.moe/c/technical/panel"
+        href="https://bbs.haozi.net/c/technical/panel"
       >
         交流社区
       </a>
