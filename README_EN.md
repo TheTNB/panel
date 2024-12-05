@@ -110,7 +110,7 @@ For issues with the panel itself, you can submit feedback on the `Issues` page o
 
 If the Rat Panel is helpful to you, welcome to sponsor us, also thanks to the following supporters/sponsors:
 
-![Alipay](https://github.com/user-attachments/assets/fec37fdd-e78a-4ab7-8210-61e33397fb2f) ![WeChat](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
+![Alipay](https://github.com/user-attachments/assets/d000b147-6da1-467a-9d80-9a3e8078602a) ![WeChat](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
 
 ### Financial
 

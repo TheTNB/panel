@@ -110,7 +110,7 @@ panel-cli
 
 如果耗子面板对您有帮助，欢迎赞助我们，同时感谢以下支持者/赞助商的支持：
 
-![支付宝](https://github.com/user-attachments/assets/fec37fdd-e78a-4ab7-8210-61e33397fb2f) ![微信](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
+![支付宝](https://github.com/user-attachments/assets/d000b147-6da1-467a-9d80-9a3e8078602a) ![微信](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
 
 ### 资金
 
