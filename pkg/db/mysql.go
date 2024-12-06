@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	"net/url"
 	"regexp"
 	"slices"
 
@@ -19,6 +20,8 @@ type MySQL struct {
 }
 
 func NewMySQL(username, password, address string, typ ...string) (*MySQL, error) {
+	username = url.QueryEscape(username)
+	password = url.QueryEscape(password)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/", username, password, address)
 	if len(typ) > 0 && typ[0] == "unix" {
 		dsn = fmt.Sprintf("%s:%s@unix(%s)/", username, password, address)

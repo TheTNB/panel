@@ -42,6 +42,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 						})
 					}
 				}
+				_ = mysql.Close()
 			}
 		case biz.DatabaseTypePostgresql:
 			postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
@@ -58,6 +59,7 @@ func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 						})
 					}
 				}
+				_ = postgres.Close()
 			}
 		}
 	}
@@ -77,6 +79,7 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		if req.CreateUser {
 			if err = NewDatabaseUserRepo().Create(&request.DatabaseUserCreate{
 				ServerID: req.ServerID,
@@ -100,6 +103,7 @@ func (r databaseRepo) Create(req *request.DatabaseCreate) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		if req.CreateUser {
 			if err = NewDatabaseUserRepo().Create(&request.DatabaseUserCreate{
 				ServerID: req.ServerID,
@@ -138,12 +142,14 @@ func (r databaseRepo) Delete(serverID uint, name string) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		return mysql.DatabaseDrop(name)
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		return postgres.DatabaseDrop(name)
 	}
 
@@ -164,6 +170,7 @@ func (r databaseRepo) Comment(req *request.DatabaseComment) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		return postgres.DatabaseComment(req.Name, req.Comment)
 	}
 

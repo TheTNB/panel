@@ -63,6 +63,7 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		if err = mysql.UserCreate(req.Username, req.Password, req.Host); err != nil {
 			return err
 		}
@@ -81,6 +82,7 @@ func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		if err = postgres.UserCreate(req.Username, req.Password); err != nil {
 			return err
 		}
@@ -122,6 +124,7 @@ func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		if req.Password != "" {
 			if err = mysql.UserPassword(user.Username, req.Password, user.Host); err != nil {
 				return err
@@ -137,6 +140,7 @@ func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		if req.Password != "" {
 			if err = postgres.UserPassword(user.Username, req.Password); err != nil {
 				return err
@@ -183,12 +187,14 @@ func (r databaseUserRepo) Delete(id uint) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		_ = mysql.UserDrop(user.Username, user.Host)
 	case biz.DatabaseTypePostgresql:
 		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		_ = postgres.UserDrop(user.Username)
 	}
 
@@ -207,6 +213,7 @@ func (r databaseUserRepo) DeleteByNames(serverID uint, names []string) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		users := make([]*biz.DatabaseUser, 0)
 		if err = app.Orm.Where("server_id = ? AND username IN ?", serverID, names).Find(&users).Error; err != nil {
 			return err
@@ -226,6 +233,7 @@ func (r databaseUserRepo) DeleteByNames(serverID uint, names []string) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		for name := range slices.Values(names) {
 			_ = postgres.UserDrop(name)
 		}
@@ -246,10 +254,12 @@ func (r databaseUserRepo) fillUser(user *biz.DatabaseUser) {
 		case biz.DatabaseTypeMysql:
 			mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
 			if err == nil {
+				defer mysql.Close()
 				privileges, _ := mysql.UserPrivileges(user.Username, user.Host)
 				user.Privileges = privileges
 			}
-			if _, err := db.NewMySQL(user.Username, user.Password, fmt.Sprintf("%s:%d", server.Host, server.Port)); err == nil {
+			if mysql2, err := db.NewMySQL(user.Username, user.Password, fmt.Sprintf("%s:%d", server.Host, server.Port)); err == nil {
+				_ = mysql2.Close()
 				user.Status = biz.DatabaseUserStatusValid
 			} else {
 				user.Status = biz.DatabaseUserStatusInvalid
@@ -257,10 +267,12 @@ func (r databaseUserRepo) fillUser(user *biz.DatabaseUser) {
 		case biz.DatabaseTypePostgresql:
 			postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 			if err == nil {
+				defer postgres.Close()
 				privileges, _ := postgres.UserPrivileges(user.Username)
 				user.Privileges = privileges
 			}
-			if _, err := db.NewPostgres(user.Username, user.Password, server.Host, server.Port); err == nil {
+			if postgres2, err := db.NewPostgres(user.Username, user.Password, server.Host, server.Port); err == nil {
+				_ = postgres2.Close()
 				user.Status = biz.DatabaseUserStatusValid
 			} else {
 				user.Status = biz.DatabaseUserStatusInvalid

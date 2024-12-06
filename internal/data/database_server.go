@@ -130,6 +130,7 @@ func (r databaseServerRepo) Sync(id uint) error {
 		if err != nil {
 			return err
 		}
+		defer mysql.Close()
 		allUsers, err := mysql.Users()
 		if err != nil {
 			return err
@@ -154,6 +155,7 @@ func (r databaseServerRepo) Sync(id uint) error {
 		if err != nil {
 			return err
 		}
+		defer postgres.Close()
 		allUsers, err := postgres.Users()
 		if err != nil {
 			return err
@@ -179,20 +181,23 @@ func (r databaseServerRepo) Sync(id uint) error {
 func (r databaseServerRepo) checkServer(server *biz.DatabaseServer) bool {
 	switch server.Type {
 	case biz.DatabaseTypeMysql:
-		_, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		mysql, err := db.NewMySQL(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
 		if err == nil {
+			_ = mysql.Close()
 			server.Status = biz.DatabaseServerStatusValid
 			return true
 		}
 	case biz.DatabaseTypePostgresql:
-		_, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
+		postgres, err := db.NewPostgres(server.Username, server.Password, server.Host, server.Port)
 		if err == nil {
+			_ = postgres.Close()
 			server.Status = biz.DatabaseServerStatusValid
 			return true
 		}
 	case biz.DatabaseTypeRedis:
-		_, err := db.NewRedis(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
+		redis, err := db.NewRedis(server.Username, server.Password, fmt.Sprintf("%s:%d", server.Host, server.Port))
 		if err == nil {
+			_ = redis.Close()
 			server.Status = biz.DatabaseServerStatusValid
 			return true
 		}

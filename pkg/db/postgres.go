@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"slices"
+	"strings"
 
 	_ "github.com/lib/pq"
 
@@ -20,12 +21,14 @@ type Postgres struct {
 }
 
 func NewPostgres(username, password, address string, port uint) (*Postgres, error) {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable", address, port, username, password)
+	username = strings.ReplaceAll(username, `'`, `\'`)
+	password = strings.ReplaceAll(password, `'`, `\'`)
+	dsn := fmt.Sprintf(`host=%s port=%d user='%s' password='%s' dbname=postgres sslmode=disable`, address, port, username, password)
 	if password == "" {
 		if username == "" {
 			username = "postgres"
 		}
-		dsn = fmt.Sprintf("host=%s port=%d user=%s dbname=postgres sslmode=disable", address, port, username)
+		dsn = fmt.Sprintf(`host=%s port=%d user='%s' dbname=postgres sslmode=disable`, address, port, username)
 	}
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
