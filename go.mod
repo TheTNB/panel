@@ -32,7 +32,7 @@ require (
 	github.com/libdns/huaweicloud v0.3.1
 	github.com/libdns/libdns v0.2.2
 	github.com/libdns/tencentcloud v1.1.0
-	github.com/mholt/acmez/v2 v2.0.3
+	github.com/mholt/acmez/v3 v3.0.0-20241205212901-02868f041e58
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/do/v2 v2.0.0-beta.7
@@ -43,8 +43,6 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/tufanbarisyildirim/gonginx v0.0.0-20241205102811-323481085fb4
 	github.com/urfave/cli/v3 v3.0.0-beta1
-	go.uber.org/zap v1.27.0
-	go.uber.org/zap/exp v0.3.0
 	golang.org/x/crypto v0.30.0
 	golang.org/x/net v0.32.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
@@ -81,7 +79,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.14 // indirect
 	github.com/tklauser/numcpus v0.8.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
+	go.uber.org/goleak v1.3.0 // indirect
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
@@ -94,5 +92,5 @@ require (
 
 replace (
 	github.com/libdns/tencentcloud => github.com/devhaozi/tencentcloud v0.0.0-20241129095955-7d4e898ce504
-	github.com/mholt/acmez/v2 => github.com/TheTNB/acmez/v2 v2.0.0-20241025203320-cc718c4c870b
+	github.com/mholt/acmez/v3 => github.com/TheTNB/acmez/v3 v3.0.0-20241207104744-c778583fbd17
 )

@@ -12,7 +12,7 @@ import (
 	"github.com/libdns/huaweicloud"
 	"github.com/libdns/libdns"
 	"github.com/libdns/tencentcloud"
-	"github.com/mholt/acmez/v2/acme"
+	"github.com/mholt/acmez/v3/acme"
 	"golang.org/x/net/publicsuffix"
 
 	"github.com/TheTNB/panel/pkg/shell"
