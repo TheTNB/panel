@@ -16,7 +16,7 @@ importers:
         version: 5.1.1
       '@guolao/vue-monaco-editor':
         specifier: ^1.5.4
-        version: 1.5.4(monaco-editor@0.52.0)(vue@3.5.13(typescript@5.6.3))
+        version: 1.5.4(monaco-editor@0.52.2)(vue@3.5.13(typescript@5.6.3))
       '@vue-js-cron/naive-ui':
         specifier: ^2.0.9
         version: 2.0.9
@@ -149,7 +149,7 @@ importers:
         version: 5.0.2(@codemirror/view@6.35.2)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3))
       monaco-editor:
         specifier: ^0.52.0
-        version: 0.52.0
+        version: 0.52.2
       naive-ui:
         specifier: ^2.40.1
         version: 2.40.3(vue@3.5.13(typescript@5.6.3))
@@ -2681,8 +2681,8 @@ packages:
     resolution: {integrity: sha512-eQsKcWzIaZzEZ07NuEyO4Nw65g0hdWAyurVol1IPl1gahRwY+svqzfgfey8U8dahLwG44d6/RwEzuK52rSa/JQ==}
     hasBin: true
 
-  monaco-editor@0.52.0:
-    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
+  monaco-editor@0.52.2:
+    resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -4270,10 +4270,10 @@ snapshots:
 
   '@fontsource-variable/jetbrains-mono@5.1.1': {}
 
-  '@guolao/vue-monaco-editor@1.5.4(monaco-editor@0.52.0)(vue@3.5.13(typescript@5.6.3))':
+  '@guolao/vue-monaco-editor@1.5.4(monaco-editor@0.52.2)(vue@3.5.13(typescript@5.6.3))':
     dependencies:
-      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.0)
-      monaco-editor: 0.52.0
+      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.2)
+      monaco-editor: 0.52.2
       vue: 3.5.13(typescript@5.6.3)
       vue-demi: 0.14.10(vue@3.5.13(typescript@5.6.3))
 
@@ -4444,9 +4444,9 @@ snapshots:
       '@lezer/highlight': 1.2.1
       '@lezer/lr': 1.4.2
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.0)':
+  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.2)':
     dependencies:
-      monaco-editor: 0.52.0
+      monaco-editor: 0.52.2
       state-local: 1.0.7
 
   '@nodelib/fs.scandir@2.1.5':
@@ -6443,7 +6443,7 @@ snapshots:
     dependencies:
       commander: 12.1.0
 
-  monaco-editor@0.52.0: {}
+  monaco-editor@0.52.2: {}
 
   mri@1.2.0: {}
 
