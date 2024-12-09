@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 	"net"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/TheTNB/panel/internal/app"
 )
@@ -65,7 +65,7 @@ func MustLogin(next http.Handler) http.Handler {
 		if safeLogin {
 			safeClientHash := cast.ToString(sess.Get("safe_client"))
 			ip, _, _ := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
-			clientHash := fmt.Sprintf("%x", sha3.Sum256([]byte(ip)))
+			clientHash := fmt.Sprintf("%x", sha256.Sum256([]byte(ip)))
 			if safeClientHash != clientHash || safeClientHash == "" {
 				render := chix.NewRender(w)
 				render.Status(http.StatusUnauthorized)
