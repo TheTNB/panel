@@ -2,16 +2,12 @@ package bootstrap
 
 import (
 	"os"
-	"runtime/debug"
 )
 
 func boot() {
 	if os.Geteuid() != 0 {
 		panic("panel must run as root")
 	}
-
-	debug.SetGCPercent(10)
-	debug.SetMemoryLimit(64 << 20)
 
 	initConf()
 	initGlobal()
