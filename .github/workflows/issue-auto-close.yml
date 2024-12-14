@@ -1,7 +1,7 @@
 name: Issue Auto Lock
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
   issues:
     types: [ opened ]
