@@ -35,12 +35,6 @@ Website: [panel.haozi.net](https://panel.haozi.net) | QQ group: [12370907](https
 
 [https://ratpanel.github.io/quickstart/install.html](https://ratpanel.github.io/quickstart/install.html)
 
-## Feedback
-
-For usage issues, you can ask questions in the [Moe Tom](https://bbs.haozi.net) or seek AI help. You can also seek paid support in the group.
-
-For issues with the panel itself, you can submit feedback on the `Issues` page of GitHub. Please note [the wisdom of asking questions](http://www.catb.org/~esr/faqs/smart-questions.html).
-
 ## Sponsor
 
 If the Rat Panel is helpful to you, welcome to sponsor us, also thanks to the following supporters/sponsors:

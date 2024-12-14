@@ -35,12 +35,6 @@
 
 [https://ratpanel.github.io/quickstart/install.html](https://ratpanel.github.io/quickstart/install.html)
 
-## 问题反馈
-
-使用类问题，可在 [Moe Tom](https://bbs.haozi.net) 提问或寻求 AI 帮助，亦可在群里寻求付费支持。
-
-面板自身问题，可在 GitHub 的`Issues`页面提交问题反馈，注意[提问的智慧](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)。
-
 ## 赞助商
 
 如果耗子面板对您有帮助，欢迎赞助我们，同时感谢以下支持者/赞助商的支持：
