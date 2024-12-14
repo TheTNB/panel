@@ -35,26 +35,18 @@
 
 [https://ratpanel.github.io/quickstart/install.html](https://ratpanel.github.io/quickstart/install.html)
 
-## 赞助商
+## 合作伙伴
 
 如果耗子面板对您有帮助，欢迎赞助我们，同时感谢以下支持者/赞助商的支持：
 
 ![支付宝](https://github.com/user-attachments/assets/d000b147-6da1-467a-9d80-9a3e8078602a) ![微信](https://github.com/user-attachments/assets/a53ff212-7076-487e-88bd-c93f6e98df1d)
 
-### 资金
-
 <a href="https://www.weixiaoduo.com/">
   <img height="80" src=".github/assets/wxd.png" alt="微晓朵">
 </a>
-
-### 服务器
-
 <a href="https://www.dkdun.cn/aff/MQZZNVHQ">
   <img height="80" src=".github/assets/dk.png" alt="林枫云">
 </a>
-
-### CDN
-
 <a href="https://su.sctes.com/register?code=8st689ujpmm2p">
   <img height="80" src=".github/assets/sctes.png" alt="无畏云加速">
 </a>
@@ -64,31 +56,13 @@
 <a href="https://scdn.ddunyun.com/">
   <img height="80" src=".github/assets/ddunyun.png" alt="盾云SCDN">
 </a>
-
-### 合作伙伴
-
 <a href="https://1ms.run">
   <img height="80" src=".github/assets/1ms.svg" alt="毫秒镜像提供经过审核的 Docker 镜像加速服务">
 </a>
 
-### 赞助商们
-
 <p align="center">
   <a target="_blank" href="https://afdian.com/a/TheTNB">
     <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
-  </a>
-</p>
-
-## 贡献者
-
-这个项目的存在要归功于所有做出贡献的人，参与贡献请先查看贡献代码部分。
-
-<p align="center">
-  <a href="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors?repo_id=572922963&limit=30" target="_blank">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=572922963&limit=30&image_size=auto&color_scheme=dark" width="655" height="auto">
-      <img alt="Active Contributors of TheTNB/panel - Last 28 days" src="https://next.ossinsight.io/widgets/official/compose-recent-active-contributors/thumbnail.png?repo_id=572922963&limit=30&image_size=auto&color_scheme=light" width="655" height="auto">
-    </picture>
   </a>
 </p>
 
