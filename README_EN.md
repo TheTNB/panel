@@ -12,93 +12,28 @@
   <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
-Rat Panel is a new generation of enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
+Enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
 
-QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6) | Forum: [bbs.haozi.net](https://bbs.haozi.net)
+Website: [panel.haozi.net](https://panel.haozi.net) | QQ group: [12370907](https://jq.qq.com/?_wv=1027&k=I1oJKSTH) | WeChat group: [Copy this link](https://work.weixin.qq.com/gm/d8ebf618553398d454e3378695c858b6)
 
 ## Advantages
 
-1. **Extremely low usage:** Deploying the panel + LNMP environment under Debian, the memory usage is less than 500 MB, far ahead of other panels using containerization.
-2. **Low destructiveness:** The design concept of the panel is to minimize the additional modifications to the system. Among similar panels, we have made the least modifications to the system.
-3. **Follow the times:** All components of the panel are at the forefront of the times, updated quickly, powerful functions, and guaranteed security.
-4. **Efficient operation and maintenance:** The panel is simple and easy to operate, and you can quickly deploy various environments and adjust application settings without complicated configuration.
-5. **Offline operation:** The panel can run without relying on any external services. You can even stop the panel process after deployment is complete, and it will not affect the deployed services.
-6. **Tested by time:** We have been using it in production environment since 2022, and it has been running stably for 2 year without any accidents.
-7. **Open source and open:** The panel is open source, you can freely modify and audit the panel source code, and the security is guaranteed.
+1. **Extremely low occupancy:** Developed in Go language, small installation package, low occupancy, single file operation, will not affect system performance
+2. **Low Destructiveness:** Designed to minimize additional modifications to the system, we make the fewest modifications to the system among similar products
+3. **Follow the Times:** The overall design is at the forefront of the times, with good compatibility with new systems, leading in the same type of products
+4. **Efficient Operation and Maintenance:** Complete functions, strong customization capabilities, can quickly deploy small websites, and deploy complex applications based on customized requirements
+5. **Offline Operation:** Support offline mode, and even stop the panel process after deployment, without affecting any existing services
+6. **Safe and Stable:** The panel adopts a variety of industry technologies to ensure the security of the body, and has been running stably in multiple survival environments for a long time
+7. **Fully Open Source:** Few fully open source panels, you can freely modify and develop the panel on the premise of complying with the open source agreement
+8. **Permanently free:** Commit to the panel body will not introduce any charging/authorization functions in the future, and will be permanently free to use
 
 ## UI Screenshots
 
 ![UI Screenshots](.github/assets/ui.png)
 
-## Operating Environment
+## Quick Install
 
-Rat Panel supports mainstream systems under the `amd64` | `arm64` architecture, and the systems in the table below have been tested for LNMP environment installation.
-
-It is recommended to use the systems marked **Recommended** first, and not recommended to use the systems marked **Not recommended** without special circumstances.
-
-For other systems not listed in the table below, you can try to install them by yourself, but there is no technical support will be provided (accept related PR submissions).
-
-| OS                  | Version | Note            |
-|---------------------|---------|-----------------|
-| AlmaLinux           | 9       | Recommended     |
-| AlmaLinux           | 8       | Not recommended |
-| RockyLinux          | 9       | Support         |
-| RockyLinux          | 8       | Not recommended |
-| CentOS Stream       | 9       | Not recommended |
-| CentOS Stream       | 8       | Not recommended |
-| Ubuntu              | 24      | Recommended     |
-| Ubuntu              | 22      | Support         |
-| Debian              | 12      | Recommended     |
-| Debian              | 11      | Support         |
-| OpenCloudOS         | 9       | Support         |
-| TencentOS Server    | 4       | Support         |
-| TencentOS Server    | 3.1     | Not recommended |
-| Alibaba Cloud Linux | 3.2     | Not recommended |
-| Anolis              | 8       | Not recommended |
-| openEuler           | 22      | Not recommended |
-
-As system versions are constantly updated, we may also terminate support for some older systems to ensure the robustness of the panel.
-
-## Mount Disk
-
-If your server has an unmounted data disk, you can run the following command as the `root` user to automatically mount it before installation. The panel does not support cross-directory migration after installation.
-
-```shell
-curl -fsLm 10 -o auto_mount.sh https://dl.cdn.haozi.net/panel/auto_mount.sh && bash auto_mount.sh
-```
-
-## Install Panel
-
-> **Warning**
-> Before installing the panel, you need to understand the basic knowledge of the LNMP environment and how to deal with common LNMP environment problems. We are not recommended for users with zero basic knowledge to install and use Rat Panel.
-
-Login to the server as the `root` user and run the following command to install the panel:
-
-```shell
-curl -fsLm 10 -o install.sh https://dl.cdn.haozi.net/panel/install.sh && bash install.sh
-```
-
-## Uninstall Panel
-
-Recommended to back up data and reinstall the system first, so that the system can be kept clean.
-
-If you are unable to reinstall the system, log in to the server as the `root` user and execute the following command to uninstall the panel:
-
-```shell
-curl -fsLm 10 -o uninstall.sh https://dl.cdn.haozi.net/panel/uninstall.sh && bash uninstall.sh
-```
-
-Before uninstalling the panel, please be sure to back up all data and uninstall all panel plugins in advance. The data will **not be recoverable** after uninstallation!
-
-## Daily Maintenance
-
-Use `panel-cli` command for daily maintenance:
-
-```shell
-panel-cli
-```
-
-See more usage methods and tips in [Document](https://bbs.haozi.net/docs?category=57).
+[https://ratpanel.github.io/quickstart/install.html](https://ratpanel.github.io/quickstart/install.html)
 
 ## Feedback
 
@@ -172,7 +107,3 @@ This project owes its existence to all those who have contributed. To contribute
    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
  </picture>
 </a>
-
-## Disclaimer
-
-It is strictly prohibited to use the Rat Panel to engage in any illegal activities. Please do not request any form of technical support from us for illegal sites. If illegal content is discovered during the technical support process, we will immediately stop technical support and retain relevant evidence.

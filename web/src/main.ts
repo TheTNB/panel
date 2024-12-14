@@ -1,7 +1,7 @@
 import '@/styles/index.scss'
 import '@/styles/reset.css'
 import '@vue-js-cron/naive-ui/dist/naive-ui.css'
-import 'uno.css'
+import 'virtual:uno.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
