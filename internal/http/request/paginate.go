@@ -5,8 +5,8 @@ import (
 )
 
 type Paginate struct {
-	Page  uint `json:"page" form:"page" query:"page" validate:"required,number,gte=1"`
-	Limit uint `json:"limit" form:"limit" query:"limit" validate:"required,number,gte=1,lte=10000"`
+	Page  uint `json:"page" form:"page" query:"page" validate:"required|number|min:1"`
+	Limit uint `json:"limit" form:"limit" query:"limit" validate:"required|number|min:1|max:10000"`
 }
 
 func (r *Paginate) Messages(_ *http.Request) map[string]string {

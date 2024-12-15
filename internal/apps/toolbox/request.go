@@ -8,7 +8,7 @@ type DNS struct {
 }
 
 type SWAP struct {
-	Size int64 `form:"size" json:"size" validate:"gte=0"`
+	Size int64 `form:"size" json:"size" validate:"min:0"`
 }
 
 type Timezone struct {
@@ -20,7 +20,7 @@ type Time struct {
 }
 
 type Hostname struct {
-	Hostname string `form:"hostname" json:"hostname" validate:"required,regex=^[a-zA-Z0-9][a-zA-Z0-9-]{0，61}[a-zA-Z0-9]$"`
+	Hostname string `form:"hostname" json:"hostname" validate:"required|regex:^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$"`
 }
 
 type Hosts struct {
@@ -28,5 +28,5 @@ type Hosts struct {
 }
 
 type Password struct {
-	Password string `form:"password" json:"password" validate:"required,password"`
+	Password string `form:"password" json:"password" validate:"required|password"`
 }

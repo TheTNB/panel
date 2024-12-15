@@ -18,5 +18,5 @@ type CreateProcess struct {
 	User    string `form:"user" json:"user" validate:"required"`
 	Path    string `form:"path" json:"path" validate:"required"`
 	Command string `form:"command" json:"command" validate:"required"`
-	Num     int    `form:"num" json:"num" validate:"required,gte=1"`
+	Num     int    `form:"num" json:"num" validate:"required|min:1"`
 }

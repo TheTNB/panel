@@ -5,5 +5,5 @@ type UpdateConfig struct {
 }
 
 type SetRootPassword struct {
-	Password string `form:"password" json:"password" validate:"required,password"`
+	Password string `form:"password" json:"password" validate:"required|password"`
 }
