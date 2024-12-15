@@ -28,10 +28,10 @@ body:
   - type: input
     id: system
     attributes:
-      label: 操作系统及版本 (OS Version)
+      label: 系统版本 (OS Version)
       description: |
-        请提供操作系统及其版本号。
-        Please provide the operating system and its version number.
+        请提供服务器所使用的操作系统及其版本号。
+        Please provide the operating system and its version number used by the server.
       placeholder: "Ubuntu 24.04"
     validations:
       required: true
@@ -86,8 +86,8 @@ body:
         Please copy and paste any relevant log output.
         可以把文件拖入这个区域以添加日志文件。
         Files can be dragged into this area to add log files.
-        面板日志文件可在安装目录 `panel/storage/logs` 中找到。
-        Panel log files can be found in the installation directory `panel/storage/logs`.
+        面板日志文件可在面板目录 `storage/logs` 中找到。
+        Panel log files can be found in the panel directory `storage/logs`.
     validations:
       required: false
   - type: textarea
