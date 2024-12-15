@@ -4,5 +4,7 @@ package tools
 type NoopLogger struct{}
 
 func (NoopLogger) Errorf(format string, v ...any) {}
-func (NoopLogger) Warnf(format string, v ...any)  {}
+
+func (NoopLogger) Warnf(format string, v ...any) {}
+
 func (NoopLogger) Debugf(format string, v ...any) {}

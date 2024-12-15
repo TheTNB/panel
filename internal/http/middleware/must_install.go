@@ -2,11 +2,12 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/internal/biz"
 	"net/http"
 	"strings"
 
 	"github.com/go-rat/chix"
+
+	"github.com/TheTNB/panel/internal/biz"
 )
 
 // MustInstall 确保已安装应用
@@ -33,7 +34,7 @@ func MustInstall(app biz.AppRepo) func(next http.Handler) http.Handler {
 
 			flag := false
 			for _, s := range slugs {
-				if installed, _ := app.IsInstalled("slug = ?", s); installed { // TODO 优化实现
+				if installed, _ := app.IsInstalled("slug = ?", s); installed {
 					flag = true
 					break
 				}

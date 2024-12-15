@@ -1,11 +1,11 @@
 package job
 
 import (
-	"gorm.io/gorm"
 	"log/slog"
 	"time"
 
 	"github.com/spf13/cast"
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"

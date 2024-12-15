@@ -1,12 +1,12 @@
 package bootstrap
 
 import (
-	"github.com/knadh/koanf/v2"
 	"log/slog"
 	"path/filepath"
 
 	"github.com/glebarez/sqlite"
 	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/knadh/koanf/v2"
 	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/gorm"
 

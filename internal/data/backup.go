@@ -3,7 +3,6 @@ package data
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"os"
 	"path/filepath"
 	"slices"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/disk"
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"

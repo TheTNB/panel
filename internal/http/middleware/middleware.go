@@ -1,17 +1,18 @@
 package middleware
 
 import (
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-rat/sessions"
-	"github.com/google/wire"
-	"github.com/knadh/koanf/v2"
 	"log/slog"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-rat/sessions"
 	sessionmiddleware "github.com/go-rat/sessions/middleware"
 	"github.com/golang-cz/httplog"
+	"github.com/google/wire"
+	"github.com/knadh/koanf/v2"
+
+	"github.com/TheTNB/panel/internal/biz"
 )
 
 var ProviderSet = wire.NewSet(NewMiddlewares)

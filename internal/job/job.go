@@ -1,11 +1,13 @@
 package job
 
 import (
-	"github.com/TheTNB/panel/internal/biz"
+	"log/slog"
+
 	"github.com/google/wire"
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
-	"log/slog"
+
+	"github.com/TheTNB/panel/internal/biz"
 )
 
 var ProviderSet = wire.NewSet(NewJobs)

@@ -2,13 +2,14 @@ package bootstrap
 
 import (
 	"crypto/tls"
+	"log/slog"
+	"net/http"
+
 	"github.com/bddjr/hlfhr"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/sessions"
 	"github.com/knadh/koanf/v2"
 	"gorm.io/gorm"
-	"log/slog"
-	"net/http"
 
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/route"

@@ -1,12 +1,12 @@
 package bootstrap
 
 import (
-	"github.com/TheTNB/panel/internal/job"
 	"log/slog"
 
 	"github.com/knadh/koanf/v2"
 	"github.com/robfig/cron/v3"
 
+	"github.com/TheTNB/panel/internal/job"
 	pkgcron "github.com/TheTNB/panel/pkg/cron"
 )
 

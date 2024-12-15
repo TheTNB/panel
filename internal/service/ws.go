@@ -3,11 +3,11 @@ package service
 import (
 	"bufio"
 	"context"
-	"github.com/knadh/koanf/v2"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
+	"github.com/knadh/koanf/v2"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"

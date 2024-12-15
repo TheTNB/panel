@@ -3,10 +3,12 @@ package data
 import (
 	"errors"
 	"fmt"
-	"gorm.io/gorm"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/go-rat/utils/str"
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -15,7 +17,6 @@ import (
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/go-rat/utils/str"
 )
 
 type cronRepo struct {

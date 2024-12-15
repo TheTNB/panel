@@ -1,12 +1,13 @@
 package job
 
 import (
-	"gorm.io/gorm"
 	"log/slog"
 	"math/rand/v2"
 	"runtime"
 	"runtime/debug"
 	"time"
+
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"

@@ -2,13 +2,14 @@ package data
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/pkg/queue"
-	"gorm.io/gorm"
 	"log/slog"
+
+	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/queuejob"
+	"github.com/TheTNB/panel/pkg/queue"
 )
 
 type taskRepo struct {

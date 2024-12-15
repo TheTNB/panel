@@ -2,11 +2,12 @@ package data
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/internal/app"
-	"gorm.io/gorm"
 	"log/slog"
 	"slices"
 
+	"gorm.io/gorm"
+
+	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"

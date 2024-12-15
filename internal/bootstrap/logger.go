@@ -1,12 +1,13 @@
 package bootstrap
 
 import (
-	"github.com/knadh/koanf/v2"
 	"log/slog"
 	"path/filepath"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/knadh/koanf/v2"
 	"gopkg.in/natefinch/lumberjack.v2"
+
+	"github.com/TheTNB/panel/internal/app"
 )
 
 func NewLog(conf *koanf.Koanf) *slog.Logger {
