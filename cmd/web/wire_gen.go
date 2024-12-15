@@ -10,6 +10,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/bootstrap"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/route"
 	"github.com/TheTNB/panel/internal/service"
 )
@@ -94,7 +95,11 @@ func initWeb() (*app.Web, error) {
 		return nil, err
 	}
 	gormigrate := bootstrap.NewMigrate(db)
-	cron := bootstrap.NewCron(koanf, logger)
+	jobs := job.NewJobs(db, logger, settingRepo, certRepo, backupRepo, cacheRepo)
+	cron, err := bootstrap.NewCron(koanf, logger, jobs)
+	if err != nil {
+		return nil, err
+	}
 	validation := bootstrap.NewValidator(db)
 	web := app.NewWeb(koanf, mux, server, gormigrate, cron, validation)
 	return web, nil

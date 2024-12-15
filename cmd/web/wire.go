@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/TheTNB/panel/internal/job"
 	"github.com/google/wire"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -14,5 +15,5 @@ import (
 
 // initWeb init application.
 func initWeb() (*app.Web, error) {
-	panic(wire.Build(bootstrap.ProviderSet, route.ProviderSet, service.ProviderSet, data.ProviderSet, app.NewWeb))
+	panic(wire.Build(bootstrap.ProviderSet, route.ProviderSet, service.ProviderSet, data.ProviderSet, job.ProviderSet, app.NewWeb))
 }

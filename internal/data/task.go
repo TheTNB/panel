@@ -70,7 +70,7 @@ func (r *taskRepo) Push(task *biz.Task) error {
 	})
 }
 
-// TODO fix
+// TODO 修复此功能
 func (r *taskRepo) DispatchWaiting() {
 	// cli下不处理
 	if app.IsCli {
