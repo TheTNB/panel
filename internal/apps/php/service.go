@@ -243,7 +243,7 @@ func (s *Service) getExtensions() []Extension {
 		{
 			Name:        "Redis",
 			Slug:        "redis",
-			Description: "PhpRedis 是一个用 C 语言编写的 PHP 模块，用来连接并操作 Redis 数据库上的数据",
+			Description: "PhpRedis 是一个用 C 语言编写的 PHP 模块，用来连接并操作 Redis 数据库上的数据（需先安装 igbinary）",
 		},
 		{
 			Name:        "Memcached",
@@ -263,7 +263,7 @@ func (s *Service) getExtensions() []Extension {
 		{
 			Name:        "pdo_pgsql",
 			Slug:        "pdo_pgsql",
-			Description: "pdo_pgsql 是一个驱动程序，它实现了 PHP 数据对象（PDO）接口以启用从 PHP 到 PostgreSQL 数据库的访问（需先安装PostgreSQL）",
+			Description: "pdo_pgsql 是一个驱动程序，它实现了 PHP 数据对象（PDO）接口以启用从 PHP 到 PostgreSQL 数据库的访问（需先安装 PostgreSQL）",
 		},
 		{
 			Name:        "imap",
