@@ -1,6 +1,8 @@
 package biz
 
 import (
+	"github.com/TheTNB/panel/internal/app"
+	"github.com/go-rat/utils/crypt"
 	"time"
 
 	"gorm.io/gorm"
@@ -21,31 +23,38 @@ type SSH struct {
 }
 
 func (r *SSH) BeforeSave(tx *gorm.DB) error {
-	// TODO fix
-	/*var err error
-	r.Config.Key, err = app.Crypter.Encrypt([]byte(r.Config.Key))
+	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
 	if err != nil {
 		return err
 	}
-	r.Config.Password, err = app.Crypter.Encrypt([]byte(r.Config.Password))
+
+	r.Config.Key, err = crypter.Encrypt([]byte(r.Config.Key))
 	if err != nil {
 		return err
-	}*/
+	}
+	r.Config.Password, err = crypter.Encrypt([]byte(r.Config.Password))
+	if err != nil {
+		return err
+	}
 
 	return nil
 
 }
 
 func (r *SSH) AfterFind(tx *gorm.DB) error {
-	// TODO fix
-	/*key, err := app.Crypter.Decrypt(r.Config.Key)
+	crypter, err := crypt.NewXChacha20Poly1305([]byte(app.Key))
+	if err != nil {
+		return err
+	}
+
+	key, err := crypter.Decrypt(r.Config.Key)
 	if err == nil {
 		r.Config.Key = string(key)
 	}
-	password, err := app.Crypter.Decrypt(r.Config.Password)
+	password, err := crypter.Decrypt(r.Config.Password)
 	if err == nil {
 		r.Config.Password = string(password)
-	}*/
+	}
 
 	return nil
 }
