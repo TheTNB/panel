@@ -21,41 +21,24 @@ body:
           required: true
         - label: 我已经阅读了文档中除版本记录以外的所有内容 (I've read everything in the documentation except the version notes)
           required: true
-        - label: 我没有改动过面板及系统的任何文件 (I have not changed any files of the panel and system)
-          required: false
         - label: 这个问题可以被稳定复现 (The problem can be stably reproduced)
           required: false
         - label: 问题是在更新之后产生的 (The problem is generated after upgrading)
           required: false
-  - type: dropdown
+  - type: input
     id: system
     attributes:
-      label: 操作系统 (Operating System)
+      label: 操作系统及版本 (OS Version)
       description: |
-        请提供安装面板的操作系统。
-        Please provide the operating system on which the panel is installed.
-      options:
-        - Debian
-        - Ubuntu
-        - AlmaLinux
-        - RockyLinux
-        - Other
-    validations:
-      required: true
-  - type: input
-    id: system-version
-    attributes:
-      label: 操作系统版本 (Operating System Version)
-      description: |
-        请提供操作系统的版本号。
-        Please provide the version number of the operating system.
-      placeholder: "12"
+        请提供操作系统及其版本号。
+        Please provide the operating system and its version number.
+      placeholder: "Ubuntu 24.04"
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: 耗子面板版本 (Rat Panel Version)
+      label: 面板版本 (Panel Version)
       description: |
         请提供面板的版本号。
         Please provide the version number of the panel.
@@ -93,7 +76,7 @@ body:
         简明概要地描述您期望发生的事情。
         Briefly describe what you expect to happen.
     validations:
-      required: true
+      required: false
   - type: textarea
     id: logs
     attributes:
