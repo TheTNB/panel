@@ -2,12 +2,16 @@ package rule
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
+// Exists 验证一个值在某个表中的字段中存在，支持同时判断多个字段
+// Exists verify a value exists in a table field, support judging multiple fields at the same time
+// 用法：exists:表名称,字段名称,字段名称,字段名称
+// Usage: exists:table_name,field_name,field_name,field_name
+// 例子：exists:users,phone,email
+// Example: exists:users,phone,email
 type Exists struct {
 	DB *gorm.DB
 }
@@ -16,20 +20,17 @@ func NewExists(db *gorm.DB) *Exists {
 	return &Exists{DB: db}
 }
 
-// Exists 格式 `exists=categories id other_field`
-func (r *Exists) Exists(fl validator.FieldLevel) bool {
-	requestValue := fl.Field().Interface()
-	params := strings.Fields(fl.Param())
-	if len(params) < 2 {
+func (r *Exists) Passes(val any, options ...any) bool {
+	if len(options) < 2 {
 		return false
 	}
 
-	tableName := params[0]
-	fieldNames := params[1:]
+	tableName := options[0].(string)
+	fieldNames := options[1:]
 
-	query := r.DB.Table(tableName).Where(fmt.Sprintf("%s = ?", fieldNames[0]), requestValue)
+	query := r.DB.Table(tableName).Where(fmt.Sprintf("%s = ?", fieldNames[0]), val)
 	for _, fieldName := range fieldNames[1:] {
-		query = query.Or(fmt.Sprintf("%s = ?", fieldName), requestValue)
+		query = query.Or(fmt.Sprintf("%s = ?", fieldName), val)
 	}
 
 	var count int64

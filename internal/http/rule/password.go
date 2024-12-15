@@ -3,18 +3,18 @@ package rule
 import (
 	"unicode"
 
-	"github.com/go-playground/validator/v10"
+	"github.com/spf13/cast"
 )
 
+// Password 密码复杂度校验
 type Password struct{}
 
 func NewPassword() *Password {
 	return &Password{}
 }
 
-// Password 密码复杂度校验
-func (r *Password) Password(fl validator.FieldLevel) bool {
-	password := fl.Field().String()
+func (r *Password) Passes(val any, options ...any) bool {
+	password := cast.ToString(val)
 	// 不对空密码进行校验，有需要可以使用 required 标签
 	if password == "" {
 		return true

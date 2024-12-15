@@ -1,0 +1,11 @@
+with-expecter: True
+disable-version-string: True
+dir: mocks/{{ replaceAll .InterfaceDirRelative "internal" "" }}
+mockname: "{{.InterfaceName}}"
+outpkg: "{{.PackageName}}"
+filename: "{{.InterfaceName}}.go"
+all: True
+packages:
+  github.com/TheTNB/panel/internal/biz:
+    config:
+      recursive: True

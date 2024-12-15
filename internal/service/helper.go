@@ -1,16 +1,14 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"slices"
 	"strings"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/go-rat/chix"
+	"github.com/gookit/validate"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -53,7 +51,7 @@ func ErrorSystem(w http.ResponseWriter) {
 	render.Header(chix.HeaderContentType, chix.MIMEApplicationJSONCharsetUTF8) // must before Status()
 	render.Status(http.StatusInternalServerError)
 	render.JSON(&ErrorResponse{
-		Message: "系统内部错误",
+		Message: http.StatusText(http.StatusInternalServerError),
 	})
 }
 
@@ -64,12 +62,6 @@ func Bind[T any](r *http.Request) (*T, error) {
 	// 绑定参数
 	binder := chix.NewBind(r)
 	defer binder.Release()
-	if err := binder.URI(req); err != nil {
-		return nil, err
-	}
-	if err := binder.Query(req); err != nil {
-		return nil, err
-	}
 	if slices.Contains([]string{"POST", "PUT", "PATCH", "DELETE"}, strings.ToUpper(r.Method)) {
 		if r.ContentLength > 0 {
 			if err := binder.Body(req); err != nil {
@@ -77,48 +69,58 @@ func Bind[T any](r *http.Request) (*T, error) {
 			}
 		}
 	}
+	if err := binder.Query(req); err != nil {
+		return nil, err
+	}
+	if err := binder.URI(req); err != nil {
+		return nil, err
+	}
 
 	// 准备验证
+	df, err := validate.FromStruct(req)
+	if err != nil {
+		return nil, err
+	}
+	v := df.Create()
+
 	if reqWithPrepare, ok := any(req).(request.WithPrepare); ok {
-		if err := reqWithPrepare.Prepare(r); err != nil {
+		if err = reqWithPrepare.Prepare(r); err != nil {
 			return nil, err
 		}
 	}
 	if reqWithAuthorize, ok := any(req).(request.WithAuthorize); ok {
-		if err := reqWithAuthorize.Authorize(r); err != nil {
+		if err = reqWithAuthorize.Authorize(r); err != nil {
 			return nil, err
 		}
 	}
 	if reqWithRules, ok := any(req).(request.WithRules); ok {
 		if rules := reqWithRules.Rules(r); rules != nil {
-			app.Validator.RegisterStructValidationMapRules(rules, req)
+			for key, value := range rules {
+				v.StringRule(key, value)
+			}
+		}
+	}
+	if reqWithFilters, ok := any(req).(request.WithFilters); ok {
+		if filters := reqWithFilters.Filters(r); filters != nil {
+			v.FilterRules(filters)
+		}
+	}
+	if reqWithMessages, ok := any(req).(request.WithMessages); ok {
+		if messages := reqWithMessages.Messages(r); messages != nil {
+			v.AddMessages(messages)
 		}
 	}
 
-	// 验证参数
-	err := app.Validator.Struct(req)
-	if err == nil {
+	// 开始验证
+	if v.Validate() && v.IsSuccess() {
 		return req, nil
 	}
 
-	// 翻译错误信息
-	var errs validator.ValidationErrors
-	if errors.As(err, &errs) {
-		for _, e := range errs {
-			if reqWithMessages, ok := any(req).(request.WithMessages); ok {
-				if msg, found := reqWithMessages.Messages(r)[fmt.Sprintf("%s.%s", e.Field(), e.Tag())]; found {
-					return nil, errors.New(msg)
-				}
-			}
-			return nil, errors.New(e.Translate(*app.Translator)) // nolint:staticcheck
-		}
-	}
-
-	return nil, err
+	return nil, v.Errors.OneError()
 }
 
 // Paginate 取分页条目
-func Paginate[T any](r *http.Request, allItems []T) (pagedItems []T, total uint) {
+func Paginate[T any](r *http.Request, items []T) (pagedItems []T, total uint) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
 		req = &request.Paginate{
@@ -126,19 +128,19 @@ func Paginate[T any](r *http.Request, allItems []T) (pagedItems []T, total uint)
 			Limit: 10,
 		}
 	}
-	total = uint(len(allItems))
-	startIndex := (req.Page - 1) * req.Limit
-	endIndex := req.Page * req.Limit
+	total = uint(len(items))
+	start := (req.Page - 1) * req.Limit
+	end := req.Page * req.Limit
 
 	if total == 0 {
 		return []T{}, 0
 	}
-	if startIndex > total {
+	if start > total {
 		return []T{}, total
 	}
-	if endIndex > total {
-		endIndex = total
+	if end > total {
+		end = total
 	}
 
-	return allItems[startIndex:endIndex], total
+	return items[start:end], total
 }
