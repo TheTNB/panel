@@ -6,7 +6,6 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/queuejob"
 	"github.com/TheTNB/panel/pkg/queue"
@@ -69,32 +68,4 @@ func (r *taskRepo) Push(task *biz.Task) error {
 	return r.queue.Push(queuejob.NewProcessTask(r.log, r), []any{
 		task.ID,
 	})
-}
-
-// TODO 修复此功能
-func (r *taskRepo) DispatchWaiting() {
-	// cli下不处理
-	if app.IsCli {
-		return
-	}
-
-	if err := r.db.Model(&biz.Task{}).Where("status = ?", biz.TaskStatusRunning).Update("status", biz.TaskStatusFailed).Error; err != nil {
-		r.log.Warn("failed to mark running tasks as failed", slog.Any("err", err))
-		return
-	}
-
-	var tasks []biz.Task
-	if err := r.db.Where("status = ?", biz.TaskStatusWaiting).Find(&tasks).Error; err != nil {
-		r.log.Warn("failed to get pending tasks", slog.Any("err", err))
-		return
-	}
-
-	for _, task := range tasks {
-		if err := r.queue.Push(queuejob.NewProcessTask(r.log, r), []any{
-			task.ID,
-		}); err != nil {
-			r.log.Warn("failed to push task", slog.Any("err", err))
-			return
-		}
-	}
 }

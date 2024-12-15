@@ -2,20 +2,18 @@ package bootstrap
 
 import (
 	"crypto/tls"
-	"log/slog"
+	"fmt"
 	"net/http"
 
 	"github.com/bddjr/hlfhr"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-rat/sessions"
 	"github.com/knadh/koanf/v2"
-	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/route"
 )
 
-func NewRouter(conf *koanf.Koanf, db *gorm.DB, log *slog.Logger, session *sessions.Manager, middlewares *middleware.Middlewares, http *route.Http, ws *route.Ws) (*chi.Mux, error) {
+func NewRouter(middlewares *middleware.Middlewares, http *route.Http, ws *route.Ws) (*chi.Mux, error) {
 	r := chi.NewRouter()
 
 	// add middleware
@@ -30,7 +28,7 @@ func NewRouter(conf *koanf.Koanf, db *gorm.DB, log *slog.Logger, session *sessio
 
 func NewHttp(conf *koanf.Koanf, r *chi.Mux) (*hlfhr.Server, error) {
 	srv := hlfhr.New(&http.Server{
-		Addr:           conf.MustString("http.address"),
+		Addr:           fmt.Sprintf(":%d", conf.MustInt("http.port")),
 		Handler:        http.AllowQuerySemicolons(r),
 		MaxHeaderBytes: 2048 << 20,
 	})

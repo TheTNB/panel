@@ -40,6 +40,7 @@ type Http struct {
 	monitor          *service.MonitorService
 	setting          *service.SettingService
 	systemctl        *service.SystemctlService
+	apps             *apps.Loader
 }
 
 func NewHttp(
@@ -68,6 +69,7 @@ func NewHttp(
 	monitor *service.MonitorService,
 	setting *service.SettingService,
 	systemctl *service.SystemctlService,
+	apps *apps.Loader,
 ) *Http {
 	return &Http{
 		user:             user,
@@ -95,6 +97,7 @@ func NewHttp(
 		monitor:          monitor,
 		setting:          setting,
 		systemctl:        systemctl,
+		apps:             apps,
 	}
 }
 
@@ -344,7 +347,7 @@ func (route *Http) Register(r *chi.Mux) {
 		})
 
 		r.Route("/apps", func(r chi.Router) {
-			apps.Boot(r)
+			route.apps.Register(r)
 		})
 	})
 

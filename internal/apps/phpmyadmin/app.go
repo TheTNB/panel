@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
@@ -17,13 +18,20 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) Info(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/info", s.Info)
+	r.Post("/port", s.UpdatePort)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+}
+
+func (s *App) Info(w http.ResponseWriter, r *http.Request) {
 	files, err := io.ReadDir(fmt.Sprintf("%s/server/phpmyadmin", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "找不到 phpMyAdmin 目录")
@@ -58,7 +66,7 @@ func (s *Service) Info(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdatePort(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdatePort](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -98,7 +106,7 @@ func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/vhost/phpmyadmin.conf", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -108,7 +116,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

@@ -1,19 +1,12 @@
 package app
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"runtime"
-	"syscall"
-	"time"
+	"path/filepath"
 
 	"github.com/bddjr/hlfhr"
-	"github.com/cloudflare/tableflip"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/gookit/validate"
@@ -51,73 +44,18 @@ func (r *Web) Run() error {
 	fmt.Println("[CRON] cron scheduler started")
 
 	// run http server
-	if runtime.GOOS != "windows" {
-		return r.runServer()
-	}
-
-	return r.runServerFallback()
-}
-
-// runServer graceful run server
-func (r *Web) runServer() error {
-	upg, err := tableflip.New(tableflip.Options{})
-	if err != nil {
-		return err
-	}
-	defer upg.Stop()
-
-	// By prefixing PID to log, easy to interrupt from another process.
-	log.SetPrefix(fmt.Sprintf("[PID %d]", os.Getpid()))
-
-	// Listen for the process signal to trigger the tableflip upgrade.
-	go func() {
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGHUP)
-		for range sig {
-			if err = upg.Upgrade(); err != nil {
-				log.Println("[Graceful] upgrade failed:", err)
-			}
+	if r.conf.Bool("http.tls") {
+		cert := filepath.Join(Root, "panel/storage/cert.pem")
+		key := filepath.Join(Root, "panel/storage/cert.key")
+		fmt.Println("[HTTP] listening and serving on port", r.conf.MustInt("http.port"), "with tls")
+		if err := r.server.ListenAndServeTLS(cert, key); !errors.Is(err, http.ErrServerClosed) {
+			return err
 		}
-	}()
-
-	ln, err := upg.Listen("tcp", r.conf.MustString("http.address"))
-	if err != nil {
-		return err
-	}
-	defer ln.Close()
-
-	fmt.Println("[HTTP] listening and serving on", r.conf.MustString("http.address"))
-	go func() {
-		if err = r.server.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
-			log.Println("[HTTP] server error:", err)
+	} else {
+		fmt.Println("[HTTP] listening and serving on port", r.conf.MustInt("http.port"))
+		if err := r.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			return err
 		}
-	}()
-
-	// tableflip ready
-	if err = upg.Ready(); err != nil {
-		return err
-	}
-
-	fmt.Println("[Graceful] ready for upgrade")
-	<-upg.Exit()
-
-	// Make sure to set a deadline on exiting the process
-	// after upg.Exit() is closed. No new upgrades can be
-	// performed if the parent doesn't exit.
-	time.AfterFunc(60*time.Second, func() {
-		log.Println("[Graceful] shutdown timeout, force exit")
-		os.Exit(1)
-	})
-
-	// Wait for connections to drain.
-	return r.server.Shutdown(context.Background())
-}
-
-// runServerFallback fallback for windows
-func (r *Web) runServerFallback() error {
-	fmt.Println("[HTTP] listening and serving on", r.conf.MustString("http.address"))
-	if err := r.server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-		return err
 	}
 
 	return nil

@@ -3,18 +3,25 @@ package docker
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+}
+
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/docker/daemon.json")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -24,7 +31,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

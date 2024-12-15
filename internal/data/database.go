@@ -5,24 +5,30 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/TheTNB/panel/internal/app"
+	"gorm.io/gorm"
+
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
 )
 
 type databaseRepo struct {
+	db     *gorm.DB
 	server biz.DatabaseServerRepo
 	user   biz.DatabaseUserRepo
 }
 
-func NewDatabaseRepo(server biz.DatabaseServerRepo, user biz.DatabaseUserRepo) biz.DatabaseRepo {
-	return &databaseRepo{server: server, user: user}
+func NewDatabaseRepo(db *gorm.DB, server biz.DatabaseServerRepo, user biz.DatabaseUserRepo) biz.DatabaseRepo {
+	return &databaseRepo{
+		db:     db,
+		server: server,
+		user:   user,
+	}
 }
 
 func (r databaseRepo) List(page, limit uint) ([]*biz.Database, int64, error) {
 	var databaseServer []*biz.DatabaseServer
-	if err := app.Orm.Model(&biz.DatabaseServer{}).Order("id desc").Find(&databaseServer).Error; err != nil {
+	if err := r.db.Model(&biz.DatabaseServer{}).Order("id desc").Find(&databaseServer).Error; err != nil {
 		return nil, 0, err
 	}
 

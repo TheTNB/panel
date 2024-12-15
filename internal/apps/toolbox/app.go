@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
@@ -18,14 +19,30 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
+}
+
+func (s *App) Route(r chi.Router) {
+	r.Get("/dns", s.GetDNS)
+	r.Post("/dns", s.UpdateDNS)
+	r.Get("/swap", s.GetSWAP)
+	r.Post("/swap", s.UpdateSWAP)
+	r.Get("/timezone", s.GetTimezone)
+	r.Post("/timezone", s.UpdateTimezone)
+	r.Post("/time", s.UpdateTime)
+	r.Post("/syncTime", s.SyncTime)
+	r.Get("/hostname", s.GetHostname)
+	r.Post("/hostname", s.UpdateHostname)
+	r.Get("/hosts", s.GetHosts)
+	r.Post("/hosts", s.UpdateHosts)
+	r.Post("/rootPassword", s.UpdateRootPassword)
 }
 
 // GetDNS 获取 DNS 信息
-func (s *Service) GetDNS(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetDNS(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/resolv.conf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -46,7 +63,7 @@ func (s *Service) GetDNS(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateDNS 设置 DNS 信息
-func (s *Service) UpdateDNS(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateDNS(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[DNS](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -66,7 +83,7 @@ func (s *Service) UpdateDNS(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetSWAP 获取 SWAP 信息
-func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetSWAP(w http.ResponseWriter, r *http.Request) {
 	var total, used, free string
 	var size int64
 	if io.Exists(filepath.Join(app.Root, "swap")) {
@@ -104,7 +121,7 @@ func (s *Service) GetSWAP(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateSWAP 设置 SWAP 信息
-func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SWAP](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -172,7 +189,7 @@ func (s *Service) UpdateSWAP(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetTimezone 获取时区
-func (s *Service) GetTimezone(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetTimezone(w http.ResponseWriter, r *http.Request) {
 	raw, err := shell.Execf("timedatectl | grep zone")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取时区信息失败")
@@ -207,7 +224,7 @@ func (s *Service) GetTimezone(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateTimezone 设置时区
-func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Timezone](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -223,7 +240,7 @@ func (s *Service) UpdateTimezone(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateTime 设置时间
-func (s *Service) UpdateTime(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateTime(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Time](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -240,7 +257,7 @@ func (s *Service) UpdateTime(w http.ResponseWriter, r *http.Request) {
 }
 
 // SyncTime 同步时间
-func (s *Service) SyncTime(w http.ResponseWriter, r *http.Request) {
+func (s *App) SyncTime(w http.ResponseWriter, r *http.Request) {
 	now, err := ntp.Now()
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -256,13 +273,13 @@ func (s *Service) SyncTime(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetHostname 获取主机名
-func (s *Service) GetHostname(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetHostname(w http.ResponseWriter, r *http.Request) {
 	hostname, _ := io.Read("/etc/hostname")
 	service.Success(w, strings.TrimSpace(hostname))
 }
 
 // UpdateHostname 设置主机名
-func (s *Service) UpdateHostname(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateHostname(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Hostname](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -281,13 +298,13 @@ func (s *Service) UpdateHostname(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetHosts 获取 hosts 信息
-func (s *Service) GetHosts(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetHosts(w http.ResponseWriter, r *http.Request) {
 	hosts, _ := io.Read("/etc/hosts")
 	service.Success(w, hosts)
 }
 
 // UpdateHosts 设置 hosts 信息
-func (s *Service) UpdateHosts(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateHosts(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Hosts](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -303,7 +320,7 @@ func (s *Service) UpdateHosts(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateRootPassword 设置 root 密码
-func (s *Service) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateRootPassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Password](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
@@ -15,18 +16,24 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
-type Service struct {
+type App struct {
 	settingRepo biz.SettingRepo
 }
 
-func NewService() *Service {
-	return &Service{
-		settingRepo: nil, // TODO fixme
+func NewApp(setting biz.SettingRepo) *App {
+	return &App{
+		settingRepo: setting,
 	}
 }
 
+func (s *App) Route(r chi.Router) {
+	r.Get("/mounts", s.List)
+	r.Post("/mounts", s.Create)
+	r.Delete("/mounts", s.Delete)
+}
+
 // List 所有 S3fs 挂载
-func (s *Service) List(w http.ResponseWriter, r *http.Request) {
+func (s *App) List(w http.ResponseWriter, r *http.Request) {
 	var s3fsList []Mount
 	list, err := s.settingRepo.Get("s3fs", "[]")
 	if err != nil {
@@ -48,7 +55,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create 添加 S3fs 挂载
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
+func (s *App) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -133,7 +140,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete 删除 S3fs 挂载
-func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *App) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
@@ -14,11 +15,11 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct {
+type App struct {
 	name string
 }
 
-func NewService() *Service {
+func NewApp() *App {
 	var name string
 	if os.IsRHEL() {
 		name = "supervisord"
@@ -26,18 +27,35 @@ func NewService() *Service {
 		name = "supervisor"
 	}
 
-	return &Service{
+	return &App{
 		name: name,
 	}
 }
 
+func (s *App) Route(r chi.Router) {
+	r.Get("/service", s.Service)
+	r.Post("/clearLog", s.ClearLog)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+	r.Get("/processes", s.Processes)
+	r.Post("/processes/{process}/start", s.StartProcess)
+	r.Post("/processes/{process}/stop", s.StopProcess)
+	r.Post("/processes/{process}/restart", s.RestartProcess)
+	r.Get("/processes/{process}/log", s.ProcessLog)
+	r.Post("/processes/{process}/clearLog", s.ClearProcessLog)
+	r.Get("/processes/{process}", s.ProcessConfig)
+	r.Post("/processes/{process}", s.UpdateProcessConfig)
+	r.Delete("/processes/{process}", s.DeleteProcess)
+	r.Post("/processes", s.CreateProcess)
+}
+
 // Service 获取服务名称
-func (s *Service) Service(w http.ResponseWriter, r *http.Request) {
+func (s *App) Service(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, s.name)
 }
 
 // ClearLog 清空日志
-func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf(`echo "" > /var/log/supervisor/supervisord.log`); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -47,7 +65,7 @@ func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetConfig 获取配置
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	var config string
 	var err error
 	if os.IsRHEL() {
@@ -65,7 +83,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateConfig 保存配置
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -92,7 +110,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // Processes 进程列表
-func (s *Service) Processes(w http.ResponseWriter, r *http.Request) {
+func (s *App) Processes(w http.ResponseWriter, r *http.Request) {
 	out, err := shell.Execf(`supervisorctl status | awk '{print $1}'`)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -131,7 +149,7 @@ func (s *Service) Processes(w http.ResponseWriter, r *http.Request) {
 }
 
 // StartProcess 启动进程
-func (s *Service) StartProcess(w http.ResponseWriter, r *http.Request) {
+func (s *App) StartProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -147,7 +165,7 @@ func (s *Service) StartProcess(w http.ResponseWriter, r *http.Request) {
 }
 
 // StopProcess 停止进程
-func (s *Service) StopProcess(w http.ResponseWriter, r *http.Request) {
+func (s *App) StopProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -163,7 +181,7 @@ func (s *Service) StopProcess(w http.ResponseWriter, r *http.Request) {
 }
 
 // RestartProcess 重启进程
-func (s *Service) RestartProcess(w http.ResponseWriter, r *http.Request) {
+func (s *App) RestartProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -179,7 +197,7 @@ func (s *Service) RestartProcess(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProcessLog 进程日志
-func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ProcessLog(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -202,7 +220,7 @@ func (s *Service) ProcessLog(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClearProcessLog 清空进程日志
-func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -230,7 +248,7 @@ func (s *Service) ClearProcessLog(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProcessConfig 获取进程配置
-func (s *Service) ProcessConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) ProcessConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -253,7 +271,7 @@ func (s *Service) ProcessConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateProcessConfig 保存进程配置
-func (s *Service) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateProcessConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -279,7 +297,7 @@ func (s *Service) UpdateProcessConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateProcess 添加进程
-func (s *Service) CreateProcess(w http.ResponseWriter, r *http.Request) {
+func (s *App) CreateProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[CreateProcess](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -318,7 +336,7 @@ stdout_logfile_maxbytes=2MB
 }
 
 // DeleteProcess 删除进程
-func (s *Service) DeleteProcess(w http.ResponseWriter, r *http.Request) {
+func (s *App) DeleteProcess(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ProcessName](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

@@ -32,10 +32,6 @@ func (r *Monitoring) Run() {
 		return
 	}
 
-	// 将等待中的任务分发
-	//task := data.NewTaskRepo()
-	//_ = task.DispatchWaiting()
-
 	monitor, err := r.settingRepo.Get(biz.SettingKeyMonitor)
 	if err != nil || !cast.ToBool(monitor) {
 		return

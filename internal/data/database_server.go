@@ -7,7 +7,6 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
@@ -120,7 +119,7 @@ func (r databaseServerRepo) Delete(id uint) error {
 
 // ClearUsers 删除指定服务器的所有用户，只是删除面板记录，不会实际删除
 func (r databaseServerRepo) ClearUsers(serverID uint) error {
-	return app.Orm.Where("server_id = ?", serverID).Delete(&biz.DatabaseUser{}).Error
+	return r.db.Where("server_id = ?", serverID).Delete(&biz.DatabaseUser{}).Error
 }
 
 func (r databaseServerRepo) Sync(id uint) error {

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
@@ -13,14 +15,24 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
+}
+
+func (s *App) Route(r chi.Router) {
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+	r.Get("/userConfig", s.GetUserConfig)
+	r.Post("/userConfig", s.UpdateUserConfig)
+	r.Get("/load", s.Load)
+	r.Get("/log", s.Log)
+	r.Post("/clearLog", s.ClearLog)
 }
 
 // GetConfig 获取配置
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	// 获取配置
 	config, err := io.Read(fmt.Sprintf("%s/server/postgresql/data/postgresql.conf", app.Root))
 	if err != nil {
@@ -32,7 +44,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateConfig 保存配置
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -53,7 +65,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetUserConfig 获取用户配置
-func (s *Service) GetUserConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetUserConfig(w http.ResponseWriter, r *http.Request) {
 	// 获取配置
 	config, err := io.Read(fmt.Sprintf("%s/server/postgresql/data/pg_hba.conf", app.Root))
 	if err != nil {
@@ -65,7 +77,7 @@ func (s *Service) GetUserConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateUserConfig 保存用户配置
-func (s *Service) UpdateUserConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateUserConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -86,7 +98,7 @@ func (s *Service) UpdateUserConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // Load 获取负载
-func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
+func (s *App) Load(w http.ResponseWriter, r *http.Request) {
 	status, _ := systemctl.Status("postgresql")
 	if !status {
 		service.Success(w, []types.NV{})
@@ -131,12 +143,12 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 }
 
 // Log 获取日志
-func (s *Service) Log(w http.ResponseWriter, r *http.Request) {
+func (s *App) Log(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, fmt.Sprintf("%s/server/postgresql/logs/postgresql-%s.log", app.Root, time.Now().Format(time.DateOnly)))
 }
 
 // ClearLog 清空日志
-func (s *Service) ClearLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("rm -rf %s/server/postgresql/logs/postgresql-*.log", app.Root); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return

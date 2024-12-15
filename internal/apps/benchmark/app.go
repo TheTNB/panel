@@ -21,18 +21,24 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/service"
 )
 
-type Service struct {
+type App struct {
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
+}
+
+func (s *App) Route(r chi.Router) {
+	r.Post("/test", s.Test)
 }
 
 // Test 运行测试
-func (s *Service) Test(w http.ResponseWriter, r *http.Request) {
+func (s *App) Test(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Test](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -73,7 +79,7 @@ func (s *Service) Test(w http.ResponseWriter, r *http.Request) {
 }
 
 // calculateCpuScore 计算CPU成绩
-func (s *Service) calculateCpuScore(duration time.Duration) int {
+func (s *App) calculateCpuScore(duration time.Duration) int {
 	score := int((10 / duration.Seconds()) * float64(3000))
 
 	if score < 0 {
@@ -83,7 +89,7 @@ func (s *Service) calculateCpuScore(duration time.Duration) int {
 }
 
 // calculateScore 计算内存/硬盘成绩
-func (s *Service) calculateScore(duration time.Duration) int {
+func (s *App) calculateScore(duration time.Duration) int {
 	score := int((20 / duration.Seconds()) * float64(30000))
 
 	if score < 0 {
@@ -94,7 +100,7 @@ func (s *Service) calculateScore(duration time.Duration) int {
 
 // 图像处理
 
-func (s *Service) imageProcessing(multi bool) int {
+func (s *App) imageProcessing(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -107,7 +113,7 @@ func (s *Service) imageProcessing(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) imageProcessingTask(numThreads int) error {
+func (s *App) imageProcessingTask(numThreads int) error {
 	img := image.NewRGBA(image.Rect(0, 0, 4000, 4000))
 	for x := 0; x < 4000; x++ {
 		for y := 0; y < 4000; y++ {
@@ -156,7 +162,7 @@ func (s *Service) imageProcessingTask(numThreads int) error {
 
 // 机器学习（矩阵乘法）
 
-func (s *Service) machineLearning(multi bool) int {
+func (s *App) machineLearning(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -167,7 +173,7 @@ func (s *Service) machineLearning(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) machineLearningTask(numThreads int) {
+func (s *App) machineLearningTask(numThreads int) {
 	size := 900
 	a := make([][]float64, size)
 	b := make([][]float64, size)
@@ -214,7 +220,7 @@ func (s *Service) machineLearningTask(numThreads int) {
 
 // 数学问题（计算斐波那契数）
 
-func (s *Service) compileSimulationSingle(multi bool) int {
+func (s *App) compileSimulationSingle(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -248,7 +254,7 @@ func (s *Service) compileSimulationSingle(multi bool) int {
 }
 
 // 斐波那契函数
-func (s *Service) fib(n int) *big.Int {
+func (s *App) fib(n int) *big.Int {
 	if n < 2 {
 		return big.NewInt(int64(n))
 	}
@@ -265,7 +271,7 @@ func (s *Service) fib(n int) *big.Int {
 
 // AES加密
 
-func (s *Service) encryptionTest(multi bool) int {
+func (s *App) encryptionTest(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -278,7 +284,7 @@ func (s *Service) encryptionTest(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) encryptionTestTask(numThreads int) error {
+func (s *App) encryptionTestTask(numThreads int) error {
 	key := []byte("abcdefghijklmnopqrstuvwxyz123456")
 	dataSize := 1 * 1024 * 1024 * 1024 // 1GB
 	plaintext := []byte(strings.Repeat("A", dataSize))
@@ -320,7 +326,7 @@ func (s *Service) encryptionTestTask(numThreads int) error {
 
 // 压缩/解压缩
 
-func (s *Service) compressionTest(multi bool) int {
+func (s *App) compressionTest(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -331,7 +337,7 @@ func (s *Service) compressionTest(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) compressionTestTask(numThreads int) {
+func (s *App) compressionTestTask(numThreads int) {
 	data := []byte(strings.Repeat("耗子面板", 50000000))
 	chunkSize := len(data) / numThreads
 
@@ -381,7 +387,7 @@ func (s *Service) compressionTestTask(numThreads int) {
 
 // 物理仿真（N体问题）
 
-func (s *Service) physicsSimulation(multi bool) int {
+func (s *App) physicsSimulation(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -392,7 +398,7 @@ func (s *Service) physicsSimulation(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) physicsSimulationTask(numThreads int) {
+func (s *App) physicsSimulationTask(numThreads int) {
 	const (
 		numBodies = 4000
 		steps     = 30
@@ -479,7 +485,7 @@ func (s *Service) physicsSimulationTask(numThreads int) {
 
 // JSON解析
 
-func (s *Service) jsonProcessing(multi bool) int {
+func (s *App) jsonProcessing(multi bool) int {
 	n := 1
 	if multi {
 		n = runtime.NumCPU()
@@ -490,7 +496,7 @@ func (s *Service) jsonProcessing(multi bool) int {
 	return s.calculateCpuScore(duration)
 }
 
-func (s *Service) jsonProcessingTask(numThreads int) {
+func (s *App) jsonProcessingTask(numThreads int) {
 	numElements := 1000000
 	elementsPerThread := numElements / numThreads
 
@@ -531,7 +537,7 @@ func (s *Service) jsonProcessingTask(numThreads int) {
 
 // 内存性能
 
-func (s *Service) memoryTestTask() map[string]any {
+func (s *App) memoryTestTask() map[string]any {
 	results := make(map[string]any)
 	dataSize := 500 * 1024 * 1024 // 500 MB
 	data := make([]byte, dataSize)
@@ -549,7 +555,7 @@ func (s *Service) memoryTestTask() map[string]any {
 	return results
 }
 
-func (s *Service) memoryBandwidthTest(data []byte) string {
+func (s *App) memoryBandwidthTest(data []byte) string {
 	dataSize := len(data)
 
 	startTime := time.Now()
@@ -566,7 +572,7 @@ func (s *Service) memoryBandwidthTest(data []byte) string {
 	return fmt.Sprintf("%.2f MB/s", speed)
 }
 
-func (s *Service) memoryLatencyTest(data []byte) string {
+func (s *App) memoryLatencyTest(data []byte) string {
 	dataSize := len(data)
 	indices := rand.Perm(dataSize)
 
@@ -585,7 +591,7 @@ func (s *Service) memoryLatencyTest(data []byte) string {
 
 // 硬盘IO
 
-func (s *Service) diskTestTask() map[string]any {
+func (s *App) diskTestTask() map[string]any {
 	results := make(map[string]any)
 	blockSizes := []int64{4 * 1024, 64 * 1024, 512 * 1024, 1 * 1024 * 1024} // 4K, 64K, 512K, 1M
 	fileSize := int64(100 * 1024 * 1024)                                    // 100MB 文件
@@ -601,7 +607,7 @@ func (s *Service) diskTestTask() map[string]any {
 	return results
 }
 
-func (s *Service) diskIOTest(blockSize int64, fileSize int64) map[string]any {
+func (s *App) diskIOTest(blockSize int64, fileSize int64) map[string]any {
 	result := make(map[string]any)
 	tempFile := fmt.Sprintf("tempfile_%d", blockSize)
 	defer os.Remove(tempFile)
@@ -619,7 +625,7 @@ func (s *Service) diskIOTest(blockSize int64, fileSize int64) map[string]any {
 	return result
 }
 
-func (s *Service) diskWriteTest(fileName string, blockSize int64, fileSize int64) (float64, float64) {
+func (s *App) diskWriteTest(fileName string, blockSize int64, fileSize int64) (float64, float64) {
 	totalBlocks := fileSize / blockSize
 
 	data := make([]byte, blockSize)
@@ -653,7 +659,7 @@ func (s *Service) diskWriteTest(fileName string, blockSize int64, fileSize int64
 	return speed, iops
 }
 
-func (s *Service) diskReadTest(fileName string, blockSize int64, fileSize int64) (float64, float64) {
+func (s *App) diskReadTest(fileName string, blockSize int64, fileSize int64) (float64, float64) {
 	totalBlocks := fileSize / blockSize
 
 	data := make([]byte, blockSize)

@@ -3,18 +3,27 @@ package podman
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) GetRegistryConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/registryConfig", s.GetRegistryConfig)
+	r.Post("/registryConfig", s.UpdateRegistryConfig)
+	r.Get("/storageConfig", s.GetStorageConfig)
+	r.Post("/storageConfig", s.UpdateStorageConfig)
+}
+
+func (s *App) GetRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/containers/registries.conf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -24,7 +33,7 @@ func (s *Service) GetRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateRegistryConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -44,7 +53,7 @@ func (s *Service) UpdateRegistryConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) GetStorageConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetStorageConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/containers/storage.conf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -54,7 +63,7 @@ func (s *Service) GetStorageConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateStorageConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateStorageConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

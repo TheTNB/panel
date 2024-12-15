@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
@@ -16,14 +17,23 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
+}
+
+func (s *App) Route(r chi.Router) {
+	r.Get("/users", s.List)
+	r.Post("/users", s.Create)
+	r.Delete("/users/{username}", s.Delete)
+	r.Post("/users/{username}/password", s.ChangePassword)
+	r.Get("/port", s.GetPort)
+	r.Post("/port", s.UpdatePort)
 }
 
 // List 获取用户列表
-func (s *Service) List(w http.ResponseWriter, r *http.Request) {
+func (s *App) List(w http.ResponseWriter, r *http.Request) {
 	listRaw, err := shell.Execf("pure-pw list")
 	if err != nil {
 		service.Success(w, chix.M{
@@ -55,7 +65,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create 创建用户
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
+func (s *App) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -91,7 +101,7 @@ func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete 删除用户
-func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *App) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -111,7 +121,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 // ChangePassword 修改密码
-func (s *Service) ChangePassword(w http.ResponseWriter, r *http.Request) {
+func (s *App) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[ChangePassword](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -131,7 +141,7 @@ func (s *Service) ChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetPort 获取端口
-func (s *Service) GetPort(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetPort(w http.ResponseWriter, r *http.Request) {
 	port, err := shell.Execf(`cat %s/server/pure-ftpd/etc/pure-ftpd.conf | grep "Bind" | awk '{print $2}' | awk -F "," '{print $2}'`, app.Root)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取PureFtpd端口失败")
@@ -142,7 +152,7 @@ func (s *Service) GetPort(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdatePort 设置端口
-func (s *Service) UpdatePort(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdatePort(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdatePort](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

@@ -5,7 +5,6 @@ go 1.23
 require (
 	github.com/bddjr/hlfhr v1.3.5
 	github.com/beevik/ntp v1.4.3
-	github.com/cloudflare/tableflip v1.2.3
 	github.com/creack/pty v1.1.24
 	github.com/expr-lang/expr v1.16.9
 	github.com/glebarez/sqlite v1.11.0

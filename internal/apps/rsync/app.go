@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/go-rat/utils/str"
 
@@ -15,13 +16,22 @@ import (
 	"github.com/TheTNB/panel/pkg/systemctl"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) List(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/modules", s.List)
+	r.Post("/modules", s.Create)
+	r.Post("/modules/{name}", s.Update)
+	r.Delete("/modules/{name}", s.Delete)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+}
+
+func (s *App) List(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -86,7 +96,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
+func (s *App) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Create](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -131,7 +141,7 @@ secrets file = /etc/rsyncd.secrets
 	service.Success(w, nil)
 }
 
-func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *App) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -173,7 +183,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) Update(w http.ResponseWriter, r *http.Request) {
+func (s *App) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Update](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -229,7 +239,7 @@ secrets file = /etc/rsyncd.secrets
 	service.Success(w, nil)
 }
 
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/rsyncd.conf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -239,7 +249,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

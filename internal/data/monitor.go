@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 )
@@ -53,12 +52,12 @@ func (r monitorRepo) UpdateSetting(setting *request.MonitorSetting) error {
 }
 
 func (r monitorRepo) Clear() error {
-	return app.Orm.Where("1 = 1").Delete(&biz.Monitor{}).Error
+	return r.db.Where("1 = 1").Delete(&biz.Monitor{}).Error
 }
 
 func (r monitorRepo) List(start, end time.Time) ([]*biz.Monitor, error) {
 	var monitors []*biz.Monitor
-	if err := app.Orm.Where("created_at BETWEEN ? AND ?", start, end).Find(&monitors).Error; err != nil {
+	if err := r.db.Where("created_at BETWEEN ? AND ?", start, end).Find(&monitors).Error; err != nil {
 		return nil, err
 	}
 

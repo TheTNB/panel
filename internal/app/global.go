@@ -1,13 +1,5 @@
 package app
 
-import (
-	"gorm.io/gorm"
-)
-
-var (
-	Orm *gorm.DB
-)
-
 // 面板状态常量
 const (
 	StatusNormal = iota

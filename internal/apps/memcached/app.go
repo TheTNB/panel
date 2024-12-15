@@ -6,19 +6,27 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/go-chi/chi/v5"
+
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/systemctl"
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Service struct{}
+type App struct{}
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/load", s.Load)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+}
+
+func (s *App) Load(w http.ResponseWriter, r *http.Request) {
 	status, err := systemctl.Status("memcached")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "failed to get Memcached status: %v", err)
@@ -66,7 +74,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, data)
 }
 
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read("/etc/systemd/system/memcached.service")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
@@ -76,7 +84,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)

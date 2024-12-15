@@ -8,6 +8,25 @@ package main
 
 import (
 	"github.com/TheTNB/panel/internal/app"
+	"github.com/TheTNB/panel/internal/apps"
+	"github.com/TheTNB/panel/internal/apps/benchmark"
+	"github.com/TheTNB/panel/internal/apps/docker"
+	"github.com/TheTNB/panel/internal/apps/fail2ban"
+	"github.com/TheTNB/panel/internal/apps/frp"
+	"github.com/TheTNB/panel/internal/apps/gitea"
+	"github.com/TheTNB/panel/internal/apps/memcached"
+	"github.com/TheTNB/panel/internal/apps/mysql"
+	"github.com/TheTNB/panel/internal/apps/nginx"
+	"github.com/TheTNB/panel/internal/apps/php"
+	"github.com/TheTNB/panel/internal/apps/phpmyadmin"
+	"github.com/TheTNB/panel/internal/apps/podman"
+	"github.com/TheTNB/panel/internal/apps/postgresql"
+	"github.com/TheTNB/panel/internal/apps/pureftpd"
+	"github.com/TheTNB/panel/internal/apps/redis"
+	"github.com/TheTNB/panel/internal/apps/rsync"
+	"github.com/TheTNB/panel/internal/apps/s3fs"
+	"github.com/TheTNB/panel/internal/apps/supervisor"
+	"github.com/TheTNB/panel/internal/apps/toolbox"
 	"github.com/TheTNB/panel/internal/bootstrap"
 	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/middleware"
@@ -45,8 +64,8 @@ func initWeb() (*app.Web, error) {
 	userRepo := data.NewUserRepo(db)
 	userService := service.NewUserService(koanf, manager, userRepo)
 	databaseServerRepo := data.NewDatabaseServerRepo(db, logger)
-	databaseUserRepo := data.NewDatabaseUserRepo(databaseServerRepo)
-	databaseRepo := data.NewDatabaseRepo(databaseServerRepo, databaseUserRepo)
+	databaseUserRepo := data.NewDatabaseUserRepo(db, databaseServerRepo)
+	databaseRepo := data.NewDatabaseRepo(db, databaseServerRepo, databaseUserRepo)
 	certRepo := data.NewCertRepo(db)
 	certAccountRepo := data.NewCertAccountRepo(db, userRepo)
 	websiteRepo := data.NewWebsiteRepo(db, cacheRepo, databaseRepo, databaseServerRepo, databaseUserRepo, certRepo, certAccountRepo)
@@ -85,10 +104,29 @@ func initWeb() (*app.Web, error) {
 	monitorService := service.NewMonitorService(settingRepo, monitorRepo)
 	settingService := service.NewSettingService(settingRepo)
 	systemctlService := service.NewSystemctlService()
-	http := route.NewHttp(userService, dashboardService, taskService, websiteService, databaseService, databaseServerService, databaseUserService, backupService, certService, certDNSService, certAccountService, appService, cronService, processService, safeService, firewallService, sshService, containerService, containerNetworkService, containerImageService, containerVolumeService, fileService, monitorService, settingService, systemctlService)
+	benchmarkApp := benchmark.NewApp()
+	dockerApp := docker.NewApp()
+	fail2banApp := fail2ban.NewApp(websiteRepo)
+	frpApp := frp.NewApp()
+	giteaApp := gitea.NewApp()
+	memcachedApp := memcached.NewApp()
+	mysqlApp := mysql.NewApp(settingRepo)
+	nginxApp := nginx.NewApp()
+	phpApp := php.NewApp(taskRepo)
+	phpmyadminApp := phpmyadmin.NewApp()
+	podmanApp := podman.NewApp()
+	postgresqlApp := postgresql.NewApp()
+	pureftpdApp := pureftpd.NewApp()
+	redisApp := redis.NewApp()
+	rsyncApp := rsync.NewApp()
+	s3fsApp := s3fs.NewApp(settingRepo)
+	supervisorApp := supervisor.NewApp()
+	toolboxApp := toolbox.NewApp()
+	loader := apps.NewLoader(benchmarkApp, dockerApp, fail2banApp, frpApp, giteaApp, memcachedApp, mysqlApp, nginxApp, phpApp, phpmyadminApp, podmanApp, postgresqlApp, pureftpdApp, redisApp, rsyncApp, s3fsApp, supervisorApp, toolboxApp)
+	http := route.NewHttp(userService, dashboardService, taskService, websiteService, databaseService, databaseServerService, databaseUserService, backupService, certService, certDNSService, certAccountService, appService, cronService, processService, safeService, firewallService, sshService, containerService, containerNetworkService, containerImageService, containerVolumeService, fileService, monitorService, settingService, systemctlService, loader)
 	wsService := service.NewWsService(koanf, sshRepo)
 	ws := route.NewWs(wsService)
-	mux, err := bootstrap.NewRouter(koanf, db, logger, manager, middlewares, http, ws)
+	mux, err := bootstrap.NewRouter(middlewares, http, ws)
 	if err != nil {
 		return nil, err
 	}

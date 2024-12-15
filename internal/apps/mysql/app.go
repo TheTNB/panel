@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -19,18 +20,29 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Service struct {
+type App struct {
 	settingRepo biz.SettingRepo
 }
 
-func NewService() *Service {
-	return &Service{
-		settingRepo: nil, // TODO fixme
+func NewApp(setting biz.SettingRepo) *App {
+	return &App{
+		settingRepo: setting,
 	}
 }
 
+func (s *App) Route(r chi.Router) {
+	r.Get("/load", s.Load)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.UpdateConfig)
+	r.Post("/clearErrorLog", s.ClearErrorLog)
+	r.Get("/slowLog", s.SlowLog)
+	r.Post("/clearSlowLog", s.ClearSlowLog)
+	r.Get("/rootPassword", s.GetRootPassword)
+	r.Post("/rootPassword", s.SetRootPassword)
+}
+
 // GetConfig 获取配置
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(app.Root + "/server/mysql/conf/my.cnf")
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取配置失败")
@@ -41,7 +53,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateConfig 保存配置
-func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -62,7 +74,7 @@ func (s *Service) UpdateConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 // Load 获取负载
-func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
+func (s *App) Load(w http.ResponseWriter, r *http.Request) {
 	rootPassword, err := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取root密码失败")
@@ -142,7 +154,7 @@ func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
 }
 
 // ClearErrorLog 清空错误日志
-func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if err := systemctl.LogsClear("mysqld"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -152,12 +164,12 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 }
 
 // SlowLog 获取慢查询日志
-func (s *Service) SlowLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) SlowLog(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, fmt.Sprintf("%s/server/mysql/mysql-slow.log", app.Root))
 }
 
 // ClearSlowLog 清空慢查询日志
-func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/server/mysql/mysql-slow.log", app.Root); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -167,7 +179,7 @@ func (s *Service) ClearSlowLog(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetRootPassword 获取root密码
-func (s *Service) GetRootPassword(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetRootPassword(w http.ResponseWriter, r *http.Request) {
 	rootPassword, err := s.settingRepo.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取root密码失败")
@@ -182,7 +194,7 @@ func (s *Service) GetRootPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 // SetRootPassword 设置root密码
-func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
+func (s *App) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SetRootPassword](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -212,7 +224,7 @@ func (s *Service) SetRootPassword(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) getSock() string {
+func (s *App) getSock() string {
 	if io.Exists("/tmp/mysql.sock") {
 		return "/tmp/mysql.sock"
 	}

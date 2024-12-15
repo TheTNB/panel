@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
 
@@ -18,15 +19,23 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type Service struct {
+type App struct {
 	// Dependent services
 }
 
-func NewService() *Service {
-	return &Service{}
+func NewApp() *App {
+	return &App{}
 }
 
-func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) Route(r chi.Router) {
+	r.Get("/load", s.Load)
+	r.Get("/config", s.GetConfig)
+	r.Post("/config", s.SaveConfig)
+	r.Get("/errorLog", s.ErrorLog)
+	r.Post("/clearErrorLog", s.ClearErrorLog)
+}
+
+func (s *App) GetConfig(w http.ResponseWriter, r *http.Request) {
 	config, err := io.Read(fmt.Sprintf("%s/server/nginx/conf/nginx.conf", app.Root))
 	if err != nil {
 		service.Error(w, http.StatusInternalServerError, "获取配置失败")
@@ -36,7 +45,7 @@ func (s *Service) GetConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, config)
 }
 
-func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
+func (s *App) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[UpdateConfig](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -57,11 +66,11 @@ func (s *Service) SaveConfig(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) ErrorLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ErrorLog(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, fmt.Sprintf("%s/%s", app.Root, "wwwlogs/nginx-error.log"))
 }
 
-func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
+func (s *App) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	if _, err := shell.Execf("echo '' > %s/%s", app.Root, "wwwlogs/nginx-error.log"); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -70,7 +79,7 @@ func (s *Service) ClearErrorLog(w http.ResponseWriter, r *http.Request) {
 	service.Success(w, nil)
 }
 
-func (s *Service) Load(w http.ResponseWriter, r *http.Request) {
+func (s *App) Load(w http.ResponseWriter, r *http.Request) {
 	client := resty.New().SetTimeout(10 * time.Second)
 	resp, err := client.R().Get("http://127.0.0.1/nginx_status")
 	if err != nil || !resp.IsSuccess() {

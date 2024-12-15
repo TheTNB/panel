@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-rat/chix"
 	"github.com/go-rat/utils/str"
 	"github.com/spf13/cast"
@@ -17,18 +18,28 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
-type Service struct {
+type App struct {
 	websiteRepo biz.WebsiteRepo
 }
 
-func NewService() *Service {
-	return &Service{
-		websiteRepo: nil, // TODO fixme
+func NewApp(website biz.WebsiteRepo) *App {
+	return &App{
+		websiteRepo: website,
 	}
 }
 
+func (s *App) Route(r chi.Router) {
+	r.Get("/jails", s.List)
+	r.Post("/jails", s.Create)
+	r.Delete("/jails", s.Delete)
+	r.Get("/jails/{name}", s.BanList)
+	r.Post("/unban", s.Unban)
+	r.Post("/whiteList", s.SetWhiteList)
+	r.Get("/whiteList", s.GetWhiteList)
+}
+
 // List 所有规则
-func (s *Service) List(w http.ResponseWriter, r *http.Request) {
+func (s *App) List(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -75,7 +86,7 @@ func (s *Service) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // Create 添加规则
-func (s *Service) Create(w http.ResponseWriter, r *http.Request) {
+func (s *App) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Add](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -202,7 +213,7 @@ bantime = ` + jailBanTime + `
 }
 
 // Delete 删除规则
-func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *App) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Delete](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -236,7 +247,7 @@ func (s *Service) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 // BanList 获取封禁列表
-func (s *Service) BanList(w http.ResponseWriter, r *http.Request) {
+func (s *App) BanList(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[BanList](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -281,7 +292,7 @@ func (s *Service) BanList(w http.ResponseWriter, r *http.Request) {
 }
 
 // Unban 解封
-func (s *Service) Unban(w http.ResponseWriter, r *http.Request) {
+func (s *App) Unban(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[Unban](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -297,7 +308,7 @@ func (s *Service) Unban(w http.ResponseWriter, r *http.Request) {
 }
 
 // SetWhiteList 设置白名单
-func (s *Service) SetWhiteList(w http.ResponseWriter, r *http.Request) {
+func (s *App) SetWhiteList(w http.ResponseWriter, r *http.Request) {
 	req, err := service.Bind[SetWhiteList](r)
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -331,7 +342,7 @@ func (s *Service) SetWhiteList(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetWhiteList 获取白名单
-func (s *Service) GetWhiteList(w http.ResponseWriter, r *http.Request) {
+func (s *App) GetWhiteList(w http.ResponseWriter, r *http.Request) {
 	raw, err := io.Read("/etc/fail2ban/jail.local")
 	if err != nil {
 		service.Error(w, http.StatusUnprocessableEntity, "%v", err)
