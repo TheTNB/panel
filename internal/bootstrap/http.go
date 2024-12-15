@@ -14,11 +14,11 @@ import (
 	"github.com/TheTNB/panel/internal/route"
 )
 
-func NewRouter(conf *koanf.Koanf, db *gorm.DB, log *slog.Logger, session *sessions.Manager, http *route.Http, ws *route.Ws) (*chi.Mux, error) {
+func NewRouter(conf *koanf.Koanf, db *gorm.DB, log *slog.Logger, session *sessions.Manager, middlewares *middleware.Middlewares, http *route.Http, ws *route.Ws) (*chi.Mux, error) {
 	r := chi.NewRouter()
 
 	// add middleware
-	r.Use(middleware.GlobalMiddleware(r, conf, db, log, session)...)
+	r.Use(middlewares.Globals(r)...)
 	// add http route
 	http.Register(r)
 	// add ws route

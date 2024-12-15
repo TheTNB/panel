@@ -10,6 +10,7 @@ import (
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/bootstrap"
 	"github.com/TheTNB/panel/internal/data"
+	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/job"
 	"github.com/TheTNB/panel/internal/route"
 	"github.com/TheTNB/panel/internal/service"
@@ -36,18 +37,19 @@ func initWeb() (*app.Web, error) {
 	if err != nil {
 		return nil, err
 	}
-	userRepo := data.NewUserRepo(db)
-	userService := service.NewUserService(koanf, manager, userRepo)
+	cacheRepo := data.NewCacheRepo(db)
 	queue := bootstrap.NewQueue()
 	taskRepo := data.NewTaskRepo(db, logger, queue)
-	cacheRepo := data.NewCacheRepo(db)
+	appRepo := data.NewAppRepo(db, cacheRepo, taskRepo)
+	middlewares := middleware.NewMiddlewares(koanf, logger, manager, appRepo)
+	userRepo := data.NewUserRepo(db)
+	userService := service.NewUserService(koanf, manager, userRepo)
 	databaseServerRepo := data.NewDatabaseServerRepo(db, logger)
 	databaseUserRepo := data.NewDatabaseUserRepo(databaseServerRepo)
 	databaseRepo := data.NewDatabaseRepo(databaseServerRepo, databaseUserRepo)
 	certRepo := data.NewCertRepo(db)
 	certAccountRepo := data.NewCertAccountRepo(db, userRepo)
 	websiteRepo := data.NewWebsiteRepo(db, cacheRepo, databaseRepo, databaseServerRepo, databaseUserRepo, certRepo, certAccountRepo)
-	appRepo := data.NewAppRepo(db, cacheRepo, taskRepo)
 	settingRepo := data.NewSettingRepo(db, koanf, taskRepo)
 	cronRepo := data.NewCronRepo(db)
 	backupRepo := data.NewBackupRepo(db, settingRepo, websiteRepo)
@@ -86,7 +88,7 @@ func initWeb() (*app.Web, error) {
 	http := route.NewHttp(userService, dashboardService, taskService, websiteService, databaseService, databaseServerService, databaseUserService, backupService, certService, certDNSService, certAccountService, appService, cronService, processService, safeService, firewallService, sshService, containerService, containerNetworkService, containerImageService, containerVolumeService, fileService, monitorService, settingService, systemctlService)
 	wsService := service.NewWsService(koanf, sshRepo)
 	ws := route.NewWs(wsService)
-	mux, err := bootstrap.NewRouter(koanf, db, logger, manager, http, ws)
+	mux, err := bootstrap.NewRouter(koanf, db, logger, manager, middlewares, http, ws)
 	if err != nil {
 		return nil, err
 	}

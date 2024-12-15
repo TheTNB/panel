@@ -2,8 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/TheTNB/panel/internal/data"
-	"gorm.io/gorm"
+	"github.com/TheTNB/panel/internal/biz"
 	"net/http"
 	"strings"
 
@@ -11,7 +10,7 @@ import (
 )
 
 // MustInstall 确保已安装应用
-func MustInstall(db *gorm.DB) func(next http.Handler) http.Handler {
+func MustInstall(app biz.AppRepo) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var slugs []string
@@ -34,7 +33,7 @@ func MustInstall(db *gorm.DB) func(next http.Handler) http.Handler {
 
 			flag := false
 			for _, s := range slugs {
-				if installed, _ := data.NewAppRepo(db, nil, nil).IsInstalled("slug = ?", s); installed { // TODO 优化实现
+				if installed, _ := app.IsInstalled("slug = ?", s); installed { // TODO 优化实现
 					flag = true
 					break
 				}
