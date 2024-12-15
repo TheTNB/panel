@@ -188,7 +188,9 @@ func (r *cronRepo) Status(id uint, status bool) error {
 		return err
 	}
 	if status {
-		return r.addToSystem(cron)
+		if err = r.addToSystem(cron); err != nil {
+			return err
+		}
 	}
 
 	cron.Status = status
