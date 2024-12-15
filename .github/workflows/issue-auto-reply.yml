@@ -1,0 +1,27 @@
+name: Issue Auto Reply
+on:
+  issues:
+    types: [ labeled ]
+permissions:
+  contents: read
+jobs:
+  issue-reply:
+    permissions:
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-24.04
+    steps:
+      - name: ☢️ Bug
+        if: github.event.label.name == '☢️ Bug'
+        uses: actions-cool/issues-helper@v3
+        with:
+          actions: 'create-comment'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Hi @${{ github.event.issue.user.login }} 👋
+            
+            感谢提交 Bug，请确保您的描述清晰，日志完整，最好能提供复现步骤，以便我们更快定位问题并解决。
+            Thanks for submitting a bug, please make sure your description is clear, log is complete, and it is best to provide a reproduction step so that we can locate and solve the problem faster.
+            
+            ![Log](https://github.com/user-attachments/assets/0ce7a32d-cc79-4bef-91fc-5bec1d0ed376)
