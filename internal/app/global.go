@@ -1,27 +1,11 @@
 package app
 
 import (
-	"log/slog"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-rat/sessions"
-	"github.com/go-rat/utils/crypt"
-	"github.com/knadh/koanf/v2"
-	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
-
-	"github.com/TheTNB/panel/pkg/queue"
 )
 
 var (
-	Conf    *koanf.Koanf
-	Http    *chi.Mux
-	Orm     *gorm.DB
-	Session *sessions.Manager
-	Cron    *cron.Cron
-	Queue   *queue.Queue
-	Logger  *slog.Logger
-	Crypter crypt.Crypter
+	Orm *gorm.DB
 )
 
 // 面板状态常量

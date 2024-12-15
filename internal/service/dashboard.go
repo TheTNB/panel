@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/knadh/koanf/v2"
 	"net"
 	"net/http"
 	"regexp"
@@ -16,7 +17,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/db"
@@ -27,21 +27,25 @@ import (
 
 type DashboardService struct {
 	api         *api.API
+	conf        *koanf.Koanf
 	taskRepo    biz.TaskRepo
 	websiteRepo biz.WebsiteRepo
 	appRepo     biz.AppRepo
 	settingRepo biz.SettingRepo
 	cronRepo    biz.CronRepo
+	backupRepo  biz.BackupRepo
 }
 
-func NewDashboardService() *DashboardService {
+func NewDashboardService(conf *koanf.Koanf, task biz.TaskRepo, website biz.WebsiteRepo, appRepo biz.AppRepo, setting biz.SettingRepo, cron biz.CronRepo, backupRepo biz.BackupRepo) *DashboardService {
 	return &DashboardService{
 		api:         api.NewAPI(app.Version),
-		taskRepo:    data.NewTaskRepo(),
-		websiteRepo: data.NewWebsiteRepo(),
-		appRepo:     data.NewAppRepo(),
-		settingRepo: data.NewSettingRepo(),
-		cronRepo:    data.NewCronRepo(),
+		conf:        conf,
+		taskRepo:    task,
+		websiteRepo: website,
+		appRepo:     appRepo,
+		settingRepo: setting,
+		cronRepo:    cron,
+		backupRepo:  backupRepo,
 	}
 }
 
@@ -53,7 +57,7 @@ func (s *DashboardService) Panel(w http.ResponseWriter, r *http.Request) {
 
 	Success(w, chix.M{
 		"name":   name,
-		"locale": app.Conf.MustString("app.locale"),
+		"locale": s.conf.String("app.locale"),
 	})
 }
 
@@ -309,7 +313,7 @@ func (s *DashboardService) Update(w http.ResponseWriter, r *http.Request) {
 	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
 	app.Status = app.StatusUpgrade
-	if err = s.settingRepo.UpdatePanel(ver, url, checksum); err != nil {
+	if err = s.backupRepo.UpdatePanel(ver, url, checksum); err != nil {
 		app.Status = app.StatusFailed
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return

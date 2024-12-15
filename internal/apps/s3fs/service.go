@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -22,7 +21,7 @@ type Service struct {
 
 func NewService() *Service {
 	return &Service{
-		settingRepo: data.NewSettingRepo(),
+		settingRepo: nil, // TODO fixme
 	}
 }
 

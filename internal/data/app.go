@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"slices"
 
 	"github.com/expr-lang/expr"
 	"github.com/go-rat/utils/collect"
 	"github.com/hashicorp/go-version"
-	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -18,14 +18,22 @@ import (
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
-type appRepo struct{}
+type appRepo struct {
+	db    *gorm.DB
+	cache biz.CacheRepo
+	task  biz.TaskRepo
+}
 
-func NewAppRepo() biz.AppRepo {
-	return do.MustInvoke[biz.AppRepo](injector)
+func NewAppRepo(db *gorm.DB, cache biz.CacheRepo, task biz.TaskRepo) biz.AppRepo {
+	return &appRepo{
+		db:    db,
+		cache: cache,
+		task:  task,
+	}
 }
 
 func (r *appRepo) All() api.Apps {
-	cached, err := NewCacheRepo().Get(biz.CacheKeyApps)
+	cached, err := r.cache.Get(biz.CacheKeyApps)
 	if err != nil {
 		return nil
 	}
@@ -69,7 +77,7 @@ func (r *appRepo) UpdateExist(slug string) bool {
 
 func (r *appRepo) Installed() ([]*biz.App, error) {
 	var apps []*biz.App
-	if err := app.Orm.Find(&apps).Error; err != nil {
+	if err := r.db.Find(&apps).Error; err != nil {
 		return nil, err
 	}
 
@@ -79,7 +87,7 @@ func (r *appRepo) Installed() ([]*biz.App, error) {
 
 func (r *appRepo) GetInstalled(slug string) (*biz.App, error) {
 	installed := new(biz.App)
-	if err := app.Orm.Where("slug = ?", slug).First(installed).Error; err != nil {
+	if err := r.db.Where("slug = ?", slug).First(installed).Error; err != nil {
 		return nil, err
 	}
 
@@ -88,7 +96,7 @@ func (r *appRepo) GetInstalled(slug string) (*biz.App, error) {
 
 func (r *appRepo) GetInstalledAll(query string, cond ...string) ([]*biz.App, error) {
 	var apps []*biz.App
-	if err := app.Orm.Where(query, cond).Find(&apps).Error; err != nil {
+	if err := r.db.Where(query, cond).Find(&apps).Error; err != nil {
 		return nil, err
 	}
 
@@ -97,7 +105,7 @@ func (r *appRepo) GetInstalledAll(query string, cond ...string) ([]*biz.App, err
 
 func (r *appRepo) GetHomeShow() ([]map[string]string, error) {
 	var apps []*biz.App
-	if err := app.Orm.Where("show = ?", true).Order("show_order").Find(&apps).Error; err != nil {
+	if err := r.db.Where("show = ?", true).Order("show_order").Find(&apps).Error; err != nil {
 		return nil, err
 	}
 
@@ -122,11 +130,11 @@ func (r *appRepo) GetHomeShow() ([]map[string]string, error) {
 func (r *appRepo) IsInstalled(query string, cond ...string) (bool, error) {
 	var count int64
 	if len(cond) == 0 {
-		if err := app.Orm.Model(&biz.App{}).Where("slug = ?", query).Count(&count).Error; err != nil {
+		if err := r.db.Model(&biz.App{}).Where("slug = ?", query).Count(&count).Error; err != nil {
 			return false, err
 		}
 	} else {
-		if err := app.Orm.Model(&biz.App{}).Where(query, cond).Count(&count).Error; err != nil {
+		if err := r.db.Model(&biz.App{}).Where(query, cond).Count(&count).Error; err != nil {
 			return false, err
 		}
 	}
@@ -182,7 +190,7 @@ func (r *appRepo) Install(channel, slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return NewTaskRepo().Push(task)
+	return r.task.Push(task)
 }
 
 func (r *appRepo) UnInstall(slug string) error {
@@ -237,7 +245,7 @@ func (r *appRepo) UnInstall(slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return NewTaskRepo().Push(task)
+	return r.task.Push(task)
 }
 
 func (r *appRepo) Update(slug string) error {
@@ -292,7 +300,7 @@ func (r *appRepo) Update(slug string) error {
 	task.Shell = fmt.Sprintf(`curl -fsLm 10 --retry 3 "%s" | bash -s -- "%s" "%s" >> /tmp/%s.log 2>&1`, shellUrl, shellChannel, shellVersion, item.Slug)
 	task.Log = "/tmp/" + item.Slug + ".log"
 
-	return NewTaskRepo().Push(task)
+	return r.task.Push(task)
 }
 
 func (r *appRepo) UpdateShow(slug string, show bool) error {
@@ -303,7 +311,7 @@ func (r *appRepo) UpdateShow(slug string, show bool) error {
 
 	item.Show = show
 
-	return app.Orm.Save(item).Error
+	return r.db.Save(item).Error
 }
 
 func (r *appRepo) preCheck(app *api.App) error {

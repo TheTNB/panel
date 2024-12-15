@@ -17,11 +17,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
+	"os"
 	_ "time/tzdata"
-
-	"github.com/TheTNB/panel/internal/bootstrap"
 )
 
 func main() {
-	bootstrap.BootCli()
+	if os.Geteuid() != 0 {
+		panic("panel must run as root")
+	}
+
+	cli, err := initCli()
+	if err != nil {
+		panic(err)
+	}
+
+	if err = cli.Run(); err != nil {
+		panic(err)
+	}
 }

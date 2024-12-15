@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/knadh/koanf/v2"
 	"path/filepath"
 	"time"
 
@@ -17,7 +18,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/api"
 	"github.com/TheTNB/panel/pkg/cert"
@@ -33,6 +33,7 @@ import (
 type CliService struct {
 	hr                 string
 	api                *api.API
+	conf               *koanf.Koanf
 	appRepo            biz.AppRepo
 	cacheRepo          biz.CacheRepo
 	userRepo           biz.UserRepo
@@ -43,17 +44,18 @@ type CliService struct {
 	hash               hash.Hasher
 }
 
-func NewCliService() *CliService {
+func NewCliService(conf *koanf.Koanf, appRepo biz.AppRepo, cache biz.CacheRepo, user biz.UserRepo, setting biz.SettingRepo, backup biz.BackupRepo, website biz.WebsiteRepo, databaseServer biz.DatabaseServerRepo) *CliService {
 	return &CliService{
 		hr:                 `+----------------------------------------------------`,
 		api:                api.NewAPI(app.Version),
-		appRepo:            data.NewAppRepo(),
-		cacheRepo:          data.NewCacheRepo(),
-		userRepo:           data.NewUserRepo(),
-		settingRepo:        data.NewSettingRepo(),
-		backupRepo:         data.NewBackupRepo(),
-		websiteRepo:        data.NewWebsiteRepo(),
-		databaseServerRepo: data.NewDatabaseServerRepo(),
+		conf:               conf,
+		appRepo:            appRepo,
+		cacheRepo:          cache,
+		userRepo:           user,
+		settingRepo:        setting,
+		backupRepo:         backup,
+		websiteRepo:        website,
+		databaseServerRepo: databaseServer,
 		hash:               hash.NewArgon2id(),
 	}
 }
@@ -97,7 +99,7 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 	}
 	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
-	return s.settingRepo.UpdatePanel(ver, url, checksum)
+	return s.backupRepo.UpdatePanel(ver, url, checksum)
 }
 
 func (s *CliService) Sync(ctx context.Context, cmd *cli.Command) error {
@@ -113,7 +115,7 @@ func (s *CliService) Sync(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) Fix(ctx context.Context, cmd *cli.Command) error {
-	return s.settingRepo.FixPanel()
+	return s.backupRepo.FixPanel()
 }
 
 func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
@@ -138,15 +140,15 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	protocol := "http"
-	if app.Conf.Bool("http.tls") {
+	if s.conf.Bool("http.tls") {
 		protocol = "https"
 	}
 
-	port := app.Conf.String("http.port")
+	port := s.conf.String("http.port")
 	if port == "" {
 		return fmt.Errorf("端口获取失败")
 	}
-	entrance := app.Conf.String("http.entrance")
+	entrance := s.conf.String("http.entrance")
 	if entrance == "" {
 		return fmt.Errorf("入口获取失败")
 	}
@@ -831,8 +833,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("初始化失败：%v", err)
 	}
 
-	user := data.NewUserRepo()
-	_, err = user.Create("admin", value)
+	_, err = s.userRepo.Create("admin", value)
 	if err != nil {
 		return fmt.Errorf("初始化失败：%v", err)
 	}

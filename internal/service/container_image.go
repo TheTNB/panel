@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type ContainerImageService struct {
 	containerImageRepo biz.ContainerImageRepo
 }
 
-func NewContainerImageService() *ContainerImageService {
+func NewContainerImageService(containerImage biz.ContainerImageRepo) *ContainerImageService {
 	return &ContainerImageService{
-		containerImageRepo: data.NewContainerImageRepo(),
+		containerImageRepo: containerImage,
 	}
 }
 

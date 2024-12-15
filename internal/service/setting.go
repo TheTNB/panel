@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/tools"
 )
@@ -13,9 +12,9 @@ type SettingService struct {
 	settingRepo biz.SettingRepo
 }
 
-func NewSettingService() *SettingService {
+func NewSettingService(setting biz.SettingRepo) *SettingService {
 	return &SettingService{
-		settingRepo: data.NewSettingRepo(),
+		settingRepo: setting,
 	}
 }
 

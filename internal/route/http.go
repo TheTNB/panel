@@ -14,274 +14,333 @@ import (
 	"github.com/TheTNB/panel/internal/service"
 )
 
-func Http(r chi.Router) {
+type Http struct {
+	user             *service.UserService
+	dashboard        *service.DashboardService
+	task             *service.TaskService
+	website          *service.WebsiteService
+	database         *service.DatabaseService
+	databaseServer   *service.DatabaseServerService
+	databaseUser     *service.DatabaseUserService
+	backup           *service.BackupService
+	cert             *service.CertService
+	certDNS          *service.CertDNSService
+	certAccount      *service.CertAccountService
+	app              *service.AppService
+	cron             *service.CronService
+	process          *service.ProcessService
+	safe             *service.SafeService
+	firewall         *service.FirewallService
+	ssh              *service.SSHService
+	container        *service.ContainerService
+	containerNetwork *service.ContainerNetworkService
+	containerImage   *service.ContainerImageService
+	containerVolume  *service.ContainerVolumeService
+	file             *service.FileService
+	monitor          *service.MonitorService
+	setting          *service.SettingService
+	systemctl        *service.SystemctlService
+}
+
+func NewHttp(
+	user *service.UserService,
+	dashboard *service.DashboardService,
+	task *service.TaskService,
+	website *service.WebsiteService,
+	database *service.DatabaseService,
+	databaseServer *service.DatabaseServerService,
+	databaseUser *service.DatabaseUserService,
+	backup *service.BackupService,
+	cert *service.CertService,
+	certDNS *service.CertDNSService,
+	certAccount *service.CertAccountService,
+	app *service.AppService,
+	cron *service.CronService,
+	process *service.ProcessService,
+	safe *service.SafeService,
+	firewall *service.FirewallService,
+	ssh *service.SSHService,
+	container *service.ContainerService,
+	containerNetwork *service.ContainerNetworkService,
+	containerImage *service.ContainerImageService,
+	containerVolume *service.ContainerVolumeService,
+	file *service.FileService,
+	monitor *service.MonitorService,
+	setting *service.SettingService,
+	systemctl *service.SystemctlService,
+) *Http {
+	return &Http{
+		user:             user,
+		dashboard:        dashboard,
+		task:             task,
+		website:          website,
+		database:         database,
+		databaseServer:   databaseServer,
+		databaseUser:     databaseUser,
+		backup:           backup,
+		cert:             cert,
+		certDNS:          certDNS,
+		certAccount:      certAccount,
+		app:              app,
+		cron:             cron,
+		process:          process,
+		safe:             safe,
+		firewall:         firewall,
+		ssh:              ssh,
+		container:        container,
+		containerNetwork: containerNetwork,
+		containerImage:   containerImage,
+		containerVolume:  containerVolume,
+		file:             file,
+		monitor:          monitor,
+		setting:          setting,
+		systemctl:        systemctl,
+	}
+}
+
+func (route *Http) Register(r *chi.Mux) {
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/user", func(r chi.Router) {
-			user := service.NewUserService()
-			r.Get("/key", user.GetKey)
-			r.With(middleware.Throttle(5, time.Minute)).Post("/login", user.Login)
-			r.Post("/logout", user.Logout)
-			r.Get("/isLogin", user.IsLogin)
-			r.Get("/info", user.Info)
+			r.Get("/key", route.user.GetKey)
+			r.With(middleware.Throttle(5, time.Minute)).Post("/login", route.user.Login)
+			r.Post("/logout", route.user.Logout)
+			r.Get("/isLogin", route.user.IsLogin)
+			r.Get("/info", route.user.Info)
 		})
 
 		r.Route("/dashboard", func(r chi.Router) {
-			dashboard := service.NewDashboardService()
-			r.Get("/panel", dashboard.Panel)
-			r.Get("/homeApps", dashboard.HomeApps)
-			r.Post("/current", dashboard.Current)
-			r.Get("/systemInfo", dashboard.SystemInfo)
-			r.Get("/countInfo", dashboard.CountInfo)
-			r.Get("/installedDbAndPhp", dashboard.InstalledDbAndPhp)
-			r.Get("/checkUpdate", dashboard.CheckUpdate)
-			r.Get("/updateInfo", dashboard.UpdateInfo)
-			r.Post("/update", dashboard.Update)
-			r.Post("/restart", dashboard.Restart)
+			r.Get("/panel", route.dashboard.Panel)
+			r.Get("/homeApps", route.dashboard.HomeApps)
+			r.Post("/current", route.dashboard.Current)
+			r.Get("/systemInfo", route.dashboard.SystemInfo)
+			r.Get("/countInfo", route.dashboard.CountInfo)
+			r.Get("/installedDbAndPhp", route.dashboard.InstalledDbAndPhp)
+			r.Get("/checkUpdate", route.dashboard.CheckUpdate)
+			r.Get("/updateInfo", route.dashboard.UpdateInfo)
+			r.Post("/update", route.dashboard.Update)
+			r.Post("/restart", route.dashboard.Restart)
 		})
 
 		r.Route("/task", func(r chi.Router) {
-			task := service.NewTaskService()
-			r.Get("/status", task.Status)
-			r.Get("/", task.List)
-			r.Get("/{id}", task.Get)
-			r.Delete("/{id}", task.Delete)
+			r.Get("/status", route.task.Status)
+			r.Get("/", route.task.List)
+			r.Get("/{id}", route.task.Get)
+			r.Delete("/{id}", route.task.Delete)
 		})
 
 		r.Route("/website", func(r chi.Router) {
-			website := service.NewWebsiteService()
-			r.Get("/rewrites", website.GetRewrites)
-			r.Get("/defaultConfig", website.GetDefaultConfig)
-			r.Post("/defaultConfig", website.UpdateDefaultConfig)
-			r.Get("/", website.List)
-			r.Post("/", website.Create)
-			r.Get("/{id}", website.Get)
-			r.Put("/{id}", website.Update)
-			r.Delete("/{id}", website.Delete)
-			r.Delete("/{id}/log", website.ClearLog)
-			r.Post("/{id}/updateRemark", website.UpdateRemark)
-			r.Post("/{id}/resetConfig", website.ResetConfig)
-			r.Post("/{id}/status", website.UpdateStatus)
-			r.Post("/{id}/obtainCert", website.ObtainCert)
+			r.Get("/rewrites", route.website.GetRewrites)
+			r.Get("/defaultConfig", route.website.GetDefaultConfig)
+			r.Post("/defaultConfig", route.website.UpdateDefaultConfig)
+			r.Get("/", route.website.List)
+			r.Post("/", route.website.Create)
+			r.Get("/{id}", route.website.Get)
+			r.Put("/{id}", route.website.Update)
+			r.Delete("/{id}", route.website.Delete)
+			r.Delete("/{id}/log", route.website.ClearLog)
+			r.Post("/{id}/updateRemark", route.website.UpdateRemark)
+			r.Post("/{id}/resetConfig", route.website.ResetConfig)
+			r.Post("/{id}/status", route.website.UpdateStatus)
+			r.Post("/{id}/obtainCert", route.website.ObtainCert)
 		})
 
 		r.Route("/database", func(r chi.Router) {
-			database := service.NewDatabaseService()
-			r.Get("/", database.List)
-			r.Post("/", database.Create)
-			r.Delete("/", database.Delete)
-			r.Post("/comment", database.Comment)
+			r.Get("/", route.database.List)
+			r.Post("/", route.database.Create)
+			r.Delete("/", route.database.Delete)
+			r.Post("/comment", route.database.Comment)
 		})
 
 		r.Route("/databaseServer", func(r chi.Router) {
-			server := service.NewDatabaseServerService()
-			r.Get("/", server.List)
-			r.Post("/", server.Create)
-			r.Get("/{id}", server.Get)
-			r.Put("/{id}", server.Update)
-			r.Put("/{id}/remark", server.UpdateRemark)
-			r.Delete("/{id}", server.Delete)
-			r.Post("/{id}/sync", server.Sync)
+			r.Get("/", route.databaseServer.List)
+			r.Post("/", route.databaseServer.Create)
+			r.Get("/{id}", route.databaseServer.Get)
+			r.Put("/{id}", route.databaseServer.Update)
+			r.Put("/{id}/remark", route.databaseServer.UpdateRemark)
+			r.Delete("/{id}", route.databaseServer.Delete)
+			r.Post("/{id}/sync", route.databaseServer.Sync)
 		})
 
 		r.Route("/databaseUser", func(r chi.Router) {
-			user := service.NewDatabaseUserService()
-			r.Get("/", user.List)
-			r.Post("/", user.Create)
-			r.Get("/{id}", user.Get)
-			r.Put("/{id}", user.Update)
-			r.Put("/{id}/remark", user.UpdateRemark)
-			r.Delete("/{id}", user.Delete)
+			r.Get("/", route.databaseUser.List)
+			r.Post("/", route.databaseUser.Create)
+			r.Get("/{id}", route.databaseUser.Get)
+			r.Put("/{id}", route.databaseUser.Update)
+			r.Put("/{id}/remark", route.databaseUser.UpdateRemark)
+			r.Delete("/{id}", route.databaseUser.Delete)
 		})
 
 		r.Route("/backup", func(r chi.Router) {
-			backup := service.NewBackupService()
-			r.Get("/{type}", backup.List)
-			r.Post("/{type}", backup.Create)
-			r.Post("/{type}/upload", backup.Upload)
-			r.Delete("/{type}/delete", backup.Delete)
-			r.Post("/{type}/restore", backup.Restore)
+			r.Get("/{type}", route.backup.List)
+			r.Post("/{type}", route.backup.Create)
+			r.Post("/{type}/upload", route.backup.Upload)
+			r.Delete("/{type}/delete", route.backup.Delete)
+			r.Post("/{type}/restore", route.backup.Restore)
 		})
 
 		r.Route("/cert", func(r chi.Router) {
-			cert := service.NewCertService()
-			r.Get("/caProviders", cert.CAProviders)
-			r.Get("/dnsProviders", cert.DNSProviders)
-			r.Get("/algorithms", cert.Algorithms)
+			r.Get("/caProviders", route.cert.CAProviders)
+			r.Get("/dnsProviders", route.cert.DNSProviders)
+			r.Get("/algorithms", route.cert.Algorithms)
 			r.Route("/cert", func(r chi.Router) {
-				r.Get("/", cert.List)
-				r.Post("/", cert.Create)
-				r.Post("/upload", cert.Upload)
-				r.Put("/{id}", cert.Update)
-				r.Get("/{id}", cert.Get)
-				r.Delete("/{id}", cert.Delete)
-				r.Post("/{id}/obtainAuto", cert.ObtainAuto)
-				r.Post("/{id}/obtainManual", cert.ObtainManual)
-				r.Post("/{id}/obtainSelfSigned", cert.ObtainSelfSigned)
-				r.Post("/{id}/renew", cert.Renew)
-				r.Post("/{id}/manualDNS", cert.ManualDNS)
-				r.Post("/{id}/deploy", cert.Deploy)
+				r.Get("/", route.cert.List)
+				r.Post("/", route.cert.Create)
+				r.Post("/upload", route.cert.Upload)
+				r.Put("/{id}", route.cert.Update)
+				r.Get("/{id}", route.cert.Get)
+				r.Delete("/{id}", route.cert.Delete)
+				r.Post("/{id}/obtainAuto", route.cert.ObtainAuto)
+				r.Post("/{id}/obtainManual", route.cert.ObtainManual)
+				r.Post("/{id}/obtainSelfSigned", route.cert.ObtainSelfSigned)
+				r.Post("/{id}/renew", route.cert.Renew)
+				r.Post("/{id}/manualDNS", route.cert.ManualDNS)
+				r.Post("/{id}/deploy", route.cert.Deploy)
 			})
 			r.Route("/dns", func(r chi.Router) {
-				certDNS := service.NewCertDNSService()
-				r.Get("/", certDNS.List)
-				r.Post("/", certDNS.Create)
-				r.Put("/{id}", certDNS.Update)
-				r.Get("/{id}", certDNS.Get)
-				r.Delete("/{id}", certDNS.Delete)
+				r.Get("/", route.certDNS.List)
+				r.Post("/", route.certDNS.Create)
+				r.Put("/{id}", route.certDNS.Update)
+				r.Get("/{id}", route.certDNS.Get)
+				r.Delete("/{id}", route.certDNS.Delete)
 			})
 			r.Route("/account", func(r chi.Router) {
-				certAccount := service.NewCertAccountService()
-				r.Get("/", certAccount.List)
-				r.Post("/", certAccount.Create)
-				r.Put("/{id}", certAccount.Update)
-				r.Get("/{id}", certAccount.Get)
-				r.Delete("/{id}", certAccount.Delete)
+				r.Get("/", route.certAccount.List)
+				r.Post("/", route.certAccount.Create)
+				r.Put("/{id}", route.certAccount.Update)
+				r.Get("/{id}", route.certAccount.Get)
+				r.Delete("/{id}", route.certAccount.Delete)
 			})
 		})
 
 		r.Route("/app", func(r chi.Router) {
-			app := service.NewAppService()
-			r.Get("/list", app.List)
-			r.Post("/install", app.Install)
-			r.Post("/uninstall", app.Uninstall)
-			r.Post("/update", app.Update)
-			r.Post("/updateShow", app.UpdateShow)
-			r.Get("/isInstalled", app.IsInstalled)
-			r.Get("/updateCache", app.UpdateCache)
+			r.Get("/list", route.app.List)
+			r.Post("/install", route.app.Install)
+			r.Post("/uninstall", route.app.Uninstall)
+			r.Post("/update", route.app.Update)
+			r.Post("/updateShow", route.app.UpdateShow)
+			r.Get("/isInstalled", route.app.IsInstalled)
+			r.Get("/updateCache", route.app.UpdateCache)
 		})
 
 		r.Route("/cron", func(r chi.Router) {
-			cron := service.NewCronService()
-			r.Get("/", cron.List)
-			r.Post("/", cron.Create)
-			r.Put("/{id}", cron.Update)
-			r.Get("/{id}", cron.Get)
-			r.Delete("/{id}", cron.Delete)
-			r.Post("/{id}/status", cron.Status)
+			r.Get("/", route.cron.List)
+			r.Post("/", route.cron.Create)
+			r.Put("/{id}", route.cron.Update)
+			r.Get("/{id}", route.cron.Get)
+			r.Delete("/{id}", route.cron.Delete)
+			r.Post("/{id}/status", route.cron.Status)
 		})
 
 		r.Route("/process", func(r chi.Router) {
-			process := service.NewProcessService()
-			r.Get("/", process.List)
-			r.Post("/kill", process.Kill)
+			r.Get("/", route.process.List)
+			r.Post("/kill", route.process.Kill)
 		})
 
 		r.Route("/safe", func(r chi.Router) {
-			safe := service.NewSafeService()
-			r.Get("/ssh", safe.GetSSH)
-			r.Post("/ssh", safe.UpdateSSH)
-			r.Get("/ping", safe.GetPingStatus)
-			r.Post("/ping", safe.UpdatePingStatus)
+			r.Get("/ssh", route.safe.GetSSH)
+			r.Post("/ssh", route.safe.UpdateSSH)
+			r.Get("/ping", route.safe.GetPingStatus)
+			r.Post("/ping", route.safe.UpdatePingStatus)
 		})
 
 		r.Route("/firewall", func(r chi.Router) {
-			firewall := service.NewFirewallService()
-			r.Get("/status", firewall.GetStatus)
-			r.Post("/status", firewall.UpdateStatus)
-			r.Get("/rule", firewall.GetRules)
-			r.Post("/rule", firewall.CreateRule)
-			r.Delete("/rule", firewall.DeleteRule)
-			r.Get("/ipRule", firewall.GetIPRules)
-			r.Post("/ipRule", firewall.CreateIPRule)
-			r.Delete("/ipRule", firewall.DeleteIPRule)
-			r.Get("/forward", firewall.GetForwards)
-			r.Post("/forward", firewall.CreateForward)
-			r.Delete("/forward", firewall.DeleteForward)
+			r.Get("/status", route.firewall.GetStatus)
+			r.Post("/status", route.firewall.UpdateStatus)
+			r.Get("/rule", route.firewall.GetRules)
+			r.Post("/rule", route.firewall.CreateRule)
+			r.Delete("/rule", route.firewall.DeleteRule)
+			r.Get("/ipRule", route.firewall.GetIPRules)
+			r.Post("/ipRule", route.firewall.CreateIPRule)
+			r.Delete("/ipRule", route.firewall.DeleteIPRule)
+			r.Get("/forward", route.firewall.GetForwards)
+			r.Post("/forward", route.firewall.CreateForward)
+			r.Delete("/forward", route.firewall.DeleteForward)
 		})
 
 		r.Route("/ssh", func(r chi.Router) {
-			ssh := service.NewSSHService()
-			r.Get("/", ssh.List)
-			r.Post("/", ssh.Create)
-			r.Put("/{id}", ssh.Update)
-			r.Get("/{id}", ssh.Get)
-			r.Delete("/{id}", ssh.Delete)
+			r.Get("/", route.ssh.List)
+			r.Post("/", route.ssh.Create)
+			r.Put("/{id}", route.ssh.Update)
+			r.Get("/{id}", route.ssh.Get)
+			r.Delete("/{id}", route.ssh.Delete)
 		})
 
 		r.Route("/container", func(r chi.Router) {
 			r.Route("/container", func(r chi.Router) {
-				container := service.NewContainerService()
-				r.Get("/", container.List)
-				r.Get("/search", container.Search)
-				r.Post("/", container.Create)
-				r.Delete("/{id}", container.Remove)
-				r.Post("/{id}/start", container.Start)
-				r.Post("/{id}/stop", container.Stop)
-				r.Post("/{id}/restart", container.Restart)
-				r.Post("/{id}/pause", container.Pause)
-				r.Post("/{id}/unpause", container.Unpause)
-				r.Post("/{id}/kill", container.Kill)
-				r.Post("/{id}/rename", container.Rename)
-				r.Get("/{id}/logs", container.Logs)
-				r.Post("/prune", container.Prune)
+				r.Get("/", route.container.List)
+				r.Get("/search", route.container.Search)
+				r.Post("/", route.container.Create)
+				r.Delete("/{id}", route.container.Remove)
+				r.Post("/{id}/start", route.container.Start)
+				r.Post("/{id}/stop", route.container.Stop)
+				r.Post("/{id}/restart", route.container.Restart)
+				r.Post("/{id}/pause", route.container.Pause)
+				r.Post("/{id}/unpause", route.container.Unpause)
+				r.Post("/{id}/kill", route.container.Kill)
+				r.Post("/{id}/rename", route.container.Rename)
+				r.Get("/{id}/logs", route.container.Logs)
+				r.Post("/prune", route.container.Prune)
 			})
 			r.Route("/network", func(r chi.Router) {
-				containerNetwork := service.NewContainerNetworkService()
-				r.Get("/", containerNetwork.List)
-				r.Post("/", containerNetwork.Create)
-				r.Delete("/{id}", containerNetwork.Remove)
-				r.Post("/prune", containerNetwork.Prune)
+				r.Get("/", route.containerNetwork.List)
+				r.Post("/", route.containerNetwork.Create)
+				r.Delete("/{id}", route.containerNetwork.Remove)
+				r.Post("/prune", route.containerNetwork.Prune)
 			})
 			r.Route("/image", func(r chi.Router) {
-				containerImage := service.NewContainerImageService()
-				r.Get("/", containerImage.List)
-				r.Post("/", containerImage.Pull)
-				r.Delete("/{id}", containerImage.Remove)
-				r.Post("/prune", containerImage.Prune)
+				r.Get("/", route.containerImage.List)
+				r.Post("/", route.containerImage.Pull)
+				r.Delete("/{id}", route.containerImage.Remove)
+				r.Post("/prune", route.containerImage.Prune)
 			})
 			r.Route("/volume", func(r chi.Router) {
-				containerVolume := service.NewContainerVolumeService()
-				r.Get("/", containerVolume.List)
-				r.Post("/", containerVolume.Create)
-				r.Delete("/{id}", containerVolume.Remove)
-				r.Post("/prune", containerVolume.Prune)
+				r.Get("/", route.containerVolume.List)
+				r.Post("/", route.containerVolume.Create)
+				r.Delete("/{id}", route.containerVolume.Remove)
+				r.Post("/prune", route.containerVolume.Prune)
 			})
 		})
 
 		r.Route("/file", func(r chi.Router) {
-			file := service.NewFileService()
-			r.Post("/create", file.Create)
-			r.Get("/content", file.Content)
-			r.Post("/save", file.Save)
-			r.Post("/delete", file.Delete)
-			r.Post("/upload", file.Upload)
-			r.Post("/exist", file.Exist)
-			r.Post("/move", file.Move)
-			r.Post("/copy", file.Copy)
-			r.Get("/download", file.Download)
-			r.Post("/remoteDownload", file.RemoteDownload)
-			r.Get("/info", file.Info)
-			r.Post("/permission", file.Permission)
-			r.Post("/compress", file.Compress)
-			r.Post("/unCompress", file.UnCompress)
-			r.Get("/search", file.Search)
-			r.Get("/list", file.List)
+			r.Post("/create", route.file.Create)
+			r.Get("/content", route.file.Content)
+			r.Post("/save", route.file.Save)
+			r.Post("/delete", route.file.Delete)
+			r.Post("/upload", route.file.Upload)
+			r.Post("/exist", route.file.Exist)
+			r.Post("/move", route.file.Move)
+			r.Post("/copy", route.file.Copy)
+			r.Get("/download", route.file.Download)
+			r.Post("/remoteDownload", route.file.RemoteDownload)
+			r.Get("/info", route.file.Info)
+			r.Post("/permission", route.file.Permission)
+			r.Post("/compress", route.file.Compress)
+			r.Post("/unCompress", route.file.UnCompress)
+			r.Get("/search", route.file.Search)
+			r.Get("/list", route.file.List)
 		})
 
 		r.Route("/monitor", func(r chi.Router) {
-			monitor := service.NewMonitorService()
-			r.Get("/setting", monitor.GetSetting)
-			r.Post("/setting", monitor.UpdateSetting)
-			r.Post("/clear", monitor.Clear)
-			r.Get("/list", monitor.List)
+			r.Get("/setting", route.monitor.GetSetting)
+			r.Post("/setting", route.monitor.UpdateSetting)
+			r.Post("/clear", route.monitor.Clear)
+			r.Get("/list", route.monitor.List)
 		})
 
 		r.Route("/setting", func(r chi.Router) {
-			setting := service.NewSettingService()
-			r.Get("/", setting.Get)
-			r.Post("/", setting.Update)
+			r.Get("/", route.setting.Get)
+			r.Post("/", route.setting.Update)
 		})
 
 		r.Route("/systemctl", func(r chi.Router) {
-			systemctl := service.NewSystemctlService()
-			r.Get("/status", systemctl.Status)
-			r.Get("/isEnabled", systemctl.IsEnabled)
-			r.Post("/enable", systemctl.Enable)
-			r.Post("/disable", systemctl.Disable)
-			r.Post("/restart", systemctl.Restart)
-			r.Post("/reload", systemctl.Reload)
-			r.Post("/start", systemctl.Start)
-			r.Post("/stop", systemctl.Stop)
+			r.Get("/status", route.systemctl.Status)
+			r.Get("/isEnabled", route.systemctl.IsEnabled)
+			r.Post("/enable", route.systemctl.Enable)
+			r.Post("/disable", route.systemctl.Disable)
+			r.Post("/restart", route.systemctl.Restart)
+			r.Post("/reload", route.systemctl.Reload)
+			r.Post("/start", route.systemctl.Start)
+			r.Post("/stop", route.systemctl.Stop)
 		})
 
 		r.Route("/apps", func(r chi.Router) {

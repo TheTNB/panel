@@ -1,9 +1,6 @@
 package bootstrap
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/urfave/cli/v3"
@@ -12,9 +9,7 @@ import (
 	"github.com/TheTNB/panel/internal/route"
 )
 
-func initCli() {
-	app.IsCli = true
-
+func NewCli(cmd *route.Cli) *cli.Command {
 	cli.RootCommandHelpTemplate = strings.ReplaceAll(cli.RootCommandHelpTemplate, "NAME", "名称")
 	cli.RootCommandHelpTemplate = strings.ReplaceAll(cli.RootCommandHelpTemplate, "USAGE", "用法")
 	cli.RootCommandHelpTemplate = strings.ReplaceAll(cli.RootCommandHelpTemplate, "VERSION", "版本")
@@ -38,13 +33,10 @@ func initCli() {
 	cli.RootCommandHelpTemplate += "\n论坛：https://bbs.haozi.net"
 	cli.RootCommandHelpTemplate += "\nQ群：12370907\n"
 
-	cmd := &cli.Command{
+	return &cli.Command{
 		Name:     "panel-cli",
 		Usage:    "耗子面板命令行工具",
 		Version:  app.Version,
-		Commands: route.Cli(),
-	}
-	if err := cmd.Run(context.Background(), os.Args); err != nil {
-		fmt.Printf("|-%v\n", err)
+		Commands: cmd.Commands(),
 	}
 }

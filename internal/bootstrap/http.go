@@ -2,55 +2,46 @@ package bootstrap
 
 import (
 	"crypto/tls"
-	"fmt"
-	"log"
-	"net/http"
-	"path/filepath"
-
 	"github.com/bddjr/hlfhr"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-rat/sessions"
+	"github.com/knadh/koanf/v2"
+	"gorm.io/gorm"
+	"log/slog"
+	"net/http"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/route"
 )
 
-func initHttp() {
-	app.Http = chi.NewRouter()
+func NewRouter(conf *koanf.Koanf, db *gorm.DB, log *slog.Logger, session *sessions.Manager, http *route.Http, ws *route.Ws) (*chi.Mux, error) {
+	r := chi.NewRouter()
 
 	// add middleware
-	app.Http.Use(middleware.GlobalMiddleware()...)
+	r.Use(middleware.GlobalMiddleware(r, conf, db, log, session)...)
+	// add http route
+	http.Register(r)
+	// add ws route
+	ws.Register(r)
 
-	// add route
-	route.Http(app.Http)
-	route.Ws(app.Http)
+	return r, nil
+}
 
+func NewHttp(conf *koanf.Koanf, r *chi.Mux) (*hlfhr.Server, error) {
 	srv := hlfhr.New(&http.Server{
-		Addr:           fmt.Sprintf(":%d", app.Conf.MustInt("http.port")),
-		Handler:        http.AllowQuerySemicolons(app.Http),
+		Addr:           conf.MustString("http.address"),
+		Handler:        http.AllowQuerySemicolons(r),
 		MaxHeaderBytes: 2048 << 20,
 	})
 	srv.HttpOnHttpsPortErrorHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hlfhr.RedirectToHttps(w, r, http.StatusTemporaryRedirect)
 	})
 
-	if app.Conf.Bool("http.tls") {
+	if conf.Bool("http.tls") {
 		srv.TLSConfig = &tls.Config{
 			MinVersion: tls.VersionTLS13,
 		}
-
-		cert := filepath.Join(app.Root, "panel/storage/cert.pem")
-		key := filepath.Join(app.Root, "panel/storage/cert.key")
-		go func() {
-			if err := srv.ListenAndServeTLS(cert, key); err != nil {
-				log.Fatalf("failed to start https server: %v", err)
-			}
-		}()
-	} else {
-		go func() {
-			if err := srv.ListenAndServe(); err != nil {
-				log.Fatalf("failed to start http server: %v", err)
-			}
-		}()
 	}
+
+	return srv, nil
 }

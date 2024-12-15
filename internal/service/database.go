@@ -6,21 +6,20 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
-type Database struct {
+type DatabaseService struct {
 	databaseRepo biz.DatabaseRepo
 }
 
-func NewDatabaseService() *Database {
-	return &Database{
-		databaseRepo: data.NewDatabaseRepo(),
+func NewDatabaseService(database biz.DatabaseRepo) *DatabaseService {
+	return &DatabaseService{
+		databaseRepo: database,
 	}
 }
 
-func (s *Database) List(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -39,7 +38,7 @@ func (s *Database) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Database) Create(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseCreate](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -54,7 +53,7 @@ func (s *Database) Create(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *Database) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseDelete](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -69,7 +68,7 @@ func (s *Database) Delete(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *Database) Comment(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseService) Comment(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseComment](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)

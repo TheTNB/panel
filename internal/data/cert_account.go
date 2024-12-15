@@ -4,39 +4,43 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"time"
 
-	"github.com/go-resty/resty/v2"
-	"github.com/samber/do/v2"
-
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/cert"
+	"github.com/go-resty/resty/v2"
 )
 
-type certAccountRepo struct{}
+type certAccountRepo struct {
+	db   *gorm.DB
+	user biz.UserRepo
+}
 
-func NewCertAccountRepo() biz.CertAccountRepo {
-	return do.MustInvoke[biz.CertAccountRepo](injector)
+func NewCertAccountRepo(db *gorm.DB, user biz.UserRepo) biz.CertAccountRepo {
+	return &certAccountRepo{
+		db:   db,
+		user: user,
+	}
 }
 
 func (r certAccountRepo) List(page, limit uint) ([]*biz.CertAccount, int64, error) {
 	var accounts []*biz.CertAccount
 	var total int64
-	err := app.Orm.Model(&biz.CertAccount{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&accounts).Error
+	err := r.db.Model(&biz.CertAccount{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&accounts).Error
 	return accounts, total, err
 }
 
 func (r certAccountRepo) GetDefault(userID uint) (*biz.CertAccount, error) {
-	user, err := NewUserRepo().Get(userID)
+	user, err := r.user.Get(userID)
 	if err != nil {
 		return nil, err
 	}
 
 	account := new(biz.CertAccount)
-	if err = app.Orm.Model(&biz.CertAccount{}).Where("ca = ?", "googlecn").Where("email = ?", user.Email).First(account).Error; err == nil {
+	if err = r.db.Model(&biz.CertAccount{}).Where("ca = ?", "googlecn").Where("email = ?", user.Email).First(account).Error; err == nil {
 		return account, nil
 	}
 
@@ -51,7 +55,7 @@ func (r certAccountRepo) GetDefault(userID uint) (*biz.CertAccount, error) {
 
 func (r certAccountRepo) Get(id uint) (*biz.CertAccount, error) {
 	account := new(biz.CertAccount)
-	err := app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).First(account).Error
+	err := r.db.Model(&biz.CertAccount{}).Where("id = ?", id).First(account).Error
 	return account, err
 }
 
@@ -104,7 +108,7 @@ func (r certAccountRepo) Create(req *request.CertAccountCreate) (*biz.CertAccoun
 	}
 	account.PrivateKey = string(privateKey)
 
-	if err = app.Orm.Create(account).Error; err != nil {
+	if err = r.db.Create(account).Error; err != nil {
 		return nil, err
 	}
 
@@ -163,11 +167,11 @@ func (r certAccountRepo) Update(req *request.CertAccountUpdate) error {
 	}
 	account.PrivateKey = string(privateKey)
 
-	return app.Orm.Save(account).Error
+	return r.db.Save(account).Error
 }
 
 func (r certAccountRepo) Delete(id uint) error {
-	return app.Orm.Model(&biz.CertAccount{}).Where("id = ?", id).Delete(&biz.CertAccount{}).Error
+	return r.db.Model(&biz.CertAccount{}).Where("id = ?", id).Delete(&biz.CertAccount{}).Error
 }
 
 // getGoogleEAB 获取 Google EAB

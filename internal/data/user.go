@@ -4,19 +4,21 @@ import (
 	"errors"
 
 	"github.com/go-rat/utils/hash"
-	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 )
 
 type userRepo struct {
+	db     *gorm.DB
 	hasher hash.Hasher
 }
 
-func NewUserRepo() biz.UserRepo {
-	return do.MustInvoke[biz.UserRepo](injector)
+func NewUserRepo(db *gorm.DB) biz.UserRepo {
+	return &userRepo{
+		db:     db,
+		hasher: hash.NewArgon2id(),
+	}
 }
 
 func (r *userRepo) Create(username, password string) (*biz.User, error) {
@@ -29,7 +31,7 @@ func (r *userRepo) Create(username, password string) (*biz.User, error) {
 		Username: username,
 		Password: value,
 	}
-	if err = app.Orm.Create(user).Error; err != nil {
+	if err = r.db.Create(user).Error; err != nil {
 		return nil, err
 	}
 
@@ -38,7 +40,7 @@ func (r *userRepo) Create(username, password string) (*biz.User, error) {
 
 func (r *userRepo) CheckPassword(username, password string) (*biz.User, error) {
 	user := new(biz.User)
-	if err := app.Orm.Where("username = ?", username).First(user).Error; err != nil {
+	if err := r.db.Where("username = ?", username).First(user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("用户名或密码错误")
 		} else {
@@ -55,7 +57,7 @@ func (r *userRepo) CheckPassword(username, password string) (*biz.User, error) {
 
 func (r *userRepo) Get(id uint) (*biz.User, error) {
 	user := new(biz.User)
-	if err := app.Orm.First(user, id).Error; err != nil {
+	if err := r.db.First(user, id).Error; err != nil {
 		return nil, err
 	}
 
@@ -63,5 +65,5 @@ func (r *userRepo) Get(id uint) (*biz.User, error) {
 }
 
 func (r *userRepo) Save(user *biz.User) error {
-	return app.Orm.Save(user).Error
+	return r.db.Save(user).Error
 }

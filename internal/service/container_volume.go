@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type ContainerVolumeService struct {
 	containerVolumeRepo biz.ContainerVolumeRepo
 }
 
-func NewContainerVolumeService() *ContainerVolumeService {
+func NewContainerVolumeService(containerVolume biz.ContainerVolumeRepo) *ContainerVolumeService {
 	return &ContainerVolumeService{
-		containerVolumeRepo: data.NewContainerVolumeRepo(),
+		containerVolumeRepo: containerVolume,
 	}
 }
 

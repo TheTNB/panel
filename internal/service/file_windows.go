@@ -18,6 +18,7 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
+	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -25,10 +26,13 @@ import (
 )
 
 type FileService struct {
+	taskRepo biz.TaskRepo
 }
 
-func NewFileService() *FileService {
-	return &FileService{}
+func NewFileService(task biz.TaskRepo) *FileService {
+	return &FileService{
+		taskRepo: task,
+	}
 }
 
 func (s *FileService) Create(w http.ResponseWriter, r *http.Request) {

@@ -4,20 +4,21 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/pkg/shell"
 )
 
 // ProcessTask 处理面板任务
 type ProcessTask struct {
+	log      *slog.Logger
 	taskRepo biz.TaskRepo
 	taskID   uint
 }
 
 // NewProcessTask 实例化 ProcessTask
-func NewProcessTask(taskRepo biz.TaskRepo) *ProcessTask {
+func NewProcessTask(log *slog.Logger, taskRepo biz.TaskRepo) *ProcessTask {
 	return &ProcessTask{
+		log:      log,
 		taskRepo: taskRepo,
 	}
 }
@@ -50,6 +51,6 @@ func (r *ProcessTask) Handle(args ...any) error {
 }
 
 func (r *ProcessTask) ErrHandle(err error) {
-	app.Logger.Warn("background task failed", slog.Any("task_id", r.taskID), slog.Any("err", err))
+	r.log.Warn("background task failed", slog.Any("task_id", r.taskID), slog.Any("err", err))
 	_ = r.taskRepo.UpdateStatus(r.taskID, biz.TaskStatusFailed)
 }

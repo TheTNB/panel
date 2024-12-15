@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type SafeService struct {
 	safeRepo biz.SafeRepo
 }
 
-func NewSafeService() *SafeService {
+func NewSafeService(safe biz.SafeRepo) *SafeService {
 	return &SafeService{
-		safeRepo: data.NewSafeRepo(),
+		safeRepo: safe,
 	}
 }
 

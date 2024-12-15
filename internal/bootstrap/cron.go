@@ -1,29 +1,22 @@
 package bootstrap
 
 import (
-	"log"
+	"log/slog"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/robfig/cron/v3"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/job"
 	pkgcron "github.com/TheTNB/panel/pkg/cron"
 )
 
-func initCron() {
-	logger := pkgcron.NewLogger(app.Logger, app.Conf.Bool("app.debug"))
-	c := cron.New(
+func NewCron(conf *koanf.Koanf, log *slog.Logger) *cron.Cron {
+	logger := pkgcron.NewLogger(log, conf.Bool("app.debug"))
+
+	return cron.New(
 		cron.WithParser(cron.NewParser(
 			cron.SecondOptional|cron.Minute|cron.Hour|cron.Dom|cron.Month|cron.Dow|cron.Descriptor,
 		)),
 		cron.WithLogger(logger),
 		cron.WithChain(cron.Recover(logger), cron.SkipIfStillRunning(logger)),
 	)
-	app.Cron = c
-
-	if err := job.Boot(app.Cron); err != nil {
-		log.Fatalf("failed to boot cron jobs: %v", err)
-	}
-
-	c.Start()
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type ContainerNetworkService struct {
 	containerNetworkRepo biz.ContainerNetworkRepo
 }
 
-func NewContainerNetworkService() *ContainerNetworkService {
+func NewContainerNetworkService(containerNetwork biz.ContainerNetworkRepo) *ContainerNetworkService {
 	return &ContainerNetworkService{
-		containerNetworkRepo: data.NewContainerNetworkRepo(),
+		containerNetworkRepo: containerNetwork,
 	}
 }
 

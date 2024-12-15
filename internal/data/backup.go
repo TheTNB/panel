@@ -3,13 +3,13 @@ package data
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/samber/do/v2"
 	"github.com/shirou/gopsutil/disk"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -21,10 +21,18 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type backupRepo struct{}
+type backupRepo struct {
+	db      *gorm.DB
+	setting biz.SettingRepo
+	website biz.WebsiteRepo
+}
 
-func NewBackupRepo() biz.BackupRepo {
-	return do.MustInvoke[biz.BackupRepo](injector)
+func NewBackupRepo(db *gorm.DB, setting biz.SettingRepo, website biz.WebsiteRepo) biz.BackupRepo {
+	return &backupRepo{
+		db:      db,
+		setting: setting,
+		website: website,
+	}
 }
 
 // List 备份列表
@@ -192,7 +200,7 @@ func (r *backupRepo) ClearExpired(path, prefix string, save int) error {
 
 // GetPath 获取备份路径
 func (r *backupRepo) GetPath(typ biz.BackupType) (string, error) {
-	backupPath, err := NewSettingRepo().Get(biz.SettingKeyBackupPath)
+	backupPath, err := r.setting.Get(biz.SettingKeyBackupPath)
 	if err != nil {
 		return "", err
 	}
@@ -212,7 +220,7 @@ func (r *backupRepo) GetPath(typ biz.BackupType) (string, error) {
 
 // createWebsite 创建网站备份
 func (r *backupRepo) createWebsite(to string, name string) error {
-	website, err := NewWebsiteRepo().GetByName(name)
+	website, err := r.website.GetByName(name)
 	if err != nil {
 		return err
 	}
@@ -236,7 +244,7 @@ func (r *backupRepo) createWebsite(to string, name string) error {
 
 // createMySQL 创建 MySQL 备份
 func (r *backupRepo) createMySQL(to string, name string) error {
-	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
+	rootPassword, err := r.setting.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		return err
 	}
@@ -367,7 +375,7 @@ func (r *backupRepo) restoreWebsite(backup, target string) error {
 		return errors.New("备份文件不存在")
 	}
 
-	website, err := NewWebsiteRepo().GetByName(target)
+	website, err := r.website.GetByName(target)
 	if err != nil {
 		return err
 	}
@@ -394,7 +402,7 @@ func (r *backupRepo) restoreMySQL(backup, target string) error {
 		return errors.New("备份文件不存在")
 	}
 
-	rootPassword, err := NewSettingRepo().Get(biz.SettingKeyMySQLRootPassword)
+	rootPassword, err := r.setting.Get(biz.SettingKeyMySQLRootPassword)
 	if err != nil {
 		return err
 	}
@@ -541,4 +549,266 @@ func (r *backupRepo) autoUnCompressSQL(backup string) (string, error) {
 	}
 
 	return backup, nil
+}
+
+func (r *backupRepo) FixPanel() error {
+	if app.IsCli {
+		fmt.Println("|-开始修复面板...")
+	}
+
+	// 检查关键文件是否正常
+	flag := false
+	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
+		flag = true
+	}
+	if !io.Exists(filepath.Join(app.Root, "panel", "storage", "app.db")) {
+		flag = true
+	}
+	if io.Exists("/tmp/panel-storage.zip") {
+		flag = true
+	}
+	if !flag {
+		return fmt.Errorf("文件正常无需修复，请运行 panel-cli update 更新面板")
+	}
+
+	// 再次确认是否需要修复
+	if io.Exists("/tmp/panel-storage.zip") {
+		// 文件齐全情况下只移除临时文件
+		if io.Exists(filepath.Join(app.Root, "panel", "web")) &&
+			io.Exists(filepath.Join(app.Root, "panel", "storage", "app.db")) &&
+			io.Exists("/usr/local/etc/panel/config.yml") {
+			if err := io.Remove("/tmp/panel-storage.zip"); err != nil {
+				return fmt.Errorf("清理临时文件失败：%w", err)
+			}
+			if app.IsCli {
+				fmt.Println("|-已清理临时文件，请运行 panel-cli update 更新面板")
+			}
+			return nil
+		}
+	}
+
+	// 从备份目录中找最新的备份文件
+	list, err := r.List(biz.BackupTypePanel)
+	if err != nil {
+		return err
+	}
+	slices.SortFunc(list, func(a *types.BackupFile, b *types.BackupFile) int {
+		return int(b.Time.Unix() - a.Time.Unix())
+	})
+	if len(list) == 0 {
+		return fmt.Errorf("未找到备份文件，无法自动修复")
+	}
+	latest := list[0]
+	if app.IsCli {
+		fmt.Printf("|-使用备份文件：%s\n", latest.Name)
+	}
+
+	// 解压备份文件
+	if app.IsCli {
+		fmt.Println("|-解压备份文件...")
+	}
+	if err = io.Remove("/tmp/panel-fix"); err != nil {
+		return fmt.Errorf("清理临时目录失败：%w", err)
+	}
+	if err = io.UnCompress(latest.Path, "/tmp/panel-fix"); err != nil {
+		return fmt.Errorf("解压备份文件失败：%w", err)
+	}
+
+	// 移动文件到对应位置
+	if app.IsCli {
+		fmt.Println("|-移动备份文件...")
+	}
+	if io.Exists(filepath.Join("/tmp/panel-fix", "panel")) && io.IsDir(filepath.Join("/tmp/panel-fix", "panel")) {
+		if err = io.Remove(filepath.Join(app.Root, "panel")); err != nil {
+			return fmt.Errorf("删除目录失败：%w", err)
+		}
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "panel"), filepath.Join(app.Root)); err != nil {
+			return fmt.Errorf("移动目录失败：%w", err)
+		}
+	}
+	if io.Exists(filepath.Join("/tmp/panel-fix", "config.yml")) {
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "config.yml"), "/usr/local/etc/panel/config.yml"); err != nil {
+			return fmt.Errorf("移动文件失败：%w", err)
+		}
+	}
+	if io.Exists(filepath.Join("/tmp/panel-fix", "panel-cli")) {
+		if err = io.Mv(filepath.Join("/tmp/panel-fix", "panel-cli"), "/usr/local/sbin/panel-cli"); err != nil {
+			return fmt.Errorf("移动文件失败：%w", err)
+		}
+	}
+
+	// tmp 目录下如果有 storage 备份，则解压回去
+	if app.IsCli {
+		fmt.Println("|-恢复面板数据...")
+	}
+	if io.Exists("/tmp/panel-storage.zip") {
+		if err = io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel")); err != nil {
+			return fmt.Errorf("恢复面板数据失败：%w", err)
+		}
+		if err = io.Remove("/tmp/panel-storage.zip"); err != nil {
+			return fmt.Errorf("清理临时文件失败：%w", err)
+		}
+	}
+
+	// 下载服务文件
+	if !io.Exists("/etc/systemd/system/panel.service") {
+		if _, err = shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
+			return err
+		}
+	}
+
+	// 处理权限
+	if app.IsCli {
+		fmt.Println("|-设置关键文件权限...")
+	}
+	if err = io.Chmod("/usr/local/etc/panel/config.yml", 0600); err != nil {
+		return err
+	}
+	if err = io.Chmod("/etc/systemd/system/panel.service", 0700); err != nil {
+		return err
+	}
+	if err = io.Chmod("/usr/local/sbin/panel-cli", 0700); err != nil {
+		return err
+	}
+	if err = io.Chmod(filepath.Join(app.Root, "panel"), 0700); err != nil {
+		return err
+	}
+
+	if app.IsCli {
+		fmt.Println("|-修复完成")
+	}
+
+	tools.RestartPanel()
+	return nil
+}
+
+func (r *backupRepo) UpdatePanel(version, url, checksum string) error {
+	// 预先优化数据库
+	if err := r.db.Exec("VACUUM").Error; err != nil {
+		return err
+	}
+	if err := r.db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
+		return err
+	}
+
+	name := filepath.Base(url)
+	if app.IsCli {
+		fmt.Printf("|-目标版本：%s\n", version)
+		fmt.Printf("|-下载链接：%s\n", url)
+		fmt.Printf("|-文件名：%s\n", name)
+	}
+
+	if app.IsCli {
+		fmt.Println("|-正在下载...")
+	}
+	if _, err := shell.Execf("wget -T 120 -t 3 -O /tmp/%s %s", name, url); err != nil {
+		return fmt.Errorf("下载失败：%w", err)
+	}
+	if _, err := shell.Execf("wget -T 20 -t 3 -O /tmp/%s %s", name+".sha256", checksum); err != nil {
+		return fmt.Errorf("下载失败：%w", err)
+	}
+	if !io.Exists(filepath.Join("/tmp", name)) || !io.Exists(filepath.Join("/tmp", name+".sha256")) {
+		return errors.New("下载文件检查失败")
+	}
+
+	if app.IsCli {
+		fmt.Println("|-校验下载文件...")
+	}
+	if check, err := shell.Execf("cd /tmp && sha256sum -c %s --ignore-missing", name+".sha256"); check != name+": OK" || err != nil {
+		return errors.New("下载文件校验失败")
+	}
+	if err := io.Remove(filepath.Join("/tmp", name+".sha256")); err != nil {
+		if app.IsCli {
+			fmt.Println("|-清理校验文件失败：", err)
+		}
+		return fmt.Errorf("清理校验文件失败：%w", err)
+	}
+
+	if app.IsCli {
+		fmt.Println("|-前置检查...")
+	}
+	if io.Exists("/tmp/panel-storage.zip") {
+		return errors.New("检测到 /tmp 存在临时文件，可能是上次更新失败所致，请运行 panel-cli fix 修复后重试")
+	}
+
+	if app.IsCli {
+		fmt.Println("|-备份面板数据...")
+	}
+	// 备份面板
+	if err := r.Create(biz.BackupTypePanel, ""); err != nil {
+		if app.IsCli {
+			fmt.Println("|-备份面板失败：", err)
+		}
+		return fmt.Errorf("备份面板失败：%w", err)
+	}
+	if err := io.Compress(filepath.Join(app.Root, "panel/storage"), nil, "/tmp/panel-storage.zip"); err != nil {
+		if app.IsCli {
+			fmt.Println("|-备份面板数据失败：", err)
+		}
+		return fmt.Errorf("备份面板数据失败：%w", err)
+	}
+	if !io.Exists("/tmp/panel-storage.zip") {
+		return errors.New("已备份面板数据检查失败")
+	}
+
+	if app.IsCli {
+		fmt.Println("|-清理旧版本...")
+	}
+	if _, err := shell.Execf("rm -rf %s/panel/*", app.Root); err != nil {
+		return fmt.Errorf("清理旧版本失败：%w", err)
+	}
+
+	if app.IsCli {
+		fmt.Println("|-解压新版本...")
+	}
+	if err := io.UnCompress(filepath.Join("/tmp", name), filepath.Join(app.Root, "panel")); err != nil {
+		return fmt.Errorf("解压失败：%w", err)
+	}
+	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
+		return errors.New("解压失败，缺失文件")
+	}
+
+	if app.IsCli {
+		fmt.Println("|-恢复面板数据...")
+	}
+	if err := io.UnCompress("/tmp/panel-storage.zip", filepath.Join(app.Root, "panel", "storage")); err != nil {
+		return fmt.Errorf("恢复面板数据失败：%w", err)
+	}
+	if !io.Exists(filepath.Join(app.Root, "panel/storage/app.db")) {
+		return errors.New("恢复面板数据失败")
+	}
+
+	if app.IsCli {
+		fmt.Println("|-运行更新后脚本...")
+	}
+	if _, err := shell.Execf("curl -fsLm 10 https://dl.cdn.haozi.net/panel/auto_update.sh | bash"); err != nil {
+		return fmt.Errorf("运行面板更新后脚本失败：%w", err)
+	}
+	if _, err := shell.Execf(`wget -O /etc/systemd/system/panel.service https://dl.cdn.haozi.net/panel/panel.service && sed -i "s|/www|%s|g" /etc/systemd/system/panel.service`, app.Root); err != nil {
+		return fmt.Errorf("下载面板服务文件失败：%w", err)
+	}
+	if _, err := shell.Execf("panel-cli setting write version %s", version); err != nil {
+		return fmt.Errorf("写入面板版本号失败：%w", err)
+	}
+	if err := io.Mv(filepath.Join(app.Root, "panel/cli"), "/usr/local/sbin/panel-cli"); err != nil {
+		return fmt.Errorf("移动面板命令行工具失败：%w", err)
+	}
+
+	if app.IsCli {
+		fmt.Println("|-设置关键文件权限...")
+	}
+	_ = io.Chmod("/usr/local/sbin/panel-cli", 0700)
+	_ = io.Chmod("/etc/systemd/system/panel.service", 0700)
+	_ = io.Chmod(filepath.Join(app.Root, "panel"), 0700)
+
+	if app.IsCli {
+		fmt.Println("|-更新完成")
+	}
+
+	_, _ = shell.Execf("systemctl daemon-reload")
+	_ = io.Remove("/tmp/panel-storage.zip")
+	_ = io.Remove(filepath.Join(app.Root, "panel/config.example.yml"))
+	tools.RestartPanel()
+
+	return nil
 }

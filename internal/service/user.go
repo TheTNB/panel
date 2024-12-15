@@ -4,6 +4,8 @@ import (
 	"crypto/rsa"
 	"encoding/gob"
 	"fmt"
+	"github.com/go-rat/sessions"
+	"github.com/knadh/koanf/v2"
 	"net"
 	"net/http"
 	"strings"
@@ -12,21 +14,23 @@ import (
 	"github.com/spf13/cast"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/rsacrypto"
 )
 
 type UserService struct {
-	repo biz.UserRepo
+	conf     *koanf.Koanf
+	session  *sessions.Manager
+	userRepo biz.UserRepo
 }
 
-func NewUserService() *UserService {
+func NewUserService(conf *koanf.Koanf, session *sessions.Manager, user biz.UserRepo) *UserService {
 	gob.Register(rsa.PrivateKey{}) // 必须注册 rsa.PrivateKey 类型否则无法反序列化 session 中的 key
 	return &UserService{
-		repo: data.NewUserRepo(),
+		conf:     conf,
+		session:  session,
+		userRepo: user,
 	}
 }
 
@@ -37,7 +41,7 @@ func (s *UserService) GetKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sess, err := app.Session.GetSession(r)
+	sess, err := s.session.GetSession(r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -54,7 +58,7 @@ func (s *UserService) GetKey(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := s.session.GetSession(r)
 	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
@@ -74,7 +78,7 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 
 	decryptedUsername, _ := rsacrypto.DecryptData(&key, req.Username)
 	decryptedPassword, _ := rsacrypto.DecryptData(&key, req.Password)
-	user, err := s.repo.CheckPassword(string(decryptedUsername), string(decryptedPassword))
+	user, err := s.userRepo.CheckPassword(string(decryptedUsername), string(decryptedPassword))
 	if err != nil {
 		Error(w, http.StatusForbidden, "%v", err)
 		return
@@ -87,7 +91,7 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
-	if req.SafeLogin && !app.Conf.Bool("http.tls") {
+	if req.SafeLogin && !s.conf.Bool("http.tls") {
 		sess.Put("safe_login", true)
 		sess.Put("safe_client", fmt.Sprintf("%x", sha3.Sum256([]byte(ip))))
 	}
@@ -98,7 +102,7 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := s.session.GetSession(r)
 	if err == nil {
 		if err = sess.Invalidate(); err != nil {
 			Error(w, http.StatusInternalServerError, "%v", err)
@@ -110,7 +114,7 @@ func (s *UserService) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *UserService) IsLogin(w http.ResponseWriter, r *http.Request) {
-	sess, err := app.Session.GetSession(r)
+	sess, err := s.session.GetSession(r)
 	if err != nil {
 		Success(w, false)
 		return
@@ -125,7 +129,7 @@ func (s *UserService) Info(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := s.repo.Get(userID)
+	user, err := s.userRepo.Get(userID)
 	if err != nil {
 		ErrorSystem(w)
 		return

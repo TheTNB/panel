@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type TaskService struct {
 	taskRepo biz.TaskRepo
 }
 
-func NewTaskService() *TaskService {
+func NewTaskService(task biz.TaskRepo) *TaskService {
 	return &TaskService{
-		taskRepo: data.NewTaskRepo(),
+		taskRepo: task,
 	}
 }
 

@@ -6,43 +6,52 @@ import (
 	"github.com/TheTNB/panel/internal/service"
 )
 
-func Cli() []*cli.Command {
-	cliService := service.NewCliService()
+type Cli struct {
+	cli *service.CliService
+}
+
+func NewCli(cli *service.CliService) *Cli {
+	return &Cli{
+		cli: cli,
+	}
+}
+
+func (route *Cli) Commands() []*cli.Command {
 	return []*cli.Command{
 		{
 			Name:   "restart",
 			Usage:  "重启面板服务",
-			Action: cliService.Restart,
+			Action: route.cli.Restart,
 		},
 		{
 			Name:   "stop",
 			Usage:  "停止面板服务",
-			Action: cliService.Stop,
+			Action: route.cli.Stop,
 		},
 		{
 			Name:   "start",
 			Usage:  "启动面板服务",
-			Action: cliService.Start,
+			Action: route.cli.Start,
 		},
 		{
 			Name:   "update",
 			Usage:  "更新面板",
-			Action: cliService.Update,
+			Action: route.cli.Update,
 		},
 		{
 			Name:   "sync",
 			Usage:  "同步数据",
-			Action: cliService.Sync,
+			Action: route.cli.Sync,
 		},
 		{
 			Name:   "fix",
 			Usage:  "修复面板",
-			Action: cliService.Fix,
+			Action: route.cli.Fix,
 		},
 		{
 			Name:   "info",
 			Usage:  "输出面板基本信息",
-			Action: cliService.Info,
+			Action: route.cli.Info,
 		},
 		{
 			Name:  "user",
@@ -51,17 +60,17 @@ func Cli() []*cli.Command {
 				{
 					Name:   "list",
 					Usage:  "列出所有用户",
-					Action: cliService.UserList,
+					Action: route.cli.UserList,
 				},
 				{
 					Name:   "username",
 					Usage:  "修改用户名",
-					Action: cliService.UserName,
+					Action: route.cli.UserName,
 				},
 				{
 					Name:   "password",
 					Usage:  "修改用户密码",
-					Action: cliService.UserPassword,
+					Action: route.cli.UserPassword,
 				},
 			},
 		},
@@ -72,17 +81,17 @@ func Cli() []*cli.Command {
 				{
 					Name:   "on",
 					Usage:  "开启HTTPS",
-					Action: cliService.HTTPSOn,
+					Action: route.cli.HTTPSOn,
 				},
 				{
 					Name:   "off",
 					Usage:  "关闭HTTPS",
-					Action: cliService.HTTPSOff,
+					Action: route.cli.HTTPSOff,
 				},
 				{
 					Name:   "generate",
 					Usage:  "生成HTTPS证书",
-					Action: cliService.HTTPSGenerate,
+					Action: route.cli.HTTPSGenerate,
 				},
 			},
 		},
@@ -93,19 +102,19 @@ func Cli() []*cli.Command {
 				{
 					Name:   "on",
 					Usage:  "开启访问入口",
-					Action: cliService.EntranceOn,
+					Action: route.cli.EntranceOn,
 				},
 				{
 					Name:   "off",
 					Usage:  "关闭访问入口",
-					Action: cliService.EntranceOff,
+					Action: route.cli.EntranceOff,
 				},
 			},
 		},
 		{
 			Name:   "port",
 			Usage:  "修改面板端口",
-			Action: cliService.Port,
+			Action: route.cli.Port,
 		},
 		{
 			Name:  "website",
@@ -114,7 +123,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "create",
 					Usage:  "创建新网站",
-					Action: cliService.WebsiteCreate,
+					Action: route.cli.WebsiteCreate,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -147,7 +156,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "remove",
 					Usage:  "移除网站",
-					Action: cliService.WebsiteRemove,
+					Action: route.cli.WebsiteRemove,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -160,7 +169,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "delete",
 					Usage:  "删除网站（包括网站目录、同名数据库）",
-					Action: cliService.WebsiteDelete,
+					Action: route.cli.WebsiteDelete,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -174,7 +183,7 @@ func Cli() []*cli.Command {
 					Name:   "write",
 					Usage:  "写入网站数据（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.WebsiteWrite,
+					Action: route.cli.WebsiteWrite,
 				},
 			},
 		},
@@ -185,7 +194,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "add-server",
 					Usage:  "添加数据库服务器",
-					Action: cliService.DatabaseAddServer,
+					Action: route.cli.DatabaseAddServer,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "type",
@@ -224,7 +233,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "delete-server",
 					Usage:  "删除数据库服务器",
-					Action: cliService.DatabaseDeleteServer,
+					Action: route.cli.DatabaseDeleteServer,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -243,7 +252,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "website",
 					Usage:  "备份网站",
-					Action: cliService.BackupWebsite,
+					Action: route.cli.BackupWebsite,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -261,7 +270,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "database",
 					Usage:  "备份数据库",
-					Action: cliService.BackupDatabase,
+					Action: route.cli.BackupDatabase,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "type",
@@ -285,7 +294,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "panel",
 					Usage:  "备份面板",
-					Action: cliService.BackupPanel,
+					Action: route.cli.BackupPanel,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:    "path",
@@ -297,7 +306,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "clear",
 					Usage:  "清理备份",
-					Action: cliService.BackupClear,
+					Action: route.cli.BackupClear,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "type",
@@ -333,7 +342,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "website",
 					Usage:  "网站",
-					Action: cliService.CutoffWebsite,
+					Action: route.cli.CutoffWebsite,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "name",
@@ -352,7 +361,7 @@ func Cli() []*cli.Command {
 				{
 					Name:   "clear",
 					Usage:  "清理切割的日志",
-					Action: cliService.CutoffClear,
+					Action: route.cli.CutoffClear,
 					Flags: []cli.Flag{
 						&cli.StringFlag{
 							Name:     "type",
@@ -388,29 +397,29 @@ func Cli() []*cli.Command {
 				{
 					Name:   "install",
 					Usage:  "安装应用",
-					Action: cliService.AppInstall,
+					Action: route.cli.AppInstall,
 				},
 				{
 					Name:   "uninstall",
 					Usage:  "卸载应用",
-					Action: cliService.AppUnInstall,
+					Action: route.cli.AppUnInstall,
 				},
 				{
 					Name:   "update",
 					Usage:  "更新应用",
-					Action: cliService.AppUpdate,
+					Action: route.cli.AppUpdate,
 				},
 				{
 					Name:   "write",
 					Usage:  "添加面板应用标记（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.AppWrite,
+					Action: route.cli.AppWrite,
 				},
 				{
 					Name:   "remove",
 					Usage:  "移除面板应用标记（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.AppRemove,
+					Action: route.cli.AppRemove,
 				},
 			},
 		},
@@ -423,38 +432,38 @@ func Cli() []*cli.Command {
 					Name:   "get",
 					Usage:  "获取面板设置（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.GetSetting,
+					Action: route.cli.GetSetting,
 				},
 				{
 					Name:   "write",
 					Usage:  "写入面板设置（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.WriteSetting,
+					Action: route.cli.WriteSetting,
 				},
 				{
 					Name:   "remove",
 					Usage:  "移除面板设置（仅限指导下使用）",
 					Hidden: true,
-					Action: cliService.RemoveSetting,
+					Action: route.cli.RemoveSetting,
 				},
 			},
 		},
 		{
 			Name:   "sync-time",
 			Usage:  "同步系统时间",
-			Action: cliService.SyncTime,
+			Action: route.cli.SyncTime,
 		},
 		{
 			Name:   "clear-task",
 			Usage:  "清理面板任务队列（仅限指导下使用）",
 			Hidden: true,
-			Action: cliService.ClearTask,
+			Action: route.cli.ClearTask,
 		},
 		{
 			Name:   "init",
 			Usage:  "初始化面板（仅限指导下使用）",
 			Hidden: true,
-			Action: cliService.Init,
+			Action: route.cli.Init,
 		},
 	}
 }

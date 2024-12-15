@@ -5,7 +5,6 @@ import (
 	"errors"
 	"slices"
 
-	"github.com/samber/do/v2"
 	"gorm.io/gorm"
 
 	"github.com/TheTNB/panel/internal/app"
@@ -16,15 +15,19 @@ import (
 
 type cacheRepo struct {
 	api *api.API
+	db  *gorm.DB
 }
 
-func NewCacheRepo() biz.CacheRepo {
-	return do.MustInvoke[biz.CacheRepo](injector)
+func NewCacheRepo(db *gorm.DB) biz.CacheRepo {
+	return &cacheRepo{
+		api: api.NewAPI(app.Version),
+		db:  db,
+	}
 }
 
 func (r *cacheRepo) Get(key biz.CacheKey, defaultValue ...string) (string, error) {
 	cache := new(biz.Cache)
-	if err := app.Orm.Where("key = ?", key).First(cache).Error; err != nil {
+	if err := r.db.Where("key = ?", key).First(cache).Error; err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", err
 		}
@@ -39,12 +42,12 @@ func (r *cacheRepo) Get(key biz.CacheKey, defaultValue ...string) (string, error
 
 func (r *cacheRepo) Set(key biz.CacheKey, value string) error {
 	cache := new(biz.Cache)
-	if err := app.Orm.Where(biz.Cache{Key: key}).FirstOrInit(cache).Error; err != nil {
+	if err := r.db.Where(biz.Cache{Key: key}).FirstOrInit(cache).Error; err != nil {
 		return err
 	}
 
 	cache.Value = value
-	return app.Orm.Save(cache).Error
+	return r.db.Save(cache).Error
 }
 
 func (r *cacheRepo) UpdateApps() error {

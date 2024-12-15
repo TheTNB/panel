@@ -1,23 +1,27 @@
 package job
 
 import (
+	"gorm.io/gorm"
 	"log/slog"
 	"time"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	pkgcert "github.com/TheTNB/panel/pkg/cert"
 )
 
 // CertRenew 证书续签
 type CertRenew struct {
+	db       *gorm.DB
+	log      *slog.Logger
 	certRepo biz.CertRepo
 }
 
-func NewCertRenew() *CertRenew {
+func NewCertRenew(db *gorm.DB, log *slog.Logger, cert biz.CertRepo) *CertRenew {
 	return &CertRenew{
-		certRepo: data.NewCertRepo(),
+		db:       db,
+		log:      log,
+		certRepo: cert,
 	}
 }
 
@@ -27,8 +31,8 @@ func (r *CertRenew) Run() {
 	}
 
 	var certs []biz.Cert
-	if err := app.Orm.Preload("Website").Preload("Account").Preload("DNS").Find(&certs).Error; err != nil {
-		app.Logger.Warn("获取证书失败", slog.Any("err", err))
+	if err := r.db.Preload("Website").Preload("Account").Preload("DNS").Find(&certs).Error; err != nil {
+		r.log.Warn("获取证书失败", slog.Any("err", err))
 		return
 	}
 
@@ -50,7 +54,7 @@ func (r *CertRenew) Run() {
 
 		_, err = r.certRepo.Renew(cert.ID)
 		if err != nil {
-			app.Logger.Warn("续签证书失败", slog.Any("err", err))
+			r.log.Warn("续签证书失败", slog.Any("err", err))
 		}
 	}
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 )
@@ -18,9 +17,9 @@ type BackupService struct {
 	backupRepo biz.BackupRepo
 }
 
-func NewBackupService() *BackupService {
+func NewBackupService(backup biz.BackupRepo) *BackupService {
 	return &BackupService{
-		backupRepo: data.NewBackupRepo(),
+		backupRepo: backup,
 	}
 }
 

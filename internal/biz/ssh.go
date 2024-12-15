@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/ssh"
 )
@@ -22,7 +21,8 @@ type SSH struct {
 }
 
 func (r *SSH) BeforeSave(tx *gorm.DB) error {
-	var err error
+	// TODO fix
+	/*var err error
 	r.Config.Key, err = app.Crypter.Encrypt([]byte(r.Config.Key))
 	if err != nil {
 		return err
@@ -30,21 +30,22 @@ func (r *SSH) BeforeSave(tx *gorm.DB) error {
 	r.Config.Password, err = app.Crypter.Encrypt([]byte(r.Config.Password))
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 
 }
 
 func (r *SSH) AfterFind(tx *gorm.DB) error {
-	key, err := app.Crypter.Decrypt(r.Config.Key)
+	// TODO fix
+	/*key, err := app.Crypter.Decrypt(r.Config.Key)
 	if err == nil {
 		r.Config.Key = string(key)
 	}
 	password, err := app.Crypter.Decrypt(r.Config.Password)
 	if err == nil {
 		r.Config.Password = string(password)
-	}
+	}*/
 
 	return nil
 }

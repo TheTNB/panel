@@ -2,26 +2,31 @@ package data
 
 import (
 	"fmt"
+	"github.com/TheTNB/panel/internal/app"
+	"gorm.io/gorm"
 	"log/slog"
 	"slices"
 
-	"github.com/samber/do/v2"
-
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
 )
 
-type databaseServerRepo struct{}
+type databaseServerRepo struct {
+	db  *gorm.DB
+	log *slog.Logger
+}
 
-func NewDatabaseServerRepo() biz.DatabaseServerRepo {
-	return do.MustInvoke[biz.DatabaseServerRepo](injector)
+func NewDatabaseServerRepo(db *gorm.DB, log *slog.Logger) biz.DatabaseServerRepo {
+	return &databaseServerRepo{
+		db:  db,
+		log: log,
+	}
 }
 
 func (r databaseServerRepo) Count() (int64, error) {
 	var count int64
-	if err := app.Orm.Model(&biz.DatabaseServer{}).Count(&count).Error; err != nil {
+	if err := r.db.Model(&biz.DatabaseServer{}).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
@@ -31,7 +36,7 @@ func (r databaseServerRepo) Count() (int64, error) {
 func (r databaseServerRepo) List(page, limit uint) ([]*biz.DatabaseServer, int64, error) {
 	var databaseServer []*biz.DatabaseServer
 	var total int64
-	err := app.Orm.Model(&biz.DatabaseServer{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&databaseServer).Error
+	err := r.db.Model(&biz.DatabaseServer{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&databaseServer).Error
 
 	for server := range slices.Values(databaseServer) {
 		r.checkServer(server)
@@ -42,7 +47,7 @@ func (r databaseServerRepo) List(page, limit uint) ([]*biz.DatabaseServer, int64
 
 func (r databaseServerRepo) Get(id uint) (*biz.DatabaseServer, error) {
 	databaseServer := new(biz.DatabaseServer)
-	if err := app.Orm.Where("id = ?", id).First(databaseServer).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(databaseServer).Error; err != nil {
 		return nil, err
 	}
 
@@ -53,7 +58,7 @@ func (r databaseServerRepo) Get(id uint) (*biz.DatabaseServer, error) {
 
 func (r databaseServerRepo) GetByName(name string) (*biz.DatabaseServer, error) {
 	databaseServer := new(biz.DatabaseServer)
-	if err := app.Orm.Where("name = ?", name).First(databaseServer).Error; err != nil {
+	if err := r.db.Where("name = ?", name).First(databaseServer).Error; err != nil {
 		return nil, err
 	}
 
@@ -77,7 +82,7 @@ func (r databaseServerRepo) Create(req *request.DatabaseServerCreate) error {
 		return fmt.Errorf("check server connection failed")
 	}
 
-	return app.Orm.Create(databaseServer).Error
+	return r.db.Create(databaseServer).Error
 }
 
 func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
@@ -97,20 +102,24 @@ func (r databaseServerRepo) Update(req *request.DatabaseServerUpdate) error {
 		return fmt.Errorf("check server connection failed")
 	}
 
-	return app.Orm.Save(server).Error
+	return r.db.Save(server).Error
 }
 
 func (r databaseServerRepo) UpdateRemark(req *request.DatabaseServerUpdateRemark) error {
-	return app.Orm.Model(&biz.DatabaseServer{}).Where("id = ?", req.ID).Update("remark", req.Remark).Error
+	return r.db.Model(&biz.DatabaseServer{}).Where("id = ?", req.ID).Update("remark", req.Remark).Error
 }
 
 func (r databaseServerRepo) Delete(id uint) error {
-	// 删除服务器下的所有用户
-	if err := NewDatabaseUserRepo().DeleteByServerID(id); err != nil {
+	if err := r.ClearUsers(id); err != nil {
 		return err
 	}
 
-	return app.Orm.Where("id = ?", id).Delete(&biz.DatabaseServer{}).Error
+	return r.db.Where("id = ?", id).Delete(&biz.DatabaseServer{}).Error
+}
+
+// ClearUsers 删除指定服务器的所有用户，只是删除面板记录，不会实际删除
+func (r databaseServerRepo) ClearUsers(serverID uint) error {
+	return app.Orm.Where("server_id = ?", serverID).Delete(&biz.DatabaseUser{}).Error
 }
 
 func (r databaseServerRepo) Sync(id uint) error {
@@ -120,7 +129,7 @@ func (r databaseServerRepo) Sync(id uint) error {
 	}
 
 	users := make([]*biz.DatabaseUser, 0)
-	if err = app.Orm.Where("server_id = ?", id).Find(&users).Error; err != nil {
+	if err = r.db.Where("server_id = ?", id).Find(&users).Error; err != nil {
 		return err
 	}
 
@@ -145,8 +154,8 @@ func (r databaseServerRepo) Sync(id uint) error {
 					Host:     user.Host,
 					Remark:   fmt.Sprintf("sync from server %s", server.Name),
 				}
-				if err = app.Orm.Create(newUser).Error; err != nil {
-					app.Logger.Warn("sync database user failed", slog.Any("err", err))
+				if err = r.db.Create(newUser).Error; err != nil {
+					r.log.Warn("sync database user failed", slog.Any("err", err))
 				}
 			}
 		}
@@ -169,7 +178,7 @@ func (r databaseServerRepo) Sync(id uint) error {
 					Username: user.Role,
 					Remark:   fmt.Sprintf("sync from server %s", server.Name),
 				}
-				app.Orm.Create(newUser)
+				r.db.Create(newUser)
 			}
 		}
 	}

@@ -10,7 +10,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/db"
 	"github.com/TheTNB/panel/pkg/io"
@@ -26,7 +25,7 @@ type Service struct {
 
 func NewService() *Service {
 	return &Service{
-		settingRepo: data.NewSettingRepo(),
+		settingRepo: nil, // TODO fixme
 	}
 }
 

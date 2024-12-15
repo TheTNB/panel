@@ -4,18 +4,18 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/samber/do/v2"
-
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/db"
 )
 
-type databaseUserRepo struct{}
+type databaseUserRepo struct {
+	server biz.DatabaseServerRepo
+}
 
-func NewDatabaseUserRepo() biz.DatabaseUserRepo {
-	return do.MustInvoke[biz.DatabaseUserRepo](injector)
+func NewDatabaseUserRepo(server biz.DatabaseServerRepo) biz.DatabaseUserRepo {
+	return &databaseUserRepo{server: server}
 }
 
 func (r databaseUserRepo) Count() (int64, error) {
@@ -51,7 +51,7 @@ func (r databaseUserRepo) Get(id uint) (*biz.DatabaseUser, error) {
 }
 
 func (r databaseUserRepo) Create(req *request.DatabaseUserCreate) error {
-	server, err := NewDatabaseServerRepo().Get(req.ServerID)
+	server, err := r.server.Get(req.ServerID)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,7 @@ func (r databaseUserRepo) Update(req *request.DatabaseUserUpdate) error {
 		return err
 	}
 
-	server, err := NewDatabaseServerRepo().Get(user.ServerID)
+	server, err := r.server.Get(user.ServerID)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func (r databaseUserRepo) Delete(id uint) error {
 		return err
 	}
 
-	server, err := NewDatabaseServerRepo().Get(user.ServerID)
+	server, err := r.server.Get(user.ServerID)
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func (r databaseUserRepo) Delete(id uint) error {
 }
 
 func (r databaseUserRepo) DeleteByNames(serverID uint, names []string) error {
-	server, err := NewDatabaseServerRepo().Get(serverID)
+	server, err := r.server.Get(serverID)
 	if err != nil {
 		return err
 	}
@@ -242,13 +242,8 @@ func (r databaseUserRepo) DeleteByNames(serverID uint, names []string) error {
 	return app.Orm.Where("server_id = ? AND username IN ?", serverID, names).Delete(&biz.DatabaseUser{}).Error
 }
 
-// DeleteByServerID 删除指定服务器的所有用户，只是删除面板记录，不会实际删除
-func (r databaseUserRepo) DeleteByServerID(serverID uint) error {
-	return app.Orm.Where("server_id = ?", serverID).Delete(&biz.DatabaseUser{}).Error
-}
-
 func (r databaseUserRepo) fillUser(user *biz.DatabaseUser) {
-	server, err := NewDatabaseServerRepo().Get(user.ServerID)
+	server, err := r.server.Get(user.ServerID)
 	if err == nil {
 		switch server.Type {
 		case biz.DatabaseTypeMysql:

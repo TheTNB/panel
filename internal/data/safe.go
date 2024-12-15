@@ -2,9 +2,9 @@ package data
 
 import (
 	"fmt"
+	"github.com/TheTNB/panel/pkg/os"
 	"strings"
 
-	"github.com/samber/do/v2"
 	"github.com/spf13/cast"
 
 	"github.com/TheTNB/panel/internal/biz"
@@ -18,7 +18,15 @@ type safeRepo struct {
 }
 
 func NewSafeRepo() biz.SafeRepo {
-	return do.MustInvoke[biz.SafeRepo](injector)
+	var ssh string
+	if os.IsRHEL() {
+		ssh = "sshd"
+	} else {
+		ssh = "ssh"
+	}
+	return &safeRepo{
+		ssh: ssh,
+	}
 }
 
 func (r *safeRepo) GetSSH() (uint, bool, error) {

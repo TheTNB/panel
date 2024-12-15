@@ -3,26 +3,27 @@ package service
 import (
 	"bufio"
 	"context"
+	"github.com/knadh/koanf/v2"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/ssh"
 )
 
 type WsService struct {
+	conf    *koanf.Koanf
 	sshRepo biz.SSHRepo
 }
 
-func NewWsService() *WsService {
+func NewWsService(conf *koanf.Koanf, ssh biz.SSHRepo) *WsService {
 	return &WsService{
-		sshRepo: data.NewSSHRepo(),
+		conf:    conf,
+		sshRepo: ssh,
 	}
 }
 
@@ -121,7 +122,7 @@ func (s *WsService) upgrade(w http.ResponseWriter, r *http.Request) (*websocket.
 	}
 
 	// debug 模式下不校验 origin，方便 vite 代理调试
-	if app.Conf.Bool("app.debug") {
+	if s.conf.Bool("app.debug") {
 		upGrader.CheckOrigin = func(r *http.Request) bool {
 			return true
 		}

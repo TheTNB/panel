@@ -3,12 +3,10 @@ package data
 import (
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"path/filepath"
 	"strconv"
 	"time"
-
-	"github.com/go-rat/utils/str"
-	"github.com/samber/do/v2"
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
@@ -17,17 +15,22 @@ import (
 	"github.com/TheTNB/panel/pkg/os"
 	"github.com/TheTNB/panel/pkg/shell"
 	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/go-rat/utils/str"
 )
 
-type cronRepo struct{}
+type cronRepo struct {
+	db *gorm.DB
+}
 
-func NewCronRepo() biz.CronRepo {
-	return do.MustInvoke[biz.CronRepo](injector)
+func NewCronRepo(db *gorm.DB) biz.CronRepo {
+	return &cronRepo{
+		db: db,
+	}
 }
 
 func (r *cronRepo) Count() (int64, error) {
 	var count int64
-	if err := app.Orm.Model(&biz.Cron{}).Count(&count).Error; err != nil {
+	if err := r.db.Model(&biz.Cron{}).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
@@ -37,13 +40,13 @@ func (r *cronRepo) Count() (int64, error) {
 func (r *cronRepo) List(page, limit uint) ([]*biz.Cron, int64, error) {
 	var cron []*biz.Cron
 	var total int64
-	err := app.Orm.Model(&biz.Cron{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&cron).Error
+	err := r.db.Model(&biz.Cron{}).Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&cron).Error
 	return cron, total, err
 }
 
 func (r *cronRepo) Get(id uint) (*biz.Cron, error) {
 	cron := new(biz.Cron)
-	if err := app.Orm.Where("id = ?", id).First(cron).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(cron).Error; err != nil {
 		return nil, err
 	}
 
@@ -113,7 +116,7 @@ panel-cli cutoff clear -t website -f %s -s %d -p %s
 	cron.Shell = shellDir + shellFile + ".sh"
 	cron.Log = shellLogDir + shellFile + ".log"
 
-	if err := app.Orm.Create(cron).Error; err != nil {
+	if err := r.db.Create(cron).Error; err != nil {
 		return err
 	}
 	if err := r.addToSystem(cron); err != nil {
@@ -135,7 +138,7 @@ func (r *cronRepo) Update(req *request.CronUpdate) error {
 
 	cron.Time = req.Time
 	cron.Name = req.Name
-	if err = app.Orm.Save(cron).Error; err != nil {
+	if err = r.db.Save(cron).Error; err != nil {
 		return err
 	}
 
@@ -171,7 +174,7 @@ func (r *cronRepo) Delete(id uint) error {
 		return err
 	}
 
-	return app.Orm.Delete(cron).Error
+	return r.db.Delete(cron).Error
 }
 
 func (r *cronRepo) Status(id uint, status bool) error {
@@ -189,7 +192,7 @@ func (r *cronRepo) Status(id uint, status bool) error {
 
 	cron.Status = status
 
-	return app.Orm.Save(cron).Error
+	return r.db.Save(cron).Error
 }
 
 // addToSystem 添加到系统

@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/acme"
 	"github.com/TheTNB/panel/pkg/types"
@@ -16,9 +15,9 @@ type CertService struct {
 	certRepo biz.CertRepo
 }
 
-func NewCertService() *CertService {
+func NewCertService(cert biz.CertRepo) *CertService {
 	return &CertService{
-		certRepo: data.NewCertRepo(),
+		certRepo: cert,
 	}
 }
 

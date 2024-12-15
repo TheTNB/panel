@@ -3,15 +3,22 @@ package route
 import (
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TheTNB/panel/internal/http/middleware"
 	"github.com/TheTNB/panel/internal/service"
 )
 
-func Ws(r chi.Router) {
+type Ws struct {
+	ws *service.WsService
+}
+
+func NewWs(ws *service.WsService) *Ws {
+	return &Ws{
+		ws: ws,
+	}
+}
+
+func (route *Ws) Register(r *chi.Mux) {
 	r.Route("/api/ws", func(r chi.Router) {
-		r.Use(middleware.MustLogin)
-		ws := service.NewWsService()
-		r.Get("/ssh", ws.Session)
-		r.Get("/exec", ws.Exec)
+		r.Get("/ssh", route.ws.Session)
+		r.Get("/exec", route.ws.Exec)
 	})
 }

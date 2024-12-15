@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/types"
 )
@@ -17,11 +16,11 @@ type AppService struct {
 	settingRepo biz.SettingRepo
 }
 
-func NewAppService() *AppService {
+func NewAppService(app biz.AppRepo, cache biz.CacheRepo, setting biz.SettingRepo) *AppService {
 	return &AppService{
-		appRepo:     data.NewAppRepo(),
-		cacheRepo:   data.NewCacheRepo(),
-		settingRepo: data.NewSettingRepo(),
+		appRepo:     app,
+		cacheRepo:   cache,
+		settingRepo: setting,
 	}
 }
 

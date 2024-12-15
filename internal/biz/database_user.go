@@ -5,7 +5,6 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -32,21 +31,23 @@ type DatabaseUser struct {
 }
 
 func (r *DatabaseUser) BeforeSave(tx *gorm.DB) error {
-	var err error
+	// TODO fix
+	/*var err error
 	r.Password, err = app.Crypter.Encrypt([]byte(r.Password))
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 
 }
 
 func (r *DatabaseUser) AfterFind(tx *gorm.DB) error {
-	password, err := app.Crypter.Decrypt(r.Password)
+	// TODO fix
+	/*password, err := app.Crypter.Decrypt(r.Password)
 	if err == nil {
 		r.Password = string(password)
-	}
+	}*/
 
 	return nil
 }
@@ -60,5 +61,4 @@ type DatabaseUserRepo interface {
 	UpdateRemark(req *request.DatabaseUserUpdateRemark) error
 	Delete(id uint) error
 	DeleteByNames(serverID uint, names []string) error
-	DeleteByServerID(serverID uint) error
 }

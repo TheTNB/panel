@@ -8,7 +8,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 )
@@ -18,10 +17,10 @@ type WebsiteService struct {
 	settingRepo biz.SettingRepo
 }
 
-func NewWebsiteService() *WebsiteService {
+func NewWebsiteService(website biz.WebsiteRepo, setting biz.SettingRepo) *WebsiteService {
 	return &WebsiteService{
-		websiteRepo: data.NewWebsiteRepo(),
-		settingRepo: data.NewSettingRepo(),
+		websiteRepo: website,
+		settingRepo: setting,
 	}
 }
 

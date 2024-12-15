@@ -1,6 +1,7 @@
 package job
 
 import (
+	"gorm.io/gorm"
 	"log/slog"
 	"time"
 
@@ -8,18 +9,21 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/pkg/tools"
 )
 
 // Monitoring 系统监控
 type Monitoring struct {
+	db          *gorm.DB
+	log         *slog.Logger
 	settingRepo biz.SettingRepo
 }
 
-func NewMonitoring() *Monitoring {
+func NewMonitoring(db *gorm.DB, log *slog.Logger, setting biz.SettingRepo) *Monitoring {
 	return &Monitoring{
-		settingRepo: data.NewSettingRepo(),
+		db:          db,
+		log:         log,
+		settingRepo: setting,
 	}
 }
 
@@ -47,8 +51,8 @@ func (r *Monitoring) Run() {
 		return
 	}
 
-	if err = app.Orm.Create(&biz.Monitor{Info: info}).Error; err != nil {
-		app.Logger.Warn("记录系统监控失败", slog.Any("err", err))
+	if err = r.db.Create(&biz.Monitor{Info: info}).Error; err != nil {
+		r.log.Warn("记录系统监控失败", slog.Any("err", err))
 		return
 	}
 
@@ -61,8 +65,8 @@ func (r *Monitoring) Run() {
 	if day <= 0 || app.Status != app.StatusNormal {
 		return
 	}
-	if err = app.Orm.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format(time.DateTime)).Delete(&biz.Monitor{}).Error; err != nil {
-		app.Logger.Warn("删除过期系统监控失败", slog.Any("err", err))
+	if err = r.db.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format(time.DateTime)).Delete(&biz.Monitor{}).Error; err != nil {
+		r.log.Warn("删除过期系统监控失败", slog.Any("err", err))
 		return
 	}
 }

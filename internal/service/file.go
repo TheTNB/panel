@@ -21,7 +21,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/os"
@@ -33,9 +32,9 @@ type FileService struct {
 	taskRepo biz.TaskRepo
 }
 
-func NewFileService() *FileService {
+func NewFileService(task biz.TaskRepo) *FileService {
 	return &FileService{
-		taskRepo: data.NewTaskRepo(),
+		taskRepo: task,
 	}
 }
 

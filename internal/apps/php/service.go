@@ -13,7 +13,6 @@ import (
 
 	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/service"
 	"github.com/TheTNB/panel/pkg/io"
 	"github.com/TheTNB/panel/pkg/shell"
@@ -28,7 +27,7 @@ type Service struct {
 func NewService(version uint) *Service {
 	return &Service{
 		version:  version,
-		taskRepo: data.NewTaskRepo(),
+		taskRepo: nil, // TODO fixme
 	}
 }
 

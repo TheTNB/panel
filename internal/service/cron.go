@@ -6,7 +6,6 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
@@ -14,9 +13,9 @@ type CronService struct {
 	cronRepo biz.CronRepo
 }
 
-func NewCronService() *CronService {
+func NewCronService(cron biz.CronRepo) *CronService {
 	return &CronService{
-		cronRepo: data.NewCronRepo(),
+		cronRepo: cron,
 	}
 }
 

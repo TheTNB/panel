@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"path/filepath"
 	"slices"
 	"strings"
 	"time"
 
-	"github.com/samber/do/v2"
 	"github.com/samber/lo"
 	"github.com/spf13/cast"
 
@@ -29,14 +29,30 @@ import (
 	"github.com/TheTNB/panel/pkg/types"
 )
 
-type websiteRepo struct{}
+type websiteRepo struct {
+	db             *gorm.DB
+	cache          biz.CacheRepo
+	database       biz.DatabaseRepo
+	databaseServer biz.DatabaseServerRepo
+	databaseUser   biz.DatabaseUserRepo
+	cert           biz.CertRepo
+	certAccount    biz.CertAccountRepo
+}
 
-func NewWebsiteRepo() biz.WebsiteRepo {
-	return do.MustInvoke[biz.WebsiteRepo](injector)
+func NewWebsiteRepo(db *gorm.DB, cache biz.CacheRepo, database biz.DatabaseRepo, databaseServer biz.DatabaseServerRepo, databaseUser biz.DatabaseUserRepo, cert biz.CertRepo, certAccount biz.CertAccountRepo) biz.WebsiteRepo {
+	return &websiteRepo{
+		db:             db,
+		cache:          cache,
+		database:       database,
+		databaseServer: databaseServer,
+		databaseUser:   databaseUser,
+		cert:           cert,
+		certAccount:    certAccount,
+	}
 }
 
 func (r *websiteRepo) GetRewrites() (map[string]string, error) {
-	cached, err := NewCacheRepo().Get(biz.CacheKeyRewrites)
+	cached, err := r.cache.Get(biz.CacheKeyRewrites)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +83,7 @@ func (r *websiteRepo) UpdateDefaultConfig(req *request.WebsiteDefaultConfig) err
 
 func (r *websiteRepo) Count() (int64, error) {
 	var count int64
-	if err := app.Orm.Model(&biz.Website{}).Count(&count).Error; err != nil {
+	if err := r.db.Model(&biz.Website{}).Count(&count).Error; err != nil {
 		return 0, err
 	}
 
@@ -76,7 +92,7 @@ func (r *websiteRepo) Count() (int64, error) {
 
 func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := r.db.Where("id", id).First(website).Error; err != nil {
 		return nil, err
 	}
 	// 解析nginx配置
@@ -176,7 +192,7 @@ func (r *websiteRepo) Get(id uint) (*types.WebsiteSetting, error) {
 
 func (r *websiteRepo) GetByName(name string) (*types.WebsiteSetting, error) {
 	website := new(biz.Website)
-	if err := app.Orm.Where("name", name).First(website).Error; err != nil {
+	if err := r.db.Where("name", name).First(website).Error; err != nil {
 		return nil, err
 	}
 
@@ -188,11 +204,11 @@ func (r *websiteRepo) List(page, limit uint) ([]*biz.Website, int64, error) {
 	var websites []*biz.Website
 	var total int64
 
-	if err := app.Orm.Model(&biz.Website{}).Count(&total).Error; err != nil {
+	if err := r.db.Model(&biz.Website{}).Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
-	if err := app.Orm.Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&websites).Error; err != nil {
+	if err := r.db.Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&websites).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -312,7 +328,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 		Https:  false,
 		Remark: req.Remark,
 	}
-	if err = app.Orm.Create(w).Error; err != nil {
+	if err = r.db.Create(w).Error; err != nil {
 		return nil, err
 	}
 
@@ -324,11 +340,11 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 	// 创建数据库
 	name := "local_" + req.DBType
 	if req.DB {
-		server, err := NewDatabaseServerRepo().GetByName(name)
+		server, err := r.databaseServer.GetByName(name)
 		if err != nil {
 			return nil, fmt.Errorf(`create database: can't find %s database server, please add it first`, name)
 		}
-		if err = NewDatabaseRepo().Create(&request.DatabaseCreate{
+		if err = r.database.Create(&request.DatabaseCreate{
 			ServerID:   server.ID,
 			Name:       req.DBName,
 			CreateUser: true,
@@ -346,7 +362,7 @@ func (r *websiteRepo) Create(req *request.WebsiteCreate) (*biz.Website, error) {
 
 func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", req.ID).First(website).Error; err != nil {
+	if err := r.db.Where("id", req.ID).First(website).Error; err != nil {
 		return err
 	}
 	if !website.Status {
@@ -494,7 +510,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 		return err
 	}
 
-	if err = app.Orm.Save(website).Error; err != nil {
+	if err = r.db.Save(website).Error; err != nil {
 		return err
 	}
 
@@ -508,7 +524,7 @@ func (r *websiteRepo) Update(req *request.WebsiteUpdate) error {
 
 func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 	website := new(biz.Website)
-	if err := app.Orm.Preload("Cert").Where("id", req.ID).First(website).Error; err != nil {
+	if err := r.db.Preload("Cert").Where("id", req.ID).First(website).Error; err != nil {
 		return err
 	}
 	if website.Cert != nil {
@@ -527,18 +543,17 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 		_ = io.Remove(website.Path)
 	}
 	if req.DB {
-		repo := NewDatabaseServerRepo()
-		if mysql, err := repo.GetByName("local_mysql"); err == nil {
-			_ = NewDatabaseUserRepo().DeleteByNames(mysql.ID, []string{website.Name})
-			_ = NewDatabaseRepo().Delete(mysql.ID, website.Name)
+		if mysql, err := r.databaseServer.GetByName("local_mysql"); err == nil {
+			_ = r.databaseUser.DeleteByNames(mysql.ID, []string{website.Name})
+			_ = r.database.Delete(mysql.ID, website.Name)
 		}
-		if postgres, err := repo.GetByName("local_postgresql"); err == nil {
-			_ = NewDatabaseUserRepo().DeleteByNames(postgres.ID, []string{website.Name})
-			_ = NewDatabaseRepo().Delete(postgres.ID, website.Name)
+		if postgres, err := r.databaseServer.GetByName("local_postgresql"); err == nil {
+			_ = r.databaseUser.DeleteByNames(postgres.ID, []string{website.Name})
+			_ = r.database.Delete(postgres.ID, website.Name)
 		}
 	}
 
-	if err := app.Orm.Delete(website).Error; err != nil {
+	if err := r.db.Delete(website).Error; err != nil {
 		return err
 	}
 
@@ -552,7 +567,7 @@ func (r *websiteRepo) Delete(req *request.WebsiteDelete) error {
 
 func (r *websiteRepo) ClearLog(id uint) error {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := r.db.Where("id", id).First(website).Error; err != nil {
 		return err
 	}
 
@@ -562,17 +577,17 @@ func (r *websiteRepo) ClearLog(id uint) error {
 
 func (r *websiteRepo) UpdateRemark(id uint, remark string) error {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", id).First(website).Error; err != nil {
+	if err := r.db.Where("id", id).First(website).Error; err != nil {
 		return err
 	}
 
 	website.Remark = remark
-	return app.Orm.Save(website).Error
+	return r.db.Save(website).Error
 }
 
 func (r *websiteRepo) ResetConfig(id uint) error {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", id).First(&website).Error; err != nil {
+	if err := r.db.Where("id", id).First(&website).Error; err != nil {
 		return err
 	}
 
@@ -617,7 +632,7 @@ func (r *websiteRepo) ResetConfig(id uint) error {
 
 	website.Status = true
 	website.Https = false
-	if err = app.Orm.Save(website).Error; err != nil {
+	if err = r.db.Save(website).Error; err != nil {
 		return err
 	}
 
@@ -631,7 +646,7 @@ func (r *websiteRepo) ResetConfig(id uint) error {
 
 func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 	website := new(biz.Website)
-	if err := app.Orm.Where("id", id).First(&website).Error; err != nil {
+	if err := r.db.Where("id", id).First(&website).Error; err != nil {
 		return err
 	}
 
@@ -694,7 +709,7 @@ func (r *websiteRepo) UpdateStatus(id uint, status bool) error {
 	}
 
 	website.Status = status
-	if err = app.Orm.Save(website).Error; err != nil {
+	if err = r.db.Save(website).Error; err != nil {
 		return err
 	}
 
@@ -715,15 +730,14 @@ func (r *websiteRepo) ObtainCert(ctx context.Context, id uint) error {
 		return errors.New("cannot one-key obtain wildcard certificate")
 	}
 
-	account, err := NewCertAccountRepo().GetDefault(cast.ToUint(ctx.Value("user_id")))
+	account, err := r.certAccount.GetDefault(cast.ToUint(ctx.Value("user_id")))
 	if err != nil {
 		return err
 	}
 
-	cRepo := NewCertRepo()
-	newCert, err := cRepo.GetByWebsite(website.ID)
+	newCert, err := r.cert.GetByWebsite(website.ID)
 	if err != nil {
-		newCert, err = cRepo.Create(&request.CertCreate{
+		newCert, err = r.cert.Create(&request.CertCreate{
 			Type:      string(acme.KeyEC256),
 			Domains:   website.Domains,
 			AutoRenew: true,
@@ -735,14 +749,14 @@ func (r *websiteRepo) ObtainCert(ctx context.Context, id uint) error {
 		}
 	}
 	newCert.Domains = website.Domains
-	if err = app.Orm.Save(newCert).Error; err != nil {
+	if err = r.db.Save(newCert).Error; err != nil {
 		return err
 	}
 
-	_, err = cRepo.ObtainAuto(newCert.ID)
+	_, err = r.cert.ObtainAuto(newCert.ID)
 	if err != nil {
 		return err
 	}
 
-	return cRepo.Deploy(newCert.ID, website.ID)
+	return r.cert.Deploy(newCert.ID, website.ID)
 }

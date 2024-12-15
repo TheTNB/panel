@@ -2,31 +2,33 @@ package data
 
 import (
 	"fmt"
+	"gorm.io/gorm"
 
-	"github.com/samber/do/v2"
-
-	"github.com/TheTNB/panel/internal/app"
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
 	pkgssh "github.com/TheTNB/panel/pkg/ssh"
 )
 
-type sshRepo struct{}
+type sshRepo struct {
+	db *gorm.DB
+}
 
-func NewSSHRepo() biz.SSHRepo {
-	return do.MustInvoke[biz.SSHRepo](injector)
+func NewSSHRepo(db *gorm.DB) biz.SSHRepo {
+	return &sshRepo{
+		db: db,
+	}
 }
 
 func (r *sshRepo) List(page, limit uint) ([]*biz.SSH, int64, error) {
 	var ssh []*biz.SSH
 	var total int64
-	err := app.Orm.Model(&biz.SSH{}).Omit("Hosts").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&ssh).Error
+	err := r.db.Model(&biz.SSH{}).Omit("Hosts").Order("id desc").Count(&total).Offset(int((page - 1) * limit)).Limit(int(limit)).Find(&ssh).Error
 	return ssh, total, err
 }
 
 func (r *sshRepo) Get(id uint) (*biz.SSH, error) {
 	ssh := new(biz.SSH)
-	if err := app.Orm.Where("id = ?", id).First(ssh).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(ssh).Error; err != nil {
 		return nil, err
 	}
 
@@ -54,7 +56,7 @@ func (r *sshRepo) Create(req *request.SSHCreate) error {
 		Remark: req.Remark,
 	}
 
-	return app.Orm.Create(ssh).Error
+	return r.db.Create(ssh).Error
 }
 
 func (r *sshRepo) Update(req *request.SSHUpdate) error {
@@ -79,9 +81,9 @@ func (r *sshRepo) Update(req *request.SSHUpdate) error {
 		Remark: req.Remark,
 	}
 
-	return app.Orm.Model(ssh).Where("id = ?", req.ID).Select("*").Updates(ssh).Error
+	return r.db.Model(ssh).Where("id = ?", req.ID).Select("*").Updates(ssh).Error
 }
 
 func (r *sshRepo) Delete(id uint) error {
-	return app.Orm.Delete(&biz.SSH{}, id).Error
+	return r.db.Delete(&biz.SSH{}, id).Error
 }

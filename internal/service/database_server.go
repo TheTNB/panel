@@ -6,21 +6,20 @@ import (
 	"github.com/go-rat/chix"
 
 	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/data"
 	"github.com/TheTNB/panel/internal/http/request"
 )
 
-type DatabaseServer struct {
+type DatabaseServerService struct {
 	databaseServerRepo biz.DatabaseServerRepo
 }
 
-func NewDatabaseServerService() *DatabaseServer {
-	return &DatabaseServer{
-		databaseServerRepo: data.NewDatabaseServerRepo(),
+func NewDatabaseServerService(databaseServer biz.DatabaseServerRepo) *DatabaseServerService {
+	return &DatabaseServerService{
+		databaseServerRepo: databaseServer,
 	}
 }
 
-func (s *DatabaseServer) List(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) List(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.Paginate](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -39,7 +38,7 @@ func (s *DatabaseServer) List(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *DatabaseServer) Create(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) Create(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseServerCreate](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -54,7 +53,7 @@ func (s *DatabaseServer) Create(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *DatabaseServer) Get(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) Get(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -70,7 +69,7 @@ func (s *DatabaseServer) Get(w http.ResponseWriter, r *http.Request) {
 	Success(w, server)
 }
 
-func (s *DatabaseServer) Update(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) Update(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseServerUpdate](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -85,7 +84,7 @@ func (s *DatabaseServer) Update(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *DatabaseServer) UpdateRemark(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) UpdateRemark(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.DatabaseServerUpdateRemark](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -100,7 +99,7 @@ func (s *DatabaseServer) UpdateRemark(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *DatabaseServer) Delete(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) Delete(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
@@ -115,7 +114,7 @@ func (s *DatabaseServer) Delete(w http.ResponseWriter, r *http.Request) {
 	Success(w, nil)
 }
 
-func (s *DatabaseServer) Sync(w http.ResponseWriter, r *http.Request) {
+func (s *DatabaseServerService) Sync(w http.ResponseWriter, r *http.Request) {
 	req, err := Bind[request.ID](r)
 	if err != nil {
 		Error(w, http.StatusUnprocessableEntity, "%v", err)
