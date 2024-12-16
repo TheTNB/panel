@@ -2377,8 +2377,8 @@ packages:
     resolution: {integrity: sha512-5KoIu2Ngpyek75jXodFvnafB6DJgr3u8uuK0LEZJjrU19DrMD3EVERaR8sjz8CCGgpZvxPl9SuE1GMVPFHx1mw==}
     engines: {node: '>= 0.4'}
 
-  is-number-object@1.1.0:
-    resolution: {integrity: sha512-KVSZV0Dunv9DTPkhXwcZ3Q+tUc9TsaE1ZwX5J2WMvsSGS6Md8TFPun5uwh0yRdrNerI6vf/tbJxqSx4c1ZI1Lw==}
+  is-number-object@1.1.1:
+    resolution: {integrity: sha512-lZhclumE1G6VYD8VHe35wFaIif+CTy5SJIi5+3y4psDgWu4wPDoBhF8NxUOinEc7pHgiTsT6MaBb92rKhhD+Xw==}
     engines: {node: '>= 0.4'}
 
   is-number@7.0.0:
@@ -6198,9 +6198,9 @@ snapshots:
 
   is-negative-zero@2.0.3: {}
 
-  is-number-object@1.1.0:
+  is-number-object@1.1.1:
     dependencies:
-      call-bind: 1.0.8
+      call-bound: 1.0.3
       has-tostringtag: 1.0.2
 
   is-number@7.0.0: {}
@@ -7467,7 +7467,7 @@ snapshots:
     dependencies:
       is-bigint: 1.1.0
       is-boolean-object: 1.2.1
-      is-number-object: 1.1.0
+      is-number-object: 1.1.1
       is-string: 1.1.0
       is-symbol: 1.1.1
 
