@@ -14,6 +14,7 @@ func Status(next http.Handler) http.Handler {
 		switch app.Status {
 		case app.StatusUpgrade:
 			render := chix.NewRender(w)
+			defer render.Release()
 			render.Status(http.StatusServiceUnavailable)
 			render.JSON(chix.M{
 				"message": "面板更新中，请稍后刷新",
@@ -21,6 +22,7 @@ func Status(next http.Handler) http.Handler {
 			return
 		case app.StatusMaintain:
 			render := chix.NewRender(w)
+			defer render.Release()
 			render.Status(http.StatusServiceUnavailable)
 			render.JSON(chix.M{
 				"message": "面板正在运行维护任务，请稍后刷新",
@@ -28,6 +30,7 @@ func Status(next http.Handler) http.Handler {
 			return
 		case app.StatusClosed:
 			render := chix.NewRender(w)
+			defer render.Release()
 			render.Status(http.StatusForbidden)
 			render.JSON(chix.M{
 				"message": "面板已关闭",
@@ -35,6 +38,7 @@ func Status(next http.Handler) http.Handler {
 			return
 		case app.StatusFailed:
 			render := chix.NewRender(w)
+			defer render.Release()
 			render.Status(http.StatusInternalServerError)
 			render.JSON(chix.M{
 				"message": "面板运行出错，请检查排除或联系支持",

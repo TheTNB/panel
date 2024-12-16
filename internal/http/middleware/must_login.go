@@ -29,10 +29,12 @@ func MustLogin(session *sessions.Manager) func(next http.Handler) http.Handler {
 			sess, err := session.GetSession(r)
 			if err != nil {
 				render := chix.NewRender(w)
+				defer render.Release()
 				render.Status(http.StatusInternalServerError)
 				render.JSON(chix.M{
 					"message": err.Error(),
 				})
+				return
 			}
 
 			// 对白名单和非 API 请求放行
@@ -43,6 +45,7 @@ func MustLogin(session *sessions.Manager) func(next http.Handler) http.Handler {
 
 			if sess.Missing("user_id") {
 				render := chix.NewRender(w)
+				defer render.Release()
 				render.Status(http.StatusUnauthorized)
 				render.JSON(chix.M{
 					"message": "会话已过期，请重新登录",
@@ -53,6 +56,7 @@ func MustLogin(session *sessions.Manager) func(next http.Handler) http.Handler {
 			userID := cast.ToUint(sess.Get("user_id"))
 			if userID == 0 {
 				render := chix.NewRender(w)
+				defer render.Release()
 				render.Status(http.StatusUnauthorized)
 				render.JSON(chix.M{
 					"message": "会话无效，请重新登录",
@@ -67,6 +71,7 @@ func MustLogin(session *sessions.Manager) func(next http.Handler) http.Handler {
 				clientHash := fmt.Sprintf("%x", sha256.Sum256([]byte(ip)))
 				if safeClientHash != clientHash || safeClientHash == "" {
 					render := chix.NewRender(w)
+					defer render.Release()
 					render.Status(http.StatusUnauthorized)
 					render.JSON(chix.M{
 						"message": "客户端IP/UA变化，请重新登录",

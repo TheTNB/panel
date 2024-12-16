@@ -17,16 +17,19 @@ func Entrance(conf *koanf.Koanf, session *sessions.Manager) func(next http.Handl
 			sess, err := session.GetSession(r)
 			if err != nil {
 				render := chix.NewRender(w)
+				defer render.Release()
 				render.Status(http.StatusInternalServerError)
 				render.JSON(chix.M{
 					"message": err.Error(),
 				})
+				return
 			}
 
 			entrance := conf.String("http.entrance")
 			if strings.TrimSuffix(r.URL.Path, "/") == strings.TrimSuffix(entrance, "/") {
 				sess.Put("verify_entrance", true)
 				render := chix.NewRender(w, r)
+				defer render.Release()
 				render.Redirect("/login")
 				return
 			}
@@ -35,6 +38,7 @@ func Entrance(conf *koanf.Koanf, session *sessions.Manager) func(next http.Handl
 				!cast.ToBool(sess.Get("verify_entrance", false)) &&
 				r.URL.Path != "/robots.txt" {
 				render := chix.NewRender(w)
+				defer render.Release()
 				render.Status(http.StatusTeapot)
 				render.JSON(chix.M{
 					"message": "请通过正确的入口访问",
