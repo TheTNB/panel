@@ -1,7 +1,7 @@
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
-github.com/TheTNB/acmez/v3 v3.0.0-20241207104744-c778583fbd17 h1:BP7w9kK5EDB8bW2GukDKJ8uUPbGOyRtuO/JesbI/wtc=
-github.com/TheTNB/acmez/v3 v3.0.0-20241207104744-c778583fbd17/go.mod h1:L1wOU06KKvq7tswuMDwKdcHeKpFFgkppZy/y0DFxagQ=
+github.com/TheTNB/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc h1:Nh7pc2CKHFF1lg+38slGKgJZ4A8cG30ERs7pwK/+V6Y=
+github.com/TheTNB/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc/go.mod h1:L1wOU06KKvq7tswuMDwKdcHeKpFFgkppZy/y0DFxagQ=
 github.com/bddjr/hlfhr v1.3.5 h1:nBbye1k7XQ+4KJIGKQADk6lIuDUV+fcXG+TUUsFihPk=
 github.com/bddjr/hlfhr v1.3.5/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=
