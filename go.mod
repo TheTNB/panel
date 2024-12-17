@@ -90,5 +90,5 @@ require (
 
 replace (
 	github.com/libdns/tencentcloud => github.com/devhaozi/tencentcloud v0.0.0-20241129095955-7d4e898ce504
-	github.com/mholt/acmez/v3 => github.com/TheTNB/acmez/v3 v3.0.0-20241207104744-c778583fbd17
+	github.com/mholt/acmez/v3 => github.com/TheTNB/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc
 )
