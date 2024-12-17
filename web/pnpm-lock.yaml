@@ -46,7 +46,7 @@ importers:
         version: 5.5.0
       alova:
         specifier: ^3.2.4
-        version: 3.2.6
+        version: 3.2.7
       axios:
         specifier: ^1.7.7
         version: 1.7.9
@@ -146,7 +146,7 @@ importers:
         version: 9.32.0(eslint@9.17.0(jiti@2.4.1))
       md-editor-v3:
         specifier: ^5.0.2
-        version: 5.1.0(@codemirror/view@6.35.3)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3))
+        version: 5.1.1(@codemirror/view@6.35.3)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3))
       monaco-editor:
         specifier: ^0.52.0
         version: 0.52.2
@@ -201,8 +201,8 @@ importers:
 
 packages:
 
-  '@alova/shared@1.1.1':
-    resolution: {integrity: sha512-wYEpisfemAaKH9ODLzlFEcDN34tmc1eWrc++r/Axtdvxb4xpiokWQmQtqr+ODEJ90qG4TCuB5MkCCQBxgKf+fg==}
+  '@alova/shared@1.1.2':
+    resolution: {integrity: sha512-8q/gMHFpzm7XYcaUlsyTCMDRRhFnewwheTeObMjPl1+bFdr+wZuBEHEPYIyd8tyzLwfrqpBeonaMN2tlngM8EA==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -1512,8 +1512,8 @@ packages:
   alien-signals@0.2.2:
     resolution: {integrity: sha512-cZIRkbERILsBOXTQmMrxc9hgpxglstn69zm+F1ARf4aPAzdAFYd6sBq87ErO0Fj3DV94tglcyHG5kQz9nDC/8A==}
 
-  alova@3.2.6:
-    resolution: {integrity: sha512-PJFExNPfuoa9Bvmp2gbSpmJyqXnpT6kDFQ+UYvpyQjXqAbKW2wcw1KUcKMXdPHO9hkzkGdev1dlZRMYIMFYd8g==}
+  alova@3.2.7:
+    resolution: {integrity: sha512-V0ePERLfCg0/60f/OFbwufG7djA/uzNjSBcxXmnVZAqGIzVXaSWKe44oNE48ZiuNwsWZUfP0pc36wv9XWVQOyA==}
     engines: {node: '>= 18.0.0'}
 
   ansi-styles@4.3.0:
@@ -2599,8 +2599,8 @@ packages:
     resolution: {integrity: sha512-4MqMiKP90ybymYvsut0CH2g4XWbfLtmlCkXmtmdcDCxNB+mQcu1w/1+L/VD7vi/PSv7X2JYV7SCcR+jiPXnQtA==}
     engines: {node: '>= 0.4'}
 
-  md-editor-v3@5.1.0:
-    resolution: {integrity: sha512-c++wFxzJOs5ILyntyf0CpBWWosc5GNNT3j8NoOd/n5UsqVH9dv1p2OymrxBmU5XuOyc6xEazfDMAKK7FxtmZTw==}
+  md-editor-v3@5.1.1:
+    resolution: {integrity: sha512-qF7NCQOyg8dndm8RRTp+l8fIUpRKooWY7DqHLjr2jkuIZKN4kOei8tQcrNivDKsR1sHuQ1Vdvps5ssI6Aw2ruQ==}
     peerDependencies:
       vue: ^3.5.3
 
@@ -3619,7 +3619,7 @@ packages:
 
 snapshots:
 
-  '@alova/shared@1.1.1': {}
+  '@alova/shared@1.1.2': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -5190,9 +5190,9 @@ snapshots:
 
   alien-signals@0.2.2: {}
 
-  alova@3.2.6:
+  alova@3.2.7:
     dependencies:
-      '@alova/shared': 1.1.1
+      '@alova/shared': 1.1.2
       rate-limiter-flexible: 5.0.4
 
   ansi-styles@4.3.0:
@@ -6378,7 +6378,7 @@ snapshots:
 
   math-intrinsics@1.0.0: {}
 
-  md-editor-v3@5.1.0(@codemirror/view@6.35.3)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3)):
+  md-editor-v3@5.1.1(@codemirror/view@6.35.3)(@lezer/common@1.2.3)(vue@3.5.13(typescript@5.6.3)):
     dependencies:
       '@codemirror/lang-markdown': 6.3.1
       '@codemirror/language-data': 6.5.1(@codemirror/view@6.35.3)
