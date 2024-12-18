@@ -37,7 +37,7 @@ require (
 	github.com/samber/lo v1.47.0
 	github.com/sethvargo/go-limiter v1.0.0
 	github.com/shirou/gopsutil v2.21.11+incompatible
-	github.com/spf13/cast v1.7.0
+	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tufanbarisyildirim/gonginx v0.0.0-20241205102811-323481085fb4
 	github.com/urfave/cli/v3 v3.0.0-beta1
