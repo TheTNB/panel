@@ -39,10 +39,10 @@ require (
 	github.com/shirou/gopsutil v2.21.11+incompatible
 	github.com/spf13/cast v1.7.1
 	github.com/stretchr/testify v1.10.0
-	github.com/tufanbarisyildirim/gonginx v0.0.0-20241205102811-323481085fb4
+	github.com/tufanbarisyildirim/gonginx v0.0.0-20241218171455-78982de517fa
 	github.com/urfave/cli/v3 v3.0.0-beta1
 	golang.org/x/crypto v0.31.0
-	golang.org/x/net v0.32.0
+	golang.org/x/net v0.33.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/gorm v1.25.12
