@@ -286,7 +286,7 @@ func (s *App) encryptionTest(multi bool) int {
 
 func (s *App) encryptionTestTask(numThreads int) error {
 	key := []byte("abcdefghijklmnopqrstuvwxyz123456")
-	dataSize := 1 * 1024 * 1024 * 1024 // 1GB
+	dataSize := 1024 * 1024 * 512 // 512 MB
 	plaintext := []byte(strings.Repeat("A", dataSize))
 	block, err := aes.NewCipher(key)
 	if err != nil {
