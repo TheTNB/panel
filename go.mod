@@ -31,7 +31,7 @@ require (
 	github.com/libdns/huaweicloud v0.3.1
 	github.com/libdns/libdns v0.2.2
 	github.com/libdns/tencentcloud v1.1.0
-	github.com/mholt/acmez/v3 v3.0.0-20241214053340-45433dfc1161
+	github.com/mholt/acmez/v3 v3.0.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/samber/lo v1.47.0
