@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 	"github.com/gookit/validate"
 	"github.com/knadh/koanf/v2"
 	"github.com/robfig/cron/v3"
+
+	"github.com/TheTNB/panel/pkg/queue"
 )
 
 type Web struct {
@@ -20,15 +23,17 @@ type Web struct {
 	server   *hlfhr.Server
 	migrator *gormigrate.Gormigrate
 	cron     *cron.Cron
+	queue    *queue.Queue
 }
 
-func NewWeb(conf *koanf.Koanf, router *chi.Mux, server *hlfhr.Server, migrator *gormigrate.Gormigrate, cron *cron.Cron, _ *validate.Validation) *Web {
+func NewWeb(conf *koanf.Koanf, router *chi.Mux, server *hlfhr.Server, migrator *gormigrate.Gormigrate, cron *cron.Cron, queue *queue.Queue, _ *validate.Validation) *Web {
 	return &Web{
 		conf:     conf,
 		router:   router,
 		server:   server,
 		migrator: migrator,
 		cron:     cron,
+		queue:    queue,
 	}
 }
 
@@ -42,6 +47,9 @@ func (r *Web) Run() error {
 	// start cron scheduler
 	r.cron.Start()
 	fmt.Println("[CRON] cron scheduler started")
+
+	// start queue
+	r.queue.Run(context.TODO())
 
 	// run http server
 	if r.conf.Bool("http.tls") {

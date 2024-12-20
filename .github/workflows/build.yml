@@ -1,11 +1,46 @@
-name: Backend
+name: Build
 on:
   push:
     branches:
       - main
   pull_request:
 jobs:
-  build:
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+          package_json_file: web/package.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Build frontend
+        # We need to run the dev server first to generate the auto-imports files
+        run: |
+          cp .env.production .env
+          cp settings/proxy-config.example.ts settings/proxy-config.ts
+          pnpm dev &
+          sleep 5
+          kill %1
+          pnpm build
+      - name: Upload frontend
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: web/dist/ # https://github.com/actions/upload-artifact/issues/541
+  backend:
+    needs: frontend
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -23,19 +58,11 @@ jobs:
           go-version: 'stable'
       - name: Install dependencies
         run: go mod tidy
-      - name: Wait for frontend build
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          check-name: 'build (frontend)'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Download frontend
-        uses: dawidd6/action-download-artifact@v7
+        uses: actions/download-artifact@v4
         with:
-          workflow: frontend.yml
           name: frontend
           path: internal/embed/frontend
-          check_artifacts: true
       - name: Set build info
         run: |
           echo "VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0')" >> $GITHUB_ENV
