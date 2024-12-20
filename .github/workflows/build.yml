@@ -95,7 +95,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.goarch }}
+          name: backend-${{ matrix.goarch }}
           path: |
             web-${{ matrix.goarch }}
             cli-${{ matrix.goarch }}
