@@ -18,16 +18,15 @@
   ],
   "packageRules": [
     {
-      "groupName": "all dependencies",
-      "groupSlug": "all",
-      "description": "Automerge non-major updates",
+      "groupName": "non-major dependencies",
       "matchUpdateTypes": [
         "digest",
         "pin",
         "patch",
         "minor"
       ],
-      "automerge": true
+      "automerge": true,
+      "automergeType": "branch"
     }
   ],
   "ignoreDeps": [
