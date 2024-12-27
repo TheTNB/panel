@@ -1,6 +1,5 @@
-//go:build !windows
+//go:build windows
 
-// Package chattr https://github.com/g0rbe/go-chattr/pull/3
 package chattr
 
 /*
@@ -24,9 +23,8 @@ Example to set the immutable attribute to a file:
 */
 
 import (
+	"errors"
 	"os"
-	"syscall"
-	"unsafe"
 )
 
 // from /usr/include/linux/fs.h
@@ -67,13 +65,7 @@ const (
 )
 
 func ioctl(f *os.File, request uintptr, attrp *uint32) error {
-	argp := uintptr(unsafe.Pointer(attrp))
-	_, _, errno := syscall.SyscallN(syscall.SYS_IOCTL, f.Fd(), request, argp)
-	if errno != 0 {
-		return os.NewSyscallError("ioctl", errno)
-	}
-
-	return nil
+	return errors.New("not supported on windows")
 }
 
 // GetAttrs retrieves the attributes of a file.

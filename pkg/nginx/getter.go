@@ -14,7 +14,7 @@ func (p *Parser) GetListen() ([][]string, error) {
 
 	var result [][]string
 	for _, dir := range directives {
-		result = append(result, dir.GetParameters())
+		result = append(result, p.parameters2Slices(dir.GetParameters()))
 	}
 
 	return result, nil
@@ -26,7 +26,7 @@ func (p *Parser) GetServerName() ([]string, error) {
 		return nil, err
 	}
 
-	return directive.GetParameters(), nil
+	return p.parameters2Slices(directive.GetParameters()), nil
 }
 
 func (p *Parser) GetIndex() ([]string, error) {
@@ -35,7 +35,7 @@ func (p *Parser) GetIndex() ([]string, error) {
 		return nil, err
 	}
 
-	return directive.GetParameters(), nil
+	return p.parameters2Slices(directive.GetParameters()), nil
 }
 
 func (p *Parser) GetIndexWithComment() ([]string, []string, error) {
@@ -44,7 +44,7 @@ func (p *Parser) GetIndexWithComment() ([]string, []string, error) {
 		return nil, nil, err
 	}
 
-	return directive.GetParameters(), directive.GetComment(), nil
+	return p.parameters2Slices(directive.GetParameters()), directive.GetComment(), nil
 }
 
 func (p *Parser) GetRoot() (string, error) {
@@ -52,11 +52,11 @@ func (p *Parser) GetRoot() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return "", nil
 	}
 
-	return directive.GetParameters()[0], nil
+	return directive.GetParameters()[0].GetValue(), nil
 }
 
 func (p *Parser) GetRootWithComment() (string, []string, error) {
@@ -64,11 +64,11 @@ func (p *Parser) GetRootWithComment() (string, []string, error) {
 	if err != nil {
 		return "", nil, err
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return "", directive.GetComment(), nil
 	}
 
-	return directive.GetParameters()[0], directive.GetComment(), nil
+	return directive.GetParameters()[0].GetValue(), directive.GetComment(), nil
 }
 
 func (p *Parser) GetIncludes() (includes []string, comments [][]string, err error) {
@@ -81,7 +81,7 @@ func (p *Parser) GetIncludes() (includes []string, comments [][]string, err erro
 		if len(dir.GetParameters()) != 1 {
 			return nil, nil, fmt.Errorf("invalid include directive, expected 1 parameter but got %d", len(dir.GetParameters()))
 		}
-		includes = append(includes, dir.GetParameters()[0])
+		includes = append(includes, dir.GetParameters()[0].GetValue())
 		comments = append(comments, dir.GetComment())
 	}
 
@@ -96,10 +96,10 @@ func (p *Parser) GetPHP() int {
 
 	var result int
 	for _, dir := range directives {
-		if slices.ContainsFunc(dir.GetParameters(), func(s string) bool {
+		if slices.ContainsFunc(p.parameters2Slices(dir.GetParameters()), func(s string) bool {
 			return strings.HasPrefix(s, "enable-php-") && strings.HasSuffix(s, ".conf")
 		}) {
-			_, _ = fmt.Sscanf(dir.GetParameters()[0], "enable-php-%d.conf", &result)
+			_, _ = fmt.Sscanf(dir.GetParameters()[0].GetValue(), "enable-php-%d.conf", &result)
 		}
 	}
 
@@ -111,7 +111,7 @@ func (p *Parser) GetHTTPS() bool {
 	if err != nil {
 		return false
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return false
 	}
 
@@ -124,7 +124,7 @@ func (p *Parser) GetHTTPSProtocols() []string {
 		return nil
 	}
 
-	return directive.GetParameters()
+	return p.parameters2Slices(directive.GetParameters())
 }
 
 func (p *Parser) GetHTTPSCiphers() string {
@@ -132,11 +132,11 @@ func (p *Parser) GetHTTPSCiphers() string {
 	if err != nil {
 		return ""
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return ""
 	}
 
-	return directive.GetParameters()[0]
+	return directive.GetParameters()[0].GetValue()
 }
 
 func (p *Parser) GetOCSP() bool {
@@ -144,11 +144,11 @@ func (p *Parser) GetOCSP() bool {
 	if err != nil {
 		return false
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return false
 	}
 
-	return directive.GetParameters()[0] == "on"
+	return directive.GetParameters()[0].GetValue() == "on"
 }
 
 func (p *Parser) GetHSTS() bool {
@@ -158,7 +158,7 @@ func (p *Parser) GetHSTS() bool {
 	}
 
 	for _, dir := range directives {
-		if slices.Contains(dir.GetParameters(), "Strict-Transport-Security") {
+		if slices.Contains(p.parameters2Slices(dir.GetParameters()), "Strict-Transport-Security") {
 			return true
 		}
 	}
@@ -174,7 +174,7 @@ func (p *Parser) GetHTTPSRedirect() bool {
 
 	for _, dir := range directives {
 		for _, dir2 := range dir.GetBlock().GetDirectives() {
-			if dir2.GetName() == "return" && slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
+			if dir2.GetName() == "return" && slices.Contains(p.parameters2Slices(dir2.GetParameters()), "https://$host$request_uri") {
 				return true
 			}
 		}
@@ -189,9 +189,9 @@ func (p *Parser) GetAltSvc() string {
 		return ""
 	}
 
-	for i, param := range directive.GetParameters() {
-		if strings.HasPrefix(param, "Alt-Svc") && i+1 < len(directive.GetParameters()) {
-			return directive.GetParameters()[i+1]
+	for i, param := range p.parameters2Slices(directive.GetParameters()) {
+		if strings.HasPrefix(param, "Alt-Svc") && i+1 < len(p.parameters2Slices(directive.GetParameters())) {
+			return p.parameters2Slices(directive.GetParameters())[i+1]
 		}
 	}
 
@@ -203,11 +203,11 @@ func (p *Parser) GetAccessLog() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return "", nil
 	}
 
-	return directive.GetParameters()[0], nil
+	return directive.GetParameters()[0].GetValue(), nil
 }
 
 func (p *Parser) GetErrorLog() (string, error) {
@@ -215,9 +215,9 @@ func (p *Parser) GetErrorLog() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(directive.GetParameters()) == 0 {
+	if len(p.parameters2Slices(directive.GetParameters())) == 0 {
 		return "", nil
 	}
 
-	return directive.GetParameters()[0], nil
+	return directive.GetParameters()[0].GetValue(), nil
 }

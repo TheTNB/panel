@@ -142,7 +142,7 @@ func (p *Parser) Set(key string, directives []*config.Directive) error {
 	}
 
 	for _, directive := range directives {
-		directive.SetParent(block)
+		directive.SetParent(block.GetParent())
 		block.Directives = append(block.Directives, directive)
 	}
 
@@ -163,7 +163,7 @@ func (p *Parser) sortDirectives(directives []config.IDirective, orderIndex map[s
 		if orderIndex[a.GetName()] != orderIndex[b.GetName()] {
 			return orderIndex[a.GetName()] - orderIndex[b.GetName()]
 		}
-		return slices.Compare(a.GetParameters(), b.GetParameters())
+		return slices.Compare(p.parameters2Slices(a.GetParameters()), p.parameters2Slices(b.GetParameters()))
 	})
 
 	for _, directive := range directives {
@@ -171,4 +171,20 @@ func (p *Parser) sortDirectives(directives []config.IDirective, orderIndex map[s
 			p.sortDirectives(block.Directives, orderIndex)
 		}
 	}
+}
+
+func (p *Parser) slices2Parameters(slices []string) []config.Parameter {
+	var parameters []config.Parameter
+	for _, slice := range slices {
+		parameters = append(parameters, config.Parameter{Value: slice})
+	}
+	return parameters
+}
+
+func (p *Parser) parameters2Slices(parameters []config.Parameter) []string {
+	var s []string
+	for _, parameter := range parameters {
+		s = append(s, parameter.Value)
+	}
+	return s
 }

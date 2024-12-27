@@ -13,7 +13,7 @@ func (p *Parser) SetListen(listen [][]string) error {
 	for _, l := range listen {
 		directives = append(directives, &config.Directive{
 			Name:       "listen",
-			Parameters: l,
+			Parameters: p.slices2Parameters(l),
 		})
 	}
 
@@ -32,7 +32,7 @@ func (p *Parser) SetServerName(serverName []string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "server_name",
-			Parameters: serverName,
+			Parameters: p.slices2Parameters(serverName),
 		},
 	})
 }
@@ -45,7 +45,7 @@ func (p *Parser) SetIndex(index []string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "index",
-			Parameters: index,
+			Parameters: p.slices2Parameters(index),
 		},
 	})
 }
@@ -58,7 +58,7 @@ func (p *Parser) SetIndexWithComment(index []string, comment []string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "index",
-			Parameters: index,
+			Parameters: p.slices2Parameters(index),
 			Comment:    comment,
 		},
 	})
@@ -72,7 +72,7 @@ func (p *Parser) SetRoot(root string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "root",
-			Parameters: []string{root},
+			Parameters: []config.Parameter{{Value: root}},
 		},
 	})
 }
@@ -85,7 +85,7 @@ func (p *Parser) SetRootWithComment(root string, comment []string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "root",
-			Parameters: []string{root},
+			Parameters: []config.Parameter{{Value: root}},
 			Comment:    comment,
 		},
 	})
@@ -104,7 +104,7 @@ func (p *Parser) SetIncludes(includes []string, comments [][]string) error {
 		}
 		directives = append(directives, &config.Directive{
 			Name:       "include",
-			Parameters: []string{item},
+			Parameters: []config.Parameter{{Value: item}},
 			Comment:    comment,
 		})
 	}
@@ -125,13 +125,13 @@ func (p *Parser) SetPHP(php int) error {
 	var foundFlag bool
 	for _, item := range old {
 		// 查找enable-php的配置
-		if slices.ContainsFunc(item.GetParameters(), func(s string) bool {
+		if slices.ContainsFunc(p.parameters2Slices(item.GetParameters()), func(s string) bool {
 			return strings.HasPrefix(s, "enable-php-") && strings.HasSuffix(s, ".conf")
 		}) {
 			foundFlag = true
 			directives = append(directives, &config.Directive{
 				Name:       item.GetName(),
-				Parameters: []string{fmt.Sprintf("enable-php-%d.conf", php)},
+				Parameters: []config.Parameter{{Value: fmt.Sprintf("enable-php-%d.conf", php)}},
 				Comment:    item.GetComment(),
 			})
 		} else {
@@ -148,7 +148,7 @@ func (p *Parser) SetPHP(php int) error {
 	if !foundFlag {
 		directives = append(directives, &config.Directive{
 			Name:       "include",
-			Parameters: []string{fmt.Sprintf("enable-php-%d.conf", php)},
+			Parameters: []config.Parameter{{Value: fmt.Sprintf("enable-php-%d.conf", php)}},
 		})
 	}
 
@@ -192,35 +192,35 @@ func (p *Parser) SetHTTPS(cert, key string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "ssl_certificate",
-			Parameters: []string{cert},
+			Parameters: []config.Parameter{{Value: cert}},
 		},
 		{
 			Name:       "ssl_certificate_key",
-			Parameters: []string{key},
+			Parameters: []config.Parameter{{Value: key}},
 		},
 		{
 			Name:       "ssl_session_timeout",
-			Parameters: []string{"1d"},
+			Parameters: []config.Parameter{{Value: "1d"}},
 		},
 		{
 			Name:       "ssl_session_cache",
-			Parameters: []string{"shared:SSL:10m"},
+			Parameters: []config.Parameter{{Value: "shared:SSL:10m"}},
 		},
 		{
 			Name:       "ssl_protocols",
-			Parameters: []string{"TLSv1.2", "TLSv1.3"},
+			Parameters: []config.Parameter{{Value: "TLSv1.2"}, {Value: "TLSv1.3"}},
 		},
 		{
 			Name:       "ssl_ciphers",
-			Parameters: []string{"ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305"},
+			Parameters: []config.Parameter{{Value: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305"}},
 		},
 		{
 			Name:       "ssl_prefer_server_ciphers",
-			Parameters: []string{"off"},
+			Parameters: []config.Parameter{{Value: "off"}},
 		},
 		{
 			Name:       "ssl_early_data",
-			Parameters: []string{"on"},
+			Parameters: []config.Parameter{{Value: "on"}},
 		},
 	})
 }
@@ -233,7 +233,7 @@ func (p *Parser) SetHTTPSProtocols(protocols []string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "ssl_protocols",
-			Parameters: protocols,
+			Parameters: p.slices2Parameters(protocols),
 		},
 	})
 }
@@ -246,7 +246,7 @@ func (p *Parser) SetHTTPSCiphers(ciphers string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "ssl_ciphers",
-			Parameters: []string{ciphers},
+			Parameters: []config.Parameter{{Value: ciphers}},
 		},
 	})
 }
@@ -263,11 +263,11 @@ func (p *Parser) SetOCSP(ocsp bool) error {
 		return p.Set("server", []*config.Directive{
 			{
 				Name:       "ssl_stapling",
-				Parameters: []string{"on"},
+				Parameters: []config.Parameter{{Value: "on"}},
 			},
 			{
 				Name:       "ssl_stapling_verify",
-				Parameters: []string{"on"},
+				Parameters: []config.Parameter{{Value: "on"}},
 			},
 		})
 	}
@@ -287,12 +287,12 @@ func (p *Parser) SetHSTS(hsts bool) error {
 	var directives []*config.Directive
 	var foundFlag bool
 	for _, dir := range old {
-		if slices.Contains(dir.GetParameters(), "Strict-Transport-Security") {
+		if slices.Contains(p.parameters2Slices(dir.GetParameters()), "Strict-Transport-Security") {
 			foundFlag = true
 			if hsts {
 				directives = append(directives, &config.Directive{
 					Name:       dir.GetName(),
-					Parameters: []string{"Strict-Transport-Security", "max-age=31536000"},
+					Parameters: []config.Parameter{{Value: "Strict-Transport-Security"}, {Value: "max-age=31536000"}},
 					Comment:    dir.GetComment(),
 				})
 			}
@@ -308,7 +308,7 @@ func (p *Parser) SetHSTS(hsts bool) error {
 	if !foundFlag && hsts {
 		directives = append(directives, &config.Directive{
 			Name:       "add_header",
-			Parameters: []string{"Strict-Transport-Security", "max-age=31536000"},
+			Parameters: []config.Parameter{{Value: "Strict-Transport-Security"}, {Value: "max-age=31536000"}},
 		})
 	}
 
@@ -329,7 +329,7 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	var foundFlag bool
 	for _, dir := range ifs { // 所有 if
 		if !httpRedirect {
-			if len(dir.GetParameters()) == 3 && dir.GetParameters()[0] == "($scheme" && dir.GetParameters()[1] == "=" && dir.GetParameters()[2] == "http)" {
+			if len(dir.GetParameters()) == 3 && dir.GetParameters()[0].GetValue() == "($scheme" && dir.GetParameters()[1].GetValue() == "=" && dir.GetParameters()[2].GetValue() == "http)" {
 				continue
 			}
 		}
@@ -337,12 +337,12 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 		for _, dir2 := range dir.GetBlock().GetDirectives() { // 每个 if 中所有指令
 			if !httpRedirect {
 				// 不启用http重定向，则判断并移除特定的return指令
-				if dir2.GetName() != "return" && !slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
+				if dir2.GetName() != "return" && !slices.Contains(p.parameters2Slices(dir2.GetParameters()), "https://$host$request_uri") {
 					ifDirectives = append(ifDirectives, dir2)
 				}
 			} else {
 				// 启用http重定向，需要检查防止重复添加
-				if dir2.GetName() == "return" && slices.Contains(dir2.GetParameters(), "https://$host$request_uri") {
+				if dir2.GetName() == "return" && slices.Contains(p.parameters2Slices(dir2.GetParameters()), "https://$host$request_uri") {
 					foundFlag = true
 				}
 				ifDirectives = append(ifDirectives, dir2)
@@ -364,13 +364,13 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 		ifDir := &config.Directive{
 			Name:       "if",
 			Block:      &config.Block{},
-			Parameters: []string{"($scheme", "=", "http)"},
+			Parameters: []config.Parameter{{Value: "($scheme"}, {Value: "="}, {Value: "http)"}},
 		}
 		redirectDir := &config.Directive{
 			Name:       "return",
-			Parameters: []string{"308", "https://$host$request_uri"},
+			Parameters: []config.Parameter{{Value: "308"}, {Value: "https://$host$request_uri"}},
 		}
-		redirectDir.SetParent(ifDir.GetBlock())
+		redirectDir.SetParent(ifDir.GetParent())
 		ifBlock := ifDir.GetBlock().(*config.Block)
 		ifBlock.Directives = append(ifBlock.Directives, redirectDir)
 		directives = append(directives, ifDir)
@@ -393,7 +393,7 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	for _, dir := range errorPages {
 		if !httpRedirect {
 			// 不启用https重定向，则判断并移除特定的return指令
-			if !slices.Contains(dir.GetParameters(), "497") && !slices.Contains(dir.GetParameters(), "https://$host:$server_port$request_uri") {
+			if !slices.Contains(p.parameters2Slices(dir.GetParameters()), "497") && !slices.Contains(p.parameters2Slices(dir.GetParameters()), "https://$host:$server_port$request_uri") {
 				directives = append(directives, &config.Directive{
 					Block:      dir.GetBlock(),
 					Name:       dir.GetName(),
@@ -403,7 +403,7 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 			}
 		} else {
 			// 启用https重定向，需要检查防止重复添加
-			if slices.Contains(dir.GetParameters(), "497") && slices.Contains(dir.GetParameters(), "https://$host:$server_port$request_uri") {
+			if slices.Contains(p.parameters2Slices(dir.GetParameters()), "497") && slices.Contains(p.parameters2Slices(dir.GetParameters()), "https://$host:$server_port$request_uri") {
 				found497 = true
 			}
 			directives = append(directives, &config.Directive{
@@ -418,7 +418,7 @@ func (p *Parser) SetHTTPRedirect(httpRedirect bool) error {
 	if !found497 && httpRedirect {
 		directives = append(directives, &config.Directive{
 			Name:       "error_page",
-			Parameters: []string{"497", "=308", "https://$host:$server_port$request_uri"},
+			Parameters: []config.Parameter{{Value: "497"}, {Value: "=308"}, {Value: "https://$host:$server_port$request_uri"}},
 		})
 	}
 
@@ -437,12 +437,12 @@ func (p *Parser) SetAltSvc(altSvc string) error {
 	var directives []*config.Directive
 	var foundFlag bool
 	for _, dir := range old {
-		if slices.Contains(dir.GetParameters(), "Alt-Svc") {
+		if slices.Contains(p.parameters2Slices(dir.GetParameters()), "Alt-Svc") {
 			foundFlag = true
 			if altSvc != "" { // 为空表示要删除
 				directives = append(directives, &config.Directive{
 					Name:       dir.GetName(),
-					Parameters: []string{"Alt-Svc", altSvc},
+					Parameters: []config.Parameter{{Value: "Alt-Svc"}, {Value: altSvc}},
 					Comment:    dir.GetComment(),
 				})
 			}
@@ -458,7 +458,7 @@ func (p *Parser) SetAltSvc(altSvc string) error {
 	if !foundFlag && altSvc != "" {
 		directives = append(directives, &config.Directive{
 			Name:       "add_header",
-			Parameters: []string{"Alt-Svc", altSvc},
+			Parameters: []config.Parameter{{Value: "Alt-Svc"}, {Value: altSvc}},
 		})
 	}
 
@@ -473,7 +473,7 @@ func (p *Parser) SetAccessLog(accessLog string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "access_log",
-			Parameters: []string{accessLog},
+			Parameters: []config.Parameter{{Value: accessLog}},
 		},
 	})
 }
@@ -486,7 +486,7 @@ func (p *Parser) SetErrorLog(errorLog string) error {
 	return p.Set("server", []*config.Directive{
 		{
 			Name:       "error_log",
-			Parameters: []string{errorLog},
+			Parameters: []config.Parameter{{Value: errorLog}},
 		},
 	})
 }
