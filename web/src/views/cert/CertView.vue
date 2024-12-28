@@ -190,7 +190,6 @@ const columns: any = [
     width: 350,
     align: 'center',
     hideInExcel: true,
-    resizable: true,
     render(row: any) {
       return [
         row.type != 'upload' && row.cert == '' && row.key == ''
