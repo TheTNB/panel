@@ -10,7 +10,7 @@ import PermissionModal from '@/views/file/PermissionModal.vue'
 import ToolBar from '@/views/file/ToolBar.vue'
 import type { Marked } from '@/views/file/types'
 
-const path = ref('/www')
+const path = ref('/')
 const selected = ref<string[]>([])
 const marked = ref<Marked[]>([])
 const markedType = ref<string>('copy')
