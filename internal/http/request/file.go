@@ -45,7 +45,7 @@ type FilePermission struct {
 
 type FileCompress struct {
 	Dir   string   `form:"dir" json:"dir" validate:"required|isUnixPath"`
-	Paths []string `form:"paths" json:"paths" validate:"required"`
+	Paths []string `form:"paths" json:"paths" validate:"required|isSlice"`
 	File  string   `form:"file" json:"file" validate:"required|isUnixPath"`
 }
 

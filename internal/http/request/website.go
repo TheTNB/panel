@@ -9,8 +9,8 @@ type WebsiteDefaultConfig struct {
 
 type WebsiteCreate struct {
 	Name       string   `form:"name" json:"name" validate:"required|notExists:websites,name"`
-	Listens    []string `form:"listens" json:"listens" validate:"required"`
-	Domains    []string `form:"domains" json:"domains" validate:"required"`
+	Listens    []string `form:"listens" json:"listens" validate:"required|isSlice"`
+	Domains    []string `form:"domains" json:"domains" validate:"required|isSlice"`
 	Path       string   `form:"path" json:"path"`
 	PHP        int      `form:"php" json:"php"`
 	DB         bool     `form:"db" json:"db"`
@@ -29,14 +29,14 @@ type WebsiteDelete struct {
 
 type WebsiteUpdate struct {
 	ID                uint                  `form:"id" json:"id" validate:"required|exists:websites,id"`
-	Listens           []types.WebsiteListen `form:"listens" json:"listens" validate:"required"`
-	Domains           []string              `form:"domains" json:"domains" validate:"required"`
+	Listens           []types.WebsiteListen `form:"listens" json:"listens" validate:"required|isSlice"`
+	Domains           []string              `form:"domains" json:"domains" validate:"required|isSlice"`
 	HTTPS             bool                  `form:"https" json:"https"`
 	OCSP              bool                  `form:"ocsp" json:"ocsp"`
 	HSTS              bool                  `form:"hsts" json:"hsts"`
 	HTTPRedirect      bool                  `form:"http_redirect" json:"http_redirect"`
 	OpenBasedir       bool                  `form:"open_basedir" json:"open_basedir"`
-	Index             []string              `form:"index" json:"index" validate:"required"`
+	Index             []string              `form:"index" json:"index" validate:"required|isSlice"`
 	Path              string                `form:"path" json:"path" validate:"required"` // 网站目录
 	Root              string                `form:"root" json:"root" validate:"required"` // 运行目录
 	Raw               string                `form:"raw" json:"raw"`
