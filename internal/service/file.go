@@ -457,8 +457,8 @@ func (s *FileService) List(w http.ResponseWriter, r *http.Request) {
 // formatDir 格式化目录信息
 func (s *FileService) formatDir(base string, entries []stdos.DirEntry) []any {
 	var paths []any
-	for file := range slices.Values(entries) {
-		info, err := file.Info()
+	for item := range slices.Values(entries) {
+		info, err := item.Info()
 		if err != nil {
 			continue
 		}
