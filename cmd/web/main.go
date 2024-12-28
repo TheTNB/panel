@@ -28,7 +28,7 @@ func main() {
 	}
 
 	debug.SetGCPercent(10)
-	debug.SetMemoryLimit(256 << 20)
+	debug.SetMemoryLimit(128 << 20)
 
 	web, err := initWeb()
 	if err != nil {
