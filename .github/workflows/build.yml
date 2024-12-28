@@ -59,7 +59,7 @@ jobs:
           path: internal/embed/frontend
       - name: Set build info
         run: |
-          echo "VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo '0.0.0')" >> $GITHUB_ENV
+          echo "VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo '0.0.0')" >> $GITHUB_ENV
           echo "BUILD_TIME=$(date -u '+%F %T UTC')" >> $GITHUB_ENV
           echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "GO_VERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
