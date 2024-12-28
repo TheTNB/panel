@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2022 - now  HaoZi Technology Co., Ltd.
+Copyright (C) 2022 - now  Rat Technology Co., Ltd.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
