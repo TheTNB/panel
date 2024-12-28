@@ -125,6 +125,7 @@ func (p *Parser) Set(key string, directives []*config.Directive) error {
 	parts := strings.Split(key, ".")
 
 	var block *config.Block
+	var blockDirective config.IDirective
 	var ok bool
 	block = p.c.Block
 	for i := 0; i < len(parts); i++ {
@@ -139,10 +140,11 @@ func (p *Parser) Set(key string, directives []*config.Directive) error {
 		if !ok {
 			return errors.New("block is not *config.Block")
 		}
+		blockDirective = sub[0]
 	}
 
 	for _, directive := range directives {
-		directive.SetParent(block.GetParent())
+		directive.SetParent(blockDirective)
 		block.Directives = append(block.Directives, directive)
 	}
 
