@@ -28,7 +28,6 @@ jobs:
           cp .env.production .env
           cp settings/proxy-config.example.ts settings/proxy-config.ts
           pnpm build
-          pnpm run copy
       - name: Upload frontend
         uses: actions/upload-artifact@v4
         with:

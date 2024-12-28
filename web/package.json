@@ -12,11 +12,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p gen-auto-import type-check build-only",
+    "build": "run-s gen-auto-import type-check build-only copy",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "run-p gen-auto-import lint-only",
+    "lint": "run-s gen-auto-import lint-only",
     "lint-only": "eslint . --fix",
     "format": "prettier --write src/",
     "copy": "cpx \"dist/**/*\" \"../internal/embed/frontend\" -C",

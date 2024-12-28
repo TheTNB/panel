@@ -36,7 +36,6 @@ jobs:
           cp .env.production .env
           cp settings/proxy-config.example.ts settings/proxy-config.ts
           pnpm build
-          pnpm run copy
       - name: Set environment variables
         run: |
           echo "GOVERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
