@@ -8,16 +8,16 @@ type WebsiteDefaultConfig struct {
 }
 
 type WebsiteCreate struct {
-	Name       string   `form:"name" json:"name" validate:"required|not_exists:websites,name"`
+	Name       string   `form:"name" json:"name" validate:"required|notExists:websites,name"`
 	Listens    []string `form:"listens" json:"listens" validate:"required"`
 	Domains    []string `form:"domains" json:"domains" validate:"required"`
 	Path       string   `form:"path" json:"path"`
 	PHP        int      `form:"php" json:"php"`
 	DB         bool     `form:"db" json:"db"`
-	DBType     string   `form:"db_type" json:"db_type" validate:"required_if:DB,true"`
-	DBName     string   `form:"db_name" json:"db_name" validate:"required_if:DB,true"`
-	DBUser     string   `form:"db_user" json:"db_user" validate:"required_if:DB,true"`
-	DBPassword string   `form:"db_password" json:"db_password" validate:"required_if:DB,true"`
+	DBType     string   `form:"db_type" json:"db_type" validate:"requiredIf:DB,true"`
+	DBName     string   `form:"db_name" json:"db_name" validate:"requiredIf:DB,true"`
+	DBUser     string   `form:"db_user" json:"db_user" validate:"requiredIf:DB,true"`
+	DBPassword string   `form:"db_password" json:"db_password" validate:"requiredIf:DB,true"`
 	Remark     string   `form:"remark" json:"remark"`
 }
 
@@ -42,8 +42,8 @@ type WebsiteUpdate struct {
 	Raw               string                `form:"raw" json:"raw"`
 	Rewrite           string                `form:"rewrite" json:"rewrite"`
 	PHP               int                   `form:"php" json:"php"`
-	SSLCertificate    string                `form:"ssl_certificate" json:"ssl_certificate" validate:"required_if:HTTPS,true"`
-	SSLCertificateKey string                `form:"ssl_certificate_key" json:"ssl_certificate_key" validate:"required_if:HTTPS,true"`
+	SSLCertificate    string                `form:"ssl_certificate" json:"ssl_certificate" validate:"requiredIf:HTTPS,true"`
+	SSLCertificateKey string                `form:"ssl_certificate_key" json:"ssl_certificate_key" validate:"requiredIf:HTTPS,true"`
 }
 
 type WebsiteUpdateRemark struct {

@@ -35,7 +35,7 @@ func (r monitorRepo) GetSetting() (*request.MonitorSetting, error) {
 
 	setting := new(request.MonitorSetting)
 	setting.Enabled = cast.ToBool(monitor)
-	setting.Days = cast.ToInt(monitorDays)
+	setting.Days = cast.ToUint(monitorDays)
 
 	return setting, nil
 }

@@ -8,10 +8,10 @@ import (
 
 // NotExists 验证一个值在某个表中的字段中不存在，支持同时判断多个字段
 // NotExists verify a value does not exist in a table field, support judging multiple fields at the same time
-// 用法：not_exists:表名称,字段名称,字段名称,字段名称
-// Usage: not_exists:table_name,field_name,field_name,field_name
-// 例子：not_exists:users,phone,email
-// Example: not_exists:users,phone,email
+// 用法：notExists:表名称,字段名称,字段名称,字段名称
+// Usage: notExists:table_name,field_name,field_name,field_name
+// 例子：notExists:users,phone,email
+// Example: notExists:users,phone,email
 type NotExists struct {
 	DB *gorm.DB
 }

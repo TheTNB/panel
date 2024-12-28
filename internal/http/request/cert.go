@@ -27,6 +27,6 @@ type CertUpdate struct {
 }
 
 type CertDeploy struct {
-	ID        uint `form:"id" json:"id" validate:"required,exists:certs,id"`
-	WebsiteID uint `form:"website_id" json:"website_id" validate:"required"`
+	ID        uint `form:"id" json:"id" validate:"required|exists:certs,id"`
+	WebsiteID uint `form:"website_id" json:"website_id" validate:"required|exists:websites,id"`
 }

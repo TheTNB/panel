@@ -12,7 +12,7 @@ type FirewallRule struct {
 	Protocol  string `json:"protocol" validate:"required|in:tcp,udp,tcp/udp"`
 	Address   string `json:"address"`
 	Strategy  string `json:"strategy" validate:"required|in:accept,drop,reject"`
-	Direction string `json:"direction"`
+	Direction string `json:"direction" validate:"required|in:in,out"`
 }
 
 type FirewallIPRule struct {
@@ -20,7 +20,7 @@ type FirewallIPRule struct {
 	Protocol  string `json:"protocol" validate:"required|in:tcp,udp,tcp/udp"`
 	Address   string `json:"address"`
 	Strategy  string `json:"strategy" validate:"required|in:accept,drop,reject"`
-	Direction string `json:"direction"`
+	Direction string `json:"direction" validate:"required|in:in,out"`
 }
 
 type FirewallForward struct {

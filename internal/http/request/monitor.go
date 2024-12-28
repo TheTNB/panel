@@ -2,7 +2,7 @@ package request
 
 type MonitorSetting struct {
 	Enabled bool `json:"enabled"`
-	Days    int  `json:"days"`
+	Days    uint `json:"days"`
 }
 
 type MonitorList struct {

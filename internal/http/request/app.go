@@ -1,7 +1,7 @@
 package request
 
 type App struct {
-	Slug    string `json:"slug" form:"slug" validate:"required|not_exists:apps,slug"`
+	Slug    string `json:"slug" form:"slug" validate:"required|notExists:apps,slug"`
 	Channel string `json:"channel" form:"channel" validate:"required"`
 }
 
