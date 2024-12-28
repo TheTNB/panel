@@ -12,13 +12,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check build-only copy",
+    "build": "run-p gen-auto-import type-check build-only copy",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --fix",
+    "lint": "run-p gen-auto-import lint-only",
+    "lint-only": "eslint . --fix",
     "format": "prettier --write src/",
-    "copy": "cpx \"dist/**/*\" \"../internal/embed/frontend\" -C"
+    "copy": "cpx \"dist/**/*\" \"../internal/embed/frontend\" -C",
+    "gen-auto-import": "tsx gen-auto-import.ts"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -76,6 +78,7 @@
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.1.0",
     "sass": "^1.81.0",
+    "tsx": "^4.19.2",
     "typescript": "5.7.2",
     "unocss": "^0.65.0",
     "unplugin-auto-import": "^0.19.0",

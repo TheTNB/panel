@@ -32,13 +32,9 @@ jobs:
           cache-dependency-path: web/pnpm-lock.yaml
       - name: Build frontend
         working-directory: web
-        # We need to run the dev server first to generate the auto-imports files
         run: |
           cp .env.production .env
           cp settings/proxy-config.example.ts settings/proxy-config.ts
-          pnpm dev &
-          sleep 5
-          kill %1
           pnpm build
       - name: Set environment variables
         run: |
