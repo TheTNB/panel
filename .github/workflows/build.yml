@@ -7,9 +7,6 @@ on:
 jobs:
   frontend:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: web
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,15 +23,17 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: web/pnpm-lock.yaml
       - name: Build frontend
+        working-directory: web
         run: |
           cp .env.production .env
           cp settings/proxy-config.example.ts settings/proxy-config.ts
           pnpm build
+          pnpm run copy
       - name: Upload frontend
         uses: actions/upload-artifact@v4
         with:
           name: frontend
-          path: web/dist/ # https://github.com/actions/upload-artifact/issues/541
+          path: web/dist/
   backend:
     needs: frontend
     runs-on: ubuntu-24.04
