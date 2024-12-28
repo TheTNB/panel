@@ -18,19 +18,28 @@ jobs:
         with:
           cache: true
           go-version: 'stable'
-      - name: Wait for frontend build
-        uses: lewagon/wait-on-check-action@v1.3.4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          check-name: 'build (frontend)'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Download frontend
-        uses: dawidd6/action-download-artifact@v7
+          version: latest
+          run_install: true
+          package_json_file: web/package.json
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          workflow: frontend.yml
-          name: frontend
-          path: internal/embed/frontend
-          check_artifacts: true
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Build frontend
+        working-directory: web
+        # We need to run the dev server first to generate the auto-imports files
+        run: |
+          cp .env.production .env
+          cp settings/proxy-config.example.ts settings/proxy-config.ts
+          pnpm dev &
+          sleep 5
+          kill %1
+          pnpm build
       - name: Set environment variables
         run: |
           echo "GOVERSION=$(go version | cut -d' ' -f3)" >> $GITHUB_ENV
