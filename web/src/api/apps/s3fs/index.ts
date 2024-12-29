@@ -9,5 +9,6 @@ export default {
   // 添加
   add: (data: any): Promise<AxiosResponse<any>> => request.post('/apps/s3fs/mounts', data),
   // 删除
-  delete: (id: number): Promise<AxiosResponse<any>> => request.post('/apps/s3fs/mounts', { id })
+  delete: (id: number): Promise<AxiosResponse<any>> =>
+    request.delete('/apps/s3fs/mounts', { data: { id } })
 }

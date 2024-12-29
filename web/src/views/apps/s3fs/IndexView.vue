@@ -139,12 +139,12 @@ onMounted(() => {
   <n-modal v-model:show="addMountModal" title="添加挂载">
     <n-card closable @close="() => (addMountModal = false)" title="添加挂载" style="width: 60vw">
       <n-form :model="addMountModel">
-        <n-form-item path="bucket" label="Bucket（腾讯云COS为: xxxx-用户ID）">
+        <n-form-item path="bucket" label="Bucket">
           <n-input
             v-model:value="addMountModel.bucket"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入Bucket名字"
+            placeholder="输入 Bucket 名（COS 为: xxxx-ID）"
           />
         </n-form-item>
         <n-form-item path="ak" label="AK">
@@ -152,7 +152,7 @@ onMounted(() => {
             v-model:value="addMountModel.ak"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入AK密钥"
+            placeholder="输入 AK 密钥"
           />
         </n-form-item>
         <n-form-item path="sk" label="SK">
@@ -160,7 +160,7 @@ onMounted(() => {
             v-model:value="addMountModel.sk"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入SK密钥"
+            placeholder="输入 SK 密钥"
           />
         </n-form-item>
         <n-form-item path="url" label="地域节点">
@@ -168,7 +168,7 @@ onMounted(() => {
             v-model:value="addMountModel.url"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入地域节点的 URL"
+            placeholder="输入地域节点的完整 URL（https://oss-cn-beijing.aliyuncs.com）"
           />
         </n-form-item>
         <n-form-item path="path" label="挂载目录">
@@ -176,7 +176,7 @@ onMounted(() => {
             v-model:value="addMountModel.path"
             type="text"
             @keydown.enter.prevent
-            placeholder="输入挂载目录"
+            placeholder="输入挂载目录（/oss）"
           />
         </n-form-item>
       </n-form>
