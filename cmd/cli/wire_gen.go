@@ -47,6 +47,7 @@ func initCli() (*app.Cli, error) {
 	cliService := service.NewCliService(koanf, db, appRepo, cacheRepo, userRepo, settingRepo, backupRepo, websiteRepo, databaseServerRepo)
 	cli := route.NewCli(cliService)
 	command := bootstrap.NewCli(cli)
-	appCli := app.NewCli(command)
+	gormigrate := bootstrap.NewMigrate(db)
+	appCli := app.NewCli(command, gormigrate)
 	return appCli, nil
 }
