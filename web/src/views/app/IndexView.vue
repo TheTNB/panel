@@ -71,7 +71,7 @@ const columns: any = [
   {
     title: t('appIndex.columns.actions'),
     key: 'actions',
-    width: 280,
+    width: 300,
     hideInExcel: true,
     render(row: any) {
       return h(
@@ -259,7 +259,7 @@ onMounted(() => {
       <n-data-table
         striped
         remote
-        :scroll-x="1000"
+        :scroll-x="1200"
         :loading="false"
         :columns="columns"
         :data="apps"
