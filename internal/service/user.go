@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/rsa"
+	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
 	"net"
@@ -12,7 +13,6 @@ import (
 	"github.com/go-rat/sessions"
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/cast"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/TheTNB/panel/internal/biz"
 	"github.com/TheTNB/panel/internal/http/request"
@@ -93,7 +93,10 @@ func (s *UserService) Login(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.SafeLogin && !s.conf.Bool("http.tls") {
 		sess.Put("safe_login", true)
-		sess.Put("safe_client", fmt.Sprintf("%x", sha3.Sum256([]byte(ip))))
+		sess.Put("safe_client", fmt.Sprintf("%x", sha256.Sum256([]byte(ip))))
+	} else {
+		sess.Forget("safe_login")
+		sess.Forget("safe_client")
 	}
 
 	sess.Put("user_id", user.ID)
