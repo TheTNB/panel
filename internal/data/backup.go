@@ -571,6 +571,9 @@ func (r *backupRepo) FixPanel() error {
 		flag = true
 	}
 	// 检查数据库连接
+	if err := r.db.Exec("VACUUM").Error; err != nil {
+		flag = true
+	}
 	if err := r.db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
 		flag = true
 	}
