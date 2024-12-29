@@ -23,9 +23,8 @@ func NewCli(cmd *cli.Command, migrator *gormigrate.Gormigrate) *Cli {
 
 func (r *Cli) Run() error {
 	// migrate database
-	if err := r.migrator.Migrate(); err != nil {
-		return err
-	}
+	// 这里不处理错误，这么做是为了在异常时用户可以用 fix 命令尝试修复
+	_ = r.migrator.Migrate()
 
 	return r.cmd.Run(context.Background(), os.Args)
 }
