@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -26,5 +27,9 @@ func (r *Cli) Run() error {
 	// 这里不处理错误，这么做是为了在异常时用户可以用 fix 命令尝试修复
 	_ = r.migrator.Migrate()
 
-	return r.cmd.Run(context.Background(), os.Args)
+	if err := r.cmd.Run(context.TODO(), os.Args); err != nil {
+		fmt.Printf("|-%v\n", err)
+	}
+
+	return nil
 }
