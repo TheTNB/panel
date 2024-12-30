@@ -684,6 +684,10 @@ func (r *backupRepo) FixPanel() error {
 		return err
 	}
 
+	if err = io.Remove("/tmp/panel-fix"); err != nil {
+		return err
+	}
+
 	if app.IsCli {
 		fmt.Println("|-修复完成")
 	}
@@ -776,6 +780,9 @@ func (r *backupRepo) UpdatePanel(version, url, checksum string) error {
 	}
 	if !io.Exists(filepath.Join(app.Root, "panel", "web")) {
 		return errors.New("解压失败，缺失文件")
+	}
+	if err := io.Remove(filepath.Join("/tmp", name)); err != nil {
+		return fmt.Errorf("清理临时文件失败：%w", err)
 	}
 
 	if app.IsCli {
