@@ -864,8 +864,5 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 
-	// 初始化缓存
-	_ = s.cacheRepo.UpdateApps()
-	_ = s.cacheRepo.UpdateRewrites()
 	return nil
 }
