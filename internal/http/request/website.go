@@ -1,6 +1,6 @@
 package request
 
-import "github.com/TheTNB/panel/pkg/types"
+import "github.com/tnb-labs/panel/pkg/types"
 
 type WebsiteDefaultConfig struct {
 	Index string `json:"index" form:"index" validate:"required"`

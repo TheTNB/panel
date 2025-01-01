@@ -4,8 +4,8 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/pkg/shell"
 )
 
 // ProcessTask 处理面板任务

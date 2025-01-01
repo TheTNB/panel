@@ -1,7 +1,5 @@
 filippo.io/edwards25519 v1.1.0 h1:FNf4tywRC1HmFuKW5xopWpigGjJKiJSV0Cqo0cJWDaA=
 filippo.io/edwards25519 v1.1.0/go.mod h1:BxyFTGdWcka3PhytdK4V28tE5sGfRvvvRV7EaN4VDT4=
-github.com/TheTNB/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc h1:Nh7pc2CKHFF1lg+38slGKgJZ4A8cG30ERs7pwK/+V6Y=
-github.com/TheTNB/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc/go.mod h1:L1wOU06KKvq7tswuMDwKdcHeKpFFgkppZy/y0DFxagQ=
 github.com/bddjr/hlfhr v1.3.6 h1:XautNR6Vomud8SGh1V1Yjoj1L4YblsNM0ZUwZ7r3q4U=
 github.com/bddjr/hlfhr v1.3.6/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/beevik/ntp v1.4.3 h1:PlbTvE5NNy4QHmA4Mg57n7mcFTmr1W1j3gcK7L1lqho=
@@ -147,6 +145,8 @@ github.com/tklauser/go-sysconf v0.3.14 h1:g5vzr9iPFFz24v2KZXs/pvpvh8/V9Fw6vQK5ZZ
 github.com/tklauser/go-sysconf v0.3.14/go.mod h1:1ym4lWMLUOhuBOPGtRcJm7tEGX4SCYNEEEtghGG/8uY=
 github.com/tklauser/numcpus v0.8.0 h1:Mx4Wwe/FjZLeQsK/6kt2EOepwwSl7SmJrK5bV/dXYgY=
 github.com/tklauser/numcpus v0.8.0/go.mod h1:ZJZlAY+dmR4eut8epnzf0u/VwodKmryxR8txiloSqBE=
+github.com/tnb-labs/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc h1:DjqfrS/10NQOqx8yFtPcNfbAN5wrjnYgaub+ZQXPHEY=
+github.com/tnb-labs/acmez/v3 v3.0.0-20241217024017-a2f2c48efdcc/go.mod h1:L1wOU06KKvq7tswuMDwKdcHeKpFFgkppZy/y0DFxagQ=
 github.com/tufanbarisyildirim/gonginx v0.0.0-20241225173012-5cc15aab65bd h1:PYNV7LTzEzZ4lousHUM2yaDO2zI3FNt9NA0iuGrbK7w=
 github.com/tufanbarisyildirim/gonginx v0.0.0-20241225173012-5cc15aab65bd/go.mod h1:hdMWBc1+TyB6G5ZZBBgPWQ8cjRZ6zpYdhal0uu6E9QM=
 github.com/urfave/cli/v3 v3.0.0-beta1 h1:6DTaaUarcM0wX7qj5Hcvs+5Dm3dyUTBbEwIWAjcw9Zg=

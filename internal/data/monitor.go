@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
 )
 
 type monitorRepo struct {

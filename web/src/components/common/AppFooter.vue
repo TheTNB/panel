@@ -5,7 +5,7 @@
       <a
         hover="decoration-primary color-primary"
         target="__blank"
-        href="https://github.com/TheTNB/panel"
+        href="https://github.com/tnb-labs/panel"
       >
         耗子面板
       </a>

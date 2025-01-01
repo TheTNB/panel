@@ -14,9 +14,9 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/rsacrypto"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/rsacrypto"
 )
 
 type UserService struct {

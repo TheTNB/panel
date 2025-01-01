@@ -1,6 +1,6 @@
 package request
 
-import "github.com/TheTNB/panel/pkg/types"
+import "github.com/tnb-labs/panel/pkg/types"
 
 type ContainerVolumeID struct {
 	ID string `json:"id" form:"id" validate:"required"`

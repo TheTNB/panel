@@ -9,10 +9,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/knadh/koanf/v2"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/ssh"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/ssh"
 )
 
 type WsService struct {

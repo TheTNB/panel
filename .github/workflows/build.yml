@@ -73,13 +73,13 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
         run: |
           LDFLAGS="-s -w --extldflags '-static'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.Version=${VERSION}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildTime=${BUILD_TIME}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.CommitHash=${COMMIT_HASH}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.GoVersion=${GO_VERSION}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildID=${BUILD_ID}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildUser=${BUILD_USER}'"
-          LDFLAGS="${LDFLAGS} -X 'github.com/TheTNB/panel/internal/app.BuildHost=${BUILD_HOST}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.Version=${VERSION}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.BuildTime=${BUILD_TIME}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.CommitHash=${COMMIT_HASH}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.GoVersion=${GO_VERSION}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.BuildID=${BUILD_ID}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.BuildUser=${BUILD_USER}'"
+          LDFLAGS="${LDFLAGS} -X 'github.com/tnb-labs/panel/internal/app.BuildHost=${BUILD_HOST}'"
           go build -ldflags "${LDFLAGS}" -o web-${{ matrix.goarch }} ./cmd/web
           go build -ldflags "${LDFLAGS}" -o cli-${{ matrix.goarch }} ./cmd/cli
       - name: Compress ${{ matrix.goarch }}

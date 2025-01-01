@@ -5,8 +5,8 @@ import (
 
 	"github.com/urfave/cli/v3"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/route"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/route"
 )
 
 func NewCli(cmd *route.Cli) *cli.Command {

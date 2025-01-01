@@ -7,9 +7,9 @@ import (
 	"github.com/spf13/cast"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/pkg/tools"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/pkg/tools"
 )
 
 // Monitoring 系统监控

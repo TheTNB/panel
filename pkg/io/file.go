@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/TheTNB/panel/pkg/chattr"
+	"github.com/tnb-labs/panel/pkg/chattr"
 )
 
 // Write 写入文件

@@ -9,10 +9,10 @@ import (
 	"github.com/go-resty/resty/v2"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/acme"
-	"github.com/TheTNB/panel/pkg/cert"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/acme"
+	"github.com/tnb-labs/panel/pkg/cert"
 )
 
 type certAccountRepo struct {

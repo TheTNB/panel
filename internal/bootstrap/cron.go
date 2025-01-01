@@ -6,8 +6,8 @@ import (
 	"github.com/knadh/koanf/v2"
 	"github.com/robfig/cron/v3"
 
-	"github.com/TheTNB/panel/internal/job"
-	pkgcron "github.com/TheTNB/panel/pkg/cron"
+	"github.com/tnb-labs/panel/internal/job"
+	pkgcron "github.com/tnb-labs/panel/pkg/cron"
 )
 
 func NewCron(conf *koanf.Koanf, log *slog.Logger, jobs *job.Jobs) (*cron.Cron, error) {

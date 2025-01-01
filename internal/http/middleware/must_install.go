@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-rat/chix"
 
-	"github.com/TheTNB/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/biz"
 )
 
 // MustInstall 确保已安装应用

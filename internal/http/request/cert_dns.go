@@ -1,6 +1,6 @@
 package request
 
-import "github.com/TheTNB/panel/pkg/acme"
+import "github.com/tnb-labs/panel/pkg/acme"
 
 type CertDNSCreate struct {
 	Type string        `form:"type" json:"type" validate:"required"`

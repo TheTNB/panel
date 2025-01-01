@@ -12,7 +12,7 @@ import (
 	"github.com/google/wire"
 	"github.com/knadh/koanf/v2"
 
-	"github.com/TheTNB/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/biz"
 )
 
 var ProviderSet = wire.NewSet(NewMiddlewares)

@@ -8,12 +8,12 @@ import (
 
 	"github.com/go-resty/resty/v2"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/pkg/types"
-	"github.com/TheTNB/panel/pkg/types/docker/volume"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/tools"
+	"github.com/tnb-labs/panel/pkg/types"
+	"github.com/tnb-labs/panel/pkg/types/docker/volume"
 )
 
 type containerVolumeRepo struct {

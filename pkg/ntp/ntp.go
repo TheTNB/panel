@@ -8,7 +8,7 @@ import (
 
 	"github.com/beevik/ntp"
 
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/shell"
 )
 
 var ErrNotReachable = errors.New("无法连接到 NTP 服务器")

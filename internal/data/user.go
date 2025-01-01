@@ -6,7 +6,7 @@ import (
 	"github.com/go-rat/utils/hash"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/biz"
 )
 
 type userRepo struct {

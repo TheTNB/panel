@@ -7,9 +7,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/db"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/db"
 )
 
 type databaseRepo struct {

@@ -23,7 +23,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TheTNB/panel/internal/service"
+	"github.com/tnb-labs/panel/internal/service"
 )
 
 type App struct {

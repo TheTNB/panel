@@ -7,7 +7,7 @@ package service
 import (
 	"net/http"
 
-	"github.com/TheTNB/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/biz"
 )
 
 type FileService struct{}

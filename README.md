@@ -5,11 +5,11 @@
 <h1 align="center" style="font-size: 40px">耗子面板</h1>
 
 <p align="center">
-  <a href="https://github.com/TheTNB/panel/releases"><img src="https://img.shields.io/github/release/TheTNB/panel.svg"></a>
-  <a href="https://github.com/TheTNB/panel/actions"><img src="https://github.com/TheTNB/panel/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://goreportcard.com/report/github.com/TheTNB/panel"><img src="https://goreportcard.com/badge/github.com/TheTNB/panel"></a>
-  <a href="https://img.shields.io/github/license/TheTNB/panel"><img src="https://img.shields.io/github/license/TheTNB/panel"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2FTheTNB%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2FTheTNB%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
+  <a href="https://github.com/tnb-labs/panel/releases"><img src="https://img.shields.io/github/release/tnb-labs/panel.svg"></a>
+  <a href="https://github.com/tnb-labs/panel/actions"><img src="https://github.com/tnb-labs/panel/actions/workflows/test.yml/badge.svg"></a>
+  <a href="https://goreportcard.com/report/github.com/tnb-labs/panel"><img src="https://goreportcard.com/badge/github.com/tnb-labs/panel"></a>
+  <a href="https://img.shields.io/github/license/tnb-labs/panel"><img src="https://img.shields.io/github/license/tnb-labs/panel"></a>
+  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Ftnb-labs%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftnb-labs%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
 </p>
 
 企业级全能服务器运维管理面板。简单轻量，高效运维。
@@ -62,16 +62,16 @@
 
 <p align="center">
   <a target="_blank" href="https://afdian.com/a/tnblabs">
-    <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
+    <img alt="sponsors" src="https://github.com/tnb-labs/sponsor/blob/main/sponsors.svg?raw=true"/>
   </a>
 </p>
 
 ## Star 历史
 
-<a href="https://star-history.com/#TheTNB/panel&Date">
+<a href="https://star-history.com/#tnb-labs/panel&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=TheTNB/panel&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=tnb-labs/panel&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=tnb-labs/panel&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=tnb-labs/panel&type=Date" />
  </picture>
 </a>

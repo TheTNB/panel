@@ -8,8 +8,8 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/pkg/io"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/pkg/io"
 )
 
 func NewConf() (*koanf.Koanf, error) {

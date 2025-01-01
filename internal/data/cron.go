@@ -10,13 +10,13 @@ import (
 	"github.com/go-rat/utils/str"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/io"
+	"github.com/tnb-labs/panel/pkg/os"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/systemctl"
 )
 
 type cronRepo struct {

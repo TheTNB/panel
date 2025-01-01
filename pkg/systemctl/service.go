@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/TheTNB/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/shell"
 )
 
 // Status 获取服务状态

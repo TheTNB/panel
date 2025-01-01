@@ -9,8 +9,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/biz"
 )
 
 // PanelTask 面板每日任务

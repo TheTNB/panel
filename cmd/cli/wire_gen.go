@@ -7,11 +7,11 @@
 package main
 
 import (
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/bootstrap"
-	"github.com/TheTNB/panel/internal/data"
-	"github.com/TheTNB/panel/internal/route"
-	"github.com/TheTNB/panel/internal/service"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/bootstrap"
+	"github.com/tnb-labs/panel/internal/data"
+	"github.com/tnb-labs/panel/internal/route"
+	"github.com/tnb-labs/panel/internal/service"
 )
 
 import (

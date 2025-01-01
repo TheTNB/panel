@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-rat/chix"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
 )
 
 type ContainerVolumeService struct {

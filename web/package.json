@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/TheTNB/panel-frontend"
+    "url": "https://github.com/tnb-labs/panel-frontend"
   },
   "scripts": {
     "dev": "vite",

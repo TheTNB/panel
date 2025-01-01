@@ -10,10 +10,10 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/go-rat/utils/str"
 
-	"github.com/TheTNB/panel/internal/service"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/internal/service"
+	"github.com/tnb-labs/panel/pkg/io"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/systemctl"
 )
 
 type App struct{}

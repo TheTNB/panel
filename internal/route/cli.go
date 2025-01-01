@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/urfave/cli/v3"
 
-	"github.com/TheTNB/panel/internal/service"
+	"github.com/tnb-labs/panel/internal/service"
 )
 
 type Cli struct {

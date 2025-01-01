@@ -10,13 +10,13 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/service"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
-	"github.com/TheTNB/panel/pkg/tools"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/service"
+	"github.com/tnb-labs/panel/pkg/io"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/pkg/tools"
+	"github.com/tnb-labs/panel/pkg/types"
 )
 
 type App struct {

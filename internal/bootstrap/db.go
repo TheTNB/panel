@@ -10,8 +10,8 @@ import (
 	slogGorm "github.com/orandin/slog-gorm"
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/migration"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/migration"
 )
 
 func NewDB(conf *koanf.Koanf, log *slog.Logger) (*gorm.DB, error) {

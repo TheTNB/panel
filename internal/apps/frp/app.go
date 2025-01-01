@@ -6,10 +6,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/TheTNB/panel/internal/app"
-	"github.com/TheTNB/panel/internal/service"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/service"
+	"github.com/tnb-labs/panel/pkg/io"
+	"github.com/tnb-labs/panel/pkg/systemctl"
 )
 
 type App struct{}

@@ -8,11 +8,11 @@ import (
 	"github.com/go-rat/chix"
 	"github.com/spf13/cast"
 
-	"github.com/TheTNB/panel/internal/service"
-	"github.com/TheTNB/panel/pkg/io"
-	"github.com/TheTNB/panel/pkg/os"
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/internal/service"
+	"github.com/tnb-labs/panel/pkg/io"
+	"github.com/tnb-labs/panel/pkg/os"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/systemctl"
 )
 
 type App struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-rat/chix"
 
-	"github.com/TheTNB/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/app"
 )
 
 // Status 检查程序状态

@@ -9,8 +9,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/knadh/koanf/v2"
 
-	"github.com/TheTNB/panel/internal/http/middleware"
-	"github.com/TheTNB/panel/internal/route"
+	"github.com/tnb-labs/panel/internal/http/middleware"
+	"github.com/tnb-labs/panel/internal/route"
 )
 
 func NewRouter(middlewares *middleware.Middlewares, http *route.Http, ws *route.Ws) (*chi.Mux, error) {

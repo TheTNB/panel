@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/TheTNB/panel/internal/http/request"
-	"github.com/TheTNB/panel/pkg/types"
+	"github.com/tnb-labs/panel/internal/http/request"
+	"github.com/tnb-labs/panel/pkg/types"
 )
 
 type Website struct {

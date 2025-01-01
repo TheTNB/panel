@@ -1,7 +1,7 @@
 package biz
 
 import (
-	"github.com/TheTNB/panel/internal/http/request"
+	"github.com/tnb-labs/panel/internal/http/request"
 )
 
 type DatabaseType string

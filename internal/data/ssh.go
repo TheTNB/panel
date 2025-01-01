@@ -5,9 +5,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/TheTNB/panel/internal/biz"
-	"github.com/TheTNB/panel/internal/http/request"
-	pkgssh "github.com/TheTNB/panel/pkg/ssh"
+	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/internal/http/request"
+	pkgssh "github.com/tnb-labs/panel/pkg/ssh"
 )
 
 type sshRepo struct {

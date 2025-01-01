@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/TheTNB/panel/pkg/shell"
-	"github.com/TheTNB/panel/pkg/systemctl"
+	"github.com/tnb-labs/panel/pkg/shell"
+	"github.com/tnb-labs/panel/pkg/systemctl"
 )
 
 // MySQLResetRootPassword 重置 MySQL root密码
