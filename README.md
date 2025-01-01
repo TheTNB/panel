@@ -4,7 +4,7 @@
 
 <h1 align="center" style="font-size: 40px">耗子面板</h1>
 
-<p align="center">
+<div align="center">
 
 [![Go](https://img.shields.io/github/go-mod/go-version/tnb-labs/panel)](https://go.dev/)
 [![Release](https://img.shields.io/github/release/tnb-labs/panel.svg)](https://github.com/tnb-labs/panel/releases)
@@ -13,7 +13,7 @@
 [![Stars](https://img.shields.io/github/stars/tnb-labs/panel?style=flat)](https://github.com/tnb-labs/panel)
 [![License](https://img.shields.io/github/license/tnb-labs/panel)](https://www.gnu.org/licenses/agpl-3.0.html)
 
-</p>
+</div>
 
 企业级全能服务器运维管理面板。简单轻量，高效运维。
 
