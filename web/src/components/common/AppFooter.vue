@@ -35,7 +35,7 @@
       <a
         hover="decoration-primary color-primary"
         target="_blank"
-        href="https://afdian.com/a/TheTNB"
+        href="https://afdian.com/a/tnblabs"
       >
         赞助支持
       </a>

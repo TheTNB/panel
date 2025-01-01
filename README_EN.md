@@ -61,7 +61,7 @@ If the Rat Panel is helpful to you, welcome to sponsor us, also thanks to the fo
 </a>
 
 <p align="center">
-  <a target="_blank" href="https://afdian.com/a/TheTNB">
+  <a target="_blank" href="https://afdian.com/a/tnblabs">
     <img alt="sponsors" src="https://github.com/TheTNB/sponsor/blob/main/sponsors.svg?raw=true"/>
   </a>
 </p>

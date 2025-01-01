@@ -330,7 +330,7 @@ const handleUpdate = () => {
 }
 
 const toSponsor = () => {
-  window.open('https://afdian.com/a/TheTNB')
+  window.open('https://afdian.com/a/tnblabs')
 }
 
 const handleManageApp = (slug: string) => {
