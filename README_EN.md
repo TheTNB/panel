@@ -5,11 +5,14 @@
 <h1 align="center" style="font-size: 40px">Rat Panel</h1>
 
 <p align="center">
-  <a href="https://github.com/tnb-labs/panel/releases"><img src="https://img.shields.io/github/release/tnb-labs/panel.svg"></a>
-  <a href="https://github.com/tnb-labs/panel/actions"><img src="https://github.com/tnb-labs/panel/actions/workflows/test.yml/badge.svg"></a>
-  <a href="https://goreportcard.com/report/github.com/tnb-labs/panel"><img src="https://goreportcard.com/badge/github.com/tnb-labs/panel"></a>
-  <a href="https://img.shields.io/github/license/tnb-labs/panel"><img src="https://img.shields.io/github/license/tnb-labs/panel"></a>
-  <a href="https://app.fossa.com/projects/git%2Bgithub.com%2Ftnb-labs%2Fpanel?ref=badge_shield"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftnb-labs%2Fpanel.svg?type=shield" alt="FOSSA Status"></a>
+
+[![Go](https://img.shields.io/github/go-mod/go-version/tnb-labs/panel)](https://go.dev/)
+[![Release](https://img.shields.io/github/release/tnb-labs/panel.svg)](https://github.com/tnb-labs/panel/releases)
+[![Test](https://github.com/tnb-labs/panel/actions/workflows/test.yml/badge.svg)](https://github.com/tnb-labs/panel/actions)
+[![Report Card](https://goreportcard.com/badge/github.com/tnb-labs/panel)](https://goreportcard.com/report/github.com/tnb-labs/panel)
+[![Stars](https://img.shields.io/github/stars/tnb-labs/panel?style=flat)](https://github.com/tnb-labs/panel)
+[![License](https://img.shields.io/github/license/tnb-labs/panel)](https://www.gnu.org/licenses/agpl-3.0.html)
+
 </p>
 
 Enterprise-level all-in-one server operation and maintenance management panel. Simple and lightweight, efficient operation and maintenance.
