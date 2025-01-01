@@ -102,7 +102,7 @@ const columns: DataTableColumns<RowData> = [
       return h(
         NFlex,
         {
-          class: 'table-name',
+          class: 'cursor-pointer hover:opacity-60',
           onClick: () => {
             if (row.dir) {
               path.value = row.full
@@ -719,14 +719,3 @@ onUnmounted(() => {
     </n-flex>
   </n-modal>
 </template>
-
-<style scoped lang="scss">
-:deep(.table-name) {
-  cursor: pointer;
-}
-
-:deep(.table-name:hover) {
-  color: var(--primary-color);
-  opacity: 0.6;
-}
-</style>

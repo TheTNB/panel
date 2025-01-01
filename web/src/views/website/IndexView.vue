@@ -12,15 +12,18 @@ import {
   NInput,
   NPopconfirm,
   NSpace,
-  NSwitch
+  NSwitch,
+  NTag
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 
 import dashboard from '@/api/panel/dashboard'
 import website from '@/api/panel/website'
+import { useFileStore } from '@/store'
 import { generateRandomString, isNullOrUndef, renderIcon } from '@/utils'
 import type { Website } from './types'
 
+const fileStore = useFileStore()
 const { t } = useI18n()
 const router = useRouter()
 const selectedRowKeys = ref<any>([])
@@ -53,7 +56,20 @@ const columns: any = [
     key: 'path',
     minWidth: 200,
     resizable: true,
-    ellipsis: { tooltip: true }
+    render(row: any) {
+      return h(
+        NTag,
+        {
+          class: 'cursor-pointer hover:opacity-60',
+          type: 'info',
+          onClick: () => {
+            fileStore.path = row.path
+            router.push({ name: 'file-index' })
+          }
+        },
+        { default: () => row.path }
+      )
+    }
   },
   {
     title: 'HTTPS',
