@@ -95,10 +95,12 @@ func EncodeKey(key crypto.Signer) ([]byte, error) {
 
 // GenerateSelfSigned 生成自签名证书
 func GenerateSelfSigned(names []string) (cert []byte, key []byte, err error) {
-	rootPrivateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	// 生成根密钥对
+	rootPublicKey, rootPrivateKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return nil, nil, err
 	}
+
 	var ips []net.IP
 	ip := false
 	for _, item := range names {
@@ -113,44 +115,63 @@ func GenerateSelfSigned(names []string) (cert []byte, key []byte, err error) {
 		SerialNumber:          big.NewInt(1),
 		Subject:               pkix.Name{CommonName: "Rat Panel Root CA"},
 		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(40, 0, 0),
+		NotAfter:              time.Now().AddDate(25, 0, 0),
 		BasicConstraintsValid: true,
 		IsCA:                  true,
 		KeyUsage:              x509.KeyUsageCertSign,
+		SignatureAlgorithm:    x509.PureEd25519,
 	}
 
-	rootCertBytes, _ := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootPrivateKey.PublicKey, rootPrivateKey)
+	rootCertBytes, err := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, rootPublicKey, rootPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
 	rootCertBlock := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: rootCertBytes,
 	}
 
-	interPrivateKey, _ := rsa.GenerateKey(rand.Reader, 4096)
+	// 生成中间证书密钥对
+	interPublicKey, interPrivateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	interTemplate := x509.Certificate{
 		SerialNumber:          big.NewInt(2),
 		Subject:               pkix.Name{CommonName: "Rat Panel CA"},
 		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(30, 0, 0),
+		NotAfter:              time.Now().AddDate(1, 1, 0),
 		BasicConstraintsValid: true,
 		IsCA:                  true,
 		KeyUsage:              x509.KeyUsageCertSign,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		SignatureAlgorithm:    x509.PureEd25519,
 	}
 
-	interCertBytes, _ := x509.CreateCertificate(rand.Reader, &interTemplate, &rootTemplate, &interPrivateKey.PublicKey, rootPrivateKey)
+	interCertBytes, err := x509.CreateCertificate(rand.Reader, &interTemplate, &rootTemplate, interPublicKey, rootPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
 	interCertBlock := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: interCertBytes,
 	}
 
-	clientPrivateKey, _ := rsa.GenerateKey(rand.Reader, 4096)
+	// 生成客户端证书密钥对
+	clientPublicKey, clientPrivateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	clientTemplate := x509.Certificate{
-		SerialNumber: big.NewInt(3),
-		Subject:      pkix.Name{CommonName: "Rat Panel"},
-		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(20, 0, 0),
-		KeyUsage:     x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		SerialNumber:       big.NewInt(3),
+		Subject:            pkix.Name{CommonName: "Rat Panel"},
+		NotBefore:          time.Now(),
+		NotAfter:           time.Now().AddDate(1, 1, 0),
+		KeyUsage:           x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:        []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		SignatureAlgorithm: x509.PureEd25519,
 	}
 	if ip {
 		clientTemplate.IPAddresses = ips
@@ -158,16 +179,29 @@ func GenerateSelfSigned(names []string) (cert []byte, key []byte, err error) {
 		clientTemplate.DNSNames = names
 	}
 
-	clientCertBytes, _ := x509.CreateCertificate(rand.Reader, &clientTemplate, &interTemplate, &clientPrivateKey.PublicKey, interPrivateKey)
+	clientCertBytes, err := x509.CreateCertificate(rand.Reader, &clientTemplate, &interTemplate, clientPublicKey, interPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
 	clientCertBlock := &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: clientCertBytes,
 	}
 
+	// 拼接证书链
 	cert = append(cert, pem.EncodeToMemory(clientCertBlock)...)
 	cert = append(cert, pem.EncodeToMemory(interCertBlock)...)
 	cert = append(cert, pem.EncodeToMemory(rootCertBlock)...)
-	key = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(clientPrivateKey)})
+
+	// 编码私钥
+	privateKeyBytes, err := x509.MarshalPKCS8PrivateKey(clientPrivateKey)
+	if err != nil {
+		return nil, nil, err
+	}
+	key = pem.EncodeToMemory(&pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: privateKeyBytes,
+	})
 
 	return cert, key, nil
 }
