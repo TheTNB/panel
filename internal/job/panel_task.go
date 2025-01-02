@@ -44,10 +44,12 @@ func (r *PanelTask) Run() {
 	if err := r.db.Exec("VACUUM").Error; err != nil {
 		app.Status = app.StatusFailed
 		r.log.Warn("[Panel Task] failed to vacuum database", slog.Any("err", err))
+		return
 	}
 	if err := r.db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
 		app.Status = app.StatusFailed
 		r.log.Warn("[Panel Task] failed to wal checkpoint database", slog.Any("err", err))
+		return
 	}
 
 	// 备份面板
@@ -62,6 +64,7 @@ func (r *PanelTask) Run() {
 		}
 	}
 
+	// 非离线模式下任务
 	if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
 		r.updateApps()
 		r.updateRewrites()
@@ -103,15 +106,15 @@ func (r *PanelTask) updatePanel() {
 		if err != nil {
 			return
 		}
-		old, err := version.NewVersion(app.Version)
+		current, err := version.NewVersion(app.Version)
 		if err != nil {
 			return
 		}
-		current, err := version.NewVersion(panel.Version)
+		latest, err := version.NewVersion(panel.Version)
 		if err != nil {
 			return
 		}
-		if !current.GreaterThan(old) {
+		if current.GreaterThanOrEqual(latest) {
 			return
 		}
 		if download := collect.First(panel.Downloads); download != nil {
