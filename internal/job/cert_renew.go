@@ -2,7 +2,6 @@ package job
 
 import (
 	"log/slog"
-	"path/filepath"
 	"time"
 
 	"gorm.io/gorm"
@@ -10,8 +9,6 @@ import (
 	"github.com/tnb-labs/panel/internal/app"
 	"github.com/tnb-labs/panel/internal/biz"
 	pkgcert "github.com/tnb-labs/panel/pkg/cert"
-	"github.com/tnb-labs/panel/pkg/io"
-	"github.com/tnb-labs/panel/pkg/shell"
 )
 
 // CertRenew 证书续签
@@ -59,20 +56,5 @@ func (r *CertRenew) Run() {
 		if err != nil {
 			r.log.Warn("[Cert Renew] failed to renew cert", slog.Any("err", err))
 		}
-	}
-
-	// 续签面板证书
-	panelCert, err := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
-	if err != nil {
-		r.log.Warn("[Cert Renew] failed to read panel cert", slog.Any("err", err))
-		return
-	}
-	decode, err := pkgcert.ParseCert(panelCert)
-	if err != nil {
-		r.log.Warn("[Cert Renew] failed to parse panel cert", slog.Any("err", err))
-		return
-	}
-	if time.Until(decode.NotAfter) < 24*7*time.Hour {
-		_, _ = shell.Exec("panel-cli https generate")
 	}
 }

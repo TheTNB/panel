@@ -141,7 +141,7 @@ func GenerateSelfSigned(names []string) (cert []byte, key []byte, err error) {
 		SerialNumber:          big.NewInt(2),
 		Subject:               pkix.Name{CommonName: "Rat Panel CA"},
 		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(3, 0, 0),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
 		BasicConstraintsValid: true,
 		IsCA:                  true,
 		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageDigitalSignature,
@@ -167,7 +167,7 @@ func GenerateSelfSigned(names []string) (cert []byte, key []byte, err error) {
 		SerialNumber: big.NewInt(3),
 		Subject:      pkix.Name{CommonName: "Rat Panel"},
 		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(1, 0, 0),
+		NotAfter:     time.Now().AddDate(10, 0, 0),
 		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 	}
