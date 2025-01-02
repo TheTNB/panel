@@ -120,6 +120,7 @@ func (r *PanelTask) updatePanel() {
 		if download := collect.First(panel.Downloads); download != nil {
 			if err = r.backupRepo.UpdatePanel(panel.Version, download.URL, download.Checksum); err != nil {
 				r.log.Warn("[Panel Task] failed to update panel", slog.Any("err", err))
+				_ = r.backupRepo.FixPanel()
 			}
 		}
 	})
