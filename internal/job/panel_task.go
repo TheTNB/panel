@@ -38,11 +38,11 @@ func (r *PanelTask) Run() {
 	// 优化数据库
 	if err := r.db.Exec("VACUUM").Error; err != nil {
 		app.Status = app.StatusFailed
-		r.log.Warn("优化面板数据库失败", slog.Any("err", err))
+		r.log.Warn("[Panel Task] failed to vacuum database", slog.Any("err", err))
 	}
 	if err := r.db.Exec("PRAGMA wal_checkpoint(TRUNCATE);").Error; err != nil {
 		app.Status = app.StatusFailed
-		r.log.Warn("优化面板数据库失败", slog.Any("err", err))
+		r.log.Warn("[Panel Task] failed to wal checkpoint database", slog.Any("err", err))
 	}
 
 	// 备份面板
@@ -54,7 +54,7 @@ func (r *PanelTask) Run() {
 	path, err := r.backupRepo.GetPath("panel")
 	if err == nil {
 		if err = r.backupRepo.ClearExpired(path, "panel_", 10); err != nil {
-			r.log.Warn("清理面板备份失败", slog.Any("err", err))
+			r.log.Warn("[Panel Task] failed to clear backup", slog.Any("err", err))
 		}
 	}
 
@@ -62,7 +62,7 @@ func (r *PanelTask) Run() {
 	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
 		if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
 			if err = r.cacheRepo.UpdateApps(); err != nil {
-				r.log.Warn("更新商店缓存失败", slog.Any("err", err))
+				r.log.Warn("[Panel Task] failed to update apps cache", slog.Any("err", err))
 			}
 		}
 	})
@@ -71,7 +71,7 @@ func (r *PanelTask) Run() {
 	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
 		if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
 			if err = r.cacheRepo.UpdateRewrites(); err != nil {
-				r.log.Warn("更新伪静态缓存失败", slog.Any("err", err))
+				r.log.Warn("[Panel Task] failed to update rewrites cache", slog.Any("err", err))
 			}
 		}
 	})

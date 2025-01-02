@@ -48,7 +48,7 @@ func (r *Monitoring) Run() {
 	}
 
 	if err = r.db.Create(&biz.Monitor{Info: info}).Error; err != nil {
-		r.log.Warn("记录系统监控失败", slog.Any("err", err))
+		r.log.Warn("[Monitor] failed to create monitor record", slog.Any("err", err))
 		return
 	}
 
@@ -62,7 +62,7 @@ func (r *Monitoring) Run() {
 		return
 	}
 	if err = r.db.Where("created_at < ?", time.Now().AddDate(0, 0, -day).Format(time.DateTime)).Delete(&biz.Monitor{}).Error; err != nil {
-		r.log.Warn("删除过期系统监控失败", slog.Any("err", err))
+		r.log.Warn("[Monitor] failed to delete monitor record", slog.Any("err", err))
 		return
 	}
 }

@@ -36,7 +36,7 @@ func (r *CertRenew) Run() {
 
 	var certs []biz.Cert
 	if err := r.db.Preload("Website").Preload("Account").Preload("DNS").Find(&certs).Error; err != nil {
-		r.log.Warn("获取证书失败", slog.Any("err", err))
+		r.log.Warn("[Cert Renew] failed to get certs", slog.Any("err", err))
 		return
 	}
 
@@ -58,19 +58,19 @@ func (r *CertRenew) Run() {
 
 		_, err = r.certRepo.Renew(cert.ID)
 		if err != nil {
-			r.log.Warn("续签证书失败", slog.Any("err", err))
+			r.log.Warn("[Cert Renew] failed to renew cert", slog.Any("err", err))
 		}
 	}
 
 	// 续签面板证书
 	panelCert, err := io.Read(filepath.Join(app.Root, "panel/storage/cert.pem"))
 	if err != nil {
-		r.log.Warn("读取面板证书失败", slog.Any("err", err))
+		r.log.Warn("[Cert Renew] failed to read panel cert", slog.Any("err", err))
 		return
 	}
 	decode, err := pkgcert.ParseCert(panelCert)
 	if err != nil {
-		r.log.Warn("解析面板证书失败", slog.Any("err", err))
+		r.log.Warn("[Cert Renew] failed to parse panel cert", slog.Any("err", err))
 		return
 	}
 	if decode.NotAfter.Sub(time.Now()).Hours() < 24*7 {
