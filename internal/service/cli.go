@@ -825,7 +825,7 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 		{Key: biz.SettingKeyWebsitePath, Value: filepath.Join(app.Root, "wwwroot")},
 		{Key: biz.SettingKeyVersion, Value: app.Version},
 		{Key: biz.SettingKeyOfflineMode, Value: "false"},
-		{Key: biz.SettingKeyAutoUpdate, Value: "false"},
+		{Key: biz.SettingKeyAutoUpdate, Value: "true"},
 	}
 	if err := s.db.Create(&settings).Error; err != nil {
 		return fmt.Errorf("初始化失败：%v", err)
