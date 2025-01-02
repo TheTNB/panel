@@ -51,8 +51,7 @@ func (r *CertRenew) Run() {
 		}
 
 		// 结束时间大于 7 天的证书不续签
-		now := time.Now()
-		if decode.NotAfter.Sub(now).Hours() > 24*7 {
+		if time.Until(decode.NotAfter) > 24*7*time.Hour {
 			continue
 		}
 
@@ -73,7 +72,7 @@ func (r *CertRenew) Run() {
 		r.log.Warn("[Cert Renew] failed to parse panel cert", slog.Any("err", err))
 		return
 	}
-	if decode.NotAfter.Sub(time.Now()).Hours() < 24*7 {
-		_, err = shell.Exec("panel-cli https generate")
+	if time.Until(decode.NotAfter) < 24*7*time.Hour {
+		_, _ = shell.Exec("panel-cli https generate")
 	}
 }
