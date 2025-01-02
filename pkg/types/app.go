@@ -2,10 +2,9 @@ package types
 
 import "github.com/go-chi/chi/v5"
 
-// App 应用元数据结构
-type App struct {
-	Slug  string             `json:"slug"` // 应用标识
-	Route func(r chi.Router) `json:"-"`    // 路由
+// App 应用接口
+type App interface {
+	Route(r chi.Router)
 }
 
 // AppCenter 应用中心结构

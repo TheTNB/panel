@@ -11,11 +11,11 @@ const (
 
 // 面板全局变量
 var (
-	Key    string
-	Root   string
-	Locale string
-	IsCli  bool
-	Status = StatusNormal
+	Key    string         // 密钥
+	Root   string         // 根目录
+	Locale string         // 语言
+	IsCli  bool           // 是否命令行
+	Status = StatusNormal // 面板状态
 )
 
 // 自动注入

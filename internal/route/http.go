@@ -8,10 +8,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/tnb-labs/panel/internal/apps"
 	"github.com/tnb-labs/panel/internal/embed"
 	"github.com/tnb-labs/panel/internal/http/middleware"
 	"github.com/tnb-labs/panel/internal/service"
+	"github.com/tnb-labs/panel/pkg/apploader"
 )
 
 type Http struct {
@@ -40,7 +40,7 @@ type Http struct {
 	monitor          *service.MonitorService
 	setting          *service.SettingService
 	systemctl        *service.SystemctlService
-	apps             *apps.Loader
+	apps             *apploader.Loader
 }
 
 func NewHttp(
@@ -69,7 +69,7 @@ func NewHttp(
 	monitor *service.MonitorService,
 	setting *service.SettingService,
 	systemctl *service.SystemctlService,
-	apps *apps.Loader,
+	apps *apploader.Loader,
 ) *Http {
 	return &Http{
 		user:             user,

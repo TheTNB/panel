@@ -8,7 +8,6 @@ package main
 
 import (
 	"github.com/tnb-labs/panel/internal/app"
-	"github.com/tnb-labs/panel/internal/apps"
 	"github.com/tnb-labs/panel/internal/apps/benchmark"
 	"github.com/tnb-labs/panel/internal/apps/docker"
 	"github.com/tnb-labs/panel/internal/apps/fail2ban"
@@ -17,7 +16,12 @@ import (
 	"github.com/tnb-labs/panel/internal/apps/memcached"
 	"github.com/tnb-labs/panel/internal/apps/mysql"
 	"github.com/tnb-labs/panel/internal/apps/nginx"
-	"github.com/tnb-labs/panel/internal/apps/php"
+	"github.com/tnb-labs/panel/internal/apps/php74"
+	"github.com/tnb-labs/panel/internal/apps/php80"
+	"github.com/tnb-labs/panel/internal/apps/php81"
+	"github.com/tnb-labs/panel/internal/apps/php82"
+	"github.com/tnb-labs/panel/internal/apps/php83"
+	"github.com/tnb-labs/panel/internal/apps/php84"
 	"github.com/tnb-labs/panel/internal/apps/phpmyadmin"
 	"github.com/tnb-labs/panel/internal/apps/podman"
 	"github.com/tnb-labs/panel/internal/apps/postgresql"
@@ -112,7 +116,12 @@ func initWeb() (*app.Web, error) {
 	memcachedApp := memcached.NewApp()
 	mysqlApp := mysql.NewApp(settingRepo)
 	nginxApp := nginx.NewApp()
-	phpApp := php.NewApp(taskRepo)
+	php74App := php74.NewApp(taskRepo)
+	php80App := php80.NewApp(taskRepo)
+	php81App := php81.NewApp(taskRepo)
+	php82App := php82.NewApp(taskRepo)
+	php83App := php83.NewApp(taskRepo)
+	php84App := php84.NewApp(taskRepo)
 	phpmyadminApp := phpmyadmin.NewApp()
 	podmanApp := podman.NewApp()
 	postgresqlApp := postgresql.NewApp()
@@ -122,7 +131,7 @@ func initWeb() (*app.Web, error) {
 	s3fsApp := s3fs.NewApp(settingRepo)
 	supervisorApp := supervisor.NewApp()
 	toolboxApp := toolbox.NewApp()
-	loader := apps.NewLoader(benchmarkApp, dockerApp, fail2banApp, frpApp, giteaApp, memcachedApp, mysqlApp, nginxApp, phpApp, phpmyadminApp, podmanApp, postgresqlApp, pureftpdApp, redisApp, rsyncApp, s3fsApp, supervisorApp, toolboxApp)
+	loader := bootstrap.NewLoader(benchmarkApp, dockerApp, fail2banApp, frpApp, giteaApp, memcachedApp, mysqlApp, nginxApp, php74App, php80App, php81App, php82App, php83App, php84App, phpmyadminApp, podmanApp, postgresqlApp, pureftpdApp, redisApp, rsyncApp, s3fsApp, supervisorApp, toolboxApp)
 	http := route.NewHttp(userService, dashboardService, taskService, websiteService, databaseService, databaseServerService, databaseUserService, backupService, certService, certDNSService, certAccountService, appService, cronService, processService, safeService, firewallService, sshService, containerService, containerNetworkService, containerImageService, containerVolumeService, fileService, monitorService, settingService, systemctlService, loader)
 	wsService := service.NewWsService(koanf, sshRepo)
 	ws := route.NewWs(wsService)

@@ -7,6 +7,8 @@ import (
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/urfave/cli/v3"
+
+	"github.com/tnb-labs/panel/pkg/apploader"
 )
 
 type Cli struct {
@@ -14,7 +16,7 @@ type Cli struct {
 	migrator *gormigrate.Gormigrate
 }
 
-func NewCli(cmd *cli.Command, migrator *gormigrate.Gormigrate) *Cli {
+func NewCli(cmd *cli.Command, migrator *gormigrate.Gormigrate, _ *apploader.Loader) *Cli {
 	IsCli = true
 	return &Cli{
 		cmd:      cmd,

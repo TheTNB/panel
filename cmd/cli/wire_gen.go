@@ -8,6 +8,29 @@ package main
 
 import (
 	"github.com/tnb-labs/panel/internal/app"
+	"github.com/tnb-labs/panel/internal/apps/benchmark"
+	"github.com/tnb-labs/panel/internal/apps/docker"
+	"github.com/tnb-labs/panel/internal/apps/fail2ban"
+	"github.com/tnb-labs/panel/internal/apps/frp"
+	"github.com/tnb-labs/panel/internal/apps/gitea"
+	"github.com/tnb-labs/panel/internal/apps/memcached"
+	"github.com/tnb-labs/panel/internal/apps/mysql"
+	"github.com/tnb-labs/panel/internal/apps/nginx"
+	"github.com/tnb-labs/panel/internal/apps/php74"
+	"github.com/tnb-labs/panel/internal/apps/php80"
+	"github.com/tnb-labs/panel/internal/apps/php81"
+	"github.com/tnb-labs/panel/internal/apps/php82"
+	"github.com/tnb-labs/panel/internal/apps/php83"
+	"github.com/tnb-labs/panel/internal/apps/php84"
+	"github.com/tnb-labs/panel/internal/apps/phpmyadmin"
+	"github.com/tnb-labs/panel/internal/apps/podman"
+	"github.com/tnb-labs/panel/internal/apps/postgresql"
+	"github.com/tnb-labs/panel/internal/apps/pureftpd"
+	"github.com/tnb-labs/panel/internal/apps/redis"
+	"github.com/tnb-labs/panel/internal/apps/rsync"
+	"github.com/tnb-labs/panel/internal/apps/s3fs"
+	"github.com/tnb-labs/panel/internal/apps/supervisor"
+	"github.com/tnb-labs/panel/internal/apps/toolbox"
 	"github.com/tnb-labs/panel/internal/bootstrap"
 	"github.com/tnb-labs/panel/internal/data"
 	"github.com/tnb-labs/panel/internal/route"
@@ -48,6 +71,30 @@ func initCli() (*app.Cli, error) {
 	cli := route.NewCli(cliService)
 	command := bootstrap.NewCli(cli)
 	gormigrate := bootstrap.NewMigrate(db)
-	appCli := app.NewCli(command, gormigrate)
+	benchmarkApp := benchmark.NewApp()
+	dockerApp := docker.NewApp()
+	fail2banApp := fail2ban.NewApp(websiteRepo)
+	frpApp := frp.NewApp()
+	giteaApp := gitea.NewApp()
+	memcachedApp := memcached.NewApp()
+	mysqlApp := mysql.NewApp(settingRepo)
+	nginxApp := nginx.NewApp()
+	php74App := php74.NewApp(taskRepo)
+	php80App := php80.NewApp(taskRepo)
+	php81App := php81.NewApp(taskRepo)
+	php82App := php82.NewApp(taskRepo)
+	php83App := php83.NewApp(taskRepo)
+	php84App := php84.NewApp(taskRepo)
+	phpmyadminApp := phpmyadmin.NewApp()
+	podmanApp := podman.NewApp()
+	postgresqlApp := postgresql.NewApp()
+	pureftpdApp := pureftpd.NewApp()
+	redisApp := redis.NewApp()
+	rsyncApp := rsync.NewApp()
+	s3fsApp := s3fs.NewApp(settingRepo)
+	supervisorApp := supervisor.NewApp()
+	toolboxApp := toolbox.NewApp()
+	loader := bootstrap.NewLoader(benchmarkApp, dockerApp, fail2banApp, frpApp, giteaApp, memcachedApp, mysqlApp, nginxApp, php74App, php80App, php81App, php82App, php83App, php84App, phpmyadminApp, podmanApp, postgresqlApp, pureftpdApp, redisApp, rsyncApp, s3fsApp, supervisorApp, toolboxApp)
+	appCli := app.NewCli(command, gormigrate, loader)
 	return appCli, nil
 }

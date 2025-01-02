@@ -1,8 +1,6 @@
-package apps
+package bootstrap
 
 import (
-	"github.com/google/wire"
-
 	"github.com/tnb-labs/panel/internal/apps/benchmark"
 	"github.com/tnb-labs/panel/internal/apps/docker"
 	"github.com/tnb-labs/panel/internal/apps/fail2ban"
@@ -26,30 +24,35 @@ import (
 	"github.com/tnb-labs/panel/internal/apps/s3fs"
 	"github.com/tnb-labs/panel/internal/apps/supervisor"
 	"github.com/tnb-labs/panel/internal/apps/toolbox"
+	"github.com/tnb-labs/panel/pkg/apploader"
 )
 
-var ProviderSet = wire.NewSet(
-	benchmark.NewApp,
-	docker.NewApp,
-	fail2ban.NewApp,
-	frp.NewApp,
-	gitea.NewApp,
-	memcached.NewApp,
-	mysql.NewApp,
-	nginx.NewApp,
-	php74.NewApp,
-	php80.NewApp,
-	php81.NewApp,
-	php82.NewApp,
-	php83.NewApp,
-	php84.NewApp,
-	phpmyadmin.NewApp,
-	podman.NewApp,
-	postgresql.NewApp,
-	pureftpd.NewApp,
-	redis.NewApp,
-	rsync.NewApp,
-	s3fs.NewApp,
-	supervisor.NewApp,
-	toolbox.NewApp,
-)
+func NewLoader(
+	benchmark *benchmark.App,
+	docker *docker.App,
+	fail2ban *fail2ban.App,
+	frp *frp.App,
+	gitea *gitea.App,
+	memcached *memcached.App,
+	mysql *mysql.App,
+	nginx *nginx.App,
+	php74 *php74.App,
+	php80 *php80.App,
+	php81 *php81.App,
+	php82 *php82.App,
+	php83 *php83.App,
+	php84 *php84.App,
+	phpmyadmin *phpmyadmin.App,
+	podman *podman.App,
+	postgresql *postgresql.App,
+	pureftpd *pureftpd.App,
+	redis *redis.App,
+	rsync *rsync.App,
+	s3fs *s3fs.App,
+	supervisor *supervisor.App,
+	toolbox *toolbox.App,
+) *apploader.Loader {
+	loader := new(apploader.Loader)
+	loader.Add(benchmark, docker, fail2ban, frp, gitea, memcached, mysql, nginx, php74, php80, php81, php82, php83, php84, phpmyadmin, podman, postgresql, pureftpd, redis, rsync, s3fs, supervisor, toolbox)
+	return loader
+}

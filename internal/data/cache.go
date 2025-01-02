@@ -8,9 +8,9 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/tnb-labs/panel/internal/app"
-	"github.com/tnb-labs/panel/internal/apps"
 	"github.com/tnb-labs/panel/internal/biz"
 	"github.com/tnb-labs/panel/pkg/api"
+	"github.com/tnb-labs/panel/pkg/apploader"
 )
 
 type cacheRepo struct {
@@ -57,8 +57,8 @@ func (r *cacheRepo) UpdateApps() error {
 	}
 
 	// 去除本地不存在的应用
-	*remote = slices.Clip(slices.DeleteFunc(*remote, func(app *api.App) bool {
-		return !slices.Contains(apps.Slugs(), app.Slug)
+	*remote = slices.Clip(slices.DeleteFunc(*remote, func(item *api.App) bool {
+		return !slices.Contains(apploader.Slugs(), item.Slug)
 	}))
 
 	encoded, err := json.Marshal(remote)
