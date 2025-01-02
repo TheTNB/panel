@@ -17,6 +17,7 @@ const model = ref<Setting>({
   port: 8888,
   entrance: '',
   offline_mode: false,
+  auto_update: false,
   website_path: '',
   backup_path: '',
   https: false,
@@ -102,6 +103,9 @@ onMounted(() => {
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.offline.label')">
         <n-switch v-model:value="model.offline_mode" />
+      </n-form-item>
+      <n-form-item label="自动更新">
+        <n-switch v-model:value="model.auto_update" />
       </n-form-item>
       <n-form-item :label="$t('settingIndex.edit.fields.path.label')">
         <n-input

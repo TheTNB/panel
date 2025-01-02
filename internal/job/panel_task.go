@@ -7,14 +7,18 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/go-rat/utils/collect"
+	"github.com/hashicorp/go-version"
 	"gorm.io/gorm"
 
 	"github.com/tnb-labs/panel/internal/app"
 	"github.com/tnb-labs/panel/internal/biz"
+	"github.com/tnb-labs/panel/pkg/api"
 )
 
 // PanelTask 面板每日任务
 type PanelTask struct {
+	api         *api.API
 	db          *gorm.DB
 	log         *slog.Logger
 	backupRepo  biz.BackupRepo
@@ -24,6 +28,7 @@ type PanelTask struct {
 
 func NewPanelTask(db *gorm.DB, log *slog.Logger, backup biz.BackupRepo, cache biz.CacheRepo, setting biz.SettingRepo) *PanelTask {
 	return &PanelTask{
+		api:         api.NewAPI(app.Version),
 		db:          db,
 		log:         log,
 		backupRepo:  backup,
@@ -51,34 +56,68 @@ func (r *PanelTask) Run() {
 	}
 
 	// 清理备份
-	path, err := r.backupRepo.GetPath("panel")
-	if err == nil {
+	if path, err := r.backupRepo.GetPath("panel"); err == nil {
 		if err = r.backupRepo.ClearExpired(path, "panel_", 10); err != nil {
 			r.log.Warn("[Panel Task] failed to clear backup", slog.Any("err", err))
 		}
 	}
 
-	// 更新商店缓存
-	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
-		if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
-			if err = r.cacheRepo.UpdateApps(); err != nil {
-				r.log.Warn("[Panel Task] failed to update apps cache", slog.Any("err", err))
-			}
+	if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
+		r.updateApps()
+		r.updateRewrites()
+		if autoUpdate, err := r.settingRepo.GetBool(biz.SettingKeyAutoUpdate); err == nil && autoUpdate {
+			r.updatePanel()
 		}
-	})
-
-	// 更新伪静态缓存
-	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
-		if offline, err := r.settingRepo.GetBool(biz.SettingKeyOfflineMode); err == nil && !offline {
-			if err = r.cacheRepo.UpdateRewrites(); err != nil {
-				r.log.Warn("[Panel Task] failed to update rewrites cache", slog.Any("err", err))
-			}
-		}
-	})
+	}
 
 	// 回收内存
 	runtime.GC()
 	debug.FreeOSMemory()
 
 	app.Status = app.StatusNormal
+}
+
+// 更新商店缓存
+func (r *PanelTask) updateApps() {
+	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
+		if err := r.cacheRepo.UpdateApps(); err != nil {
+			r.log.Warn("[Panel Task] failed to update apps cache", slog.Any("err", err))
+		}
+	})
+}
+
+// 更新伪静态缓存
+func (r *PanelTask) updateRewrites() {
+	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second, func() {
+		if err := r.cacheRepo.UpdateRewrites(); err != nil {
+			r.log.Warn("[Panel Task] failed to update rewrites cache", slog.Any("err", err))
+		}
+	})
+}
+
+// 更新面板
+func (r *PanelTask) updatePanel() {
+	// 加 300 秒确保在缓存更新后才更新面板
+	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second+300*time.Second, func() {
+		panel, err := r.api.LatestVersion()
+		if err != nil {
+			return
+		}
+		old, err := version.NewVersion(app.Version)
+		if err != nil {
+			return
+		}
+		current, err := version.NewVersion(panel.Version)
+		if err != nil {
+			return
+		}
+		if !current.GreaterThan(old) {
+			return
+		}
+		if download := collect.First(panel.Downloads); download != nil {
+			if err = r.backupRepo.UpdatePanel(panel.Version, download.URL, download.Checksum); err != nil {
+				r.log.Warn("[Panel Task] failed to update panel", slog.Any("err", err))
+			}
+		}
+	})
 }

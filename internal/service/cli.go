@@ -99,9 +99,8 @@ func (s *CliService) Update(ctx context.Context, cmd *cli.Command) error {
 	if download == nil {
 		return fmt.Errorf("下载地址为空")
 	}
-	ver, url, checksum := panel.Version, download.URL, download.Checksum
 
-	return s.backupRepo.UpdatePanel(ver, url, checksum)
+	return s.backupRepo.UpdatePanel(panel.Version, download.URL, download.Checksum)
 }
 
 func (s *CliService) Sync(ctx context.Context, cmd *cli.Command) error {
@@ -820,11 +819,13 @@ func (s *CliService) Init(ctx context.Context, cmd *cli.Command) error {
 
 	settings := []biz.Setting{
 		{Key: biz.SettingKeyName, Value: "耗子面板"},
-		{Key: biz.SettingKeyMonitor, Value: "1"},
+		{Key: biz.SettingKeyMonitor, Value: "true"},
 		{Key: biz.SettingKeyMonitorDays, Value: "30"},
 		{Key: biz.SettingKeyBackupPath, Value: filepath.Join(app.Root, "backup")},
 		{Key: biz.SettingKeyWebsitePath, Value: filepath.Join(app.Root, "wwwroot")},
 		{Key: biz.SettingKeyVersion, Value: app.Version},
+		{Key: biz.SettingKeyOfflineMode, Value: "false"},
+		{Key: biz.SettingKeyAutoUpdate, Value: "false"},
 	}
 	if err := s.db.Create(&settings).Error; err != nil {
 		return fmt.Errorf("初始化失败：%v", err)

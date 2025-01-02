@@ -93,7 +93,11 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 	if err != nil {
 		return nil, err
 	}
-	offlineMode, err := r.Get(biz.SettingKeyOfflineMode)
+	offlineMode, err := r.GetBool(biz.SettingKeyOfflineMode)
+	if err != nil {
+		return nil, err
+	}
+	autoUpdate, err := r.GetBool(biz.SettingKeyAutoUpdate)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +129,8 @@ func (r *settingRepo) GetPanelSetting(ctx context.Context) (*request.PanelSettin
 		Name:        name,
 		Locale:      r.conf.String("app.locale"),
 		Entrance:    r.conf.String("http.entrance"),
-		OfflineMode: cast.ToBool(offlineMode),
+		OfflineMode: offlineMode,
+		AutoUpdate:  autoUpdate,
 		WebsitePath: websitePath,
 		BackupPath:  backupPath,
 		Username:    user.Username,
@@ -142,6 +147,9 @@ func (r *settingRepo) UpdatePanelSetting(ctx context.Context, setting *request.P
 		return false, err
 	}
 	if err := r.Set(biz.SettingKeyOfflineMode, cast.ToString(setting.OfflineMode)); err != nil {
+		return false, err
+	}
+	if err := r.Set(biz.SettingKeyAutoUpdate, cast.ToString(setting.AutoUpdate)); err != nil {
 		return false, err
 	}
 	if err := r.Set(biz.SettingKeyWebsitePath, setting.WebsitePath); err != nil {

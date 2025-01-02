@@ -5,6 +5,7 @@ type PanelSetting struct {
 	Locale      string `json:"locale" validate:"required"`
 	Entrance    string `json:"entrance" validate:"required"`
 	OfflineMode bool   `json:"offline_mode"`
+	AutoUpdate  bool   `json:"auto_update"`
 	WebsitePath string `json:"website_path" validate:"required"`
 	BackupPath  string `json:"backup_path" validate:"required"`
 	Username    string `json:"username" validate:"required"`

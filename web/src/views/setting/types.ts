@@ -7,6 +7,7 @@ export interface Setting {
   port: number
   entrance: string
   offline_mode: boolean
+  auto_update: boolean
   website_path: string
   backup_path: string
   https: boolean

@@ -18,6 +18,7 @@ const (
 	SettingKeyWebsitePath       SettingKey = "website_path"
 	SettingKeyMySQLRootPassword SettingKey = "mysql_root_password"
 	SettingKeyOfflineMode       SettingKey = "offline_mode"
+	SettingKeyAutoUpdate        SettingKey = "auto_update"
 )
 
 type Setting struct {
