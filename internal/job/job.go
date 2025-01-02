@@ -19,9 +19,10 @@ type Jobs struct {
 	cert    biz.CertRepo
 	backup  biz.BackupRepo
 	cache   biz.CacheRepo
+	task    biz.TaskRepo
 }
 
-func NewJobs(db *gorm.DB, log *slog.Logger, setting biz.SettingRepo, cert biz.CertRepo, backup biz.BackupRepo, cache biz.CacheRepo) *Jobs {
+func NewJobs(db *gorm.DB, log *slog.Logger, setting biz.SettingRepo, cert biz.CertRepo, backup biz.BackupRepo, cache biz.CacheRepo, task biz.TaskRepo) *Jobs {
 	return &Jobs{
 		db:      db,
 		log:     log,
@@ -29,6 +30,7 @@ func NewJobs(db *gorm.DB, log *slog.Logger, setting biz.SettingRepo, cert biz.Ce
 		cert:    cert,
 		backup:  backup,
 		cache:   cache,
+		task:    task,
 	}
 }
 
@@ -40,7 +42,7 @@ func (r *Jobs) Register(c *cron.Cron) error {
 		return err
 	}
 
-	if _, err := c.AddJob("0 2 * * *", NewPanelTask(r.db, r.log, r.backup, r.cache, r.setting)); err != nil {
+	if _, err := c.AddJob("0 2 * * *", NewPanelTask(r.db, r.log, r.backup, r.cache, r.task, r.setting)); err != nil {
 		return err
 	}
 

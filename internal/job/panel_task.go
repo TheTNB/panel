@@ -23,16 +23,18 @@ type PanelTask struct {
 	log         *slog.Logger
 	backupRepo  biz.BackupRepo
 	cacheRepo   biz.CacheRepo
+	taskRepo    biz.TaskRepo
 	settingRepo biz.SettingRepo
 }
 
-func NewPanelTask(db *gorm.DB, log *slog.Logger, backup biz.BackupRepo, cache biz.CacheRepo, setting biz.SettingRepo) *PanelTask {
+func NewPanelTask(db *gorm.DB, log *slog.Logger, backup biz.BackupRepo, cache biz.CacheRepo, task biz.TaskRepo, setting biz.SettingRepo) *PanelTask {
 	return &PanelTask{
 		api:         api.NewAPI(app.Version),
 		db:          db,
 		log:         log,
 		backupRepo:  backup,
 		cacheRepo:   cache,
+		taskRepo:    task,
 		settingRepo: setting,
 	}
 }
@@ -100,6 +102,10 @@ func (r *PanelTask) updateRewrites() {
 
 // 更新面板
 func (r *PanelTask) updatePanel() {
+	if r.taskRepo.HasRunningTask() {
+		return
+	}
+
 	// 加 300 秒确保在缓存更新后才更新面板
 	time.AfterFunc(time.Duration(rand.IntN(300))*time.Second+300*time.Second, func() {
 		panel, err := r.api.LatestVersion()

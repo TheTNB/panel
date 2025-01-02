@@ -144,7 +144,7 @@ func initWeb() (*app.Web, error) {
 		return nil, err
 	}
 	gormigrate := bootstrap.NewMigrate(db)
-	jobs := job.NewJobs(db, logger, settingRepo, certRepo, backupRepo, cacheRepo)
+	jobs := job.NewJobs(db, logger, settingRepo, certRepo, backupRepo, cacheRepo, taskRepo)
 	cron, err := bootstrap.NewCron(koanf, logger, jobs)
 	if err != nil {
 		return nil, err
