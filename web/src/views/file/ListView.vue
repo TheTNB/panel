@@ -1136,6 +1136,11 @@ const handleKeyDown = (event: KeyboardEvent) => {
     return
   }
 
+  // 弹窗、抽屉打开时不处理快捷键，否则弹窗内选中文本按 Ctrl+C 会被接管成标记复制文件
+  if (document.querySelector('.n-modal-mask, .n-drawer-mask')) {
+    return
+  }
+
   // 如果焦点在输入框中，不处理快捷键
   const target = event.target as HTMLElement
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
