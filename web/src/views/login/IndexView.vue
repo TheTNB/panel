@@ -246,68 +246,69 @@ onMounted(() => {
             {{ $gettext('Passkey login failed, please use username and password.') }}
           </n-alert>
 
-          <n-input
-            v-model:value="loginInfo.username"
-            :maxlength="32"
-            :placeholder="$gettext('Username')"
-            autofocus
-            class="text-md h-12 items-center"
-            :on-blur="isTwoFA"
-          />
-
-          <n-input
-            v-model:value="loginInfo.password"
-            :maxlength="32"
-            :placeholder="$gettext('Password')"
-            class="text-md mt-5 h-12 items-center"
-            type="password"
-            show-password-on="click"
-            @keydown.enter="handleLogin"
-          />
-
-          <n-input
-            v-if="showTwoFA"
-            v-model:value="loginInfo.pass_code"
-            :maxlength="6"
-            :placeholder="$gettext('2FA Code')"
-            :input-props="{ autocomplete: 'one-time-code' }"
-            class="text-md mt-5 h-12 items-center"
-            type="text"
-            @keydown.enter="handleLogin"
-          />
-
-          <n-flex v-if="captchaRequired" align="center" class="mt-5">
+          <form @submit.prevent="handleLogin">
             <n-input
-              v-model:value="loginInfo.captcha_code"
-              :maxlength="4"
-              :placeholder="$gettext('Captcha Code')"
+              v-model:value="loginInfo.username"
+              :maxlength="32"
+              :placeholder="$gettext('Username')"
+              :input-props="{ autocomplete: 'username' }"
+              autofocus
               class="text-md h-12 items-center"
-              style="flex: 1"
+              :on-blur="isTwoFA"
+            />
+
+            <n-input
+              v-model:value="loginInfo.password"
+              :maxlength="32"
+              :placeholder="$gettext('Password')"
+              class="text-md mt-5 h-12 items-center"
+              :input-props="{ autocomplete: 'current-password' }"
+              type="password"
+              show-password-on="click"
+            />
+
+            <n-input
+              v-if="showTwoFA"
+              v-model:value="loginInfo.pass_code"
+              :maxlength="6"
+              :placeholder="$gettext('2FA Code')"
+              :input-props="{ autocomplete: 'one-time-code' }"
+              class="text-md mt-5 h-12 items-center"
               type="text"
-              @keydown.enter="handleLogin"
             />
-            <n-image
-              :src="captchaImage"
-              preview-disabled
-              class="rounded h-12 cursor-pointer"
-              @click="refreshCaptcha"
-            />
-          </n-flex>
 
-          <n-flex class="mt-5">
-            <n-checkbox v-model:checked="loginInfo.safe_login" :label="$gettext('Safe Login')" />
-            <n-checkbox v-model:checked="isRemember" :label="$gettext('Remember Me')" />
-          </n-flex>
+            <n-flex v-if="captchaRequired" align="center" class="mt-5">
+              <n-input
+                v-model:value="loginInfo.captcha_code"
+                :maxlength="4"
+                :placeholder="$gettext('Captcha Code')"
+                class="text-md h-12 items-center"
+                style="flex: 1"
+                type="text"
+              />
+              <n-image
+                :src="captchaImage"
+                preview-disabled
+                class="rounded h-12 cursor-pointer"
+                @click="refreshCaptcha"
+              />
+            </n-flex>
 
-          <n-button
-            :loading="!keyLoaded || logining"
-            :disabled="!keyLoaded || logining"
-            class="text-lg mt-6 h-12 w-full"
-            type="primary"
-            @click="handleLogin"
-          >
-            {{ $gettext('Login') }}
-          </n-button>
+            <n-flex class="mt-5">
+              <n-checkbox v-model:checked="loginInfo.safe_login" :label="$gettext('Safe Login')" />
+              <n-checkbox v-model:checked="isRemember" :label="$gettext('Remember Me')" />
+            </n-flex>
+
+            <n-button
+              :loading="!keyLoaded || logining"
+              :disabled="!keyLoaded || logining"
+              class="text-lg mt-6 h-12 w-full"
+              type="primary"
+              attr-type="submit"
+            >
+              {{ $gettext('Login') }}
+            </n-button>
+          </form>
 
           <!-- 手动触发通行密钥登录 -->
           <n-button
