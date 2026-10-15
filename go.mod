@@ -21,7 +21,7 @@ require (
 	github.com/go-webauthn/webauthn v0.18.2
 	github.com/gomodule/redigo v1.9.3
 	github.com/google/go-cmp v0.7.0
-	github.com/gookit/color v1.6.1
+	github.com/gookit/color v1.6.3
 	github.com/hashicorp/go-version v1.9.0
 	github.com/klauspost/compress v1.20.3
 	github.com/leonelquinteros/gotext v1.8.0
