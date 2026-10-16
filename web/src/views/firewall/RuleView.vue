@@ -297,7 +297,7 @@ const selectedRowKeys = ref<any>([])
 const importing = ref(false)
 const selectingUnused = ref(false)
 
-// 勾选所有未使用的端口规则，配合批量删除清理
+// 端口未占用不代表出站或拒绝规则无用，只勾选入站放行规则
 // 后端 limit 校验上限 10000，规则总数超限时按 total 循环拉取所有分页
 const selectUnused = async () => {
   selectingUnused.value = true
@@ -307,12 +307,16 @@ const selectUnused = async () => {
     for (let page = 1; (page - 1) * 10000 < total; page++) {
       await useRequest(firewall.rules(page, 10000)).onSuccess(({ data }: any) => {
         total = data.total
-        unused.push(...data.items.filter((row: any) => !row.in_use))
+        unused.push(
+          ...data.items.filter(
+            (row: any) => row.direction === 'in' && row.strategy === 'accept' && !row.in_use,
+          ),
+        )
       })
     }
     selectedRowKeys.value = unused.map((row) => JSON.stringify(row))
     if (selectedRowKeys.value.length === 0) {
-      window.$message.info($gettext('No unused rules'))
+      window.$message.info($gettext('No inbound allow rules with unoccupied ports'))
     }
   } finally {
     selectingUnused.value = false
@@ -375,7 +379,7 @@ onMounted(() => {
         {{ $gettext('Create Rule') }}
       </n-button>
       <n-button :loading="selectingUnused" :disabled="selectingUnused" ghost @click="selectUnused">
-        {{ $gettext('Select Unused') }}
+        {{ $gettext('Select Inbound Allow Rules with Unoccupied Ports') }}
       </n-button>
       <ConfirmDialog
         type="danger"
