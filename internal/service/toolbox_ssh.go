@@ -14,6 +14,7 @@ import (
 	"github.com/acepanel/panel/v3/pkg/io"
 	"github.com/acepanel/panel/v3/pkg/os"
 	"github.com/acepanel/panel/v3/pkg/shell"
+	"github.com/acepanel/panel/v3/pkg/ssh"
 	"github.com/acepanel/panel/v3/pkg/systemctl"
 )
 
@@ -115,7 +116,12 @@ func (s *ToolboxSSHService) UpdatePort(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.restart(w, r)
+	if err = ssh.ApplyServerPort(r.Context(), s.service, req.Port); err != nil {
+		Error(w, http.StatusInternalServerError, s.t.Get("failed to update SSH port: %v", err))
+		return
+	}
+
+	Success(w, nil)
 }
 
 // UpdatePasswordAuth 设置密码认证
