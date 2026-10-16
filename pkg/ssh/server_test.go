@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -80,45 +81,104 @@ fi
 	}
 }
 
-func TestServerSocketPortConfig(t *testing.T) {
+func TestServerSocketPortChanged(t *testing.T) {
 	tests := []struct {
 		name    string
 		listen  string
-		want    string
 		changed bool
 		wantErr bool
 	}{
-		{
-			name:    "保留双栈监听地址",
-			listen:  "0.0.0.0:22 (Stream)\n[::]:22 (Stream)\n",
-			want:    "[Socket]\nListenStream=\nListenStream=0.0.0.0:2222\nListenStream=[::]:2222\n",
-			changed: true,
-		},
-		{
-			name:    "保留指定地址并合并重复监听",
-			listen:  "127.0.0.1:22 (Stream)\n127.0.0.1:2222 (Stream)\n[fe80::1%eth0]:22 (Stream)\n",
-			want:    "[Socket]\nListenStream=\nListenStream=127.0.0.1:2222\nListenStream=[fe80::1%eth0]:2222\n",
-			changed: true,
-		},
-		{
-			name:   "generator 已更新端口时无需覆盖",
-			listen: "[::]:2222 (Stream)\n",
-			want:   "[Socket]\nListenStream=\nListenStream=[::]:2222\n",
-		},
+		{name: "双栈端口需要更新", listen: "0.0.0.0:22 (Stream)\n[::]:22 (Stream)\n", changed: true},
+		{name: "部分监听尚未更新", listen: "127.0.0.1:2222 (Stream)\n[fe80::1%eth0]:22 (Stream)\n", changed: true},
+		{name: "generator 已更新端口", listen: "[::]:2222 (Stream)\n"},
 		{name: "拒绝空监听", wantErr: true},
 		{name: "拒绝 Unix socket", listen: "/run/ssh.sock (Stream)", wantErr: true},
 		{name: "拒绝非 TCP 监听", listen: "0.0.0.0:22 (Datagram)", wantErr: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config, changed, err := serverSocketPortConfig(tt.listen, 2222)
+			changed, err := serverSocketPortChanged(tt.listen, 2222)
 			if tt.wantErr {
 				must.Error(t, err)
 				return
 			}
 			must.NoError(t, err)
-			check.Equal(t, config, tt.want)
 			check.Equal(t, changed, tt.changed)
+		})
+	}
+}
+
+func TestUpdateServerSocketConfigs(t *testing.T) {
+	tests := []struct {
+		name    string
+		configs []string
+		want    []string
+		wantErr bool
+	}{
+		{
+			name:    "原地更新裸端口并保留注释和其他配置",
+			configs: []string{"# SSH 配置\n[Unit]\nDescription=SSH\n\n[Socket]\n#ListenStream=23\n ListenStream = 22 \nAccept=yes\n\n[Install]\nWantedBy=sockets.target\n"},
+			want:    []string{"# SSH 配置\n[Unit]\nDescription=SSH\n\n[Socket]\n#ListenStream=23\n ListenStream = 2222 \nAccept=yes\n\n[Install]\nWantedBy=sockets.target\n"},
+		},
+		{
+			name:    "保留 IPv4 和 IPv6 绑定地址",
+			configs: []string{"[Socket]\nListenStream=127.0.0.1:22\nListenStream=[fe80::1%eth0]:22\nFreeBind=yes\n"},
+			want:    []string{"[Socket]\nListenStream=127.0.0.1:2222\nListenStream=[fe80::1%eth0]:2222\nFreeBind=yes\n"},
+		},
+		{
+			name:    "已有覆盖清空列表时只改生效文件",
+			configs: []string{"[Socket]\nListenStream=22\nAccept=no\n", "[Socket]\nListenStream=\nListenStream=127.0.0.1:2200\n"},
+			want:    []string{"[Socket]\nListenStream=22\nAccept=no\n", "[Socket]\nListenStream=\nListenStream=127.0.0.1:2222\n"},
+		},
+		{
+			name:    "跨文件合并重复监听",
+			configs: []string{"[Socket]\nListenStream=22\n", "[Socket]\nListenStream=[::]:2200\nListenStream=127.0.0.1:2200\n"},
+			want:    []string{"[Socket]\nListenStream=2222\n", "[Socket]\n\nListenStream=127.0.0.1:2222\n"},
+		},
+		{
+			name:    "不改已经被覆盖的监听",
+			configs: []string{"[Socket]\nListenStream=/run/old.sock\n", "[Socket]\nListenStream=\nListenStream=2222\n"},
+			want:    []string{"[Socket]\nListenStream=/run/old.sock\n", "[Socket]\nListenStream=\nListenStream=2222\n"},
+		},
+		{
+			name:    "解析失败时不写入任何文件",
+			configs: []string{"[Socket]\nListenStream=22\n", "[Socket]\nListenStream=/run/ssh.sock\n"},
+			wantErr: true,
+		},
+		{
+			name:    "拒绝空监听列表",
+			configs: []string{"[Socket]\nListenStream=22\n", "[Socket]\nListenStream=\n"},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := t.TempDir()
+			var paths []string
+			for i, config := range tt.configs {
+				path := filepath.Join(dir, strconv.Itoa(i)+".conf")
+				must.NoError(t, os.WriteFile(path, []byte(config), 0600))
+				paths = append(paths, path)
+			}
+			err := updateServerSocketConfigs(paths, 2222)
+			want := tt.want
+			if tt.wantErr {
+				must.Error(t, err)
+				want = tt.configs
+			} else {
+				must.NoError(t, err)
+			}
+			for i, path := range paths {
+				content, err := os.ReadFile(path)
+				must.NoError(t, err)
+				check.Equal(t, string(content), want[i])
+				info, err := os.Stat(path)
+				must.NoError(t, err)
+				check.Equal(t, info.Mode().Perm(), os.FileMode(0600))
+			}
+			entries, err := os.ReadDir(dir)
+			must.NoError(t, err)
+			check.Len(t, entries, len(tt.configs))
 		})
 	}
 }

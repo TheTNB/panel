@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -41,17 +40,26 @@ func ApplyServerPort(ctx context.Context, service string, port uint) error {
 	if err != nil {
 		return err
 	}
-	config, changed, err := serverSocketPortConfig(state["Listen"], port)
+	changed, err := serverSocketPortChanged(state["Listen"], port)
 	if err != nil {
 		return err
 	}
 	if changed {
-		// 没有 generator 或存在静态覆盖时，只替换端口，保留 IPv4/IPv6 监听地址。
-		if err = io.Write("/etc/systemd/system/"+socket+".d/zz-acepanel-port.conf", config, 0644); err != nil {
+		paths := append([]string{state["FragmentPath"]}, strings.Fields(state["DropInPaths"])...)
+		if err = updateServerSocketConfigs(paths, port); err != nil {
 			return err
 		}
 		if _, err = shell.Exec(ctx, "systemctl daemon-reload"); err != nil {
 			return err
+		}
+		state, err = readServerSocket(ctx, socket)
+		if err != nil {
+			return err
+		}
+		if changed, err = serverSocketPortChanged(state["Listen"], port); err != nil {
+			return err
+		} else if changed {
+			return errors.New("SSH socket port did not take effect")
 		}
 	}
 
@@ -67,7 +75,7 @@ func ApplyServerPort(ctx context.Context, service string, port uint) error {
 }
 
 func readServerSocket(ctx context.Context, socket string) (map[string]string, error) {
-	output, err := shell.Execf(ctx, "systemctl show '%s' --property=LoadState,ActiveState,UnitFileState,Accept,Listen", socket)
+	output, err := shell.Execf(ctx, "systemctl show '%s' --property=LoadState,ActiveState,UnitFileState,Accept,Listen,FragmentPath,DropInPaths", socket)
 	if err != nil {
 		return nil, err
 	}
@@ -91,34 +99,101 @@ func readServerSocket(ctx context.Context, socket string) (map[string]string, er
 	}
 }
 
-func serverSocketPortConfig(listen string, port uint) (string, bool, error) {
+func serverSocketPortChanged(listen string, port uint) (bool, error) {
 	if strings.TrimSpace(listen) == "" {
-		return "", false, errors.New("SSH socket has no listening address")
+		return false, errors.New("SSH socket has no listening address")
 	}
 	newPort := strconv.FormatUint(uint64(port), 10)
-	addresses := make([]string, 0)
 	changed := false
 	for line := range strings.SplitSeq(strings.TrimSpace(listen), "\n") {
 		address, ok := strings.CutSuffix(line, " (Stream)")
 		if !ok {
-			return "", false, fmt.Errorf("unsupported SSH socket listener: %s", line)
+			return false, fmt.Errorf("unsupported SSH socket listener: %s", line)
 		}
-		host, oldPort, err := net.SplitHostPort(address)
+		_, oldPort, err := net.SplitHostPort(address)
 		if err != nil {
-			return "", false, err
+			return false, err
 		}
 		changed = changed || oldPort != newPort
-		address = net.JoinHostPort(host, newPort)
-		if !slices.Contains(addresses, address) {
-			addresses = append(addresses, address)
+	}
+	return changed, nil
+}
+
+func updateServerSocketConfigs(paths []string, port uint) error {
+	type configFile struct {
+		content string
+		lines   []string
+	}
+	type listener struct {
+		file int
+		line int
+	}
+	files := make([]configFile, len(paths))
+	var listeners []listener
+	for i, path := range paths {
+		content, err := io.Read(path)
+		if err != nil {
+			return err
+		}
+		files[i] = configFile{content: content, lines: strings.Split(content, "\n")}
+		section := ""
+		for j, line := range files[i].lines {
+			line = strings.TrimSpace(line)
+			if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+				section = line
+			}
+			key, value, ok := strings.Cut(line, "=")
+			if section != "[Socket]" || !ok || strings.TrimSpace(key) != "ListenStream" {
+				continue
+			}
+			// 空赋值会清空此前的监听列表，只修改最后一次清空后仍生效的原始配置。
+			if strings.TrimSpace(value) == "" {
+				listeners = nil
+			} else {
+				listeners = append(listeners, listener{file: i, line: j})
+			}
 		}
 	}
-	var config strings.Builder
-	config.WriteString("[Socket]\nListenStream=\n")
-	for _, address := range addresses {
-		config.WriteString("ListenStream=")
-		config.WriteString(address)
-		config.WriteByte('\n')
+	if len(listeners) == 0 {
+		return errors.New("SSH socket has no ListenStream configuration")
 	}
-	return config.String(), changed, nil
+
+	newPort := strconv.FormatUint(uint64(port), 10)
+	seen := make(map[string]bool)
+	for _, item := range listeners {
+		line := files[item.file].lines[item.line]
+		key, value, _ := strings.Cut(line, "=")
+		address := strings.TrimSpace(value)
+		updated := newPort
+		host := "::"
+		if _, err := strconv.ParseUint(address, 10, 16); err != nil {
+			host, _, err = net.SplitHostPort(address)
+			if err != nil {
+				return err
+			}
+			updated = net.JoinHostPort(host, newPort)
+		}
+		binding := net.JoinHostPort(host, newPort)
+		if seen[binding] {
+			files[item.file].lines[item.line] = ""
+		} else {
+			seen[binding] = true
+			files[item.file].lines[item.line] = key + "=" + strings.Replace(value, address, updated, 1)
+		}
+	}
+	// generator 的输出会在 daemon-reload 时重建，不能当成原始配置修改。
+	for i, file := range files {
+		if strings.HasPrefix(paths[i], "/run/systemd/generator") && strings.Join(file.lines, "\n") != file.content {
+			return fmt.Errorf("cannot modify generated SSH socket configuration: %s", paths[i])
+		}
+	}
+	for i, file := range files {
+		content := strings.Join(file.lines, "\n")
+		if content != file.content {
+			if err := io.Write(paths[i], content, 0644); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
