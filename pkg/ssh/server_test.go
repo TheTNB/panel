@@ -18,11 +18,14 @@ func TestApplyServerPort(t *testing.T) {
 		state      string
 		stop       string
 		restart    string
+		wantErr    string
 		cancelled  bool
 		queryError bool
 	}{
 		{name: "没有 socket 时重启常驻服务", state: "LoadState=not-found\nActiveState=inactive\n", restart: "restart ssh"},
 		{name: "未启用 socket 时保留常驻服务", state: "LoadState=loaded\nActiveState=inactive\nUnitFileState=disabled\n", restart: "restart ssh"},
+		{name: "masked 但仍运行时保留原监听", state: "LoadState=masked\nActiveState=active\nUnitFileState=masked\nAccept=no\nListen=[::]:2222 (Stream)\n", wantErr: "ssh.socket is masked"},
+		{name: "masked 且未运行时保留常驻服务", state: "LoadState=masked\nActiveState=inactive\nUnitFileState=masked\n", restart: "restart ssh"},
 		{name: "socket 激活同时更新监听和常驻进程", state: "LoadState=loaded\nActiveState=active\nUnitFileState=enabled\nAccept=no\nListen=[::]:2222 (Stream)\n", stop: "stop ssh.socket ssh", restart: "restart ssh.socket"},
 		{name: "临时启用的 socket 保留激活方式", state: "LoadState=loaded\nActiveState=inactive\nUnitFileState=enabled-runtime\nAccept=no\nListen=[::]:2222 (Stream)\n", stop: "stop ssh.socket ssh", restart: "restart ssh.socket"},
 		{name: "按连接激活不启动互斥的常驻服务", state: "LoadState=loaded\nActiveState=active\nUnitFileState=disabled\nAccept=yes\nListen=[::]:2222 (Stream)\n", restart: "restart ssh.socket"},
@@ -54,8 +57,11 @@ fi
 				cancel()
 			}
 			err := ApplyServerPort(ctx, "ssh", 2222)
-			if tt.queryError {
+			if tt.queryError || tt.wantErr != "" {
 				must.Error(t, err)
+				if tt.wantErr != "" {
+					check.True(t, strings.Contains(err.Error(), tt.wantErr))
+				}
 			} else {
 				must.NoError(t, err)
 			}
@@ -72,8 +78,9 @@ fi
 				}
 			}
 			check.Equal(t, strings.Join(stops, "\n"), tt.stop)
-			if tt.queryError {
+			if tt.queryError || tt.wantErr != "" {
 				check.Len(t, restarts, 0)
+				check.False(t, strings.Contains(string(log), "daemon-reload"))
 			} else {
 				check.Equal(t, strings.Join(restarts, "\n"), tt.restart)
 			}

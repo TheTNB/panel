@@ -91,6 +91,9 @@ func readServerSocket(ctx context.Context, socket string) (map[string]string, er
 			state[key] = value
 		}
 	}
+	if state["LoadState"] == "masked" && state["ActiveState"] == "active" {
+		return nil, fmt.Errorf("SSH socket %s is masked and still active", socket)
+	}
 	switch state["LoadState"] {
 	case "loaded", "not-found", "masked":
 		return state, nil
