@@ -74,7 +74,7 @@
     "@vue/tsconfig": "0.9.1",
     "colord": "2.10.0",
     "cpx2": "9.0.3",
-    "eslint": "10.12.0",
+    "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-oxlint": "1.88.0",
     "eslint-plugin-vue": "10.11.1",
@@ -96,5 +96,5 @@
     "vite-plugin-vue-devtools": "8.2.1",
     "vue-tsc": "3.3.13"
   },
-  "packageManager": "pnpm@12.11.2"
+  "packageManager": "pnpm@12.14.0"
 }
