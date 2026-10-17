@@ -27,7 +27,8 @@ const (
 // stopURI 站点停用时请求重写到的路径
 const stopURI = "/ace-stop/"
 
-const accessLogFormat = `"%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""`
+// accessLogFormat OLS 不剥离值两端的引号，外层加引号会原样写进每行日志
+const accessLogFormat = `%h %l %u %t "%r" %>s %b "%{Referer}i" "%{User-Agent}i"`
 
 const phpCacheConf = `expires {
   enableExpires           1

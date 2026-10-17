@@ -890,7 +890,7 @@ func (r *websiteRepo) applyUpdate(ctx context.Context, req *request.WebsiteUpdat
 			HSTS:         req.HSTS,
 			OCSP:         req.OCSP,
 			HTTPRedirect: req.HTTPRedirect,
-			AltSvc:       lo.If(quic, `'h3=":$server_port"; ma=2592000'`).Else(``),
+			AltSvc:       lo.If(quic, `h3=":$server_port"; ma=2592000`).Else(``),
 		}); err != nil {
 			return err
 		}
