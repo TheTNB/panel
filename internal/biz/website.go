@@ -129,19 +129,9 @@ func (uc *WebsiteUsecase) Create(ctx context.Context, req *request.WebsiteCreate
 	// 记录日志
 	uc.log.Info("website created", slog.String("type", OperationTypeWebsite), slog.Uint64("operator_id", operatorID(ctx)), slog.String("name", req.Name), slog.String("website_type", req.Type), slog.String("path", req.Path))
 
-	// 建站后的任何一步失败都整体回滚站点，否则重试会提示名称已存在
-	rollback := func(cause error) (*Website, error) {
-		rbCtx := context.WithoutCancel(ctx)
-		_ = uc.repo.RemoveFiles(rbCtx, req.Name, true)
-		_ = uc.repo.Delete(w)
-		_ = uc.repo.ReloadWebServer(rbCtx)
-		uc.log.Error("website creation rolled back", slog.String("type", OperationTypeWebsite), slog.String("name", req.Name), slog.Any("reason", cause))
-		return nil, cause
-	}
-
 	// 重载 Web 服务器
 	if err = uc.repo.ReloadWebServer(ctx); err != nil {
-		return rollback(err)
+		return nil, err
 	}
 
 	// 创建数据库
@@ -149,7 +139,7 @@ func (uc *WebsiteUsecase) Create(ctx context.Context, req *request.WebsiteCreate
 	if req.DB {
 		server, err := uc.databaseServer.GetByName(ctx, name)
 		if err != nil {
-			return rollback(errors.New(uc.t.Get("can't find %s database server, please add it first", name)))
+			return nil, errors.New(uc.t.Get("can't find %s database server, please add it first", name))
 		}
 		if err = uc.database.Create(ctx, &request.DatabaseCreate{
 			ServerID:   server.ID,
@@ -160,7 +150,7 @@ func (uc *WebsiteUsecase) Create(ctx context.Context, req *request.WebsiteCreate
 			Host:       "localhost",
 			Comment:    "website " + req.Name,
 		}); err != nil {
-			return rollback(err)
+			return nil, err
 		}
 	}
 
