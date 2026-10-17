@@ -402,8 +402,12 @@ func (r *websiteRepo) Create(ctx context.Context, req *request.WebsiteCreate) (*
 	if err != nil {
 		return nil, errors.New(r.t.Get("failed to get index template file: %v", err))
 	}
-	if err = io.Write(filepath.Join(req.Path, "index.html"), string(index), 0644); err != nil {
-		return nil, err
+	// 目录可能已有用户文件，存在则不覆盖
+	indexPath := filepath.Join(req.Path, "index.html")
+	if !io.Exists(indexPath) {
+		if err = io.Write(indexPath, string(index), 0644); err != nil {
+			return nil, err
+		}
 	}
 	var notFound []byte
 
@@ -422,8 +426,11 @@ func (r *websiteRepo) Create(ctx context.Context, req *request.WebsiteCreate) (*
 		}
 	}
 
-	if err = io.Write(filepath.Join(req.Path, "404.html"), string(notFound), 0644); err != nil {
-		return nil, err
+	notFoundPath := filepath.Join(req.Path, "404.html")
+	if !io.Exists(notFoundPath) {
+		if err = io.Write(notFoundPath, string(notFound), 0644); err != nil {
+			return nil, err
+		}
 	}
 
 	// 写配置
