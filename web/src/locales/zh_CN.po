@@ -9549,7 +9549,7 @@ msgstr "上一级"
 
 #: src/views/file/PathInput.vue:144
 msgid "Hide hidden files"
-msgstr "隐藏隐藏文件"
+msgstr "不显示隐藏文件"
 
 #: src/views/file/PathInput.vue:144
 msgid "Show hidden files"
