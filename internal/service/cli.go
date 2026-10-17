@@ -500,38 +500,18 @@ func (s *CliService) HTTPSGenerate(ctx context.Context, cmd *cli.Command) error 
 	var crt, key []byte
 	var err error
 
+	// ACME 模式任一环节失败（含注册账户）都回退到自签，保证面板能启动
 	switch s.conf.HTTP.TLS {
-	case "self-signed":
-		// 自签模式
-		crt, key, err = cert.GenerateSelfSigned(names)
-		if err != nil {
-			return err
-		}
-	case "off", "custom":
-		// off/custom 不需要自动生成，回退到自签
-		crt, key, err = cert.GenerateSelfSigned(names)
-		if err != nil {
-			return err
-		}
+	case "self-signed", "off", "custom":
 	default:
-		// ACME 模式
-		var user biz.User
-		if err = s.db.First(&user).Error; err != nil {
-			return errors.New(s.t.Get("Failed to get a panel user: %v", err))
-		}
-		account, err := s.certAccountRepo.GetDefault(ctx, user.ID)
-		if err != nil {
-			return errors.New(s.t.Get("Failed to get ACME account: %v", err))
-		}
-		crt, key, err = s.certRepo.ObtainPanel(ctx, account, s.conf.HTTP.BindDomain)
+		crt, key, err = s.obtainPanelACME(ctx)
 		if err == nil {
 			fmt.Println(s.t.Get("Successfully obtained panel certificate via ACME"))
 		} else {
-			fmt.Println(s.t.Get("Failed to obtain panel certificate via ACME, using self-signed certificate"))
+			fmt.Println(s.t.Get("Failed to obtain panel certificate via ACME, using self-signed certificate: %v", err))
 		}
 	}
 
-	// ACME 失败回退到自签
 	if crt == nil || key == nil {
 		crt, key, err = cert.GenerateSelfSigned(names)
 		if err != nil {
@@ -548,6 +528,18 @@ func (s *CliService) HTTPSGenerate(ctx context.Context, cmd *cli.Command) error 
 
 	fmt.Println(s.t.Get("HTTPS certificate generated"))
 	return s.Restart(ctx, cmd)
+}
+
+func (s *CliService) obtainPanelACME(ctx context.Context) ([]byte, []byte, error) {
+	var user biz.User
+	if err := s.db.First(&user).Error; err != nil {
+		return nil, nil, errors.New(s.t.Get("Failed to get a panel user: %v", err))
+	}
+	account, err := s.certAccountRepo.GetDefault(ctx, user.ID)
+	if err != nil {
+		return nil, nil, errors.New(s.t.Get("Failed to get ACME account: %v", err))
+	}
+	return s.certRepo.ObtainPanel(ctx, account, s.conf.HTTP.BindDomain)
 }
 
 func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
