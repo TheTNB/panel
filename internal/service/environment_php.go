@@ -618,7 +618,7 @@ func (s *EnvironmentPHPService) Opcache(w http.ResponseWriter, r *http.Request) 
 
 	socket, _ := s.probeSocket(req.Version)
 	if _, err = os.Stat(socket); err != nil {
-		Success(w, types.EnvironmentPHPOpcache{Enabled: false})
+		Success(w, types.EnvironmentPHPOpcache{Message: s.t.Get("PHP-%d backend is not running, unable to get OPcache status", req.Version)})
 		return
 	}
 
@@ -628,18 +628,24 @@ func (s *EnvironmentPHPService) Opcache(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// OPcache 未启用时探针返回 false，无法解析为对象
-	var raw map[string]any
-	if err = json.Unmarshal(body, &raw); err != nil || raw == nil {
-		Success(w, types.EnvironmentPHPOpcache{Enabled: false})
+	text := strings.TrimSpace(string(body))
+	if text == "null" {
+		Success(w, types.EnvironmentPHPOpcache{Message: s.t.Get("OPcache is not enabled. Install the Zend OPcache module in Module Management to significantly improve PHP performance.")})
 		return
+	}
+	var raw map[string]any
+	if text != "false" {
+		if err = json.Unmarshal(body, &raw); err != nil {
+			Error(w, http.StatusInternalServerError, s.t.Get("failed to get OPcache status: %s", text))
+			return
+		}
 	}
 
 	memory := cast.ToStringMap(raw["memory_usage"])
 	stats := cast.ToStringMap(raw["opcache_statistics"])
 	jit := cast.ToStringMap(raw["jit"])
 
-	Success(w, types.EnvironmentPHPOpcache{
+	result := types.EnvironmentPHPOpcache{
 		Enabled:       cast.ToBool(raw["opcache_enabled"]),
 		MemoryUsed:    tools.FormatBytes(cast.ToFloat64(memory["used_memory"])),
 		MemoryFree:    tools.FormatBytes(cast.ToFloat64(memory["free_memory"])),
@@ -655,7 +661,12 @@ func (s *EnvironmentPHPService) Opcache(w http.ResponseWriter, r *http.Request) 
 		JitEnabled:    cast.ToBool(jit["enabled"]) && cast.ToBool(jit["on"]),
 		JitBufferSize: tools.FormatBytes(cast.ToFloat64(jit["buffer_size"])),
 		JitBufferFree: tools.FormatBytes(cast.ToFloat64(jit["buffer_free"])),
-	})
+	}
+	if !result.Enabled {
+		result.Message = s.t.Get("OPcache is loaded but not running, check the opcache settings in php.ini and the PHP error log")
+	}
+
+	Success(w, result)
 }
 
 // ResetOpcache 重置 OPcache
@@ -1017,7 +1028,7 @@ if (($_GET['action'] ?? '') === 'reset') {
     echo json_encode(['reset' => function_exists('opcache_reset') && opcache_reset()]);
     exit;
 }
-echo json_encode(function_exists('opcache_get_status') ? opcache_get_status(false) : false);
+echo json_encode(function_exists('opcache_get_status') ? opcache_get_status(false) : null);
 `
 	tmpPath := probePath + "." + str.Random(8)
 	if err := io.Write(tmpPath, probe, 0644); err != nil {

@@ -399,11 +399,7 @@ const handleSaveComposerMirror = async () => {
       <n-tab-pane name="opcache" tab="OPcache">
         <n-flex vertical>
           <n-alert v-if="!opcache.enabled" type="info">
-            {{
-              $gettext(
-                'OPcache is not enabled. Install the Zend OPcache module in Module Management to significantly improve PHP performance.',
-              )
-            }}
+            {{ opcache.message }}
           </n-alert>
           <template v-else>
             <n-flex>

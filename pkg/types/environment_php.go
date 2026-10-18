@@ -24,6 +24,7 @@ type EnvironmentPHPProcess struct {
 // EnvironmentPHPOpcache OPcache 状态
 type EnvironmentPHPOpcache struct {
 	Enabled       bool    `json:"enabled"`
+	Message       string  `json:"message"` // 未启用时的原因
 	MemoryUsed    string  `json:"memory_used"`
 	MemoryFree    string  `json:"memory_free"`
 	MemoryWasted  string  `json:"memory_wasted"`
