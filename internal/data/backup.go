@@ -949,9 +949,7 @@ func (r *backupRepo) restoreWebsite(ctx context.Context, backup, target string) 
 	if err = io.ChmodR(replaceCtx, website.Path, 0755); err != nil {
 		return err
 	}
-	if err = io.ChownR(replaceCtx, website.Path, "www", "www"); err != nil {
-		return err
-	}
+	_ = io.ChownR(replaceCtx, website.Path, "www", "www")
 
 	return nil
 }

@@ -523,7 +523,7 @@ func (s *FileService) RemoteDownload(w http.ResponseWriter, r *http.Request) {
 	task.Key = "download:" + req.Path
 	task.Name = s.t.Get("Download remote file %v", filepath.Base(req.Path))
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf(`aria2c -c --file-allocation=falloc --allow-overwrite=true --auto-file-renaming=false --check-certificate=false --retry-wait=5 --max-tries=5 -x 16 -s 16 -k 1M -d '%s' -o '%s' '%s' && chmod 0755 '%s' && chown www:www '%s'`, filepath.Dir(req.Path), filepath.Base(req.Path), req.URL, req.Path, req.Path)
+	task.Shell = fmt.Sprintf(`aria2c -c --file-allocation=falloc --allow-overwrite=true --auto-file-renaming=false --check-certificate=false --retry-wait=5 --max-tries=5 -x 16 -s 16 -k 1M -d '%s' -o '%s' '%s' && %s`, filepath.Dir(req.Path), filepath.Base(req.Path), req.URL, s.wwwShell(req.Path, false))
 	task.CancelShell = fmt.Sprintf(`rm -f '%s' '%s.aria2'`, req.Path, req.Path)
 
 	if err = s.taskRepo.Push(task); err != nil {
@@ -656,7 +656,7 @@ func (s *FileService) Compress(w http.ResponseWriter, r *http.Request) {
 	task.Key = "compress:" + req.File
 	task.Name = s.t.Get("Compress %v", filepath.Base(req.File))
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf("%s && chmod 0755 %s && chown www:www %s", cmd, shell.Quote(req.File), shell.Quote(req.File))
+	task.Shell = cmd + " && " + s.wwwShell(req.File, false)
 	task.CancelShell = "rm -f " + shell.Quote(req.File)
 
 	if err = s.taskRepo.Push(task); err != nil {
@@ -684,7 +684,7 @@ func (s *FileService) UnCompress(w http.ResponseWriter, r *http.Request) {
 	task.Key = fmt.Sprintf("uncompress:%s:%s", req.File, req.Path)
 	task.Name = s.t.Get("Uncompress %v", filepath.Base(req.File))
 	task.Status = biz.TaskStatusWaiting
-	task.Shell = fmt.Sprintf("%s; chmod -R 0755 %s; chown -R www:www %s; true", cmd, shell.Quote(req.Path), shell.Quote(req.Path))
+	task.Shell = cmd + " && " + s.wwwShell(req.Path, true)
 
 	if err = s.taskRepo.Push(task); err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
@@ -998,6 +998,12 @@ func readlink(path string) string {
 func (s *FileService) setPermission(path string, mode stdos.FileMode, owner, group string) {
 	_ = io.Chmod(path, mode)
 	_ = io.Chown(path, owner, group)
+}
+
+func (s *FileService) wwwShell(path string, recursive bool) string {
+	flag := lo.Ternary(recursive, "-R ", "")
+	quoted := shell.Quote(path)
+	return fmt.Sprintf("{ chmod %s0755 %s; chown %swww:www %s; true; }", flag, quoted, flag, quoted)
 }
 
 // chunkTempPaths 分块上传的临时文件：同目录下的稀疏数据文件和位图文件

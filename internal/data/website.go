@@ -467,9 +467,7 @@ func (r *websiteRepo) Create(ctx context.Context, req *request.WebsiteCreate) (*
 	if err = io.ChmodR(ctx, req.Path, 0755); err != nil {
 		return nil, err
 	}
-	if err = io.ChownR(ctx, req.Path, "www", "www"); err != nil {
-		return nil, err
-	}
+	_ = io.ChownR(ctx, req.Path, "www", "www")
 	if err = io.ChmodR(ctx, filepath.Join(app.Root, "sites", req.Name, "log"), 0701); err != nil {
 		return nil, err
 	}
