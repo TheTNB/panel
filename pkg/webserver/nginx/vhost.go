@@ -343,6 +343,7 @@ func (v *baseVhost) RemoveConfig(name string, scope types.ConfigScope) error {
 
 const (
 	hstsHeader     = "Strict-Transport-Security"
+	altSvcHeader   = "Alt-Svc"
 	httpsRedirect  = "https://$host$request_uri"
 	https497Target = "https://$host:$server_port$request_uri"
 )
@@ -364,7 +365,7 @@ func (v *baseVhost) SSLConfig() *types.SSLConfig {
 		switch d.Arg(0) {
 		case hstsHeader:
 			cfg.HSTS = true
-		case "Alt-Svc":
+		case altSvcHeader:
 			cfg.AltSvc = d.Arg(1)
 		}
 	}
@@ -398,7 +399,7 @@ func (v *baseVhost) SetSSLConfig(cfg *types.SSLConfig) error {
 		v.server.Add("ssl_stapling_verify", "on")
 	}
 	if cfg.AltSvc != "" {
-		v.server.Add("add_header", "Alt-Svc", cfg.AltSvc)
+		v.server.Add("add_header", altSvcHeader, cfg.AltSvc)
 	}
 	v.setHTTPSRedirect(cfg.HTTPRedirect)
 
@@ -412,12 +413,14 @@ func (v *baseVhost) ClearSSL() error {
 	} {
 		v.server.Remove(name)
 	}
-	v.server.RemoveFunc("add_header", func(d *conf.Directive) bool {
-		return d.Arg(0) == hstsHeader || d.Arg(0) == "Alt-Svc"
-	})
+	v.server.RemoveFunc("add_header", sslHeader)
 	v.setHTTPSRedirect(false)
 
 	return nil
+}
+
+func sslHeader(d *conf.Directive) bool {
+	return d.Arg(0) == hstsHeader || d.Arg(0) == altSvcHeader
 }
 
 // setHTTPSRedirect 用 if ($scheme = http) 跳转普通 HTTP，用 error_page 497 跳转发到 HTTPS 端口的明文请求
