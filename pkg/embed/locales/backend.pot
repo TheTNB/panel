@@ -1030,11 +1030,11 @@ msgstr ""
 msgid "Failed to generate password: %v"
 msgstr ""
 
-#: internal/service/cli.go:1742
+#: internal/service/cli.go:1740
 msgid "Failed to get ACME account: %v"
 msgstr ""
 
-#: internal/service/cli.go:1738
+#: internal/service/cli.go:1736
 msgid "Failed to get a panel user: %v"
 msgstr ""
 
@@ -1618,11 +1618,11 @@ msgstr ""
 msgid "Listening port"
 msgstr ""
 
-#: internal/service/cli.go:1717
+#: internal/service/cli.go:1716
 msgid "Local IPv4: %s://%s:%d%s"
 msgstr ""
 
-#: internal/service/cli.go:1722
+#: internal/service/cli.go:1720
 msgid "Local IPv6: %s://[%s]:%d%s"
 msgstr ""
 
@@ -2271,11 +2271,11 @@ msgstr ""
 msgid "Pspell is a spell-checking library"
 msgstr ""
 
-#: internal/service/cli.go:1726
+#: internal/service/cli.go:1724
 msgid "Public IPv4: %s://%s:%d%s"
 msgstr ""
 
-#: internal/service/cli.go:1730
+#: internal/service/cli.go:1728
 msgid "Public IPv6: %s://[%s]:%d%s"
 msgstr ""
 
