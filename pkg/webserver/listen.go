@@ -36,6 +36,10 @@ func WithIPv6Listens(listens []types.Listen) []types.Listen {
 // MergeHTTPSListens 补充 443 监听，已有的 443 地址补齐 SSL 参数
 func (d Dialect) MergeHTTPSListens(listens []types.Listen, listenIPv6 bool) []types.Listen {
 	args := d.HTTPSListenArgs()
+	// 否则 HTTPS 的默认站点仍是内置站点
+	if slices.ContainsFunc(listens, func(listen types.Listen) bool { return slices.Contains(listen.Args, "default_server") }) {
+		args = append(args, "default_server")
+	}
 	addresses := []string{"443"}
 	if d.Features().IPv6Listen && listenIPv6 {
 		addresses = append(addresses, "[::]:443")

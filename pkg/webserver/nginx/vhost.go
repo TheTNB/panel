@@ -178,8 +178,9 @@ func (v *baseVhost) SetListen(listens []types.Listen) error {
 		// nginx 不允许 ssl 与 quic 同在一条 listen，拆成两行
 		if hasSSL && hasQUIC {
 			sslArgs := slices.DeleteFunc(slices.Clone(l.Args), func(arg string) bool { return arg == "quic" })
+			quicArgs := slices.DeleteFunc(slices.Clone(l.Args), func(arg string) bool { return arg != "quic" && arg != "default_server" })
 			v.server.Add("listen", append([]string{l.Address}, sslArgs...)...)
-			v.server.Add("listen", l.Address, "quic")
+			v.server.Add("listen", append([]string{l.Address}, quicArgs...)...)
 			continue
 		}
 		v.server.Add("listen", append([]string{l.Address}, l.Args...)...)

@@ -113,7 +113,7 @@ func (Dialect) DefaultSiteConf() string {
 	return DefaultSiteConf
 }
 
-// WriteDefaultSite asDefault 为 false 时 default_server 由某个站点持有，TCP 的 reuseport 沿用现状
+// WriteDefaultSite asDefault 为 false 时 default_server 由某个站点持有
 func (Dialect) WriteDefaultSite(asDefault bool) error {
 	return os.WriteFile(DefaultSiteConf, []byte(defaultSiteContent(asDefault, DefaultSiteReuseport())), 0600)
 }
@@ -127,7 +127,6 @@ func DefaultSiteReuseport() bool {
 	return tcpReuseportRe.Match(content)
 }
 
-// SetDefaultSiteReuseport 切换内置默认站点 TCP 监听的 reuseport，default_server 归属不变
 func SetDefaultSiteReuseport(enable bool) error {
 	content, err := os.ReadFile(DefaultSiteConf)
 	if err != nil {
@@ -137,8 +136,7 @@ func SetDefaultSiteReuseport(enable bool) error {
 	return os.WriteFile(DefaultSiteConf, []byte(defaultSiteContent(asDefault, enable)), 0600)
 }
 
-// defaultSiteContent TCP 带 reuseport 时，手动误启动的第二个 nginx 也能绑定端口并分走连接，所以默认不带；
-// quic 必须带，否则多个 worker 共用一个 UDP socket，同一连接的包会被别的 worker 读走
+// defaultSiteContent quic 必须带 reuseport，否则多个 worker 共用一个 UDP socket，同一连接的包会被别的 worker 读走
 func defaultSiteContent(asDefault, reuseport bool) string {
 	flag := ""
 	if asDefault {

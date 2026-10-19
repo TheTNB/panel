@@ -680,3 +680,29 @@ func TestProxyWithUpstream(t *testing.T) {
 	must.NoError(t, err)
 	check.Contains(t, string(content), "http://api-servers")
 }
+
+func TestDefaultWithSSLAndQUIC(t *testing.T) {
+	vhost, configDir := newPHPVhost(t)
+	must.NoError(t, vhost.SetListen([]types.Listen{
+		{Address: "80"},
+		{Address: "443", Args: []string{"ssl", "quic"}},
+		{Address: "[::]:443", Args: []string{"ssl", "quic"}},
+	}))
+	for _, enabled := range []bool{true, false, true} {
+		must.NoError(t, vhost.SetDefault(enabled))
+		must.NoError(t, vhost.Save())
+		var err error
+		vhost, err = NewPHPVhost(configDir)
+		must.NoError(t, err)
+		must.Equal(t, vhost.Default(), enabled)
+
+		dump := Render(vhost.cfg)
+		for _, listen := range []string{"80", "443 ssl", "443 quic", "[::]:443 ssl", "[::]:443 quic"} {
+			want := "listen " + listen
+			if enabled {
+				want += " default_server"
+			}
+			check.Contains(t, dump, want+";", check.Msgf("默认站点 %v 后的配置：\n%s", enabled, dump))
+		}
+	}
+}
