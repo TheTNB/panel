@@ -306,8 +306,11 @@ func proxyNode(p types.Proxy) *conf.Directive {
 	}
 	loc.Add("proxy_buffering", buffering)
 
+	// 不写 off 会继承全局的 proxy_cache
 	if p.Cache != nil {
 		addProxyCache(loc, p.Cache)
+	} else {
+		loc.Add("proxy_cache", "off")
 	}
 	for _, name := range slices.Sorted(maps.Keys(p.Headers)) {
 		loc.Add("proxy_set_header", name, p.Headers[name])

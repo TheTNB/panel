@@ -1,0 +1,44 @@
+package nginx
+
+import (
+	"path/filepath"
+	"testing"
+
+	"github.com/libtnb/assert/check"
+	"github.com/libtnb/assert/must"
+
+	"github.com/acepanel/panel/v3/pkg/webserver/types"
+)
+
+func TestProxyCacheToggle(t *testing.T) {
+	t.Parallel()
+	v, dir := newProxyVhost(t)
+	for _, tt := range []struct {
+		name  string
+		cache *types.CacheConfig
+		want  string
+	}{
+		{"首次禁用", nil, "off"},
+		{"开启缓存", &types.CacheConfig{Valid: map[string]string{"200": "10m"}}, "cache_one"},
+		{"再次禁用", nil, "off"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			must.NoError(t, v.SetProxies([]types.Proxy{{Location: "/", Pass: "http://127.0.0.1:8080", Cache: tt.cache}}))
+			must.NoError(t, v.Save())
+			var err error
+			v, err = NewProxyVhost(dir)
+			must.NoError(t, err)
+			cfg, err := ParseFile(filepath.Join(dir, "site", "200-proxy.conf"))
+			must.NoError(t, err)
+			loc := cfg.GetBlock("location")
+			check.Equal(t, loc.Value("proxy_cache"), tt.want)
+			check.Equal(t, len(loc.GetAll("proxy_cache")), 1)
+			if tt.cache == nil {
+				check.Nil(t, v.Proxies()[0].Cache)
+			} else {
+				must.NotNil(t, v.Proxies()[0].Cache)
+				check.DeepEqual(t, v.Proxies()[0].Cache.Valid, tt.cache.Valid)
+			}
+		})
+	}
+}
