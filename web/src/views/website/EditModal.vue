@@ -1704,6 +1704,13 @@ const removeCustomConfig = (index: number) => {
                                 :add-button-text="$gettext('Add Response Header')"
                                 default-key-prefix="X-Custom-Header"
                               />
+                              <template #feedback>
+                                {{
+                                  $gettext(
+                                    'Custom headers replace the site-level HSTS and Alt-Svc headers for this location',
+                                  )
+                                }}
+                              </template>
                             </n-form-item-gi>
                           </n-grid>
                         </template>
