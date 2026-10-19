@@ -35,16 +35,7 @@ const handleUpdate = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Change Password')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Change Password')">
     <n-form :model="model">
       <n-form-item path="password" :label="$gettext('Password')">
         <n-input
@@ -59,7 +50,7 @@ const handleUpdate = () => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleUpdate">{{
       $gettext('Submit')
     }}</n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

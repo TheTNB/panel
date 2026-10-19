@@ -6,6 +6,7 @@ import { useGettext } from 'vue3-gettext'
 import database from '@/api/panel/database'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import UpdateServerModal from '@/views/database/UpdateServerModal.vue'
 
@@ -261,6 +262,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (id: number) => {
   useRequest(database.serverDelete(id)).onSuccess(() => {
@@ -299,14 +301,7 @@ onUnmounted(() => {
     :columns="columns"
     :data="data"
     :row-key="(row: any) => row.name"
-    :pagination="{
-      page: page,
-      pageSize: pageSize,
-      itemCount: total,
-      showQuickJumper: true,
-      showSizePicker: true,
-      pageSizes: [20, 50, 100, 200],
-    }"
+    :pagination="pagination"
   />
   <update-server-modal v-model:id="updateID" v-model:show="updateModal" />
   <!-- 终端弹窗 -->

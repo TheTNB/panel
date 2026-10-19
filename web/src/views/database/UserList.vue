@@ -5,6 +5,7 @@ import { useGettext } from 'vue3-gettext'
 
 import database from '@/api/panel/database'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import UpdateUserModal from '@/views/database/UpdateUserModal.vue'
 
@@ -178,6 +179,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (id: number) => {
   useRequest(database.userDelete(id)).onSuccess(() => {
@@ -214,14 +216,7 @@ onUnmounted(() => {
     :row-key="(row: any) => row.name"
     v-model:page="page"
     v-model:pageSize="pageSize"
-    :pagination="{
-      page: page,
-      pageSize: pageSize,
-      itemCount: total,
-      showQuickJumper: true,
-      showSizePicker: true,
-      pageSizes: [20, 50, 100, 200],
-    }"
+    :pagination="pagination"
   />
   <update-user-modal v-model:show="updateModal" v-model:id="updateID" />
 </template>

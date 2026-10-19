@@ -26,7 +26,6 @@ const loadColumns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -84,14 +83,7 @@ const handleSaveConfig = () => {
         <memcached-config-tune-view />
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="1000"
-          :loading="false"
-          :columns="loadColumns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="loadColumns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <realtime-log service="memcached" />

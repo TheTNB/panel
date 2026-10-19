@@ -8,6 +8,7 @@ import { useGettext } from 'vue3-gettext'
 
 import frp from '@/api/apps/frp'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 import FrpProxyModal from './FrpProxyModal.vue'
 
@@ -118,6 +119,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (name: string) => {
   useRequest(frp.deleteProxy(name)).onSuccess(() => {
@@ -160,14 +162,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.name"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <frp-proxy-modal v-model:show="modalShow" :proxy="current" @submitted="refresh" />

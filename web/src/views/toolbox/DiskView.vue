@@ -10,6 +10,7 @@ import { h } from 'vue'
 import { useGettext } from 'vue3-gettext'
 
 import disk from '@/api/panel/toolbox-disk'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { formatBytes } from '@/utils'
 
 import RaidView from './disk/RaidView.vue'
@@ -48,6 +49,7 @@ interface DiskData {
 }
 
 const { $gettext, $pgettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('disk')
 const diskOpTab = ref('mount')
 const lvmOpTab = ref('pv')
@@ -626,7 +628,7 @@ const fstabColumns = computed<DataTableColumns<FstabEntry>>(() => [
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <!-- 磁盘管理 -->
     <n-tab-pane name="disk" :tab="$gettext('Disk Management')">
       <n-flex vertical :size="16">
@@ -782,6 +784,7 @@ const fstabColumns = computed<DataTableColumns<FstabEntry>>(() => [
               :columns="fstabColumns"
               :data="fstabList"
               :bordered="false"
+              :scroll-x="760"
               size="small"
               :row-key="(row: FstabEntry) => row.mount_point"
             />

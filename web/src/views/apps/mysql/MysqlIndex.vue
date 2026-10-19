@@ -56,7 +56,6 @@ const loadColumns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -182,14 +181,7 @@ const handleCopyRootPassword = () => {
         <mysql-maintenance-view :api="props.api" />
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="400"
-          :loading="false"
-          :columns="loadColumns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="loadColumns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <n-flex vertical>

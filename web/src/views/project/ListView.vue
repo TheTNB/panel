@@ -6,6 +6,7 @@ import project from '@/api/panel/project'
 import systemctl from '@/api/panel/systemctl'
 import RealtimeLog from '@/components/common/RealtimeLog.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { useFileStore } from '@/stores'
 
 const type = defineModel<string>('type', { type: String, required: true })
@@ -213,6 +214,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     debounce: [0, 300],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleToggleStatus = (row: any) => {
   if (row.status === 'active') {
@@ -308,7 +310,12 @@ onMounted(() => {
           </template>
         </ConfirmDialog>
       </n-flex>
-      <n-input v-model:value="keyword" :placeholder="$gettext('Search')" clearable class="!w-60" />
+      <n-input
+        v-model:value="keyword"
+        :placeholder="$gettext('Search')"
+        clearable
+        class="md:!w-60"
+      />
     </n-flex>
     <n-data-table
       striped
@@ -321,27 +328,10 @@ onMounted(() => {
       v-model:checked-row-keys="selectedRowKeys"
       v-model:page="page"
       v-model:pageSize="pageSize"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
-    v-model:show="logModal"
-    preset="card"
-    :title="$gettext('Logs')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="logModal = false"
-    @mask-click="logModal = false"
-  >
+  <app-modal v-model:show="logModal" :title="$gettext('Logs')" @mask-click="logModal = false">
     <realtime-log :service="logService" />
-  </n-modal>
+  </app-modal>
 </template>

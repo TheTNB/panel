@@ -99,18 +99,20 @@ const handleRefresh = () => {
 <template>
   <n-flex vertical class="h-full">
     <n-flex align="center">
-      <span>{{ $gettext('Show entries') }}:</span>
-      <n-select
-        v-model:value="limit"
-        :options="[
-          { label: '100', value: 100 },
-          { label: '200', value: 200 },
-          { label: '500', value: 500 },
-          { label: '1000', value: 1000 },
-        ]"
-        class="w-25"
-        @update:value="handleRefresh"
-      />
+      <div class="flex gap-3 items-center">
+        <span>{{ $gettext('Show entries') }}:</span>
+        <n-select
+          v-model:value="limit"
+          :options="[
+            { label: '100', value: 100 },
+            { label: '200', value: 200 },
+            { label: '500', value: 500 },
+            { label: '1000', value: 1000 },
+          ]"
+          class="w-25"
+          @update:value="handleRefresh"
+        />
+      </div>
       <n-button type="primary" @click="handleRefresh">
         {{ $gettext('Refresh') }}
       </n-button>

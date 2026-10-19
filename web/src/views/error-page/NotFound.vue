@@ -13,7 +13,7 @@ const { replace } = useRouter()
       status="404"
     >
       <template #icon>
-        <img src="@/assets/images/404.webp" width="500" />
+        <img src="@/assets/images/404.webp" class="max-w-full" />
       </template>
       <template #footer>
         <n-button @click="replace('/')">{{ $gettext('Back to Home') }}</n-button>

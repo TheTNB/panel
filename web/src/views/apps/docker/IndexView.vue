@@ -7,9 +7,12 @@ import { useGettext } from 'vue3-gettext'
 
 import docker from '@/api/apps/docker'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const { $gettext } = useGettext()
 const currentTab = ref('status')
+const formLayout = useFormLayout(120)
+const firewallFormLayout = useFormLayout(140)
 
 const { data: config } = useRequest(docker.config, {
   initialData: {
@@ -231,87 +234,73 @@ watch(currentTab, (tab) => {
                     )
                   }}
                 </n-alert>
-                <n-form label-placement="left" label-width="120">
+                <n-form v-bind="formLayout">
                   <n-form-item :label="$gettext('Log Driver')">
                     <n-select
                       v-model:value="settings['log-driver']"
                       :options="logDriverOptions"
                       :placeholder="$gettext('Select log driver')"
-                      class="w-50"
+                      class="md:!w-50"
                     />
                   </n-form-item>
-                  <n-row :gutter="[24, 0]">
-                    <n-col :span="12">
-                      <n-form-item :label="$gettext('Max Size')">
-                        <n-input
-                          v-model:value="settings['log-opts']!['max-size']"
-                          :placeholder="$gettext('e.g., 10m, 100m, 1g')"
-                        />
-                      </n-form-item>
-                    </n-col>
-                    <n-col :span="12">
-                      <n-form-item :label="$gettext('Max Files')">
-                        <n-input
-                          v-model:value="settings['log-opts']!['max-file']"
-                          :placeholder="$gettext('e.g., 3, 5, 10')"
-                        />
-                      </n-form-item>
-                    </n-col>
-                  </n-row>
+                  <n-grid cols="1 m:24" responsive="screen" :x-gap="24">
+                    <n-form-item-gi :span="12" :label="$gettext('Max Size')">
+                      <n-input
+                        v-model:value="settings['log-opts']!['max-size']"
+                        :placeholder="$gettext('e.g., 10m, 100m, 1g')"
+                      />
+                    </n-form-item-gi>
+                    <n-form-item-gi :span="12" :label="$gettext('Max Files')">
+                      <n-input
+                        v-model:value="settings['log-opts']!['max-file']"
+                        :placeholder="$gettext('e.g., 3, 5, 10')"
+                      />
+                    </n-form-item-gi>
+                  </n-grid>
                 </n-form>
               </n-flex>
             </n-card>
 
             <!-- 运行时选项 -->
             <n-card :title="$gettext('Runtime Options')">
-              <n-form label-placement="left" label-width="120">
-                <n-row :gutter="[24, 0]">
-                  <n-col :span="12">
-                    <n-form-item :label="$gettext('Live Restore')">
-                      <n-switch v-model:value="settings['live-restore']" />
-                      <span class="text-gray-400 ml-2">
-                        {{ $gettext('Keep containers alive during daemon downtime') }}
-                      </span>
-                    </n-form-item>
-                  </n-col>
-                  <n-col :span="12">
-                    <n-form-item :label="$gettext('Cgroup Driver')">
-                      <n-select
-                        v-model:value="settings['cgroup-driver']"
-                        :options="cgroupDriverOptions"
-                        :placeholder="$gettext('Select cgroup driver')"
-                        class="w-50"
-                      />
-                    </n-form-item>
-                  </n-col>
-                </n-row>
-                <n-row :gutter="[24, 0]">
-                  <n-col :span="12">
-                    <n-form-item :label="$gettext('IPv6')">
-                      <n-switch v-model:value="settings.ipv6" />
-                      <span class="text-gray-400 ml-2">
-                        {{ $gettext('Requires additional configuration.') }}
-                        <n-button
-                          text
-                          tag="a"
-                          href="https://docs.docker.com/engine/daemon/ipv6/"
-                          target="_blank"
-                          type="info"
-                        >
-                          {{ $gettext('Docs') }}
-                        </n-button>
-                      </span>
-                    </n-form-item>
-                  </n-col>
-                  <n-col :span="12">
-                    <n-form-item :label="$gettext('IP Forward')">
-                      <n-switch v-model:value="settings['ip-forward']" />
-                      <span class="text-gray-400 ml-2">
-                        {{ $gettext('Enable IP forwarding') }}
-                      </span>
-                    </n-form-item>
-                  </n-col>
-                </n-row>
+              <n-form v-bind="formLayout">
+                <n-grid cols="1 m:24" responsive="screen" :x-gap="24">
+                  <n-form-item-gi :span="12" :label="$gettext('Live Restore')">
+                    <n-switch v-model:value="settings['live-restore']" />
+                    <span class="text-gray-400 ml-2">
+                      {{ $gettext('Keep containers alive during daemon downtime') }}
+                    </span>
+                  </n-form-item-gi>
+                  <n-form-item-gi :span="12" :label="$gettext('Cgroup Driver')">
+                    <n-select
+                      v-model:value="settings['cgroup-driver']"
+                      :options="cgroupDriverOptions"
+                      :placeholder="$gettext('Select cgroup driver')"
+                      class="md:!w-50"
+                    />
+                  </n-form-item-gi>
+                  <n-form-item-gi :span="12" :label="$gettext('IPv6')">
+                    <n-switch v-model:value="settings.ipv6" />
+                    <span class="text-gray-400 ml-2">
+                      {{ $gettext('Requires additional configuration.') }}
+                      <n-button
+                        text
+                        tag="a"
+                        href="https://docs.docker.com/engine/daemon/ipv6/"
+                        target="_blank"
+                        type="info"
+                      >
+                        {{ $gettext('Docs') }}
+                      </n-button>
+                    </span>
+                  </n-form-item-gi>
+                  <n-form-item-gi :span="12" :label="$gettext('IP Forward')">
+                    <n-switch v-model:value="settings['ip-forward']" />
+                    <span class="text-gray-400 ml-2">
+                      {{ $gettext('Enable IP forwarding') }}
+                    </span>
+                  </n-form-item-gi>
+                </n-grid>
               </n-form>
             </n-card>
 
@@ -325,13 +314,13 @@ watch(currentTab, (tab) => {
                     )
                   }}
                 </n-alert>
-                <n-form label-placement="left" label-width="140">
+                <n-form v-bind="firewallFormLayout">
                   <n-form-item :label="$gettext('Firewall Backend')">
                     <n-select
                       v-model:value="settings['firewall-backend']"
                       :options="firewallBackendOptions"
                       :placeholder="$gettext('Select firewall backend')"
-                      class="w-70"
+                      class="md:!w-70"
                     />
                   </n-form-item>
                 </n-form>
@@ -340,13 +329,13 @@ watch(currentTab, (tab) => {
 
             <!-- 存储与路径 -->
             <n-card :title="$gettext('Storage & Paths')">
-              <n-form label-placement="left" label-width="120">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Storage Driver')">
                   <n-select
                     v-model:value="settings['storage-driver']"
                     :options="storageDriverOptions"
                     :placeholder="$gettext('Select storage driver')"
-                    class="w-50"
+                    class="md:!w-50"
                   />
                 </n-form-item>
                 <n-form-item :label="$gettext('Data Root')">
@@ -378,7 +367,7 @@ watch(currentTab, (tab) => {
 
             <!-- 网络配置 -->
             <n-card :title="$gettext('Network Configuration')">
-              <n-form label-placement="left" label-width="120">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Bridge IP')">
                   <n-input
                     v-model:value="settings.bip"

@@ -6,8 +6,10 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import mongodb from '@/api/apps/mongodb'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('storage')
 
 const dbPath = ref('')
@@ -55,7 +57,7 @@ const handleSave = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="storage" :tab="$gettext('Storage')">
       <n-flex vertical>
         <n-alert type="info">

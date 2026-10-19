@@ -65,6 +65,6 @@ const columns = computed(() => [
 
 <template>
   <n-spin :show="loading">
-    <n-data-table :columns="columns" :data="items" :bordered="false" size="small" />
+    <n-data-table :columns="columns" :data="items" :bordered="false" size="small" :scroll-x="900" />
   </n-spin>
 </template>

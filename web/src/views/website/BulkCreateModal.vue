@@ -176,16 +176,7 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    :title="modalTitle"
-    preset="card"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="modalTitle">
     <n-flex vertical>
       <n-form-item v-if="type === 'all'" :label="$gettext('Website Type')">
         <n-select
@@ -241,7 +232,7 @@ const handleCreate = async () => {
         {{ $gettext('Create') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

@@ -99,8 +99,9 @@ const titleLabel = computed(() => props.path || props.service || props.container
 
 const supported = computed(() => !!sourceParams.value)
 
-// oxlint-disable-next-line no-control-regex
-const NON_CSI_ESCAPE = /\x1b[\]PX^_][\s\S]*?(?:\x07|\x1b\\|$)|\x1b[\x20-\x2f]+[\x30-\x7e]|\x1b[\x30-\x5a\x5c-\x7e]|\x1b$/g
+const NON_CSI_ESCAPE =
+  // oxlint-disable-next-line no-control-regex
+  /\x1b[\]PX^_][\s\S]*?(?:\x07|\x1b\\|$)|\x1b[\x20-\x2f]+[\x30-\x7e]|\x1b[\x30-\x5a\x5c-\x7e]|\x1b$/g
 
 const normalizeLine = (raw: string) => {
   let line = raw.replace(/\r+$/, '')
@@ -878,6 +879,7 @@ defineExpose({ clear })
   // 翻页提示胶囊的定位上下文
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
@@ -891,7 +893,8 @@ defineExpose({ clear })
   align-items: center;
   gap: 8px;
   flex: 1;
-  min-width: 0;
+  // 放不下标题和按钮时让按钮换行，而不是把标题挤没
+  min-width: 120px;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.65);
   font-family: 'JetBrains Mono Variable', monospace;
@@ -936,9 +939,13 @@ defineExpose({ clear })
 
 .titlebar-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 2px;
   flex-shrink: 0;
+  // 窄屏时标题独占一行，按钮行靠右再按需折行
+  max-width: 100%;
+  margin-left: auto;
 }
 
 .action-btn {
@@ -970,6 +977,17 @@ defineExpose({ clear })
   height: 16px;
   background: rgba(255, 255, 255, 0.1);
   margin: 0 4px;
+}
+
+// 手机上去掉分隔线、收窄按钮，让整排按钮尽量留在一行
+@media (max-width: 767.98px) {
+  .action-btn {
+    width: 28px;
+  }
+
+  .action-divider {
+    display: none;
+  }
 }
 
 .log-content {

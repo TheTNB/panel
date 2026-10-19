@@ -115,7 +115,7 @@ defineExpose({ selectedFiles, refresh, hostId, path })
         :value="hostId"
         :options="props.hosts"
         size="small"
-        class="sftp-host-select"
+        class="sftp-host-select md:!w-35"
         @update:value="(v: number) => (hostId = v)"
       />
       <n-input
@@ -182,7 +182,7 @@ defineExpose({ selectedFiles, refresh, hostId, path })
           </span>
           <span class="sftp-row-name" :title="file.name">{{ file.name }}</span>
           <span class="sftp-row-size">{{ file.is_dir ? '-' : formatBytes(file.size) }}</span>
-          <span class="sftp-row-time">{{ formatTime(file.mod_time) }}</span>
+          <span class="sftp-row-time hidden md:block">{{ formatTime(file.mod_time) }}</span>
         </div>
         <n-empty
           v-if="!files.length && !loading"
@@ -207,8 +207,10 @@ defineExpose({ selectedFiles, refresh, hostId, path })
   overflow: hidden;
 }
 
+// 手机上主机下拉满宽独占一行，路径框与按钮组换到第二行
 .sftp-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   padding: 8px;
@@ -217,7 +219,6 @@ defineExpose({ selectedFiles, refresh, hostId, path })
 }
 
 .sftp-host-select {
-  width: 140px;
   flex-shrink: 0;
 }
 

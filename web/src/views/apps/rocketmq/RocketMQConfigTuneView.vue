@@ -6,8 +6,10 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import rocketmq from '@/api/apps/rocketmq'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('broker')
 
 const brokerName = ref('')
@@ -79,7 +81,7 @@ const handleSave = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="broker" :tab="$gettext('Broker')">
       <n-flex vertical>
         <n-alert type="info">

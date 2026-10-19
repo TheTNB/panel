@@ -79,7 +79,6 @@ const loadColumns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -245,14 +244,7 @@ const handleCopyPostgresPassword = () => {
         </n-flex>
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="400"
-          :loading="false"
-          :columns="loadColumns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="loadColumns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <n-flex vertical>
@@ -272,7 +264,7 @@ const handleCopyPostgresPassword = () => {
       <n-tab-pane name="app-log" :tab="$gettext('Application Logs')">
         <n-flex vertical>
           <n-flex>
-            <n-select v-model:value="selectedLog" :options="logOptions" class="w-60" />
+            <n-select v-model:value="selectedLog" :options="logOptions" class="md:!w-60" />
             <n-button
               type="primary"
               :loading="clearAppLogLoading"

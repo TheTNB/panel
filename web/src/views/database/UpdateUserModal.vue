@@ -44,16 +44,7 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Modify User')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Modify User')">
     <n-flex vertical>
       <n-alert type="info">
         {{
@@ -89,7 +80,7 @@ watch(
         $gettext('Submit')
       }}</n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

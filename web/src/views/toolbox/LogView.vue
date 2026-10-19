@@ -232,6 +232,7 @@ const anyLoading = computed(() => {
                       :bordered="false"
                       size="small"
                       :max-height="220"
+                      :scroll-x="340"
                     />
                   </n-collapse-item>
                 </n-collapse>

@@ -5,6 +5,7 @@ import { useGettext } from 'vue3-gettext'
 import app from '@/api/panel/app'
 import environment from '@/api/panel/environment'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { router } from '@/router'
 import { renderLocalIcon } from '@/utils'
 
@@ -247,7 +248,6 @@ const {
   page: appPage,
   total: appTotal,
   pageSize: appPageSize,
-  pageCount: appPageCount,
   refresh: appRefresh,
 } = usePagination((page, pageSize) => app.list(page, pageSize, undefined, undefined, true), {
   initialData: { total: 0, list: [] },
@@ -255,6 +255,7 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const appPagination = useTablePagination(appPage, appPageSize, appTotal)
 
 // 获取已安装环境
 const {
@@ -335,15 +336,7 @@ onMounted(() => {
         :columns="appColumns"
         :data="appData"
         :row-key="(row: any) => row.slug"
-        :pagination="{
-          page: appPage,
-          pageCount: appPageCount,
-          pageSize: appPageSize,
-          itemCount: appTotal,
-          showQuickJumper: true,
-          showSizePicker: true,
-          pageSizes: [20, 50, 100, 200],
-        }"
+        :pagination="appPagination"
       />
     </n-flex>
     <!-- 已安装环境 -->

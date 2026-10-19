@@ -7,6 +7,7 @@ import DraggableWindow from '@/components/common/DraggableWindow.vue'
 import RealtimeLog from '@/components/common/RealtimeLog.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
 import type { QueueTask, QueueTaskStatus } from '@/stores'
+import { useThemeStore } from '@/stores'
 
 const props = defineProps<{
   tasks: QueueTask[]
@@ -19,6 +20,7 @@ const minimized = defineModel<boolean>('minimized', { default: false })
 
 const { $gettext } = useGettext()
 const { confirmAction } = useConfirm()
+const themeStore = useThemeStore()
 
 const statusMeta = computed<Record<QueueTaskStatus, { label: string; type: TagProps['type'] }>>(
   () => ({
@@ -42,6 +44,12 @@ const current = computed(
     props.tasks.find((t) => t.status === 'running') ??
     props.tasks[0],
 )
+
+// 手机上展开的列表会挤掉大半日志区，选中后收起
+const handleSelect = (id: number) => {
+  selectedId.value = id
+  if (themeStore.isMobile) collapsed.value = true
+}
 
 const handleCancel = async (item: QueueTask) => {
   const ok = await confirmAction({
@@ -89,7 +97,7 @@ const handleCancel = async (item: QueueTask) => {
             :key="item.id"
             class="hover-bg px-3 py-2 rounded cursor-pointer"
             :class="{ 'bg-bg-subtle': item.id === current?.id }"
-            @click="selectedId = item.id"
+            @click="handleSelect(item.id)"
           >
             <n-ellipsis class="w-full">{{ item.name }}</n-ellipsis>
             <n-flex align="center" justify="space-between" class="mt-1">

@@ -117,7 +117,7 @@ const columns = computed<DataTableColumns<UploadItem>>(() => [
   {
     title: $gettext('File'),
     key: 'name',
-    minWidth: 220,
+    minWidth: 160,
     render: (row) => {
       const uploadName = getFilename(row.target)
       const renamed = uploadName !== getFilename(row.name)
@@ -136,7 +136,7 @@ const columns = computed<DataTableColumns<UploadItem>>(() => [
   {
     title: $gettext('Progress'),
     key: 'loaded',
-    width: 200,
+    width: 160,
     render: (row) => {
       const percent =
         row.status === 'done'
@@ -297,15 +297,7 @@ const onConflictCancel = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Upload')"
-    style="width: 80vw; max-width: 1200px"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" size="lg" :title="$gettext('Upload')">
     <div
       ref="bodyRef"
       class="upload-body"
@@ -371,6 +363,7 @@ const onConflictCancel = () => {
             size="small"
             virtual-scroll
             max-height="55vh"
+            :scroll-x="800"
             :columns="columns"
             :data="uploadStore.items"
             :row-key="rowKey"
@@ -430,17 +423,12 @@ const onConflictCancel = () => {
         <NText>{{ $gettext('Drop to add to the queue') }}</NText>
       </div>
     </div>
-  </n-modal>
+  </app-modal>
 
   <!-- 文件冲突处理弹窗：批量列出冲突文件，每个单独选 跳过/重命名/覆盖 -->
-  <n-modal
+  <app-modal
     :show="conflictShow"
-    preset="card"
     :title="$gettext('Files already exist')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="false"
     :closable="false"
   >
@@ -473,7 +461,8 @@ const onConflictCancel = () => {
             justify="space-between"
             class="conflict-row"
           >
-            <n-flex vertical :size="4" style="min-width: 0; flex: 1">
+            <!-- 给文件名列基准宽度，窄屏时单选组整体换到下一行，而不是把文件名挤成一条 -->
+            <n-flex vertical :size="4" style="min-width: 0; flex: 1 1 240px">
               <NText style="word-break: break-all">{{ item.name }}</NText>
               <n-flex v-if="item.action === 'rename'" align="center" :size="6" style="min-width: 0">
                 <NText depth="3" style="font-size: 12px">→</NText>
@@ -498,7 +487,7 @@ const onConflictCancel = () => {
         <n-button type="primary" @click="onConflictConfirm">{{ $gettext('Confirm') }}</n-button>
       </n-flex>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss">

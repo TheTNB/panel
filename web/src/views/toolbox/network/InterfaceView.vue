@@ -362,14 +362,9 @@ loadInterfaces()
     />
   </n-flex>
 
-  <n-modal
+  <app-modal
     v-model:show="showModal"
-    preset="card"
     :title="$gettext('Configure Network Interface: %{ name }', { name: editing.name })"
-    style="width: min(900px, 90vw)"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-form :model="editing" label-placement="top">
       <n-form-item :label="$gettext('MTU')">
@@ -432,7 +427,7 @@ loadInterfaces()
         {{ $gettext('Save and Apply') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped>

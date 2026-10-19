@@ -25,21 +25,13 @@ watch(show, (val) => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Preview - ') + path"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Preview - ') + path">
     <n-image width="100%" :src="img" preview-disabled :show-toolbar="false">
       <template #placeholder>
         <n-spin />
       </template>
     </n-image>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

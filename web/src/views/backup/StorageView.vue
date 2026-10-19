@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import storage from '@/api/panel/backup-storage'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -139,6 +140,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleCreate = () => {
   createLoading.value = true
@@ -204,28 +206,12 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
 
   <!-- Create Modal -->
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Add Storage')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="createModal = false"
-  >
+  <app-modal v-model:show="createModal" :title="$gettext('Add Storage')">
     <n-form :model="createModel">
       <n-form-item :label="$gettext('Name')" required>
         <n-input v-model:value="createModel.name" :placeholder="$gettext('Enter storage name')" />
@@ -375,19 +361,10 @@ onMounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 
   <!-- Edit Modal -->
-  <n-modal
-    v-model:show="editModal"
-    preset="card"
-    :title="$gettext('Edit Storage')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="editModal = false"
-  >
+  <app-modal v-model:show="editModal" :title="$gettext('Edit Storage')">
     <n-form :model="editModel">
       <n-form-item :label="$gettext('Name')" required>
         <n-input v-model:value="editModel.name" :placeholder="$gettext('Enter storage name')" />
@@ -528,7 +505,7 @@ onMounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

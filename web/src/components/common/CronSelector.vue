@@ -330,11 +330,7 @@ const showCustom = computed(() => selectedOption.value === 'custom')
   <n-flex vertical :size="12">
     <n-flex align="center" :wrap="true">
       <!-- 周期类型选择 -->
-      <n-select
-        v-model:value="selectedOption"
-        :options="options"
-        :style="{ width: '160px', flexShrink: 0 }"
-      />
+      <n-select v-model:value="selectedOption" :options="options" class="shrink-0 md:!w-40" />
 
       <!-- 每 N 秒 -->
       <n-input-number
@@ -434,7 +430,7 @@ const showCustom = computed(() => selectedOption.value === 'custom')
         v-if="showCustom"
         v-model:value="formData.customCron"
         :placeholder="$gettext('Enter Cron expression')"
-        :style="{ width: '240px' }"
+        class="md:!w-60"
       />
     </n-flex>
 

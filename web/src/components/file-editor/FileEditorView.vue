@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useGettext } from 'vue3-gettext'
 
-import { useEditorStore } from '@/stores'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useEditorStore, useThemeStore } from '@/stores'
 
 import EditorPane from './EditorPane.vue'
 import EditorStatusBar from './EditorStatusBar.vue'
@@ -10,6 +11,8 @@ import FileTree from './FileTree.vue'
 
 const { $gettext } = useGettext()
 const editorStore = useEditorStore()
+const themeStore = useThemeStore()
+const formLayout = useFormLayout(140)
 
 const props = defineProps<{
   initialPath?: string
@@ -18,9 +21,15 @@ const props = defineProps<{
   active?: boolean
 }>()
 
-// 侧边栏折叠状态
-const siderCollapsed = ref(false)
+// 手机上文件树会挤掉大半编辑区，默认折叠，靠侧栏的展开条打开
+const siderCollapsed = ref(themeStore.isMobile)
 const siderWidth = ref(250)
+watch(
+  () => themeStore.isMobile,
+  (mobile) => {
+    if (mobile) siderCollapsed.value = true
+  },
+)
 
 // 文件树根目录
 const rootPath = ref(props.initialPath || editorStore.rootPath || '/')
@@ -143,14 +152,9 @@ defineExpose({
     </div>
 
     <!-- 设置弹窗 -->
-    <n-modal
-      v-model:show="showSettings"
-      preset="card"
-      :title="$gettext('Editor Settings')"
-      class="w-150"
-    >
+    <app-modal v-model:show="showSettings" size="sm" :title="$gettext('Editor Settings')">
       <n-scrollbar style="max-height: 70vh">
-        <n-form label-placement="left" label-width="140" class="settings-form">
+        <n-form v-bind="formLayout" class="settings-form">
           <!-- 基础设置 -->
           <n-divider title-placement="left">{{ $gettext('Basic') }}</n-divider>
 
@@ -328,7 +332,7 @@ defineExpose({
           </n-form-item>
         </n-form>
       </n-scrollbar>
-    </n-modal>
+    </app-modal>
   </div>
 </template>
 

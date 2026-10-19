@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import firewall from '@/api/panel/firewall'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import CreateIpModal from '@/views/firewall/CreateIpModal.vue'
 
 const { $gettext } = useGettext()
@@ -152,6 +153,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const selectedRowKeys = ref<any>([])
 
@@ -217,14 +219,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => JSON.stringify(row)"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <create-ip-modal v-model:show="createModalShow" />

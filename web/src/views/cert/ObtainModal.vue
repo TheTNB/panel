@@ -130,14 +130,9 @@ const showProgress = computed(() => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
     :title="modalTitle"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="!loading"
     :closable="!loading"
     @after-leave="handleClose"
@@ -182,7 +177,7 @@ const showProgress = computed(() => {
     <n-button v-else type="success" block @click="show = false">
       {{ $gettext('Close') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

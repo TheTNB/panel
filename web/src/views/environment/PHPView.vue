@@ -288,7 +288,8 @@ const handleSaveComposerMirror = async () => {
     <n-tabs v-model:value="currentTab" type="line" animated>
       <n-tab-pane name="status" :tab="$gettext('Running Status')">
         <n-flex vertical>
-          <n-card>
+          <!-- 限制按钮区宽度，窄屏时按钮换行，避免把标题挤成一字一行 -->
+          <n-card header-extra-class="max-w-[65%]">
             <template #header> PHP {{ slug }} </template>
             <template #header-extra>
               <n-flex>
@@ -304,7 +305,7 @@ const handleSaveComposerMirror = async () => {
           <n-alert v-if="lsapiTakeover" type="info" :show-icon="true">
             {{
               $gettext(
-                'PHP requests are handled by OpenLiteSpeed over LSAPI and do not go through php-fpm, so its stopped state does not affect websites.'
+                'PHP requests are handled by OpenLiteSpeed over LSAPI and do not go through php-fpm, so its stopped state does not affect websites.',
               )
             }}
           </n-alert>
@@ -413,20 +414,20 @@ const handleSaveComposerMirror = async () => {
             <n-card :title="$gettext('Cache Statistics')">
               <n-flex>
                 <n-statistic :label="$gettext('Hit Rate')" :value="`${opcache.hit_rate}%`" />
-                <n-statistic class="ml-40" :label="$gettext('Hits')" :value="opcache.hits" />
-                <n-statistic class="ml-40" :label="$gettext('Misses')" :value="opcache.misses" />
+                <n-statistic class="md:ml-40" :label="$gettext('Hits')" :value="opcache.hits" />
+                <n-statistic class="md:ml-40" :label="$gettext('Misses')" :value="opcache.misses" />
                 <n-statistic
-                  class="ml-40"
+                  class="md:ml-40"
                   :label="$gettext('Cached Scripts')"
                   :value="opcache.cached_scripts"
                 />
                 <n-statistic
-                  class="ml-40"
+                  class="md:ml-40"
                   :label="$gettext('Cached Keys')"
                   :value="`${opcache.cached_keys} / ${opcache.max_cached_keys}`"
                 />
                 <n-statistic
-                  class="ml-40"
+                  class="md:ml-40"
                   :label="$gettext('OOM Restarts')"
                   :value="opcache.oom_restarts"
                 />
@@ -435,9 +436,13 @@ const handleSaveComposerMirror = async () => {
             <n-card :title="$gettext('Memory')">
               <n-flex>
                 <n-statistic :label="$gettext('Used')" :value="opcache.memory_used" />
-                <n-statistic class="ml-40" :label="$gettext('Free')" :value="opcache.memory_free" />
                 <n-statistic
-                  class="ml-40"
+                  class="md:ml-40"
+                  :label="$gettext('Free')"
+                  :value="opcache.memory_free"
+                />
+                <n-statistic
+                  class="md:ml-40"
                   :label="$gettext('Wasted')"
                   :value="`${opcache.memory_wasted} (${opcache.wasted_percent}%)`"
                 />
@@ -447,7 +452,7 @@ const handleSaveComposerMirror = async () => {
               <n-flex v-if="opcache.jit_enabled">
                 <n-statistic :label="$gettext('Buffer Size')" :value="opcache.jit_buffer_size" />
                 <n-statistic
-                  class="ml-40"
+                  class="md:ml-40"
                   :label="$gettext('Buffer Free')"
                   :value="opcache.jit_buffer_free"
                 />
@@ -495,7 +500,7 @@ const handleSaveComposerMirror = async () => {
                   <n-select
                     v-model:value="composerMirror"
                     :options="composerMirrorOptions"
-                    class="w-80"
+                    class="md:!w-80"
                   />
                   <n-button type="primary" @click="handleSaveComposerMirror">
                     {{ $gettext('Save') }}
@@ -532,11 +537,10 @@ const handleSaveComposerMirror = async () => {
     </n-tabs>
 
     <!-- PHPInfo 弹窗 -->
-    <n-modal
+    <app-modal
       v-model:show="showPHPInfoModal"
-      preset="card"
+      size="full"
       :title="$gettext('PHPInfo') + ' - PHP ' + slug"
-      :style="{ width: '90%', maxWidth: '1200px' }"
       :mask-closable="true"
     >
       <n-spin :show="phpinfoLoading">
@@ -544,7 +548,7 @@ const handleSaveComposerMirror = async () => {
           <div class="phpinfo-content" v-html="phpinfoContent"></div>
         </n-scrollbar>
       </n-spin>
-    </n-modal>
+    </app-modal>
   </PageContainer>
 </template>
 
@@ -554,6 +558,17 @@ const handleSaveComposerMirror = async () => {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 10px;
+  }
+
+  // phpinfo 自带样式把分隔线定为 934px、标签列定为 300px，窄屏会横向溢出或把值列挤到只剩几个字宽
+  :deep(hr) {
+    max-width: 100%;
+  }
+
+  @media (max-width: 767px) {
+    :deep(td.e) {
+      width: 40%;
+    }
   }
 }
 </style>

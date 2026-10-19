@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import HealthBanner from '@/components/system/HealthBanner.vue'
 import { useThemeStore } from '@/stores'
 
@@ -7,19 +8,16 @@ import AppHeader from './header/IndexView.vue'
 import SideBar from './sidebar/IndexView.vue'
 
 const themeStore = useThemeStore()
+const { breakpoint } = useResponsive()
 
-// 平板自动 collapsed
-const handleResize = () => {
-  const w = window.innerWidth
-  if (w < 1024 && w >= 768 && !themeStore.sider.collapsed) {
-    themeStore.setCollapsed(true)
-  }
-}
-onMounted(() => {
-  handleResize()
-  window.addEventListener('resize', handleResize)
-})
-onBeforeUnmount(() => window.removeEventListener('resize', handleResize))
+// 平板自动折叠侧栏；手机上 collapsed 控制抽屉开合，持久化的 false 会让抽屉一进页面就弹出
+watch(
+  breakpoint,
+  (value) => {
+    if (value === 'mobile' || value === 'tablet') themeStore.setCollapsed(true)
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -39,7 +37,7 @@ onBeforeUnmount(() => window.removeEventListener('resize', handleResize))
       v-else
       :auto-focus="false"
       :show="!themeStore.sider.collapsed"
-      :width="themeStore.sider.width"
+      :width="240"
       display-directive="show"
       placement="left"
       @mask-click="themeStore.setCollapsed(true)"

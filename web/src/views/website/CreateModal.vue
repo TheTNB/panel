@@ -131,16 +131,7 @@ watch(showPathSelector, (val) => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    :title="modalTitle"
-    preset="card"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="modalTitle">
     <n-form :model="createModel">
       <n-form-item v-if="type === 'all'" path="type" :label="$gettext('Website Type')">
         <n-select
@@ -161,101 +152,84 @@ watch(showPathSelector, (val) => {
           "
         />
       </n-form-item>
-      <n-row :gutter="[0, 24]">
-        <n-col :span="11">
-          <n-form-item :label="$gettext('Domain')">
-            <ListInput
-              v-model:value="createModel.domains"
-              placeholder="example.com"
-              :min="1"
-              show-sort-button
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="2"></n-col>
-        <n-col :span="11">
-          <n-form-item :label="$gettext('Port')">
-            <ListInput
-              v-model:value="createModel.listens"
-              placeholder="80"
-              :min="1"
-              show-sort-button
-            />
-          </n-form-item>
-        </n-col>
-      </n-row>
-      <n-row v-if="effectiveType == 'php'" :gutter="[0, 24]">
-        <n-col :span="11">
-          <n-form-item path="php" :label="$gettext('PHP Version')">
-            <n-select
-              v-model:value="createModel.php"
-              :options="installedEnvironment.php"
-              :placeholder="$gettext('Select PHP Version')"
-              clearable
-              @keydown.enter.prevent
-            >
-            </n-select>
-          </n-form-item>
-        </n-col>
-        <n-col :span="2"></n-col>
-        <n-col :span="11">
-          <n-form-item path="db" :label="$gettext('Database')">
-            <n-select
-              v-model:value="createModel.db_type"
-              :options="installedEnvironment.db"
-              :placeholder="$gettext('Select Database')"
-              @keydown.enter.prevent
-              @update:value="
-                () => {
-                  createModel.db = createModel.db_type != '0'
-                  createModel.db_name = formatDbValue(createModel.name)
-                  createModel.db_user = formatDbValue(createModel.name)
-                  createModel.db_password = generateRandomString(16)
-                }
-              "
-            >
-            </n-select>
-          </n-form-item>
-        </n-col>
-      </n-row>
-      <n-row v-if="effectiveType == 'php'" :gutter="[0, 24]">
-        <n-col :span="7">
-          <n-form-item v-if="createModel.db" path="db_name" :label="$gettext('Database Name')">
-            <n-input
-              v-model:value="createModel.db_name"
-              type="text"
-              @keydown.enter.prevent
-              :placeholder="$gettext('Database Name')"
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="1"></n-col>
-        <n-col :span="7">
-          <n-form-item v-if="createModel.db" path="db_user" :label="$gettext('Database User')">
-            <n-input
-              v-model:value="createModel.db_user"
-              type="text"
-              @keydown.enter.prevent
-              :placeholder="$gettext('Database User')"
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="1"></n-col>
-        <n-col :span="8">
-          <n-form-item
-            v-if="createModel.db"
-            path="db_password"
-            :label="$gettext('Database Password')"
+      <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+        <n-form-item-gi :span="12" :label="$gettext('Domain')">
+          <ListInput
+            v-model:value="createModel.domains"
+            placeholder="example.com"
+            :min="1"
+            show-sort-button
+          />
+        </n-form-item-gi>
+        <n-form-item-gi :span="12" :label="$gettext('Port')">
+          <ListInput
+            v-model:value="createModel.listens"
+            placeholder="80"
+            :min="1"
+            show-sort-button
+          />
+        </n-form-item-gi>
+      </n-grid>
+      <n-grid v-if="effectiveType == 'php'" cols="1 m:24" :x-gap="24" responsive="screen">
+        <n-form-item-gi :span="12" path="php" :label="$gettext('PHP Version')">
+          <n-select
+            v-model:value="createModel.php"
+            :options="installedEnvironment.php"
+            :placeholder="$gettext('Select PHP Version')"
+            clearable
+            @keydown.enter.prevent
           >
-            <n-input
-              v-model:value="createModel.db_password"
-              type="text"
-              @keydown.enter.prevent
-              :placeholder="$gettext('Database Password')"
-            />
-          </n-form-item>
-        </n-col>
-      </n-row>
+          </n-select>
+        </n-form-item-gi>
+        <n-form-item-gi :span="12" path="db" :label="$gettext('Database')">
+          <n-select
+            v-model:value="createModel.db_type"
+            :options="installedEnvironment.db"
+            :placeholder="$gettext('Select Database')"
+            @keydown.enter.prevent
+            @update:value="
+              () => {
+                createModel.db = createModel.db_type != '0'
+                createModel.db_name = formatDbValue(createModel.name)
+                createModel.db_user = formatDbValue(createModel.name)
+                createModel.db_password = generateRandomString(16)
+              }
+            "
+          >
+          </n-select>
+        </n-form-item-gi>
+      </n-grid>
+      <n-grid
+        v-if="effectiveType == 'php' && createModel.db"
+        cols="1 m:24"
+        :x-gap="24"
+        responsive="screen"
+      >
+        <n-form-item-gi :span="8" path="db_name" :label="$gettext('Database Name')">
+          <n-input
+            v-model:value="createModel.db_name"
+            type="text"
+            @keydown.enter.prevent
+            :placeholder="$gettext('Database Name')"
+          />
+        </n-form-item-gi>
+        <n-form-item-gi :span="8" path="db_user" :label="$gettext('Database User')">
+          <n-input
+            v-model:value="createModel.db_user"
+            type="text"
+            @keydown.enter.prevent
+            :placeholder="$gettext('Database User')"
+          />
+        </n-form-item-gi>
+        <n-form-item-gi :span="8" path="db_password" :label="$gettext('Database Password')">
+          <n-input
+            v-model:value="createModel.db_password"
+            type="text"
+            @keydown.enter.prevent
+            :placeholder="$gettext('Database Password')"
+          />
+        </n-form-item-gi>
+      </n-grid>
       <n-form-item v-if="effectiveType != 'proxy'" path="path" :label="$gettext('Directory')">
         <n-input-group>
           <n-input
@@ -295,7 +269,7 @@ watch(showPathSelector, (val) => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Create') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 
   <!-- 目录选择器 -->
   <path-selector v-model:show="showPathSelector" v-model:path="pathSelectorPath" :dir="true" />

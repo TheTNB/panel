@@ -3,6 +3,8 @@ import { useGettext } from 'vue3-gettext'
 
 import file from '@/api/panel/file'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
+import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { useFileStore, useTaskQueueStore, useUploadStore } from '@/stores'
 import { checkName, joinPath } from '@/utils/file'
 import { useFileOps } from '@/views/file/composables/useFileOps'
@@ -14,6 +16,8 @@ const uploadStore = useUploadStore()
 const taskQueue = useTaskQueueStore()
 const { handlePaste: doPaste } = usePaste()
 const { deletePaths, markClipboard } = useFileOps()
+const { isMobile } = useResponsive()
+const { confirmDelete } = useConfirm()
 
 const props = defineProps<{
   tabId: string
@@ -90,6 +94,28 @@ const handlePaste = () => {
 }
 
 const bulkDelete = () => deletePaths(selected.value)
+
+// 批量操作：桌面按钮组，手机放不下改下拉，下拉里的删除改用对话框确认
+const batchActions = computed(() => [
+  { label: $gettext('Copy'), key: 'copy', handler: handleCopy },
+  { label: $gettext('Move'), key: 'move', handler: handleMove },
+  { label: $gettext('Compress'), key: 'compress', handler: () => (compress.value = true) },
+  { label: $gettext('Permission'), key: 'permission', handler: () => (permission.value = true) },
+])
+const batchMobileActions = computed(() => [
+  ...batchActions.value,
+  {
+    label: $gettext('Delete'),
+    key: 'delete',
+    handler: async () => {
+      if (await confirmDelete({ content: $gettext('Are you sure you want to delete in bulk?') })) {
+        bulkDelete()
+      }
+    },
+  },
+])
+const handleBatchSelect = (key: string) =>
+  batchMobileActions.value.find((item) => item.key === key)?.handler()
 
 // 自动填充下载文件名
 watch(
@@ -192,35 +218,36 @@ const handleSortSelect = (key: string) => {
         <n-button v-if="marked.length" secondary type="primary" @click="handlePaste">
           {{ $gettext('Paste') }}
         </n-button>
-        <n-button-group v-if="selected.length">
-          <n-button @click="handleCopy">{{ $gettext('Copy') }}</n-button>
-          <n-button @click="handleMove">{{ $gettext('Move') }}</n-button>
-          <n-button @click="compress = true">{{ $gettext('Compress') }}</n-button>
-          <n-button @click="permission = true">{{ $gettext('Permission') }}</n-button>
-          <ConfirmDialog
-            type="danger"
-            :content="$gettext('Are you sure you want to delete in bulk?')"
-            @confirm="bulkDelete"
+        <template v-if="selected.length">
+          <n-dropdown
+            v-if="isMobile"
+            trigger="click"
+            :options="batchMobileActions"
+            @select="handleBatchSelect"
           >
-            <template #trigger>
-              <n-button :disabled="selected.length === 0" ghost>
-                {{ $gettext('Delete') }}
-              </n-button>
-            </template>
-          </ConfirmDialog>
-        </n-button-group>
+            <n-button>{{ $gettext('Actions') }}</n-button>
+          </n-dropdown>
+          <n-button-group v-else>
+            <n-button v-for="item in batchActions" :key="item.key" @click="item.handler">
+              {{ item.label }}
+            </n-button>
+            <ConfirmDialog
+              type="danger"
+              :content="$gettext('Are you sure you want to delete in bulk?')"
+              @confirm="bulkDelete"
+            >
+              <template #trigger>
+                <n-button :disabled="selected.length === 0" ghost>
+                  {{ $gettext('Delete') }}
+                </n-button>
+              </template>
+            </ConfirmDialog>
+          </n-button-group>
+        </template>
       </n-flex>
     </div>
   </n-flex>
-  <n-modal
-    v-model:show="download"
-    preset="card"
-    :title="$gettext('Remote Download')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="download" :title="$gettext('Remote Download')">
     <n-space vertical>
       <n-form :model="downloadModel">
         <n-form-item :label="$gettext('Download URL')">
@@ -239,7 +266,7 @@ const handleSortSelect = (key: string) => {
         >{{ $gettext('Submit') }}</n-button
       >
     </n-space>
-  </n-modal>
+  </app-modal>
   <!-- 终端弹窗 -->
   <pty-terminal-modal
     v-model:show="terminalModal"

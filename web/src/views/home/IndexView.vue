@@ -21,6 +21,8 @@ import draggable from 'vuedraggable'
 import app from '@/api/panel/app'
 import home from '@/api/panel/home'
 import TheIconLocal from '@/components/custom/TheIconLocal.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { router } from '@/router'
 import { useTabStore } from '@/stores'
 import { formatDateTime, formatDuration, toTimestamp } from '@/utils/common'
@@ -41,6 +43,8 @@ use([
 const { current: locale, $gettext } = useGettext()
 const themeVars = useThemeVars()
 const tabStore = useTabStore()
+const { isMobile } = useResponsive()
+const monitorFormLayout = useFormLayout('auto', true)
 const realtime = ref<Realtime | null>(null)
 
 const cpuTopProcesses = ref<ProcessStat[]>([])
@@ -504,7 +508,7 @@ if (import.meta.hot) {
 </script>
 
 <template>
-  <PageContainer :show-footer="true" bare class="min-w-94">
+  <PageContainer :show-footer="true" bare>
     <div flex-1>
       <n-space vertical>
         <!-- 系统是否 EOL -->
@@ -530,8 +534,14 @@ if (import.meta.hot) {
           }}
         </n-alert>
         <n-card :segmented="true" size="small">
-          <n-page-header :subtitle="systemInfo?.panel_version">
-            <n-grid :cols="countInfo.container >= 0 ? 5 : 4" pb-10>
+          <n-page-header :subtitle="systemInfo?.panel_version" class="home-header">
+            <n-grid
+              :cols="countInfo.container >= 0 ? '2 s:3 m:5' : '2 m:4'"
+              responsive="screen"
+              :x-gap="12"
+              :y-gap="12"
+              pb-10
+            >
               <n-gi v-if="countInfo.container >= 0">
                 <n-statistic
                   :label="$gettext('Container')"
@@ -581,9 +591,17 @@ if (import.meta.hot) {
 
         <n-card :segmented="true" size="small" :title="$gettext('Resource Overview')">
           <n-flex v-if="realtime" size="large">
-            <n-popover placement="bottom" trigger="hover">
+            <n-popover
+              placement="bottom"
+              :trigger="isMobile ? 'click' : 'hover'"
+              class="max-w-[calc(100vw-32px)]"
+            >
               <template #trigger>
-                <n-flex vertical p-5 pl-10 pr-10 flex items-center>
+                <n-flex
+                  vertical
+                  class="px-1 py-5 text-center w-[calc(50%-9px)] md:px-10 md:w-auto"
+                  items-center
+                >
                   <p>{{ $gettext('Load Status') }}</p>
                   <n-progress
                     type="dashboard"
@@ -594,8 +612,13 @@ if (import.meta.hot) {
                   <p>{{ statusText((realtime.load.load1 / cores) * 100) }}</p>
                 </n-flex>
               </template>
-              <n-scrollbar max-h-85>
-                <n-descriptions label-placement="top" :column="3" bordered size="small">
+              <n-scrollbar class="max-h-[calc(50vh-140px)] md:max-h-85">
+                <n-descriptions
+                  label-placement="top"
+                  :column="isMobile ? 1 : 3"
+                  bordered
+                  size="small"
+                >
                   <n-descriptions-item :label="$gettext('Last 1 minute')">
                     {{ formatPercent((realtime.load.load1 / cores) * 100) }}% /
                     {{ realtime.load.load1 }}
@@ -611,9 +634,17 @@ if (import.meta.hot) {
                 </n-descriptions>
               </n-scrollbar>
             </n-popover>
-            <n-popover placement="bottom" trigger="hover">
+            <n-popover
+              placement="bottom"
+              :trigger="isMobile ? 'click' : 'hover'"
+              class="max-w-[calc(100vw-32px)]"
+            >
               <template #trigger>
-                <n-flex vertical p-5 pl-10 pr-10 flex items-center>
+                <n-flex
+                  vertical
+                  class="px-1 py-5 text-center w-[calc(50%-9px)] md:px-10 md:w-auto"
+                  items-center
+                >
                   <p>CPU</p>
                   <n-progress
                     type="dashboard"
@@ -624,9 +655,14 @@ if (import.meta.hot) {
                   <p>{{ cores }} {{ $gettext('cores') }}</p>
                 </n-flex>
               </template>
-              <n-scrollbar max-h-110>
-                <n-descriptions label-placement="top" :column="3" bordered size="small">
-                  <n-descriptions-item :label="$gettext('Model')" :span="3">
+              <n-scrollbar class="max-h-[calc(50vh-140px)] md:max-h-110">
+                <n-descriptions
+                  label-placement="top"
+                  :column="isMobile ? 1 : 3"
+                  bordered
+                  size="small"
+                >
+                  <n-descriptions-item :label="$gettext('Model')" :span="isMobile ? 1 : 3">
                     {{ realtime.cpus[0]?.modelName }}
                   </n-descriptions-item>
                   <n-descriptions-item :label="$gettext('CPU Count')">
@@ -663,7 +699,7 @@ if (import.meta.hot) {
                   :single-line="false"
                   size="small"
                   striped
-                  class="mt-2"
+                  class="mt-2 whitespace-nowrap"
                 >
                   <thead>
                     <tr>
@@ -694,9 +730,17 @@ if (import.meta.hot) {
                 </n-table>
               </n-scrollbar>
             </n-popover>
-            <n-popover placement="bottom" trigger="hover">
+            <n-popover
+              placement="bottom"
+              :trigger="isMobile ? 'click' : 'hover'"
+              class="max-w-[calc(100vw-32px)]"
+            >
               <template #trigger>
-                <n-flex vertical p-5 pl-10 pr-10 flex items-center>
+                <n-flex
+                  vertical
+                  class="px-1 py-5 text-center w-[calc(50%-9px)] md:px-10 md:w-auto"
+                  items-center
+                >
                   <p>{{ $gettext('Memory') }}</p>
                   <n-progress
                     type="dashboard"
@@ -707,8 +751,13 @@ if (import.meta.hot) {
                   <p>{{ formatBytes(realtime.mem.total) }}</p>
                 </n-flex>
               </template>
-              <n-scrollbar max-h-110>
-                <n-descriptions label-placement="top" :column="4" bordered size="small">
+              <n-scrollbar class="max-h-[calc(50vh-140px)] md:max-h-110">
+                <n-descriptions
+                  label-placement="top"
+                  :column="isMobile ? 1 : 4"
+                  bordered
+                  size="small"
+                >
                   <n-descriptions-item :label="$gettext('Physical Memory Size')">
                     {{ formatBytes(realtime.mem.total) }}
                   </n-descriptions-item>
@@ -764,7 +813,7 @@ if (import.meta.hot) {
                   :single-line="false"
                   size="small"
                   striped
-                  class="mt-2"
+                  class="mt-2 whitespace-nowrap"
                 >
                   <thead>
                     <tr>
@@ -799,10 +848,15 @@ if (import.meta.hot) {
               v-for="item in realtime.disk_usage"
               :key="item.path"
               placement="bottom"
-              trigger="hover"
+              :trigger="isMobile ? 'click' : 'hover'"
+              class="max-w-[calc(100vw-32px)]"
             >
               <template #trigger>
-                <n-flex vertical p-5 pl-10 pr-10 flex items-center>
+                <n-flex
+                  vertical
+                  class="px-1 py-5 text-center w-[calc(50%-9px)] md:px-10 md:w-auto"
+                  items-center
+                >
                   <p>{{ item.path }}</p>
                   <n-progress
                     type="dashboard"
@@ -813,8 +867,13 @@ if (import.meta.hot) {
                   <p>{{ formatBytes(item.used) }} / {{ formatBytes(item.total) }}</p>
                 </n-flex>
               </template>
-              <n-scrollbar max-h-85>
-                <n-descriptions label-placement="top" :column="3" bordered size="small">
+              <n-scrollbar class="max-h-[calc(50vh-140px)] md:max-h-85">
+                <n-descriptions
+                  label-placement="top"
+                  :column="isMobile ? 1 : 3"
+                  bordered
+                  size="small"
+                >
                   <n-descriptions-item :label="$gettext('Mount Point')">
                     {{ item.path }}
                   </n-descriptions-item>
@@ -956,12 +1015,7 @@ if (import.meta.hot) {
           <n-gi>
             <n-card :segmented="true" size="small" :title="$gettext('Real-time Monitoring')">
               <n-flex vertical v-if="systemInfo">
-                <n-form
-                  inline
-                  label-placement="left"
-                  label-width="auto"
-                  require-mark-placement="right-hanging"
-                >
+                <n-form v-bind="monitorFormLayout" require-mark-placement="right-hanging">
                   <n-form-item>
                     <n-radio-group v-model:value="chartType">
                       <n-radio-button value="net" :label="$gettext('Network')" />
@@ -982,7 +1036,7 @@ if (import.meta.hot) {
                       v-model:value="nets"
                       :options="systemInfo.nets"
                       @update-value="clearCurrent"
-                      w-50
+                      class="md:!w-50"
                     ></n-select>
                   </n-form-item>
                   <n-form-item v-if="chartType == 'disk'" :label="$gettext('Disk')">
@@ -991,7 +1045,7 @@ if (import.meta.hot) {
                       v-model:value="disks"
                       :options="systemInfo.disks"
                       @update-value="clearCurrent"
-                      w-50
+                      class="md:!w-50"
                     ></n-select>
                   </n-form-item>
                 </n-form>
@@ -1017,7 +1071,7 @@ if (import.meta.hot) {
                   >
                   <n-tag>{{ $gettext('Read/Write Latency') }} {{ current.diskRWTime }}ms</n-tag>
                 </n-flex>
-                <n-card :bordered="false" class="pt-10 h-132">
+                <n-card :bordered="false" class="pt-10 h-80 md:h-132">
                   <v-chart class="chart" :option="chartOptions" autoresize />
                 </n-card>
               </n-flex>
@@ -1045,6 +1099,12 @@ if (import.meta.hot) {
 </template>
 
 <style scoped>
+/* 标题与右侧按钮一行放不下时让按钮换到下一行，否则标题会被挤得逐字折行 */
+.home-header :deep(.n-page-header) {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .app-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

@@ -109,14 +109,9 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
     :title="isEdit ? $gettext('Edit Visitor') : $gettext('Add Visitor')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-form :model="model">
       <n-form-item path="name" :label="$gettext('Name')">
@@ -240,5 +235,5 @@ const handleSubmit = () => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

@@ -14,7 +14,7 @@ const handleReloadPage = () => {
 <template>
   <n-tooltip trigger="hover">
     <template #trigger>
-      <n-icon mr-5 cursor-pointer size="20" @click="handleReloadPage">
+      <n-icon cursor-pointer size="20" @click="handleReloadPage">
         <i-mdi-refresh />
       </n-icon>
     </template>

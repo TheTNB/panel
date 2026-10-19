@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import database from '@/api/panel/database'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatBytes } from '@/utils'
 import RedisKeyModal from '@/views/database/RedisKeyModal.vue'
 
@@ -198,6 +199,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     immediate: false,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleSearch = () => {
   search.value = searchInput.value
@@ -265,24 +267,24 @@ onUnmounted(() => {
 
 <template>
   <n-flex vertical>
-    <n-flex justify="space-between" align="center" :wrap="false">
-      <n-flex :wrap="false">
+    <n-flex justify="space-between" align="center">
+      <n-flex class="w-full md:w-auto">
         <n-select
           v-model:value="selectedServer"
           :options="serverOptions"
           :loading="serverLoading"
           :placeholder="$gettext('Select Server')"
-          class="w-62.5"
+          class="md:!w-62.5"
         />
-        <n-select v-model:value="selectedDB" :options="dbOptions" class="w-30" />
+        <n-select v-model:value="selectedDB" :options="dbOptions" class="md:!w-30" />
       </n-flex>
-      <n-flex :wrap="false">
-        <n-input-group>
+      <n-flex class="w-full md:w-auto">
+        <n-input-group class="md:!w-auto">
           <n-input
             v-model:value="searchInput"
             :placeholder="$gettext('Search key pattern, e.g. user:*')"
             clearable
-            class="!w-62.5"
+            class="md:!w-62.5"
             @keydown.enter="handleSearch"
           />
           <n-button type="primary" @click="handleSearch">
@@ -315,14 +317,7 @@ onUnmounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.key"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <redis-key-modal
@@ -334,13 +329,7 @@ onUnmounted(() => {
     @saved="refresh"
   />
   <!-- TTL 弹窗 -->
-  <n-modal
-    v-model:show="ttlModalShow"
-    preset="card"
-    :title="$gettext('Set TTL')"
-    class="w-100"
-    :bordered="false"
-  >
+  <app-modal size="sm" v-model:show="ttlModalShow" :title="$gettext('Set TTL')">
     <n-form>
       <n-form-item label="Key">
         <n-input :value="ttlKey" disabled />
@@ -357,15 +346,9 @@ onUnmounted(() => {
     <n-button type="info" block @click="handleSetTTL">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <!-- Rename 弹窗 -->
-  <n-modal
-    v-model:show="renameModalShow"
-    preset="card"
-    :title="$gettext('Rename Key')"
-    class="w-100"
-    :bordered="false"
-  >
+  <app-modal size="sm" v-model:show="renameModalShow" :title="$gettext('Rename Key')">
     <n-form>
       <n-form-item :label="$gettext('Old Key')">
         <n-input :value="renameOldKey" disabled />
@@ -377,5 +360,5 @@ onUnmounted(() => {
     <n-button type="info" block @click="handleRename">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

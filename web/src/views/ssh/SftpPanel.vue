@@ -4,12 +4,17 @@ import { useGettext } from 'vue3-gettext'
 
 import ws from '@/api/ws'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { darkThemeOverrides } from '@/design/naive-overrides'
 import { formatBytes, joinPath } from '@/utils'
 import SftpBrowser from '@/views/ssh/SftpBrowser.vue'
 
 const { $gettext } = useGettext()
 const { confirmAction } = useConfirm()
+const { isMobile } = useResponsive()
+
+// 手机单栏显示，分段切换左右两栏；两栏都保持挂载，切换不丢选中项和路径
+const activePane = ref<'left' | 'right'>('left')
 
 const props = defineProps<{
   hosts: { label: string; value: number }[]
@@ -207,9 +212,14 @@ onUnmounted(() => {
 <template>
   <!-- 终端环境固定暗色,不随面板主题切换 -->
   <n-config-provider :theme="darkTheme" :theme-overrides="darkThemeOverrides" abstract>
-    <div class="sftp-panel">
+    <div class="sftp-panel" :class="{ single: isMobile }">
+      <n-tabs v-if="isMobile" v-model:value="activePane" type="segment" size="small">
+        <n-tab name="left" :tab="$gettext('Left Pane')" />
+        <n-tab name="right" :tab="$gettext('Right Pane')" />
+      </n-tabs>
       <div class="sftp-panes">
         <SftpBrowser
+          v-show="!isMobile || activePane === 'left'"
           ref="leftRef"
           v-model:host-id="leftHost"
           v-model:path="leftPath"
@@ -218,26 +228,29 @@ onUnmounted(() => {
         <div class="sftp-actions">
           <n-button
             secondary
-            circle
+            :circle="!isMobile"
             :title="$gettext('Transfer to right')"
             @click="handleTransfer('ltr')"
           >
             <template #icon>
               <i-mdi-arrow-right />
             </template>
+            <template v-if="isMobile">{{ $gettext('Transfer to right') }}</template>
           </n-button>
           <n-button
             secondary
-            circle
+            :circle="!isMobile"
             :title="$gettext('Transfer to left')"
             @click="handleTransfer('rtl')"
           >
             <template #icon>
               <i-mdi-arrow-left />
             </template>
+            <template v-if="isMobile">{{ $gettext('Transfer to left') }}</template>
           </n-button>
         </div>
         <SftpBrowser
+          v-show="!isMobile || activePane === 'right'"
           ref="rightRef"
           v-model:host-id="rightHost"
           v-model:path="rightPath"
@@ -424,6 +437,42 @@ onUnmounted(() => {
 
   &.error {
     color: var(--color-error-fg, #ef4444);
+  }
+}
+
+// 单栏（手机）：传输按钮横排提到栏上方；队列项的源与目标换到第二行，避免横向溢出
+.sftp-panel.single {
+  .sftp-panes {
+    flex-direction: column;
+  }
+
+  .sftp-actions {
+    order: -1;
+    flex-direction: row;
+
+    > .n-button {
+      flex: 1;
+    }
+  }
+
+  .sftp-queue-item {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+
+  .queue-name {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .queue-route {
+    order: 1;
+    width: 100%;
+  }
+
+  .queue-meta {
+    max-width: 40%;
   }
 }
 </style>

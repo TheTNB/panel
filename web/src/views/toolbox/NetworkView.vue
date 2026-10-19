@@ -4,10 +4,13 @@ import { NTag } from 'naive-ui'
 import { useGettext } from 'vue3-gettext'
 
 import toolboxNetwork, { type NetworkListParams } from '@/api/panel/toolbox-network'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 import InterfaceView from './network/InterfaceView.vue'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('connections')
 
 // 排序状态
@@ -143,10 +146,11 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
     watchingStates: [sortState, stateFilter, pidSearch, processSearch, portSearch],
   },
 )
+const pagination = useTablePagination(page, pageSize, total, [50, 100, 200, 500])
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="connections" :tab="$gettext('Network Connections')">
       <n-flex vertical :size="16">
         <!-- 工具栏 -->
@@ -157,7 +161,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
             :options="stateOptions"
             :placeholder="$gettext('Filter by status')"
             clearable
-            class="w-70"
+            class="md:!w-70"
             @update:value="page = 1"
           />
           <n-input
@@ -174,7 +178,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
             v-model:value="processSearch"
             :placeholder="$gettext('Search process')"
             clearable
-            class="!w-45"
+            class="md:!w-45"
           >
             <template #prefix>
               <the-icon :size="16" icon="mdi:magnify" />
@@ -207,14 +211,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
           @update:sorter="handleSorterChange"
           v-model:page="page"
           v-model:pageSize="pageSize"
-          :pagination="{
-            page: page,
-            pageSize: pageSize,
-            itemCount: total,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [50, 100, 200, 500],
-          }"
+          :pagination="pagination"
         />
       </n-flex>
     </n-tab-pane>

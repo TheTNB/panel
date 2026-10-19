@@ -223,12 +223,12 @@ onMounted(() => {
     :style="{ backgroundImage: `url(${bgImg})` }"
     class="bg-cover"
   >
-    <div m-auto flex flex-col items-center>
+    <div m-auto flex flex-col w-full items-center>
       <!-- Logo -->
       <n-image :src="logo" preview-disabled mb-12 h-20 w-20 object-contain />
 
       <!-- 登录卡片 -->
-      <div px-7 py-8 rounded-lg bg-white min-w-95 card-shadow class="dark:bg-dark">
+      <div px-7 py-8 rounded-lg bg-white max-w-95 w-full card-shadow class="dark:bg-dark">
         <h2 text-4xl font-600 mb-7 text-center>{{ themeStore.name }}</h2>
 
         <!-- 通行密钥正在尝试中 -->

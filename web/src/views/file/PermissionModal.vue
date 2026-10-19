@@ -46,7 +46,9 @@ watch(
 const handlePermission = async () => {
   // allSettled 保证部分失败时也刷新列表，失败的错误弹窗由全局拦截器负责
   const results = await Promise.allSettled(
-    selected.value.map((path) => file.permission(path, `0${mode.value}`, owner.value, group.value, recursive.value)),
+    selected.value.map((path) =>
+      file.permission(path, `0${mode.value}`, owner.value, group.value, recursive.value),
+    ),
   )
 
   window.$bus.emit('file:refresh')
@@ -105,46 +107,32 @@ watch(mode, updateCheckboxes, { immediate: true })
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="title"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="title">
     <n-flex vertical>
       <n-form>
-        <n-row :gutter="[0, 24]">
-          <n-col :span="8">
-            <n-form-item :label="$gettext('Owner')">
-              <n-checkbox-group v-model:value="checkbox.owner" @update:value="calculateMode">
-                <n-checkbox value="read" :label="$gettext('Read')" />
-                <n-checkbox value="write" :label="$gettext('Write')" />
-                <n-checkbox value="execute" :label="$gettext('Execute')" />
-              </n-checkbox-group>
-            </n-form-item>
-          </n-col>
-          <n-col :span="8">
-            <n-form-item :label="$gettext('Group')">
-              <n-checkbox-group v-model:value="checkbox.group" @update:value="calculateMode">
-                <n-checkbox value="read" :label="$gettext('Read')" />
-                <n-checkbox value="write" :label="$gettext('Write')" />
-                <n-checkbox value="execute" :label="$gettext('Execute')" />
-              </n-checkbox-group>
-            </n-form-item>
-          </n-col>
-          <n-col :span="8">
-            <n-form-item :label="$gettext('Others')">
-              <n-checkbox-group v-model:value="checkbox.other" @update:value="calculateMode">
-                <n-checkbox value="read" :label="$gettext('Read')" />
-                <n-checkbox value="write" :label="$gettext('Write')" />
-                <n-checkbox value="execute" :label="$gettext('Execute')" />
-              </n-checkbox-group>
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" responsive="screen">
+          <n-form-item-gi :span="8" :label="$gettext('Owner')">
+            <n-checkbox-group v-model:value="checkbox.owner" @update:value="calculateMode">
+              <n-checkbox value="read" :label="$gettext('Read')" />
+              <n-checkbox value="write" :label="$gettext('Write')" />
+              <n-checkbox value="execute" :label="$gettext('Execute')" />
+            </n-checkbox-group>
+          </n-form-item-gi>
+          <n-form-item-gi :span="8" :label="$gettext('Group')">
+            <n-checkbox-group v-model:value="checkbox.group" @update:value="calculateMode">
+              <n-checkbox value="read" :label="$gettext('Read')" />
+              <n-checkbox value="write" :label="$gettext('Write')" />
+              <n-checkbox value="execute" :label="$gettext('Execute')" />
+            </n-checkbox-group>
+          </n-form-item-gi>
+          <n-form-item-gi :span="8" :label="$gettext('Others')">
+            <n-checkbox-group v-model:value="checkbox.other" @update:value="calculateMode">
+              <n-checkbox value="read" :label="$gettext('Read')" />
+              <n-checkbox value="write" :label="$gettext('Write')" />
+              <n-checkbox value="execute" :label="$gettext('Execute')" />
+            </n-checkbox-group>
+          </n-form-item-gi>
+        </n-grid>
         <n-form-item :label="$gettext('Permission')">
           <n-input v-model:value="mode" />
         </n-form-item>
@@ -162,7 +150,7 @@ watch(mode, updateCheckboxes, { immediate: true })
       </n-form>
       <n-button type="primary" @click="handlePermission"> {{ $gettext('Modify') }} </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

@@ -205,11 +205,10 @@ const handleSaveConfig = () => {
       }}
     </n-alert>
     <n-data-table striped :columns="columns" :data="exporters" :scroll-x="960" />
-    <n-modal
+    <app-modal
       v-model:show="showConfigModal"
-      preset="card"
+      size="lg"
       :title="$gettext('Exporter Configuration') + ' - ' + configSlug"
-      class="w-200"
     >
       <n-flex vertical>
         <n-alert type="warning">
@@ -227,6 +226,6 @@ const handleSaveConfig = () => {
           </n-button>
         </n-flex>
       </n-flex>
-    </n-modal>
+    </app-modal>
   </n-flex>
 </template>

@@ -62,7 +62,7 @@ const sorted = computed<HealthIssue[]>(() => {
       <div class="flex flex-col">
         <span class="font-medium">{{ titleFor(issue) }}</span>
         <span v-if="hintFor(issue)" class="text-xs opacity-80">{{ hintFor(issue) }}</span>
-        <span v-if="issue.message" class="text-xs font-mono opacity-60">
+        <span v-if="issue.message" class="text-xs font-mono opacity-60 break-all">
           {{ issue.message }}
         </span>
       </div>

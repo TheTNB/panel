@@ -32,15 +32,7 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Upload Certificate')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Upload Certificate')">
     <n-space vertical>
       <n-form :model="model">
         <n-form-item :label="$gettext('Certificate')">
@@ -64,7 +56,7 @@ const handleSubmit = () => {
         $gettext('Submit')
       }}</n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

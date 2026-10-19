@@ -3,9 +3,11 @@ import { useGettext } from 'vue3-gettext'
 
 import home from '@/api/panel/home'
 import website from '@/api/panel/website'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { webserverFeatures } from '@/utils'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 const currentTab = ref('default-page')
 const saveLoading = ref(false)
@@ -96,7 +98,7 @@ const handleSaveDefaultSite = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="default-page" :tab="$gettext('Default Page')">
       <n-flex vertical>
         <common-editor v-model:value="model.index" height="60vh" />
@@ -153,7 +155,7 @@ const handleSaveDefaultSite = () => {
         </n-alert>
         <n-form>
           <n-form-item :label="$gettext('Default Site')">
-            <n-select v-model:value="defaultSite" :options="defaultSiteOptions" class="w-100" />
+            <n-select v-model:value="defaultSite" :options="defaultSiteOptions" class="md:!w-100" />
           </n-form-item>
           <n-button
             type="primary"

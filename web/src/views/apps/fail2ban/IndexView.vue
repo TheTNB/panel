@@ -11,6 +11,7 @@ import app from '@/api/panel/app'
 import website from '@/api/panel/website'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { WEBSERVER_SLUGS } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -201,6 +202,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleAddJail = () => {
   addJailLoading.value = true
@@ -306,14 +308,7 @@ onMounted(() => {
               :columns="jailsColumns"
               :data="data"
               :row-key="(row: any) => row.name"
-              :pagination="{
-                page: page,
-                pageSize: pageSize,
-                itemCount: total,
-                showQuickJumper: true,
-                showSizePicker: true,
-                pageSizes: [20, 50, 100, 200],
-              }"
+              :pagination="pagination"
             />
           </n-card>
           <n-flex>
@@ -333,108 +328,93 @@ onMounted(() => {
       </n-tab-pane>
     </n-tabs>
   </PageContainer>
-  <n-modal v-model:show="addJailModal" :title="$gettext('Add Rule')">
-    <n-card
-      closable
-      @close="() => (addJailModal = false)"
-      :title="$gettext('Add Rule')"
-      style="width: 60vw"
-    >
-      <n-space vertical>
-        <n-alert type="info">
-          {{
-            $gettext(
-              'If an IP exceeds the maximum retries within the find time (seconds), it will be banned for the ban time (seconds)',
-            )
-          }}
-        </n-alert>
-        <n-alert type="warning">
-          {{
-            $gettext(
-              'Protected ports are automatically obtained. If you modify the port corresponding to a rule, please delete and re-add the rule, otherwise protection may not be effective',
-            )
-          }}
-        </n-alert>
+  <app-modal v-model:show="addJailModal" :title="$gettext('Add Rule')">
+    <n-space vertical>
+      <n-alert type="info">
+        {{
+          $gettext(
+            'If an IP exceeds the maximum retries within the find time (seconds), it will be banned for the ban time (seconds)',
+          )
+        }}
+      </n-alert>
+      <n-alert type="warning">
+        {{
+          $gettext(
+            'Protected ports are automatically obtained. If you modify the port corresponding to a rule, please delete and re-add the rule, otherwise protection may not be effective',
+          )
+        }}
+      </n-alert>
 
-        <n-form :model="addJailModel">
-          <n-form-item :label="$gettext('Type')">
-            <n-select
-              v-model:value="addJailModel.type"
-              :options="[
-                { label: $gettext('Website'), value: 'website' },
-                { label: $gettext('Service'), value: 'service' },
-              ]"
-            >
-            </n-select>
-          </n-form-item>
-          <n-form-item v-if="addJailModel.type === 'website'" :label="$gettext('Select Website')">
-            <n-select
-              v-model:value="addJailModel.website_name"
-              :options="websites"
-              :placeholder="$gettext('Select Website')"
-            />
-          </n-form-item>
-          <n-form-item v-if="addJailModel.type === 'website'" :label="$gettext('Protection Mode')">
-            <n-select
-              v-model:value="addJailModel.website_mode"
-              :options="[
-                { label: 'CC', value: 'cc' },
-                { label: $gettext('Path'), value: 'path' },
-              ]"
-            >
-            </n-select>
-          </n-form-item>
-          <n-form-item
-            v-if="addJailModel.type === 'website' && addJailModel.website_mode === 'path'"
-            :label="$gettext('Protection Path')"
+      <n-form :model="addJailModel">
+        <n-form-item :label="$gettext('Type')">
+          <n-select
+            v-model:value="addJailModel.type"
+            :options="[
+              { label: $gettext('Website'), value: 'website' },
+              { label: $gettext('Service'), value: 'service' },
+            ]"
           >
-            <n-input
-              v-model:value="addJailModel.website_path"
-              :placeholder="$gettext('Protection Path')"
-            />
-          </n-form-item>
-          <n-form-item v-if="addJailModel.type === 'service'" :label="$gettext('Service')">
-            <n-select
-              v-model:value="addJailModel.name"
-              :options="[
-                { label: 'SSH', value: 'ssh' },
-                { label: 'MySQL', value: 'mysql' },
-                { label: 'Pure-Ftpd', value: 'pure-ftpd' },
-              ]"
-            >
-            </n-select>
-          </n-form-item>
-          <n-form-item path="maxretry" :label="$gettext('Max Retries')">
-            <n-input-number v-model:value="addJailModel.maxretry" @keydown.enter.prevent :min="1" />
-          </n-form-item>
-          <n-form-item path="findtime" :label="$gettext('Find Time')">
-            <n-input-number v-model:value="addJailModel.findtime" @keydown.enter.prevent :min="1" />
-          </n-form-item>
-          <n-form-item path="bantime" :label="$gettext('Ban Time')">
-            <n-input-number v-model:value="addJailModel.bantime" @keydown.enter.prevent :min="1" />
-          </n-form-item>
-        </n-form>
-        <n-button
-          type="info"
-          block
-          :loading="addJailLoading"
-          :disabled="addJailLoading"
-          @click="handleAddJail"
+          </n-select>
+        </n-form-item>
+        <n-form-item v-if="addJailModel.type === 'website'" :label="$gettext('Select Website')">
+          <n-select
+            v-model:value="addJailModel.website_name"
+            :options="websites"
+            :placeholder="$gettext('Select Website')"
+          />
+        </n-form-item>
+        <n-form-item v-if="addJailModel.type === 'website'" :label="$gettext('Protection Mode')">
+          <n-select
+            v-model:value="addJailModel.website_mode"
+            :options="[
+              { label: 'CC', value: 'cc' },
+              { label: $gettext('Path'), value: 'path' },
+            ]"
+          >
+          </n-select>
+        </n-form-item>
+        <n-form-item
+          v-if="addJailModel.type === 'website' && addJailModel.website_mode === 'path'"
+          :label="$gettext('Protection Path')"
         >
-          {{ $gettext('Submit') }}
-        </n-button>
-      </n-space>
-    </n-card>
-  </n-modal>
-  <n-modal
-    v-model:show="editJailModal"
-    preset="card"
-    :title="$gettext('Rule Configuration')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+          <n-input
+            v-model:value="addJailModel.website_path"
+            :placeholder="$gettext('Protection Path')"
+          />
+        </n-form-item>
+        <n-form-item v-if="addJailModel.type === 'service'" :label="$gettext('Service')">
+          <n-select
+            v-model:value="addJailModel.name"
+            :options="[
+              { label: 'SSH', value: 'ssh' },
+              { label: 'MySQL', value: 'mysql' },
+              { label: 'Pure-Ftpd', value: 'pure-ftpd' },
+            ]"
+          >
+          </n-select>
+        </n-form-item>
+        <n-form-item path="maxretry" :label="$gettext('Max Retries')">
+          <n-input-number v-model:value="addJailModel.maxretry" @keydown.enter.prevent :min="1" />
+        </n-form-item>
+        <n-form-item path="findtime" :label="$gettext('Find Time')">
+          <n-input-number v-model:value="addJailModel.findtime" @keydown.enter.prevent :min="1" />
+        </n-form-item>
+        <n-form-item path="bantime" :label="$gettext('Ban Time')">
+          <n-input-number v-model:value="addJailModel.bantime" @keydown.enter.prevent :min="1" />
+        </n-form-item>
+      </n-form>
+      <n-button
+        type="info"
+        block
+        :loading="addJailLoading"
+        :disabled="addJailLoading"
+        @click="handleAddJail"
+      >
+        {{ $gettext('Submit') }}
+      </n-button>
+    </n-space>
+  </app-modal>
+  <app-modal v-model:show="editJailModal" :title="$gettext('Rule Configuration')">
     <n-flex vertical>
       <n-alert type="info">
         {{
@@ -485,40 +465,33 @@ onMounted(() => {
         {{ $gettext('Save') }}
       </n-button>
     </n-flex>
-  </n-modal>
-  <n-modal v-model:show="jailModal" :title="$gettext('View Rule')">
-    <n-card
-      closable
-      @close="() => (jailModal = false)"
-      :title="$gettext('View Rule')"
-      style="width: 60vw"
-    >
-      <n-space vertical>
-        <n-card :title="$gettext('Rule Information')" :segmented="true">
-          <n-space vertical>
-            <n-space>
-              <n-text>{{ $gettext('Currently Banned') }}</n-text>
-              <n-text>{{ jailCurrentlyBan }}</n-text>
-            </n-space>
-            <n-space>
-              <n-text>{{ $gettext('Total Bans') }}</n-text>
-              <n-text>{{ jailTotalBan }}</n-text>
-            </n-space>
+  </app-modal>
+  <app-modal v-model:show="jailModal" :title="$gettext('View Rule')">
+    <n-space vertical>
+      <n-card :title="$gettext('Rule Information')" :segmented="true">
+        <n-space vertical>
+          <n-space>
+            <n-text>{{ $gettext('Currently Banned') }}</n-text>
+            <n-text>{{ jailCurrentlyBan }}</n-text>
           </n-space>
-        </n-card>
-        <n-card :title="$gettext('Ban List')" :segmented="true">
-          <n-data-table
-            striped
-            remote
-            :scroll-x="300"
-            :loading="false"
-            :columns="banedIPColumns"
-            :data="jailBanedList"
-            :row-key="(row: any) => row.ip"
-            :pagination="false"
-          />
-        </n-card>
-      </n-space>
-    </n-card>
-  </n-modal>
+          <n-space>
+            <n-text>{{ $gettext('Total Bans') }}</n-text>
+            <n-text>{{ jailTotalBan }}</n-text>
+          </n-space>
+        </n-space>
+      </n-card>
+      <n-card :title="$gettext('Ban List')" :segmented="true">
+        <n-data-table
+          striped
+          remote
+          :scroll-x="300"
+          :loading="false"
+          :columns="banedIPColumns"
+          :data="jailBanedList"
+          :row-key="(row: any) => row.ip"
+          :pagination="false"
+        />
+      </n-card>
+    </n-space>
+  </app-modal>
 </template>

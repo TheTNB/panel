@@ -5,12 +5,15 @@ import { useGettext } from 'vue3-gettext'
 import monitor from '@/api/panel/monitor'
 import notify from '@/api/panel/notify'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import ChannelModal from '@/views/monitor/ChannelModal.vue'
 import { useNotifyEvents } from '@/views/monitor/metrics'
 
 const { $gettext } = useGettext()
 const { confirmAction } = useConfirm()
 const events = useNotifyEvents()
+const formLayout = useFormLayout(160)
 
 // 监控设置
 const setting = ref({
@@ -68,6 +71,12 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const channelPagination = useTablePagination(
+  channelPage,
+  channelPageSize,
+  channelTotal,
+  [20, 50, 100],
+)
 
 const handleAddChannel = () => {
   editingChannel.value = null
@@ -196,22 +205,32 @@ const handleChannelSaved = () => {
 <template>
   <n-flex vertical :size="16">
     <n-card :title="$gettext('Monitoring')" size="small">
-      <n-form label-placement="left" :label-width="160">
+      <n-form v-bind="formLayout">
         <n-form-item :label="$gettext('Enable Monitoring')">
           <n-switch v-model:value="setting.enabled" />
         </n-form-item>
         <n-form-item :label="$gettext('Save Days')">
-          <n-input-number v-model:value="setting.days" :min="1" :max="365" class="w-50">
+          <n-input-number v-model:value="setting.days" :min="1" :max="365" class="w-full md:!w-50">
             <template #suffix>{{ $gettext('days') }}</template>
           </n-input-number>
         </n-form-item>
         <n-form-item :label="$gettext('Collection Interval')">
-          <n-input-number v-model:value="setting.interval" :min="1" :max="120" class="w-50">
+          <n-input-number
+            v-model:value="setting.interval"
+            :min="1"
+            :max="120"
+            class="w-full md:!w-50"
+          >
             <template #suffix>{{ $gettext('minutes') }}</template>
           </n-input-number>
         </n-form-item>
         <n-form-item :label="$gettext('Alert Record Retention')">
-          <n-input-number v-model:value="setting.alert_days" :min="1" :max="365" class="w-50">
+          <n-input-number
+            v-model:value="setting.alert_days"
+            :min="1"
+            :max="365"
+            class="w-full md:!w-50"
+          >
             <template #suffix>{{ $gettext('days') }}</template>
           </n-input-number>
         </n-form-item>
@@ -243,27 +262,21 @@ const handleChannelSaved = () => {
         </n-button>
       </template>
       <n-data-table
+        v-model:page="channelPage"
+        v-model:pageSize="channelPageSize"
         remote
         striped
+        :scroll-x="800"
         :loading="channelsLoading"
         :columns="channelColumns"
         :data="channels"
         :row-key="(row: any) => row.id"
-        :pagination="{
-          page: channelPage,
-          pageSize: channelPageSize,
-          itemCount: channelTotal,
-          showQuickJumper: true,
-          showSizePicker: true,
-          pageSizes: [20, 50, 100],
-          onUpdatePage: (p: number) => (channelPage = p),
-          onUpdatePageSize: (ps: number) => (channelPageSize = ps),
-        }"
+        :pagination="channelPagination"
       />
     </n-card>
 
     <n-card :title="$gettext('System Event Notifications')" size="small">
-      <n-form label-placement="left" :label-width="160">
+      <n-form v-bind="formLayout">
         <n-form-item :label="$gettext('Events')">
           <n-checkbox-group v-model:value="notifySetting.events">
             <n-grid :cols="2" :x-gap="16" :y-gap="8" item-responsive responsive="screen">

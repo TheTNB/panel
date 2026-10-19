@@ -6,12 +6,14 @@ import project from '@/api/panel/project'
 import website from '@/api/panel/website'
 import ListInput from '@/components/common/ListInput.vue'
 import PathSelector from '@/components/common/PathSelector.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 import { notifyWebsiteCreated } from '@/utils'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const type = defineModel<string>('type', { type: String, required: true })
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(100)
 
 // Go 运行模式
 const goModes = [
@@ -384,17 +386,8 @@ const modalTitle = computed(() => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    :title="modalTitle"
-    preset="card"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
-    <n-form :model="createModel" label-placement="left" label-width="100">
+  <app-modal v-model:show="show" :title="modalTitle">
+    <n-form :model="createModel" v-bind="formLayout">
       <n-form-item path="name" :label="$gettext('Project Name')">
         <n-input
           v-model:value="createModel.name"
@@ -439,159 +432,135 @@ const modalTitle = computed(() => {
 
         <!-- 源码模式 -->
         <template v-if="goOptions.mode === 'source'">
-          <n-row :gutter="[24, 0]">
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Go Version')">
-                <n-select
-                  v-model:value="goOptions.version"
-                  :options="goVersionOptions"
-                  :placeholder="$gettext('Select Go Version')"
-                  @keydown.enter.prevent
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Entry File')">
-                <n-input
-                  v-model:value="goOptions.entryFile"
-                  type="text"
-                  @keydown.enter.prevent
-                  :placeholder="$gettext('e.g., main.go, cmd/server/main.go')"
-                />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="12" :label="$gettext('Go Version')">
+              <n-select
+                v-model:value="goOptions.version"
+                :options="goVersionOptions"
+                :placeholder="$gettext('Select Go Version')"
+                @keydown.enter.prevent
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="12" :label="$gettext('Entry File')">
+              <n-input
+                v-model:value="goOptions.entryFile"
+                type="text"
+                @keydown.enter.prevent
+                :placeholder="$gettext('e.g., main.go, cmd/server/main.go')"
+              />
+            </n-form-item-gi>
+          </n-grid>
         </template>
       </template>
 
       <!-- Java 类型特有字段 -->
       <template v-if="type === 'java'">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Java Version')">
-              <n-select
-                v-model:value="javaOptions.version"
-                :options="javaVersionOptions"
-                :placeholder="$gettext('Select Java Version')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Framework')">
-              <n-select
-                v-model:value="javaOptions.framework"
-                :options="javaFrameworks"
-                :placeholder="$gettext('Select Framework')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="12" :label="$gettext('Java Version')">
+            <n-select
+              v-model:value="javaOptions.version"
+              :options="javaVersionOptions"
+              :placeholder="$gettext('Select Java Version')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" :label="$gettext('Framework')">
+            <n-select
+              v-model:value="javaOptions.framework"
+              :options="javaFrameworks"
+              :placeholder="$gettext('Select Framework')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
 
       <!-- Node.js 类型特有字段 -->
       <template v-if="type === 'nodejs'">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Node.js Version')">
-              <n-select
-                v-model:value="nodejsOptions.version"
-                :options="nodejsVersionOptions"
-                :placeholder="$gettext('Select Node.js Version')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Framework')">
-              <n-select
-                v-model:value="nodejsOptions.framework"
-                :options="nodejsFrameworks"
-                :placeholder="$gettext('Select Framework')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="12" :label="$gettext('Node.js Version')">
+            <n-select
+              v-model:value="nodejsOptions.version"
+              :options="nodejsVersionOptions"
+              :placeholder="$gettext('Select Node.js Version')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" :label="$gettext('Framework')">
+            <n-select
+              v-model:value="nodejsOptions.framework"
+              :options="nodejsFrameworks"
+              :placeholder="$gettext('Select Framework')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
 
       <!-- PHP 类型特有字段 -->
       <template v-if="type === 'php'">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="12">
-            <n-form-item :label="$gettext('PHP Version')">
-              <n-select
-                v-model:value="phpOptions.version"
-                :options="phpVersionOptions"
-                :placeholder="$gettext('Select PHP Version')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Framework')">
-              <n-select
-                v-model:value="phpOptions.framework"
-                :options="phpFrameworks"
-                :placeholder="$gettext('Select Framework')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="12" :label="$gettext('PHP Version')">
+            <n-select
+              v-model:value="phpOptions.version"
+              :options="phpVersionOptions"
+              :placeholder="$gettext('Select PHP Version')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" :label="$gettext('Framework')">
+            <n-select
+              v-model:value="phpOptions.framework"
+              :options="phpFrameworks"
+              :placeholder="$gettext('Select Framework')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
 
       <!-- Python 类型特有字段 -->
       <template v-if="type === 'python'">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Python Version')">
-              <n-select
-                v-model:value="pythonOptions.version"
-                :options="pythonVersionOptions"
-                :placeholder="$gettext('Select Python Version')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Framework')">
-              <n-select
-                v-model:value="pythonOptions.framework"
-                :options="pythonFrameworks"
-                :placeholder="$gettext('Select Framework')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="12" :label="$gettext('Python Version')">
+            <n-select
+              v-model:value="pythonOptions.version"
+              :options="pythonVersionOptions"
+              :placeholder="$gettext('Select Python Version')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" :label="$gettext('Framework')">
+            <n-select
+              v-model:value="pythonOptions.framework"
+              :options="pythonFrameworks"
+              :placeholder="$gettext('Select Framework')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
 
       <!-- .NET 类型特有字段 -->
       <template v-if="type === 'dotnet'">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="12">
-            <n-form-item :label="$gettext('.NET Version')">
-              <n-select
-                v-model:value="dotnetOptions.version"
-                :options="dotnetVersionOptions"
-                :placeholder="$gettext('Select .NET Version')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="12">
-            <n-form-item :label="$gettext('Framework')">
-              <n-select
-                v-model:value="dotnetOptions.framework"
-                :options="dotnetFrameworks"
-                :placeholder="$gettext('Select Framework')"
-                @keydown.enter.prevent
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="12" :label="$gettext('.NET Version')">
+            <n-select
+              v-model:value="dotnetOptions.version"
+              :options="dotnetVersionOptions"
+              :placeholder="$gettext('Select .NET Version')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="12" :label="$gettext('Framework')">
+            <n-select
+              v-model:value="dotnetOptions.framework"
+              :options="dotnetFrameworks"
+              :placeholder="$gettext('Select Framework')"
+              @keydown.enter.prevent
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
 
       <n-form-item path="user" :label="$gettext('Run User')">
@@ -631,29 +600,25 @@ const modalTitle = computed(() => {
       </n-form-item>
 
       <template v-if="proxyOptions.enabled">
-        <n-row :gutter="[24, 0]">
-          <n-col :span="16">
-            <n-form-item :label="$gettext('Domain')">
-              <ListInput
-                v-model:value="proxyOptions.domains"
-                placeholder="example.com"
-                :min="1"
-                show-sort-button
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="8">
-            <n-form-item :label="$gettext('Project Port')">
-              <n-input-number
-                v-model:value="proxyOptions.port"
-                :min="1"
-                :max="65535"
-                style="width: 100%"
-                :placeholder="$gettext('e.g., 3000')"
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+          <n-form-item-gi :span="16" :label="$gettext('Domain')">
+            <ListInput
+              v-model:value="proxyOptions.domains"
+              placeholder="example.com"
+              :min="1"
+              show-sort-button
+            />
+          </n-form-item-gi>
+          <n-form-item-gi :span="8" :label="$gettext('Project Port')">
+            <n-input-number
+              v-model:value="proxyOptions.port"
+              :min="1"
+              :max="65535"
+              style="width: 100%"
+              :placeholder="$gettext('e.g., 3000')"
+            />
+          </n-form-item-gi>
+        </n-grid>
       </template>
     </n-form>
 
@@ -667,7 +632,7 @@ const modalTitle = computed(() => {
     >
       {{ $gettext('Create') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 
   <!-- 目录选择器 -->
   <path-selector v-model:show="showPathSelector" v-model:path="pathSelectorPath" :dir="true" />

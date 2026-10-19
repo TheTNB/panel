@@ -8,6 +8,7 @@ import { useGettext } from 'vue3-gettext'
 
 import s3fs from '@/api/apps/s3fs'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
@@ -67,6 +68,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleAddMount = () => {
   addMountLoading.value = true
@@ -111,79 +113,65 @@ onMounted(() => {
         :columns="columns"
         :data="data"
         :row-key="(row: any) => row.id"
-        :pagination="{
-          page: page,
-          pageSize: pageSize,
-          itemCount: total,
-          showQuickJumper: true,
-          showSizePicker: true,
-          pageSizes: [20, 50, 100, 200],
-        }"
+        :pagination="pagination"
       />
     </n-flex>
   </PageContainer>
-  <n-modal v-model:show="addMountModal" :title="$gettext('Add Mount')">
-    <n-card
-      closable
-      @close="() => (addMountModal = false)"
-      :title="$gettext('Add Mount')"
-      style="width: 60vw"
+  <app-modal v-model:show="addMountModal" :title="$gettext('Add Mount')">
+    <n-form :model="addMountModel">
+      <n-form-item path="bucket" label="Bucket">
+        <n-input
+          v-model:value="addMountModel.bucket"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter Bucket name (COS format: xxxx-ID)')"
+        />
+      </n-form-item>
+      <n-form-item path="ak" label="AK">
+        <n-input
+          v-model:value="addMountModel.ak"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter AK key')"
+        />
+      </n-form-item>
+      <n-form-item path="sk" label="SK">
+        <n-input
+          v-model:value="addMountModel.sk"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter SK key')"
+        />
+      </n-form-item>
+      <n-form-item path="url" :label="$gettext('Region Endpoint')">
+        <n-input
+          v-model:value="addMountModel.url"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="
+            $gettext(
+              'Enter complete URL of region endpoint (e.g., https://oss-cn-beijing.aliyuncs.com)',
+            )
+          "
+        />
+      </n-form-item>
+      <n-form-item path="path" :label="$gettext('Mount Directory')">
+        <n-input
+          v-model:value="addMountModel.path"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter mount directory (e.g., /oss)')"
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      type="info"
+      block
+      :loading="addMountLoading"
+      :disabled="addMountLoading"
+      @click="handleAddMount"
     >
-      <n-form :model="addMountModel">
-        <n-form-item path="bucket" label="Bucket">
-          <n-input
-            v-model:value="addMountModel.bucket"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter Bucket name (COS format: xxxx-ID)')"
-          />
-        </n-form-item>
-        <n-form-item path="ak" label="AK">
-          <n-input
-            v-model:value="addMountModel.ak"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter AK key')"
-          />
-        </n-form-item>
-        <n-form-item path="sk" label="SK">
-          <n-input
-            v-model:value="addMountModel.sk"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter SK key')"
-          />
-        </n-form-item>
-        <n-form-item path="url" :label="$gettext('Region Endpoint')">
-          <n-input
-            v-model:value="addMountModel.url"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="
-              $gettext(
-                'Enter complete URL of region endpoint (e.g., https://oss-cn-beijing.aliyuncs.com)',
-              )
-            "
-          />
-        </n-form-item>
-        <n-form-item path="path" :label="$gettext('Mount Directory')">
-          <n-input
-            v-model:value="addMountModel.path"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter mount directory (e.g., /oss)')"
-          />
-        </n-form-item>
-      </n-form>
-      <n-button
-        type="info"
-        block
-        :loading="addMountLoading"
-        :disabled="addMountLoading"
-        @click="handleAddMount"
-      >
-        {{ $gettext('Submit') }}
-      </n-button>
-    </n-card>
-  </n-modal>
+      {{ $gettext('Submit') }}
+    </n-button>
+  </app-modal>
 </template>

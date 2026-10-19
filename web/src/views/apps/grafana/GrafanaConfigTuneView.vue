@@ -6,8 +6,10 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import grafana from '@/api/apps/grafana'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('server')
 
 // [server]
@@ -145,7 +147,7 @@ const handleSave = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="server" :tab="$gettext('Server')">
       <n-flex vertical>
         <n-alert type="info">

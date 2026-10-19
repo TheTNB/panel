@@ -147,14 +147,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
     :title="$gettext('Pull Image')"
-    preset="card"
-    style="width: 60vw"
-    size="medium"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="false"
     :closable="false"
   >
@@ -229,5 +224,5 @@ onUnmounted(() => {
         <n-button type="primary" @click="handleSubmit">{{ $gettext('Submit') }}</n-button>
       </n-flex>
     </n-form>
-  </n-modal>
+  </app-modal>
 </template>

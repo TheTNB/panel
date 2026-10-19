@@ -76,16 +76,7 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create Database')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create Database')">
     <n-form :model="createModel">
       <n-form-item path="server_id" :label="$gettext('Server')">
         <n-select
@@ -168,7 +159,7 @@ watch(
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

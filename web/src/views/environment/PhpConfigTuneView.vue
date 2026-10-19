@@ -6,6 +6,7 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import php from '@/api/panel/environment/php'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { phpPreset, type TuneProfile } from '@/utils/tunepreset'
 
 const props = defineProps<{
@@ -13,6 +14,7 @@ const props = defineProps<{
 }>()
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('general')
 
 // 常规设置
@@ -310,7 +312,7 @@ const composeSizeValue = (num: number | null, unit: string): string => {
 
 <template>
   <n-flex vertical>
-    <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+    <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
       <n-tab-pane name="general" :tab="$gettext('General')">
         <n-flex vertical>
           <n-alert type="info">

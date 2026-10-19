@@ -8,6 +8,7 @@ import { useGettext } from 'vue3-gettext'
 
 import app from '@/api/panel/app'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { router } from '@/router'
 import { renderLocalIcon } from '@/utils'
 import VersionModal from '@/views/app/VersionModal.vue'
@@ -170,6 +171,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     watchingStates: [selectedCategory, searchQuery],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 // 处理分类切换
 const handleCategoryChange = (category: string) => {
@@ -236,7 +238,7 @@ onMounted(() => {
         v-model:value="searchQuery"
         :placeholder="$gettext('Search')"
         clearable
-        class="!w-60"
+        class="md:!w-60"
       />
     </n-flex>
     <n-data-table
@@ -249,14 +251,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.slug"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <version-modal

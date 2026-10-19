@@ -225,6 +225,13 @@ function handleIndentChange(value: string) {
   flex-shrink: 0;
   height: 26px;
   line-height: 26px;
+  // 窄屏放不下全部状态项时横向滑动，不挤压换行
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &.empty {
     color: v-bind('themeVars.textColor3');

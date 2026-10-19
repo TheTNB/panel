@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import cert from '@/api/panel/cert'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
@@ -122,6 +123,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleUpdateDNS = () => {
   updateDNSLoading.value = true
@@ -165,25 +167,10 @@ onUnmounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-space>
-  <n-modal
-    v-model:show="updateDNSModal"
-    preset="card"
-    :title="$gettext('Modify DNS')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="updateDNSModal" :title="$gettext('Modify DNS')">
     <n-space vertical>
       <n-form :model="updateDNSModel">
         <n-form-item path="name" :label="$gettext('Note Name')">
@@ -330,7 +317,7 @@ onUnmounted(() => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

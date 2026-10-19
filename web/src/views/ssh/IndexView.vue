@@ -19,6 +19,7 @@ import { useGettext } from 'vue3-gettext'
 import ssh from '@/api/panel/ssh'
 import ws from '@/api/ws'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import '@xterm/xterm/css/xterm.css'
 import CreateModal from '@/views/ssh/CreateModal.vue'
@@ -27,6 +28,7 @@ import UpdateModal from '@/views/ssh/UpdateModal.vue'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
+const { isMobile } = useResponsive()
 
 const LOCAL_SERVER_ID = -1
 
@@ -577,7 +579,7 @@ onUnmounted(() => {
     </div>
   </PageContainer>
 
-  <n-drawer v-model:show="showHosts" :width="360" placement="right">
+  <n-drawer v-model:show="showHosts" :width="isMobile ? '100%' : 360" placement="right">
     <n-drawer-content :title="$gettext('Hosts')" closable>
       <n-flex vertical>
         <n-button type="primary" block @click="create = true">
@@ -815,6 +817,11 @@ onUnmounted(() => {
     opacity: 1 !important;
     background: rgba(255, 255, 255, 0.15);
   }
+
+  // 触屏没有悬停，常驻显示
+  @media (hover: none) {
+    opacity: 0.7;
+  }
 }
 
 .tab-add {
@@ -956,6 +963,10 @@ onUnmounted(() => {
   opacity: 0;
   transition: opacity 150ms ease;
   flex-shrink: 0;
+
+  @media (hover: none) {
+    opacity: 1;
+  }
 }
 
 :deep(.xterm-viewport) {

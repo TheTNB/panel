@@ -35,23 +35,23 @@ const handleUpdateCache = () => {
 <template>
   <PageContainer :show-footer="true">
     <template #tabs>
-      <div class="flex items-center justify-between">
-        <n-tabs v-model:value="currentTab" animated class="flex-1">
-          <n-tab name="installed" :tab="$gettext('Installed')" />
-          <n-tab name="app" :tab="$gettext('Native App')" />
-          <n-tab name="environment" :tab="$gettext('Operating Environment')" />
-          <n-tab name="template" :tab="$gettext('Container Template')" />
-        </n-tabs>
-        <n-button
-          v-if="currentTab != 'installed'"
-          type="primary"
-          :loading="updateCacheLoading"
-          :disabled="updateCacheLoading"
-          @click="handleUpdateCache"
-        >
-          {{ $gettext('Update Cache') }}
-        </n-button>
-      </div>
+      <n-tabs v-model:value="currentTab" animated>
+        <n-tab name="installed" :tab="$gettext('Installed')" />
+        <n-tab name="app" :tab="$gettext('Native App')" />
+        <n-tab name="environment" :tab="$gettext('Operating Environment')" />
+        <n-tab name="template" :tab="$gettext('Container Template')" />
+        <template #suffix>
+          <n-button
+            v-if="currentTab != 'installed'"
+            type="primary"
+            :loading="updateCacheLoading"
+            :disabled="updateCacheLoading"
+            @click="handleUpdateCache"
+          >
+            {{ $gettext('Update Cache') }}
+          </n-button>
+        </template>
+      </n-tabs>
     </template>
     <installed-view v-if="currentTab === 'installed'" />
     <app-view v-if="currentTab === 'app'" />

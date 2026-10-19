@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import firewall from '@/api/panel/firewall'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import CreateModal from '@/views/firewall/CreateModal.vue'
 
 const { $gettext } = useGettext()
@@ -292,6 +293,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const selectedRowKeys = ref<any>([])
 const importing = ref(false)
@@ -379,7 +381,7 @@ onMounted(() => {
         {{ $gettext('Create Rule') }}
       </n-button>
       <n-button :loading="selectingUnused" :disabled="selectingUnused" ghost @click="selectUnused">
-        {{ $gettext('Select Inbound Allow Rules with Unoccupied Ports') }}
+        {{ $gettext('Select Unused Port Rules') }}
       </n-button>
       <ConfirmDialog
         type="danger"
@@ -418,14 +420,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => JSON.stringify(row)"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <create-modal v-model:show="createModalShow" @created="refresh" />

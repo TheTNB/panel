@@ -15,6 +15,7 @@ import { useGettext } from 'vue3-gettext'
 
 import website from '@/api/panel/website'
 import TheIcon from '@/components/custom/TheIcon.vue'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import ConfirmDialog from '@/components/system/ConfirmDialog.vue'
 import { useFileStore } from '@/stores'
 import { isNullOrUndef, wrapIPv6 } from '@/utils'
@@ -125,7 +126,13 @@ const columns: any = [
     render(row: any) {
       const typeMap: any = {
         proxy: { label: $gettext('Reverse Proxy'), type: 'warning' },
-        php: { label: row.php > 0 ? $gettext('PHP %{ version }', { version: (row.php / 10).toFixed(1) }) : $gettext('PHP'), type: 'info' },
+        php: {
+          label:
+            row.php > 0
+              ? $gettext('PHP %{ version }', { version: (row.php / 10).toFixed(1) })
+              : $gettext('PHP'),
+          type: 'info',
+        },
         static: { label: $gettext('Pure Static'), type: 'success' },
       }
       const config = typeMap[row.type] || { label: row.type, type: 'default' }
@@ -328,6 +335,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     debounce: [0, 300],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 // 修改运行状态
 const handleStatusChange = (row: any) => {
@@ -426,7 +434,12 @@ onMounted(() => {
           </template>
         </ConfirmDialog>
       </n-flex>
-      <n-input v-model:value="keyword" :placeholder="$gettext('Search')" clearable class="!w-60" />
+      <n-input
+        v-model:value="keyword"
+        :placeholder="$gettext('Search')"
+        clearable
+        class="md:!w-60"
+      />
     </n-flex>
     <n-data-table
       striped
@@ -439,14 +452,7 @@ onMounted(() => {
       v-model:checked-row-keys="selectedRowKeys"
       v-model:page="page"
       v-model:pageSize="pageSize"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
 </template>

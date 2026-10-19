@@ -8,6 +8,7 @@ import VChart from 'vue-echarts'
 import { useGettext } from 'vue3-gettext'
 
 import website from '@/api/panel/website'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatBytes } from '@/utils/file'
 
 import { codeToName } from './country-name-map'
@@ -23,6 +24,7 @@ const items = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
 const limit = ref(50)
+const pagination = useTablePagination(page, limit, total, [20, 50, 100])
 
 // ISP 分布数据
 const ispItems = ref<any[]>([])
@@ -161,14 +163,17 @@ const handlePageSizeChange = (s: number) => {
       <n-card :bordered="false" :title="$gettext('ISP Distribution')" v-if="ispItems.length > 0">
         <v-chart class="h-300px" :option="ispBarOption" autoresize />
       </n-card>
-      <n-data-table :columns="columns" :data="items" :bordered="false" size="small" />
+      <n-data-table
+        :columns="columns"
+        :data="items"
+        :bordered="false"
+        size="small"
+        :scroll-x="700"
+      />
       <n-flex justify="end" class="mt-3" v-if="total > 0">
         <n-pagination
           v-model:page="page"
-          :page-size="limit"
-          :item-count="total"
-          :page-sizes="[20, 50, 100]"
-          show-size-picker
+          v-bind="pagination"
           @update:page="handlePageChange"
           @update:page-size="handlePageSizeChange"
         />

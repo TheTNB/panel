@@ -2,6 +2,8 @@
 import hljs from 'highlight.js/lib/core'
 import log from 'highlight.js/lib/languages/accesslog'
 
+import { useWindowWidth } from '@/components/system/composables/useResponsive'
+import { naiveBreakpoints } from '@/design'
 import { useThemeStore } from '@/stores'
 import systemdlog from '@/utils/hljs/systemdlog'
 
@@ -19,16 +21,10 @@ watch(
   { immediate: true },
 )
 
-function handleWindowResize() {
-  themeStore.setIsMobile(document.body.offsetWidth <= 768)
-}
-
-onMounted(() => {
-  handleWindowResize()
-  window.addEventListener('resize', handleWindowResize)
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleWindowResize)
+// 阈值与 uno 的 md 断点对齐；immediate 让首次渲染前就判定，不沿用持久化的旧值
+const windowWidth = useWindowWidth()
+watch(windowWidth, (width) => themeStore.setIsMobile(width < naiveBreakpoints.m), {
+  immediate: true,
 })
 </script>
 
@@ -39,6 +35,7 @@ onBeforeUnmount(() => {
     :theme-overrides="themeStore.naiveThemeOverrides"
     :locale="themeStore.naiveLocale"
     :date-locale="themeStore.naiveDateLocale"
+    :breakpoints="naiveBreakpoints"
     wh-full
   >
     <slot />

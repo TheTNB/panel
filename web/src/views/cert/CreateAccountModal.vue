@@ -62,15 +62,7 @@ const handleCreateAccount = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create Account')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create Account')">
     <n-space vertical>
       <n-alert type="info">{{
         $gettext(
@@ -136,7 +128,7 @@ const handleCreateAccount = () => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

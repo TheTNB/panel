@@ -6,6 +6,7 @@ import file from '@/api/panel/file'
 import task from '@/api/panel/task'
 import RealtimeLogModal from '@/components/common/RealtimeLogModal.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -142,6 +143,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (id: number) => {
   useRequest(task.delete(id)).onSuccess(() => {
@@ -177,14 +179,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <realtime-log-modal

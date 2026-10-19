@@ -242,14 +242,10 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
+    size="lg"
     :title="isEdit ? $gettext('Edit Proxy') : $gettext('Add Proxy')"
-    style="width: 70vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-form :model="model">
       <n-form-item path="name" :label="$gettext('Name')">
@@ -581,5 +577,5 @@ const handleSubmit = () => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

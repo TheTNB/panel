@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import cert from '@/api/panel/cert'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
@@ -126,6 +127,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleUpdateAccount = () => {
   updateAccountLoading.value = true
@@ -174,25 +176,10 @@ onUnmounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-space>
-  <n-modal
-    v-model:show="updateAccountModal"
-    preset="card"
-    :title="$gettext('Modify Account')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="updateAccountModal" :title="$gettext('Modify Account')">
     <n-space vertical>
       <n-alert type="info">{{
         $gettext(
@@ -258,7 +245,7 @@ onUnmounted(() => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

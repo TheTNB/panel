@@ -84,15 +84,9 @@ const handleSave = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
     :title="mode === 'create' ? $gettext('Create Key') : $gettext('View Key')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
   >
     <n-spin :show="loading">
       <n-form :model="model">
@@ -129,5 +123,5 @@ const handleSave = () => {
     <n-button type="info" block :loading="saveLoading" :disabled="saveLoading" @click="handleSave">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

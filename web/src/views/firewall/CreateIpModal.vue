@@ -102,16 +102,7 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create Rule')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create Rule')">
     <n-form :model="createModel">
       <n-form-item path="protocols" :label="$gettext('Transport Protocol')">
         <n-select v-model:value="createModel.protocol" :options="protocols" />
@@ -136,7 +127,7 @@ const handleCreate = async () => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

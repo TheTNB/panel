@@ -47,16 +47,7 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Enable 2FA')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Enable 2FA')">
     <n-flex vertical>
       <n-grid :cols="8" item-responsive responsive="screen">
         <n-gi span="0 l:1"></n-gi>
@@ -80,7 +71,7 @@ watch(
             </n-text>
           </n-flex>
         </n-gi>
-        <n-gi span="0 l:1"> </n-gi>>
+        <n-gi span="0 l:1"></n-gi>
       </n-grid>
       <n-form>
         <n-form-item path="code" :label="$gettext('Code')">
@@ -95,7 +86,7 @@ watch(
         $gettext('Submit')
       }}</n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

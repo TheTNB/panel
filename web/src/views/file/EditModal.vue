@@ -16,9 +16,12 @@ const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const minimized = defineModel<boolean>('minimized', { type: Boolean, default: false })
 const filePath = defineModel<string>('file', { type: String, required: true })
 
-// 窗口默认尺寸
-const defaultWidth = Math.min(1400, window.innerWidth * 0.9)
-const defaultHeight = Math.min(900, window.innerHeight * 0.85)
+// 窗口尺寸随视口重新钳位，旋转屏幕或缩放后再打开不会超出视口
+const { width: viewportWidth, height: viewportHeight } = useWindowSize()
+const defaultWidth = computed(() => Math.min(1400, viewportWidth.value * 0.9))
+const defaultHeight = computed(() => Math.min(900, viewportHeight.value * 0.85))
+const minWidth = computed(() => Math.min(600, defaultWidth.value))
+const minHeight = computed(() => Math.min(400, defaultHeight.value))
 
 // 获取文件所在目录作为初始路径
 const initialPath = computed(() => {
@@ -134,8 +137,8 @@ watch(
     :title="$gettext('File Editor')"
     :default-width="defaultWidth"
     :default-height="defaultHeight"
-    :min-width="600"
-    :min-height="400"
+    :min-width="minWidth"
+    :min-height="minHeight"
     :before-close="handleBeforeClose"
     :close-on-overlay="false"
   >

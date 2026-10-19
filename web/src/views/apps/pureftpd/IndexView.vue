@@ -9,6 +9,7 @@ import { useGettext } from 'vue3-gettext'
 import pureftpd from '@/api/apps/pureftpd'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { generateRandomString } from '@/utils'
 
 import PureftpdConfigTuneView from './PureftpdConfigTuneView.vue'
@@ -100,6 +101,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const getPort = async () => {
   port.value = await pureftpd.port()
@@ -201,14 +203,7 @@ onMounted(() => {
             :columns="userColumns"
             :data="data"
             :row-key="(row: any) => row.username"
-            :pagination="{
-              page: page,
-              pageSize: pageSize,
-              itemCount: total,
-              showQuickJumper: true,
-              showSizePicker: true,
-              pageSizes: [20, 50, 100, 200],
-            }"
+            :pagination="pagination"
           />
         </n-flex>
       </n-tab-pane>
@@ -220,81 +215,67 @@ onMounted(() => {
       </n-tab-pane>
     </n-tabs>
   </PageContainer>
-  <n-modal v-model:show="addUserModal" :title="$gettext('Create User')">
-    <n-card
-      closable
-      @close="() => (addUserModal = false)"
-      :title="$gettext('Create User')"
-      style="width: 60vw"
+  <app-modal v-model:show="addUserModal" :title="$gettext('Create User')">
+    <n-form :model="addUserModel">
+      <n-form-item path="username" :label="$gettext('Username')">
+        <n-input
+          v-model:value="addUserModel.username"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter username')"
+        />
+      </n-form-item>
+      <n-form-item path="password" :label="$gettext('Password')">
+        <n-input
+          v-model:value="addUserModel.password"
+          type="password"
+          show-password-on="click"
+          @keydown.enter.prevent
+          :placeholder="
+            $gettext('It is recommended to use the generator to generate a random password')
+          "
+        />
+      </n-form-item>
+      <n-form-item path="path" :label="$gettext('Directory')">
+        <n-input
+          v-model:value="addUserModel.path"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="$gettext('Enter the directory authorized to the user')"
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      type="info"
+      block
+      :loading="addUserLoading"
+      :disabled="addUserLoading"
+      @click="handleAddUser"
     >
-      <n-form :model="addUserModel">
-        <n-form-item path="username" :label="$gettext('Username')">
-          <n-input
-            v-model:value="addUserModel.username"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter username')"
-          />
-        </n-form-item>
-        <n-form-item path="password" :label="$gettext('Password')">
-          <n-input
-            v-model:value="addUserModel.password"
-            type="password"
-            show-password-on="click"
-            @keydown.enter.prevent
-            :placeholder="
-              $gettext('It is recommended to use the generator to generate a random password')
-            "
-          />
-        </n-form-item>
-        <n-form-item path="path" :label="$gettext('Directory')">
-          <n-input
-            v-model:value="addUserModel.path"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="$gettext('Enter the directory authorized to the user')"
-          />
-        </n-form-item>
-      </n-form>
-      <n-button
-        type="info"
-        block
-        :loading="addUserLoading"
-        :disabled="addUserLoading"
-        @click="handleAddUser"
-      >
-        {{ $gettext('Submit') }}
-      </n-button>
-    </n-card>
-  </n-modal>
-  <n-modal v-model:show="changePasswordModal">
-    <n-card
-      closable
-      @close="() => (changePasswordModal = false)"
-      :title="$gettext('Change Password')"
-      style="width: 60vw"
+      {{ $gettext('Submit') }}
+    </n-button>
+  </app-modal>
+  <app-modal v-model:show="changePasswordModal" :title="$gettext('Change Password')">
+    <n-form :model="changePasswordModel">
+      <n-form-item path="password" :label="$gettext('Password')">
+        <n-input
+          v-model:value="changePasswordModel.password"
+          type="text"
+          @keydown.enter.prevent
+          :placeholder="
+            $gettext('It is recommended to use the generator to generate a random password')
+          "
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      type="info"
+      block
+      :loading="changePasswordLoading"
+      :disabled="changePasswordLoading"
+      @click="handleChangePassword"
     >
-      <n-form :model="changePasswordModel">
-        <n-form-item path="password" :label="$gettext('Password')">
-          <n-input
-            v-model:value="changePasswordModel.password"
-            type="text"
-            @keydown.enter.prevent
-            :placeholder="
-              $gettext('It is recommended to use the generator to generate a random password')
-            "
-          />
-        </n-form-item>
-      </n-form>
-      <n-button
-        type="info"
-        block
-        :loading="changePasswordLoading"
-        :disabled="changePasswordLoading"
-        @click="handleChangePassword"
-      >
-        {{ $gettext('Submit') }}
-      </n-button>
-    </n-card>
-  </n-modal>
+      {{ $gettext('Submit') }}
+    </n-button>
+  </app-modal>
 </template>

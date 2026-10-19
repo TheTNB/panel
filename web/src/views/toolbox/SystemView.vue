@@ -7,8 +7,10 @@ import { DateTime } from 'luxon'
 import { useGettext } from 'vue3-gettext'
 
 import system from '@/api/panel/toolbox-system'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('swap')
 const swap = ref(0)
 const swapFree = ref('')
@@ -143,7 +145,7 @@ const handleSaveNtpServers = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="swap" tab="SWAP">
       <n-flex vertical>
         <n-alert type="info">
@@ -250,15 +252,7 @@ const handleSaveNtpServers = () => {
   </n-tabs>
 
   <!-- NTP 服务器配置弹窗 -->
-  <n-modal
-    v-model:show="showNtpModal"
-    preset="card"
-    :title="$gettext('System NTP Server Configuration')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="showNtpModal" :title="$gettext('System NTP Server Configuration')">
     <n-flex vertical>
       <n-alert v-if="ntpServiceType === 'unknown'" type="warning">
         {{
@@ -320,5 +314,5 @@ const handleSaveNtpServers = () => {
         </n-button>
       </n-flex>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>

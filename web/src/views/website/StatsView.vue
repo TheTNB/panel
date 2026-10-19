@@ -2,6 +2,7 @@
 import { useGettext } from 'vue3-gettext'
 
 import website from '@/api/panel/website'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import ClientsTab from './stats/ClientsTab.vue'
 import ErrorsTab from './stats/ErrorsTab.vue'
@@ -15,6 +16,7 @@ import StatusCodesTab from './stats/StatusCodesTab.vue'
 import URIsTab from './stats/URIsTab.vue'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 // ============ 时间预设 ============
 
@@ -24,6 +26,18 @@ const activePreset = ref<TimePreset>('today')
 const customRange = ref<[number, number] | null>(null)
 const customPopover = ref(false)
 const tempRange = ref<[number, number] | null>(null)
+
+// 桌面渲染成按钮组，手机渲染成下拉
+const fixedPresets: Array<{ label: string; value: TimePreset }> = [
+  { label: $gettext('Today'), value: 'today' },
+  { label: $gettext('Yesterday'), value: 'yesterday' },
+  { label: $gettext('Last 7 Days'), value: '7d' },
+  { label: $gettext('Last 30 Days'), value: '30d' },
+]
+const presetOptions: Array<{ label: string; value: TimePreset }> = [
+  ...fixedPresets,
+  { label: $gettext('Custom'), value: 'custom' },
+]
 
 function getDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -64,6 +78,12 @@ const dateRange = computed<{ start: string; end: string }>(() => {
 
 function setPreset(preset: TimePreset) {
   activePreset.value = preset
+}
+
+// 手机下拉选中自定义时只弹日期面板，确认后才生效
+function handlePresetSelect(preset: TimePreset) {
+  if (preset === 'custom') customPopover.value = true
+  else setPreset(preset)
 }
 
 function confirmCustom() {
@@ -130,24 +150,43 @@ provide('statContext', {
       />
 
       <!-- 时间预设 -->
-      <n-button-group size="small">
+      <n-popover
+        v-if="isMobile"
+        :show="customPopover"
+        trigger="manual"
+        placement="bottom-start"
+        :show-arrow="false"
+        @clickoutside="customPopover = false"
+      >
+        <template #trigger>
+          <n-select
+            :value="activePreset"
+            :options="presetOptions"
+            size="small"
+            class="!w-36"
+            @update:value="handlePresetSelect"
+          />
+        </template>
+        <!-- 双月面板约 580px，手机上限宽并横向滚动，保证当前月完整可见 -->
+        <div class="max-w-[calc(100vw-56px)] overflow-x-auto">
+          <n-date-picker
+            v-model:value="tempRange"
+            type="daterange"
+            panel
+            :default-time="['00:00:00', '23:59:59']"
+            :actions="['confirm']"
+            @confirm="confirmCustom"
+          />
+        </div>
+      </n-popover>
+      <n-button-group v-else size="small">
         <n-button
-          :type="activePreset === 'today' ? 'primary' : 'default'"
-          @click="setPreset('today')"
+          v-for="p in fixedPresets"
+          :key="p.value"
+          :type="activePreset === p.value ? 'primary' : 'default'"
+          @click="setPreset(p.value)"
         >
-          {{ $gettext('Today') }}
-        </n-button>
-        <n-button
-          :type="activePreset === 'yesterday' ? 'primary' : 'default'"
-          @click="setPreset('yesterday')"
-        >
-          {{ $gettext('Yesterday') }}
-        </n-button>
-        <n-button :type="activePreset === '7d' ? 'primary' : 'default'" @click="setPreset('7d')">
-          {{ $gettext('Last 7 Days') }}
-        </n-button>
-        <n-button :type="activePreset === '30d' ? 'primary' : 'default'" @click="setPreset('30d')">
-          {{ $gettext('Last 30 Days') }}
+          {{ p.label }}
         </n-button>
         <n-popover
           v-model:show="customPopover"

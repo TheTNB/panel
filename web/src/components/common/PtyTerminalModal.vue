@@ -247,11 +247,11 @@ defineExpose({
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
+    size="full"
     :title="title || $gettext('Terminal')"
-    style="width: 90vw; height: 80vh; max-height: 80vh"
+    style="height: 80vh; max-height: 80vh"
     :content-style="{
       display: 'flex',
       flexDirection: 'column',
@@ -259,9 +259,6 @@ defineExpose({
       flex: 1,
       minHeight: 0,
     }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="false"
     :close-on-esc="false"
     :closable="true"
@@ -277,7 +274,7 @@ defineExpose({
       </header>
       <div ref="terminalRef" class="terminal-content" @wheel="onTerminalWheel"></div>
     </div>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss">

@@ -131,16 +131,7 @@ const handleCreate = async () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create Rule')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create Rule')">
     <n-form :model="createModel">
       <n-form-item path="protocols" :label="$gettext('Transport Protocol')">
         <n-select v-model:value="createModel.protocol" :options="protocols" />
@@ -166,28 +157,24 @@ const handleCreate = async () => {
           placeholder="80"
         />
       </n-form-item>
-      <n-row v-else :gutter="[0, 24]">
-        <n-col :span="12">
-          <n-form-item path="port_start" :label="$gettext('Start Port')">
-            <n-input-number
-              v-model:value="createModel.port_start"
-              :min="1"
-              :max="65535"
-              placeholder="80"
-            />
-          </n-form-item>
-        </n-col>
-        <n-col :span="12">
-          <n-form-item path="port_end" :label="$gettext('End Port')">
-            <n-input-number
-              v-model:value="createModel.port_end"
-              :min="createModel.port_start"
-              :max="65535"
-              placeholder="80"
-            />
-          </n-form-item>
-        </n-col>
-      </n-row>
+      <n-grid v-else cols="1 m:24" responsive="screen">
+        <n-form-item-gi :span="12" path="port_start" :label="$gettext('Start Port')">
+          <n-input-number
+            v-model:value="createModel.port_start"
+            :min="1"
+            :max="65535"
+            placeholder="80"
+          />
+        </n-form-item-gi>
+        <n-form-item-gi :span="12" path="port_end" :label="$gettext('End Port')">
+          <n-input-number
+            v-model:value="createModel.port_end"
+            :min="createModel.port_start"
+            :max="65535"
+            placeholder="80"
+          />
+        </n-form-item-gi>
+      </n-grid>
       <n-form-item path="address" :label="$gettext('Target')">
         <ListInput
           v-model:value="createModel.address"
@@ -205,7 +192,7 @@ const handleCreate = async () => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import database from '@/api/panel/database'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const props = defineProps<{
   type: string
@@ -103,6 +104,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     debounce: [300],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (serverID: number, name: string) => {
   useRequest(database.delete(serverID, name)).onSuccess(() => {
@@ -139,14 +141,7 @@ onUnmounted(() => {
     :row-key="(row: any) => row.name"
     v-model:page="page"
     v-model:pageSize="pageSize"
-    :pagination="{
-      page: page,
-      pageSize: pageSize,
-      itemCount: total,
-      showQuickJumper: true,
-      showSizePicker: true,
-      pageSizes: [20, 50, 100, 200],
-    }"
+    :pagination="pagination"
   />
 </template>
 

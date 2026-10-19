@@ -2,8 +2,10 @@
 import { useGettext } from 'vue3-gettext'
 
 import container from '@/api/panel/container'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps<{
@@ -83,23 +85,19 @@ watch(show, (val) => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
+    size="lg"
     :title="
       $gettext('Container Info') + (info ? ' - ' + String(info.Name || '').replace(/^\//, '') : '')
     "
-    preset="card"
-    :style="{ width: '70vw', maxWidth: '1080px' }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-spin :show="loading">
       <n-tabs v-model:value="currentTab" type="line" animated>
         <!-- 基本信息 -->
         <n-tab-pane name="basic" :tab="$gettext('Basic Info')">
           <n-flex v-if="info" vertical :size="16">
-            <n-descriptions :column="2" label-placement="left" bordered size="small">
+            <n-descriptions :column="isMobile ? 1 : 2" label-placement="left" bordered size="small">
               <n-descriptions-item :label="$gettext('Container Name')">
                 {{ String(info.Name || '').replace(/^\//, '') || '-' }}
               </n-descriptions-item>
@@ -129,7 +127,7 @@ watch(show, (val) => {
               <n-descriptions-item :label="$gettext('Privileged')">
                 {{ info.HostConfig?.Privileged ? $gettext('Yes') : $gettext('No') }}
               </n-descriptions-item>
-              <n-descriptions-item :label="$gettext('Network')" :span="2">
+              <n-descriptions-item :label="$gettext('Network')" :span="isMobile ? 1 : 2">
                 <n-flex v-if="networks.length > 0" :size="4">
                   <n-tag v-for="net in networks" :key="net.name" size="small">
                     {{ net.name }}: {{ net.ip }}
@@ -137,13 +135,16 @@ watch(show, (val) => {
                 </n-flex>
                 <template v-else>{{ info.HostConfig?.NetworkMode || '-' }}</template>
               </n-descriptions-item>
-              <n-descriptions-item :label="$gettext('Ports (Host->Container)')" :span="2">
+              <n-descriptions-item
+                :label="$gettext('Ports (Host->Container)')"
+                :span="isMobile ? 1 : 2"
+              >
                 <n-flex v-if="ports.length > 0" :size="4">
                   <n-tag v-for="port in ports" :key="port" size="small">{{ port }}</n-tag>
                 </n-flex>
                 <template v-else>-</template>
               </n-descriptions-item>
-              <n-descriptions-item :label="$gettext('Command')" :span="2">
+              <n-descriptions-item :label="$gettext('Command')" :span="isMobile ? 1 : 2">
                 <span style="font-family: monospace; word-break: break-all">{{ command }}</span>
               </n-descriptions-item>
             </n-descriptions>
@@ -230,5 +231,5 @@ watch(show, (val) => {
         </n-tab-pane>
       </n-tabs>
     </n-spin>
-  </n-modal>
+  </app-modal>
 </template>

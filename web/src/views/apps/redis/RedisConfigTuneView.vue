@@ -6,9 +6,11 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import redis from '@/api/apps/redis'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { mbToPair, redisPreset, type TuneProfile } from '@/utils/tunepreset'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('general')
 
 // 常规设置
@@ -134,7 +136,7 @@ const handleSave = () => {
 
 <template>
   <n-flex vertical>
-    <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+    <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
       <n-tab-pane name="general" :tab="$gettext('General')">
         <n-flex vertical>
           <n-alert type="info">

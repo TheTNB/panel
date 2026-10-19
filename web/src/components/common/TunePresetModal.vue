@@ -6,6 +6,7 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import home from '@/api/panel/home'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 import type { TuneProfile } from '@/utils/tunepreset'
 
 const props = withDefaults(
@@ -33,6 +34,7 @@ const emit = defineEmits<{
 const show = defineModel<boolean>('show', { default: false })
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout('auto')
 
 const memoryMB = ref<number | null>(null)
 const cpuCores = ref<number | null>(null)
@@ -78,12 +80,7 @@ const handleGenerate = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Generate Recommended Configuration')"
-    class="w-160"
-  >
+  <app-modal v-model:show="show" size="sm" :title="$gettext('Generate Recommended Configuration')">
     <n-flex vertical>
       <n-alert type="info">
         {{
@@ -92,7 +89,7 @@ const handleGenerate = () => {
           )
         }}
       </n-alert>
-      <n-form label-placement="left" label-width="auto">
+      <n-form v-bind="formLayout">
         <n-form-item v-if="fields.includes('memory')" :label="$gettext('Memory (MB)')">
           <n-input-number
             class="w-full"
@@ -120,5 +117,5 @@ const handleGenerate = () => {
         </n-button>
       </n-flex>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>

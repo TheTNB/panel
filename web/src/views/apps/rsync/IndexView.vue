@@ -9,6 +9,7 @@ import { useGettext } from 'vue3-gettext'
 import rsync from '@/api/apps/rsync'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { generateRandomString } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -124,6 +125,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const getConfig = async () => {
   config.value = await rsync.config()
@@ -223,14 +225,7 @@ onMounted(() => {
             :columns="processColumns"
             :data="data"
             :row-key="(row: any) => row.name"
-            :pagination="{
-              page: page,
-              pageSize: pageSize,
-              itemCount: total,
-              showQuickJumper: true,
-              showSizePicker: true,
-              pageSizes: [20, 50, 100, 200],
-            }"
+            :pagination="pagination"
           />
         </n-flex>
       </n-tab-pane>
@@ -261,16 +256,7 @@ onMounted(() => {
       </n-tab-pane>
     </n-tabs>
   </PageContainer>
-  <n-modal
-    v-model:show="addModuleModal"
-    preset="card"
-    :title="$gettext('Add Module')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="addModuleModal = false"
-  >
+  <app-modal v-model:show="addModuleModal" :title="$gettext('Add Module')">
     <n-form :model="addModuleModel">
       <n-form-item path="name" :label="$gettext('Name')">
         <n-input
@@ -333,16 +319,8 @@ onMounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
-  <n-modal
-    v-model:show="editModuleModal"
-    preset="card"
-    :title="$gettext('Module Configuration')"
-    style="width: 80vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  </app-modal>
+  <app-modal v-model:show="editModuleModal" :title="$gettext('Module Configuration')">
     <n-form :model="editModuleModel">
       <n-form-item path="path" :label="$gettext('Directory')">
         <n-input
@@ -390,5 +368,5 @@ onMounted(() => {
       </n-form-item>
     </n-form>
     <n-button type="info" block @click="handleSaveModuleConfig">{{ $gettext('Save') }}</n-button>
-  </n-modal>
+  </app-modal>
 </template>

@@ -8,9 +8,11 @@ import VChart from 'vue-echarts'
 import { useGettext } from 'vue3-gettext'
 
 import website from '@/api/panel/website'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { formatBytes } from '@/utils/file'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 use([CanvasRenderer, LineChart, TooltipComponent, LegendComponent, GridComponent])
 
@@ -495,7 +497,15 @@ const trafficChartOption = computed<EChartsOption>(() => {
     <n-card :bordered="false">
       <template #header>
         <div class="flex flex-wrap gap-2 items-center justify-between">
-          <n-radio-group v-model:value="activeMetric" size="small">
+          <n-select
+            v-if="isMobile"
+            v-model:value="activeMetric"
+            :options="metrics"
+            value-field="key"
+            size="small"
+            class="!w-32"
+          />
+          <n-radio-group v-else v-model:value="activeMetric" size="small">
             <n-radio-button v-for="m in metrics" :key="m.key" :value="m.key">
               {{ m.label }}
             </n-radio-button>
@@ -511,7 +521,7 @@ const trafficChartOption = computed<EChartsOption>(() => {
     </n-card>
 
     <!-- 性能 + 流量 -->
-    <n-grid :cols="2" :x-gap="20">
+    <n-grid cols="1 m:2" :x-gap="20" :y-gap="20" responsive="screen">
       <n-gi>
         <n-card :bordered="false" :title="$gettext('Performance')">
           <n-spin :show="loading">

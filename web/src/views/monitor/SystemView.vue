@@ -18,6 +18,7 @@ import VChart from 'vue-echarts'
 import { useGettext } from 'vue3-gettext'
 
 import monitor from '@/api/panel/monitor'
+import TimeRangePicker, { type TimePreset } from '@/views/monitor/TimeRangePicker.vue'
 
 const { $gettext } = useGettext()
 
@@ -30,9 +31,6 @@ use([
   GridComponent,
   DataZoomComponent,
 ])
-
-// 时间预设选项
-type TimePreset = 'yesterday' | 'today' | 'week' | 'custom'
 
 interface TimeRange {
   start: number
@@ -112,55 +110,6 @@ function updateTimeRange(
       break
     case 'diskIO':
       diskIOTime.value = newValue
-      break
-  }
-}
-
-// 自定义时间 popover 状态
-const loadCustomPopover = ref(false)
-const cpuCustomPopover = ref(false)
-const memCustomPopover = ref(false)
-const netCustomPopover = ref(false)
-const diskIOCustomPopover = ref(false)
-
-// 临时时间范围
-const loadTempRange = ref<[number, number] | null>(null)
-const cpuTempRange = ref<[number, number] | null>(null)
-const memTempRange = ref<[number, number] | null>(null)
-const netTempRange = ref<[number, number] | null>(null)
-const diskIOTempRange = ref<[number, number] | null>(null)
-
-function confirmCustomTime(key: 'load' | 'cpu' | 'mem' | 'net' | 'diskIO') {
-  switch (key) {
-    case 'load':
-      if (loadTempRange.value) {
-        updateTimeRange('load', 'custom', loadTempRange.value)
-      }
-      loadCustomPopover.value = false
-      break
-    case 'cpu':
-      if (cpuTempRange.value) {
-        updateTimeRange('cpu', 'custom', cpuTempRange.value)
-      }
-      cpuCustomPopover.value = false
-      break
-    case 'mem':
-      if (memTempRange.value) {
-        updateTimeRange('mem', 'custom', memTempRange.value)
-      }
-      memCustomPopover.value = false
-      break
-    case 'net':
-      if (netTempRange.value) {
-        updateTimeRange('net', 'custom', netTempRange.value)
-      }
-      netCustomPopover.value = false
-      break
-    case 'diskIO':
-      if (diskIOTempRange.value) {
-        updateTimeRange('diskIO', 'custom', diskIOTempRange.value)
-      }
-      diskIOCustomPopover.value = false
       break
   }
 }
@@ -351,6 +300,8 @@ function createBaseOption(valueFormatter?: any, timeRangeMs?: number) {
     boundaryGap: false,
     data: [] as string[],
     axisLabel: {
+      // 手机宽度下整点刻度仍会挤在一起，重叠的直接隐藏
+      hideOverlap: true,
       interval: (index: number, value: string) => {
         // 根据时间范围动态调整刻度间隔
         const timePart = value.split(' ')[1] || ''
@@ -681,48 +632,12 @@ const diskIOOption = computed<EChartsOption>(() => {
     <!-- 负载 - 全宽 -->
     <n-card :bordered="false">
       <template #header>
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap gap-2 items-center justify-between">
           <span class="font-bold">{{ $gettext('Load') }}</span>
-          <n-button-group size="small">
-            <n-button
-              :type="loadTime.preset === 'yesterday' ? 'primary' : 'default'"
-              @click="updateTimeRange('load', 'yesterday')"
-            >
-              {{ $gettext('Yesterday') }}
-            </n-button>
-            <n-button
-              :type="loadTime.preset === 'today' ? 'primary' : 'default'"
-              @click="updateTimeRange('load', 'today')"
-            >
-              {{ $gettext('Today') }}
-            </n-button>
-            <n-button
-              :type="loadTime.preset === 'week' ? 'primary' : 'default'"
-              @click="updateTimeRange('load', 'week')"
-            >
-              {{ $gettext('Last 7 Days') }}
-            </n-button>
-            <n-popover
-              v-model:show="loadCustomPopover"
-              trigger="click"
-              placement="bottom-end"
-              :show-arrow="false"
-            >
-              <template #trigger>
-                <n-button :type="loadTime.preset === 'custom' ? 'primary' : 'default'">
-                  {{ $gettext('Custom') }}
-                </n-button>
-              </template>
-              <n-date-picker
-                v-model:value="loadTempRange"
-                type="daterange"
-                panel
-                :default-time="['00:00:00', '23:59:59']"
-                :actions="['confirm']"
-                @confirm="confirmCustomTime('load')"
-              />
-            </n-popover>
-          </n-button-group>
+          <time-range-picker
+            :preset="loadTime.preset"
+            @change="(preset, range) => updateTimeRange('load', preset, range)"
+          />
         </div>
       </template>
       <n-spin :show="loadLoading">
@@ -735,48 +650,12 @@ const diskIOOption = computed<EChartsOption>(() => {
       <!-- CPU -->
       <n-card :bordered="false">
         <template #header>
-          <div class="flex items-center justify-between">
+          <div class="flex flex-wrap gap-2 items-center justify-between">
             <span class="font-bold">CPU</span>
-            <n-button-group size="small">
-              <n-button
-                :type="cpuTime.preset === 'yesterday' ? 'primary' : 'default'"
-                @click="updateTimeRange('cpu', 'yesterday')"
-              >
-                {{ $gettext('Yesterday') }}
-              </n-button>
-              <n-button
-                :type="cpuTime.preset === 'today' ? 'primary' : 'default'"
-                @click="updateTimeRange('cpu', 'today')"
-              >
-                {{ $gettext('Today') }}
-              </n-button>
-              <n-button
-                :type="cpuTime.preset === 'week' ? 'primary' : 'default'"
-                @click="updateTimeRange('cpu', 'week')"
-              >
-                {{ $gettext('Last 7 Days') }}
-              </n-button>
-              <n-popover
-                v-model:show="cpuCustomPopover"
-                trigger="click"
-                placement="bottom-end"
-                :show-arrow="false"
-              >
-                <template #trigger>
-                  <n-button :type="cpuTime.preset === 'custom' ? 'primary' : 'default'">
-                    {{ $gettext('Custom') }}
-                  </n-button>
-                </template>
-                <n-date-picker
-                  v-model:value="cpuTempRange"
-                  type="daterange"
-                  panel
-                  :default-time="['00:00:00', '23:59:59']"
-                  :actions="['confirm']"
-                  @confirm="confirmCustomTime('cpu')"
-                />
-              </n-popover>
-            </n-button-group>
+            <time-range-picker
+              :preset="cpuTime.preset"
+              @change="(preset, range) => updateTimeRange('cpu', preset, range)"
+            />
           </div>
         </template>
         <n-spin :show="cpuLoading">
@@ -787,48 +666,12 @@ const diskIOOption = computed<EChartsOption>(() => {
       <!-- 内存 -->
       <n-card :bordered="false">
         <template #header>
-          <div class="flex items-center justify-between">
+          <div class="flex flex-wrap gap-2 items-center justify-between">
             <span class="font-bold">{{ $gettext('Memory') }}</span>
-            <n-button-group size="small">
-              <n-button
-                :type="memTime.preset === 'yesterday' ? 'primary' : 'default'"
-                @click="updateTimeRange('mem', 'yesterday')"
-              >
-                {{ $gettext('Yesterday') }}
-              </n-button>
-              <n-button
-                :type="memTime.preset === 'today' ? 'primary' : 'default'"
-                @click="updateTimeRange('mem', 'today')"
-              >
-                {{ $gettext('Today') }}
-              </n-button>
-              <n-button
-                :type="memTime.preset === 'week' ? 'primary' : 'default'"
-                @click="updateTimeRange('mem', 'week')"
-              >
-                {{ $gettext('Last 7 Days') }}
-              </n-button>
-              <n-popover
-                v-model:show="memCustomPopover"
-                trigger="click"
-                placement="bottom-end"
-                :show-arrow="false"
-              >
-                <template #trigger>
-                  <n-button :type="memTime.preset === 'custom' ? 'primary' : 'default'">
-                    {{ $gettext('Custom') }}
-                  </n-button>
-                </template>
-                <n-date-picker
-                  v-model:value="memTempRange"
-                  type="daterange"
-                  panel
-                  :default-time="['00:00:00', '23:59:59']"
-                  :actions="['confirm']"
-                  @confirm="confirmCustomTime('mem')"
-                />
-              </n-popover>
-            </n-button-group>
+            <time-range-picker
+              :preset="memTime.preset"
+              @change="(preset, range) => updateTimeRange('mem', preset, range)"
+            />
           </div>
         </template>
         <n-spin :show="memLoading">
@@ -843,48 +686,12 @@ const diskIOOption = computed<EChartsOption>(() => {
       <n-card :bordered="false">
         <template #header>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap gap-2 items-center justify-between">
               <span class="font-bold">{{ $gettext('Disk I/O') }}</span>
-              <n-button-group size="small">
-                <n-button
-                  :type="diskIOTime.preset === 'yesterday' ? 'primary' : 'default'"
-                  @click="updateTimeRange('diskIO', 'yesterday')"
-                >
-                  {{ $gettext('Yesterday') }}
-                </n-button>
-                <n-button
-                  :type="diskIOTime.preset === 'today' ? 'primary' : 'default'"
-                  @click="updateTimeRange('diskIO', 'today')"
-                >
-                  {{ $gettext('Today') }}
-                </n-button>
-                <n-button
-                  :type="diskIOTime.preset === 'week' ? 'primary' : 'default'"
-                  @click="updateTimeRange('diskIO', 'week')"
-                >
-                  {{ $gettext('Last 7 Days') }}
-                </n-button>
-                <n-popover
-                  v-model:show="diskIOCustomPopover"
-                  trigger="click"
-                  placement="bottom-end"
-                  :show-arrow="false"
-                >
-                  <template #trigger>
-                    <n-button :type="diskIOTime.preset === 'custom' ? 'primary' : 'default'">
-                      {{ $gettext('Custom') }}
-                    </n-button>
-                  </template>
-                  <n-date-picker
-                    v-model:value="diskIOTempRange"
-                    type="daterange"
-                    panel
-                    :default-time="['00:00:00', '23:59:59']"
-                    :actions="['confirm']"
-                    @confirm="confirmCustomTime('diskIO')"
-                  />
-                </n-popover>
-              </n-button-group>
+              <time-range-picker
+                :preset="diskIOTime.preset"
+                @change="(preset, range) => updateTimeRange('diskIO', preset, range)"
+              />
             </div>
             <n-checkbox-group
               v-if="availableDisks.length > 0"
@@ -910,48 +717,12 @@ const diskIOOption = computed<EChartsOption>(() => {
       <n-card :bordered="false">
         <template #header>
           <div class="flex flex-col gap-2">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap gap-2 items-center justify-between">
               <span class="font-bold">{{ $gettext('Network') }}</span>
-              <n-button-group size="small">
-                <n-button
-                  :type="netTime.preset === 'yesterday' ? 'primary' : 'default'"
-                  @click="updateTimeRange('net', 'yesterday')"
-                >
-                  {{ $gettext('Yesterday') }}
-                </n-button>
-                <n-button
-                  :type="netTime.preset === 'today' ? 'primary' : 'default'"
-                  @click="updateTimeRange('net', 'today')"
-                >
-                  {{ $gettext('Today') }}
-                </n-button>
-                <n-button
-                  :type="netTime.preset === 'week' ? 'primary' : 'default'"
-                  @click="updateTimeRange('net', 'week')"
-                >
-                  {{ $gettext('Last 7 Days') }}
-                </n-button>
-                <n-popover
-                  v-model:show="netCustomPopover"
-                  trigger="click"
-                  placement="bottom-end"
-                  :show-arrow="false"
-                >
-                  <template #trigger>
-                    <n-button :type="netTime.preset === 'custom' ? 'primary' : 'default'">
-                      {{ $gettext('Custom') }}
-                    </n-button>
-                  </template>
-                  <n-date-picker
-                    v-model:value="netTempRange"
-                    type="daterange"
-                    panel
-                    :default-time="['00:00:00', '23:59:59']"
-                    :actions="['confirm']"
-                    @confirm="confirmCustomTime('net')"
-                  />
-                </n-popover>
-              </n-button-group>
+              <time-range-picker
+                :preset="netTime.preset"
+                @change="(preset, range) => updateTimeRange('net', preset, range)"
+              />
             </div>
             <n-checkbox-group
               v-if="availableNetDevices.length > 0"

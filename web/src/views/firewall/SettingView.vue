@@ -3,8 +3,10 @@ import { useGettext } from 'vue3-gettext'
 
 import firewall from '@/api/panel/firewall'
 import safe from '@/api/panel/safe'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(160)
 const model = ref({
   firewallStatus: false,
   pingStatus: false,
@@ -86,7 +88,7 @@ const handleSaveScanSetting = () => {
 </script>
 
 <template>
-  <n-form :model="model" label-placement="left" label-width="160">
+  <n-form :model="model" v-bind="formLayout">
     <n-form-item path="firewall" :label="$gettext('System Firewall')">
       <n-switch v-model:value="model.firewallStatus" @update:value="handleFirewallStatus" />
     </n-form-item>

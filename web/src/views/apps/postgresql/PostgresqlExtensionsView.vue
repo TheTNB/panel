@@ -197,11 +197,10 @@ const handleUninstall = (slug: string) => {
       }}
     </n-alert>
     <n-data-table striped :columns="columns" :data="extensions" :scroll-x="1000" />
-    <n-modal
+    <app-modal
       v-model:show="showEnableModal"
-      preset="card"
+      size="sm"
       :title="$gettext('Enable Extension') + ' - ' + enableSlug"
-      class="w-120"
     >
       <n-flex vertical>
         <n-alert type="info">
@@ -228,6 +227,6 @@ const handleUninstall = (slug: string) => {
           </n-button>
         </n-flex>
       </n-flex>
-    </n-modal>
+    </app-modal>
   </n-flex>
 </template>

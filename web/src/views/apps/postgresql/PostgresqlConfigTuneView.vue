@@ -6,9 +6,11 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import postgresql from '@/api/apps/postgresql'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { kbToPair, postgresqlPreset, type TuneProfile } from '@/utils/tunepreset'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('connection')
 
 // 连接设置
@@ -206,7 +208,7 @@ const handleSave = () => {
 
 <template>
   <n-flex vertical>
-    <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+    <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
       <n-tab-pane name="connection" :tab="$gettext('Connection')">
         <n-flex vertical>
           <n-alert type="info">

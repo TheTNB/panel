@@ -6,9 +6,11 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import apache from '@/api/apps/apache'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { apachePreset, type TuneProfile } from '@/utils/tunepreset'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('mpm')
 
 // MPM 事件模型
@@ -92,7 +94,7 @@ const handleSave = () => {
 
 <template>
   <n-flex vertical>
-    <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+    <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
       <n-tab-pane name="mpm" :tab="$gettext('MPM Event')">
         <n-flex vertical>
           <n-alert type="info">

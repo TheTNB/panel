@@ -10,6 +10,7 @@ import supervisor from '@/api/apps/supervisor'
 import file from '@/api/panel/file'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const { $gettext } = useGettext()
 const { confirmDelete, confirmAction } = useConfirm()
@@ -225,6 +226,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleSaveConfig = () => {
   saveConfigLoading.value = true
@@ -377,14 +379,7 @@ onUnmounted(() => {
             :columns="processColumns"
             :data="data"
             :row-key="(row: any) => row.name"
-            :pagination="{
-              page: page,
-              pageSize: pageSize,
-              itemCount: total,
-              showQuickJumper: true,
-              showSizePicker: true,
-              pageSizes: [20, 50, 100, 200],
-            }"
+            :pagination="pagination"
           />
         </n-flex>
       </n-tab-pane>
@@ -430,16 +425,7 @@ onUnmounted(() => {
       </n-tab-pane>
     </n-tabs>
   </PageContainer>
-  <n-modal
-    v-model:show="createProcessModal"
-    preset="card"
-    :title="$gettext('Add Process')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="createProcessModal = false"
-  >
+  <app-modal v-model:show="createProcessModal" :title="$gettext('Add Process')">
     <n-form :model="createProcessModel">
       <n-form-item path="name" :label="$gettext('Name')">
         <n-input
@@ -486,7 +472,7 @@ onUnmounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <realtime-log-modal
     ref="processLogModalRef"
     v-model:show="processLogModal"
@@ -494,15 +480,7 @@ onUnmounted(() => {
     clearable
     @clear="handleClearProcessLog"
   />
-  <n-modal
-    v-model:show="editProcessModal"
-    preset="card"
-    :title="$gettext('Process Configuration')"
-    style="width: 80vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="editProcessModal" size="lg" :title="$gettext('Process Configuration')">
     <n-tabs v-model:value="editProcessTab" type="line" animated>
       <n-tab-pane name="setting" :tab="$gettext('Parameter Settings')">
         <n-flex vertical>
@@ -599,5 +577,5 @@ onUnmounted(() => {
         </n-flex>
       </n-tab-pane>
     </n-tabs>
-  </n-modal>
+  </app-modal>
 </template>

@@ -2,10 +2,13 @@
 import { useThemeVars } from 'naive-ui'
 import { useGettext } from 'vue3-gettext'
 
+import { useThemeStore } from '@/stores'
+
 import { useWindowStack } from './composables/useWindowStack'
 
 const { $gettext } = useGettext()
 const themeVars = useThemeVars()
+const themeStore = useThemeStore()
 
 const props = withDefaults(
   defineProps<{
@@ -34,6 +37,8 @@ const { zIndex, dock } = useWindowStack(computed(() => show.value && !minimized.
 
 // 窗口状态
 const isMaximized = ref(false)
+// 最大化或手机全屏时位置尺寸固定，不能拖拽和缩放
+const locked = computed(() => isMaximized.value || themeStore.isMobile)
 
 // 窗口位置和大小
 const position = ref({ x: 0, y: 0 })
@@ -53,10 +58,14 @@ const resizeStart = ref({ x: 0, y: 0, width: 0, height: 0, posX: 0, posY: 0 })
 
 // 窗口样式
 const windowStyle = computed(() => ({
-  left: position.value.x + 'px',
-  top: position.value.y + 'px',
-  width: size.value.width + 'px',
-  height: size.value.height + 'px',
+  ...(themeStore.isMobile
+    ? { left: '0', top: '0', width: '100%', height: '100%' }
+    : {
+        left: position.value.x + 'px',
+        top: position.value.y + 'px',
+        width: size.value.width + 'px',
+        height: size.value.height + 'px',
+      }),
   zIndex: zIndex.value,
   background: themeVars.value.cardColor,
   '--border-color': themeVars.value.borderColor,
@@ -68,17 +77,20 @@ const windowStyle = computed(() => ({
   '--border-radius': themeVars.value.borderRadius,
 }))
 
-// 初始化窗口位置（居中）
+// 按默认尺寸居中，视口放不下时先缩到视口大小，保证坐标不为负、标题栏按钮可见
 function initPosition() {
+  const width = Math.min(props.defaultWidth, window.innerWidth)
+  const height = Math.min(props.defaultHeight, window.innerHeight)
+  size.value = { width, height }
   position.value = {
-    x: (window.innerWidth - size.value.width) / 2,
-    y: (window.innerHeight - size.value.height) / 2,
+    x: (window.innerWidth - width) / 2,
+    y: (window.innerHeight - height) / 2,
   }
 }
 
 // 开始拖拽
 function startDrag(e: MouseEvent) {
-  if (isMaximized.value) return
+  if (locked.value) return
   isDragging.value = true
   dragStart.value = {
     x: e.clientX - position.value.x,
@@ -104,7 +116,7 @@ function stopDrag() {
 
 // 开始调整大小
 function startResize(e: MouseEvent, direction: string) {
-  if (isMaximized.value) return
+  if (locked.value) return
   e.preventDefault()
   e.stopPropagation()
   isResizing.value = true
@@ -225,8 +237,9 @@ async function close() {
   show.value = false
 }
 
-// 双击标题栏最大化/还原
+// 双击标题栏最大化/还原，手机固定全屏不响应
 function onTitleDoubleClick() {
+  if (themeStore.isMobile) return
   toggleMaximize()
 }
 
@@ -235,15 +248,34 @@ watch(show, (newShow) => {
   if (newShow) {
     minimized.value = false
     isMaximized.value = false
-    size.value = { width: props.defaultWidth, height: props.defaultHeight }
     initPosition()
   }
 })
 
-// 监听窗口大小变化
+// 手机全屏期间不维护尺寸，回到桌面时最大化的铺满视口，其余按默认尺寸重新居中
+// 调用方的默认尺寸可能也随视口计算，且它的 resize 监听在判定 isMobile 的监听之后才跑，
+// 放到动画帧里取，此时本帧所有 resize 监听和由此触发的重渲染都已完成
+watch(
+  () => themeStore.isMobile,
+  (mobile) => {
+    if (mobile) return
+    requestAnimationFrame(() => (isMaximized.value ? handleWindowResize() : initPosition()))
+  },
+)
+
+// 浏览器缩放或旋转屏幕后把窗口收回视口内
 function handleWindowResize() {
+  if (themeStore.isMobile) return
   if (isMaximized.value) {
     size.value = { width: window.innerWidth, height: window.innerHeight }
+    return
+  }
+  const width = Math.min(size.value.width, window.innerWidth)
+  const height = Math.min(size.value.height, window.innerHeight)
+  size.value = { width, height }
+  position.value = {
+    x: Math.min(position.value.x, window.innerWidth - width),
+    y: Math.min(position.value.y, window.innerHeight - height),
   }
 }
 
@@ -277,7 +309,7 @@ onBeforeUnmount(() => {
         v-show="!minimized"
         ref="windowRef"
         class="draggable-window"
-        :class="{ maximized: isMaximized, dragging: isDragging, resizing: isResizing }"
+        :class="{ maximized: locked, dragging: isDragging, resizing: isResizing }"
         :style="windowStyle"
       >
         <!-- 标题栏 -->
@@ -292,6 +324,7 @@ onBeforeUnmount(() => {
               <i-mdi-window-minimize />
             </button>
             <button
+              v-if="!themeStore.isMobile"
               class="control-btn maximize"
               @click.stop="toggleMaximize"
               :title="isMaximized ? $gettext('Restore') : $gettext('Maximize')"
@@ -311,7 +344,7 @@ onBeforeUnmount(() => {
         </div>
 
         <!-- 调整大小的边框 -->
-        <template v-if="!isMaximized">
+        <template v-if="!locked">
           <div class="resize-handle n" @mousedown="startResize($event, 'n')" />
           <div class="resize-handle s" @mousedown="startResize($event, 's')" />
           <div class="resize-handle e" @mousedown="startResize($event, 'e')" />
@@ -392,6 +425,10 @@ onBeforeUnmount(() => {
 }
 
 .draggable-window-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 500;
   font-size: 14px;
   color: var(--text-color-1);
@@ -399,6 +436,7 @@ onBeforeUnmount(() => {
 
 .draggable-window-controls {
   display: flex;
+  flex-shrink: 0;
   gap: 4px;
 }
 
@@ -500,6 +538,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
   padding: 8px 16px;
   border-radius: var(--border-radius);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
@@ -511,7 +550,16 @@ onBeforeUnmount(() => {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   }
 
+  // 图标可能来自调用方插槽，带的是调用方的 scoped 标记
+  :deep(svg) {
+    flex-shrink: 0;
+  }
+
   span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 13px;
   }
 }

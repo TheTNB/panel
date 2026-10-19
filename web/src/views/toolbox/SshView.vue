@@ -7,9 +7,11 @@ import { useGettext } from 'vue3-gettext'
 
 import toolboxSSH from '@/api/panel/toolbox-ssh'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { generateRandomString } from '@/utils'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 const currentTab = ref('auth')
 
@@ -181,7 +183,12 @@ onMounted(() => {
     <n-flex vertical :size="16">
       <service-status v-if="service != ''" :service="service" />
 
-      <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+      <n-tabs
+        v-model:value="currentTab"
+        type="line"
+        :placement="isMobile ? 'top' : 'left'"
+        animated
+      >
         <!-- 基础设置 -->
         <n-tab-pane name="auth" :tab="$gettext('Service & Auth')">
           <n-flex vertical :size="0">
@@ -273,7 +280,7 @@ onMounted(() => {
                 :value="rootLogin"
                 :options="rootLoginOptions"
                 :loading="rootLoginLoading"
-                class="!w-87"
+                class="md:!w-87"
                 @update:value="handleUpdateRootLogin"
               />
             </div>
@@ -294,7 +301,7 @@ onMounted(() => {
                   type="password"
                   show-password-on="click"
                   :placeholder="$gettext('Enter new password')"
-                  class="!w-75"
+                  class="md:!w-75"
                 />
                 <n-button
                   quaternary
@@ -352,13 +359,7 @@ onMounted(() => {
     </n-flex>
   </n-spin>
 
-  <n-modal
-    v-model:show="showKeyModal"
-    preset="card"
-    :title="$gettext('Root Private Key')"
-    style="width: 60vw"
-    :bordered="false"
-  >
+  <app-modal v-model:show="showKeyModal" :title="$gettext('Root Private Key')">
     <n-flex vertical :size="16">
       <n-alert type="warning">
         {{
@@ -383,12 +384,13 @@ onMounted(() => {
         </n-button>
       </n-flex>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss">
 .setting-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -400,9 +402,14 @@ onMounted(() => {
   }
 }
 
+// 说明区要有基准宽度，窄屏时右侧控件才会换到下一行
 .setting-row__info {
-  flex: 1;
+  flex: 1 1 160px;
   min-width: 0;
+}
+
+.setting-row--vertical .setting-row__info {
+  flex: none;
 }
 
 .setting-row__title {

@@ -146,16 +146,7 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Passkeys')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Passkeys')">
     <n-flex vertical>
       <n-alert v-if="!passkeySupported" type="info" :bordered="false">
         {{
@@ -169,7 +160,7 @@ watch(
           <n-input
             v-model:value="passkeyName"
             :placeholder="$gettext('Passkey name')"
-            :style="{ maxWidth: '300px' }"
+            class="md:max-w-75"
             @keydown.enter="handleRegister"
           />
           <n-button
@@ -191,7 +182,7 @@ watch(
         :row-key="(row: any) => row.id"
       />
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

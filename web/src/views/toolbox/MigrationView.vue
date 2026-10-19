@@ -15,8 +15,12 @@ import migration, {
   type MigrationResult,
 } from '@/api/panel/toolbox-migration'
 import ws from '@/api/ws'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 const step = ref(0)
 const loading = ref(false)
@@ -31,6 +35,10 @@ const connection = ref<MigrationConnection>({
 const source = ref<Record<string, any> | null>(null)
 const resources = ref<MigrationResource[]>([])
 const selected = ref<string[]>([])
+const page = ref(1)
+const pageSize = ref(20)
+const pagination = useTablePagination(page, pageSize, () => resources.value.length)
+const formLayout = useFormLayout(120)
 const targetPaths = ref<Record<string, string>>({})
 const targetUsers = ref<Record<string, string>>({})
 const skipBlocked = ref(false)
@@ -499,7 +507,7 @@ watch(
 
 <template>
   <n-flex vertical :size="16">
-    <n-steps :current="step + 1" size="small">
+    <n-steps :current="step + 1" size="small" :vertical="isMobile">
       <n-step :title="$gettext('Connect')" />
       <n-step :title="$gettext('Select resources')" />
       <n-step :title="$gettext('Migrating')" />
@@ -509,7 +517,14 @@ watch(
     <n-card v-if="step === 0" :title="$gettext('Migration source')">
       <n-flex vertical :size="16">
         <n-flex vertical :size="8">
-          <n-radio-group v-model:value="connection.source_panel" size="large">
+          <n-select
+            v-if="isMobile"
+            v-model:value="connection.source_panel"
+            :options="panels"
+            label-field="title"
+            size="large"
+          />
+          <n-radio-group v-else v-model:value="connection.source_panel" size="large">
             <n-radio-button v-for="panel in panels" :key="panel.value" :value="panel.value">
               {{ panel.title }}
             </n-radio-button>
@@ -517,7 +532,7 @@ watch(
           <n-text depth="3">{{ currentDescription }}</n-text>
         </n-flex>
 
-        <n-form label-placement="left" :label-width="120">
+        <n-form v-bind="formLayout">
           <n-form-item
             :label="isPush ? $gettext('Target address') : $gettext('Source address')"
             required
@@ -584,10 +599,12 @@ watch(
       <n-flex vertical :size="16">
         <n-data-table
           v-model:checked-row-keys="selected"
+          v-model:page="page"
+          v-model:pageSize="pageSize"
           :columns="columns"
           :data="resources"
           :row-key="(row: MigrationResource) => row.key"
-          :pagination="{ pageSize: 20 }"
+          :pagination="pagination"
           size="small"
           striped
         />

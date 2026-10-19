@@ -92,14 +92,21 @@ const removeItem = (key: string) => {
 
 <template>
   <n-flex vertical :size="8" w-full>
-    <n-flex v-for="(value, key) in modelValue" :key="String(key)" :size="8" align="center">
+    <!-- 手机上键独占一行，值和删除按钮一行，组间多留间距以免分不清归属 -->
+    <n-flex
+      v-for="(value, key) in modelValue"
+      :key="String(key)"
+      :size="8"
+      align="center"
+      class="pb-2 md:pb-0"
+    >
       <n-input
         :default-value="String(key)"
         :placeholder="keyPlaceholder"
-        flex-1
+        class="flex-[1_1_100%] md:flex-1"
         @blur="(e: FocusEvent) => updateKey(String(key), (e.target as HTMLInputElement).value)"
       />
-      <span flex-shrink-0>{{ separator }}</span>
+      <span class="shrink-0 hidden md:inline">{{ separator }}</span>
       <n-input
         :default-value="String(value)"
         :type="valueType"

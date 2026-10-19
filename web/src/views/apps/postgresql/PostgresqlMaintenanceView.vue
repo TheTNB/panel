@@ -271,7 +271,7 @@ const handleDropSlot = (name: string) => {
           <n-select
             v-model:value="selectedDatabase"
             :options="databaseOptions"
-            class="w-60"
+            class="md:!w-60"
             @update:value="refreshBloat"
           />
           <n-button type="primary" @click="refreshBloat">
@@ -325,12 +325,12 @@ const handleDropSlot = (name: string) => {
           <n-flex>
             <n-statistic :label="$gettext('WAL Size')" :value="wal.wal_size" />
             <n-statistic
-              class="ml-40"
+              class="ml-4 md:ml-40"
               :label="$gettext('Archived Count')"
               :value="wal.archiver.archived_count"
             />
             <n-statistic
-              class="ml-40"
+              class="ml-4 md:ml-40"
               :label="$gettext('Archive Failed Count')"
               :value="wal.archiver.failed_count"
             />

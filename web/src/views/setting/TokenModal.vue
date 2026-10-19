@@ -6,6 +6,7 @@ import { useGettext } from 'vue3-gettext'
 import user from '@/api/panel/user'
 import ListInput from '@/components/common/ListInput.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -111,6 +112,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = (id: number) => {
   useRequest(() => user.tokenDelete(id)).onSuccess(() => {
@@ -207,16 +209,7 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Access Tokens')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Access Tokens')">
     <n-flex vertical>
       <n-flex>
         <n-button type="primary" @click="createModal = true">
@@ -233,27 +226,11 @@ watch(
         :columns="columns"
         :data="data"
         :row-key="(row: any) => row.name"
-        :pagination="{
-          page: page,
-          pageSize: pageSize,
-          itemCount: total,
-          showQuickJumper: true,
-          showSizePicker: true,
-          pageSizes: [20, 50, 100, 200],
-        }"
+        :pagination="pagination"
       />
     </n-flex>
-  </n-modal>
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Create Access Token')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="createModal = false"
-  >
+  </app-modal>
+  <app-modal v-model:show="createModal" :title="$gettext('Create Access Token')">
     <n-flex vertical>
       <n-form>
         <n-form-item :label="$gettext('IP White List')">
@@ -281,17 +258,8 @@ watch(
         {{ $gettext('Create') }}
       </n-button>
     </n-flex>
-  </n-modal>
-  <n-modal
-    v-model:show="updateModal"
-    preset="card"
-    :title="$gettext('Modify Access Token')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="updateModal = false"
-  >
+  </app-modal>
+  <app-modal v-model:show="updateModal" :title="$gettext('Modify Access Token')">
     <n-flex vertical>
       <n-form>
         <n-form-item :label="$gettext('IP White List')">
@@ -319,7 +287,7 @@ watch(
         {{ $gettext('Update') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

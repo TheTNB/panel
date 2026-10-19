@@ -69,15 +69,7 @@ watch(show, (val) => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Compress')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Compress')">
     <n-flex vertical>
       <n-form>
         <n-form-item>
@@ -112,7 +104,7 @@ watch(show, (val) => {
         {{ $gettext('Compress') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss">

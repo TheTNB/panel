@@ -17,6 +17,7 @@ import {
   darkThemeOverrides,
   lightSemantic,
   lightThemeOverrides,
+  mobileThemeOverrides,
   type SemanticPalette,
 } from '@/design'
 
@@ -38,7 +39,8 @@ export const useThemeStore = defineStore('theme', {
       return this.darkMode ? darkTheme : lightTheme
     },
     naiveThemeOverrides(): GlobalThemeOverrides {
-      return this.darkMode ? darkThemeOverrides : lightThemeOverrides
+      const base = this.darkMode ? darkThemeOverrides : lightThemeOverrides
+      return this.isMobile ? { ...base, ...mobileThemeOverrides } : base
     },
     semanticColors(state): SemanticPalette {
       return state.darkMode ? darkSemantic : lightSemantic

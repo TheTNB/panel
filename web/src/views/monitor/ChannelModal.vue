@@ -2,8 +2,10 @@
 import { useGettext } from 'vue3-gettext'
 
 import notify from '@/api/panel/notify'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(120)
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps<{
@@ -78,15 +80,12 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
+    size="sm"
     v-model:show="show"
     :title="isEdit ? $gettext('Edit Channel') : $gettext('Add Channel')"
-    preset="card"
-    :style="{ width: '640px' }"
-    :bordered="false"
-    :segmented="false"
   >
-    <n-form label-placement="left" :label-width="120">
+    <n-form v-bind="formLayout">
       <n-form-item :label="$gettext('Name')" required>
         <n-input v-model:value="model.name" :placeholder="$gettext('Channel name')" />
       </n-form-item>
@@ -97,7 +96,7 @@ const handleSubmit = () => {
         <n-input v-model:value="model.config.host" placeholder="smtp.example.com" />
       </n-form-item>
       <n-form-item :label="$gettext('Encryption')" required>
-        <n-flex :size="8" :wrap="false" class="w-full">
+        <n-flex :size="8" class="w-full">
           <n-select
             v-model:value="model.config.encryption"
             :options="encryptions"
@@ -108,7 +107,7 @@ const handleSubmit = () => {
             v-model:value="model.config.port"
             :min="1"
             :max="65535"
-            class="w-40"
+            class="md:!w-40"
             :show-button="false"
           />
         </n-flex>
@@ -151,5 +150,5 @@ const handleSubmit = () => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 </template>

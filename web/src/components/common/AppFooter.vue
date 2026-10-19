@@ -19,7 +19,7 @@ const year = new Date().getFullYear()
       </a>
       {{ $gettext('All Rights Reserved.') }}
     </p>
-    <p class="flex gap-1 items-center">
+    <p class="flex flex-wrap gap-1 items-center justify-center">
       <a
         class="hover:text-brand-hover hover:underline"
         rel="noreferrer"

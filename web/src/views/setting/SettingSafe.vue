@@ -4,8 +4,10 @@ import { useGettext } from 'vue3-gettext'
 
 import cert from '@/api/panel/cert'
 import ListInput from '@/components/common/ListInput.vue'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 const model = defineModel<any>('model', { type: Object, required: true })
 
@@ -16,6 +18,13 @@ const httpsMode = computed({
     model.value.tls = v
   },
 })
+// 四个选项的按钮组在手机上放不下，手机改用下拉
+const httpsModeOptions = computed(() => [
+  { label: $gettext('Disabled'), value: 'off' },
+  { label: $gettext('ACME (Auto)'), value: 'acme' },
+  { label: $gettext('Self-Signed'), value: 'self-signed' },
+  { label: $gettext('Custom Certificate'), value: 'custom' },
+])
 
 // 证书管理中已签发的证书
 const certs = ref<any[]>([])
@@ -261,14 +270,10 @@ const selectedCert = computed({
             }}
           </n-tooltip>
         </template>
-        <n-radio-group v-model:value="httpsMode">
+        <n-select v-if="isMobile" v-model:value="httpsMode" :options="httpsModeOptions" />
+        <n-radio-group v-else v-model:value="httpsMode">
           <n-radio-button
-            v-for="option in [
-              { label: $gettext('Disabled'), value: 'off' },
-              { label: $gettext('ACME (Auto)'), value: 'acme' },
-              { label: $gettext('Self-Signed'), value: 'self-signed' },
-              { label: $gettext('Custom Certificate'), value: 'custom' },
-            ]"
+            v-for="option in httpsModeOptions"
             :key="option.value"
             :value="option.value"
             :label="option.label"

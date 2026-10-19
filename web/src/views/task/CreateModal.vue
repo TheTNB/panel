@@ -317,14 +317,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
     :title="mode === 'create' ? $gettext('Create Scheduled Task') : $gettext('Edit Scheduled Task')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-form>
       <n-form-item v-if="mode === 'create'" :label="$gettext('Task Type')">
@@ -343,8 +338,9 @@ onMounted(() => {
         <n-input v-model:value="formModel.name" :placeholder="$gettext('Task Name')" />
       </n-form-item>
       <n-grid
-        :cols="formModel.type === 'backup' || formModel.type === 'cutoff' ? 2 : 1"
+        :cols="formModel.type === 'backup' || formModel.type === 'cutoff' ? '1 m:2' : 1"
         :x-gap="16"
+        responsive="screen"
       >
         <n-gi>
           <n-form-item :label="$gettext('Task Schedule')">
@@ -422,7 +418,7 @@ onMounted(() => {
             :autosize="{ minRows: 3, maxRows: 10 }"
           />
         </n-form-item>
-        <n-grid :cols="3" :x-gap="16">
+        <n-grid cols="1 m:3" :x-gap="16" responsive="screen">
           <n-gi>
             <n-form-item :label="$gettext('Timeout (seconds)')">
               <n-input-number v-model:value="formModel.timeout" :min="0" w-full />
@@ -548,7 +544,7 @@ onMounted(() => {
     <n-button type="info" :loading="loading" :disabled="loading" @click="handleSubmit" mt-10 block>
       {{ mode === 'create' ? $gettext('Submit') : $gettext('Save') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <!-- 目录选择器 -->
   <path-selector v-model:show="showPathSelector" v-model:path="pathSelectorPath" :dir="true" />
 </template>

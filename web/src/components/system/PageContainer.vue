@@ -31,6 +31,13 @@ const slots = defineSlots<{
 }>()
 
 const hasHeader = computed(() => !!(props.title || slots.header || slots.actions))
+
+// 手机屏幕小，带页脚的页面让内容区至少撑满一屏，页脚滚动后才出现
+// 用 flex-basis 而不是 min-height：显式 min-height 会取消 flex 子项按内容算的最小高度，内容会溢出卡片
+const bodyClass = computed(() => {
+  if (props.flex) return 'flex-1 min-h-0'
+  return props.showFooter || slots.footer ? 'flex-1 lt-md:basis-full lt-md:shrink-0' : 'flex-1'
+})
 </script>
 
 <template>
@@ -48,16 +55,13 @@ const hasHeader = computed(() => !!(props.title || slots.header || slots.actions
         </n-card>
       </header>
 
-      <div
-        v-if="bare"
-        :class="flex ? 'flex flex-col flex-1 min-h-0 gap-1' : 'flex flex-col flex-1 gap-1'"
-      >
+      <div v-if="bare" class="flex flex-col gap-1" :class="bodyClass">
         <LoadingSkeleton v-if="loading" type="card" />
         <slot v-else />
       </div>
       <n-card
         v-else
-        :class="flex ? 'flex-1 min-h-0' : 'flex-1'"
+        :class="bodyClass"
         :content-class="flex ? 'flex flex-col min-h-0 h-full' : undefined"
       >
         <LoadingSkeleton v-if="loading" type="card" />
@@ -65,7 +69,8 @@ const hasHeader = computed(() => !!(props.title || slots.header || slots.actions
       </n-card>
 
       <slot v-if="slots.footer" name="footer" />
-      <AppFooter v-else-if="showFooter" class="mt-auto pt-5" />
+      <!-- flex 页面内容区固定占满视口、没有页面滚动，手机上页脚无处可滚到，直接隐藏 -->
+      <AppFooter v-else-if="showFooter" class="mt-auto pt-5" :class="{ 'lt-md:hidden': flex }" />
     </section>
   </transition>
 </template>

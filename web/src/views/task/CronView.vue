@@ -7,6 +7,7 @@ import file from '@/api/panel/file'
 import CronPreview from '@/components/common/CronPreview.vue'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { decodeBase64, formatDateTime } from '@/utils'
 import CreateModal from '@/views/task/CreateModal.vue'
 
@@ -182,6 +183,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleStatusChange = (row: any) => {
   useRequest(cron.status(row.id, !row.status)).onSuccess(() => {
@@ -288,14 +290,7 @@ onUnmounted(() => {
     :columns="columns"
     :data="data"
     :row-key="(row: any) => row.id"
-    :pagination="{
-      page: page,
-      pageSize: pageSize,
-      itemCount: total,
-      showQuickJumper: true,
-      showSizePicker: true,
-      pageSizes: [20, 50, 100, 200],
-    }"
+    :pagination="pagination"
   />
   <realtime-log-modal
     ref="logModalRef"
@@ -305,15 +300,7 @@ onUnmounted(() => {
     @clear="handleClearLog"
   />
   <!-- Shell 脚本编辑模态框 -->
-  <n-modal
-    v-model:show="shellEditModal"
-    preset="card"
-    :title="$gettext('Edit Task')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="shellEditModal" :title="$gettext('Edit Task')">
     <n-form>
       <n-form-item :label="$gettext('Task Name')">
         <n-input v-model:value="shellEditTask.name" :placeholder="$gettext('Task Name')" />
@@ -343,7 +330,7 @@ onUnmounted(() => {
     >
       {{ $gettext('Save') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <create-modal v-model:show="visualEditModal" mode="edit" :edit-data="visualEditData" />
   <pty-terminal-modal
     v-model:show="runModal"

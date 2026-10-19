@@ -5,9 +5,11 @@ import { NButton, NFlex, NPopconfirm, NTag } from 'naive-ui'
 import { useGettext } from 'vue3-gettext'
 
 import file from '@/api/panel/file'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout('auto', true)
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const path = defineModel<string>('path', { type: String, required: true })
@@ -77,20 +79,20 @@ const columns = computed<DataTableColumns<any>>(() => [
   {
     title: $gettext('Link'),
     key: 'token',
-    minWidth: 300,
+    minWidth: 220,
     render: (row) => h('span', { class: 'break-all' }, shareUrl(row.token)),
   },
   {
     title: $gettext('Downloads'),
     key: 'downloads',
-    width: 120,
+    width: 100,
     render: (row) =>
       row.max_downloads > 0 ? `${row.downloads} / ${row.max_downloads}` : `${row.downloads}`,
   },
   {
     title: $gettext('Expire Time'),
     key: 'expired_at',
-    width: 200,
+    width: 180,
     render: (row) =>
       h(
         NTag,
@@ -137,26 +139,18 @@ watch(
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Share - %{ path }', { path })"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Share - %{ path }', { path })">
     <n-flex vertical :size="16">
-      <n-form inline label-placement="left">
+      <n-form v-bind="formLayout" class="flex-wrap">
         <n-form-item :label="$gettext('Validity Period')">
           <n-select
             v-model:value="createModel.expireHours"
             :options="expireOptions"
-            class="w-160px"
+            class="md:!w-40"
           />
         </n-form-item>
         <n-form-item :label="$gettext('Download Limit')">
-          <n-input-number v-model:value="createModel.maxDownloads" :min="0" class="w-160px">
+          <n-input-number v-model:value="createModel.maxDownloads" :min="0" class="w-full md:!w-40">
             <template #suffix>
               <span v-if="createModel.maxDownloads === 0" class="text-gray-400">
                 {{ $gettext('Unlimited') }}
@@ -164,7 +158,7 @@ watch(
             </template>
           </n-input-number>
         </n-form-item>
-        <n-form-item>
+        <n-form-item :show-label="false">
           <n-button type="primary" @click="handleCreate">
             {{ $gettext('Create Share Link') }}
           </n-button>
@@ -178,7 +172,7 @@ watch(
         :bordered="false"
       />
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

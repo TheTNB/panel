@@ -18,6 +18,8 @@ import tamper from '@/api/panel/tamper'
 import { hasOpenWindow } from '@/components/common/composables/useWindowStack'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
 import TheIcon from '@/components/custom/TheIcon.vue'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { useFileStore, useTaskQueueStore } from '@/stores'
 import {
   checkName,
@@ -42,6 +44,7 @@ const fileStore = useFileStore()
 const taskQueue = useTaskQueueStore()
 const { handlePaste: doPaste } = usePaste()
 const { deletePaths, movePath, markClipboard } = useFileOps()
+const { isMobile } = useResponsive()
 
 const props = defineProps<{
   tabId: string
@@ -996,11 +999,7 @@ const onCloseDropdown = () => {
   showDropdown.value = false
 }
 
-// 操作列点击处理
-const handleRenameClick = (item: any) => {
-  openRename(item)
-}
-
+// 行内删除按钮已经过气泡确认，直接执行
 const handleDeleteClick = (item: any) => {
   doDelete([item])
 }
@@ -1044,14 +1043,50 @@ const getMoreOptions = (item: any): SelectOption[] => {
   return options
 }
 
-// 处理更多操作选择
 // 下载文件
 const handleDownload = (item: any) => {
   window.open('/api/file/download?path=' + encodeURIComponent(item.full))
 }
 
-const handleMoreSelect = (key: string, item: any) => {
+// 手机操作列折叠成下拉：行内按钮在前，「更多」里的选项接在分隔线后，去掉与行内重复的项
+const getRowMenuOptions = (item: any): DropdownOption[] => {
+  const primary: DropdownOption[] = [
+    {
+      label: item.dir
+        ? $gettext('Open')
+        : isImage(item.name)
+          ? $gettext('Preview')
+          : $gettext('Edit'),
+      key: 'open',
+    },
+    item.dir
+      ? { label: $gettext('Compress'), key: 'compress' }
+      : { label: $gettext('Download'), key: 'download' },
+    { label: $gettext('Rename'), key: 'rename' },
+    { label: () => h('span', { style: { color: 'red' } }, $gettext('Delete')), key: 'delete' },
+  ]
+  const keys = new Set(primary.map((o) => o.key))
+  const more = getMoreOptions(item)
+    .filter((o) => !keys.has(o.value as string))
+    .map((o) => ({ label: o.label as string, key: o.value as string }))
+  return [...primary, { type: 'divider', key: 'divider' }, ...more]
+}
+
+// 行操作统一分发：桌面行内按钮、「更多」菜单与手机下拉共用
+const handleRowAction = (key: string, item: any) => {
   switch (key) {
+    case 'open':
+      openFile(item)
+      break
+    case 'download':
+      handleDownload(item)
+      break
+    case 'rename':
+      openRename(item)
+      break
+    case 'delete':
+      deleteFiles([item])
+      break
     case 'copy':
       markFiles([item], 'copy')
       break
@@ -1310,6 +1345,7 @@ const {
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total, [100, 200, 500, 1000])
 
 const data = computed(() => {
   if (fileStore.showHidden) {
@@ -1415,6 +1451,7 @@ onUnmounted(() => {
         :class="{
           'grid-mode': fileStore.viewType === 'grid',
           'list-mode': fileStore.viewType === 'list',
+          'is-mobile': isMobile,
         }"
         @mousedown="onSelectionStart"
         @contextmenu="handleEmptyContextMenu"
@@ -1635,37 +1672,64 @@ onUnmounted(() => {
               <n-tag type="warning" size="small" :bordered="false">{{ item.modify }}</n-tag>
             </div>
             <div class="list-col col-actions">
-              <n-flex :size="4">
+              <n-dropdown
+                v-if="isMobile"
+                trigger="click"
+                :options="getRowMenuOptions(item)"
+                @select="(key: string) => handleRowAction(key, item)"
+              >
+                <n-button size="small" quaternary circle @click.stop>
+                  <template #icon>
+                    <the-icon icon="mdi:dots-vertical" :size="18" />
+                  </template>
+                </n-button>
+              </n-dropdown>
+              <n-flex v-else :size="4">
                 <!-- 文件夹操作 -->
                 <template v-if="item.dir">
-                  <n-button size="tiny" type="success" tertiary @click.stop="openFile(item)">
+                  <n-button
+                    size="tiny"
+                    type="success"
+                    tertiary
+                    @click.stop="handleRowAction('open', item)"
+                  >
                     {{ $gettext('Open') }}
                   </n-button>
                   <n-button
                     size="tiny"
                     type="primary"
                     tertiary
-                    @click.stop="
-                      () => {
-                        selected = [item.full]
-                        compress = true
-                      }
-                    "
+                    @click.stop="handleRowAction('compress', item)"
                   >
                     {{ $gettext('Compress') }}
                   </n-button>
                 </template>
                 <!-- 文件操作 -->
                 <template v-else>
-                  <n-button size="tiny" type="primary" tertiary @click.stop="openFile(item)">
+                  <n-button
+                    size="tiny"
+                    type="primary"
+                    tertiary
+                    @click.stop="handleRowAction('open', item)"
+                  >
                     {{ isImage(item.name) ? $gettext('Preview') : $gettext('Edit') }}
                   </n-button>
-                  <n-button size="tiny" type="info" tertiary @click.stop="handleDownload(item)">
+                  <n-button
+                    size="tiny"
+                    type="info"
+                    tertiary
+                    @click.stop="handleRowAction('download', item)"
+                  >
                     {{ $gettext('Download') }}
                   </n-button>
                 </template>
                 <!-- 通用操作 -->
-                <n-button size="tiny" type="warning" tertiary @click.stop="handleRenameClick(item)">
+                <n-button
+                  size="tiny"
+                  type="warning"
+                  tertiary
+                  @click.stop="handleRowAction('rename', item)"
+                >
                   {{ $gettext('Rename') }}
                 </n-button>
                 <ConfirmDialog
@@ -1684,7 +1748,7 @@ onUnmounted(() => {
                 <n-popselect
                   :options="getMoreOptions(item)"
                   trigger="click"
-                  @update:value="(key: string) => handleMoreSelect(key, item)"
+                  @update:value="(key: string) => handleRowAction(key, item)"
                 >
                   <n-button size="tiny" tertiary @click.stop>
                     {{ $gettext('More') }}
@@ -1720,14 +1784,7 @@ onUnmounted(() => {
           }}</span>
         </template>
       </div>
-      <n-pagination
-        v-model:page="page"
-        v-model:page-size="pageSize"
-        :item-count="total"
-        show-quick-jumper
-        show-size-picker
-        :page-sizes="[100, 200, 500, 1000]"
-      />
+      <n-pagination v-model:page="page" v-model:page-size="pageSize" v-bind="pagination" />
     </n-flex>
   </div>
 
@@ -1746,14 +1803,9 @@ onUnmounted(() => {
   <!-- 预览弹窗 -->
   <preview-modal v-model:show="previewModal" v-model:path="currentFile" />
   <!-- 解压弹窗 -->
-  <n-modal
+  <app-modal
     v-model:show="unCompressModal"
-    preset="card"
     :title="$gettext('Uncompress - %{ file }', { file: unCompressModel.file })"
-    class="w-60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-flex vertical>
       <n-form>
@@ -1763,7 +1815,7 @@ onUnmounted(() => {
       </n-form>
       <n-button type="primary" @click="handleUnCompress">{{ $gettext('Uncompress') }}</n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
   <!-- 属性弹窗 -->
   <property-modal v-model:show="propertyModal" v-model:file-info="propertyFileInfo" />
   <!-- 分享弹窗 -->
@@ -1916,6 +1968,26 @@ onUnmounted(() => {
   &.col-actions {
     width: 240px;
     flex-shrink: 0;
+  }
+}
+
+// 手机只留勾选、名称、操作三列，名称与操作列放开宽度，避免容器横向溢出
+// 不用 hidden 工具类：上面 scoped 的 display: flex 优先级更高
+.file-container.is-mobile .list-col {
+  &.col-size,
+  &.col-mode,
+  &.col-owner,
+  &.col-modify {
+    display: none;
+  }
+
+  &.col-name {
+    min-width: 0;
+  }
+
+  &.col-actions {
+    width: auto;
+    justify-content: flex-end;
   }
 }
 .selection-box {

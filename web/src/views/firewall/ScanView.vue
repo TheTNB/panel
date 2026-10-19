@@ -10,6 +10,7 @@ import { useGettext } from 'vue3-gettext'
 
 import firewall from '@/api/panel/firewall'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 import { codeToName } from '../website/stats/country-name-map'
@@ -65,6 +66,7 @@ const eventsTotal = ref(0)
 const eventsPage = ref(1)
 const eventsPageSize = ref(20)
 const eventsLoading = ref(false)
+const eventsPagination = useTablePagination(eventsPage, eventsPageSize, eventsTotal, [20, 50, 100])
 const searchIP = ref('')
 const searchPort = ref<number | null>(null)
 const searchLocation = ref('')
@@ -357,20 +359,21 @@ const handleClear = () => {
       <n-tab name="events" :tab="$gettext('Scan Events')" />
     </n-tabs>
     <!-- 工具栏 -->
-    <div class="flex w-full items-center justify-between">
+    <div class="flex flex-wrap gap-2 w-full items-center justify-between">
       <n-date-picker
         v-model:value="dateRange"
         type="daterange"
         clearable
         :default-time="['00:00:00', '23:59:59']"
+        class="w-full md:w-auto"
       />
-      <n-flex items-center :size="8">
+      <n-flex items-center :size="8" class="w-full md:w-auto">
         <n-input
           v-if="currentTab === 'events'"
           v-model:value="searchIP"
           :placeholder="$gettext('Search IP')"
           clearable
-          class="!w-40"
+          class="md:!w-40"
           @clear="loadEvents()"
           @keyup.enter="loadEvents()"
         />
@@ -380,7 +383,7 @@ const handleClear = () => {
           :placeholder="$gettext('Port')"
           clearable
           :show-button="false"
-          class="!w-25"
+          class="w-full md:!w-25"
           @clear="loadEvents()"
           @keyup.enter="loadEvents()"
         />
@@ -389,7 +392,7 @@ const handleClear = () => {
           v-model:value="searchLocation"
           :placeholder="$gettext('Location')"
           clearable
-          class="!w-40"
+          class="md:!w-40"
           @clear="loadEvents()"
           @keyup.enter="loadEvents()"
         />
@@ -410,7 +413,7 @@ const handleClear = () => {
     <!-- 概览 -->
     <template v-if="currentTab === 'overview'">
       <!-- 统计卡片 -->
-      <n-grid :cols="3" :x-gap="16">
+      <n-grid cols="2 m:3" responsive="screen" :x-gap="16" :y-gap="16">
         <n-gi>
           <n-card :bordered="false">
             <n-statistic :label="$gettext('Total Scans')" :value="summary.total_count">
@@ -456,7 +459,7 @@ const handleClear = () => {
       </n-card>
 
       <!-- Top IP 和 Top 端口 -->
-      <n-grid :cols="2" :x-gap="16">
+      <n-grid cols="1 m:2" responsive="screen" :x-gap="16" :y-gap="16">
         <n-gi>
           <n-card h-full :bordered="false" :title="$gettext('Top 10 Source IPs')">
             <n-data-table
@@ -502,14 +505,7 @@ const handleClear = () => {
           :columns="eventColumns"
           :data="events"
           :row-key="(row: any) => row.id"
-          :pagination="{
-            page: eventsPage,
-            pageSize: eventsPageSize,
-            itemCount: eventsTotal,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [20, 50, 100],
-          }"
+          :pagination="eventsPagination"
         />
       </n-card>
     </template>

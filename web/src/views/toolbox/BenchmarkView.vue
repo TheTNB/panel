@@ -102,8 +102,8 @@ const handleTest = async () => {
     <n-progress v-if="inTest" :percentage="progress" processing />
   </n-flex>
   <n-flex vertical pt-10 items-center>
-    <div w-200>
-      <n-grid :cols="3">
+    <div class="max-w-200 w-full">
+      <n-grid cols="1 m:3" responsive="screen" :y-gap="24">
         <n-gi>
           <n-popover trigger="hover">
             <template #trigger>

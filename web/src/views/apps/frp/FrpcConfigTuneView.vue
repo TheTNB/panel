@@ -6,10 +6,12 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import frp from '@/api/apps/frp'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import { authMethodOptions, logLevelOptions, toOptions, useBoolOptions } from './options'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('general')
 const saveLoading = ref(false)
 
@@ -70,7 +72,7 @@ const handleSave = () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="general" :tab="$gettext('General')">
       <n-flex vertical>
         <n-alert type="info">

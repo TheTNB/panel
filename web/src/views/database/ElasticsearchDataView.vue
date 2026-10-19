@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import database from '@/api/panel/database'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import ElasticsearchDocModal from '@/views/database/ElasticsearchDocModal.vue'
 
 const { confirmDelete } = useConfirm()
@@ -217,6 +218,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     immediate: false,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 // 选中索引时加载文档
 watch(selectedIndex, (val) => {
@@ -285,14 +287,14 @@ onUnmounted(() => {
 
 <template>
   <n-flex vertical>
-    <n-flex justify="space-between" align="center" :wrap="false">
-      <n-flex :wrap="false">
+    <n-flex justify="space-between" align="center">
+      <n-flex class="w-full md:w-auto">
         <n-select
           v-model:value="selectedServer"
           :options="serverOptions"
           :loading="serverLoading"
           :placeholder="$gettext('Select Server')"
-          class="w-62.5"
+          class="md:!w-62.5"
         />
         <n-button v-if="!selectedIndex" type="primary" @click="createIndexShow = true">
           {{ $gettext('Create Index') }}
@@ -301,13 +303,13 @@ onUnmounted(() => {
           {{ $gettext('Back to Indices') }}
         </n-button>
       </n-flex>
-      <n-flex v-if="selectedIndex" :wrap="false">
-        <n-input-group>
+      <n-flex v-if="selectedIndex" class="w-full md:w-auto">
+        <n-input-group class="md:!w-auto">
           <n-input
             v-model:value="searchInput"
             :placeholder="$gettext('Search query, e.g. field:value')"
             clearable
-            class="!w-75"
+            class="md:!w-75"
             @keydown.enter="handleSearch"
           />
           <n-button type="primary" @click="handleSearch">
@@ -324,6 +326,7 @@ onUnmounted(() => {
     <n-data-table
       v-if="!selectedIndex"
       striped
+      :scroll-x="800"
       :loading="indicesLoading"
       :columns="indexColumns"
       :data="indices"
@@ -343,14 +346,7 @@ onUnmounted(() => {
         :row-key="(row: any) => row.id"
         v-model:page="page"
         v-model:pageSize="pageSize"
-        :pagination="{
-          page: page,
-          pageSize: pageSize,
-          itemCount: total,
-          showQuickJumper: true,
-          showSizePicker: true,
-          pageSizes: [20, 50, 100, 200],
-        }"
+        :pagination="pagination"
       />
     </template>
   </n-flex>
@@ -366,13 +362,7 @@ onUnmounted(() => {
   />
 
   <!-- 创建索引弹窗 -->
-  <n-modal
-    v-model:show="createIndexShow"
-    preset="card"
-    :title="$gettext('Create Index')"
-    class="w-100"
-    :bordered="false"
-  >
+  <app-modal size="sm" v-model:show="createIndexShow" :title="$gettext('Create Index')">
     <n-form>
       <n-form-item :label="$gettext('Index Name')">
         <n-input
@@ -391,5 +381,5 @@ onUnmounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

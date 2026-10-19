@@ -115,7 +115,7 @@ onMounted(() => {
       </n-card>
       <n-card :title="$gettext('Modify Username')">
         <n-flex>
-          <n-input v-model:value="newUsername" class="!w-60" :placeholder="email" />
+          <n-input v-model:value="newUsername" class="md:!w-60" :placeholder="email" />
           <n-button
             type="warning"
             :loading="updateUsernameLoading"
@@ -137,7 +137,7 @@ onMounted(() => {
             v-model:value="newPassword"
             type="password"
             show-password-on="click"
-            class="!w-60"
+            class="md:!w-60"
             :placeholder="$gettext('New password')"
           />
           <n-button

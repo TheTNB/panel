@@ -8,9 +8,11 @@ import { useGettext } from 'vue3-gettext'
 
 import grafana from '@/api/apps/grafana'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
+const formLayout = useFormLayout('auto')
 
 const { data: datasources, send: refreshList } = useRequest(grafana.datasources, {
   initialData: [],
@@ -196,13 +198,12 @@ const handleDelete = (name: string) => {
       </n-button>
     </n-flex>
     <n-data-table striped :columns="columns" :data="datasources" :scroll-x="800" />
-    <n-modal
+    <app-modal
       v-model:show="showModal"
-      preset="card"
+      size="sm"
       :title="editMode ? $gettext('Edit Data Source') : $gettext('Add Data Source')"
-      class="w-150"
     >
-      <n-form :model="formModel" label-placement="left" label-width="auto">
+      <n-form :model="formModel" v-bind="formLayout">
         <n-form-item :label="$gettext('Name')">
           <n-input v-model:value="formModel.name" :placeholder="$gettext('e.g. Prometheus')" />
         </n-form-item>
@@ -247,6 +248,6 @@ const handleDelete = (name: string) => {
           </n-button>
         </n-flex>
       </template>
-    </n-modal>
+    </app-modal>
   </n-flex>
 </template>

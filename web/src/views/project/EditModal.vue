@@ -6,11 +6,15 @@ import { useGettext } from 'vue3-gettext'
 import project from '@/api/panel/project'
 import systemctl from '@/api/panel/systemctl'
 import PathSelector from '@/components/common/PathSelector.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const editId = defineModel<number>('editId', { type: Number, required: true })
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(120)
+const formLayoutWide = useFormLayout(140)
+const securityFormLayout = useFormLayout(160)
 
 const currentTab = ref('basic')
 
@@ -243,21 +247,16 @@ const handleSave = async () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
+    size="lg"
     :title="$gettext('Edit Project - %{ name }', { name: model.name })"
-    preset="card"
-    :style="{ width: '70vw', maxWidth: '1080px' }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
   >
     <n-spin :show="loading">
       <n-tabs v-model:value="currentTab" type="line" animated>
         <!-- 基本设置 -->
         <n-tab-pane name="basic" :tab="$gettext('Basic Settings')">
-          <n-form :model="model" label-placement="left" label-width="120">
+          <n-form :model="model" v-bind="formLayout">
             <n-form-item path="name" :label="$gettext('Project Name')">
               <n-input
                 v-model:value="model.name"
@@ -330,7 +329,7 @@ const handleSave = async () => {
 
         <!-- 运行设置 -->
         <n-tab-pane name="runtime" :tab="$gettext('Runtime Settings')">
-          <n-form :model="model" label-placement="left" label-width="140">
+          <n-form :model="model" v-bind="formLayoutWide">
             <n-form-item path="exec_start" :label="$gettext('Start Command')">
               <n-input
                 v-model:value="model.exec_start"
@@ -374,86 +373,84 @@ const handleSave = async () => {
 
             <n-divider title-placement="left">{{ $gettext('Restart Policy') }}</n-divider>
 
-            <n-row :gutter="[24, 0]">
-              <n-col :span="12">
-                <n-form-item path="restart" :label="$gettext('Restart Strategy')">
-                  <n-select
-                    v-model:value="model.restart"
-                    :options="restartOptions"
-                    @keydown.enter.prevent
-                  />
-                </n-form-item>
-              </n-col>
-              <n-col :span="12">
-                <n-form-item path="restart_sec" :label="$gettext('Restart Interval')">
-                  <n-input
-                    v-model:value="model.restart_sec"
-                    type="text"
-                    @keydown.enter.prevent
-                    :placeholder="$gettext('e.g., 5s, 1min')"
-                  />
-                </n-form-item>
-              </n-col>
-            </n-row>
-            <n-row :gutter="[24, 0]">
-              <n-col :span="8">
-                <n-form-item path="restart_max" :label="$gettext('Max Restarts')">
-                  <n-input-number
-                    v-model:value="model.restart_max"
-                    :min="0"
-                    :max="100"
-                    style="width: 100%"
-                  />
-                </n-form-item>
-              </n-col>
-              <n-col :span="8">
-                <n-form-item path="timeout_start_sec" :label="$gettext('Start Timeout (s)')">
-                  <n-input-number
-                    v-model:value="model.timeout_start_sec"
-                    :min="0"
-                    :max="3600"
-                    style="width: 100%"
-                  />
-                </n-form-item>
-              </n-col>
-              <n-col :span="8">
-                <n-form-item path="timeout_stop_sec" :label="$gettext('Stop Timeout (s)')">
-                  <n-input-number
-                    v-model:value="model.timeout_stop_sec"
-                    :min="0"
-                    :max="3600"
-                    style="width: 100%"
-                  />
-                </n-form-item>
-              </n-col>
-            </n-row>
+            <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+              <n-form-item-gi :span="12" path="restart" :label="$gettext('Restart Strategy')">
+                <n-select
+                  v-model:value="model.restart"
+                  :options="restartOptions"
+                  @keydown.enter.prevent
+                />
+              </n-form-item-gi>
+              <n-form-item-gi :span="12" path="restart_sec" :label="$gettext('Restart Interval')">
+                <n-input
+                  v-model:value="model.restart_sec"
+                  type="text"
+                  @keydown.enter.prevent
+                  :placeholder="$gettext('e.g., 5s, 1min')"
+                />
+              </n-form-item-gi>
+            </n-grid>
+            <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+              <n-form-item-gi :span="8" path="restart_max" :label="$gettext('Max Restarts')">
+                <n-input-number
+                  v-model:value="model.restart_max"
+                  :min="0"
+                  :max="100"
+                  style="width: 100%"
+                />
+              </n-form-item-gi>
+              <n-form-item-gi
+                :span="8"
+                path="timeout_start_sec"
+                :label="$gettext('Start Timeout (s)')"
+              >
+                <n-input-number
+                  v-model:value="model.timeout_start_sec"
+                  :min="0"
+                  :max="3600"
+                  style="width: 100%"
+                />
+              </n-form-item-gi>
+              <n-form-item-gi
+                :span="8"
+                path="timeout_stop_sec"
+                :label="$gettext('Stop Timeout (s)')"
+              >
+                <n-input-number
+                  v-model:value="model.timeout_stop_sec"
+                  :min="0"
+                  :max="3600"
+                  style="width: 100%"
+                />
+              </n-form-item-gi>
+            </n-grid>
 
             <n-divider title-placement="left">{{ $gettext('Other') }}</n-divider>
 
-            <n-row :gutter="[24, 0]">
-              <n-col :span="12">
-                <n-form-item path="standard_output" :label="$gettext('Standard Output')">
-                  <n-select
-                    v-model:value="model.standard_output"
-                    :options="outputOptions"
-                    tag
-                    filterable
-                    @keydown.enter.prevent
-                  />
-                </n-form-item>
-              </n-col>
-              <n-col :span="12">
-                <n-form-item path="standard_error" :label="$gettext('Standard Error')">
-                  <n-select
-                    v-model:value="model.standard_error"
-                    :options="outputOptions"
-                    tag
-                    filterable
-                    @keydown.enter.prevent
-                  />
-                </n-form-item>
-              </n-col>
-            </n-row>
+            <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+              <n-form-item-gi
+                :span="12"
+                path="standard_output"
+                :label="$gettext('Standard Output')"
+              >
+                <n-select
+                  v-model:value="model.standard_output"
+                  :options="outputOptions"
+                  tag
+                  filterable
+                  @keydown.enter.prevent
+                />
+              </n-form-item-gi>
+              <n-form-item-gi :span="12" path="standard_error" :label="$gettext('Standard Error')">
+                <n-select
+                  v-model:value="model.standard_error"
+                  :options="outputOptions"
+                  tag
+                  filterable
+                  @keydown.enter.prevent
+                />
+              </n-form-item-gi>
+            </n-grid>
             <n-form-item :label="$gettext('Environment Variables')">
               <n-dynamic-input
                 v-model:value="model.environments"
@@ -461,17 +458,18 @@ const handleSave = async () => {
                 show-sort-button
               >
                 <template #default="{ value }">
-                  <div flex gap-2 w-full items-center>
+                  <!-- 手机上输入框各占一行，桌面按 1:2 同行 -->
+                  <div flex flex-wrap gap-2 w-full items-center>
                     <n-input
                       v-model:value="value.key"
                       :placeholder="$gettext('Variable name')"
-                      style="flex: 1"
+                      class="md:flex-1"
                     />
-                    <span>=</span>
+                    <span class="hidden md:inline">=</span>
                     <n-input
                       v-model:value="value.value"
                       :placeholder="$gettext('Variable value')"
-                      style="flex: 2"
+                      class="md:flex-[2]"
                     />
                   </div>
                 </template>
@@ -482,7 +480,7 @@ const handleSave = async () => {
 
         <!-- 依赖设置 -->
         <n-tab-pane name="dependencies" :tab="$gettext('Dependencies')">
-          <n-form :model="model" label-placement="left" label-width="140">
+          <n-form :model="model" v-bind="formLayoutWide">
             <n-alert type="info" class="mb-4">
               {{
                 $gettext(
@@ -517,7 +515,7 @@ const handleSave = async () => {
 
         <!-- 资源限制 -->
         <n-tab-pane name="resources" :tab="$gettext('Resource Limits')">
-          <n-form :model="model" label-placement="left" label-width="140">
+          <n-form :model="model" v-bind="formLayoutWide">
             <n-alert type="info" class="mb-4">
               {{
                 $gettext(
@@ -526,45 +524,41 @@ const handleSave = async () => {
               }}
             </n-alert>
 
-            <n-row :gutter="[24, 0]">
-              <n-col :span="12">
-                <n-form-item path="memory_limit" :label="$gettext('Memory Limit (MB)')">
-                  <n-input-number
-                    v-model:value="model.memory_limit"
-                    :min="0"
-                    :max="1024000"
-                    style="width: 100%"
-                    :placeholder="$gettext('0 means no limit')"
-                  />
-                  <template #feedback>
-                    <span class="text-gray-400">
-                      {{ $gettext('Set to 0 to disable memory limit') }}
-                    </span>
-                  </template>
-                </n-form-item>
-              </n-col>
-              <n-col :span="12">
-                <n-form-item path="cpu_quota" :label="$gettext('CPU Quota')">
-                  <n-input
-                    v-model:value="model.cpu_quota"
-                    type="text"
-                    @keydown.enter.prevent
-                    :placeholder="$gettext('e.g., 50% or 200%')"
-                  />
-                  <template #feedback>
-                    <span class="text-gray-400">
-                      {{ $gettext('100% = 1 CPU core, 200% = 2 cores') }}
-                    </span>
-                  </template>
-                </n-form-item>
-              </n-col>
-            </n-row>
+            <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+              <n-form-item-gi :span="12" path="memory_limit" :label="$gettext('Memory Limit (MB)')">
+                <n-input-number
+                  v-model:value="model.memory_limit"
+                  :min="0"
+                  :max="1024000"
+                  style="width: 100%"
+                  :placeholder="$gettext('0 means no limit')"
+                />
+                <template #feedback>
+                  <span class="text-gray-400">
+                    {{ $gettext('Set to 0 to disable memory limit') }}
+                  </span>
+                </template>
+              </n-form-item-gi>
+              <n-form-item-gi :span="12" path="cpu_quota" :label="$gettext('CPU Quota')">
+                <n-input
+                  v-model:value="model.cpu_quota"
+                  type="text"
+                  @keydown.enter.prevent
+                  :placeholder="$gettext('e.g., 50% or 200%')"
+                />
+                <template #feedback>
+                  <span class="text-gray-400">
+                    {{ $gettext('100% = 1 CPU core, 200% = 2 cores') }}
+                  </span>
+                </template>
+              </n-form-item-gi>
+            </n-grid>
           </n-form>
         </n-tab-pane>
 
         <!-- 安全设置 -->
         <n-tab-pane name="security" :tab="$gettext('Security Settings')">
-          <n-form :model="model" label-placement="left" label-width="160">
+          <n-form :model="model" v-bind="securityFormLayout">
             <n-alert type="warning" class="mb-4">
               {{
                 $gettext(
@@ -575,23 +569,21 @@ const handleSave = async () => {
 
             <n-divider title-placement="left">{{ $gettext('Privilege Control') }}</n-divider>
 
-            <n-row :gutter="[24, 0]">
-              <n-col :span="8">
-                <n-form-item path="no_new_privileges" :label="$gettext('No New Privileges')">
-                  <n-switch v-model:value="model.no_new_privileges" />
-                </n-form-item>
-              </n-col>
-              <n-col :span="8">
-                <n-form-item path="protect_tmp" :label="$gettext('Protect /tmp')">
-                  <n-switch v-model:value="model.protect_tmp" />
-                </n-form-item>
-              </n-col>
-              <n-col :span="8">
-                <n-form-item path="protect_home" :label="$gettext('Protect /home')">
-                  <n-switch v-model:value="model.protect_home" />
-                </n-form-item>
-              </n-col>
-            </n-row>
+            <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+              <n-form-item-gi
+                :span="8"
+                path="no_new_privileges"
+                :label="$gettext('No New Privileges')"
+              >
+                <n-switch v-model:value="model.no_new_privileges" />
+              </n-form-item-gi>
+              <n-form-item-gi :span="8" path="protect_tmp" :label="$gettext('Protect /tmp')">
+                <n-switch v-model:value="model.protect_tmp" />
+              </n-form-item-gi>
+              <n-form-item-gi :span="8" path="protect_home" :label="$gettext('Protect /home')">
+                <n-switch v-model:value="model.protect_home" />
+              </n-form-item-gi>
+            </n-grid>
 
             <n-form-item path="protect_system" :label="$gettext('Protect System')">
               <n-select
@@ -662,7 +654,7 @@ const handleSave = async () => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 
   <!-- 目录选择器 -->
   <path-selector

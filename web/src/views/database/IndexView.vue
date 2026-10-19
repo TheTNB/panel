@@ -198,7 +198,7 @@ const handlePgAdmin = () => {
           v-model:value="keyword"
           :placeholder="$gettext('Search')"
           clearable
-          class="!w-60"
+          class="md:!w-60"
         />
       </n-flex>
       <database-list

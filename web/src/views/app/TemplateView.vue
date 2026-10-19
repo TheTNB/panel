@@ -16,6 +16,7 @@ import { useGettext } from 'vue3-gettext'
 
 import app from '@/api/panel/app'
 import template from '@/api/panel/template'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 
 import TemplateDeployModal from './TemplateDeployModal.vue'
 import type { Template } from './types'
@@ -42,6 +43,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total, [12, 24, 48, 96])
 
 // 获取所有分类
 const { data: categories } = useRequest(app.categories, {
@@ -101,7 +103,7 @@ onMounted(() => {
         v-model:value="searchQuery"
         :placeholder="$gettext('Search')"
         clearable
-        class="!w-60"
+        class="md:!w-60"
       />
     </n-flex>
 
@@ -161,14 +163,7 @@ onMounted(() => {
     </n-spin>
 
     <n-flex justify="end" v-if="total > 12">
-      <n-pagination
-        v-model:page="page"
-        v-model:page-size="pageSize"
-        :item-count="total"
-        show-quick-jumper
-        show-size-picker
-        :page-sizes="[12, 24, 48, 96]"
-      />
+      <n-pagination v-model:page="page" v-model:page-size="pageSize" v-bind="pagination" />
     </n-flex>
   </n-flex>
 

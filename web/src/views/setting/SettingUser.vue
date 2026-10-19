@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import user from '@/api/panel/user'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import PasskeyModal from '@/views/setting/PasskeyModal.vue'
 import PasswordModal from '@/views/setting/PasswordModal.vue'
@@ -155,6 +156,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleUsername = (row: any) => {
   useRequest(user.updateUsername(row.id, row.username)).onSuccess(() => {
@@ -192,14 +194,7 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.name"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <password-modal v-model:id="currentID" v-model:show="passwordModal" />

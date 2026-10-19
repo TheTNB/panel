@@ -14,6 +14,8 @@ import { useGettext } from 'vue3-gettext'
 
 import container from '@/api/panel/container'
 import ws from '@/api/ws'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import ContainerCreate from '@/views/container/ContainerCreate.vue'
 import ContainerInfoModal from '@/views/container/ContainerInfoModal.vue'
 
@@ -283,6 +285,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     debounce: [300],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleShowLog = (row: any) => {
   logId.value = row.id
@@ -425,6 +428,19 @@ const bulkUnpause = async () => {
   refresh()
   window.$message.success($gettext('Resume successful'))
 }
+
+// 批量操作：桌面按钮组，手机七个按钮放不下改下拉
+const { isMobile } = useResponsive()
+const bulkActions = [
+  { label: $gettext('Start'), key: 'start', handler: bulkStart },
+  { label: $gettext('Stop'), key: 'stop', handler: bulkStop },
+  { label: $gettext('Restart'), key: 'restart', handler: bulkRestart },
+  { label: $gettext('Force Stop'), key: 'forceStop', handler: bulkForceStop },
+  { label: $gettext('Pause'), key: 'pause', handler: bulkPause },
+  { label: $gettext('Resume'), key: 'unpause', handler: bulkUnpause },
+  { label: $gettext('Delete'), key: 'delete', handler: bulkDelete },
+]
+const handleBulkSelect = (key: string) => bulkActions.find((item) => item.key === key)?.handler()
 
 const closeContainerCreateModal = () => {
   refresh()
@@ -602,31 +618,35 @@ onUnmounted(() => {
         >
           {{ $gettext('Cleanup Containers') }}
         </n-button>
-        <n-button-group>
-          <n-button @click="bulkStart" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Start') }}
+        <n-dropdown
+          v-if="isMobile"
+          trigger="click"
+          :options="bulkActions"
+          :disabled="selectedRowKeys.length === 0"
+          @select="handleBulkSelect"
+        >
+          <n-button :disabled="selectedRowKeys.length === 0" ghost>
+            {{ $gettext('Actions') }}
           </n-button>
-          <n-button @click="bulkStop" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Stop') }}
-          </n-button>
-          <n-button @click="bulkRestart" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Restart') }}
-          </n-button>
-          <n-button @click="bulkForceStop" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Force Stop') }}
-          </n-button>
-          <n-button @click="bulkPause" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Pause') }}
-          </n-button>
-          <n-button @click="bulkUnpause" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Resume') }}
-          </n-button>
-          <n-button @click="bulkDelete" :disabled="selectedRowKeys.length === 0" ghost>
-            {{ $gettext('Delete') }}
+        </n-dropdown>
+        <n-button-group v-else>
+          <n-button
+            v-for="item in bulkActions"
+            :key="item.key"
+            :disabled="selectedRowKeys.length === 0"
+            ghost
+            @click="item.handler"
+          >
+            {{ item.label }}
           </n-button>
         </n-button-group>
       </n-flex>
-      <n-input v-model:value="keyword" :placeholder="$gettext('Search')" clearable class="!w-60" />
+      <n-input
+        v-model:value="keyword"
+        :placeholder="$gettext('Search')"
+        clearable
+        class="md:!w-60"
+      />
     </n-flex>
     <n-data-table
       striped
@@ -639,26 +659,11 @@ onUnmounted(() => {
       v-model:checked-row-keys="selectedRowKeys"
       v-model:page="page"
       v-model:pageSize="pageSize"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
   <realtime-log-modal v-model:show="logModal" :container="logId" />
-  <n-modal
-    v-model:show="renameModal"
-    preset="card"
-    :title="$gettext('Rename')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="renameModal" :title="$gettext('Rename')">
     <n-form :model="renameModel">
       <n-form-item path="name" :label="$gettext('New Name')">
         <n-input
@@ -678,15 +683,12 @@ onUnmounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
-  <n-modal
+  </app-modal>
+  <app-modal
     v-model:show="terminalModal"
-    preset="card"
+    size="full"
     :title="$gettext('Terminal') + ' - ' + terminalContainerName"
-    style="width: 90vw; height: 80vh"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
+    style="height: 80vh"
     @after-leave="handleTerminalModalClose"
   >
     <div
@@ -694,7 +696,7 @@ onUnmounted(() => {
       @wheel="onTerminalWheel"
       style="height: 100%; min-height: 60vh; background: #111"
     ></div>
-  </n-modal>
+  </app-modal>
   <ContainerCreate v-model:show="containerCreateModal" @update:show="closeContainerCreateModal" />
   <ContainerCreate
     v-model:show="editModal"

@@ -6,8 +6,10 @@ import { h } from 'vue'
 import { useGettext } from 'vue3-gettext'
 
 import disk from '@/api/panel/toolbox-disk'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 interface RaidDevice {
   name: string
@@ -138,7 +140,7 @@ const deviceColumns = computed<DataTableColumns<RaidDevice>>(() => {
         :title="$gettext('Controller') + ` #${i + 1}`"
         size="small"
       >
-        <n-descriptions bordered :column="2" label-placement="left" size="small">
+        <n-descriptions bordered :column="isMobile ? 1 : 2" label-placement="left" size="small">
           <n-descriptions-item v-if="ctrl.model" :label="$gettext('Model')">
             {{ ctrl.model }}
           </n-descriptions-item>
@@ -170,7 +172,7 @@ const deviceColumns = computed<DataTableColumns<RaidDevice>>(() => {
         </template>
 
         <n-flex vertical :size="12">
-          <n-descriptions bordered :column="3" label-placement="left" size="small">
+          <n-descriptions bordered :column="isMobile ? 1 : 3" label-placement="left" size="small">
             <n-descriptions-item v-if="arr.raid_level" :label="$gettext('RAID Level')">
               {{ arr.raid_level }}
             </n-descriptions-item>

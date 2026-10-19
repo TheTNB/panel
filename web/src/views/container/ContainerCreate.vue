@@ -2,10 +2,15 @@
 import { useGettext } from 'vue3-gettext'
 
 import container from '@/api/panel/container'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import ImagePullModal from './ImagePullModal.vue'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(120)
+const formLayoutWide = useFormLayout(140)
+const { isMobile } = useResponsive()
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps<{
@@ -434,21 +439,17 @@ watch(show, (val) => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
+    size="lg"
     :title="isEdit ? $gettext('Edit Container') : $gettext('Create Container')"
-    preset="card"
-    :style="{ width: '70vw', maxWidth: '1080px' }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="!doSubmit"
     :closable="!doSubmit"
   >
     <n-tabs v-model:value="currentTab" type="line" animated>
       <!-- 基本设置 -->
       <n-tab-pane name="basic" :tab="$gettext('Basic Settings')">
-        <n-form :model="createModel" label-placement="left" label-width="120">
+        <n-form :model="createModel" v-bind="formLayout">
           <n-form-item path="name" :label="$gettext('Container Name')">
             <n-input
               v-model:value="createModel.name"
@@ -477,44 +478,32 @@ watch(show, (val) => {
 
           <n-divider title-placement="left">{{ $gettext('Container Options') }}</n-divider>
 
-          <n-row :gutter="[24, 0]">
-            <n-col :span="8">
-              <n-form-item path="tty" :label="$gettext('TTY (-t)')">
-                <n-switch v-model:value="createModel.tty" />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="open_stdin" :label="$gettext('STDIN (-i)')">
-                <n-switch v-model:value="createModel.open_stdin" />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="auto_remove" :label="$gettext('Auto Remove')">
-                <n-switch v-model:value="createModel.auto_remove" />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="privileged" :label="$gettext('Privileged')">
-                <n-switch v-model:value="createModel.privileged" />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="init" :label="$gettext('Init Process')">
-                <n-switch v-model:value="createModel.init" />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="readonly_rootfs" :label="$gettext('Read-Only')">
-                <n-switch v-model:value="createModel.readonly_rootfs" />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="8" path="tty" :label="$gettext('TTY (-t)')">
+              <n-switch v-model:value="createModel.tty" />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="open_stdin" :label="$gettext('STDIN (-i)')">
+              <n-switch v-model:value="createModel.open_stdin" />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="auto_remove" :label="$gettext('Auto Remove')">
+              <n-switch v-model:value="createModel.auto_remove" />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="privileged" :label="$gettext('Privileged')">
+              <n-switch v-model:value="createModel.privileged" />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="init" :label="$gettext('Init Process')">
+              <n-switch v-model:value="createModel.init" />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="readonly_rootfs" :label="$gettext('Read-Only')">
+              <n-switch v-model:value="createModel.readonly_rootfs" />
+            </n-form-item-gi>
+          </n-grid>
         </n-form>
       </n-tab-pane>
 
       <!-- 网络 -->
       <n-tab-pane name="network" :tab="$gettext('Network')">
-        <n-form :model="createModel" label-placement="left" label-width="120">
+        <n-form :model="createModel" v-bind="formLayout">
           <n-form-item path="network" :label="$gettext('Network')">
             <n-select
               v-model:value="createModel.network"
@@ -568,7 +557,7 @@ watch(show, (val) => {
 
       <!-- 端口映射 -->
       <n-tab-pane name="ports" :tab="$gettext('Port Mapping')">
-        <n-form :model="createModel" label-placement="left" label-width="120">
+        <n-form :model="createModel" v-bind="formLayout">
           <n-form-item :label="$gettext('Port Mode')">
             <n-radio-group v-model:value="createModel.publish_all_ports">
               <n-radio-button :value="false">{{ $gettext('Map Ports') }}</n-radio-button>
@@ -587,48 +576,53 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <!-- 桌面保持单行（IP 框收缩）；手机按「IP / 主机端口段 / 容器端口段 / 协议」分行 -->
+                <n-flex align="center" :wrap="isMobile" style="width: 100%">
                   <n-input
                     v-model:value="value.host"
                     :placeholder="$gettext('IP (optional)')"
                     class="w-30"
                   />
-                  <span>:</span>
-                  <n-input-number
-                    v-model:value="value.host_start"
-                    :min="1"
-                    :max="65535"
-                    :show-button="false"
-                    :placeholder="$gettext('Host Start')"
-                    class="w-22.5"
-                  />
-                  <span>-</span>
-                  <n-input-number
-                    v-model:value="value.host_end"
-                    :min="1"
-                    :max="65535"
-                    :show-button="false"
-                    :placeholder="$gettext('Host End')"
-                    class="w-22.5"
-                  />
-                  <span>:</span>
-                  <n-input-number
-                    v-model:value="value.container_start"
-                    :min="1"
-                    :max="65535"
-                    :show-button="false"
-                    :placeholder="$gettext('Container Start')"
-                    class="w-22.5"
-                  />
-                  <span>-</span>
-                  <n-input-number
-                    v-model:value="value.container_end"
-                    :min="1"
-                    :max="65535"
-                    :show-button="false"
-                    :placeholder="$gettext('Container End')"
-                    class="w-22.5"
-                  />
+                  <n-flex align="center" :wrap="false" class="w-full md:w-auto">
+                    <span>:</span>
+                    <n-input-number
+                      v-model:value="value.host_start"
+                      :min="1"
+                      :max="65535"
+                      :show-button="false"
+                      :placeholder="$gettext('Host Start')"
+                      class="flex-1 min-w-0 md:flex-none md:w-22.5"
+                    />
+                    <span>-</span>
+                    <n-input-number
+                      v-model:value="value.host_end"
+                      :min="1"
+                      :max="65535"
+                      :show-button="false"
+                      :placeholder="$gettext('Host End')"
+                      class="flex-1 min-w-0 md:flex-none md:w-22.5"
+                    />
+                  </n-flex>
+                  <n-flex align="center" :wrap="false" class="w-full md:w-auto">
+                    <span>:</span>
+                    <n-input-number
+                      v-model:value="value.container_start"
+                      :min="1"
+                      :max="65535"
+                      :show-button="false"
+                      :placeholder="$gettext('Container Start')"
+                      class="flex-1 min-w-0 md:flex-none md:w-22.5"
+                    />
+                    <span>-</span>
+                    <n-input-number
+                      v-model:value="value.container_end"
+                      :min="1"
+                      :max="65535"
+                      :show-button="false"
+                      :placeholder="$gettext('Container End')"
+                      class="flex-1 min-w-0 md:flex-none md:w-22.5"
+                    />
+                  </n-flex>
                   <n-select
                     v-model:value="value.protocol"
                     :options="protocolOptions"
@@ -651,7 +645,7 @@ watch(show, (val) => {
 
       <!-- 存储挂载 -->
       <n-tab-pane name="volumes" :tab="$gettext('Volumes')">
-        <n-form :model="createModel" label-placement="left" label-width="120">
+        <n-form :model="createModel" v-bind="formLayout">
           <n-form-item :label="$gettext('Volume Mounts')" :show-label="false">
             <n-dynamic-input
               v-model:value="createModel.volumes"
@@ -659,19 +653,23 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.host"
                     :placeholder="$gettext('Host path')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>:</span>
+                  <span class="hidden md:inline">:</span>
                   <n-input
                     v-model:value="value.container"
                     :placeholder="$gettext('Container path')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <n-select v-model:value="value.mode" :options="volumeModeOptions" class="w-30" />
+                  <n-select
+                    v-model:value="value.mode"
+                    :options="volumeModeOptions"
+                    class="md:!w-30"
+                  />
                 </n-flex>
               </template>
             </n-dynamic-input>
@@ -694,17 +692,17 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.key"
                     :placeholder="$gettext('Container path')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>:</span>
+                  <span class="hidden md:inline">:</span>
                   <n-input
                     v-model:value="value.value"
                     :placeholder="$gettext('Mount options, e.g., size=64m')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
                 </n-flex>
               </template>
@@ -715,7 +713,7 @@ watch(show, (val) => {
 
       <!-- 资源限制 -->
       <n-tab-pane name="resources" :tab="$gettext('Resource Limits')">
-        <n-form :model="createModel" label-placement="left" label-width="120">
+        <n-form :model="createModel" v-bind="formLayout">
           <n-alert type="info" class="mb-4">
             {{
               $gettext(
@@ -724,45 +722,37 @@ watch(show, (val) => {
             }}
           </n-alert>
 
-          <n-row :gutter="[24, 0]">
-            <n-col :span="8">
-              <n-form-item path="memory" :label="$gettext('Memory (MB)')">
-                <n-input-number
-                  v-model:value="createModel.memory"
-                  :min="0"
-                  style="width: 100%"
-                  :placeholder="$gettext('0 = no limit')"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="cpus" :label="$gettext('CPU Cores')">
-                <n-input-number
-                  v-model:value="createModel.cpus"
-                  :min="0"
-                  :precision="2"
-                  :step="0.5"
-                  style="width: 100%"
-                  :placeholder="$gettext('0 = no limit')"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="cpu_shares" :label="$gettext('CPU Shares')">
-                <n-input-number
-                  v-model:value="createModel.cpu_shares"
-                  :min="0"
-                  :max="262144"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="8">
-              <n-form-item path="shm_size" :label="$gettext('Shm Size (MB)')">
-                <n-input-number v-model:value="createModel.shm_size" :min="0" style="width: 100%" />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="8" path="memory" :label="$gettext('Memory (MB)')">
+              <n-input-number
+                v-model:value="createModel.memory"
+                :min="0"
+                style="width: 100%"
+                :placeholder="$gettext('0 = no limit')"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="cpus" :label="$gettext('CPU Cores')">
+              <n-input-number
+                v-model:value="createModel.cpus"
+                :min="0"
+                :precision="2"
+                :step="0.5"
+                style="width: 100%"
+                :placeholder="$gettext('0 = no limit')"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="cpu_shares" :label="$gettext('CPU Shares')">
+              <n-input-number
+                v-model:value="createModel.cpu_shares"
+                :min="0"
+                :max="262144"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="8" path="shm_size" :label="$gettext('Shm Size (MB)')">
+              <n-input-number v-model:value="createModel.shm_size" :min="0" style="width: 100%" />
+            </n-form-item-gi>
+          </n-grid>
 
           <n-divider title-placement="left">{{ $gettext('Ulimits') }}</n-divider>
 
@@ -773,22 +763,22 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
-                  <n-select v-model:value="value.name" :options="ulimitOptions" class="w-40" />
+                <n-flex align="center" style="width: 100%">
+                  <n-select v-model:value="value.name" :options="ulimitOptions" class="md:!w-40" />
                   <n-input-number
                     v-model:value="value.soft"
                     :min="-1"
                     :show-button="false"
                     :placeholder="$gettext('Soft Limit')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>:</span>
+                  <span class="hidden md:inline">:</span>
                   <n-input-number
                     v-model:value="value.hard"
                     :min="-1"
                     :show-button="false"
                     :placeholder="$gettext('Hard Limit')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
                 </n-flex>
               </template>
@@ -833,7 +823,7 @@ watch(show, (val) => {
 
       <!-- 环境与命令 -->
       <n-tab-pane name="environment" :tab="$gettext('Environment')">
-        <n-form :model="createModel" label-placement="left" label-width="140">
+        <n-form :model="createModel" v-bind="formLayoutWide">
           <n-form-item :label="$gettext('Environment Variables')">
             <n-dynamic-input
               v-model:value="createModel.env"
@@ -841,17 +831,17 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.key"
                     :placeholder="$gettext('Variable name')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>=</span>
+                  <span class="hidden md:inline">=</span>
                   <n-input
                     v-model:value="value.value"
                     :placeholder="$gettext('Variable value')"
-                    style="flex: 2"
+                    class="md:flex-[2]"
                   />
                 </n-flex>
               </template>
@@ -911,17 +901,17 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.key"
                     :placeholder="$gettext('Label name')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>=</span>
+                  <span class="hidden md:inline">=</span>
                   <n-input
                     v-model:value="value.value"
                     :placeholder="$gettext('Label value')"
-                    style="flex: 2"
+                    class="md:flex-[2]"
                   />
                 </n-flex>
               </template>
@@ -932,28 +922,24 @@ watch(show, (val) => {
 
       <!-- 高级设置 -->
       <n-tab-pane name="advanced" :tab="$gettext('Advanced Settings')">
-        <n-form :model="createModel" label-placement="left" label-width="140">
-          <n-row :gutter="[24, 0]">
-            <n-col :span="12">
-              <n-form-item path="stop_signal" :label="$gettext('Stop Signal')">
-                <n-input
-                  v-model:value="createModel.stop_signal"
-                  type="text"
-                  @keydown.enter.prevent
-                  :placeholder="$gettext('Optional, uses the image default if empty')"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="12">
-              <n-form-item path="stop_timeout" :label="$gettext('Stop Timeout (s)')">
-                <n-input-number
-                  v-model:value="createModel.stop_timeout"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-          </n-row>
+        <n-form :model="createModel" v-bind="formLayoutWide">
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="12" path="stop_signal" :label="$gettext('Stop Signal')">
+              <n-input
+                v-model:value="createModel.stop_signal"
+                type="text"
+                @keydown.enter.prevent
+                :placeholder="$gettext('Optional, uses the image default if empty')"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="12" path="stop_timeout" :label="$gettext('Stop Timeout (s)')">
+              <n-input-number
+                v-model:value="createModel.stop_timeout"
+                :min="0"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+          </n-grid>
 
           <n-divider title-placement="left">{{ $gettext('Health Check') }}</n-divider>
 
@@ -975,44 +961,36 @@ watch(show, (val) => {
             </template>
           </n-form-item>
 
-          <n-row :gutter="[24, 0]">
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Interval (s)')">
-                <n-input-number
-                  v-model:value="createModel.healthcheck.interval"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Timeout (s)')">
-                <n-input-number
-                  v-model:value="createModel.healthcheck.timeout"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Start Period (s)')">
-                <n-input-number
-                  v-model:value="createModel.healthcheck.start_period"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-            <n-col :span="12">
-              <n-form-item :label="$gettext('Retry Count')">
-                <n-input-number
-                  v-model:value="createModel.healthcheck.retries"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="12" :label="$gettext('Interval (s)')">
+              <n-input-number
+                v-model:value="createModel.healthcheck.interval"
+                :min="0"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="12" :label="$gettext('Timeout (s)')">
+              <n-input-number
+                v-model:value="createModel.healthcheck.timeout"
+                :min="0"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="12" :label="$gettext('Start Period (s)')">
+              <n-input-number
+                v-model:value="createModel.healthcheck.start_period"
+                :min="0"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+            <n-form-item-gi :span="12" :label="$gettext('Retry Count')">
+              <n-input-number
+                v-model:value="createModel.healthcheck.retries"
+                :min="0"
+                style="width: 100%"
+              />
+            </n-form-item-gi>
+          </n-grid>
 
           <n-divider title-placement="left">{{ $gettext('Security') }}</n-divider>
 
@@ -1050,22 +1028,22 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.host"
                     :placeholder="$gettext('Host path')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>:</span>
+                  <span class="hidden md:inline">:</span>
                   <n-input
                     v-model:value="value.container"
                     :placeholder="$gettext('Container path, same as host if empty')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
                   <n-select
                     v-model:value="value.permissions"
                     :options="devicePermissionOptions"
-                    class="w-22.5"
+                    class="md:!w-22.5"
                   />
                 </n-flex>
               </template>
@@ -1081,17 +1059,17 @@ watch(show, (val) => {
               show-sort-button
             >
               <template #default="{ value }">
-                <n-flex align="center" :wrap="false" style="width: 100%">
+                <n-flex align="center" style="width: 100%">
                   <n-input
                     v-model:value="value.key"
                     :placeholder="$gettext('e.g., net.core.somaxconn')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
-                  <span>=</span>
+                  <span class="hidden md:inline">=</span>
                   <n-input
                     v-model:value="value.value"
                     :placeholder="$gettext('Value')"
-                    style="flex: 1"
+                    class="md:flex-1"
                   />
                 </n-flex>
               </template>
@@ -1111,7 +1089,7 @@ watch(show, (val) => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 
   <!-- 镜像拉取弹窗 -->
   <image-pull-modal

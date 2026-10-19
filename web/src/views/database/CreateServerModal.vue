@@ -90,16 +90,7 @@ const handleCreate = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Add Server')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Add Server')">
     <n-form :model="createModel">
       <n-form-item v-if="!props.type" path="type" :label="$gettext('Type')">
         <n-select
@@ -142,29 +133,25 @@ const handleCreate = () => {
         </n-form-item>
       </template>
       <template v-else>
-        <n-row :gutter="[0, 24]">
-          <n-col :span="15">
-            <n-form-item path="host" :label="$gettext('Host')">
-              <n-input
-                v-model:value="createModel.host"
-                type="text"
-                @keydown.enter.prevent
-                :placeholder="$gettext('Enter database server host')"
-              />
-            </n-form-item>
-          </n-col>
-          <n-col :span="2"></n-col>
-          <n-col :span="7">
-            <n-form-item path="port" :label="$gettext('Port')">
-              <n-input-number
-                w-full
-                v-model:value="createModel.port"
-                @keydown.enter.prevent
-                :placeholder="$gettext('Enter database server port')"
-              />
-            </n-form-item>
-          </n-col>
-        </n-row>
+        <n-grid cols="1 m:24" responsive="screen">
+          <n-form-item-gi :span="15" path="host" :label="$gettext('Host')">
+            <n-input
+              v-model:value="createModel.host"
+              type="text"
+              @keydown.enter.prevent
+              :placeholder="$gettext('Enter database server host')"
+            />
+          </n-form-item-gi>
+          <n-gi :span="2" />
+          <n-form-item-gi :span="7" path="port" :label="$gettext('Port')">
+            <n-input-number
+              w-full
+              v-model:value="createModel.port"
+              @keydown.enter.prevent
+              :placeholder="$gettext('Enter database server port')"
+            />
+          </n-form-item-gi>
+        </n-grid>
         <n-form-item
           v-if="!['redis', 'sqlite'].includes(createModel.type)"
           path="username"
@@ -203,7 +190,7 @@ const handleCreate = () => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <path-selector v-model:show="showPathSelector" v-model:path="pathSelectorPath" :dir="false" />
 </template>
 

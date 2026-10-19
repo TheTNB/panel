@@ -6,8 +6,10 @@ defineOptions({
 import { useGettext } from 'vue3-gettext'
 
 import home from '@/api/panel/home'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const currentTab = ref('runtime')
 
 // 运行时信息
@@ -87,12 +89,12 @@ watch(currentTab, (val) => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="runtime" :tab="$gettext('Runtime')">
       <n-spin :show="runtimeLoading">
         <n-flex vertical :size="24">
           <!-- 基础信息 -->
-          <n-descriptions :column="2" label-placement="left" bordered>
+          <n-descriptions :column="isMobile ? 1 : 2" label-placement="left" bordered>
             <template #header>
               <n-flex justify="space-between" align="center">
                 {{ $gettext('Basic Info') }}
@@ -119,7 +121,12 @@ watch(currentTab, (val) => {
           </n-descriptions>
 
           <!-- 内存统计 -->
-          <n-descriptions :title="$gettext('Memory')" :column="2" label-placement="left" bordered>
+          <n-descriptions
+            :title="$gettext('Memory')"
+            :column="isMobile ? 1 : 2"
+            label-placement="left"
+            bordered
+          >
             <n-descriptions-item :label="$gettext('Allocated')">
               {{ formatBytes(runtimeData.memory_alloc || 0) }}
             </n-descriptions-item>
@@ -141,7 +148,7 @@ watch(currentTab, (val) => {
           </n-descriptions>
 
           <!-- Heap 统计 -->
-          <n-descriptions title="Heap" :column="2" label-placement="left" bordered>
+          <n-descriptions title="Heap" :column="isMobile ? 1 : 2" label-placement="left" bordered>
             <n-descriptions-item :label="$gettext('Allocated')">
               {{ formatBytes(runtimeData.heap_alloc || 0) }}
             </n-descriptions-item>
@@ -165,7 +172,7 @@ watch(currentTab, (val) => {
           <!-- Stack / MSpan / MCache -->
           <n-descriptions
             title="Stack / MSpan / MCache"
-            :column="2"
+            :column="isMobile ? 1 : 2"
             label-placement="left"
             bordered
           >
@@ -196,7 +203,7 @@ watch(currentTab, (val) => {
           </n-descriptions>
 
           <!-- GC 统计 -->
-          <n-descriptions title="GC" :column="2" label-placement="left" bordered>
+          <n-descriptions title="GC" :column="isMobile ? 1 : 2" label-placement="left" bordered>
             <n-descriptions-item :label="$gettext('GC Runs')">
               {{ runtimeData.gc_num }}
             </n-descriptions-item>

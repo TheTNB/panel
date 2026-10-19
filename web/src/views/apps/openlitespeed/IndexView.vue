@@ -8,8 +8,10 @@ import { useGettext } from 'vue3-gettext'
 
 import openlitespeed from '@/api/apps/openlitespeed'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(140)
 const currentTab = ref('status')
 const saveConfigLoading = ref(false)
 const clearErrorLogLoading = ref(false)
@@ -64,7 +66,6 @@ const columns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -196,7 +197,7 @@ const handleClearErrorLog = () => {
               )
             }}
           </n-alert>
-          <n-form label-placement="left" label-width="140px">
+          <n-form v-bind="formLayout">
             <n-form-item :label="$gettext('Enable')">
               <n-switch v-model:value="realIP.enabled" />
             </n-form-item>
@@ -222,14 +223,7 @@ const handleClearErrorLog = () => {
         </n-flex>
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="400"
-          :loading="false"
-          :columns="columns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="columns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <realtime-log service="openlitespeed" />

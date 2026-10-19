@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import environment from '@/api/panel/environment'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { router } from '@/router'
 import { renderLocalIcon } from '@/utils'
 import CustomForm from '@/views/app/CustomForm.vue'
@@ -171,6 +172,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     watchingStates: [selectedType, searchQuery],
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 // 处理类型切换
 const handleTypeChange = (type: string) => {
@@ -263,7 +265,7 @@ onMounted(() => {
         v-model:value="searchQuery"
         :placeholder="$gettext('Search')"
         clearable
-        class="!w-60"
+        class="md:!w-60"
       />
     </n-flex>
     <n-data-table
@@ -276,24 +278,12 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.slug"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
+  <app-modal
     v-model:show="installModalShow"
-    preset="card"
     :title="$gettext('Install') + ' ' + (installModalRow?.name ?? '')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
   >
     <n-flex vertical>
       <!-- 环境的自定义参数目录名为 type+slug(如 php83),与安装脚本约定一致 -->
@@ -312,7 +302,7 @@ onMounted(() => {
         {{ $gettext('Install') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import alert from '@/api/panel/alert'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import AlertRuleModal from '@/views/monitor/AlertRuleModal.vue'
 import { useAlertMetrics } from '@/views/monitor/metrics'
@@ -31,6 +32,7 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const rulePagination = useTablePagination(rulePage, rulePageSize, ruleTotal)
 
 const handleAddRule = () => {
   editingRule.value = null
@@ -139,6 +141,7 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const recordPagination = useTablePagination(recordPage, recordPageSize, recordTotal)
 
 const recordColumns: any = [
   {
@@ -203,6 +206,8 @@ const handleClearRecords = async () => {
           </n-button>
         </n-flex>
         <n-data-table
+          v-model:page="rulePage"
+          v-model:pageSize="rulePageSize"
           remote
           striped
           :scroll-x="1200"
@@ -210,16 +215,7 @@ const handleClearRecords = async () => {
           :columns="ruleColumns"
           :data="rules"
           :row-key="(row: any) => row.id"
-          :pagination="{
-            page: rulePage,
-            pageSize: rulePageSize,
-            itemCount: ruleTotal,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [20, 50, 100, 200],
-            onUpdatePage: (p: number) => (rulePage = p),
-            onUpdatePageSize: (ps: number) => (rulePageSize = ps),
-          }"
+          :pagination="rulePagination"
         />
       </n-flex>
     </n-tab-pane>
@@ -241,6 +237,8 @@ const handleClearRecords = async () => {
           </n-button>
         </n-flex>
         <n-data-table
+          v-model:page="recordPage"
+          v-model:pageSize="recordPageSize"
           remote
           striped
           :scroll-x="1000"
@@ -248,16 +246,7 @@ const handleClearRecords = async () => {
           :columns="recordColumns"
           :data="records"
           :row-key="(row: any) => row.id"
-          :pagination="{
-            page: recordPage,
-            pageSize: recordPageSize,
-            itemCount: recordTotal,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [20, 50, 100, 200],
-            onUpdatePage: (p: number) => (recordPage = p),
-            onUpdatePageSize: (ps: number) => (recordPageSize = ps),
-          }"
+          :pagination="recordPagination"
         />
       </n-flex>
     </n-tab-pane>

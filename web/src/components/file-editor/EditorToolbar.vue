@@ -138,7 +138,7 @@ defineExpose({
 
 <template>
   <div class="editor-toolbar">
-    <n-flex align="center" :wrap="false">
+    <n-flex align="center">
       <!-- 文件操作 -->
       <n-button-group size="small">
         <n-button

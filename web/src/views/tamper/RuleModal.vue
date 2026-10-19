@@ -84,13 +84,10 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
+    size="sm"
     v-model:show="show"
     :title="isEdit ? $gettext('Edit Rule') : $gettext('Add Rule')"
-    preset="card"
-    :style="{ width: '640px' }"
-    :bordered="false"
-    :segmented="false"
   >
     <n-form>
       <n-form-item v-if="!isEdit" :label="$gettext('Quick Select Website')">
@@ -137,5 +134,5 @@ const handleSubmit = () => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 </template>

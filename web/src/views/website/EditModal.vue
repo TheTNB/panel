@@ -11,12 +11,18 @@ import website from '@/api/panel/website'
 import KeyValueEditor from '@/components/common/KeyValueEditor.vue'
 import ListInput from '@/components/common/ListInput.vue'
 import PathSelector from '@/components/common/PathSelector.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 import { webserverFeatures } from '@/utils'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const editId = defineModel<number>('editId', { type: Number, required: true })
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
+const formLayout = useFormLayout(140)
+const presetFormLayout = useFormLayout('auto')
+const configFormLayout = useFormLayout(100)
 let messageReactive: MessageReactive | null = null
 
 const current = ref('listen')
@@ -968,16 +974,7 @@ const removeCustomConfig = (index: number) => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="title"
-    :style="{ width: '70vw', maxWidth: '1080px' }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="show = false"
-  >
+  <app-modal v-model:show="show" size="lg" :title="title">
     <n-spin :show="loading">
       <n-tabs v-model:value="current" type="line" animated>
         <n-tab-pane name="listen" :tab="$gettext('Domain & Listening')">
@@ -997,14 +994,12 @@ const removeCustomConfig = (index: number) => {
                 :on-create="onCreateListen"
               >
                 <template #default="{ value }">
-                  <div flex w-full items-center>
-                    <n-input v-model:value="value.address" clearable />
+                  <div class="flex flex-wrap gap-x-5 gap-y-2 w-full items-center">
+                    <n-input v-model:value="value.address" clearable class="md:flex-1" />
                     <n-checkbox
                       :checked="hasArg(value.args, 'ssl')"
                       @update:checked="(checked: boolean) => toggleArg(value.args, 'ssl', checked)"
-                      ml-5
-                      mr-5
-                      w-30
+                      class="md:!w-30"
                     >
                       HTTPS
                     </n-checkbox>
@@ -1012,7 +1007,7 @@ const removeCustomConfig = (index: number) => {
                       v-if="features.quic"
                       :checked="hasArg(value.args, 'quic')"
                       @update:checked="(checked: boolean) => toggleArg(value.args, 'quic', checked)"
-                      w-50
+                      class="md:!w-50"
                     >
                       QUIC(HTTP3)
                     </n-checkbox>
@@ -1096,12 +1091,12 @@ const removeCustomConfig = (index: number) => {
                         v-model:value="upstream.name"
                         :placeholder="$gettext('Upstream name')"
                         size="small"
-                        class="w-50"
+                        class="md:!w-50"
                       />
                     </n-flex>
                   </template>
-                  <n-form label-placement="left" label-width="140px">
-                    <n-grid :cols="24" :x-gap="16">
+                  <n-form v-bind="formLayout">
+                    <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                       <n-form-item-gi :span="12" :label="$gettext('Load Balancing Algorithm')">
                         <n-select v-model:value="upstream.algo" :options="upstreamAlgoOptions" />
                       </n-form-item-gi>
@@ -1203,8 +1198,8 @@ const removeCustomConfig = (index: number) => {
                       <n-tag size="small" type="success">{{ proxy.pass }}</n-tag>
                     </n-flex>
                   </template>
-                  <n-form label-placement="left" label-width="140px">
-                    <n-grid :cols="24" :x-gap="16">
+                  <n-form v-bind="formLayout">
+                    <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                       <n-form-item-gi
                         v-if="features.matchType"
                         :span="12"
@@ -1305,7 +1300,7 @@ const removeCustomConfig = (index: number) => {
                         :title="$gettext('Cache Settings')"
                         name="cache"
                       >
-                        <n-grid :cols="24" :x-gap="16">
+                        <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                           <!-- 缓存有效期 -->
                           <n-form-item-gi :span="24" :label="$gettext('Cache Valid')">
                             <key-value-editor
@@ -1431,9 +1426,9 @@ const removeCustomConfig = (index: number) => {
                         :title="$gettext('Advanced Settings')"
                         name="advanced"
                       >
-                        <n-grid :cols="24" :x-gap="16">
+                        <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                           <!-- HTTP 协议版本 -->
-                          <n-form-item-gi :span="8" :label="$gettext('HTTP Version')">
+                          <n-form-item-gi :span="12" :label="$gettext('HTTP Version')">
                             <n-select
                               v-model:value="proxy.http_version"
                               :options="[
@@ -1446,7 +1441,7 @@ const removeCustomConfig = (index: number) => {
                           </n-form-item-gi>
 
                           <!-- 请求体大小限制 -->
-                          <n-form-item-gi :span="8" :label="$gettext('Max Body Size')">
+                          <n-form-item-gi :span="12" :label="$gettext('Max Body Size')">
                             <n-input-group>
                               <n-input-number
                                 :value="getClientMaxBodySizeValue(proxy)"
@@ -1471,7 +1466,7 @@ const removeCustomConfig = (index: number) => {
                           </n-form-item-gi>
 
                           <!-- 超时设置开关 -->
-                          <n-form-item-gi :span="8" :label="$gettext('Timeout Settings')">
+                          <n-form-item-gi :span="12" :label="$gettext('Timeout Settings')">
                             <n-switch
                               :value="proxy.timeout !== null"
                               @update:value="(v: boolean) => toggleProxyTimeout(proxy, v)"
@@ -1481,8 +1476,8 @@ const removeCustomConfig = (index: number) => {
 
                         <!-- 超时配置详情 -->
                         <template v-if="proxy.timeout">
-                          <n-grid :cols="24" :x-gap="16">
-                            <n-form-item-gi :span="8" :label="$gettext('Connect Timeout')">
+                          <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
+                            <n-form-item-gi :span="12" :label="$gettext('Connect Timeout')">
                               <n-input-group>
                                 <n-input-number
                                   :value="
@@ -1508,7 +1503,7 @@ const removeCustomConfig = (index: number) => {
                                 />
                               </n-input-group>
                             </n-form-item-gi>
-                            <n-form-item-gi :span="8" :label="$gettext('Read Timeout')">
+                            <n-form-item-gi :span="12" :label="$gettext('Read Timeout')">
                               <n-input-group>
                                 <n-input-number
                                   :value="
@@ -1534,7 +1529,7 @@ const removeCustomConfig = (index: number) => {
                                 />
                               </n-input-group>
                             </n-form-item-gi>
-                            <n-form-item-gi :span="8" :label="$gettext('Send Timeout')">
+                            <n-form-item-gi :span="12" :label="$gettext('Send Timeout')">
                               <n-input-group>
                                 <n-input-number
                                   :value="
@@ -1563,7 +1558,7 @@ const removeCustomConfig = (index: number) => {
                           </n-grid>
                         </template>
 
-                        <n-grid :cols="24" :x-gap="16">
+                        <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                           <!-- 重试配置开关 -->
                           <n-form-item-gi :span="8" :label="$gettext('Retry Settings')">
                             <n-switch
@@ -1595,8 +1590,8 @@ const removeCustomConfig = (index: number) => {
 
                         <!-- 重试配置详情 -->
                         <template v-if="proxy.retry">
-                          <n-grid :cols="24" :x-gap="16">
-                            <n-form-item-gi :span="8" :label="$gettext('Retry Conditions')">
+                          <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
+                            <n-form-item-gi :span="12" :label="$gettext('Retry Conditions')">
                               <n-select
                                 v-model:value="proxy.retry.conditions"
                                 :options="[
@@ -1615,7 +1610,7 @@ const removeCustomConfig = (index: number) => {
                                 :placeholder="$gettext('Select retry conditions')"
                               />
                             </n-form-item-gi>
-                            <n-form-item-gi :span="8" :label="$gettext('Max Tries')">
+                            <n-form-item-gi :span="12" :label="$gettext('Max Tries')">
                               <n-input-number
                                 :value="proxy.retry.tries || null"
                                 :min="0"
@@ -1623,7 +1618,7 @@ const removeCustomConfig = (index: number) => {
                                 @update:value="(v: number | null) => (proxy.retry.tries = v ?? 0)"
                               />
                             </n-form-item-gi>
-                            <n-form-item-gi :span="8" :label="$gettext('Retry Timeout')">
+                            <n-form-item-gi :span="12" :label="$gettext('Retry Timeout')">
                               <n-input-group>
                                 <n-input-number
                                   :value="
@@ -1652,7 +1647,7 @@ const removeCustomConfig = (index: number) => {
 
                         <!-- SSL 后端验证详情 -->
                         <template v-if="proxy.ssl_backend && proxy.pass?.startsWith('https')">
-                          <n-grid :cols="24" :x-gap="16">
+                          <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                             <n-form-item-gi :span="6" :label="$gettext('Enable Verify')">
                               <n-switch v-model:value="proxy.ssl_backend.verify" />
                             </n-form-item-gi>
@@ -1678,7 +1673,7 @@ const removeCustomConfig = (index: number) => {
 
                         <!-- 响应头修改详情 -->
                         <template v-if="proxy.response_headers">
-                          <n-grid :cols="24" :x-gap="16">
+                          <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                             <n-form-item-gi :span="12" :label="$gettext('Hide Headers')">
                               <n-select
                                 v-model:value="proxy.response_headers.hide"
@@ -1715,7 +1710,7 @@ const removeCustomConfig = (index: number) => {
                           </n-grid>
                         </template>
 
-                        <n-grid :cols="24" :x-gap="16">
+                        <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                           <!-- IP 访问控制开关 -->
                           <n-form-item-gi :span="8" :label="$gettext('IP Access Control')">
                             <n-switch
@@ -1727,7 +1722,7 @@ const removeCustomConfig = (index: number) => {
 
                         <!-- IP 访问控制详情 -->
                         <template v-if="proxy.access_control">
-                          <n-grid :cols="24" :x-gap="16">
+                          <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                             <n-form-item-gi :span="12" :label="$gettext('Allow IPs')">
                               <n-dynamic-tags
                                 v-model:value="proxy.access_control.allow"
@@ -1763,7 +1758,7 @@ const removeCustomConfig = (index: number) => {
         <n-tab-pane name="https" tab="HTTPS">
           <n-flex vertical v-if="setting">
             <n-card v-if="setting.ssl && setting.ssl_issuer != ''">
-              <n-descriptions :column="3">
+              <n-descriptions :column="isMobile ? 1 : 3">
                 <n-descriptions-item>
                   <template #label>{{ $gettext('Certificate Validity') }}</template>
                   <n-flex>
@@ -1787,7 +1782,7 @@ const removeCustomConfig = (index: number) => {
               </n-descriptions>
             </n-card>
             <n-form>
-              <n-grid :cols="24" :x-gap="24">
+              <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
                 <n-form-item-gi :span="12" :label="$gettext('Main Switch')">
                   <n-switch v-model:value="setting.ssl" />
                 </n-form-item-gi>
@@ -1805,7 +1800,7 @@ const removeCustomConfig = (index: number) => {
               </n-grid>
             </n-form>
             <n-form v-if="setting.ssl">
-              <n-grid :cols="24" :x-gap="24">
+              <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
                 <n-gi :span="12">
                   <n-form inline>
                     <n-form-item label="HSTS">
@@ -1834,7 +1829,7 @@ const removeCustomConfig = (index: number) => {
               </n-grid>
             </n-form>
             <n-form v-if="setting.ssl">
-              <n-grid :cols="2" :x-gap="24">
+              <n-grid cols="1 m:2" :x-gap="24" responsive="screen">
                 <n-gi>
                   <n-form-item :label="$gettext('Certificate')">
                     <n-input
@@ -1862,7 +1857,7 @@ const removeCustomConfig = (index: number) => {
         </n-tab-pane>
         <n-tab-pane v-if="setting.type == 'php'" name="rewrite" :tab="$gettext('Rewrite')">
           <n-flex vertical>
-            <n-form v-if="features.rewritePresets" label-placement="left" label-width="auto">
+            <n-form v-if="features.rewritePresets" v-bind="presetFormLayout">
               <n-form-item :label="$gettext('Presets')">
                 <n-select
                   v-model:value="rewriteValue"
@@ -1904,8 +1899,8 @@ const removeCustomConfig = (index: number) => {
                       <n-tag size="small" type="success">{{ redirect.to }}</n-tag>
                     </n-flex>
                   </template>
-                  <n-form label-placement="left" label-width="140px">
-                    <n-grid :cols="24" :x-gap="16">
+                  <n-form v-bind="formLayout">
+                    <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                       <n-form-item-gi :span="12" :label="$gettext('Redirect Type')">
                         <n-select v-model:value="redirect.type" :options="redirectTypeOptions" />
                       </n-form-item-gi>
@@ -1968,7 +1963,7 @@ const removeCustomConfig = (index: number) => {
         <n-tab-pane name="advanced" :tab="$gettext('Advanced Settings')">
           <n-collapse accordion>
             <n-collapse-item :title="$gettext('Website Type')" name="website_type">
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Current Website Type')">
                   <n-tag>{{ websiteTypeLabel(setting.type) }}</n-tag>
                 </n-form-item>
@@ -2016,7 +2011,7 @@ const removeCustomConfig = (index: number) => {
               :title="$gettext('Access Statistics')"
               name="stat_settings"
             >
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Enable Statistics')">
                   <n-switch v-model:value="setting.stat_enabled" />
                 </n-form-item>
@@ -2032,7 +2027,7 @@ const removeCustomConfig = (index: number) => {
                   )
                 }}
               </n-alert>
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Enable LSCache')">
                   <n-switch v-model:value="setting.lscache" />
                 </n-form-item>
@@ -2041,7 +2036,7 @@ const removeCustomConfig = (index: number) => {
 
             <!-- 日志设置 -->
             <n-collapse-item :title="$gettext('Log Settings')" name="log_settings">
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Access Log')">
                   <n-select
                     v-model:value="setting.access_log"
@@ -2069,7 +2064,7 @@ const removeCustomConfig = (index: number) => {
               :title="$gettext('Rate Limiting')"
               name="rate_limit"
             >
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Enable Rate Limiting')">
                   <n-switch v-model:value="rateLimitEnabled" />
                 </n-form-item>
@@ -2133,7 +2128,7 @@ const removeCustomConfig = (index: number) => {
                   )
                 }}
               </n-alert>
-              <n-form label-placement="left" label-width="140px">
+              <n-form v-bind="formLayout">
                 <n-form-item :label="$gettext('Enable')">
                   <n-switch v-model:value="realIPEnabled" />
                 </n-form-item>
@@ -2180,7 +2175,7 @@ const removeCustomConfig = (index: number) => {
                   closable
                   @close="removeBasicAuth(index)"
                 >
-                  <n-form label-placement="left" label-width="140px">
+                  <n-form v-bind="formLayout">
                     <n-form-item :label="$gettext('Scope')">
                       <n-radio-group
                         :value="auth._scope"
@@ -2243,8 +2238,8 @@ const removeCustomConfig = (index: number) => {
                       <span>{{ $gettext('Config') }} #{{ index + 1 }}</span>
                     </n-flex>
                   </template>
-                  <n-form label-placement="left" label-width="100px">
-                    <n-grid :cols="24" :x-gap="16">
+                  <n-form v-bind="configFormLayout">
+                    <n-grid cols="1 m:24" :x-gap="16" responsive="screen">
                       <n-form-item-gi :span="12" :label="$gettext('Name')">
                         <n-input
                           v-model:value="config.name"
@@ -2367,15 +2362,8 @@ const removeCustomConfig = (index: number) => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
-  <n-modal
-    v-model:show="dnsModal"
-    preset="card"
-    :title="$gettext('Select DNS Provider')"
-    style="width: 60vw"
-    :bordered="false"
-    :segmented="false"
-  >
+  </app-modal>
+  <app-modal v-model:show="dnsModal" :title="$gettext('Select DNS Provider')">
     <n-flex vertical>
       <n-alert type="warning">
         {{
@@ -2397,7 +2385,7 @@ const removeCustomConfig = (index: number) => {
         {{ $gettext('Issue') }}
       </n-button>
     </n-flex>
-  </n-modal>
+  </app-modal>
   <path-selector
     v-model:show="showPathSelector"
     v-model:path="setting[pathSelectorTarget]"

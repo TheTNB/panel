@@ -5,6 +5,7 @@ import { useGettext } from 'vue3-gettext'
 import container from '@/api/panel/container'
 import ws from '@/api/ws'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -126,6 +127,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = async (row: any) => {
   useRequest(container.imageRemove(row.id)).onSuccess(() => {
@@ -309,24 +311,12 @@ onUnmounted(() => {
       :data="data"
       :columns="columns"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
+  <app-modal
     v-model:show="pullModal"
-    preset="card"
     :title="$gettext('Pull Image')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="!isPulling && !pullSubmitting"
     :closable="!isPulling && !pullSubmitting"
   >
@@ -436,5 +426,5 @@ onUnmounted(() => {
         {{ $gettext('Submit') }}
       </n-button>
     </template>
-  </n-modal>
+  </app-modal>
 </template>

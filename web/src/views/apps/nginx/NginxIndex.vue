@@ -6,6 +6,7 @@ import nginx from '@/api/apps/nginx'
 import systemctl from '@/api/panel/systemctl'
 import ServiceStatus from '@/components/common/ServiceStatus.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import NginxConfigTuneView from './NginxConfigTuneView.vue'
 
@@ -15,6 +16,7 @@ const props = defineProps<{
 }>()
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const { confirmDelete } = useConfirm()
 const currentTab = ref('status')
 const streamTab = ref('server')
@@ -142,7 +144,6 @@ const columns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -525,7 +526,12 @@ const handleDeleteStreamUpstream = (name: string) => {
         <nginx-config-tune-view :api="props.api" />
       </n-tab-pane>
       <n-tab-pane name="stream" :tab="$gettext('Stream')">
-        <n-tabs v-model:value="streamTab" type="line" placement="left" animated>
+        <n-tabs
+          v-model:value="streamTab"
+          type="line"
+          :placement="isMobile ? 'top' : 'left'"
+          animated
+        >
           <n-tab-pane name="server" :tab="$gettext('Server')">
             <n-flex vertical>
               <n-flex>
@@ -563,14 +569,7 @@ const handleDeleteStreamUpstream = (name: string) => {
         </n-tabs>
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="400"
-          :loading="false"
-          :columns="columns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="columns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <n-flex vertical>
@@ -605,16 +604,7 @@ const handleDeleteStreamUpstream = (name: string) => {
     </n-tabs>
   </PageContainer>
   <!-- Stream Server 模态框 -->
-  <n-modal
-    v-model:show="streamServerModal"
-    preset="card"
-    :title="streamServerModalTitle"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="streamServerModal = false"
-  >
+  <app-modal v-model:show="streamServerModal" :title="streamServerModalTitle">
     <n-form :model="streamServerModel">
       <n-form-item path="name" :label="$gettext('Name')">
         <n-input
@@ -689,18 +679,9 @@ const handleDeleteStreamUpstream = (name: string) => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <!-- Stream Upstream 模态框 -->
-  <n-modal
-    v-model:show="streamUpstreamModal"
-    preset="card"
-    :title="streamUpstreamModalTitle"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="streamUpstreamModal = false"
-  >
+  <app-modal v-model:show="streamUpstreamModal" :title="streamUpstreamModalTitle">
     <n-form :model="streamUpstreamModel">
       <n-form-item path="name" :label="$gettext('Name')">
         <n-input
@@ -730,13 +711,13 @@ const handleDeleteStreamUpstream = (name: string) => {
             <n-input
               v-model:value="upstreamServerAddr"
               type="text"
-              class="flex-1"
+              class="flex-1 min-w-50"
               :placeholder="$gettext('Server address, e.g. 127.0.0.1:3306')"
             />
             <n-input
               v-model:value="upstreamServerOptions"
               type="text"
-              class="flex-1"
+              class="flex-1 min-w-50"
               :placeholder="$gettext('Options (optional), e.g. weight=5 backup')"
             />
             <n-button type="primary" @click="handleAddUpstreamServer">
@@ -815,5 +796,5 @@ const handleDeleteStreamUpstream = (name: string) => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

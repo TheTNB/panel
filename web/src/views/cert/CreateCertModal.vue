@@ -82,15 +82,7 @@ const handleCreateCert = () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create Certificate')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create Certificate')">
     <n-space vertical>
       <n-alert type="info">
         {{
@@ -165,7 +157,7 @@ const handleCreateCert = () => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

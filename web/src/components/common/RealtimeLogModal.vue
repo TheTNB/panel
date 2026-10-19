@@ -40,17 +40,9 @@ defineExpose({ clear })
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Logs')"
-    style="width: 80vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" size="lg" :title="$gettext('Logs')">
     <template v-if="clearable || props.path" #header-extra>
-      <n-flex size="small" align="center" :wrap="false">
+      <n-flex size="small" align="center">
         <n-button v-if="props.path" size="small" type="primary" @click="handleDownload">
           {{ $gettext('Download Log') }}
         </n-button>
@@ -75,5 +67,5 @@ defineExpose({ clear })
       :service="props.service"
       :container="props.container"
     />
-  </n-modal>
+  </app-modal>
 </template>

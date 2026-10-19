@@ -5,6 +5,7 @@ import { useGettext } from 'vue3-gettext'
 import container from '@/api/panel/container'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { useFileStore } from '@/stores'
 import { formatDateTime } from '@/utils'
 
@@ -223,6 +224,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleCreate = () => {
   loading.value = true
@@ -303,25 +305,10 @@ onMounted(() => {
       :data="data"
       :columns="columns"
       :row-key="(row: any) => row.name"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Create Compose')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="createModal" :title="$gettext('Create Compose')">
     <n-form :model="createModel">
       <n-form-item path="name" :label="$gettext('Compose Name')">
         <n-input v-model:value="createModel.name" type="text" />
@@ -341,16 +328,8 @@ onMounted(() => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
-  <n-modal
-    v-model:show="updateModal"
-    preset="card"
-    :title="$gettext('Edit Compose')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  </app-modal>
+  <app-modal v-model:show="updateModal" :title="$gettext('Edit Compose')">
     <n-form :model="updateModel">
       <n-form-item path="compose" :label="$gettext('Compose')">
         <common-editor v-model:value="updateModel.compose" lang="yaml" height="40vh" />
@@ -367,7 +346,7 @@ onMounted(() => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleUpdate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <pty-terminal-modal
     v-model:show="upModal"
     :title="$gettext('Starting Compose') + ' - ' + upComposeName"

@@ -36,7 +36,6 @@ const columns: any = [
   {
     title: $gettext('Current Value'),
     key: 'value',
-    minWidth: 200,
     ellipsis: { tooltip: true },
   },
 ]
@@ -100,14 +99,7 @@ const handleClearErrorLog = () => {
         <apache-config-tune-view />
       </n-tab-pane>
       <n-tab-pane name="load" :tab="$gettext('Load Status')">
-        <n-data-table
-          striped
-          remote
-          :scroll-x="400"
-          :loading="false"
-          :columns="columns"
-          :data="load"
-        />
+        <n-data-table striped remote :loading="false" :columns="columns" :data="load" />
       </n-tab-pane>
       <n-tab-pane name="run-log" :tab="$gettext('Runtime Logs')">
         <realtime-log service="apache" />

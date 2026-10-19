@@ -6,8 +6,10 @@ import { h } from 'vue'
 import { useGettext } from 'vue3-gettext'
 
 import disk from '@/api/panel/toolbox-disk'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 // SMART 磁盘列表
 interface SmartDisk {
@@ -262,7 +264,7 @@ const formatCapacity = (bytes: number): string => {
         <n-select
           v-model:value="selectedDisk"
           :options="diskOptions"
-          class="w-75"
+          class="md:!w-75"
           :placeholder="$gettext('Select a disk')"
         />
       </n-flex>
@@ -304,7 +306,12 @@ const formatCapacity = (bytes: number): string => {
                   </n-tag>
                 </n-flex>
 
-                <n-descriptions bordered :column="2" label-placement="left" size="small">
+                <n-descriptions
+                  bordered
+                  :column="isMobile ? 1 : 2"
+                  label-placement="left"
+                  size="small"
+                >
                   <n-descriptions-item
                     v-for="item in deviceInfo"
                     :key="item.label"

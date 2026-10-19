@@ -25,7 +25,7 @@ const open = () => {
 <template>
   <n-tooltip trigger="hover">
     <template #trigger>
-      <n-icon mr-5 cursor-pointer size="20" @click="open">
+      <n-icon cursor-pointer size="20" @click="open">
         <i-mdi-sync v-if="data.task" class="animate-spin" />
         <i-mdi-inbox-multiple-outline v-else />
       </n-icon>

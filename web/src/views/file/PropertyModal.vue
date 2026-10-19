@@ -14,15 +14,7 @@ const title = computed(() => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="title"
-    class="w-125"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" size="sm" :title="title">
     <n-descriptions bordered :column="1" label-placement="left" v-if="fileInfo">
       <n-descriptions-item :label="$gettext('Name')">
         {{ fileInfo.name }}
@@ -60,7 +52,7 @@ const title = computed(() => {
         </n-tag>
       </n-descriptions-item>
     </n-descriptions>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

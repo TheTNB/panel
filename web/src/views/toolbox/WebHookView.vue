@@ -5,6 +5,7 @@ import { useGettext } from 'vue3-gettext'
 
 import webhook from '@/api/panel/webhook'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -185,6 +186,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleStatusChange = (row: any) => {
   useRequest(
@@ -305,27 +307,12 @@ onMounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
 
   <!-- 创建弹窗 -->
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Create WebHook')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="createModal" :title="$gettext('Create WebHook')">
     <n-form :model="createModel">
       <n-form-item :label="$gettext('Name')">
         <n-input v-model:value="createModel.name" :placeholder="$gettext('Enter WebHook name')" />
@@ -355,18 +342,10 @@ onMounted(() => {
     >
       {{ $gettext('Create') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 
   <!-- 编辑弹窗 -->
-  <n-modal
-    v-model:show="editModal"
-    preset="card"
-    :title="$gettext('Edit WebHook')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="editModal" :title="$gettext('Edit WebHook')">
     <n-form :model="editModel">
       <n-form-item :label="$gettext('Name')">
         <n-input v-model:value="editModel.name" :placeholder="$gettext('Enter WebHook name')" />
@@ -399,7 +378,7 @@ onMounted(() => {
     >
       {{ $gettext('Save') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

@@ -3,10 +3,12 @@ import { useGettext } from 'vue3-gettext'
 
 import alert from '@/api/panel/alert'
 import notify from '@/api/panel/notify'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
 import { isStatusMetric, useAlertMetrics } from '@/views/monitor/metrics'
 
 const { $gettext } = useGettext()
 const { metricOptions, operators, metricOf } = useAlertMetrics()
+const formLayout = useFormLayout(120)
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const props = defineProps<{
@@ -124,15 +126,12 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
+    size="sm"
     v-model:show="show"
     :title="isEdit ? $gettext('Edit Rule') : $gettext('Add Rule')"
-    preset="card"
-    :style="{ width: '640px' }"
-    :bordered="false"
-    :segmented="false"
   >
-    <n-form label-placement="left" :label-width="120">
+    <n-form v-bind="formLayout">
       <n-form-item :label="$gettext('Name')" required>
         <n-input v-model:value="model.name" :placeholder="$gettext('Rule name')" />
       </n-form-item>
@@ -151,8 +150,8 @@ const handleSubmit = () => {
         <n-input v-model:value="model.target" :placeholder="currentMetric.placeholder" />
       </n-form-item>
       <n-form-item v-if="!isStatus" :label="$gettext('Condition')" required>
-        <n-flex :size="8" :wrap="false" class="w-full">
-          <n-select v-model:value="model.operator" :options="operators" class="w-50" />
+        <n-flex :size="8" class="w-full">
+          <n-select v-model:value="model.operator" :options="operators" class="md:!w-50" />
           <n-input-number v-model:value="model.threshold" :min="0" class="flex-1">
             <template v-if="currentMetric.unit" #suffix>{{ currentMetric.unit }}</template>
           </n-input-number>
@@ -196,5 +195,5 @@ const handleSubmit = () => {
         </n-button>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 </template>

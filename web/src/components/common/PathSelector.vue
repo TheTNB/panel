@@ -6,6 +6,7 @@ import { useGettext } from 'vue3-gettext'
 
 import file from '@/api/panel/file'
 import TheIcon from '@/components/custom/TheIcon.vue'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { checkName, checkPath, getExt, getIconByExt, joinPath } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -188,7 +189,7 @@ const columns: DataTableColumns<RowData> = [
   },
 ]
 
-const { loading, data, page, total, pageSize, pageCount, reload } = usePagination(
+const { loading, data, page, total, pageSize, reload } = usePagination(
   (page, pageSize) =>
     file.list(encodeURIComponent(currentPath.value), '', false, sort.value, page, pageSize),
   {
@@ -197,6 +198,12 @@ const { loading, data, page, total, pageSize, pageCount, reload } = usePaginatio
     total: (res: any) => res.total,
     data: (res: any) => res.items,
   },
+)
+const pagination = useTablePagination(
+  page,
+  pageSize,
+  total,
+  [100, 200, 500, 1000, 1500, 2000, 5000],
 )
 
 // 新建时在列表顶部插入输入行
@@ -333,6 +340,12 @@ watch(show, (val) => {
   }
 })
 
+// 面包屑放不下时横向滑动，打开或切换目录后停在末尾显示当前目录
+const crumbRef = ref<HTMLElement | null>(null)
+watch([crumbRef, currentPath], ([el]) => el?.scrollTo({ left: el.scrollWidth }), {
+  flush: 'post',
+})
+
 // 监听内部路径变化，刷新列表
 watch(currentPath, (value) => {
   if (!value) return
@@ -356,15 +369,7 @@ watch(selected, (val) => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="title"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="title">
     <n-flex>
       <n-popselect
         :options="[
@@ -378,20 +383,22 @@ watch(selected, (val) => {
       <n-button @click="handleUp">
         <i-mdi-arrow-up class="text-base" />
       </n-button>
-      <n-input-group flex-1>
-        <n-tag size="large" v-if="!isInput" flex-1 @click="handleInput">
-          <n-breadcrumb separator=">">
-            <n-breadcrumb-item @click.stop="setPath(-1)">
-              {{ $gettext('Root Directory') }}
-            </n-breadcrumb-item>
-            <n-breadcrumb-item
-              v-for="(item, index) in splitPath(currentPath, '/')"
-              :key="index"
-              @click.stop="setPath(index)"
-            >
-              {{ item }}
-            </n-breadcrumb-item>
-          </n-breadcrumb>
+      <n-input-group class="flex-1 min-w-0">
+        <n-tag size="large" v-if="!isInput" class="path-tag flex-1 min-w-0" @click="handleInput">
+          <div ref="crumbRef" class="path-crumb">
+            <n-breadcrumb separator=">">
+              <n-breadcrumb-item @click.stop="setPath(-1)">
+                {{ $gettext('Root Directory') }}
+              </n-breadcrumb-item>
+              <n-breadcrumb-item
+                v-for="(item, index) in splitPath(currentPath, '/')"
+                :key="index"
+                @click.stop="setPath(index)"
+              >
+                {{ item }}
+              </n-breadcrumb-item>
+            </n-breadcrumb>
+          </div>
         </n-tag>
         <n-input-group-label v-if="isInput">/</n-input-group-label>
         <n-input
@@ -423,17 +430,23 @@ watch(selected, (val) => {
       v-model:checked-row-keys="selected"
       v-model:page="page"
       v-model:pageSize="pageSize"
-      :pagination="{
-        page: page,
-        pageCount: pageCount,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [100, 200, 500, 1000, 1500, 2000, 5000],
-      }"
+      :pagination="pagination"
     />
-  </n-modal>
+  </app-modal>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.path-tag :deep(.n-tag__content) {
+  min-width: 0;
+}
+
+// 目录很深时横向滑动而不截断，写法同编辑器状态栏
+.path-crumb {
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+</style>

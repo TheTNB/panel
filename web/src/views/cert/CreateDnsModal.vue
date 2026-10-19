@@ -50,15 +50,7 @@ const handleCreateDNS = async () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Create DNS')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Create DNS')">
     <n-space vertical>
       <n-form :model="model">
         <n-form-item path="name" :label="$gettext('Comment Name')">
@@ -199,7 +191,7 @@ const handleCreateDNS = async () => {
         $gettext('Submit')
       }}</n-button>
     </n-space>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

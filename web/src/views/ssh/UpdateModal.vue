@@ -53,32 +53,20 @@ watch(show, async () => {
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Update Host')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Update Host')">
     <n-form>
       <n-form-item :label="$gettext('Name')">
         <n-input v-model:value="model.name" placeholder="127.0.0.1" />
       </n-form-item>
-      <n-row :gutter="[0, 24]" pt-5>
-        <n-col :span="15">
-          <n-form-item :label="$gettext('Host')">
-            <n-input v-model:value="model.host" placeholder="127.0.0.1" />
-          </n-form-item>
-        </n-col>
-        <n-col :span="2"> </n-col>
-        <n-col :span="7">
-          <n-form-item :label="$gettext('Port')">
-            <n-input-number v-model:value="model.port" :min="1" :max="65535" />
-          </n-form-item>
-        </n-col>
-      </n-row>
+      <n-grid cols="1 m:24" responsive="screen" pt-5>
+        <n-form-item-gi :span="15" :label="$gettext('Host')">
+          <n-input v-model:value="model.host" placeholder="127.0.0.1" />
+        </n-form-item-gi>
+        <n-gi :span="2" />
+        <n-form-item-gi :span="7" :label="$gettext('Port')">
+          <n-input-number v-model:value="model.port" :min="1" :max="65535" />
+        </n-form-item-gi>
+      </n-grid>
       <n-form-item :label="$gettext('Authentication Method')">
         <n-select
           v-model:value="model.auth_method"
@@ -110,14 +98,17 @@ watch(show, async () => {
         <n-input v-model:value="model.remark" type="textarea" />
       </n-form-item>
     </n-form>
-    <n-row :gutter="[0, 24]" pt-5>
-      <n-col :span="24">
-        <n-button type="info" block :loading="loading" :disabled="loading" @click="handleSubmit">
-          {{ $gettext('Submit') }}
-        </n-button>
-      </n-col>
-    </n-row>
-  </n-modal>
+    <n-button
+      type="info"
+      block
+      :loading="loading"
+      :disabled="loading"
+      class="mt-5"
+      @click="handleSubmit"
+    >
+      {{ $gettext('Submit') }}
+    </n-button>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

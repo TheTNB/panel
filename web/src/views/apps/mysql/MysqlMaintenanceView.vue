@@ -4,12 +4,14 @@ import { useGettext } from 'vue3-gettext'
 
 import type mysql from '@/api/apps/mysql'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 const props = defineProps<{
   api: typeof mysql
 }>()
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 const { confirmDelete, confirmAction } = useConfirm()
 
 const selectedDatabase = ref('')
@@ -195,7 +197,7 @@ const replicationRunning = (value: string) => {
           <n-select
             v-model:value="selectedDatabase"
             :options="databaseOptions"
-            class="w-60"
+            class="md:!w-60"
             @update:value="refreshTables"
           />
           <n-button type="primary" @click="() => refreshTables()">
@@ -238,7 +240,7 @@ const replicationRunning = (value: string) => {
             <n-flex>
               <n-statistic :label="$gettext('File Count')" :value="binlog.items.length" />
               <n-statistic
-                class="ml-40"
+                class="md:ml-40"
                 :label="$gettext('Total Size')"
                 :value="binlog.total_size"
               />
@@ -265,7 +267,7 @@ const replicationRunning = (value: string) => {
           {{ $gettext('This instance is not a replica.') }}
         </n-alert>
         <n-card v-else :title="$gettext('Replication Status')">
-          <n-descriptions label-placement="left" :column="2">
+          <n-descriptions label-placement="left" :column="isMobile ? 1 : 2">
             <n-descriptions-item :label="$gettext('Source Host')">
               {{ replication.source_host || '-' }}
             </n-descriptions-item>

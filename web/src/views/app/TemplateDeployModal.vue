@@ -6,10 +6,22 @@ import containerApi from '@/api/panel/container'
 import templateApi from '@/api/panel/template'
 import DiffEditor from '@/components/common/DiffEditor.vue'
 import PtyTerminalModal from '@/components/common/PtyTerminalModal.vue'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
 
 import type { Template, TemplateEnvironment } from './types'
 
 const { $gettext } = useGettext()
+const formLayout = useFormLayout(160)
+const { isMobile } = useResponsive()
+
+// 手机上四个步骤标题排不下，只显示当前步骤的标题
+const stepTitles = [
+  $gettext('Deploy Mode'),
+  $gettext('Configuration'),
+  $gettext('Preview & Edit'),
+  $gettext('Confirm'),
+]
 
 const props = defineProps<{
   template: Template | null
@@ -320,29 +332,31 @@ const composeOptions = computed(() => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
+    size="lg"
     :title="$gettext('Deploy Template') + (template ? ` - ${template.name}` : '')"
-    preset="card"
-    :style="{ width: '70vw', maxWidth: '1080px' }"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     :mask-closable="!doSubmit"
     :closable="!doSubmit"
   >
     <!-- 步骤指示器 -->
     <n-steps :current="currentStep" size="small" class="mb-6">
-      <n-step :title="$gettext('Deploy Mode')" />
-      <n-step :title="$gettext('Configuration')" />
-      <n-step :title="$gettext('Preview & Edit')" />
-      <n-step :title="$gettext('Confirm')" />
+      <n-step
+        v-for="(title, index) in stepTitles"
+        :key="index"
+        :title="isMobile && index + 1 !== currentStep ? '' : title"
+      />
     </n-steps>
 
     <!-- 步骤1：选择部署模式 -->
     <div v-if="currentStep === 1">
       <n-flex justify="center" :size="24" style="padding: 40px 0">
-        <n-card hoverable style="width: 280px; cursor: pointer" @click="handleModeSelect('create')">
+        <n-card
+          hoverable
+          class="md:!w-70"
+          style="cursor: pointer"
+          @click="handleModeSelect('create')"
+        >
           <n-flex vertical align="center" :size="16">
             <n-icon size="48" color="#18a058">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -356,7 +370,12 @@ const composeOptions = computed(() => {
           </n-flex>
         </n-card>
 
-        <n-card hoverable style="width: 280px; cursor: pointer" @click="handleModeSelect('update')">
+        <n-card
+          hoverable
+          class="md:!w-70"
+          style="cursor: pointer"
+          @click="handleModeSelect('update')"
+        >
           <n-flex vertical align="center" :size="16">
             <n-icon size="48" color="#2080f0">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -380,13 +399,7 @@ const composeOptions = computed(() => {
     <div v-else-if="currentStep === 2">
       <!-- 创建模式 -->
       <template v-if="deployMode === 'create'">
-        <n-form
-          ref="formRef"
-          :model="deployModel"
-          :rules="formRules"
-          label-placement="left"
-          label-width="160"
-        >
+        <n-form ref="formRef" :model="deployModel" :rules="formRules" v-bind="formLayout">
           <n-form-item path="name" :label="$gettext('Compose Name')" required>
             <n-input
               v-model:value="deployModel.name"
@@ -398,13 +411,11 @@ const composeOptions = computed(() => {
 
           <n-divider title-placement="left">{{ $gettext('Deploy Options') }}</n-divider>
 
-          <n-row :gutter="[24, 0]">
-            <n-col :span="8">
-              <n-form-item path="autoStart" :label="$gettext('Auto Start')">
-                <n-switch v-model:value="deployModel.autoStart" />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="8" path="autoStart" :label="$gettext('Auto Start')">
+              <n-switch v-model:value="deployModel.autoStart" />
+            </n-form-item-gi>
+          </n-grid>
 
           <!-- 环境变量 -->
           <template v-if="template?.environments?.length">
@@ -460,13 +471,7 @@ const composeOptions = computed(() => {
 
       <!-- 更新模式 -->
       <template v-else>
-        <n-form
-          ref="formRef"
-          :model="deployModel"
-          :rules="formRules"
-          label-placement="left"
-          label-width="160"
-        >
+        <n-form ref="formRef" :model="deployModel" :rules="formRules" v-bind="formLayout">
           <n-form-item :label="$gettext('Select Compose')" required>
             <n-select
               :value="selectedCompose"
@@ -480,13 +485,11 @@ const composeOptions = computed(() => {
 
           <n-divider title-placement="left">{{ $gettext('Deploy Options') }}</n-divider>
 
-          <n-row :gutter="[24, 0]">
-            <n-col :span="8">
-              <n-form-item path="autoStart" :label="$gettext('Auto Start')">
-                <n-switch v-model:value="deployModel.autoStart" />
-              </n-form-item>
-            </n-col>
-          </n-row>
+          <n-grid cols="1 m:24" :x-gap="24" responsive="screen">
+            <n-form-item-gi :span="8" path="autoStart" :label="$gettext('Auto Start')">
+              <n-switch v-model:value="deployModel.autoStart" />
+            </n-form-item-gi>
+          </n-grid>
 
           <!-- 环境变量 -->
           <template v-if="template?.environments?.length">
@@ -638,7 +641,7 @@ const composeOptions = computed(() => {
         </n-flex>
       </n-flex>
     </template>
-  </n-modal>
+  </app-modal>
 
   <pty-terminal-modal
     v-model:show="upModal"

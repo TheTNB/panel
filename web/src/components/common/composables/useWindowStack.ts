@@ -17,6 +17,8 @@ Object.assign(dock.style, {
   zIndex: String(BASE_Z + 99),
   display: 'flex',
   flexDirection: 'row-reverse',
+  flexWrap: 'wrap',
+  maxWidth: 'calc(100vw - 32px)',
   gap: '8px',
 })
 document.body.appendChild(dock)

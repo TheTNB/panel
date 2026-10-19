@@ -32,15 +32,7 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
 </script>
 
 <template>
-  <n-modal
-    v-model:show="show"
-    preset="card"
-    :title="$gettext('Upload Backup')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="show" :title="$gettext('Upload Backup')">
     <n-flex vertical>
       <n-upload ref="upload" multiple directory-dnd :custom-request="uploadRequest">
         <n-upload-dragger>
@@ -54,7 +46,7 @@ const uploadRequest = ({ file, onFinish, onError, onProgress }: UploadCustomRequ
         </n-upload-dragger>
       </n-upload>
     </n-flex>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

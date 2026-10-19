@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import container from '@/api/panel/container'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 
 const { $gettext } = useGettext()
@@ -95,6 +96,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleDelete = async (row: any) => {
   useRequest(container.volumeRemove(row.name)).onSuccess(() => {
@@ -180,25 +182,10 @@ onMounted(() => {
       :data="data"
       :columns="columns"
       :row-key="(row: any) => row.name"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Create Volume')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="createModal" :title="$gettext('Create Volume')">
     <n-form :model="createModel">
       <n-form-item path="name" :label="$gettext('Volume Name')">
         <n-input v-model:value="createModel.name" type="text" @keydown.enter.prevent />
@@ -232,5 +219,5 @@ onMounted(() => {
     <n-button type="info" block :loading="loading" :disabled="loading" @click="handleCreate">
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>

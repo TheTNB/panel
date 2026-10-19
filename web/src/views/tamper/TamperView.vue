@@ -4,11 +4,16 @@ import { useGettext } from 'vue3-gettext'
 
 import tamper from '@/api/panel/tamper'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useFormLayout } from '@/components/system/composables/useFormLayout'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import RuleModal from '@/views/tamper/RuleModal.vue'
 
 const { $gettext } = useGettext()
 const { confirmAction, confirmDelete } = useConfirm()
+const formLayout = useFormLayout(140)
+const { isMobile } = useResponsive()
 
 const currentTab = ref('setting')
 
@@ -98,6 +103,7 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const rulePagination = useTablePagination(rulePage, rulePageSize, ruleTotal, [20, 50, 100])
 
 const handleAddRule = () => {
   editingRule.value = null
@@ -177,6 +183,7 @@ const {
   total: (res: any) => res.total,
   data: (res: any) => res.items,
 })
+const logPagination = useTablePagination(logPage, logPageSize, logTotal)
 
 const opTypeMap: Record<string, 'error' | 'warning' | 'info' | 'default'> = {
   write: 'error',
@@ -220,7 +227,7 @@ const handleClearLogs = async () => {
 </script>
 
 <template>
-  <n-tabs v-model:value="currentTab" type="line" placement="left" animated>
+  <n-tabs v-model:value="currentTab" type="line" :placement="isMobile ? 'top' : 'left'" animated>
     <n-tab-pane name="setting" :tab="$gettext('Settings')">
       <n-flex vertical :size="16">
         <n-alert v-if="!supported" type="error">
@@ -228,7 +235,7 @@ const handleClearLogs = async () => {
         </n-alert>
 
         <n-card :title="$gettext('Running Status')" size="small">
-          <n-descriptions :column="3" label-placement="left" bordered size="small">
+          <n-descriptions :column="isMobile ? 1 : 3" label-placement="left" bordered size="small">
             <n-descriptions-item :label="$gettext('Status')">
               <n-tag :type="stats.running ? 'success' : 'default'" size="small">
                 {{ stats.running ? $gettext('Protecting') : $gettext('Stopped') }}
@@ -244,7 +251,7 @@ const handleClearLogs = async () => {
         </n-card>
 
         <n-card :title="$gettext('Configuration')" size="small">
-          <n-form label-placement="left" :label-width="140">
+          <n-form v-bind="formLayout">
             <n-form-item :label="$gettext('Enable Protection')">
               <n-switch v-model:value="setting.enabled" />
             </n-form-item>
@@ -283,7 +290,12 @@ const handleClearLogs = async () => {
               </n-flex>
             </n-form-item>
             <n-form-item :label="$gettext('Log Retention (days)')">
-              <n-input-number v-model:value="setting.log_days" :min="1" :max="365" class="w-40" />
+              <n-input-number
+                v-model:value="setting.log_days"
+                :min="1"
+                :max="365"
+                class="w-full md:!w-40"
+              />
             </n-form-item>
             <n-form-item>
               <n-button
@@ -301,7 +313,7 @@ const handleClearLogs = async () => {
         <!-- eBPF 环境检测与激活引导 -->
         <n-card :title="$gettext('eBPF Environment')" size="small">
           <n-flex vertical :size="10">
-            <n-descriptions :column="2" label-placement="left" bordered size="small">
+            <n-descriptions :column="isMobile ? 1 : 2" label-placement="left" bordered size="small">
               <n-descriptions-item :label="$gettext('Kernel Version')">
                 {{ ebpf.kernel_version || '-' }}
               </n-descriptions-item>
@@ -343,22 +355,16 @@ const handleClearLogs = async () => {
           </n-button>
         </n-flex>
         <n-data-table
+          v-model:page="rulePage"
+          v-model:pageSize="rulePageSize"
           remote
           striped
+          :scroll-x="800"
           :loading="rulesLoading"
           :columns="ruleColumns"
           :data="rules"
           :row-key="(row: any) => row.id"
-          :pagination="{
-            page: rulePage,
-            pageSize: rulePageSize,
-            itemCount: ruleTotal,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [20, 50, 100],
-            onUpdatePage: (p: number) => (rulePage = p),
-            onUpdatePageSize: (ps: number) => (rulePageSize = ps),
-          }"
+          :pagination="rulePagination"
         />
       </n-flex>
     </n-tab-pane>
@@ -380,22 +386,16 @@ const handleClearLogs = async () => {
           </n-button>
         </n-flex>
         <n-data-table
+          v-model:page="logPage"
+          v-model:pageSize="logPageSize"
           remote
           striped
+          :scroll-x="800"
           :loading="logsLoading"
           :columns="logColumns"
           :data="logs"
           :row-key="(row: any) => row.id"
-          :pagination="{
-            page: logPage,
-            pageSize: logPageSize,
-            itemCount: logTotal,
-            showQuickJumper: true,
-            showSizePicker: true,
-            pageSizes: [20, 50, 100, 200],
-            onUpdatePage: (p: number) => (logPage = p),
-            onUpdatePageSize: (ps: number) => (logPageSize = ps),
-          }"
+          :pagination="logPagination"
         />
       </n-flex>
     </n-tab-pane>

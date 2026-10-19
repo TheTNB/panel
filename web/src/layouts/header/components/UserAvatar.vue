@@ -53,7 +53,7 @@ const username = computed(() => {
 <template>
   <n-dropdown :options="options" @select="handleSelect">
     <div flex cursor-pointer items-center>
-      <span text-lg>{{ username }}</span>
+      <span class="text-lg max-w-30 truncate">{{ username }}</span>
     </div>
   </n-dropdown>
 </template>

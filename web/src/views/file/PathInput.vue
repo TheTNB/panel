@@ -173,7 +173,7 @@ watch(
         @blur="handleBlur"
       />
     </n-input-group>
-    <n-input-group w-100>
+    <n-input-group class="md:!w-100">
       <n-input v-model:value="tab.keyword" :placeholder="$gettext('Enter search content')">
         <template #suffix>
           <n-checkbox v-model:checked="tab.sub">

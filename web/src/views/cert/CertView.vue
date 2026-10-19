@@ -5,11 +5,14 @@ import { useGettext } from 'vue3-gettext'
 import cert from '@/api/panel/cert'
 import ListInput from '@/components/common/ListInput.vue'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime } from '@/utils'
 import ObtainModal from '@/views/cert/ObtainModal.vue'
 
 const { $gettext } = useGettext()
 const { confirmDelete } = useConfirm()
+const { isMobile } = useResponsive()
 
 const props = defineProps({
   algorithms: {
@@ -405,6 +408,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items,
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const handleUpdateCert = () => {
   updateCertLoading.value = true
@@ -504,25 +508,10 @@ onUnmounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.id"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-space>
-  <n-modal
-    v-model:show="updateModal"
-    preset="card"
-    :title="$gettext('Modify Certificate')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  <app-modal v-model:show="updateModal" :title="$gettext('Modify Certificate')">
     <n-space vertical>
       <n-alert v-if="updateModel.type != 'upload'" type="info">
         {{
@@ -653,16 +642,8 @@ onUnmounted(() => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-space>
-  </n-modal>
-  <n-modal
-    v-model:show="deployModal"
-    preset="card"
-    :title="$gettext('Deploy Certificate')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-  >
+  </app-modal>
+  <app-modal v-model:show="deployModal" :title="$gettext('Deploy Certificate')">
     <n-flex vertical>
       <n-form :model="deployModel">
         <n-form-item path="websites" :label="$gettext('Website')">
@@ -677,7 +658,17 @@ onUnmounted(() => {
                 {{ $gettext('Match Websites') }}
               </n-button>
             </n-flex>
+            <!-- 穿梭框双栏在手机上每栏不足 170px，改用多选下拉 -->
+            <n-select
+              v-if="isMobile"
+              v-model:value="deployModel.websites"
+              :options="deployWebsiteOptions"
+              multiple
+              filterable
+              clearable
+            />
             <n-transfer
+              v-else
               v-model:value="deployModel.websites"
               :options="deployWebsiteOptions"
               :source-title="$gettext('Available')"
@@ -701,15 +692,11 @@ onUnmounted(() => {
         {{ $gettext('Submit') }}
       </n-button>
     </n-flex>
-  </n-modal>
-  <n-modal
+  </app-modal>
+  <app-modal
+    size="lg"
     v-model:show="showModal"
-    preset="card"
     :title="$gettext('View Certificate')"
-    style="width: 80vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     @close="handleShowModalClose"
     @mask-click="handleShowModalClose"
   >
@@ -721,7 +708,7 @@ onUnmounted(() => {
         <common-editor v-model:value="showModel.key" height="60vh" read-only />
       </n-tab-pane>
     </n-tabs>
-  </n-modal>
+  </app-modal>
   <obtain-modal v-model:id="obtainCert" v-model:show="obtain" :mode="obtainMode" />
 </template>
 

@@ -4,9 +4,12 @@ import { NTag } from 'naive-ui'
 import { useGettext } from 'vue3-gettext'
 
 import process, { type ProcessListParams } from '@/api/panel/process'
+import { useResponsive } from '@/components/system/composables/useResponsive'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatBytes, formatDateTime, formatPercent } from '@/utils'
 
 const { $gettext } = useGettext()
+const { isMobile } = useResponsive()
 
 // 排序状态
 const sortState = ref<DataTableSortState | null>(null)
@@ -310,6 +313,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
     watchingStates: [sortState, statusFilter, keyword],
   },
 )
+const pagination = useTablePagination(page, pageSize, total, [50, 100, 200, 500])
 </script>
 
 <template>
@@ -320,7 +324,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
         v-model:value="keyword"
         :placeholder="$gettext('Search by PID or name')"
         clearable
-        class="!w-62.5"
+        class="md:!w-62.5"
       >
         <template #prefix>
           <the-icon :size="16" icon="mdi:magnify" />
@@ -329,7 +333,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
       <n-select
         v-model:value="statusFilter"
         :options="statusOptions"
-        class="w-37.5"
+        class="md:!w-37.5"
         @update:value="page = 1"
       />
       <n-button @click="reload" type="primary" ghost>{{ $gettext('Refresh') }}</n-button>
@@ -350,14 +354,7 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
       @update:sorter="handleSorterChange"
       v-model:page="page"
       v-model:pageSize="pageSize"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [50, 100, 200, 500],
-      }"
+      :pagination="pagination"
     />
 
     <!-- 右键菜单 -->
@@ -373,17 +370,15 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
     />
 
     <!-- 进程详情弹窗 -->
-    <n-modal
-      v-model:show="detailModal"
-      preset="card"
-      :title="$gettext('Process Details')"
-      style="width: 80vw; max-width: 900px"
-      size="huge"
-      :bordered="false"
-      :segmented="false"
-    >
+    <app-modal v-model:show="detailModal" size="lg" :title="$gettext('Process Details')">
       <n-spin :show="detailLoading">
-        <n-descriptions v-if="processDetail" :column="2" bordered label-placement="left">
+        <!-- 路径类省略文本用 w-0 不参与自动表格的列宽计算，再由 min-w-full 撑满单元格，省略号才生效 -->
+        <n-descriptions
+          v-if="processDetail"
+          :column="isMobile ? 1 : 2"
+          bordered
+          label-placement="left"
+        >
           <n-descriptions-item :label="'PID'">
             {{ processDetail.pid }}
           </n-descriptions-item>
@@ -420,21 +415,21 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
           <n-descriptions-item :label="$gettext('Disk Write')">
             {{ formatBytes(processDetail.disk_write) }}
           </n-descriptions-item>
-          <n-descriptions-item :label="$gettext('Start Time')" :span="2">
+          <n-descriptions-item :label="$gettext('Start Time')" :span="isMobile ? 1 : 2">
             {{ formatDateTime(processDetail.start_time) }}
           </n-descriptions-item>
-          <n-descriptions-item :label="$gettext('Executable Path')" :span="2">
-            <n-ellipsis style="max-width: 600px">
+          <n-descriptions-item :label="$gettext('Executable Path')" :span="isMobile ? 1 : 2">
+            <n-ellipsis class="min-w-full w-0">
               {{ processDetail.exe || '-' }}
             </n-ellipsis>
           </n-descriptions-item>
-          <n-descriptions-item :label="$gettext('Working Directory')" :span="2">
-            <n-ellipsis style="max-width: 600px">
+          <n-descriptions-item :label="$gettext('Working Directory')" :span="isMobile ? 1 : 2">
+            <n-ellipsis class="min-w-full w-0">
               {{ processDetail.cwd || '-' }}
             </n-ellipsis>
           </n-descriptions-item>
-          <n-descriptions-item :label="$gettext('Command Line')" :span="2">
-            <n-ellipsis :line-clamp="3" style="max-width: 600px">
+          <n-descriptions-item :label="$gettext('Command Line')" :span="isMobile ? 1 : 2">
+            <n-ellipsis :line-clamp="3" class="min-w-full w-0">
               {{ processDetail.cmd_line || '-' }}
             </n-ellipsis>
           </n-descriptions-item>
@@ -495,6 +490,6 @@ const { loading, data, page, total, pageSize, reload } = usePagination(
           </n-collapse-item>
         </n-collapse>
       </n-spin>
-    </n-modal>
+    </app-modal>
   </n-flex>
 </template>

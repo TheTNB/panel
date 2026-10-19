@@ -77,14 +77,9 @@ const handleClose = () => {
 </script>
 
 <template>
-  <n-modal
+  <app-modal
     v-model:show="show"
-    preset="card"
     :title="operation + ' ' + info.name"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
     @close="handleClose"
     @mask-click="handleClose"
   >
@@ -128,7 +123,7 @@ const handleClose = () => {
     >
       {{ operation }}
     </n-button>
-  </n-modal>
+  </app-modal>
 </template>
 
 <style scoped lang="scss"></style>

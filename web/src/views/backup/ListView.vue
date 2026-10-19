@@ -8,6 +8,7 @@ import storage from '@/api/panel/backup-storage'
 import database from '@/api/panel/database'
 import website from '@/api/panel/website'
 import { useConfirm } from '@/components/system/composables/useConfirm'
+import { useTablePagination } from '@/components/system/composables/useTablePagination'
 import { formatDateTime, WEBSERVER_SLUGS } from '@/utils'
 import UploadModal from '@/views/backup/UploadModal.vue'
 
@@ -161,6 +162,7 @@ const { loading, data, page, total, pageSize, refresh } = usePagination(
     data: (res: any) => res.items.map(toRow),
   },
 )
+const pagination = useTablePagination(page, pageSize, total)
 
 const openRestore = (row: any) => {
   restorePoints.value = row.group.items.map((item: any) => ({
@@ -332,26 +334,10 @@ onUnmounted(() => {
       :columns="columns"
       :data="data"
       :row-key="(row: any) => row.key"
-      :pagination="{
-        page: page,
-        pageSize: pageSize,
-        itemCount: total,
-        showQuickJumper: true,
-        showSizePicker: true,
-        pageSizes: [20, 50, 100, 200],
-      }"
+      :pagination="pagination"
     />
   </n-flex>
-  <n-modal
-    v-model:show="createModal"
-    preset="card"
-    :title="$gettext('Create Backup')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="createModal = false"
-  >
+  <app-modal v-model:show="createModal" :title="$gettext('Create Backup')">
     <n-form :model="createModel">
       <n-form-item v-if="type == 'website'" path="name" :label="$gettext('Website')">
         <n-select
@@ -389,17 +375,8 @@ onUnmounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
-  <n-modal
-    v-model:show="restoreModal"
-    preset="card"
-    :title="$gettext('Restore Backup')"
-    style="width: 60vw"
-    size="huge"
-    :bordered="false"
-    :segmented="false"
-    @close="restoreModal = false"
-  >
+  </app-modal>
+  <app-modal v-model:show="restoreModal" :title="$gettext('Restore Backup')">
     <n-form :model="restoreModel">
       <n-form-item path="file" :label="$gettext('Time')">
         <n-select v-model:value="restoreModel.file" :options="restorePoints" />
@@ -433,7 +410,7 @@ onUnmounted(() => {
     >
       {{ $gettext('Submit') }}
     </n-button>
-  </n-modal>
+  </app-modal>
   <upload-modal v-model:show="uploadModal" v-model:type="type" />
 </template>
 
