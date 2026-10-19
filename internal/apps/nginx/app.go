@@ -22,6 +22,7 @@ import (
 	"github.com/acepanel/panel/v3/pkg/tools"
 	"github.com/acepanel/panel/v3/pkg/types"
 	"github.com/acepanel/panel/v3/pkg/webserver"
+	webserverNginx "github.com/acepanel/panel/v3/pkg/webserver/nginx"
 )
 
 type App struct {
@@ -190,6 +191,7 @@ func (s *App) GetConfigTune(w http.ResponseWriter, r *http.Request) {
 		ClientHeaderBufferSize:    confval.Nginx.Get(config, "client_header_buffer_size"),
 		ServerNamesHashBucketSize: confval.Nginx.Get(config, "server_names_hash_bucket_size"),
 		ServerTokens:              confval.Nginx.Get(config, "server_tokens"),
+		Reuseport:                 webserverNginx.DefaultSiteReuseport(),
 		// Gzip 压缩
 		Gzip:          confval.Nginx.Get(config, "gzip"),
 		GzipMinLength: confval.Nginx.Get(config, "gzip_min_length"),
@@ -261,6 +263,12 @@ func (s *App) UpdateConfigTune(w http.ResponseWriter, r *http.Request) {
 	if err = io.Write(confPath, config, 0600); err != nil {
 		service.Error(w, http.StatusInternalServerError, "%v", err)
 		return
+	}
+	if req.Reuseport != webserverNginx.DefaultSiteReuseport() {
+		if err = webserverNginx.SetDefaultSiteReuseport(req.Reuseport); err != nil {
+			service.Error(w, http.StatusInternalServerError, "%v", err)
+			return
+		}
 	}
 
 	s.reload(w, r)

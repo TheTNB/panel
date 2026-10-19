@@ -17,6 +17,7 @@ type ConfigTune struct {
 	ClientHeaderBufferSize    string `form:"client_header_buffer_size" json:"client_header_buffer_size"`
 	ServerNamesHashBucketSize string `form:"server_names_hash_bucket_size" json:"server_names_hash_bucket_size"`
 	ServerTokens              string `form:"server_tokens" json:"server_tokens"`
+	Reuseport                 bool   `form:"reuseport" json:"reuseport"` // 内置默认站点 TCP 监听的 reuseport
 	// Gzip 压缩
 	Gzip          string `form:"gzip" json:"gzip"`
 	GzipMinLength string `form:"gzip_min_length" json:"gzip_min_length"`

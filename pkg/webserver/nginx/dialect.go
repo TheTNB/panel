@@ -1,8 +1,10 @@
 package nginx
 
 import (
+	"bytes"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/samber/lo"
@@ -111,27 +113,55 @@ func (Dialect) DefaultSiteConf() string {
 	return DefaultSiteConf
 }
 
-// WriteDefaultSite asDefault 为 false 时 default_server 由某个站点持有
+// WriteDefaultSite asDefault 为 false 时 default_server 由某个站点持有，TCP 的 reuseport 沿用现状
 func (Dialect) WriteDefaultSite(asDefault bool) error {
+	return os.WriteFile(DefaultSiteConf, []byte(defaultSiteContent(asDefault, DefaultSiteReuseport())), 0600)
+}
+
+// tcpReuseportRe 只看 80 端口的 TCP 监听，quic 监听始终带 reuseport
+var tcpReuseportRe = regexp.MustCompile(`(?m)^\s*listen\s+80\b[^;]*\breuseport\b`)
+
+// DefaultSiteReuseport 内置默认站点的 TCP 监听是否带 reuseport
+func DefaultSiteReuseport() bool {
+	content, _ := os.ReadFile(DefaultSiteConf)
+	return tcpReuseportRe.Match(content)
+}
+
+// SetDefaultSiteReuseport 切换内置默认站点 TCP 监听的 reuseport，default_server 归属不变
+func SetDefaultSiteReuseport(enable bool) error {
+	content, err := os.ReadFile(DefaultSiteConf)
+	if err != nil {
+		return err
+	}
+	asDefault := bytes.Contains(content, []byte("default_server"))
+	return os.WriteFile(DefaultSiteConf, []byte(defaultSiteContent(asDefault, enable)), 0600)
+}
+
+// defaultSiteContent TCP 带 reuseport 时，手动误启动的第二个 nginx 也能绑定端口并分走连接，所以默认不带；
+// quic 必须带，否则多个 worker 共用一个 UDP socket，同一连接的包会被别的 worker 读走
+func defaultSiteContent(asDefault, reuseport bool) string {
 	flag := ""
 	if asDefault {
 		flag = " default_server"
 	}
-	content := fmt.Sprintf(`server
+	tcp := flag
+	if reuseport {
+		tcp += " reuseport"
+	}
+	return fmt.Sprintf(`server
 {
-    listen 80%[1]s reuseport;
-    listen [::]:80%[1]s reuseport;
-    listen 443 ssl%[1]s reuseport;
-    listen [::]:443 ssl%[1]s reuseport;
-    listen 443 quic%[1]s reuseport;
-    listen [::]:443 quic%[1]s reuseport;
+    listen 80%[1]s;
+    listen [::]:80%[1]s;
+    listen 443 ssl%[1]s;
+    listen [::]:443 ssl%[1]s;
+    listen 443 quic%[2]s reuseport;
+    listen [::]:443 quic%[2]s reuseport;
     server_name _;
     index index.html;
-    root %[2]s;
+    root %[3]s;
     ssl_reject_handshake on;
 }
-`, flag, HTMLDir)
-	return os.WriteFile(DefaultSiteConf, []byte(content), 0600)
+`, tcp, flag, HTMLDir)
 }
 
 func (Dialect) HTPasswdLine(username, password string) string {

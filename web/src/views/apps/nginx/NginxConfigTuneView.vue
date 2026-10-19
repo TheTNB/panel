@@ -26,6 +26,7 @@ const clientHeaderBufferSizeNum = ref<number | null>(null)
 const clientHeaderBufferSizeUnit = ref('k')
 const serverNamesHashBucketSize = ref<number | null>(null)
 const serverTokens = ref('')
+const reuseport = ref(false)
 
 // Gzip
 const gzip = ref('')
@@ -120,6 +121,7 @@ useRequest(props.api.configTune()).onSuccess(({ data }: any) => {
   clientHeaderBufferSizeUnit.value = chbs.unit
   serverNamesHashBucketSize.value = Number(data.server_names_hash_bucket_size) || null
   serverTokens.value = data.server_tokens || null
+  reuseport.value = data.reuseport
   gzip.value = data.gzip || null
   const gml = parseSizeValue(data.gzip_min_length ?? '')
   gzipMinLengthNum.value = gml.num
@@ -159,6 +161,7 @@ const getConfigData = () => ({
   ),
   server_names_hash_bucket_size: String(serverNamesHashBucketSize.value ?? ''),
   server_tokens: serverTokens.value ?? '',
+  reuseport: reuseport.value,
   gzip: gzip.value ?? '',
   gzip_min_length: composeSizeValue(gzipMinLengthNum.value, gzipMinLengthUnit.value),
   gzip_comp_level: String(gzipCompLevel.value ?? ''),
@@ -280,6 +283,9 @@ const handleSave = () => {
             </n-form-item>
             <n-form-item :label="$gettext('Server Tokens (server_tokens)')">
               <n-select v-model:value="serverTokens" :options="onOffOptions" clearable />
+            </n-form-item>
+            <n-form-item :label="$gettext('TCP Port Reuse (reuseport)')">
+              <n-switch v-model:value="reuseport" />
             </n-form-item>
           </n-form>
           <n-flex>
