@@ -13,7 +13,7 @@ msgstr ""
 "X-Crowdin-File-ID: 1166\n"
 "Project-Id-Version: acepanel\n"
 "Language-Team: Chinese Traditional\n"
-"PO-Revision-Date: 2026-10-19 09:43\n"
+"PO-Revision-Date: 2026-10-19 15:42\n"
 
 #: pkg/tui/tui.go:144
 msgid "#%d, leave empty to finish"
@@ -1038,11 +1038,11 @@ msgstr "生成兩步驗證失敗：%v"
 msgid "Failed to generate password: %v"
 msgstr "生成密碼失敗：%v"
 
-#: internal/service/cli.go:1742
+#: internal/service/cli.go:1740
 msgid "Failed to get ACME account: %v"
 msgstr "取得 ACME 帳戶失敗：%v"
 
-#: internal/service/cli.go:1738
+#: internal/service/cli.go:1736
 msgid "Failed to get a panel user: %v"
 msgstr "取得面板使用者失敗：%v"
 
@@ -1626,11 +1626,11 @@ msgstr "監聽器"
 msgid "Listening port"
 msgstr "監聽連接埠"
 
-#: internal/service/cli.go:1717
+#: internal/service/cli.go:1716
 msgid "Local IPv4: %s://%s:%d%s"
 msgstr "本地 IPv4： %s://%s:%d%s"
 
-#: internal/service/cli.go:1722
+#: internal/service/cli.go:1720
 msgid "Local IPv6: %s://[%s]:%d%s"
 msgstr "本地 IPv6： %s://[%s]:%d%s"
 
@@ -2279,11 +2279,11 @@ msgstr "代理目標"
 msgid "Pspell is a spell-checking library"
 msgstr "Pspell 是一個拼寫檢查庫"
 
-#: internal/service/cli.go:1726
+#: internal/service/cli.go:1724
 msgid "Public IPv4: %s://%s:%d%s"
 msgstr "公網 IPv4： %s://%s:%d%s"
 
-#: internal/service/cli.go:1730
+#: internal/service/cli.go:1728
 msgid "Public IPv6: %s://[%s]:%d%s"
 msgstr "公網 IPv6： %s://[%s]:%d%s"
 
