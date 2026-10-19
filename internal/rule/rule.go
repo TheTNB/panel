@@ -13,6 +13,7 @@ func Rules(t *gotext.Locale) []validator.Rule {
 		NewCron(t),
 		NewIPCIDR(t),
 		NewUnixPath(t),
+		NewEntrance(t),
 	}
 }
 

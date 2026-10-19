@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/leonelquinteros/gotext"
@@ -286,7 +287,7 @@ func (uc *SettingUsecase) UpdatePanel(ctx context.Context, req *request.SettingP
 
 	conf.App.Locale = req.Locale
 	conf.HTTP.Port = req.Port
-	conf.HTTP.Entrance = req.Entrance
+	conf.HTTP.Entrance = "/" + strings.Trim(req.Entrance, "/")
 	conf.HTTP.EntranceError = req.EntranceError
 	conf.HTTP.LoginCaptcha = req.LoginCaptcha
 	conf.HTTP.TLS = req.TLS

@@ -4,7 +4,7 @@ type SettingPanel struct {
 	Name          string   `json:"name" validate:"required"`
 	Channel       string   `json:"channel" validate:"required && in:stable,beta"`
 	Locale        string   `json:"locale" validate:"required"`
-	Entrance      string   `json:"entrance" validate:"required"`
+	Entrance      string   `json:"entrance" validate:"required && entrance"`
 	EntranceError string   `json:"entrance_error" validate:"in:418,nginx,close"` // 安全入口错误页伪装类型
 	LoginCaptcha  bool     `json:"login_captcha"`                                // 登录验证码
 	OfflineMode   bool     `json:"offline_mode"`

@@ -75,9 +75,7 @@ const { data: model } = useRequest(setting.list, {
 watch(model, () => snapshotHttpsState(), { once: true, deep: true })
 
 const handleSave = () => {
-  if (model.value.entrance.trim() === '') {
-    model.value.entrance = '/'
-  }
+  model.value.entrance = '/' + model.value.entrance.trim().replace(/^\/+|\/+$/g, '')
   saveLoading.value = true
   useRequest(setting.update(model.value))
     .onSuccess(({ data }) => {
