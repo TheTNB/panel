@@ -221,11 +221,6 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 		}
 	}
 
-	protocol := "http"
-	if s.conf.HTTP.IsHTTPS() {
-		protocol = "https"
-	}
-
 	port := s.conf.HTTP.Port
 	if port == 0 {
 		return errors.New(s.t.Get("Failed to get port"))
@@ -243,25 +238,7 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	}
 	fmt.Println(s.t.Get("Port: %d", port))
 	fmt.Println(s.t.Get("Entrance: %s", entrance))
-
-	//nolint:contextcheck
-	lv4, err := tools.GetLocalIPv4()
-	if err == nil {
-		fmt.Println(s.t.Get("Local IPv4: %s://%s:%d%s", protocol, lv4, port, entrance))
-	}
-	//nolint:contextcheck
-	lv6, err := tools.GetLocalIPv6()
-	if err == nil {
-		fmt.Println(s.t.Get("Local IPv6: %s://[%s]:%d%s", protocol, lv6, port, entrance))
-	}
-	rv4, err := tools.GetPublicIPv4()
-	if err == nil {
-		fmt.Println(s.t.Get("Public IPv4: %s://%s:%d%s", protocol, rv4, port, entrance))
-	}
-	rv6, err := tools.GetPublicIPv6()
-	if err == nil {
-		fmt.Println(s.t.Get("Public IPv6: %s://[%s]:%d%s", protocol, rv6, port, entrance))
-	}
+	s.printAccessAddresses()
 
 	fmt.Println(s.t.Get("Please choose the appropriate address to access the panel based on your network situation"))
 	fmt.Println(s.t.Get("If you cannot access, please check whether the server's security group and firewall allow port %d", port))
@@ -462,14 +439,7 @@ func (s *CliService) UserPasskey(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.TLS = "acme"
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.TLS = "acme" }); err != nil {
 		return err
 	}
 
@@ -478,14 +448,7 @@ func (s *CliService) HTTPSOn(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) HTTPSOff(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.TLS = "off"
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.TLS = "off" }); err != nil {
 		return err
 	}
 
@@ -530,53 +493,48 @@ func (s *CliService) HTTPSGenerate(ctx context.Context, cmd *cli.Command) error 
 	return s.Restart(ctx, cmd)
 }
 
-func (s *CliService) obtainPanelACME(ctx context.Context) ([]byte, []byte, error) {
-	var user biz.User
-	if err := s.db.First(&user).Error; err != nil {
-		return nil, nil, errors.New(s.t.Get("Failed to get a panel user: %v", err))
-	}
-	account, err := s.certAccountRepo.GetDefault(ctx, user.ID)
-	if err != nil {
-		return nil, nil, errors.New(s.t.Get("Failed to get ACME account: %v", err))
-	}
-	return s.certRepo.ObtainPanel(ctx, account, s.conf.HTTP.BindDomain)
-}
-
 func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
 	// 支持自定义入口，未指定时随机生成
 	entrance := strings.Trim(cmd.StringArg("entrance"), "/")
 	if entrance == "" {
 		entrance = str.Random(6)
 	}
-	conf.HTTP.Entrance = "/" + entrance
+	if err := s.validate(ctx, &struct {
+		Entrance string `validate:"entrance"`
+	}{entrance}); err != nil {
+		return err
+	}
 
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.Entrance = "/" + entrance }); err != nil {
 		return err
 	}
 
 	fmt.Println(s.t.Get("Entrance enabled"))
-	fmt.Println(s.t.Get("Entrance: %s", conf.HTTP.Entrance))
+	fmt.Println(s.t.Get("Entrance: %s", s.conf.HTTP.Entrance))
+	s.printAccessAddresses()
 	return s.Restart(ctx, cmd)
 }
 
 func (s *CliService) EntranceOff(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.Entrance = "/"
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.Entrance = "/" }); err != nil {
 		return err
 	}
 
 	fmt.Println(s.t.Get("Entrance disabled"))
+	return s.Restart(ctx, cmd)
+}
+
+func (s *CliService) EntranceError(ctx context.Context, cmd *cli.Command) error {
+	errorType := cmd.StringArg("type")
+	if !slices.Contains([]string{"418", "nginx", "close"}, errorType) {
+		return errors.New(s.t.Get("Error page type must be one of 418, nginx, close"))
+	}
+
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.EntranceError = errorType }); err != nil {
+		return err
+	}
+
+	fmt.Println(s.t.Get("Entrance error page set to %s", errorType))
 	return s.Restart(ctx, cmd)
 }
 
@@ -586,14 +544,7 @@ func (s *CliService) BindDomainOn(ctx context.Context, cmd *cli.Command) error {
 		return errors.New(s.t.Get("Please specify at least one domain"))
 	}
 
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindDomain = domains
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindDomain = domains }); err != nil {
 		return err
 	}
 
@@ -602,14 +553,7 @@ func (s *CliService) BindDomainOn(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) BindDomainOff(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindDomain = nil
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindDomain = nil }); err != nil {
 		return err
 	}
 
@@ -623,14 +567,7 @@ func (s *CliService) BindIPOn(ctx context.Context, cmd *cli.Command) error {
 		return errors.New(s.t.Get("Please specify at least one IP"))
 	}
 
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindIP = ips
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindIP = ips }); err != nil {
 		return err
 	}
 
@@ -639,14 +576,7 @@ func (s *CliService) BindIPOn(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) BindIPOff(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindIP = nil
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindIP = nil }); err != nil {
 		return err
 	}
 
@@ -660,14 +590,7 @@ func (s *CliService) BindUAOn(ctx context.Context, cmd *cli.Command) error {
 		return errors.New(s.t.Get("Please specify at least one User-Agent"))
 	}
 
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindUA = uas
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindUA = uas }); err != nil {
 		return err
 	}
 
@@ -676,14 +599,7 @@ func (s *CliService) BindUAOn(ctx context.Context, cmd *cli.Command) error {
 }
 
 func (s *CliService) BindUAOff(ctx context.Context, cmd *cli.Command) error {
-	conf, err := config.Load()
-	if err != nil {
-		return err
-	}
-
-	conf.HTTP.BindUA = nil
-
-	if err = config.Save(conf); err != nil {
+	if err := s.updateConfig(func(conf *config.Config) { conf.HTTP.BindUA = nil }); err != nil {
 		return err
 	}
 
@@ -1737,10 +1653,10 @@ func (s *CliService) validate(ctx context.Context, req any) error {
 		return err
 	}
 	if err = vd.Validate(ctx); err != nil {
+		if errs, ok := validator.AsErrors(err); ok {
+			return errors.New(errs.One())
+		}
 		return err
-	}
-	if vd.Fails() {
-		return errors.New(vd.Errors().One())
 	}
 
 	return nil
@@ -1785,4 +1701,59 @@ func (s *CliService) readSecret(value, env, prompt string) (string, error) {
 	}
 
 	return strings.TrimSpace(string(secret)), nil
+}
+
+// printAccessAddresses 输出面板的本机与公网访问地址
+func (s *CliService) printAccessAddresses() {
+	protocol := "http"
+	if s.conf.HTTP.IsHTTPS() {
+		protocol = "https"
+	}
+	port, entrance := s.conf.HTTP.Port, s.conf.HTTP.Entrance
+
+	//nolint:contextcheck
+	lv4, err := tools.GetLocalIPv4()
+	if err == nil {
+		fmt.Println(s.t.Get("Local IPv4: %s://%s:%d%s", protocol, lv4, port, entrance))
+	}
+	//nolint:contextcheck
+	lv6, err := tools.GetLocalIPv6()
+	if err == nil {
+		fmt.Println(s.t.Get("Local IPv6: %s://[%s]:%d%s", protocol, lv6, port, entrance))
+	}
+	rv4, err := tools.GetPublicIPv4()
+	if err == nil {
+		fmt.Println(s.t.Get("Public IPv4: %s://%s:%d%s", protocol, rv4, port, entrance))
+	}
+	rv6, err := tools.GetPublicIPv6()
+	if err == nil {
+		fmt.Println(s.t.Get("Public IPv6: %s://[%s]:%d%s", protocol, rv6, port, entrance))
+	}
+}
+
+// obtainPanelACME 用首个用户的默认 ACME 账户为面板签发证书
+func (s *CliService) obtainPanelACME(ctx context.Context) ([]byte, []byte, error) {
+	var user biz.User
+	if err := s.db.First(&user).Error; err != nil {
+		return nil, nil, errors.New(s.t.Get("Failed to get a panel user: %v", err))
+	}
+	account, err := s.certAccountRepo.GetDefault(ctx, user.ID)
+	if err != nil {
+		return nil, nil, errors.New(s.t.Get("Failed to get ACME account: %v", err))
+	}
+	return s.certRepo.ObtainPanel(ctx, account, s.conf.HTTP.BindDomain)
+}
+
+// updateConfig 读取配置文件，修改后写回并同步到 s.conf
+func (s *CliService) updateConfig(update func(conf *config.Config)) error {
+	conf, err := config.Load()
+	if err != nil {
+		return err
+	}
+	update(conf)
+	if err = config.Save(conf); err != nil {
+		return err
+	}
+	*s.conf = *conf
+	return nil
 }

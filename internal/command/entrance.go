@@ -30,6 +30,14 @@ func EntranceCommand(t *gotext.Locale, cliService *service.CliService) *cli.Comm
 					return cliService.EntranceOff(ctx, cmd)
 				},
 			},
+			{
+				Name:      "error",
+				Usage:     t.Get("Set the error page for wrong entrance"),
+				Arguments: []cli.Argument{arg("type", t.Get("Error page type (418, nginx, close)"))},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					return cliService.EntranceError(ctx, cmd)
+				},
+			},
 		},
 	}
 }
