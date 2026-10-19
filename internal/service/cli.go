@@ -895,7 +895,7 @@ func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error 
 		return err
 	}
 
-	website, err := s.websiteRepo.Create(ctx, req)
+	website, warnings, err := s.websiteRepo.Create(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -904,6 +904,9 @@ func (s *CliService) WebsiteCreate(ctx context.Context, cmd *cli.Command) error 
 	fmt.Println(s.t.Get("Path: %s", req.Path))
 	if req.DB {
 		fmt.Println(s.t.Get("Database: %s, username: %s, password: %s", req.DBName, req.DBUser, req.DBPassword))
+	}
+	for _, warning := range warnings {
+		fmt.Println(s.t.Get("Warning: %s", warning))
 	}
 	return nil
 }

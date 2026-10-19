@@ -6,7 +6,7 @@ import home from '@/api/panel/home'
 import website from '@/api/panel/website'
 import ListInput from '@/components/common/ListInput.vue'
 import PathSelector from '@/components/common/PathSelector.vue'
-import { generateRandomString } from '@/utils'
+import { generateRandomString, notifyWebsiteCreated } from '@/utils'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const type = defineModel<string>('type', { type: String, required: true })
@@ -96,11 +96,9 @@ const handleCreate = async () => {
   createModel.value.listens = createModel.value.listens.filter((item) => item !== '443')
   loading.value = true
   useRequest(website.create(createModel.value))
-    .onSuccess(() => {
+    .onSuccess(({ data }) => {
       window.$bus.emit('website:refresh')
-      window.$message.success(
-        $gettext('Website %{ name } created successfully', { name: createModel.value.name }),
-      )
+      notifyWebsiteCreated(createModel.value.name, data.warnings)
       show.value = false
     })
     .onComplete(() => {

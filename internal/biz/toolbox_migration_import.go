@@ -215,10 +215,11 @@ func (uc *ToolboxMigrationUsecase) importWebsite(ctx context.Context, detail *ty
 		}
 		create.Proxy = website.Proxies[0].Pass
 	}
-	created, err := uc.website.Create(ctx, create)
+	created, createWarnings, err := uc.website.Create(ctx, create)
 	if err != nil {
 		return nil, err
 	}
+	warnings = append(warnings, createWarnings...)
 	// 走备份还原而非直接解包，那里已兼容各家面板导出的归档结构
 	if err = uc.backup.Restore(ctx, BackupTypeWebsite, archive, detail.Item.TargetName); err != nil {
 		return nil, errors.New(uc.t.Get("website file import failed: %v", err))
@@ -376,7 +377,7 @@ func (uc *ToolboxMigrationUsecase) projectWebsite(ctx context.Context, detail *t
 		return []string{uc.t.Get("the project was migrated, but its reverse proxy website already exists on the target")}
 	}
 	root, _ := uc.setting.Get(SettingKeyWebsitePath, filepath.Join(app.Root, "sites"))
-	website, err := uc.website.Create(ctx, &request.WebsiteCreate{
+	website, warnings, err := uc.website.Create(ctx, &request.WebsiteCreate{
 		Type: "proxy", Name: detail.Item.TargetName, Domains: project.Domains,
 		Listens: lo.Ternary(len(project.Listens) > 0, project.Listens, []string{"80"}),
 		Path:    filepath.Join(root, detail.Item.TargetName, "public"),
@@ -388,7 +389,7 @@ func (uc *ToolboxMigrationUsecase) projectWebsite(ctx context.Context, detail *t
 	if !project.Running {
 		_ = uc.website.UpdateStatus(ctx, website.ID, false)
 	}
-	return nil
+	return warnings
 }
 
 // rewriteExecStart 将启动命令中的来源路径与运行时可执行文件替换为目标侧

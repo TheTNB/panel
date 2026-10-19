@@ -285,12 +285,13 @@ func (s *WebsiteService) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, err = s.websiteRepo.Create(r.Context(), req); err != nil {
+	_, warnings, err := s.websiteRepo.Create(r.Context(), req)
+	if err != nil {
 		Error(w, http.StatusInternalServerError, "%v", err)
 		return
 	}
 
-	Success(w, nil)
+	Success(w, chix.M{"warnings": warnings})
 }
 
 func (s *WebsiteService) Get(w http.ResponseWriter, r *http.Request) {

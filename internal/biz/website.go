@@ -120,41 +120,43 @@ func (uc *WebsiteUsecase) List(typ, keyword string, page, limit uint) ([]*Websit
 	return uc.repo.List(typ, keyword, page, limit)
 }
 
-func (uc *WebsiteUsecase) Create(ctx context.Context, req *request.WebsiteCreate) (*Website, error) {
+func (uc *WebsiteUsecase) Create(ctx context.Context, req *request.WebsiteCreate) (*Website, []string, error) {
 	w, err := uc.repo.Create(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// 记录日志
 	uc.log.Info("website created", slog.String("type", OperationTypeWebsite), slog.Uint64("operator_id", operatorID(ctx)), slog.String("name", req.Name), slog.String("website_type", req.Type), slog.String("path", req.Path))
 
-	// 重载 Web 服务器
+	var warnings []string
 	if err = uc.repo.ReloadWebServer(ctx); err != nil {
-		return nil, err
+		warnings = append(warnings, uc.t.Get("failed to reload web server: %v", err))
 	}
-
-	// 创建数据库
-	name := "local_" + req.DBType
 	if req.DB {
-		server, err := uc.databaseServer.GetByName(ctx, name)
-		if err != nil {
-			return nil, errors.New(uc.t.Get("can't find %s database server, please add it first", name))
-		}
-		if err = uc.database.Create(ctx, &request.DatabaseCreate{
-			ServerID:   server.ID,
-			Name:       req.DBName,
-			CreateUser: true,
-			Username:   req.DBUser,
-			Password:   req.DBPassword,
-			Host:       "localhost",
-			Comment:    "website " + req.Name,
-		}); err != nil {
-			return nil, err
+		if err = uc.createDatabase(ctx, req); err != nil {
+			warnings = append(warnings, uc.t.Get("failed to create database: %v", err))
 		}
 	}
 
-	return w, nil
+	return w, warnings, nil
+}
+
+func (uc *WebsiteUsecase) createDatabase(ctx context.Context, req *request.WebsiteCreate) error {
+	name := "local_" + req.DBType
+	server, err := uc.databaseServer.GetByName(ctx, name)
+	if err != nil {
+		return errors.New(uc.t.Get("can't find %s database server, please add it first", name))
+	}
+	return uc.database.Create(ctx, &request.DatabaseCreate{
+		ServerID:   server.ID,
+		Name:       req.DBName,
+		CreateUser: true,
+		Username:   req.DBUser,
+		Password:   req.DBPassword,
+		Host:       "localhost",
+		Comment:    "website " + req.Name,
+	})
 }
 
 func (uc *WebsiteUsecase) Update(ctx context.Context, req *request.WebsiteUpdate) error {

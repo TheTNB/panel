@@ -6,6 +6,7 @@ import project from '@/api/panel/project'
 import website from '@/api/panel/website'
 import ListInput from '@/components/common/ListInput.vue'
 import PathSelector from '@/components/common/PathSelector.vue'
+import { notifyWebsiteCreated } from '@/utils'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const type = defineModel<string>('type', { type: String, required: true })
@@ -339,7 +340,10 @@ const handleCreate = async () => {
     try {
       await new Promise<void>((resolve, reject) => {
         useRequest(website.create(websiteData))
-          .onSuccess(() => resolve())
+          .onSuccess(({ data }) => {
+            notifyWebsiteCreated(websiteData.name, data.warnings)
+            resolve()
+          })
           .onError((err) => reject(err))
       })
     } catch {

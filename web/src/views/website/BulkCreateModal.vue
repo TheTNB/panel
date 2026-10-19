@@ -4,6 +4,7 @@ import { useGettext } from 'vue3-gettext'
 
 import home from '@/api/panel/home'
 import website from '@/api/panel/website'
+import { notifyWebsiteCreated } from '@/utils'
 
 const show = defineModel<boolean>('show', { type: Boolean, required: true })
 const type = defineModel<string>('type', { type: String, required: true })
@@ -162,10 +163,8 @@ const handleCreate = async () => {
     // 端口中去掉 443 端口，nginx 不允许在未配置证书下监听 443 端口
     model.listens = model.listens.filter((item) => item !== '443')
     useRequest(website.create(model))
-      .onSuccess(() => {
-        window.$message.success(
-          $gettext('Website %{ name } created successfully', { name: model.name }),
-        )
+      .onSuccess(({ data }) => {
+        notifyWebsiteCreated(model.name, data.warnings)
         window.$bus.emit('website:refresh')
       })
       .onComplete(() => {
