@@ -10,8 +10,8 @@ import (
 	"github.com/acepanel/panel/v3/pkg/webserver/types"
 )
 
+// 三个子测试按顺序切换同一个 vhost，不能并行
 func TestProxyCacheToggle(t *testing.T) {
-	t.Parallel()
 	v, dir := newProxyVhost(t)
 	for _, tt := range []struct {
 		name  string

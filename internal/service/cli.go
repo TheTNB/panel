@@ -238,7 +238,7 @@ func (s *CliService) Info(ctx context.Context, cmd *cli.Command) error {
 	}
 	fmt.Println(s.t.Get("Port: %d", port))
 	fmt.Println(s.t.Get("Entrance: %s", entrance))
-	s.printAccessAddresses()
+	s.printAccessAddresses() //nolint:contextcheck
 
 	fmt.Println(s.t.Get("Please choose the appropriate address to access the panel based on your network situation"))
 	fmt.Println(s.t.Get("If you cannot access, please check whether the server's security group and firewall allow port %d", port))
@@ -511,7 +511,7 @@ func (s *CliService) EntranceOn(ctx context.Context, cmd *cli.Command) error {
 
 	fmt.Println(s.t.Get("Entrance enabled"))
 	fmt.Println(s.t.Get("Entrance: %s", s.conf.HTTP.Entrance))
-	s.printAccessAddresses()
+	s.printAccessAddresses() //nolint:contextcheck
 	return s.Restart(ctx, cmd)
 }
 
@@ -1711,12 +1711,10 @@ func (s *CliService) printAccessAddresses() {
 	}
 	port, entrance := s.conf.HTTP.Port, s.conf.HTTP.Entrance
 
-	//nolint:contextcheck
 	lv4, err := tools.GetLocalIPv4()
 	if err == nil {
 		fmt.Println(s.t.Get("Local IPv4: %s://%s:%d%s", protocol, lv4, port, entrance))
 	}
-	//nolint:contextcheck
 	lv6, err := tools.GetLocalIPv6()
 	if err == nil {
 		fmt.Println(s.t.Get("Local IPv6: %s://[%s]:%d%s", protocol, lv6, port, entrance))
